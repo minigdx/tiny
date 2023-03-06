@@ -1,6 +1,6 @@
 package com.github.minigdx.tiny.platform
 
-import com.github.minigdx.tiny.GameOption
+import com.github.minigdx.tiny.engine.GameOption
 import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.engine.GameLoop
 import org.lwjgl.glfw.GLFW

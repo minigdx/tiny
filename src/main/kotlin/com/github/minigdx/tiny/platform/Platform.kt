@@ -1,7 +1,6 @@
 package com.github.minigdx.tiny.platform
 
-import com.github.minigdx.tiny.GameEngine
-import com.github.minigdx.tiny.GameOption
+import com.github.minigdx.tiny.engine.GameOption
 import com.github.minigdx.tiny.engine.GameLoop
 
 interface Platform {
