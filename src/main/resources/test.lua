@@ -11,6 +11,7 @@ end
 
 function update()
     timer = timer + 10
+    pset(126, 126, 1)
     -- print("it's time to update")
 end
 

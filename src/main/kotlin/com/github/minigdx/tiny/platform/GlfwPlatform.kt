@@ -84,7 +84,11 @@ class GlfwPlatform : Platform {
         GLFW.glfwGetWindowSize(window, tmpWidth, tmpHeight)
     }
 
-    override fun initGameLoop() = Unit
+    override fun initGameLoop() {
+        // setup opengl
+        // compile shaders
+
+    }
 
     override fun gameLoop(gameLoop: GameLoop) {
         // Render loop
@@ -95,6 +99,11 @@ class GlfwPlatform : Platform {
             GLFW.glfwSwapBuffers(window) // swap the color buffers
             GLFW.glfwPollEvents()
         }
+    }
+
+
+    override fun draw(image: ByteArray) {
+        // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     }
 
     override fun endGameLoop() = Unit

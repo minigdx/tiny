@@ -21,6 +21,11 @@ interface Platform {
     fun gameLoop(gameLoop: GameLoop)
 
     /**
+     * Draw the image on the screen
+     */
+    fun draw(image: ByteArray)
+
+    /**
      * The game loop stopped.
      * Game is existing.
      */
