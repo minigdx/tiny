@@ -28,6 +28,7 @@ import org.luaj.vm2.lib.TableLib
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
 import java.io.File
+import java.nio.file.SecureDirectoryStream
 
 class ScriptsCollector(private val events: MutableList<GameScript>) : FlowCollector<GameScript> {
 
@@ -47,7 +48,12 @@ class ScriptsCollector(private val events: MutableList<GameScript>) : FlowCollec
 
 }
 
+class GameOption(
+    val width: Pixel = 256,
+    val height: Pixel = 256
+)
 class GameEngine(
+    val gameOption: GameOption,
     val platform: Platform,
     val vfs: VirtualFileSystem
 ) : GameLoop {
@@ -60,13 +66,21 @@ class GameEngine(
 
     private var current: GameScript? = null
 
+    private var accumulator: Seconds = 0f
+
     fun main() {
-        platform.initWindow()
-        // Load Boot Screen resources in background
-        // When All boot screen resources in background loaded,
-        // start the boot sequence.
+        platform.initWindow(gameOption)
+
         val scope = CoroutineScope(Dispatchers.Default)
 
+        // plutot essayer de faire la partie drawing avant d'attaquer la partie texture ?
+        // faire des primitives pour lignes / cercles / rectangles / pixel
+        // 3 scripts ??
+        // 1er script : boucle uniquement de code ? -> avec resourceLoaded, uniquement 1 script est nécessaire.
+        // 2nd script : boucle avec texture bundle
+        // 3nd script : texture du jeu
+        // loading texture async. tant qu'il n'y a pas la texture, utiliser placeholder : uniquement red ??
+        // créer methode function resourceLoaded end
         val scriptsName = listOf("src/main/resources/boot.lua", "src/main/resources/test.lua")
 
         scope.launch {
@@ -91,7 +105,7 @@ class GameEngine(
     }
 
 
-    override fun advance(delta: Float) {
+    override fun advance(delta: Seconds) {
         workEvents.addAll(events)
 
         workEvents.forEach { gameScript ->
@@ -131,9 +145,18 @@ class GameEngine(
                 setState(state)
             }
 
-            current?.advance()
+            // Fixed step simulation
+            accumulator += delta
+            if(accumulator >= REFRESH_LIMIT) {
+                current?.advance()
+                accumulator -= REFRESH_LIMIT
+            }
         }
 
+    }
+
+    companion object {
+        private const val REFRESH_LIMIT: Seconds = 1/60f
     }
 
 }

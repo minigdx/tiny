@@ -1,14 +1,35 @@
 package com.github.minigdx.tiny.platform
 
+import com.github.minigdx.tiny.GameOption
+import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.engine.GameLoop
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.system.MemoryUtil
+import kotlin.math.min
 
 class GlfwPlatform : Platform {
 
-    var window: Long = 0
+    private var window: Long = 0
 
-    override fun initWindow() {
+    private var lastFrame: Long = getTime()
+
+    /**
+     * Get the time in milliseconds
+     *
+     * @return The system time in milliseconds
+     */
+    private fun getTime(): Long {
+        return System.nanoTime() / 1000000
+    }
+
+    private fun getDelta(): Seconds {
+        val time = getTime()
+        val delta = (time - lastFrame)
+        lastFrame = time
+        return min(delta / 1000f, 1 / 60f)
+    }
+
+    override fun initWindow(gameOption: GameOption) {
         if (!GLFW.glfwInit()) {
             throw IllegalStateException("Unable to initialize GLFW")
         }
@@ -26,9 +47,9 @@ class GlfwPlatform : Platform {
 
         // Create the window
         window = GLFW.glfwCreateWindow(
-            256,
-            256,
-            "pico16",
+            gameOption.width,
+            gameOption.height,
+            "Tiny",
             MemoryUtil.NULL,
             MemoryUtil.NULL
         )
@@ -68,7 +89,7 @@ class GlfwPlatform : Platform {
     override fun gameLoop(gameLoop: GameLoop) {
         // Render loop
         while (!GLFW.glfwWindowShouldClose(window)) {
-            gameLoop.advance(30f)
+            gameLoop.advance(getDelta())
             // Advance the game
             // game.render(delta)
             GLFW.glfwSwapBuffers(window) // swap the color buffers

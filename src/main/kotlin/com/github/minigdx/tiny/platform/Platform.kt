@@ -1,12 +1,14 @@
 package com.github.minigdx.tiny.platform
 
+import com.github.minigdx.tiny.GameEngine
+import com.github.minigdx.tiny.GameOption
 import com.github.minigdx.tiny.engine.GameLoop
 
 interface Platform {
     /**
      * Create the window where the game will render
      */
-    fun initWindow()
+    fun initWindow(gameOption: GameOption)
 
     /**
      * Prepare the platform for the game loop
