@@ -13,11 +13,12 @@ end
 
 
 function update()
-    xx = xx + acc
-    yy = yy + acc
+    xx = xx + 1
+    yy = yy  + acc
+    if yy >= 128 then acc = acc * -1 end
 end
 
 function draw()
-    pset(xx, yy, xx % 3)
+    pset(xx, yy, xx % 2)
 
 end

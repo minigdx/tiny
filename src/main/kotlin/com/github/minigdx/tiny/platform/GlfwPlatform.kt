@@ -94,13 +94,13 @@ class GlfwPlatform(private val logger: Logger) : Platform {
         ) // the window will stay hidden after creation
         GLFW.glfwWindowHint(
             GLFW.GLFW_RESIZABLE,
-            GLFW.GLFW_TRUE
+            GLFW.GLFW_FALSE
         ) // the window will be resizable
 
         // Create the window
         window = GLFW.glfwCreateWindow(
-            gameOption.width,
-            gameOption.height,
+            gameOption.width * gameOption.zoom,
+            gameOption.height * gameOption.zoom,
             "Tiny",
             MemoryUtil.NULL,
             MemoryUtil.NULL
@@ -290,9 +290,9 @@ class GlfwPlatform(private val logger: Logger) : Platform {
 */
     private val uvsData = FloatBuffer(
         floatArrayOf(
+            0f, 2f,
+            2f, 0f,
             0f, 0f,
-            2f, 2f,
-            0f, 2f
         )
     )
 
