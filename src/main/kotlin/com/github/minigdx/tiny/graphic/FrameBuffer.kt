@@ -7,9 +7,9 @@ import com.github.minigdx.tiny.Pixel
 class FrameBuffer(val width: Pixel, val height: Pixel) {
 
     private val defaultPalette: Array<ByteArray> = arrayOf(
-        color(0, 0, 0), // black
-        color(255, 0, 77), // red
-        color(255, 236, 39), // yellow
+        color(0x00, 0x00, 0x00), // black
+        color(0xFF, 0x00, 0x4D), // red
+        color(0xFF, 0xEC, 0x27), // yellow
     )
 
     private val colorIndexBuffer: Array<Array<ColorIndex>> = Array(height) { line ->
@@ -50,16 +50,16 @@ class FrameBuffer(val width: Pixel, val height: Pixel) {
      * Create a buffer using the colorIndexBuffer as reference.
      */
     fun generateBuffer(): ByteArray {
+        var pos = 0
         for(x in 0 until width) {
             for(y in 0 until height) {
                 val index = colorIndexBuffer[y][x]
                 val color = defaultPalette[index]
 
-                val offset = x * RGBA + y * width
-                buffer[offset + 0] = color[0]
-                buffer[offset + 1] = color[1]
-                buffer[offset + 2] = color[2]
-                buffer[offset + 3] = color[3]
+                buffer[pos++] = color[0]
+                buffer[pos++] = color[1]
+                buffer[pos++] = color[2]
+                buffer[pos++] = color[3]
             }
         }
         return buffer

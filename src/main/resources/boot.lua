@@ -1,27 +1,23 @@
-function restoreState()
-
-end
-
--- function saveState()
-
--- end
-
 function init()
-    print("BOOT init / game reloaded !")
-    frame = 0
+
+    for x = 0, 256 do
+        for y = 0, 256 do
+         pset(x, y, 1)
+        end
+    end
+
+    xx = 0
+    yy = 0
+    acc = 1
 end
+
 
 function update()
-    print("BOOT it's time to update ")
-    print(frame)
-    frame = frame + 1
-    -- End of the animation. Time to quit the boot sequence.
-    if frame > 60 then
-        print("bye bye")
-        exit()
-    end
+    xx = xx + acc
+    yy = yy + acc
 end
 
 function draw()
-    print("BOOT it's time to draw")
+    pset(xx, yy, xx % 3)
+
 end

@@ -23,22 +23,22 @@ dependencies {
     // JVM Specific
     implementation("com.danielgergely.kgl:kgl-lwjgl:0.6.1")
 
-    implementation("org.lwjgl:lwjgl-glfw:3.3.0")
-    implementation("org.lwjgl:lwjgl-opengl:3.3.0")
+    implementation("org.lwjgl:lwjgl-glfw:3.3.1")
+    implementation("org.lwjgl:lwjgl-opengl:3.3.1")
 
-    this.implementation("org.lwjgl:lwjgl:3.3.0:natives-windows")
-    this.implementation("org.lwjgl:lwjgl:3.3.0:natives-linux")
-    this.implementation("org.lwjgl:lwjgl:3.3.0:natives-macos")
+    this.implementation("org.lwjgl:lwjgl:3.3.1:natives-windows")
+    this.implementation("org.lwjgl:lwjgl:3.3.1:natives-linux")
+    this.implementation("org.lwjgl:lwjgl:3.3.1:natives-macos")
 
-    this.implementation("org.lwjgl:lwjgl-glfw:3.3.0")
-    this.implementation("org.lwjgl:lwjgl-glfw:3.3.0:natives-windows")
-    this.implementation("org.lwjgl:lwjgl-glfw:3.3.0:natives-linux")
-    this.implementation("org.lwjgl:lwjgl-glfw:3.3.0:natives-macos")
+    this.implementation("org.lwjgl:lwjgl-glfw:3.3.1")
+    this.implementation("org.lwjgl:lwjgl-glfw:3.3.1:natives-windows")
+    this.implementation("org.lwjgl:lwjgl-glfw:3.3.1:natives-linux")
+    this.implementation("org.lwjgl:lwjgl-glfw:3.3.1:natives-macos")
 
-    this.implementation("org.lwjgl:lwjgl-opengl:3.3.0")
-    this.implementation("org.lwjgl:lwjgl-opengl:3.3.0:natives-windows")
-    this.implementation("org.lwjgl:lwjgl-opengl:3.3.0:natives-linux")
-    this.implementation("org.lwjgl:lwjgl-opengl:3.3.0:natives-macos")
+    this.implementation("org.lwjgl:lwjgl-opengl:3.3.1")
+    this.implementation("org.lwjgl:lwjgl-opengl:3.3.1:natives-windows")
+    this.implementation("org.lwjgl:lwjgl-opengl:3.3.1:natives-linux")
+    this.implementation("org.lwjgl:lwjgl-opengl:3.3.1:natives-macos")
 
     implementation("org.l33tlabs.twl:pngdecoder:1.0")
 }

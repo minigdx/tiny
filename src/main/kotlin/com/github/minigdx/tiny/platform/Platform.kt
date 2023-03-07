@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.platform
 
+import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameOption
 import com.github.minigdx.tiny.engine.GameLoop
 
@@ -12,7 +13,7 @@ interface Platform {
     /**
      * Prepare the platform for the game loop
      */
-    fun initGameLoop()
+    fun createDrawContext(): DrawContext
 
     /**
      * Let's run the game loop
@@ -22,7 +23,7 @@ interface Platform {
     /**
      * Draw the image on the screen
      */
-    fun draw(image: ByteArray)
+    fun draw(context: DrawContext, image: ByteArray, width: Pixel, height: Pixel)
 
     /**
      * The game loop stopped.
