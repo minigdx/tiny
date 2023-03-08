@@ -10,7 +10,7 @@ interface SourceStream<T> {
     fun read(): T
 }
 
-class FileStream(val origin: File) : SourceStream<ByteArray> {
+class FileStream(private val origin: File) : SourceStream<ByteArray>, TargetStream<ByteArray> {
     private var lastModified: Long = 0
 
     override fun wasModified(): Boolean {
@@ -26,10 +26,19 @@ class FileStream(val origin: File) : SourceStream<ByteArray> {
     override fun read(): ByteArray {
         return origin.readBytes()
     }
+
+    override fun write(data: ByteArray) {
+        origin.writeBytes(data)
+    }
+}
+
+interface TargetStream<T> {
+    fun write(data: T)
 }
 
 interface VirtualFileSystem {
 
     fun <T> watch(source: SourceStream<T>): Flow<T>
 
+    suspend fun save(targetStream: TargetStream<ByteArray>, data: ByteArray)
 }

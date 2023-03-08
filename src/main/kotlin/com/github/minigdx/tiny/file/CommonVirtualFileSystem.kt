@@ -19,4 +19,8 @@ class CommonVirtualFileSystem : VirtualFileSystem {
             }
         }
     }
+
+    override suspend fun save(targetStream: TargetStream<ByteArray>, data: ByteArray) {
+        targetStream.write(data)
+    }
 }

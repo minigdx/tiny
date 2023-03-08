@@ -3,7 +3,7 @@ package com.github.minigdx.tiny.engine
 import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.file.FileStream
 import com.github.minigdx.tiny.file.VirtualFileSystem
-import com.github.minigdx.tiny.platform.DrawContext
+import com.github.minigdx.tiny.platform.RenderContext
 import com.github.minigdx.tiny.platform.Platform
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -50,7 +50,7 @@ class GameEngine(
 
     private var accumulator: Seconds = 0f
 
-    private lateinit var drawContext: DrawContext
+    private lateinit var renderContext: RenderContext
 
     fun main() {
         platform.initWindow(gameOption)
@@ -83,7 +83,7 @@ class GameEngine(
                 }.collect(ScriptsCollector(events))
         }
 
-        drawContext = platform.createDrawContext()
+        renderContext = platform.createDrawContext()
 
         platform.gameLoop(this)
     }
@@ -142,7 +142,7 @@ class GameEngine(
     override fun draw() {
         with(current) {
             if (this == null) return
-            platform.draw(drawContext, frameBuffer.generateBuffer(), frameBuffer.width, frameBuffer.height)
+            platform.draw(renderContext, frameBuffer.generateBuffer(), frameBuffer.width, frameBuffer.height)
         }
     }
 

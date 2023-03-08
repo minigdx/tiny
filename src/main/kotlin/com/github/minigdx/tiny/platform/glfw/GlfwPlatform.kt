@@ -1,4 +1,4 @@
-package com.github.minigdx.tiny.platform
+package com.github.minigdx.tiny.platform.glfw
 
 import com.danielgergely.kgl.ByteBuffer
 import com.danielgergely.kgl.FloatBuffer
@@ -27,36 +27,49 @@ import com.danielgergely.kgl.GL_UNSIGNED_BYTE
 import com.danielgergely.kgl.GL_VENDOR
 import com.danielgergely.kgl.GL_VERSION
 import com.danielgergely.kgl.GL_VERTEX_SHADER
-import com.danielgergely.kgl.GlBuffer
 import com.danielgergely.kgl.Kgl
 import com.danielgergely.kgl.KglLwjgl
-import com.danielgergely.kgl.Program
 import com.danielgergely.kgl.Shader
-import com.danielgergely.kgl.Texture
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOption
+import com.github.minigdx.tiny.file.FileStream
+import com.github.minigdx.tiny.file.VirtualFileSystem
 import com.github.minigdx.tiny.log.Logger
+import com.github.minigdx.tiny.platform.Platform
+import com.github.minigdx.tiny.platform.RenderContext
+import com.github.minigdx.tiny.util.MutableFixedSizeList
+import com.squareup.gifencoder.GifEncoder
+import com.squareup.gifencoder.ImageOptions
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.lwjgl.glfw.GLFW
+import org.lwjgl.glfw.GLFW.GLFW_PRESS
+import org.lwjgl.glfw.GLFW.GLFW_RELEASE
+import org.lwjgl.glfw.GLFWKeyCallback
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL33
 import org.lwjgl.system.MemoryUtil
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.util.concurrent.TimeUnit
+import kotlin.math.log
 import kotlin.math.min
 
-interface DrawContext
-class GLDrawContext(
-    val program: Program,
-    val texture: Texture,
-) : DrawContext
-
-class GlfwPlatform(private val logger: Logger) : Platform {
+class GlfwPlatform(private val logger: Logger, private val vfs: VirtualFileSystem) : Platform {
 
     private var window: Long = 0
 
     private var lastFrame: Long = getTime()
 
     private val gl: Kgl = KglLwjgl
+
+    // Keep 30 seconds at 60 frames per seconds
+    private val frameButterCache: MutableFixedSizeList<ByteArray> = MutableFixedSizeList(30 * 60)
+
+    private val recordScope = CoroutineScope(Dispatchers.Default)
 
     /**
      * Get the time in milliseconds
@@ -82,7 +95,6 @@ class GlfwPlatform(private val logger: Logger) : Platform {
         GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 2)
         GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 0)
         GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE)
-        // GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_FORWARD_COMPAT, GLFW.GLFW_TRUE)
         GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_DEBUG_CONTEXT, GLFW.GLFW_TRUE);
 
 
@@ -110,9 +122,8 @@ class GlfwPlatform(private val logger: Logger) : Platform {
         }
 
         // Get the resolution of the primary monitor
-        val vidmode =
-            GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor())
-                ?: throw IllegalStateException("No primary monitor found")
+        val vidmode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor())
+            ?: throw IllegalStateException("No primary monitor found")
         // Center our window
         GLFW.glfwSetWindowPos(
             window,
@@ -135,16 +146,43 @@ class GlfwPlatform(private val logger: Logger) : Platform {
         val tmpWidth = MemoryUtil.memAllocInt(1)
         val tmpHeight = MemoryUtil.memAllocInt(1)
         GLFW.glfwGetWindowSize(window, tmpWidth, tmpHeight)
+
+        GLFW.glfwSetKeyCallback(
+            window,
+            object : GLFWKeyCallback() {
+
+                private var controlDown = false
+                private var rDown = false
+                override fun invoke(window: Long, key: Int, scancode: Int, action: Int, mods: Int) {
+                    if (action == GLFW_PRESS) {
+                        if(key == GLFW.GLFW_KEY_R) {
+                            rDown = true
+                        } else if(key == GLFW.GLFW_KEY_LEFT_CONTROL) {
+                            controlDown = true
+                        }
+                    } else if(action == GLFW_RELEASE) {
+                        if(key == GLFW.GLFW_KEY_R) {
+                            rDown = false
+                        } else if(key == GLFW.GLFW_KEY_LEFT_CONTROL) {
+                            controlDown = false
+                        }
+                    }
+
+                    if(rDown && controlDown) {
+                        this@GlfwPlatform.record(gameOption)
+                    }
+                }
+            }
+        )
     }
 
-    override fun createDrawContext(): DrawContext {
+    override fun createDrawContext(): RenderContext {
         GL.createCapabilities(true)
         logger.info("GLFW") { "GL_VENDOR:                \t" + GL33.glGetString(GL_VENDOR) }
         logger.info("GLFW") { "GL_VERSION:               \t" + GL33.glGetString(GL_VERSION) }
         logger.info("GLFW") { "GL_RENDERER:              \t" + GL33.glGetString(GL_RENDERER) }
         logger.info("GLFW") { "SHADING_LANGUAGE_VERSION: \t" + GL33.glGetString(GL_SHADING_LANGUAGE_VERSION) }
         logger.info("GLFW") { "EXTENSIONS:               \t" + GL33.glGetString(GL_EXTENSIONS) }
-        // https://github.com/AradiPatrik/learn-opengl/blob/403632f16a279571700e1d952e214884b195cb27/src/main/kotlin/com/aradipatrik/learn/opengl/Main.kt
 
         // Load and compile the shaders
         val vertexShader = """
@@ -244,7 +282,7 @@ class GlfwPlatform(private val logger: Logger) : Platform {
         gl.enableVertexAttribArray(uvs)
 
 
-        return GLDrawContext(
+        return GLRenderContext(
             program = shaderProgram,
             texture = gameTexture,
         )
@@ -279,15 +317,6 @@ class GlfwPlatform(private val logger: Logger) : Platform {
         GLFW.glfwTerminate()
     }
 
-    /*
-    private val uvsData = FloatBuffer(
-        floatArrayOf(
-            0f, 0f,
-            2f, 2f,
-            0f, 1f
-        )
-    )
-*/
     private val uvsData = FloatBuffer(
         floatArrayOf(
             0f, 2f,
@@ -297,8 +326,8 @@ class GlfwPlatform(private val logger: Logger) : Platform {
     )
 
 
-    override fun draw(context: DrawContext, image: ByteArray, width: Pixel, height: Pixel) {
-        context as GLDrawContext
+    override fun draw(context: RenderContext, image: ByteArray, width: Pixel, height: Pixel) {
+        context as GLRenderContext
 
         gl.bindTexture(GL_TEXTURE_2D, context.texture)
         gl.texImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, ByteBuffer(image))
@@ -315,7 +344,47 @@ class GlfwPlatform(private val logger: Logger) : Platform {
 
         gl.clearColor(0f, 1f, 0.3f, 1.0f)
         gl.drawArrays(GL_TRIANGLES, 0, 3)
+
+        frameButterCache.add(image)
     }
 
     override fun endGameLoop() = Unit
+
+    override fun record(gameOption: GameOption) {
+        println("RECORD !")
+        val buffer = mutableListOf<ByteArray>().apply {
+            addAll(frameButterCache)
+        }
+
+        recordScope.launch {
+            val options = ImageOptions().apply {
+                this.setDelay(16666, TimeUnit.MICROSECONDS)
+            }
+            ByteArrayOutputStream().use { out ->
+                val encoder = GifEncoder(out, gameOption.width, gameOption.height, 0)
+                val gifFrame = IntArray(gameOption.width * gameOption.height)
+                buffer.forEach { array ->
+
+                    var pos = 0
+                    for(x in 0 until gameOption.width) {
+                        for (y in 0 until gameOption.height) {
+                            val r = array[pos++].toInt()
+                            val g = array[pos++].toInt()
+                            val b = array[pos++].toInt()
+                            val a = array[pos++] // we drop the alpha value
+
+                            val rgb = ((r and 0xFF) shl 16) or ((g and 0xFF) shl 8) or (b and 0xFF)
+                            gifFrame[x *gameOption.height + y] = rgb
+                        }
+                    }
+                    encoder.addImage(gifFrame, gameOption.width, options)
+                }
+                encoder.finishEncoding()
+                val origin = File("output.gif")
+                vfs.save(FileStream(origin), out.toByteArray())
+                logger.info("GLFW") { "Screen recorded in '${origin.absolutePath}'"}
+            }
+        }
+    }
 }
+

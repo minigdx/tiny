@@ -41,6 +41,7 @@ dependencies {
     this.implementation("org.lwjgl:lwjgl-opengl:3.3.1:natives-macos")
 
     implementation("org.l33tlabs.twl:pngdecoder:1.0")
+    implementation("com.squareup:gifencoder:0.10.1")
 }
 
 tasks.test {

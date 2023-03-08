@@ -13,7 +13,7 @@ interface Platform {
     /**
      * Prepare the platform for the game loop
      */
-    fun createDrawContext(): DrawContext
+    fun createDrawContext(): RenderContext
 
     /**
      * Let's run the game loop
@@ -23,7 +23,12 @@ interface Platform {
     /**
      * Draw the image on the screen
      */
-    fun draw(context: DrawContext, image: ByteArray, width: Pixel, height: Pixel)
+    fun draw(context: RenderContext, image: ByteArray, width: Pixel, height: Pixel)
+
+    /**
+     * Save the last 30 seconds of the game.
+     */
+    fun record(gameOption: GameOption)
 
     /**
      * The game loop stopped.
