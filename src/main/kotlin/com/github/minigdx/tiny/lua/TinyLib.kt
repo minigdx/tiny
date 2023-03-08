@@ -1,10 +1,11 @@
 package com.github.minigdx.tiny.lua
 
 import com.github.minigdx.tiny.engine.GameScript
-import org.luaj.vm2.LuaInteger
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
+import org.luaj.vm2.lib.LibFunction
+import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.ThreeArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.VarArgFunction
@@ -20,8 +21,11 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
         env["pget"] = pget()
         env["rnd"] = rnd()
         env["cls"] = cls()
+        env["circle"] = circle()
+        env["circlef"] = circlef()
         return tiny
     }
+
 
     internal inner class exit : ZeroArgFunction() {
         override fun call(): LuaValue {
@@ -30,7 +34,87 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
         }
     }
 
-    internal inner class cls : VarArgFunction() {
+    internal inner class circlef : LibFunction() {
+        // centerX: Int, centerY: Int, radius: Int, color: Int
+        override fun call(a: LuaValue, b: LuaValue, c: LuaValue, d: LuaValue): LuaValue {
+            val centerX = a.checkint()
+            val centerY = b.checkint()
+            val radius = c.checkint()
+            val color = d.checkint()
+
+            var x = 0
+            var y = radius
+            var dst = 3 - 2 * radius
+
+            while (x <= y) {
+                // Draw the outline of the circle
+                parent.frameBuffer.pixel(centerX + x, centerY + y, color)
+                parent.frameBuffer.pixel(centerX - x, centerY + y, color)
+                parent.frameBuffer.pixel(centerX + x, centerY - y, color)
+                parent.frameBuffer.pixel(centerX - x, centerY - y, color)
+                parent.frameBuffer.pixel(centerX + y, centerY + x, color)
+                parent.frameBuffer.pixel(centerX - y, centerY + x, color)
+                parent.frameBuffer.pixel(centerX + y, centerY - x, color)
+                parent.frameBuffer.pixel(centerX - y, centerY - x, color)
+
+                // Fill the circle
+                for (i in centerX - x..centerX + x) {
+                    parent.frameBuffer.pixel(i, centerY + y, color)
+                    parent.frameBuffer.pixel(i, centerY - y, color)
+                }
+                for (i in centerX - y..centerX + y) {
+                    parent.frameBuffer.pixel(i, centerY + x, color)
+                    parent.frameBuffer.pixel(i, centerY - x, color)
+                }
+
+                if (dst < 0) {
+                    dst += 4 * x + 6
+                } else {
+                    dst += 4 * (x - y) + 10
+                    y--
+                }
+                x++
+            }
+            return NONE
+        }
+    }
+
+
+    internal inner class circle : LibFunction() {
+        // centerX: Int, centerY: Int, radius: Int, color: Int
+        override fun call(a: LuaValue, b: LuaValue, c: LuaValue, d: LuaValue): LuaValue {
+            val centerX = a.checkint()
+            val centerY = b.checkint()
+            val radius = c.checkint()
+            val color = d.checkint()
+
+            var x = 0
+            var y = radius
+            var dst = 3 - 2 * radius
+
+            while (x <= y) {
+                parent.frameBuffer.pixel(centerX + x, centerY + y, color)
+                parent.frameBuffer.pixel(centerX - x, centerY + y, color)
+                parent.frameBuffer.pixel(centerX + x, centerY - y, color)
+                parent.frameBuffer.pixel(centerX - x, centerY - y, color)
+                parent.frameBuffer.pixel(centerX + y, centerY + x, color)
+                parent.frameBuffer.pixel(centerX - y, centerY + x, color)
+                parent.frameBuffer.pixel(centerX + y, centerY - x, color)
+                parent.frameBuffer.pixel(centerX - y, centerY - x, color)
+
+                if (dst < 0) {
+                    dst += 4 * x + 6
+                } else {
+                    dst += 4 * (x - y) + 10
+                    y--
+                }
+                x++
+            }
+            return NONE
+        }
+    }
+
+    internal inner class cls : OneArgFunction() {
         override fun call(): LuaValue {
             parent.frameBuffer.clear(0)
             return NONE
@@ -42,7 +126,7 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
         }
     }
 
-    internal inner class rnd : VarArgFunction() {
+    internal inner class rnd : TwoArgFunction() {
         override fun call(): LuaValue {
             return LuaValue.valueOf(Random.nextInt())
         }
@@ -52,6 +136,9 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
         }
 
         override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
+            if (arg2.isnil()) {
+                return call(arg1)
+            }
             return LuaValue.valueOf(Random.nextInt(arg1.checkint(), arg2.checkint()))
         }
     }

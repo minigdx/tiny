@@ -49,7 +49,7 @@ class GameScript(val name: String, gameOption: GameOption) {
 
     fun isValid(): Boolean {
         return try {
-            createLuaGlobals().load(String(content))
+            createLuaGlobals().load(String(content)).call()
             true
         } catch (exception: LuaError) {
             println("Can't parse '$name' as the file is not valid.")

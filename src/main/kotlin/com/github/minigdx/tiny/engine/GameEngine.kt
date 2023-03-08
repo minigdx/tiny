@@ -3,6 +3,7 @@ package com.github.minigdx.tiny.engine
 import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.file.FileStream
 import com.github.minigdx.tiny.file.VirtualFileSystem
+import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.RenderContext
 import com.github.minigdx.tiny.platform.Platform
 import kotlinx.coroutines.CoroutineScope
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
+import org.luaj.vm2.LuaError
 import java.io.File
 
 class ScriptsCollector(private val events: MutableList<GameScript>) : FlowCollector<GameScript> {
@@ -37,7 +39,8 @@ class ScriptsCollector(private val events: MutableList<GameScript>) : FlowCollec
 class GameEngine(
     val gameOption: GameOption,
     val platform: Platform,
-    val vfs: VirtualFileSystem
+    val vfs: VirtualFileSystem,
+    val logger: Logger,
 ) : GameLoop {
 
     private val scripts: MutableList<GameScript> = mutableListOf()
@@ -89,6 +92,8 @@ class GameEngine(
     }
 
 
+    private var inError = false
+
     override fun advance(delta: Seconds) {
         workEvents.addAll(events)
 
@@ -132,7 +137,15 @@ class GameEngine(
             // Fixed step simulation
             accumulator += delta
             if (accumulator >= REFRESH_LIMIT) {
-                current?.advance()
+                inError = try {
+                    current?.advance()
+                    false
+                } catch (ex: LuaError) {
+                    if(!inError) { // display the log only once.
+                        logger.warn("TINY") { "The line ${ex.level} trigger an execution error (${ex.getLuaMessage()}). Please fix your script!"}
+                    }
+                    true
+                }
                 accumulator -= REFRESH_LIMIT
             }
         }

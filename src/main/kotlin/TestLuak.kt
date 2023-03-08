@@ -3,6 +3,7 @@ import com.github.minigdx.tiny.engine.GameOption
 import com.github.minigdx.tiny.file.CommonVirtualFileSystem
 import com.github.minigdx.tiny.log.StdOutLogger
 import com.github.minigdx.tiny.platform.glfw.GlfwPlatform
+import org.luaj.vm2.LuaError
 
 fun main(args: Array<String>) {
 
@@ -17,7 +18,8 @@ fun main(args: Array<String>) {
                 128, 128, 4
             ),
             platform = GlfwPlatform(logger, vfs),
-            vfs = vfs
+            vfs = vfs,
+            logger = logger,
         ).main()
     } catch (ex: Exception) {
         logger.error("TINY", ex) { "An unexpected exception occurred. The application will stop. It might be a bug in Tiny. If so, please report it."}
