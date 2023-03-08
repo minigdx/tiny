@@ -36,10 +36,12 @@ import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOption
 import com.github.minigdx.tiny.file.FileStream
 import com.github.minigdx.tiny.file.VirtualFileSystem
+import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.RenderContext
 import com.github.minigdx.tiny.util.MutableFixedSizeList
+import com.squareup.gifencoder.FastGifEncoder
 import com.squareup.gifencoder.GifEncoder
 import com.squareup.gifencoder.ImageOptions
 import kotlinx.coroutines.CoroutineScope
@@ -55,7 +57,6 @@ import org.lwjgl.system.MemoryUtil
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.concurrent.TimeUnit
-import kotlin.math.log
 import kotlin.math.min
 
 class GlfwPlatform(private val logger: Logger, private val vfs: VirtualFileSystem) : Platform {
@@ -67,7 +68,7 @@ class GlfwPlatform(private val logger: Logger, private val vfs: VirtualFileSyste
     private val gl: Kgl = KglLwjgl
 
     // Keep 30 seconds at 60 frames per seconds
-    private val frameButterCache: MutableFixedSizeList<ByteArray> = MutableFixedSizeList(30 * 60)
+    private val gifBufferCache: MutableFixedSizeList<IntArray> = MutableFixedSizeList(30 * 60)
 
     private val recordScope = CoroutineScope(Dispatchers.Default)
 
@@ -326,8 +327,10 @@ class GlfwPlatform(private val logger: Logger, private val vfs: VirtualFileSyste
     )
 
 
-    override fun draw(context: RenderContext, image: ByteArray, width: Pixel, height: Pixel) {
+    override fun draw(context: RenderContext, frameBuffer: FrameBuffer, width: Pixel, height: Pixel) {
         context as GLRenderContext
+
+        val image = frameBuffer.generateBuffer()
 
         gl.bindTexture(GL_TEXTURE_2D, context.texture)
         gl.texImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, ByteBuffer(image))
@@ -345,15 +348,14 @@ class GlfwPlatform(private val logger: Logger, private val vfs: VirtualFileSyste
         gl.clearColor(0f, 1f, 0.3f, 1.0f)
         gl.drawArrays(GL_TRIANGLES, 0, 3)
 
-        frameButterCache.add(image)
+        gifBufferCache.add(frameBuffer.gifBuffer)
     }
 
     override fun endGameLoop() = Unit
 
     override fun record(gameOption: GameOption) {
-        println("RECORD !")
-        val buffer = mutableListOf<ByteArray>().apply {
-            addAll(frameButterCache)
+        val buffer = mutableListOf<IntArray>().apply {
+            addAll(gifBufferCache)
         }
 
         recordScope.launch {
@@ -361,23 +363,9 @@ class GlfwPlatform(private val logger: Logger, private val vfs: VirtualFileSyste
                 this.setDelay(16666, TimeUnit.MICROSECONDS)
             }
             ByteArrayOutputStream().use { out ->
-                val encoder = GifEncoder(out, gameOption.width, gameOption.height, 0)
-                val gifFrame = IntArray(gameOption.width * gameOption.height)
-                buffer.forEach { array ->
-
-                    var pos = 0
-                    for(x in 0 until gameOption.width) {
-                        for (y in 0 until gameOption.height) {
-                            val r = array[pos++].toInt()
-                            val g = array[pos++].toInt()
-                            val b = array[pos++].toInt()
-                            val a = array[pos++] // we drop the alpha value
-
-                            val rgb = ((r and 0xFF) shl 16) or ((g and 0xFF) shl 8) or (b and 0xFF)
-                            gifFrame[x *gameOption.height + y] = rgb
-                        }
-                    }
-                    encoder.addImage(gifFrame, gameOption.width, options)
+                val encoder = FastGifEncoder(out, gameOption.width, gameOption.height, 0, FrameBuffer.rgbPalette)
+                buffer.forEach { frame ->
+                    encoder.addImage(frame, gameOption.width, options)
                 }
                 encoder.finishEncoding()
                 val origin = File("output.gif")

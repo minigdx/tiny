@@ -142,7 +142,7 @@ class GameEngine(
     override fun draw() {
         with(current) {
             if (this == null) return
-            platform.draw(renderContext, frameBuffer.generateBuffer(), frameBuffer.width, frameBuffer.height)
+            platform.draw(renderContext, frameBuffer, frameBuffer.width, frameBuffer.height)
         }
     }
 
