@@ -13,7 +13,9 @@ fun main(args: Array<String>) {
     try {
         val vfs = CommonVirtualFileSystem()
         GameEngine(
-            gameOption = GameOption(),
+            gameOption = GameOption(
+                126, 126, 4
+            ),
             platform = GlfwPlatform(logger, vfs),
             vfs = vfs
         ).main()
