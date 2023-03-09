@@ -1,6 +1,7 @@
 package com.github.minigdx.tiny.lua
 
 import com.github.minigdx.tiny.engine.GameScript
+import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
@@ -10,7 +11,30 @@ import org.luaj.vm2.lib.ThreeArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.VarArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.random.Random
+
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.SOURCE)
+annotation class DocFunction(
+    val name: String,
+    val documentation: String = "",
+)
+
+@Target(AnnotationTarget.VALUE_PARAMETER)
+@Retention(AnnotationRetention.SOURCE)
+annotation class DocArg(
+    val name: String,
+    val documentation: String = "",
+)
+
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.SOURCE)
+annotation class DocCall(
+    val documentation: String = "",
+    val mainCall: Boolean = false
+)
 
 class TinyLib(val parent: GameScript) : TwoArgFunction() {
     override fun call(modname: LuaValue, env: LuaValue): LuaValue {
@@ -21,11 +45,49 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
         env["pget"] = pget()
         env["rnd"] = rnd()
         env["cls"] = cls()
+        env["min"] = min()
+        env["max"] = max()
         env["circle"] = circle()
         env["circlef"] = circlef()
         return tiny
     }
 
+    @DocFunction(
+        name = "min",
+    )
+    internal inner class min : TwoArgFunction() {
+        @DocCall(
+            documentation = "minimun value between two values. Those values can be numbers or string.",
+            mainCall = true
+        )
+        override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
+            if (arg1.type() != arg2.type()) {
+                throw LuaError("Trying to min two value with different type.")
+            }
+            return if (arg1.isint() || arg1.islong()) {
+                valueOf(min(arg1.checkint(), arg2.checkint()))
+            } else if (arg1.isnumber()) {
+                valueOf(min(arg1.checkdouble(), arg2.checkdouble()))
+            } else {
+                valueOf(listOf(arg1.checkjstring() ?: "", arg2.checkjstring() ?: "").sorted().first())
+            }
+        }
+    }
+
+    internal inner class max : TwoArgFunction() {
+        override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
+            if (arg1.type() != arg2.type()) {
+                throw LuaError("Trying to min two value with different type.")
+            }
+            return if (arg1.isint() || arg1.islong()) {
+                valueOf(max(arg1.checkint(), arg2.checkint()))
+            } else if (arg1.isnumber()) {
+                valueOf(max(arg1.checkdouble(), arg2.checkdouble()))
+            } else {
+                valueOf(listOf(arg1.checkjstring() ?: "", arg2.checkjstring() ?: "").sorted().last())
+            }
+        }
+    }
 
     internal inner class exit : ZeroArgFunction() {
         override fun call(): LuaValue {
@@ -126,20 +188,32 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
         }
     }
 
+    @DocFunction("rnd", "generate random values")
     internal inner class rnd : TwoArgFunction() {
+        @DocCall("Generate a random int (negative or positive value)", mainCall = true)
         override fun call(): LuaValue {
-            return LuaValue.valueOf(Random.nextInt())
+            return valueOf(Random.nextInt())
         }
 
+        @DocCall("Generate a random value between 1 and the argument. " +
+            "If a table is passed, it'll return a random element of the table.")
         override fun call(arg: LuaValue): LuaValue {
-            return LuaValue.valueOf(Random.nextInt(arg.checkint()))
+            return if(arg.istable()) {
+                val table = arg.checktable()!!
+                val index = Random.nextInt(1, table.arrayLength + 1)
+                table[index]
+            } else {
+
+                valueOf(Random.nextInt(arg.checkint()))
+            }
         }
 
+        @DocCall("Generate a random value between the first and the second argument.")
         override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
             if (arg2.isnil()) {
                 return call(arg1)
             }
-            return LuaValue.valueOf(Random.nextInt(arg1.checkint(), arg2.checkint()))
+            return valueOf(Random.nextInt(arg1.checkint(), arg2.checkint()))
         }
     }
 

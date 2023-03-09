@@ -86,9 +86,10 @@ class FrameBuffer(val width: Pixel, val height: Pixel) {
         // Color space. 1 byte per component. So 4 bytes per pixel.
         private const val RGBA = 4
 
-        private const val DEFAULT_INDEX = 0
+        private const val DEFAULT_INDEX = 1
 
         private val defaultPalette: Array<ByteArray> = arrayOf(
+            color(0x00, 0x00, 0x00), // fake color so the palette start at 1
             color(0x00, 0x00, 0x00), // black
             color(0x1D, 0x2B, 0x53), // light black
             color(0x7E, 0x25, 0x53), // light black
