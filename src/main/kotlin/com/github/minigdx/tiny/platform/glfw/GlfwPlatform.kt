@@ -360,7 +360,7 @@ class GlfwPlatform(private val logger: Logger, private val vfs: VirtualFileSyste
 
         recordScope.launch {
             val options = ImageOptions().apply {
-                this.setDelay(16, TimeUnit.MILLISECONDS)
+                this.setDelay(20, TimeUnit.MILLISECONDS)
             }
             ByteArrayOutputStream().use { out ->
                 val encoder = FastGifEncoder(out, gameOption.width, gameOption.height, 0, FrameBuffer.rgbPalette)
