@@ -1,5 +1,7 @@
 package com.github.minigdx.tiny.lua
 
+import com.github.minigdx.tiny.ColorIndex
+import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameScript
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaTable
@@ -9,7 +11,6 @@ import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.ThreeArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
-import org.luaj.vm2.lib.VarArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
 import kotlin.math.max
 import kotlin.math.min
@@ -142,6 +143,60 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
     }
 
 
+    internal inner class line : LibFunction() {
+
+        override fun invoke(args: Varargs): Varargs {
+            return when (args.narg()) {
+                0 -> call()
+                1 -> call(args.arg1())
+                2 -> call(args.arg1(), args.arg(2))
+                3 -> call(args.arg1(), args.arg(2), args.arg(3))
+                4 -> call(args.arg1(), args.arg(2), args.arg(3), args.arg(4))
+                else -> draw(
+                    args.arg1().checkint(),
+                    args.arg(2).checkint(),
+                    args.arg(3).checkint(),
+                    args.arg(4).checkint(),
+                    args.arg(5).checkint()
+                )
+            }
+        }
+        private fun draw(x0: Pixel, y0: Pixel, x1: Pixel, y1: Pixel, color: ColorIndex): LuaValue {
+            // (x1, y1), (x2, y2)
+            val dx = Math.abs(x1 - x0)
+            val dy = Math.abs(y1 - y0)
+            val sx = if (x0 < x1) 1 else -1
+            val sy = if (y0 < y1) 1 else -1
+            var err = dx - dy
+
+            var x = x0
+            var y = y0
+
+            while (true) {
+                parent.frameBuffer.pixel(x, y, color)
+                if (x == x1 && y == y1) break
+                val e2 = 2 * err
+                if (e2 > -dy) {
+                    err -= dy
+                    x += sx
+                }
+                if (e2 < dx) {
+                    err += dx
+                    y += sy
+                }
+            }
+            return NONE
+        }
+
+        override fun call(a: LuaValue, b: LuaValue, c: LuaValue, d: LuaValue): LuaValue {
+            val x0 = a.checkint()
+            val y0 = b.checkint()
+            val x1 = c.checkint()
+            val y1 = d.checkint()
+
+            return draw(x0, y0, x1, y1, 0)
+        }
+    }
     internal inner class circle : LibFunction() {
         // centerX: Int, centerY: Int, radius: Int, color: Int
         override fun call(a: LuaValue, b: LuaValue, c: LuaValue, d: LuaValue): LuaValue {
@@ -234,35 +289,4 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
             return valueOf(index)
         }
     }
-
-    internal inner class line : VarArgFunction() {
-
-        override fun call(): LuaValue {
-            // no op
-            return NONE
-        }
-
-        override fun call(arg: LuaValue): LuaValue {
-            // line(x1)
-            // parent.frameBuffer.pixel(x, y, color)
-            return super.call(arg)
-        }
-
-        override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
-            // line(x1, x2)
-            return super.call(arg1, arg2)
-        }
-
-        override fun call(arg1: LuaValue, arg2: LuaValue, arg3: LuaValue): LuaValue {
-            // line(x1, y1, x2)
-            return super.call(arg1, arg2, arg3)
-        }
-
-        override fun invoke(args: Varargs): Varargs {
-            // line(x1, y1, x2, y2)
-            // line(x1, y1, x2, y2, colorIndex)
-            return super.invoke(args)
-        }
-    }
-
 }
