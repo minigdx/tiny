@@ -320,8 +320,8 @@ class GlfwPlatform(private val logger: Logger, private val vfs: VirtualFileSyste
 
     private val uvsData = FloatBuffer(
         floatArrayOf(
-            0f, 2f,
             2f, 0f,
+            0f, 2f,
             0f, 0f,
         )
     )
