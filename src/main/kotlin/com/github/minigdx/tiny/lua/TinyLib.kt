@@ -12,26 +12,31 @@ import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.ThreeArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
+import kotlin.annotation.AnnotationRetention.SOURCE
+import kotlin.annotation.AnnotationTarget.CLASS
+import kotlin.annotation.AnnotationTarget.FUNCTION
+import kotlin.annotation.AnnotationTarget.VALUE_PARAMETER
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.random.Random
 
-@Target(AnnotationTarget.CLASS)
-@Retention(AnnotationRetention.SOURCE)
+@Target(CLASS)
+@Retention(SOURCE)
 annotation class DocFunction(
     val name: String,
     val documentation: String = "",
 )
 
-@Target(AnnotationTarget.VALUE_PARAMETER)
-@Retention(AnnotationRetention.SOURCE)
+@Target(VALUE_PARAMETER, FUNCTION)
+@Retention(SOURCE)
+@Repeatable
 annotation class DocArg(
     val name: String,
     val documentation: String = "",
 )
 
-@Target(AnnotationTarget.FUNCTION)
-@Retention(AnnotationRetention.SOURCE)
+@Target(FUNCTION)
+@Retention(SOURCE)
 annotation class DocCall(
     val documentation: String = "",
     val mainCall: Boolean = false
@@ -48,6 +53,8 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
         env["cls"] = cls()
         env["min"] = min()
         env["max"] = max()
+        env["rect"] = rect()
+        env["rectf"] = rectf()
         env["circle"] = circle()
         env["circlef"] = circlef()
         return tiny
@@ -93,6 +100,50 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
     internal inner class exit : ZeroArgFunction() {
         override fun call(): LuaValue {
             parent.exited = true
+            return NONE
+        }
+    }
+
+    @DocFunction("rect", "Draw a rectangle")
+    internal inner class rect : LibFunction() {
+        // cornerX: Int, cornerY: Int, width: Int, height: Int, color: Int
+        @DocCall(mainCall = true)
+        override fun invoke(args: Varargs): Varargs {
+            if (args.narg() < 5) return NONE
+            val x = args.arg(1).checkint()
+            val y = args.arg(2).checkint()
+            val width = args.arg(3).checkint()
+            val height = args.arg(4).checkint()
+            val color = args.arg(5).checkint()
+            for (i in x until x + width) {
+                parent.frameBuffer.pixel(i, y, color)
+                parent.frameBuffer.pixel(i, y + height - 1, color)
+            }
+            for (i in y until y + height) {
+                parent.frameBuffer.pixel(x, i, color)
+                parent.frameBuffer.pixel(x + width - 1, i, color)
+            }
+            return NONE
+        }
+    }
+
+    @DocFunction("rectf", "Draw a filled rectangle")
+    internal inner class rectf : LibFunction() {
+        // cornerX: Int, cornerY: Int, width: Int, height: Int, color: Int
+        @DocCall(mainCall = true)
+        override fun invoke(args: Varargs): Varargs {
+            if (args.narg() < 5) return NONE
+            val x = args.arg(1).checkint()
+            val y = args.arg(2).checkint()
+            val width = args.arg(3).checkint()
+            val height = args.arg(4).checkint()
+            val color = args.arg(5).checkint()
+
+            for (i in x until x + width) {
+                for (j in y until y + height) {
+                    parent.frameBuffer.pixel(i, j, color)
+                }
+            }
             return NONE
         }
     }
@@ -161,6 +212,7 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
                 )
             }
         }
+
         private fun draw(x0: Pixel, y0: Pixel, x1: Pixel, y1: Pixel, color: ColorIndex): LuaValue {
             // (x1, y1), (x2, y2)
             val dx = Math.abs(x1 - x0)
@@ -197,6 +249,7 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
             return draw(x0, y0, x1, y1, 0)
         }
     }
+
     internal inner class circle : LibFunction() {
         // centerX: Int, centerY: Int, radius: Int, color: Int
         override fun call(a: LuaValue, b: LuaValue, c: LuaValue, d: LuaValue): LuaValue {
@@ -250,10 +303,12 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
             return valueOf(Random.nextInt())
         }
 
-        @DocCall("Generate a random value between 1 and the argument. " +
-            "If a table is passed, it'll return a random element of the table.")
+        @DocCall(
+            "Generate a random value between 1 and the argument. " +
+                "If a table is passed, it'll return a random element of the table."
+        )
         override fun call(arg: LuaValue): LuaValue {
-            return if(arg.istable()) {
+            return if (arg.istable()) {
                 val table = arg.checktable()!!
                 val index = Random.nextInt(1, table.arrayLength + 1)
                 table[index]

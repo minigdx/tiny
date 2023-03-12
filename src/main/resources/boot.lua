@@ -40,4 +40,7 @@ function draw()
 
     x = (x + 1) % 127
     circle(x, 64, 4, 9)
+
+    rectf(11, 11, 10, 20, 4)
+    rect(10, 10, 10, 20, 12)
 end
