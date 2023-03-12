@@ -42,10 +42,14 @@ import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.RenderContext
 import com.github.minigdx.tiny.util.MutableFixedSizeList
 import com.squareup.gifencoder.FastGifEncoder
-import com.squareup.gifencoder.GifEncoder
+import com.squareup.gifencoder.Image
 import com.squareup.gifencoder.ImageOptions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flatMapMerge
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.glfw.GLFW.GLFW_PRESS
@@ -59,6 +63,7 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlin.math.min
 
+
 class GlfwPlatform(private val logger: Logger, private val vfs: VirtualFileSystem) : Platform {
 
     private var window: Long = 0
@@ -68,7 +73,7 @@ class GlfwPlatform(private val logger: Logger, private val vfs: VirtualFileSyste
     private val gl: Kgl = KglLwjgl
 
     // Keep 30 seconds at 60 frames per seconds
-    private val gifBufferCache: MutableFixedSizeList<IntArray> = MutableFixedSizeList(30 * 60)
+    private val gifBufferCache: MutableFixedSizeList<IntArray> = MutableFixedSizeList(8 * 60)
 
     private val recordScope = CoroutineScope(Dispatchers.Default)
 
@@ -156,20 +161,20 @@ class GlfwPlatform(private val logger: Logger, private val vfs: VirtualFileSyste
                 private var rDown = false
                 override fun invoke(window: Long, key: Int, scancode: Int, action: Int, mods: Int) {
                     if (action == GLFW_PRESS) {
-                        if(key == GLFW.GLFW_KEY_R) {
+                        if (key == GLFW.GLFW_KEY_R) {
                             rDown = true
-                        } else if(key == GLFW.GLFW_KEY_LEFT_CONTROL) {
+                        } else if (key == GLFW.GLFW_KEY_LEFT_CONTROL) {
                             controlDown = true
                         }
-                    } else if(action == GLFW_RELEASE) {
-                        if(key == GLFW.GLFW_KEY_R) {
+                    } else if (action == GLFW_RELEASE) {
+                        if (key == GLFW.GLFW_KEY_R) {
                             rDown = false
-                        } else if(key == GLFW.GLFW_KEY_LEFT_CONTROL) {
+                        } else if (key == GLFW.GLFW_KEY_LEFT_CONTROL) {
                             controlDown = false
                         }
                     }
 
-                    if(rDown && controlDown) {
+                    if (rDown && controlDown) {
                         this@GlfwPlatform.record(gameOption)
                     }
                 }
@@ -354,23 +359,64 @@ class GlfwPlatform(private val logger: Logger, private val vfs: VirtualFileSyste
     override fun endGameLoop() = Unit
 
     override fun record(gameOption: GameOption) {
+        val origin = File("output.gif")
+        logger.info("GLWF") { "Starting to generate GIF in '${origin.absolutePath}' (Wait for it...)" }
         val buffer = mutableListOf<IntArray>().apply {
             addAll(gifBufferCache)
         }
 
+        val images = ArrayList<Image>(8 * 60)
+
+        val now = System.currentTimeMillis()
         recordScope.launch {
             val options = ImageOptions().apply {
                 this.setDelay(20, TimeUnit.MILLISECONDS)
             }
             ByteArrayOutputStream().use { out ->
-                val encoder = FastGifEncoder(out, gameOption.width, gameOption.height, 0, FrameBuffer.rgbPalette)
-                buffer.forEach { frame ->
-                    encoder.addImage(frame, gameOption.width, options)
-                }
-                encoder.finishEncoding()
-                val origin = File("output.gif")
-                vfs.save(FileStream(origin), out.toByteArray())
-                logger.info("GLFW") { "Screen recorded in '${origin.absolutePath}'"}
+                val encoder = FastGifEncoder(
+                    out,
+                    gameOption.width * gameOption.zoom,
+                    gameOption.height * gameOption.zoom,
+                    0,
+                    FrameBuffer.rgbPalette
+                )
+                flowOf(*buffer.toTypedArray())
+                    .withIndex()
+                    .flatMapMerge(8 * 60) { indexValue ->
+                        val index = indexValue.index
+                        val frame = indexValue.value
+                        val render = IntArray(gameOption.width * gameOption.zoom * gameOption.height * gameOption.zoom)
+                        // Check each pixel of the frame
+                        (0 until gameOption.width).forEach { x ->
+                            (0 until gameOption.height).forEach { y ->
+                                val pixel = frame[x + y * gameOption.width]
+
+                                (0 until gameOption.zoom).forEach { copyx ->
+                                    val xx = x * gameOption.zoom + copyx
+                                    (0 until gameOption.zoom).forEach { copyy ->
+                                        val yy = (y * gameOption.zoom + copyy) * gameOption.width * gameOption.zoom
+                                        render[xx + yy] = pixel
+                                    }
+                                }
+                            }
+                        }
+                        flowOf(index to Image.fromRgb(render, gameOption.width * gameOption.zoom))
+                    }
+                    .onCompletion {
+                        images.forEach { render ->
+                            encoder.addImage(
+                                render,
+                                options
+                            )
+                        }
+                        encoder.finishEncoding()
+                        vfs.save(FileStream(origin), out.toByteArray())
+                        logger.info("GLFW") { "Screen recorded in '${origin.absolutePath}' in ${System.currentTimeMillis() - now} ms" }
+                    }
+                    .collect { render ->
+                        images.add(render.first, render.second)
+                    }
+
             }
         }
     }

@@ -1,5 +1,12 @@
+function init()
+    x = 10
+end
 function draw()
     cls(2)
+    pset(0, 0, 7)
+    pset(128, 128, 7)
+    pset(0, 128, 7)
+    pset(128, 0, 7)
 
     -- center
     pset(64, 64, 7)
@@ -31,4 +38,6 @@ function draw()
     pset(124, 75, 10)                    pset(126, 75, 10)
 
 
+    x = (x + 1) % 127
+    circle(x, 64, 4, 9)
 end

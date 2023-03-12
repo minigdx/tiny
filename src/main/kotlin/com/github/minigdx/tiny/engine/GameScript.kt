@@ -31,7 +31,7 @@ class GameScript(val name: String, gameOption: GameOption) {
 
     private var globals: Globals? = null
 
-    internal val frameBuffer = FrameBuffer(gameOption.width, gameOption.width)
+    internal val frameBuffer = FrameBuffer(gameOption.width, gameOption.height)
 
     class State(val args: LuaValue)
 

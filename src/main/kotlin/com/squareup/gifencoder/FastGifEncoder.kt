@@ -108,9 +108,9 @@ internal class FastLzwEncoder(colorTableSize: Int) {
     val minimumCodeSize: Int
     private val outputBits = BitSet()
     private var position = 0
-    private var codeTable: MutableMap<List<Int>, Int> = defaultCodeTable()
+    private var codeTable: MutableMap<String, Int> = defaultCodeTable()
     private var codeSize = 0
-    private var indexBuffer: List<Int> = ArrayList()
+    private var indexBuffer: String = ""
 
     /**
      * @param colorTableSize Size of the (padded) color table; must be a power of 2
@@ -132,7 +132,8 @@ internal class FastLzwEncoder(colorTableSize: Int) {
     }
 
     private fun processIndex(index: Int) {
-        val extendedIndexBuffer = append(indexBuffer, index)
+        val indexAsStr = index.toChar().toString()
+        val extendedIndexBuffer = indexBuffer + indexAsStr
         indexBuffer = if (codeTable.containsKey(extendedIndexBuffer)) {
             extendedIndexBuffer
         } else {
@@ -143,7 +144,7 @@ internal class FastLzwEncoder(colorTableSize: Int) {
             } else {
                 addCodeToTable(extendedIndexBuffer)
             }
-            listOf(index)
+            indexAsStr
         }
     }
 
@@ -171,7 +172,7 @@ internal class FastLzwEncoder(colorTableSize: Int) {
         return result
     }
 
-    private fun addCodeToTable(indices: List<Int>) {
+    private fun addCodeToTable(indices: String) {
         val newCode = codeTable.size
         codeTable[indices] = newCode
         if (newCode == 1 shl codeSize) {
@@ -187,24 +188,24 @@ internal class FastLzwEncoder(colorTableSize: Int) {
         codeSize = minimumCodeSize + 1
     }
 
-    private fun defaultCodeTable(): MutableMap<List<Int>, Int> {
-        val codeTable: MutableMap<List<Int>, Int> = HashMap()
+    private fun defaultCodeTable(): MutableMap<String, Int> {
+        val codeTable: MutableMap<String, Int> = HashMap(126 * 4 * 30 * 60)
 
         // The spec indicates that CLEAR_CODE must have a value of 2**minimumCodeSize. Thus we reserve
         // the first 2**minimumCodeSize codes for colors, even if our color table is smaller.
         val colorsInCodeTable = 1 shl minimumCodeSize
         for (i in 0 until colorsInCodeTable) {
-            codeTable[listOf(i)] = i
+            codeTable[i.toChar().toString()] = i
         }
         codeTable[CLEAR_CODE] = codeTable.size
-        codeTable[END_OF_INFO] = codeTable.size
+        codeTable[(END_OF_INFO)] = codeTable.size
         return codeTable
     }
 
     companion object {
         // Dummy values to represent special, GIF-specific instructions.
-        private val CLEAR_CODE = listOf(-1)
-        private val END_OF_INFO = listOf(-2)
+        private val CLEAR_CODE = (-1).toChar().toString()
+        private val END_OF_INFO = (-2).toChar().toString()
 
         /**
          * The specification stipulates that code size may not exceed 12 bits.
