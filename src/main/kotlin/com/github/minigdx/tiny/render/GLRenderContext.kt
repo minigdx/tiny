@@ -1,4 +1,4 @@
-package com.github.minigdx.tiny.platform.glfw
+package com.github.minigdx.tiny.render
 
 import com.danielgergely.kgl.Program
 import com.danielgergely.kgl.Texture

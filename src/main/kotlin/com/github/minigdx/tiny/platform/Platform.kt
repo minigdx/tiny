@@ -1,21 +1,23 @@
 package com.github.minigdx.tiny.platform
 
-import com.danielgergely.kgl.Framebuffer
-import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameOption
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.graphic.FrameBuffer
 
 interface Platform {
     /**
+     * Game Option from the game.
+     */
+    val gameOption: GameOption
+    /**
      * Create the window where the game will render
      */
-    fun initWindow(gameOption: GameOption)
+    fun initWindowManager()
 
     /**
      * Prepare the platform for the game loop
      */
-    fun createDrawContext(): RenderContext
+    fun initRenderManager(): RenderContext
 
     /**
      * Let's run the game loop
@@ -25,12 +27,12 @@ interface Platform {
     /**
      * Draw the image on the screen
      */
-    fun draw(context: RenderContext, frameBuffer: FrameBuffer, width: Pixel, height: Pixel)
+    fun draw(context: RenderContext, frameBuffer: FrameBuffer)
 
     /**
      * Save the last 30 seconds of the game.
      */
-    fun record(gameOption: GameOption)
+    fun record()
 
     /**
      * The game loop stopped.

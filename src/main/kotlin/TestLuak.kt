@@ -13,11 +13,10 @@ fun main(args: Array<String>) {
     val logger = StdOutLogger()
     try {
         val vfs = CommonVirtualFileSystem()
+        val gameOption = GameOption(126, 126, 2)
         GameEngine(
-            gameOption = GameOption(
-                126, 126, 2
-            ),
-            platform = GlfwPlatform(logger, vfs),
+            gameOption = gameOption,
+            platform = GlfwPlatform(gameOption, logger, vfs),
             vfs = vfs,
             logger = logger,
         ).main()

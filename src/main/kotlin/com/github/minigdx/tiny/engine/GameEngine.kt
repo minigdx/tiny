@@ -56,7 +56,7 @@ class GameEngine(
     private lateinit var renderContext: RenderContext
 
     fun main() {
-        platform.initWindow(gameOption)
+        platform.initWindowManager()
 
         val scope = CoroutineScope(Dispatchers.Default)
 
@@ -86,7 +86,7 @@ class GameEngine(
                 }.collect(ScriptsCollector(events))
         }
 
-        renderContext = platform.createDrawContext()
+        renderContext = platform.initRenderManager()
 
         platform.gameLoop(this)
     }
@@ -155,7 +155,7 @@ class GameEngine(
     override fun draw() {
         with(current) {
             if (this == null) return
-            platform.draw(renderContext, frameBuffer, frameBuffer.width, frameBuffer.height)
+            platform.draw(renderContext, frameBuffer)
         }
     }
 

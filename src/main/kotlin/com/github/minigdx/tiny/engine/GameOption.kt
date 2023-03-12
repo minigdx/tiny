@@ -10,4 +10,5 @@ class GameOption(
     val height: Pixel = 256,
     val zoom: Int = 2,
     val record: Seconds = 8f,
+    val gutter: Pair<Pixel, Pixel> = 10 to 10,
 )
