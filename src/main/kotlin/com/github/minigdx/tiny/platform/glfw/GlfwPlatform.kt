@@ -215,7 +215,7 @@ class GlfwPlatform(
                         // Check each pixel of the frame
                         (0 until gameOption.width).forEach { x ->
                             (0 until gameOption.height).forEach { y ->
-                                val pixel = frame[x + y * gameOption.width]
+                                val pixel = frame[y + x * gameOption.height]
 
                                 (0 until gameOption.zoom).forEach { copyx ->
                                     val xx = x * gameOption.zoom + copyx
