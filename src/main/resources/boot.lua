@@ -1,7 +1,10 @@
 function init()
     x = 10
+    dt = 0
 end
 function draw()
+    dt = dt + 1/60
+
     cls(2)
     pset(0, 0, 7)
     pset(128, 128, 7)
@@ -41,6 +44,7 @@ function draw()
     x = (x + 1) % 127
     circle(x, 64, 4, 9)
 
-    rectf(11, 11, 10, 20, 4)
-    rect(10, 10, 10, 20, 12)
+    xx = cos(dt) * 64 + 64
+    rectf(xx + 1, 11, 10, 20, 4)
+    rect(xx, 10, 10, 20, 12)
 end

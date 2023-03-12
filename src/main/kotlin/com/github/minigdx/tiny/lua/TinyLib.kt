@@ -16,8 +16,10 @@ import kotlin.annotation.AnnotationRetention.SOURCE
 import kotlin.annotation.AnnotationTarget.CLASS
 import kotlin.annotation.AnnotationTarget.FUNCTION
 import kotlin.annotation.AnnotationTarget.VALUE_PARAMETER
+import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.sin
 import kotlin.random.Random
 
 @Target(CLASS)
@@ -51,6 +53,8 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
         env["pget"] = pget()
         env["rnd"] = rnd()
         env["cls"] = cls()
+        env["cos"] = cos()
+        env["sin"] = sin()
         env["min"] = min()
         env["max"] = max()
         env["rect"] = rect()
@@ -58,6 +62,34 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
         env["circle"] = circle()
         env["circlef"] = circlef()
         return tiny
+    }
+
+    @DocFunction(
+        name = "cos",
+    )
+    internal inner class cos : OneArgFunction() {
+        @DocCall(
+            documentation = "cosinus of the value passed as parameter.",
+            mainCall = true
+        )
+        override fun call(arg: LuaValue): LuaValue {
+            return valueOf(cos(arg.todouble()))
+        }
+
+    }
+
+    @DocFunction(
+        name = "sin",
+    )
+    internal inner class sin : OneArgFunction() {
+        @DocCall(
+            documentation = "sinus of the value passed as parameter.",
+            mainCall = true
+        )
+        override fun call(arg: LuaValue): LuaValue {
+            return valueOf(sin(arg.todouble()))
+        }
+
     }
 
     @DocFunction(
