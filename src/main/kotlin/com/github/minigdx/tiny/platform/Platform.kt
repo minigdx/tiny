@@ -4,6 +4,7 @@ import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameOption
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.graphic.FrameBuffer
+import com.github.minigdx.tiny.platform.glfw.WindowManager
 
 class ImageData(val data: ByteArray, val width: Pixel, val height: Pixel)
 
@@ -15,12 +16,12 @@ interface Platform {
     /**
      * Create the window where the game will render
      */
-    fun initWindowManager()
+    fun initWindowManager(): WindowManager
 
     /**
      * Prepare the platform for the game loop
      */
-    fun initRenderManager(): RenderContext
+    fun initRenderManager(windowManager: WindowManager): RenderContext
 
     /**
      * Let's run the game loop

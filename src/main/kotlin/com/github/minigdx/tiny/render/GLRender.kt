@@ -33,6 +33,7 @@ import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameOption
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.RenderContext
+import com.github.minigdx.tiny.platform.glfw.WindowManager
 import org.lwjgl.opengl.GL33
 
 
@@ -50,7 +51,7 @@ class GLRender(
         )
     )
 
-    override fun init(): RenderContext {
+    override fun init(windowManager: WindowManager): RenderContext {
         logger.info("GLFW") { "GL_VENDOR:                \t" + GL33.glGetString(GL_VENDOR) }
         logger.info("GLFW") { "GL_VERSION:               \t" + GL33.glGetString(GL_VERSION) }
         logger.info("GLFW") { "GL_RENDERER:              \t" + GL33.glGetString(GL_RENDERER) }
@@ -155,6 +156,7 @@ class GLRender(
         gl.enableVertexAttribArray(uvs)
 
         return GLRenderContext(
+            windowManager = windowManager,
             program = shaderProgram,
             texture = gameTexture,
         )
@@ -179,11 +181,12 @@ class GLRender(
 
     override fun draw(context: RenderContext, image: ByteArray, width: Pixel, height: Pixel) {
         context as GLRenderContext
+
         gl.viewport(
-            gameOption.gutter.first * gameOption.zoom,
-            gameOption.gutter.second * gameOption.zoom,
-            gameOption.width * gameOption.zoom,
-            gameOption.height * gameOption.zoom
+            gameOption.gutter.first * gameOption.zoom * context.windowManager.ratioWidth,
+            gameOption.gutter.second * gameOption.zoom * context.windowManager.ratioHeight,
+            gameOption.width * gameOption.zoom * context.windowManager.ratioWidth,
+            gameOption.height * gameOption.zoom *  context.windowManager.ratioHeight
         )
 
         gl.bindTexture(GL_TEXTURE_2D, context.texture)

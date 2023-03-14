@@ -94,7 +94,7 @@ class GameEngine(
     private lateinit var renderContext: RenderContext
 
     fun main() {
-        platform.initWindowManager()
+        val windowManager = platform.initWindowManager()
 
         val scope = CoroutineScope(Dispatchers.Default)
 
@@ -139,7 +139,7 @@ class GameEngine(
 
         }
 
-        renderContext = platform.initRenderManager()
+        renderContext = platform.initRenderManager(windowManager)
 
         platform.gameLoop(this)
     }

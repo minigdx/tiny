@@ -1,7 +1,6 @@
 package com.github.minigdx.tiny.platform.glfw
 
 import com.danielgergely.kgl.KglLwjgl
-import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOption
@@ -37,6 +36,14 @@ import java.util.concurrent.TimeUnit
 import javax.imageio.ImageIO
 import kotlin.math.min
 
+class WindowManager(
+    val windowWidth: Int,
+    val windowHeight: Int,
+    val screenWidth: Int,
+    val screenHeight: Int,
+    val ratioWidth: Int = screenWidth / windowWidth,
+    val ratioHeight: Int = screenHeight / windowHeight,
+)
 
 class GlfwPlatform(
     override val gameOption: GameOption,
@@ -71,7 +78,7 @@ class GlfwPlatform(
         return min(delta / 1000f, 1 / 60f)
     }
 
-    override fun initWindowManager() {
+    override fun initWindowManager(): WindowManager {
         if (!GLFW.glfwInit()) {
             throw IllegalStateException("Unable to initialize GLFW")
         }
@@ -117,6 +124,7 @@ class GlfwPlatform(
             (vidmode.height() - windowHeight) / 2
         )
 
+
         // Make the OpenGL context current
         GLFW.glfwMakeContextCurrent(window)
 
@@ -130,6 +138,10 @@ class GlfwPlatform(
         val tmpWidth = MemoryUtil.memAllocInt(1)
         val tmpHeight = MemoryUtil.memAllocInt(1)
         GLFW.glfwGetWindowSize(window, tmpWidth, tmpHeight)
+
+        val tmpFrameBufferWidth = MemoryUtil.memAllocInt(1)
+        val tmpFrameBufferHeight = MemoryUtil.memAllocInt(1)
+        GLFW.glfwGetFramebufferSize(window, tmpFrameBufferWidth, tmpFrameBufferHeight)
 
         GLFW.glfwSetKeyCallback(
             window,
@@ -160,10 +172,16 @@ class GlfwPlatform(
         )
 
         GL.createCapabilities(true)
+        return WindowManager(
+            windowWidth = tmpWidth.get(),
+            windowHeight = tmpHeight.get(),
+            screenWidth = tmpFrameBufferWidth.get(),
+            screenHeight = tmpFrameBufferHeight.get(),
+        )
     }
 
-    override fun initRenderManager(): RenderContext {
-        return render.init()
+    override fun initRenderManager(windowManager: WindowManager): RenderContext {
+        return render.init(windowManager)
     }
 
     override fun gameLoop(gameLoop: GameLoop) {
