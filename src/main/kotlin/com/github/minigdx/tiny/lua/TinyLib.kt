@@ -3,6 +3,7 @@ package com.github.minigdx.tiny.lua
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameScript
+import com.github.minigdx.tiny.engine.SpriteSheetType.GAME
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
@@ -61,7 +62,38 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
         env["rectf"] = rectf()
         env["circle"] = circle()
         env["circlef"] = circlef()
+        env["sspr"] = sspr()
         return tiny
+    }
+
+    @DocFunction(
+        name = "sspr",
+    )
+    internal inner class sspr : LibFunction() {
+        // x, y, spr x, spr y, width, height, flip x, flip y
+        override fun invoke(args: Varargs): Varargs {
+            if(args.narg() < 6) return NONE
+            val x = args.arg(1).checkint()
+            val y = args.arg(2).checkint()
+            val sprX = args.arg(3).checkint()
+            val sprY = args.arg(4).checkint()
+            val sprWidth = args.arg(5).checkint()
+            val sprHeight = args.arg(6).checkint()
+            val flipX = args.arg(7).optboolean(false)
+            val flipY = args.arg(8).optboolean(false)
+
+            val spritesheet = parent.spriteSheets[GAME] ?: return NONE
+
+            spritesheet.copy(
+                x, y, parent.frameBuffer,
+                sprX,
+                sprY,
+                sprWidth,
+                sprHeight
+            )
+
+            return NONE
+        }
     }
 
     @DocFunction(

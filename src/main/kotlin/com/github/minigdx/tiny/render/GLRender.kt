@@ -36,16 +36,11 @@ import com.github.minigdx.tiny.platform.RenderContext
 import org.lwjgl.opengl.GL33
 
 
-interface Render {
-    fun init(): RenderContext
-
-    fun draw(context: RenderContext, image: ByteArray, width: Pixel, height: Pixel)
-}
 class GLRender(
     private val gl: Kgl,
     private val logger: Logger,
     private val gameOption: GameOption,
-) : Render{
+) : Render {
 
     private val uvsData = FloatBuffer(
         floatArrayOf(

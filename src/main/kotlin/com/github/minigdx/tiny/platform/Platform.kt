@@ -1,8 +1,11 @@
 package com.github.minigdx.tiny.platform
 
+import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameOption
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.graphic.FrameBuffer
+
+class ImageData(val data: ByteArray, val width: Pixel, val height: Pixel)
 
 interface Platform {
     /**
@@ -28,6 +31,12 @@ interface Platform {
      * Draw the image on the screen
      */
     fun draw(context: RenderContext, frameBuffer: FrameBuffer)
+
+    /**
+     * Take the compressed image data (ie: PNG) and return
+     * an uncompressed image data with RGBA for each pixel.
+     */
+    fun extractRGBA(imageData: ByteArray): ImageData
 
     /**
      * Save the last 30 seconds of the game.

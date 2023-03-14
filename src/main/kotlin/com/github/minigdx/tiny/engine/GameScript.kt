@@ -22,6 +22,7 @@ class GameScript(val name: String, gameOption: GameOption) {
     var reloaded: Boolean = false
 
     var content: ByteArray = ByteArray(0)
+    var spriteSheets: Map<SpriteSheetType, SpriteSheet> = emptyMap()
 
     private var initFunction: LuaValue? = null
     private var updateFunction: LuaValue? = null
@@ -97,6 +98,10 @@ class GameScript(val name: String, gameOption: GameOption) {
     fun advance() {
         updateFunction?.call()
         drawFunction?.call()
+    }
+
+    fun resourcesLoaded() {
+        globals?.get("_resources")?.nullIfNil()?.call()
     }
 
     private fun LuaValue.nullIfNil(): LuaValue? {

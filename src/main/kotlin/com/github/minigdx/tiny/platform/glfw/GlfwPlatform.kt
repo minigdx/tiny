@@ -1,7 +1,7 @@
 package com.github.minigdx.tiny.platform.glfw
 
-import com.danielgergely.kgl.Kgl
 import com.danielgergely.kgl.KglLwjgl
+import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOption
@@ -9,10 +9,10 @@ import com.github.minigdx.tiny.file.FileStream
 import com.github.minigdx.tiny.file.VirtualFileSystem
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.log.Logger
+import com.github.minigdx.tiny.platform.ImageData
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.RenderContext
 import com.github.minigdx.tiny.render.GLRender
-import com.github.minigdx.tiny.render.GLRenderContext
 import com.github.minigdx.tiny.util.MutableFixedSizeList
 import com.squareup.gifencoder.FastGifEncoder
 import com.squareup.gifencoder.Image
@@ -30,9 +30,11 @@ import org.lwjgl.glfw.GLFW.GLFW_RELEASE
 import org.lwjgl.glfw.GLFWKeyCallback
 import org.lwjgl.opengl.GL
 import org.lwjgl.system.MemoryUtil
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.concurrent.TimeUnit
+import javax.imageio.ImageIO
 import kotlin.math.min
 
 
@@ -247,8 +249,34 @@ class GlfwPlatform(
         }
     }
 
+    override fun extractRGBA(imageData: ByteArray): ImageData {
+        val image = ImageIO.read(ByteArrayInputStream(imageData))
+        val width = image.width
+        val height = image.height
+
+        val rgb = image.getRGB(0, 0, width, height, null, 0, width)
+
+        val result = ByteArray(width * height * RGBA)
+
+        (0 until rgb.size).forEach { pixel ->
+            // rgb is in ARGB format
+            val p = rgb[pixel]
+            val r = (p shr 16) and 0xFF
+            val g = (p shr 8) and 0xFF
+            val b = p and 0xFF
+            val a = (p shr 24) and 0xFF
+
+            result[pixel * RGBA + 0] = r.toByte()
+            result[pixel * RGBA + 1] = g.toByte()
+            result[pixel * RGBA + 2] = b.toByte()
+            result[pixel * RGBA + 3] = a.toByte()
+        }
+        return ImageData(result, width, height)
+    }
+
     companion object {
         private const val FPS = 60
+        private const val RGBA = 4
     }
 }
 

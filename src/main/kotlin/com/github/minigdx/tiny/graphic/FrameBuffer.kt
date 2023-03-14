@@ -14,8 +14,6 @@ class FrameBuffer(val width: Pixel, val height: Pixel) {
     internal var buffer: ByteArray = ByteArray(height * width * RGBA)
     internal var gifBuffer: IntArray = IntArray(0)
 
-
-
     fun pixel(x: Pixel, y: Pixel): ColorIndex {
         return colorIndexBuffer[x, y]
     }
@@ -88,7 +86,7 @@ class FrameBuffer(val width: Pixel, val height: Pixel) {
 
         private const val DEFAULT_INDEX = 1
 
-        private val defaultPalette: Array<ByteArray> = arrayOf(
+        val defaultPalette: Array<ByteArray> = arrayOf(
             color(0x00, 0x00, 0x00), // fake color so the palette start at 1
             color(0x00, 0x00, 0x00), // black
             color(0x1D, 0x2B, 0x53), // light black

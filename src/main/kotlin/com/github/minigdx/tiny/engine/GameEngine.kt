@@ -1,19 +1,25 @@
 package com.github.minigdx.tiny.engine
 
+import com.github.minigdx.tiny.ColorIndex
+import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.Seconds
+import com.github.minigdx.tiny.engine.SpriteSheetType.GAME
 import com.github.minigdx.tiny.file.FileStream
 import com.github.minigdx.tiny.file.VirtualFileSystem
+import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.log.Logger
-import com.github.minigdx.tiny.platform.RenderContext
 import com.github.minigdx.tiny.platform.Platform
+import com.github.minigdx.tiny.platform.RenderContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.launch
 import org.luaj.vm2.LuaError
 import java.io.File
@@ -36,6 +42,35 @@ class ScriptsCollector(private val events: MutableList<GameScript>) : FlowCollec
 
 }
 
+enum class SpriteSheetType {
+    // BOOT,
+    GAME
+}
+
+class SpriteSheet(
+    var pixels: Array<Array<ColorIndex>>,
+    var width: Pixel,
+    var height: Pixel,
+    val type: SpriteSheetType,
+    var reload: Boolean = true,
+    var isLoaded: Boolean = false
+) {
+    fun copy(dstX: Pixel, dstY: Pixel, dst: FrameBuffer, x: Pixel, y: Pixel, width: Pixel, height: Pixel) {
+        (0 until width).forEach { offsetX ->
+            (0 until height).forEach { offsetY ->
+                val colorIndex = pixels[y + offsetY][x + offsetX]
+                dst.pixel(dstX + offsetX, dstY + offsetY, colorIndex)
+            }
+        }
+    }
+}
+
+enum class ResourcesState {
+    BOOT,
+    BOOTED,
+    LOADED,
+}
+
 class GameEngine(
     val gameOption: GameOption,
     val platform: Platform,
@@ -49,6 +84,9 @@ class GameEngine(
     private val events: MutableList<GameScript> = mutableListOf()
     private val workEvents: MutableList<GameScript> = mutableListOf()
 
+    private var spriteSheets = emptyMap<SpriteSheetType, SpriteSheet>()
+    private var resourcesState: ResourcesState = ResourcesState.BOOT
+
     private var current: GameScript? = null
 
     private var accumulator: Seconds = 0f
@@ -60,15 +98,8 @@ class GameEngine(
 
         val scope = CoroutineScope(Dispatchers.Default)
 
-        // plutot essayer de faire la partie drawing avant d'attaquer la partie texture ?
-        // faire des primitives pour lignes / cercles / rectangles / pixel
-        // 3 scripts ??
-        // 1er script : boucle uniquement de code ? -> avec resourceLoaded, uniquement 1 script est nécessaire.
-        // 2nd script : boucle avec texture bundle
-        // 3nd script : texture du jeu
-        // loading texture async. tant qu'il n'y a pas la texture, utiliser placeholder : uniquement red ??
-        // créer methode function resourceLoaded end
         val scriptsName = listOf("src/main/resources/boot.lua", "src/main/resources/test.lua")
+        val resourcesName = listOf("src/main/resources/boot.png", "src/main/resources/test.png")
 
         scope.launch {
             scriptsName.asFlow()
@@ -85,12 +116,81 @@ class GameEngine(
                     emitAll(scriptsLoading)
                 }.collect(ScriptsCollector(events))
         }
+        scope.launch {
+            resourcesName.asFlow()
+                .zip(listOf(/*BOOT,*/ GAME, GAME).asFlow()) { file, type ->
+                    file to type
+                }
+                .flatMapMerge { (file, type) ->
+                    vfs.watch(FileStream(File(file)))
+                        .map { data -> platform.extractRGBA(data) }
+                        .map { data ->
+                            val pixels = convertTexture(data.data)
+                            val sheet = convertToColorIndex(pixels, data.width, data.height)
+                            SpriteSheet(sheet, data.width, data.height, type)
+                        }
+                }
+                .collect { spriteSheet ->
+                    spriteSheets += spriteSheet.type to spriteSheet
+                    if (spriteSheets.keys.containsAll(SpriteSheetType.values().toSet())) {
+                        resourcesState = ResourcesState.BOOTED
+                    }
+                }
+
+        }
 
         renderContext = platform.initRenderManager()
 
         platform.gameLoop(this)
     }
 
+    private fun convertTexture(imageData: ByteArray): ByteArray {
+        fun dst(r1: Int, g1: Int, b1: Int, r2: Int, g2: Int, b2: Int): Int {
+            val r = (r1 - r2) * (r1 - r2)
+            val g = (g1 - g2) * (g1 - g2)
+            val b = (b1 - b2) * (b1 - b2)
+            return r + g + b
+        }
+
+        (0 until imageData.size step RGBA).forEach { pixel ->
+            val r = imageData[pixel + 0]
+            val g = imageData[pixel + 1]
+            val b = imageData[pixel + 2]
+
+            val paletteColor = FrameBuffer.defaultPalette.minBy { color ->
+                dst(color[0].toInt(), color[1].toInt(), color[2].toInt(), r.toInt(), g.toInt(), b.toInt())
+            }
+
+            imageData[pixel + 0] = paletteColor[0]
+            imageData[pixel + 1] = paletteColor[1]
+            imageData[pixel + 2] = paletteColor[2]
+            imageData[pixel + 3] = paletteColor[3]
+        }
+        return imageData
+    }
+
+    private fun convertToColorIndex(data: ByteArray, width: Pixel, height: Pixel): Array<Array<ColorIndex>> {
+        val map = FrameBuffer.defaultPalette.mapIndexed { index, color -> color.toList() to index }
+            .toMap()
+
+        val result: Array<Array<ColorIndex>> = Array(height) {
+            Array(width) { 0 }
+        }
+
+        (0 until width).forEach { x ->
+            (0 until height).forEach { y ->
+                val coord = (x + y * width) * RGBA
+                val key = listOf(
+                    data[coord + 0],
+                    data[coord + 1],
+                    data[coord + 2],
+                    data[coord + 3]
+                )
+                result[y][x] = map[key] ?: 0
+            }
+        }
+        return result
+    }
 
     private var inError = false
 
@@ -132,6 +232,19 @@ class GameEngine(
                 val state = getState()
                 evaluate()
                 setState(state)
+                // FIXME: call resourcesLoaded
+            }
+
+            if (spriteSheets.values.any { it.reload }) {
+                spriteSheets.forEach { _, s -> s.reload = false }
+                current?.spriteSheets = this@GameEngine.spriteSheets
+            }
+
+            if (resourcesState == ResourcesState.BOOTED) {
+                resourcesState = ResourcesState.LOADED
+                logger.debug("GAME_ENGINE") { "Resources loaded" }
+                current?.spriteSheets = this@GameEngine.spriteSheets
+                current?.resourcesLoaded()
             }
 
             // Fixed step simulation
@@ -141,8 +254,8 @@ class GameEngine(
                     current?.advance()
                     false
                 } catch (ex: LuaError) {
-                    if(!inError) { // display the log only once.
-                        logger.warn("TINY") { "The line ${ex.level} trigger an execution error (${ex.getLuaMessage()}). Please fix your script!"}
+                    if (!inError) { // display the log only once.
+                        logger.warn("TINY") { "The line ${ex.level} trigger an execution error (${ex.getLuaMessage()}). Please fix your script!" }
                     }
                     true
                 }
@@ -161,6 +274,7 @@ class GameEngine(
 
     companion object {
         private const val REFRESH_LIMIT: Seconds = 1 / 60f
+        const val RGBA = 4
     }
 
 }

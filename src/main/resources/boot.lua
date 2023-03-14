@@ -44,7 +44,18 @@ function draw()
     x = (x + 1) % 127
     circle(x, 64, 4, 9)
 
+
+    sspr(10, 10,
+            10, 10,
+            120, 120)
+    
     xx = cos(dt) * 64 + 64
     rectf(xx + 1, 11, 10, 20, 4)
     rect(xx, 10, 10, 20, 12)
+
+
+end
+
+function _resources()
+    print("LOADED")
 end
