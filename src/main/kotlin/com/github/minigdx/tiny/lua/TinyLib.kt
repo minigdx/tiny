@@ -63,6 +63,7 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
         env["circle"] = circle()
         env["circlef"] = circlef()
         env["sspr"] = sspr()
+        env["spr"] = spr()
         return tiny
     }
 
@@ -90,6 +91,60 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
                 sprY,
                 sprWidth,
                 sprHeight
+            )
+
+            return NONE
+        }
+    }
+
+    @DocFunction(
+        name = "spr",
+    )
+    internal inner class spr : LibFunction() {
+        // sprn, x, y, flip x, flip y
+        override fun call(a: LuaValue, b: LuaValue, c: LuaValue): LuaValue {
+            val sprN = a.checkint()
+            val x = b.checkint()
+            val y = c.checkint()
+            val spritesheet = parent.spriteSheets[GAME] ?: return NONE
+
+            val (sw, sh) = parent.gameOption.spriteSize
+            val nbSpritePerRow = spritesheet.width / sw
+
+            val column = sprN % nbSpritePerRow
+            val row = (sprN - column) / nbSpritePerRow
+            spritesheet.copy(
+                x, y,
+                parent.frameBuffer,
+                column * sw,
+                row * sh,
+                sw, sh
+            )
+
+            return NONE
+        }
+
+        override fun invoke(args: Varargs): Varargs {
+            if (args.narg() < 3) return NONE
+            val sprN = args.arg(1).checkint()
+            val x = args.arg(2).checkint()
+            val y = args.arg(3).checkint()
+            val flipX = args.arg(4).optboolean(false)
+            val flipY = args.arg(6).optboolean(false)
+
+            val spritesheet = parent.spriteSheets[GAME] ?: return NONE
+
+            val (sw, sh) = parent.gameOption.spriteSize
+            val nbSpritePerRow = spritesheet.width / sw
+
+            val column = sprN % nbSpritePerRow
+            val row = (sprN - column) / nbSpritePerRow
+            spritesheet.copy(
+                x, y, parent.frameBuffer,
+                column * sw,
+                row * sh,
+                sw,
+                sh
             )
 
             return NONE

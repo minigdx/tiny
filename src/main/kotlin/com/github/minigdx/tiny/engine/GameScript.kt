@@ -14,7 +14,7 @@ import org.luaj.vm2.lib.PackageLib
 import org.luaj.vm2.lib.StringLib
 import org.luaj.vm2.lib.TableLib
 
-class GameScript(val name: String, gameOption: GameOption) {
+class GameScript(val name: String, val gameOption: GameOption) {
 
     var exited: Boolean = false
     var evaluated: Boolean = false
