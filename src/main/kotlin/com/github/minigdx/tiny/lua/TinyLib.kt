@@ -3,7 +3,7 @@ package com.github.minigdx.tiny.lua
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameScript
-import com.github.minigdx.tiny.engine.SpriteSheetType.GAME
+import com.github.minigdx.tiny.engine.ResourceType.GAME_SPRITESHEET
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
@@ -83,7 +83,7 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
             val flipX = args.arg(7).optboolean(false)
             val flipY = args.arg(8).optboolean(false)
 
-            val spritesheet = parent.spriteSheets[GAME] ?: return NONE
+            val spritesheet = parent.spriteSheets[GAME_SPRITESHEET] ?: return NONE
 
             spritesheet.copy(
                 x, y, parent.frameBuffer,
@@ -106,7 +106,7 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
             val sprN = a.checkint()
             val x = b.checkint()
             val y = c.checkint()
-            val spritesheet = parent.spriteSheets[GAME] ?: return NONE
+            val spritesheet = parent.spriteSheets[GAME_SPRITESHEET] ?: return NONE
 
             val (sw, sh) = parent.gameOption.spriteSize
             val nbSpritePerRow = spritesheet.width / sw
@@ -132,7 +132,7 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
             val flipX = args.arg(4).optboolean(false)
             val flipY = args.arg(6).optboolean(false)
 
-            val spritesheet = parent.spriteSheets[GAME] ?: return NONE
+            val spritesheet = parent.spriteSheets[GAME_SPRITESHEET] ?: return NONE
 
             val (sw, sh) = parent.gameOption.spriteSize
             val nbSpritePerRow = spritesheet.width / sw

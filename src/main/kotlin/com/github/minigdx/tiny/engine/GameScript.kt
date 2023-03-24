@@ -14,15 +14,22 @@ import org.luaj.vm2.lib.PackageLib
 import org.luaj.vm2.lib.StringLib
 import org.luaj.vm2.lib.TableLib
 
-class GameScript(val name: String, val gameOption: GameOption) {
+class GameScript(
+    val name: String,
+    val gameOption: GameOption,
+    override val type: ResourceType
+): GameResource {
 
     var exited: Boolean = false
     var evaluated: Boolean = false
     var loading: Boolean = false
     var reloaded: Boolean = false
 
+    override var reload: Boolean = false
+    override var isLoaded: Boolean = false
+
     var content: ByteArray = ByteArray(0)
-    var spriteSheets: Map<SpriteSheetType, SpriteSheet> = emptyMap()
+    var spriteSheets: Map<ResourceType, SpriteSheet> = emptyMap()
 
     private var initFunction: LuaValue? = null
     private var updateFunction: LuaValue? = null

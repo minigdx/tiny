@@ -9,7 +9,7 @@ function draw()
         dt = dt - 2
         index = index + 1
     end
-    cls(2)
+    cls(3)
     spr(index, 2, 3)
 
 
