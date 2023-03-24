@@ -10,7 +10,6 @@ import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
 import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.OneArgFunction
-import org.luaj.vm2.lib.TableLib
 import org.luaj.vm2.lib.ThreeArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
@@ -46,7 +45,7 @@ annotation class DocCall(
     val mainCall: Boolean = false
 )
 
-class MapLib(private val parent: GameScript): TwoArgFunction() {
+class MapLib(private val parent: GameScript) : TwoArgFunction() {
     override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
         val map = LuaTable()
         map.set("draw", draw())
@@ -56,25 +55,36 @@ class MapLib(private val parent: GameScript): TwoArgFunction() {
     }
 
     inner class draw() : LibFunction() {
+
         override fun call(): LuaValue {
             val layer = parent.level?.imageLayers?.get(0)
-            layer?.pixels?.forEachIndexed { y, row ->
-                row.forEachIndexed { x, colorIndex ->
-                    parent.frameBuffer.pixel(x, y, colorIndex)
-                }
+            if (layer != null) {
+                parent.frameBuffer.colorIndexBuffer.copyFrom(
+                    source = layer.pixels,
+                    dstX = 0,
+                    dstY = 0,
+                    sourceX = 0,
+                    sourceY = 0,
+                    width = layer.width,
+                    height = layer.height
+                )
             }
-
             return NONE
         }
 
-        override fun invoke(args: Varargs): Varargs {
-            val layer = parent.level?.imageLayers?.get(0)
-            layer?.pixels?.forEachIndexed { y, row ->
-                row.forEachIndexed { x, colorIndex ->
-                    parent.frameBuffer.pixel(x, y, colorIndex)
-                }
+        override fun call(a: LuaValue): LuaValue {
+            val layer = parent.level?.imageLayers?.getOrNull(a.checkint())
+            if (layer != null) {
+                parent.frameBuffer.colorIndexBuffer.copyFrom(
+                    source = layer.pixels,
+                    dstX = 0,
+                    dstY = 0,
+                    sourceX = 0,
+                    sourceY = 0,
+                    width = layer.width,
+                    height = layer.height
+                )
             }
-
             return NONE
         }
     }
@@ -109,7 +119,7 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
     internal inner class sspr : LibFunction() {
         // x, y, spr x, spr y, width, height, flip x, flip y
         override fun invoke(args: Varargs): Varargs {
-            if(args.narg() < 6) return NONE
+            if (args.narg() < 6) return NONE
             val x = args.arg(1).checkint()
             val y = args.arg(2).checkint()
             val sprX = args.arg(3).checkint()
@@ -121,12 +131,14 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
 
             val spritesheet = parent.spriteSheets[GAME_SPRITESHEET] ?: return NONE
 
-            spritesheet.copy(
-                x, y, parent.frameBuffer,
-                sprX,
+
+            parent.frameBuffer.colorIndexBuffer.copyFrom(
+                spritesheet.pixels, x, y, sprX,
                 sprY,
                 sprWidth,
-                sprHeight
+                sprHeight,
+                flipX,
+                flipY,
             )
 
             return NONE
@@ -149,9 +161,8 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
 
             val column = sprN % nbSpritePerRow
             val row = (sprN - column) / nbSpritePerRow
-            spritesheet.copy(
-                x, y,
-                parent.frameBuffer,
+            parent.frameBuffer.colorIndexBuffer.copyFrom(
+                spritesheet.pixels, x, y,
                 column * sw,
                 row * sh,
                 sw, sh
@@ -166,7 +177,7 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
             val x = args.arg(2).checkint()
             val y = args.arg(3).checkint()
             val flipX = args.arg(4).optboolean(false)
-            val flipY = args.arg(6).optboolean(false)
+            val flipY = args.arg(5).optboolean(false)
 
             val spritesheet = parent.spriteSheets[GAME_SPRITESHEET] ?: return NONE
 
@@ -175,12 +186,16 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
 
             val column = sprN % nbSpritePerRow
             val row = (sprN - column) / nbSpritePerRow
-            spritesheet.copy(
-                x, y, parent.frameBuffer,
-                column * sw,
-                row * sh,
-                sw,
-                sh
+            parent.frameBuffer.colorIndexBuffer.copyFrom(
+                source = spritesheet.pixels,
+                dstX = x,
+                dstY = y,
+                sourceX = column * sw,
+                sourceY = row * sh,
+                width = sw,
+                height = sh,
+                reverseX = flipX,
+                reverseY = flipY
             )
 
             return NONE

@@ -7,6 +7,7 @@ import com.github.minigdx.tiny.engine.GameOption
 import com.github.minigdx.tiny.file.FileStream
 import com.github.minigdx.tiny.file.VirtualFileSystem
 import com.github.minigdx.tiny.graphic.FrameBuffer
+import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.resources.ResourceType.BOOT_GAMESCRIPT
@@ -14,6 +15,7 @@ import com.github.minigdx.tiny.resources.ResourceType.BOOT_SPRITESHEET
 import com.github.minigdx.tiny.resources.ResourceType.GAME_GAMESCRIPT
 import com.github.minigdx.tiny.resources.ResourceType.GAME_LEVEL
 import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
+import com.github.minigdx.tiny.util.PixelFormat
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -35,7 +37,7 @@ class LdKtIntLayer(
     val y: Pixel,
     val width: Pixel,
     val height: Pixel,
-    var ints: Array<Int> = emptyArray(),
+    var ints: PixelArray = PixelArray(width, height),
 )
 
 class LdKtImageLayer(
@@ -45,7 +47,7 @@ class LdKtImageLayer(
     val y: Pixel,
     val width: Pixel,
     val height: Pixel,
-    var pixels: Array<Array<ColorIndex>> = emptyArray(),
+    var pixels: PixelArray = PixelArray(width, height),
 )
 
 @FlowPreview
@@ -169,13 +171,12 @@ class ResourceFactory(
         return imageData
     }
 
-    private fun convertToColorIndex(data: ByteArray, width: Pixel, height: Pixel): Array<Array<ColorIndex>> {
+    private fun convertToColorIndex(data: ByteArray, width: Pixel, height: Pixel): PixelArray {
+
         val map = FrameBuffer.defaultPalette.mapIndexed { index, color -> color.toList() to index }
             .toMap()
 
-        val result: Array<Array<ColorIndex>> = Array(height) {
-            Array(width) { 0 }
-        }
+        val result = PixelArray(width, height)
 
         (0 until width).forEach { x ->
             (0 until height).forEach { y ->
@@ -186,7 +187,7 @@ class ResourceFactory(
                     data[coord + 2],
                     data[coord + 3]
                 )
-                result[y][x] = map[key] ?: 0
+                result.set(x, y, map[key] ?: 0)
             }
         }
         return result

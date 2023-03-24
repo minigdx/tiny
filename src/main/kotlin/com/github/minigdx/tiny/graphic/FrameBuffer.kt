@@ -3,38 +3,29 @@ package com.github.minigdx.tiny.graphic
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.HexValue
 import com.github.minigdx.tiny.Pixel
+import com.github.minigdx.tiny.util.PixelFormat
 import kotlin.math.abs
 
 class FrameBuffer(val width: Pixel, val height: Pixel) {
 
-    private val colorIndexBuffer: Array<Array<ColorIndex>> = Array(height) { line ->
-        Array(width) { 0 }
-    }
+    internal val colorIndexBuffer: PixelArray = PixelArray(width, height, PixelFormat.INDEX)
 
     internal var buffer: ByteArray = ByteArray(height * width * RGBA)
+
     internal var gifBuffer: IntArray = IntArray(0)
 
     fun pixel(x: Pixel, y: Pixel): ColorIndex {
-        return colorIndexBuffer[x, y]
+        return colorIndexBuffer.get(x, y)[0]
     }
 
     fun pixel(x: Pixel, y: Pixel, colorIndex: ColorIndex) {
         val index = colorIndex % defaultPalette.size
-        colorIndexBuffer[x, y] = index
+        colorIndexBuffer.set(x, y, index)
     }
-
-    private operator fun Array<Array<ColorIndex>>.get(x: Pixel, y: Pixel): ColorIndex {
-        return if (validCoordinates(x, y)) {
-            colorIndexBuffer[y][x]
-        } else {
-            DEFAULT_INDEX
-        }
-    }
-
 
     private operator fun Array<Array<ColorIndex>>.set(x: Pixel, y: Pixel, value: ColorIndex) {
         if (validCoordinates(x, y)) {
-            colorIndexBuffer[y][x] = value
+            colorIndexBuffer.set(x, y, value)
         }
     }
 
@@ -42,7 +33,7 @@ class FrameBuffer(val width: Pixel, val height: Pixel) {
         val clearIndex = abs(clearIndx) % defaultPalette.size
         for (x in 0 until width) {
             for (y in 0 until height) {
-                colorIndexBuffer[y][x] = clearIndex
+                colorIndexBuffer.set(x, y, clearIndex)
             }
         }
     }
@@ -59,7 +50,7 @@ class FrameBuffer(val width: Pixel, val height: Pixel) {
         var posGif = 0
         for (x in 0 until width) {
             for (y in 0 until height) {
-                val index = colorIndexBuffer[y][x]
+                val index = colorIndexBuffer.get(x, y)[0]
                 val color = defaultPalette[index]
 
                 buffer[pos++] = color[0]
