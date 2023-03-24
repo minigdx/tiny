@@ -14,6 +14,9 @@ class FileStream(private val origin: File) : SourceStream<ByteArray>, TargetStre
     private var lastModified: Long = 0
 
     override fun wasModified(): Boolean {
+        if(!origin.exists()) {
+            return false
+        }
         val wasModified = if(origin.lastModified() != lastModified) {
             lastModified = origin.lastModified()
             true

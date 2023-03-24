@@ -2,14 +2,15 @@ package com.github.minigdx.tiny.lua
 
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
-import com.github.minigdx.tiny.engine.GameScript
-import com.github.minigdx.tiny.engine.ResourceType.GAME_SPRITESHEET
+import com.github.minigdx.tiny.resources.GameScript
+import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
 import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.OneArgFunction
+import org.luaj.vm2.lib.TableLib
 import org.luaj.vm2.lib.ThreeArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
@@ -44,6 +45,41 @@ annotation class DocCall(
     val documentation: String = "",
     val mainCall: Boolean = false
 )
+
+class MapLib(private val parent: GameScript): TwoArgFunction() {
+    override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
+        val map = LuaTable()
+        map.set("draw", draw())
+        arg2.set("map", map)
+        arg2.get("package").get("loaded").set("map", map)
+        return map
+    }
+
+    inner class draw() : LibFunction() {
+        override fun call(): LuaValue {
+            val layer = parent.level?.imageLayers?.get(0)
+            layer?.pixels?.forEachIndexed { y, row ->
+                row.forEachIndexed { x, colorIndex ->
+                    parent.frameBuffer.pixel(x, y, colorIndex)
+                }
+            }
+
+            return NONE
+        }
+
+        override fun invoke(args: Varargs): Varargs {
+            val layer = parent.level?.imageLayers?.get(0)
+            layer?.pixels?.forEachIndexed { y, row ->
+                row.forEachIndexed { x, colorIndex ->
+                    parent.frameBuffer.pixel(x, y, colorIndex)
+                }
+            }
+
+            return NONE
+        }
+    }
+
+}
 
 class TinyLib(val parent: GameScript) : TwoArgFunction() {
     override fun call(modname: LuaValue, env: LuaValue): LuaValue {

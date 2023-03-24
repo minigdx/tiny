@@ -1,6 +1,8 @@
-package com.github.minigdx.tiny.engine
+package com.github.minigdx.tiny.resources
 
+import com.github.minigdx.tiny.engine.GameOption
 import com.github.minigdx.tiny.graphic.FrameBuffer
+import com.github.minigdx.tiny.lua.MapLib
 import com.github.minigdx.tiny.lua.TinyLib
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LoadState
@@ -30,6 +32,7 @@ class GameScript(
 
     var content: ByteArray = ByteArray(0)
     var spriteSheets: Map<ResourceType, SpriteSheet> = emptyMap()
+    var level: GameLevel? = null
 
     private var initFunction: LuaValue? = null
     private var updateFunction: LuaValue? = null
@@ -51,6 +54,7 @@ class GameScript(
         load(StringLib())
         load(CoroutineLib())
         load(TinyLib(this@GameScript))
+        load(MapLib(this@GameScript))
         LoadState.install(this)
         LuaC.install(this)
     }

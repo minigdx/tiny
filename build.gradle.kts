@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "1.8.0"
+    kotlin("plugin.serialization") version "1.8.0"
 }
 
 group = "org.example"
@@ -19,6 +20,8 @@ dependencies {
     implementation("com.soywiz.korlibs.luak:luak:4.0.0-alpha-2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     implementation("com.danielgergely.kgl:kgl:0.6.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
+
 
     // JVM Specific
     implementation("com.danielgergely.kgl:kgl-lwjgl:0.6.1")

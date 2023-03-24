@@ -1,19 +1,23 @@
 package com.github.minigdx.tiny.engine
 
-import com.github.minigdx.tiny.ColorIndex
-import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.Seconds
-import com.github.minigdx.tiny.engine.ResourceType.BOOT_GAMESCRIPT
-import com.github.minigdx.tiny.engine.ResourceType.BOOT_SPRITESHEET
-import com.github.minigdx.tiny.engine.ResourceType.GAME_GAMESCRIPT
-import com.github.minigdx.tiny.engine.ResourceType.GAME_SPRITESHEET
-import com.github.minigdx.tiny.engine.ResourcesState.BOOT
-import com.github.minigdx.tiny.file.ResourceFactory
+import com.github.minigdx.tiny.resources.ResourceType.BOOT_GAMESCRIPT
+import com.github.minigdx.tiny.resources.ResourceType.BOOT_SPRITESHEET
+import com.github.minigdx.tiny.resources.ResourceType.GAME_GAMESCRIPT
+import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
+import com.github.minigdx.tiny.resources.ResourcesState.BOOT
+import com.github.minigdx.tiny.resources.ResourceFactory
 import com.github.minigdx.tiny.file.VirtualFileSystem
-import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.RenderContext
+import com.github.minigdx.tiny.resources.GameLevel
+import com.github.minigdx.tiny.resources.GameResource
+import com.github.minigdx.tiny.resources.GameScript
+import com.github.minigdx.tiny.resources.ResourceType
+import com.github.minigdx.tiny.resources.ResourceType.GAME_LEVEL
+import com.github.minigdx.tiny.resources.ResourcesState
+import com.github.minigdx.tiny.resources.SpriteSheet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.FlowCollector
@@ -51,62 +55,6 @@ class ScriptsCollector(private val events: MutableList<GameScript>) : FlowCollec
         }
     }
 
-}
-
-enum class ResourceType {
-    BOOT_GAMESCRIPT,
-    GAME_GAMESCRIPT,
-    BOOT_SPRITESHEET,
-    GAME_SPRITESHEET,
-    GAME_LEVEL,
-}
-
-interface GameResource {
-    /**
-     * Type of the resource.
-     */
-    val type: ResourceType
-
-    /**
-     * The resource needs to be reloaded ?
-     */
-    var reload: Boolean
-
-    /**
-     * The resource is loaded?
-     */
-    var isLoaded: Boolean
-}
-
-class SpriteSheet(
-    var pixels: Array<Array<ColorIndex>>,
-    var width: Pixel,
-    var height: Pixel,
-    override val type: ResourceType,
-    override var reload: Boolean = true,
-    override var isLoaded: Boolean = false,
-
-    ) : GameResource {
-    fun copy(dstX: Pixel, dstY: Pixel, dst: FrameBuffer, x: Pixel, y: Pixel, width: Pixel, height: Pixel) {
-        (0 until width).forEach { offsetX ->
-            (0 until height).forEach { offsetY ->
-                val colorIndex = pixels[y + offsetY][x + offsetX]
-                dst.pixel(dstX + offsetX, dstY + offsetY, colorIndex)
-            }
-        }
-    }
-}
-
-class GameLevel(
-    override val type: ResourceType,
-    override var reload: Boolean = true,
-    override var isLoaded: Boolean = false
-) : GameResource
-
-enum class ResourcesState {
-    BOOT,
-    BOOTED,
-    LOADED,
 }
 
 class GameEngine(
@@ -164,7 +112,10 @@ class GameEngine(
                     if (resource.type in setOf(BOOT_SPRITESHEET, GAME_SPRITESHEET)) {
                         spriteSheets += resource.type to (resource as SpriteSheet)
                     }
-                    if (resources.size == resourcesName.size) {
+                    if(resource.type == GAME_LEVEL) {
+                        current?.level = resource as GameLevel
+                    }
+                    if (resources.size == resourcesName.size && resourcesState == BOOT) {
                         resourcesState = ResourcesState.BOOTED
                     }
                 }
@@ -216,7 +167,7 @@ class GameEngine(
                 val state = getState()
                 evaluate()
                 setState(state)
-                // FIXME: call resourcesLoaded
+                inError = false
             }
 
             if (spriteSheets.values.any { it.reload }) {
@@ -239,7 +190,7 @@ class GameEngine(
                     false
                 } catch (ex: LuaError) {
                     if (!inError) { // display the log only once.
-                        logger.warn("TINY") { "The line ${ex.level} trigger an execution error (${ex.getLuaMessage()}). Please fix your script!" }
+                        logger.warn("TINY", ex) { "The line ${ex.level} trigger an execution error (${ex.getLuaMessage()}). Please fix your script!" }
                     }
                     true
                 }
