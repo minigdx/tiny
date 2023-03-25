@@ -7,7 +7,7 @@ class MutableFixedSizeList<T>(override val size: Int) : MutableList<T> {
     private val delegate: MutableList<T> = ArrayList<T>(size)
 
     private fun evictOldElements() {
-        val eltToRemove = max(0, count() - size)
+        val eltToRemove = max(0, delegate.size - size)
         (0 until eltToRemove).forEach { _ ->
             removeAt(0)
         }
