@@ -1,3 +1,5 @@
+@file:OptIn(FlowPreview::class)
+
 package com.github.minigdx.tiny.platform.glfw
 
 import com.danielgergely.kgl.KglLwjgl
@@ -18,6 +20,7 @@ import com.squareup.gifencoder.Image
 import com.squareup.gifencoder.ImageOptions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onCompletion
@@ -224,7 +227,7 @@ class GlfwPlatform(
                     gameOption.width * gameOption.zoom,
                     gameOption.height * gameOption.zoom,
                     0,
-                    FrameBuffer.rgbPalette
+                    IntArray(0)
                 )
                 flowOf(*buffer.toTypedArray())
                     .withIndex()

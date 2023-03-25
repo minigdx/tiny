@@ -1,6 +1,5 @@
 package com.github.minigdx.tiny.resources
 
-import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameEngine
 import com.github.minigdx.tiny.engine.GameOption
@@ -84,8 +83,7 @@ class ResourceFactory(
                     .flatMapMerge { layer ->
                         vfs.watch(FileStream(File(layer.name))).map { data ->
                             val imageData = platform.extractRGBA(data)
-                            val pixels = convertTexture(imageData.data)
-                            convertToColorIndex(pixels, level.width, level.height)
+                            convertToColorIndex(imageData.data, level.width, level.height)
                         }.map { texture ->
                             layer.apply {
                                 pixels = texture
@@ -136,8 +134,7 @@ class ResourceFactory(
     private fun spritesheet(name: String, resourceType: ResourceType): Flow<SpriteSheet> {
         return vfs.watch(FileStream(File(name))).map { data ->
             val imageData = platform.extractRGBA(data)
-            val pixels = convertTexture(imageData.data)
-            val sheet = convertToColorIndex(pixels, imageData.width, imageData.height)
+            val sheet = convertToColorIndex(imageData.data, imageData.width, imageData.height)
             SpriteSheet(sheet, imageData.width, imageData.height, resourceType)
         }.onEach {
             logger.debug("RESOURCE_FACTORY") {
@@ -146,48 +143,20 @@ class ResourceFactory(
         }
     }
 
-    private fun convertTexture(imageData: ByteArray): ByteArray {
-        fun dst(r1: Int, g1: Int, b1: Int, r2: Int, g2: Int, b2: Int): Int {
-            val r = (r1 - r2) * (r1 - r2)
-            val g = (g1 - g2) * (g1 - g2)
-            val b = (b1 - b2) * (b1 - b2)
-            return r + g + b
-        }
-
-        (0 until imageData.size step GameEngine.RGBA).forEach { pixel ->
-            val r = imageData[pixel + 0]
-            val g = imageData[pixel + 1]
-            val b = imageData[pixel + 2]
-
-            val paletteColor = FrameBuffer.defaultPalette.minBy { color ->
-                dst(color[0].toInt(), color[1].toInt(), color[2].toInt(), r.toInt(), g.toInt(), b.toInt())
-            }
-
-            imageData[pixel + 0] = paletteColor[0]
-            imageData[pixel + 1] = paletteColor[1]
-            imageData[pixel + 2] = paletteColor[2]
-            imageData[pixel + 3] = paletteColor[3]
-        }
-        return imageData
-    }
-
     private fun convertToColorIndex(data: ByteArray, width: Pixel, height: Pixel): PixelArray {
-
-        val map = FrameBuffer.defaultPalette.mapIndexed { index, color -> color.toList() to index }
-            .toMap()
-
         val result = PixelArray(width, height)
 
         (0 until width).forEach { x ->
             (0 until height).forEach { y ->
                 val coord = (x + y * width) * GameEngine.RGBA
-                val key = listOf(
+                val index = FrameBuffer.gamePalette.fromRGBA(byteArrayOf(
                     data[coord + 0],
                     data[coord + 1],
                     data[coord + 2],
-                    data[coord + 3]
-                )
-                result.set(x, y, map[key] ?: 0)
+                    data[coord + 3],
+                ))
+
+                result.set(x, y, index)
             }
         }
         return result

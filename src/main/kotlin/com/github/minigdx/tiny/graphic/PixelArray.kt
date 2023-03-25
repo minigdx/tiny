@@ -33,6 +33,13 @@ class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = Pix
         return tmp
     }
 
+    /**
+     * Return the value at the coordinate x/y.
+     * The pixel format should be equals to 1 otherwise
+     * it will returns only the first component of the color.
+     */
+    fun getOne(x: Pixel, y: Pixel): Int = get(x, y)[0]
+
     fun copyFrom(
         source: PixelArray,
         dstX: Pixel = 0,
