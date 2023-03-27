@@ -86,11 +86,11 @@ class GameScript(
 
         globals?.load(String(content))?.call()
 
-        initFunction = globals?.get("init")?.nullIfNil()
-        updateFunction = globals?.get("update")?.nullIfNil()
-        drawFunction = globals?.get("draw")?.nullIfNil()
-        getStateFunction = globals?.get("getState")?.nullIfNil()
-        setStateFunction = globals?.get("setState")?.nullIfNil()
+        initFunction = globals?.get("_init")?.nullIfNil()
+        updateFunction = globals?.get("_update")?.nullIfNil()
+        drawFunction = globals?.get("_draw")?.nullIfNil()
+        getStateFunction = globals?.get("_getState")?.nullIfNil()
+        setStateFunction = globals?.get("_setState")?.nullIfNil()
 
         initFunction?.call()
     }
