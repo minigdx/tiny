@@ -77,7 +77,11 @@ class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = Pix
                 val sourcePosition = (offsetX + sourceX + (offsetY + sourceY) * source.width) * pixelFormat
 
                 (0 until pixelFormat).forEach { index ->
-                    this.pixels[dstPosition + index] = source.pixels[sourcePosition + index]
+                    // TODO: manage blending?
+                    if(source.pixels[sourcePosition + index] != 0) {
+                        this.pixels[dstPosition + index] = source.pixels[sourcePosition + index]
+                    }
+
                 }
             }
         }

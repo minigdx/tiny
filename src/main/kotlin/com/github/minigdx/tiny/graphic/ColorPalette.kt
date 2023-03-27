@@ -50,10 +50,10 @@ class ColorPalette(colors: List<HexColor>) {
     }
 
     private fun dst(r1: Byte, g1: Byte, b1: Byte, r2: Byte, g2: Byte, b2: Byte): Int {
-        val r = (r1 - r2) * (r1 - r2)
-        val g = (g1 - g2) * (g1 - g2)
-        val b = (b1 - b2) * (b1 - b2)
-        return r + g + b
+        val r = (r1.toUByte() - r2.toUByte()) * (r1.toUByte() - r2.toUByte())
+        val g = (g1.toUByte() - g2.toUByte()) * (g1.toUByte() - g2.toUByte())
+        val b = (b1.toUByte() - b2.toUByte()) * (b1.toUByte() - b2.toUByte())
+        return (r + g + b).toInt()
     }
 
 
