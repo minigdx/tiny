@@ -1,5 +1,6 @@
 package com.squareup.gifencoder
 
+import com.github.minigdx.tiny.graphic.ColorPalette
 import java.io.IOException
 import java.io.OutputStream
 import java.util.BitSet
@@ -9,11 +10,15 @@ class FastGifEncoder(
     private val screenWidth: Int,
     private val screenHeight: Int,
     private val loopCount: Int,
-    private val rgbPalette: IntArray,
+    private val rgbPalette: ColorPalette,
 ) {
 
 
-    private val colorTable = ColorTable.fromColors(rgbPalette.map { rgb -> Color.fromRgbInt(rgb) }.toSet())
+    private val colorTable = ColorTable.fromColors(
+        (0 until rgbPalette.size).map { index -> rgbPalette.getGifColor(index) }
+            .map { rgb -> Color.fromRgbInt(rgb) }
+            .toSet()
+    )
 
     init {
         HeaderBlock.write(outputStream)
@@ -125,6 +130,8 @@ internal class FastLzwEncoder(colorTableSize: Int) {
         writeCode(codeTable[CLEAR_CODE]!!)
         for (index in indices) {
             processIndex(index)
+            // writeCode(codeTable[indexBuffer]!!)
+            // writeCode(codeTable[index.toChar().toString()]!!)
         }
         writeCode(codeTable[indexBuffer]!!)
         writeCode(codeTable[END_OF_INFO]!!)

@@ -209,7 +209,6 @@ class GameEngine(
 
     companion object {
         private const val REFRESH_LIMIT: Seconds = 1 / 60f
-        const val RGBA = 4
     }
 
 }

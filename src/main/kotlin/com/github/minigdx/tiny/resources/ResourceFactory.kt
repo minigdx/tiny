@@ -148,7 +148,7 @@ class ResourceFactory(
 
         (0 until width).forEach { x ->
             (0 until height).forEach { y ->
-                val coord = (x + y * width) * GameEngine.RGBA
+                val coord = (x + y * width) * PixelFormat.RGBA
                 val index = FrameBuffer.gamePalette.fromRGBA(byteArrayOf(
                     data[coord + 0],
                     data[coord + 1],

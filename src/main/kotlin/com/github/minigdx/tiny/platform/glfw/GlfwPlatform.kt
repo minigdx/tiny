@@ -21,11 +21,7 @@ import com.squareup.gifencoder.ImageOptions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.flatMapMerge
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.withIndex
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.glfw.GLFW.GLFW_PRESS
 import org.lwjgl.glfw.GLFW.GLFW_RELEASE
@@ -62,8 +58,6 @@ class GlfwPlatform(
 
     // Keep 30 seconds at 60 frames per seconds
     private val gifBufferCache: MutableFixedSizeList<IntArray> = MutableFixedSizeList(gameOption.record.toInt() * FPS)
-
-    private val recordScope = CoroutineScope(Dispatchers.Default)
 
     /**
      * Get the time in milliseconds
@@ -214,59 +208,28 @@ class GlfwPlatform(
             addAll(gifBufferCache)
         }
 
-        val images = ArrayList<Image>(gameOption.record.toInt() * FPS)
-
         val now = System.currentTimeMillis()
-        recordScope.launch {
-            val options = ImageOptions().apply {
-                this.setDelay(20, TimeUnit.MILLISECONDS)
-            }
-            ByteArrayOutputStream().use { out ->
-                val encoder = FastGifEncoder(
-                    out,
-                    gameOption.width * gameOption.zoom,
-                    gameOption.height * gameOption.zoom,
-                    0,
-                    IntArray(0)
-                )
-                flowOf(*buffer.toTypedArray())
-                    .withIndex()
-                    .flatMapMerge(gameOption.record.toInt() * FPS) { indexValue ->
-                        val index = indexValue.index
-                        val frame = indexValue.value
-                        val render = IntArray(gameOption.width * gameOption.zoom * gameOption.height * gameOption.zoom)
-                        // Check each pixel of the frame
-                        (0 until gameOption.width).forEach { x ->
-                            (0 until gameOption.height).forEach { y ->
-                                val pixel = frame[y + x * gameOption.height]
+        val options = ImageOptions().apply {
+            this.setDelay(20, TimeUnit.MILLISECONDS)
+        }
+        ByteArrayOutputStream().use { out ->
+            val encoder = FastGifEncoder(
+                out,
+                gameOption.width ,
+                gameOption.height,
+                0,
+                FrameBuffer.gamePalette
+            )
 
-                                (0 until gameOption.zoom).forEach { copyx ->
-                                    val xx = x * gameOption.zoom + copyx
-                                    (0 until gameOption.zoom).forEach { copyy ->
-                                        val yy = (y * gameOption.zoom + copyy) * gameOption.width * gameOption.zoom
-                                        render[xx + yy] = pixel
-                                    }
-                                }
-                            }
-                        }
-                        flowOf(index to Image.fromRgb(render, gameOption.width * gameOption.zoom))
-                    }
-                    .onCompletion {
-                        images.forEach { render ->
-                            encoder.addImage(
-                                render,
-                                options
-                            )
-                        }
-                        encoder.finishEncoding()
-                        vfs.save(FileStream(origin), out.toByteArray())
-                        logger.info("GLFW") { "Screen recorded in '${origin.absolutePath}' in ${System.currentTimeMillis() - now} ms" }
-                    }
-                    .collect { render ->
-                        images.add(render.first, render.second)
-                    }
-
+            buffer.forEach { img ->
+                encoder.addImage(img, gameOption.width, options)
             }
+            encoder.finishEncoding()
+            val scope = CoroutineScope(Dispatchers.Default)
+            runBlocking {
+                vfs.save(FileStream(origin), out.toByteArray())
+            }
+            logger.info("GLFW") { "Screen recorded in '${origin.absolutePath}' in ${System.currentTimeMillis() - now} ms" }
         }
     }
 

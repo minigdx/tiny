@@ -16,6 +16,7 @@ class ColorPalette(colors: List<HexColor>) {
     private val rgba: Map<Int, ByteArray>
     private val rgb: Map<Int, ByteArray>
     private val rgbForGif: Map<Int, Int>
+
     val size: Int
 
     init {
