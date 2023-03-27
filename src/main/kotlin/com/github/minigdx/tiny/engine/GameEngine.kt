@@ -112,7 +112,7 @@ class GameEngine(
         val resourcesName = listOf(
             resourceFactory.bootSpritesheet("src/main/resources/boot.png"),
             resourceFactory.gameSpritesheet("src/main/resources/test.png"),
-            resourceFactory.gameLevel("src/main/resources/hello/simplified/Level_0"),
+            resourceFactory.gameLevel("src/main/resources/platform/simplified/Level_0"),
         )
 
         scope.launch {

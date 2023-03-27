@@ -1,6 +1,7 @@
 package com.github.minigdx.tiny.lua
 
 import com.github.minigdx.tiny.resources.GameScript
+import com.github.minigdx.tiny.resources.LdtkEntity
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
@@ -11,12 +12,45 @@ class MapLib(private val parent: GameScript) : TwoArgFunction() {
     override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
         val map = LuaTable()
         map.set("draw", draw())
+        map.set("entity", entity())
         arg2.set("map", map)
         arg2.get("package").get("loaded").set("map", map)
         return map
     }
 
-    inner class draw() : LibFunction() {
+    inner class entity : LuaTable() {
+
+        override fun get(key: LuaValue): LuaValue {
+            val strKey = key.checkjstring() ?: return NIL
+            val entities = parent.level?.entities?.get(strKey) ?: return NIL
+            val first = LuaTable()
+            entities.forEach {
+                first[it.iid] = it.toLuaTable()
+            }
+
+            return first
+        }
+        private fun LdtkEntity.toLuaTable(): LuaTable {
+            val table = LuaTable()
+            table["x"] = valueOf(this.x)
+            table["y"] = valueOf(this.y)
+            table["id"] = valueOf(id)
+            table["iid"] = valueOf(iid)
+            table["layer"] = valueOf(layer)
+            table["width"] = valueOf(width)
+            table["height"] = valueOf(height)
+            table["color"] = valueOf(color)
+            table["customFields"] = customFields.let {
+                val fields = LuaTable()
+                it.forEach {(key, value) ->
+                    fields[key] = valueOf(value)
+                }
+                fields
+            }
+            return table
+        }
+    }
+    inner class draw : LibFunction() {
 
         @DocCall(
             documentation = "Draw the default layer on the screen.",

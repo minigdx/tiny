@@ -12,7 +12,12 @@ fun main(args: Array<String>) {
     val logger = StdOutLogger()
     try {
         val vfs = CommonVirtualFileSystem()
-        val gameOption = GameOption(126, 126, 2)
+        val gameOption = GameOption(
+            256,
+            256,
+            2,
+            spriteSize = 16 to 16
+        )
 
         GameEngine(
             gameOption = gameOption,

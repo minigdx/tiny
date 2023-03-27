@@ -91,7 +91,7 @@ class ResourceFactory(
                         }
                     }
 
-                flowOf(GameLevel(GAME_LEVEL, level.layers.size + 1))
+                flowOf(GameLevel(GAME_LEVEL, level.layers.size + 1, level))
                     .combine(pngLayers) { l, layer ->
                         l.apply {
                             imageLayers[layer.index] = layer
