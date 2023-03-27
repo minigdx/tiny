@@ -1,12 +1,12 @@
 package com.github.minigdx.tiny.resources
 
 import com.github.minigdx.tiny.Pixel
-import com.github.minigdx.tiny.engine.GameEngine
 import com.github.minigdx.tiny.engine.GameOption
 import com.github.minigdx.tiny.file.FileStream
 import com.github.minigdx.tiny.file.VirtualFileSystem
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.graphic.PixelArray
+import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.resources.ResourceType.BOOT_GAMESCRIPT
@@ -101,17 +101,25 @@ class ResourceFactory(
             }
     }
 
-    fun gamescript(name: String, gameOption: GameOption) = script(name, gameOption, GAME_GAMESCRIPT)
-    fun bootscript(name: String, gameOption: GameOption) = script(name, gameOption, BOOT_GAMESCRIPT)
+    fun gamescript(name: String, inputHandler: InputHandler, gameOption: GameOption) =
+        script(name, inputHandler, gameOption, GAME_GAMESCRIPT)
 
-    private fun script(name: String, gameOption: GameOption, resourceType: ResourceType): Flow<GameScript> {
+    fun bootscript(name: String, inputHandler: InputHandler, gameOption: GameOption) =
+        script(name, inputHandler, gameOption, BOOT_GAMESCRIPT)
+
+    private fun script(
+        name: String,
+        inputHandler: InputHandler,
+        gameOption: GameOption,
+        resourceType: ResourceType
+    ): Flow<GameScript> {
         // Emit empty game script to install each script ASAP.
-        return flowOf(GameScript(name, gameOption, resourceType).apply {
+        return flowOf(GameScript(name, gameOption, inputHandler, resourceType).apply {
             loading = true
         }).onCompletion {
             // Lazy loading of the script.
             val lazyScript = vfs.watch(FileStream(File(name))).map { content ->
-                GameScript(name, gameOption, resourceType).apply {
+                GameScript(name, gameOption, inputHandler, resourceType).apply {
                     this.content = content
                 }
             }
@@ -149,12 +157,14 @@ class ResourceFactory(
         (0 until width).forEach { x ->
             (0 until height).forEach { y ->
                 val coord = (x + y * width) * PixelFormat.RGBA
-                val index = FrameBuffer.gamePalette.fromRGBA(byteArrayOf(
-                    data[coord + 0],
-                    data[coord + 1],
-                    data[coord + 2],
-                    data[coord + 3],
-                ))
+                val index = FrameBuffer.gamePalette.fromRGBA(
+                    byteArrayOf(
+                        data[coord + 0],
+                        data[coord + 1],
+                        data[coord + 2],
+                        data[coord + 3],
+                    )
+                )
 
                 result.set(x, y, index)
             }

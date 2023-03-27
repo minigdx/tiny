@@ -3,7 +3,6 @@ import com.github.minigdx.tiny.engine.GameOption
 import com.github.minigdx.tiny.file.CommonVirtualFileSystem
 import com.github.minigdx.tiny.log.StdOutLogger
 import com.github.minigdx.tiny.platform.glfw.GlfwPlatform
-import org.luaj.vm2.LuaError
 
 fun main(args: Array<String>) {
 
@@ -14,6 +13,7 @@ fun main(args: Array<String>) {
     try {
         val vfs = CommonVirtualFileSystem()
         val gameOption = GameOption(126, 126, 2)
+
         GameEngine(
             gameOption = gameOption,
             platform = GlfwPlatform(gameOption, logger, vfs),

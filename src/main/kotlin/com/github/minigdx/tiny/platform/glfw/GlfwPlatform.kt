@@ -9,6 +9,8 @@ import com.github.minigdx.tiny.engine.GameOption
 import com.github.minigdx.tiny.file.FileStream
 import com.github.minigdx.tiny.file.VirtualFileSystem
 import com.github.minigdx.tiny.graphic.FrameBuffer
+import com.github.minigdx.tiny.input.InputHandler
+import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.ImageData
 import com.github.minigdx.tiny.platform.Platform
@@ -16,10 +18,7 @@ import com.github.minigdx.tiny.platform.RenderContext
 import com.github.minigdx.tiny.render.GLRender
 import com.github.minigdx.tiny.util.MutableFixedSizeList
 import com.squareup.gifencoder.FastGifEncoder
-import com.squareup.gifencoder.Image
 import com.squareup.gifencoder.ImageOptions
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.runBlocking
 import org.lwjgl.glfw.GLFW
@@ -58,6 +57,8 @@ class GlfwPlatform(
 
     // Keep 30 seconds at 60 frames per seconds
     private val gifBufferCache: MutableFixedSizeList<IntArray> = MutableFixedSizeList(gameOption.record.toInt() * FPS)
+
+    private val lwjglInputHandler = LwjglInput()
 
     /**
      * Get the time in milliseconds
@@ -140,33 +141,7 @@ class GlfwPlatform(
         val tmpFrameBufferHeight = MemoryUtil.memAllocInt(1)
         GLFW.glfwGetFramebufferSize(window, tmpFrameBufferWidth, tmpFrameBufferHeight)
 
-        GLFW.glfwSetKeyCallback(
-            window,
-            object : GLFWKeyCallback() {
-
-                private var controlDown = false
-                private var rDown = false
-                override fun invoke(window: Long, key: Int, scancode: Int, action: Int, mods: Int) {
-                    if (action == GLFW_PRESS) {
-                        if (key == GLFW.GLFW_KEY_R) {
-                            rDown = true
-                        } else if (key == GLFW.GLFW_KEY_LEFT_CONTROL) {
-                            controlDown = true
-                        }
-                    } else if (action == GLFW_RELEASE) {
-                        if (key == GLFW.GLFW_KEY_R) {
-                            rDown = false
-                        } else if (key == GLFW.GLFW_KEY_LEFT_CONTROL) {
-                            controlDown = false
-                        }
-                    }
-
-                    if (rDown && controlDown) {
-                        this@GlfwPlatform.record()
-                    }
-                }
-            }
-        )
+        lwjglInputHandler.attachHandler(window)
 
         GL.createCapabilities(true)
         return WindowManager(
@@ -179,6 +154,14 @@ class GlfwPlatform(
 
     override fun initRenderManager(windowManager: WindowManager): RenderContext {
         return render.init(windowManager)
+    }
+
+    override fun initInputManager(): InputManager {
+        return lwjglInputHandler
+    }
+
+    override fun initInputHandler(): InputHandler {
+        return lwjglInputHandler
     }
 
     override fun gameLoop(gameLoop: GameLoop) {
@@ -225,7 +208,6 @@ class GlfwPlatform(
                 encoder.addImage(img, gameOption.width, options)
             }
             encoder.finishEncoding()
-            val scope = CoroutineScope(Dispatchers.Default)
             runBlocking {
                 vfs.save(FileStream(origin), out.toByteArray())
             }

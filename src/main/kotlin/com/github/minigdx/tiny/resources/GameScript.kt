@@ -2,6 +2,8 @@ package com.github.minigdx.tiny.resources
 
 import com.github.minigdx.tiny.engine.GameOption
 import com.github.minigdx.tiny.graphic.FrameBuffer
+import com.github.minigdx.tiny.input.InputHandler
+import com.github.minigdx.tiny.lua.CtrlLib
 import com.github.minigdx.tiny.lua.MapLib
 import com.github.minigdx.tiny.lua.TinyLib
 import org.luaj.vm2.Globals
@@ -19,6 +21,7 @@ import org.luaj.vm2.lib.TableLib
 class GameScript(
     val name: String,
     val gameOption: GameOption,
+    val inputHandler: InputHandler,
     override val type: ResourceType
 ): GameResource {
 
@@ -42,6 +45,7 @@ class GameScript(
 
     private var globals: Globals? = null
 
+    // TODO: putting it out the gamescript and put it in the engine?
     internal val frameBuffer = FrameBuffer(gameOption.width, gameOption.height)
 
     class State(val args: LuaValue)
@@ -55,6 +59,7 @@ class GameScript(
         load(CoroutineLib())
         load(TinyLib(this@GameScript))
         load(MapLib(this@GameScript))
+        load(CtrlLib(inputHandler))
         LoadState.install(this)
         LuaC.install(this)
     }

@@ -8,6 +8,9 @@ import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
 import com.github.minigdx.tiny.resources.ResourcesState.BOOT
 import com.github.minigdx.tiny.resources.ResourceFactory
 import com.github.minigdx.tiny.file.VirtualFileSystem
+import com.github.minigdx.tiny.input.InputHandler
+import com.github.minigdx.tiny.input.InputManager
+import com.github.minigdx.tiny.input.Key
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.RenderContext
@@ -20,6 +23,7 @@ import com.github.minigdx.tiny.resources.ResourcesState
 import com.github.minigdx.tiny.resources.SpriteSheet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flatMapMerge
@@ -57,6 +61,7 @@ class ScriptsCollector(private val events: MutableList<GameScript>) : FlowCollec
 
 }
 
+@OptIn(FlowPreview::class)
 class GameEngine(
     val gameOption: GameOption,
     val platform: Platform,
@@ -79,17 +84,23 @@ class GameEngine(
     private var accumulator: Seconds = 0f
 
     private lateinit var renderContext: RenderContext
+    private lateinit var inputHandler: InputHandler
+    private lateinit var inputManager: InputManager
 
-    private val resourceFactory = ResourceFactory(vfs, platform, logger)
+    private lateinit var resourceFactory: ResourceFactory
 
     fun main() {
         val windowManager = platform.initWindowManager()
 
+        inputHandler = platform.initInputHandler()
+        inputManager = platform.initInputManager()
+
+        resourceFactory = ResourceFactory(vfs, platform, logger)
         val scope = CoroutineScope(Dispatchers.Default)
 
         val scripts = listOf(
-            resourceFactory.bootscript("src/main/resources/boot.lua", gameOption),
-            resourceFactory.gamescript("src/main/resources/test.lua", gameOption)
+            resourceFactory.bootscript("src/main/resources/boot.lua", inputHandler, gameOption),
+            resourceFactory.gamescript("src/main/resources/test.lua", inputHandler, gameOption)
         )
 
         scope.launch {
@@ -153,6 +164,8 @@ class GameEngine(
         events.removeAll(workEvents)
         workEvents.clear()
 
+        inputManager.record()
+
         with(current) {
             if (this == null) return
 
@@ -198,6 +211,13 @@ class GameEngine(
             }
         }
 
+        // The user hit Ctrl + R(ecord)
+        if(inputHandler.isKeyJustPressed(Key.CTRL) && inputHandler.isKeyPressed(Key.R)) {
+            platform.record()
+        } else if(inputHandler.isKeyJustPressed(Key.R) && inputHandler.isKeyPressed(Key.CTRL)) {
+            platform.record()
+        }
+        inputManager.reset()
     }
 
     override fun draw() {

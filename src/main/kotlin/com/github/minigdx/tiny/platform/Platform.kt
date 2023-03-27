@@ -4,6 +4,8 @@ import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameOption
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.graphic.FrameBuffer
+import com.github.minigdx.tiny.input.InputHandler
+import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.platform.glfw.WindowManager
 
 class ImageData(val data: ByteArray, val width: Pixel, val height: Pixel)
@@ -49,4 +51,10 @@ interface Platform {
      * Game is existing.
      */
     fun endGameLoop()
+
+    /**
+     * Initialise the input manager.
+     */
+    fun initInputHandler(): InputHandler
+    fun initInputManager(): InputManager
 }
