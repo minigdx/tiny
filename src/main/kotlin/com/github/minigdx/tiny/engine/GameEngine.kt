@@ -154,7 +154,7 @@ class GameEngine(
             } else {
                 // The script is already in the stack. Time to update it.
                 scriptsByName[gameScript.name]?.run {
-                    if (isValid()) {
+                    if (isValid(gameScript.content)) {
                         reloaded = true
                         content = gameScript.content
                     }

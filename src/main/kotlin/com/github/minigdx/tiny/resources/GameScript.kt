@@ -64,7 +64,7 @@ class GameScript(
         LuaC.install(this)
     }
 
-    fun isValid(): Boolean {
+    fun isValid(content: ByteArray): Boolean {
         return try {
             createLuaGlobals().load(String(content)).call()
             true
