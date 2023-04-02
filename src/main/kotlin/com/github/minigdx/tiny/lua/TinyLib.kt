@@ -15,11 +15,7 @@ import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.ThreeArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
-import java.awt.Frame
-import kotlin.annotation.AnnotationRetention.SOURCE
-import kotlin.annotation.AnnotationTarget.CLASS
-import kotlin.annotation.AnnotationTarget.FUNCTION
-import kotlin.annotation.AnnotationTarget.VALUE_PARAMETER
+import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.max
@@ -49,7 +45,17 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
         env["sspr"] = sspr()
         env["spr"] = spr()
         env["print"] = print()
+        env["debug"] = debug()
+        env["PI"] = valueOf(PI)
         return tiny
+    }
+
+    internal inner class debug : OneArgFunction() {
+        override fun call(arg: LuaValue): LuaValue {
+            println("🐞 -> $arg")
+            return NONE
+        }
+
     }
 
     @DocFunction(
@@ -71,7 +77,7 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
             val spritesheet = parent.spriteSheets[GAME_SPRITESHEET] ?: return NONE
 
 
-            parent.frameBuffer.colorIndexBuffer.copyFrom(
+            parent.frameBuffer.copyFrom(
                 spritesheet.pixels, x, y, sprX,
                 sprY,
                 sprWidth,
@@ -100,7 +106,7 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
 
             val column = sprN % nbSpritePerRow
             val row = (sprN - column) / nbSpritePerRow
-            parent.frameBuffer.colorIndexBuffer.copyFrom(
+            parent.frameBuffer.copyFrom(
                 spritesheet.pixels, x, y,
                 column * sw,
                 row * sh,
@@ -125,7 +131,7 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
 
             val column = sprN % nbSpritePerRow
             val row = (sprN - column) / nbSpritePerRow
-            parent.frameBuffer.colorIndexBuffer.copyFrom(
+            parent.frameBuffer.copyFrom(
                 source = spritesheet.pixels,
                 dstX = x,
                 dstY = y,
@@ -169,15 +175,24 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
             val space = 4
             var currentX = x
             str.forEach { char ->
-                if(char.isLetter()) {
+                val coord = if (char.isLetter()) {
                     val index = char.lowercaseChar() - 'a'
-                    parent.frameBuffer.colorIndexBuffer.copyFrom(
+                    index to 0
+                } else if (char.isDigit()) {
+                    val index = char.lowercaseChar() - '0'
+                    index to 4
+                } else {
+                    null
+                }
+                if (coord != null) {
+                    val (index, sheetY) = coord
+                    parent.frameBuffer.copyFrom(
                         spritesheet.pixels, currentX, y,
                         index * 4,
-                        0,
+                        sheetY,
                         4, 4,
                     ) { pixel: Array<Int> ->
-                        if(pixel[0] == 0) {
+                        if (pixel[0] == 0) {
                             null
                         } else {
                             pixel[0] = color
@@ -243,9 +258,6 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
             mainCall = true
         )
         override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
-            if (arg1.type() != arg2.type()) {
-                throw LuaError("Trying to min two value with different type.")
-            }
             return if (arg1.isint() || arg1.islong()) {
                 valueOf(min(arg1.checkint(), arg2.checkint()))
             } else if (arg1.isnumber()) {
@@ -258,9 +270,6 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
 
     internal inner class max : TwoArgFunction() {
         override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
-            if (arg1.type() != arg2.type()) {
-                throw LuaError("Trying to min two value with different type.")
-            }
             return if (arg1.isint() || arg1.islong()) {
                 valueOf(max(arg1.checkint(), arg2.checkint()))
             } else if (arg1.isnumber()) {
@@ -323,7 +332,7 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
     }
 
     private fun LuaValue.checkColorIndex(): Int {
-        return if(this.isnumber()) {
+        return if (this.isnumber()) {
             this.checkint()
         } else {
             FrameBuffer.gamePalette.getColorIndex(this.checkjstring()!!)

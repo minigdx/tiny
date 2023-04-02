@@ -4,14 +4,18 @@ import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.util.PixelFormat
 import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 class FrameBuffer(val width: Pixel, val height: Pixel) {
 
-    internal val colorIndexBuffer: PixelArray = PixelArray(width, height, PixelFormat.INDEX)
+    private val colorIndexBuffer: PixelArray = PixelArray(width, height, PixelFormat.INDEX)
 
     internal var buffer: ByteArray = ByteArray(height * width * PixelFormat.RGBA)
 
     internal var gifBuffer: IntArray = IntArray(0)
+
+    internal val clipper: Clipper = Clipper(width, height)
 
     fun pixel(x: Pixel, y: Pixel): ColorIndex {
         return colorIndexBuffer.getOne(x, y)
@@ -20,6 +24,7 @@ class FrameBuffer(val width: Pixel, val height: Pixel) {
     fun pixel(x: Pixel, y: Pixel, colorIndex: ColorIndex) {
         val index = abs(colorIndex) % gamePalette.size
         if (gamePalette.isTransparent(index)) return
+        if(!clipper.isIn(x, y)) return
         colorIndexBuffer.set(x, y, index)
     }
 
@@ -30,6 +35,38 @@ class FrameBuffer(val width: Pixel, val height: Pixel) {
                 colorIndexBuffer.set(x, y, clearIndex)
             }
         }
+    }
+
+    fun copyFrom(
+        source: PixelArray,
+        dstX: Pixel = 0,
+        dstY: Pixel = 0,
+        sourceX: Pixel = 0,
+        sourceY: Pixel = 0,
+        width: Pixel = this.width,
+        height: Pixel = this.height,
+        reverseX: Boolean = false,
+        reverseY: Boolean = false,
+        blender: (Array<Int>) -> Array<Int>? = { it }
+    ) {
+
+        val clippedX = max(dstX, clipper.left)
+        val clippedWidth = min(dstX + width, clipper.right) - dstX
+
+        val clippedY = max(dstY, clipper.top)
+        val clippedHeight = min(dstY + height, clipper.bottom) - dstY
+
+        colorIndexBuffer.copyFrom(
+            source,
+            clippedX,
+            clippedY,
+            sourceX + clippedX - dstX,
+            sourceY + clippedY - dstY,
+            clippedWidth,
+            clippedHeight,
+            reverseX, reverseY,
+            blender
+        )
     }
 
     /**

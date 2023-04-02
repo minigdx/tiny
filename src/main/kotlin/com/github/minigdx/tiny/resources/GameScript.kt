@@ -4,6 +4,7 @@ import com.github.minigdx.tiny.engine.GameOption
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.lua.CtrlLib
+import com.github.minigdx.tiny.lua.GfxLib
 import com.github.minigdx.tiny.lua.MapLib
 import com.github.minigdx.tiny.lua.TinyLib
 import org.luaj.vm2.Globals
@@ -60,6 +61,7 @@ class GameScript(
         load(CoroutineLib())
         load(TinyLib(this@GameScript))
         load(MapLib(this@GameScript))
+        load(GfxLib(this@GameScript))
         load(CtrlLib(inputHandler))
         LoadState.install(this)
         LuaC.install(this)

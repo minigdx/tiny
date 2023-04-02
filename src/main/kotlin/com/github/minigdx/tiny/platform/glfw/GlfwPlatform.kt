@@ -19,12 +19,12 @@ import com.github.minigdx.tiny.render.GLRender
 import com.github.minigdx.tiny.util.MutableFixedSizeList
 import com.squareup.gifencoder.FastGifEncoder
 import com.squareup.gifencoder.ImageOptions
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.lwjgl.glfw.GLFW
-import org.lwjgl.glfw.GLFW.GLFW_PRESS
-import org.lwjgl.glfw.GLFW.GLFW_RELEASE
-import org.lwjgl.glfw.GLFWKeyCallback
 import org.lwjgl.opengl.GL
 import org.lwjgl.system.MemoryUtil
 import java.io.ByteArrayInputStream
@@ -184,6 +184,8 @@ class GlfwPlatform(
 
     override fun endGameLoop() = Unit
 
+    private val recordScope = CoroutineScope(Dispatchers.IO)
+
     override fun record() {
         val origin = File("output.gif")
         logger.info("GLWF") { "Starting to generate GIF in '${origin.absolutePath}' (Wait for it...)" }
@@ -191,24 +193,24 @@ class GlfwPlatform(
             addAll(gifBufferCache)
         }
 
-        val now = System.currentTimeMillis()
-        val options = ImageOptions().apply {
-            this.setDelay(20, TimeUnit.MILLISECONDS)
-        }
-        ByteArrayOutputStream().use { out ->
-            val encoder = FastGifEncoder(
-                out,
-                gameOption.width ,
-                gameOption.height,
-                0,
-                FrameBuffer.gamePalette
-            )
-
-            buffer.forEach { img ->
-                encoder.addImage(img, gameOption.width, options)
+        recordScope.launch {
+            val now = System.currentTimeMillis()
+            val options = ImageOptions().apply {
+                this.setDelay(20, TimeUnit.MILLISECONDS)
             }
-            encoder.finishEncoding()
-            runBlocking {
+            ByteArrayOutputStream().use { out ->
+                val encoder = FastGifEncoder(
+                    out,
+                    gameOption.width,
+                    gameOption.height,
+                    0,
+                    FrameBuffer.gamePalette
+                )
+
+                buffer.forEach { img ->
+                    encoder.addImage(img, gameOption.width, options)
+                }
+                encoder.finishEncoding()
                 vfs.save(FileStream(origin), out.toByteArray())
             }
             logger.info("GLFW") { "Screen recorded in '${origin.absolutePath}' in ${System.currentTimeMillis() - now} ms" }

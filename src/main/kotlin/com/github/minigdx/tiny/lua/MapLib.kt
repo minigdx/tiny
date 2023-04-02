@@ -81,7 +81,7 @@ class MapLib(private val parent: GameScript) : TwoArgFunction() {
         override fun call(): LuaValue {
             val layer = parent.level?.imageLayers?.get(0)
             if (layer != null) {
-                parent.frameBuffer.colorIndexBuffer.copyFrom(
+                parent.frameBuffer.copyFrom(
                     source = layer.pixels,
                     dstX = 0,
                     dstY = 0,
@@ -100,7 +100,7 @@ class MapLib(private val parent: GameScript) : TwoArgFunction() {
         override fun call(@DocArg("x") a: LuaValue, @DocArg("y") b: LuaValue): LuaValue {
             val layer = parent.level?.imageLayers?.get(0)
             if (layer != null) {
-                parent.frameBuffer.colorIndexBuffer.copyFrom(
+                parent.frameBuffer.copyFrom(
                     source = layer.pixels,
                     dstX = a.checkint(),
                     dstY = b.checkint(),
@@ -122,7 +122,7 @@ class MapLib(private val parent: GameScript) : TwoArgFunction() {
         ): LuaValue {
             val layer = parent.level?.imageLayers?.get(0)
             if (layer != null) {
-                parent.frameBuffer.colorIndexBuffer.copyFrom(
+                parent.frameBuffer.copyFrom(
                     source = layer.pixels,
                     dstX = a.checkint(),
                     dstY = b.checkint(),
@@ -150,7 +150,7 @@ class MapLib(private val parent: GameScript) : TwoArgFunction() {
 
             val layer = parent.level?.imageLayers?.get(0)
             if (layer != null) {
-                parent.frameBuffer.colorIndexBuffer.copyFrom(
+                parent.frameBuffer.copyFrom(
                     source = layer.pixels,
                     dstX = x,
                     dstY = y,
@@ -172,7 +172,7 @@ class MapLib(private val parent: GameScript) : TwoArgFunction() {
         ): LuaValue {
             val layer = parent.level?.imageLayers?.getOrNull(a.checkint())
             if (layer != null) {
-                parent.frameBuffer.colorIndexBuffer.copyFrom(
+                parent.frameBuffer.copyFrom(
                     source = layer.pixels,
                     dstX = 0,
                     dstY = 0,

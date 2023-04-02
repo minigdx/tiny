@@ -2,6 +2,7 @@ package com.github.minigdx.tiny.graphic
 
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.util.PixelFormat
+import kotlin.math.max
 import kotlin.math.min
 
 class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = PixelFormat.INDEX) {
@@ -17,7 +18,10 @@ class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = Pix
         assert(y in 0 until height) { "y ($y) has to be between 0 and $height " }
         assert(pixel.size == pixelFormat) { "the assigned pixel needs to conform the pixel format ($pixelFormat)" }
 
-        val position = (x + y * width) * pixelFormat
+        val correctedX = min(max(0, x), width - 1)
+        val correctedY = min(max(0, y), height - 1)
+
+        val position = (correctedX + correctedY * width) * pixelFormat
         pixel.forEachIndexed { index, value ->
             pixels[position + index] = value
         }
