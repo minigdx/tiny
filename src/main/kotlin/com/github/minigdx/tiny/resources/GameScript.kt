@@ -10,6 +10,7 @@ import org.luaj.vm2.Globals
 import org.luaj.vm2.LoadState
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaValue
+import org.luaj.vm2.LuaValue.Companion.valueOf
 import org.luaj.vm2.compiler.LuaC
 import org.luaj.vm2.lib.BaseLib
 import org.luaj.vm2.lib.Bit32Lib
@@ -92,7 +93,7 @@ class GameScript(
         getStateFunction = globals?.get("_getState")?.nullIfNil()
         setStateFunction = globals?.get("_setState")?.nullIfNil()
 
-        initFunction?.call()
+        initFunction?.call(valueOf(gameOption.width), valueOf(gameOption.height))
     }
 
     fun getState(): State? {

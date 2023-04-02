@@ -2,6 +2,7 @@ package com.github.minigdx.tiny.file
 
 import kotlinx.coroutines.flow.Flow
 import java.io.File
+import kotlin.coroutines.suspendCoroutine
 
 interface SourceStream<T> {
 

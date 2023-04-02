@@ -51,7 +51,7 @@ class FrameBuffer(val width: Pixel, val height: Pixel) {
                 buffer[pos++] = color[2]
                 buffer[pos++] = color[3]
 
-                gifBuffer[posGif++] = gamePalette.getGifColor(index)
+                gifBuffer[posGif++] = gamePalette.getRGAasInt(index)
             }
         }
         return buffer

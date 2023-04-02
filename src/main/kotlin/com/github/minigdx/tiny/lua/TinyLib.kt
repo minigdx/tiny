@@ -2,7 +2,9 @@ package com.github.minigdx.tiny.lua
 
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
+import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.resources.GameScript
+import com.github.minigdx.tiny.resources.ResourceType.BOOT_SPRITESHEET
 import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaTable
@@ -13,10 +15,12 @@ import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.ThreeArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
+import java.awt.Frame
 import kotlin.annotation.AnnotationRetention.SOURCE
 import kotlin.annotation.AnnotationTarget.CLASS
 import kotlin.annotation.AnnotationTarget.FUNCTION
 import kotlin.annotation.AnnotationTarget.VALUE_PARAMETER
+import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.min
@@ -37,12 +41,14 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
         env["sin"] = sin()
         env["min"] = min()
         env["max"] = max()
+        env["abs"] = abs()
         env["rect"] = rect()
         env["rectf"] = rectf()
         env["circle"] = circle()
         env["circlef"] = circlef()
         env["sspr"] = sspr()
         env["spr"] = spr()
+        env["print"] = print()
         return tiny
     }
 
@@ -133,6 +139,71 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
 
             return NONE
         }
+    }
+
+    @DocFunction(
+        name = "print",
+    )
+    internal inner class print : LibFunction() {
+
+        @DocCall(
+            documentation = "print on the screen a string",
+            mainCall = true
+        )
+        override fun call(arg: LuaValue): LuaValue {
+            return NONE
+        }
+
+        override fun call(a: LuaValue, b: LuaValue, c: LuaValue): LuaValue {
+            return NONE
+        }
+
+        override fun call(a: LuaValue, b: LuaValue, c: LuaValue, d: LuaValue): LuaValue {
+            val str = a.checkjstring() ?: return NONE
+            val x = b.checkint()
+            val y = c.checkint()
+            val color = d.checkColorIndex() ?: 1
+
+            val spritesheet = parent.spriteSheets[BOOT_SPRITESHEET] ?: return NONE
+
+            val space = 4
+            var currentX = x
+            str.forEach { char ->
+                if(char.isLetter()) {
+                    val index = char.lowercaseChar() - 'a'
+                    parent.frameBuffer.colorIndexBuffer.copyFrom(
+                        spritesheet.pixels, currentX, y,
+                        index * 4,
+                        0,
+                        4, 4,
+                    ) { pixel: Array<Int> ->
+                        if(pixel[0] == 0) {
+                            null
+                        } else {
+                            pixel[0] = color
+                            pixel
+                        }
+                    }
+                }
+                currentX += space
+            }
+
+            return NONE
+        }
+    }
+
+    @DocFunction(
+        name = "abs",
+    )
+    internal inner class abs : OneArgFunction() {
+        @DocCall(
+            documentation = "absolute value.",
+            mainCall = true
+        )
+        override fun call(arg: LuaValue): LuaValue {
+            return valueOf(abs(arg.todouble()))
+        }
+
     }
 
     @DocFunction(
@@ -251,13 +322,21 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
         }
     }
 
+    private fun LuaValue.checkColorIndex(): Int {
+        return if(this.isnumber()) {
+            this.checkint()
+        } else {
+            FrameBuffer.gamePalette.getColorIndex(this.checkjstring()!!)
+        }
+    }
+
     internal inner class circlef : LibFunction() {
         // centerX: Int, centerY: Int, radius: Int, color: Int
         override fun call(a: LuaValue, b: LuaValue, c: LuaValue, d: LuaValue): LuaValue {
             val centerX = a.checkint()
             val centerY = b.checkint()
             val radius = c.checkint()
-            val color = d.checkint()
+            val color = d.checkColorIndex() ?: 1
 
             var x = 0
             var y = radius
@@ -433,9 +512,7 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
     internal inner class pset : ThreeArgFunction() {
         // x, y, index
         override fun call(arg1: LuaValue, arg2: LuaValue, arg3: LuaValue): LuaValue {
-            if (arg1.isint() && arg2.isint() && arg3.isint()) {
-                parent.frameBuffer.pixel(arg1.checkint(), arg2.checkint(), arg3.checkint())
-            }
+            parent.frameBuffer.pixel(arg1.checkint(), arg2.checkint(), arg3.checkint())
             return NONE
         }
 

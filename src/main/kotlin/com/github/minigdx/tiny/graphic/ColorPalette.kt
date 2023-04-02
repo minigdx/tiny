@@ -49,11 +49,12 @@ class ColorPalette(colors: List<HexColor>) {
         return byteArrayOf(red.toByte(), green.toByte(), blue.toByte(), alpha.toByte())
     }
 
-    private fun dst(r1: Byte, g1: Byte, b1: Byte, r2: Byte, g2: Byte, b2: Byte): Int {
+    private fun dst(r1: Byte, g1: Byte, b1: Byte, a1: Byte, r2: Byte, g2: Byte, b2: Byte, a2: Byte): Int {
         val r = (r1.toUByte() - r2.toUByte()) * (r1.toUByte() - r2.toUByte())
         val g = (g1.toUByte() - g2.toUByte()) * (g1.toUByte() - g2.toUByte())
         val b = (b1.toUByte() - b2.toUByte()) * (b1.toUByte() - b2.toUByte())
-        return (r + g + b).toInt()
+        val a = (a1.toUByte() - a2.toUByte()) * (a1.toUByte() - a2.toUByte())
+        return (r + g + b + a).toInt()
     }
 
 
@@ -74,8 +75,13 @@ class ColorPalette(colors: List<HexColor>) {
     /**
      * Get the RGB value already packed for GIF attached to this color index.
      */
-    fun getGifColor(index: ColorIndex): Int {
+    fun getRGAasInt(index: ColorIndex): Int {
         return rgbForGif.getOrDefault(index, rgbForGif.getValue(0))
+    }
+
+    fun getColorIndex(hexString: String): Int {
+        val color = hexStringToByteArray(hexString)
+        return fromRGBA(color)
     }
 
     /**
@@ -87,10 +93,11 @@ class ColorPalette(colors: List<HexColor>) {
         if (color[3] == 0x00.toByte()) {
             return 0
         }
+        // Remove the transparent color
         return rgba.minBy { (_, palette) ->
             dst(
-                palette[0], palette[1], palette[2],
-                color[0], color[1], color[2],
+                palette[0], palette[1], palette[2], palette[3],
+                color[0], color[1], color[2], color[3]
             )
         }.key
     }

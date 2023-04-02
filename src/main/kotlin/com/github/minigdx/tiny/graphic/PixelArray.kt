@@ -40,6 +40,15 @@ class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = Pix
      */
     fun getOne(x: Pixel, y: Pixel): Int = get(x, y)[0]
 
+    private val defaultBlender = { color: Array<Int> ->
+        // it's a transparent color
+        if (color[pixelFormat - 1] == 0x00) {
+            null
+        } else {
+            color
+        }
+    }
+
     fun copyFrom(
         source: PixelArray,
         dstX: Pixel = 0,
@@ -50,16 +59,18 @@ class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = Pix
         height: Pixel = this.height,
         reverseX: Boolean = false,
         reverseY: Boolean = false,
+        blender: (Array<Int>) -> Array<Int>? = { it }
     ) {
         assert(source.pixelFormat == pixelFormat) {
             "Can't copy PixelArray because the pixel format is different between the two PixelArray"
         }
 
         val minWidth = min(width, min(width - (dstX + width - this.width), width - (sourceX + width - source.width)))
-        val minHeight = min(height, min(height - (dstY + height - this.height), height - (sourceY + height - source.height)))
+        val minHeight =
+            min(height, min(height - (dstY + height - this.height), height - (sourceY + height - source.height)))
 
         (0 until minHeight).forEach { h ->
-            val offsetY = if(reverseY) {
+            val offsetY = if (reverseY) {
                 minHeight - h - 1
             } else {
                 h
@@ -68,7 +79,7 @@ class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = Pix
             (0 until minWidth).forEach { w ->
                 val dstPosition = (w + dstX + (h + dstY) * this.width) * pixelFormat
 
-                val offsetX = if(reverseX) {
+                val offsetX = if (reverseX) {
                     minWidth - w - 1
                 } else {
                     w
@@ -77,11 +88,15 @@ class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = Pix
                 val sourcePosition = (offsetX + sourceX + (offsetY + sourceY) * source.width) * pixelFormat
 
                 (0 until pixelFormat).forEach { index ->
-                    // TODO: manage blending?
-                    if(source.pixels[sourcePosition + index] != 0) {
-                        this.pixels[dstPosition + index] = source.pixels[sourcePosition + index]
-                    }
+                    tmp[index] = source.pixels[sourcePosition + index]
+                }
 
+                val blended = blender(tmp)
+
+                if (blended != null) {
+                    (0 until pixelFormat).forEach { index ->
+                        this.pixels[dstPosition + index] = tmp[index]
+                    }
                 }
             }
         }

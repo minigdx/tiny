@@ -1,35 +1,59 @@
+function _init(width, height)
+    current = loading
 
-function init()
-    index = 0
+    center = { x = width * 0.5, y = height * 0.5 }
+
+    dots = {}
+    for i=1,width do
+        table.insert(dots, {x = i, y = center.y, c = i})
+    end    
+    loadingTime = 3
+
     dt = 0
-    pos = {x= 64, y= 64}
+    flash = 8
+
+    txt = {"t", "i", "n", "y"}
 end
 
-function update()
-    if(ctrl.down(0)) then
-        pos.x = pos.x - 1
-    elseif (ctrl.down(2)) then
-        pos.x = pos.x + 1
-    end
-
-    if(ctrl.down(1)) then
-        pos.y = pos.y - 1
-    elseif (ctrl.down(3)) then
-        pos.y = pos.y + 1
-    end
-
-end
-function draw()
+function _update()
     dt = dt + 1/60
+    loadingTime = loadingTime - 1/60
+    current()
+end
+
+function _draw()
     cls(2)
-    table.sort({1, 2, 3})
-    w =  128 * (1 + cos(dt)) * 0.5
-     map.draw(0 + 64 - w * 0.5, 0, 64 - w * 0.5, 0, w, 128)
-    -- toto.draw()
-    -- debug.traceback(cls(1))
-    spr(4, pos.x, pos.y)
+
+    for k, d in pairs(dots) do
+        pset(d.x, d.y + cos((k * 3 + dt) * 3) * 4, d.c)
+    end
+
+    local text = {"b", "u", "i", "l", "d", " ", "w", "i", "t", "h"}
+
+    local prec = center.x
+    center.x = center.x - 20
+
+    for k,v in pairs(text) do
+        print(v, center.x + k*4 + 1, center.y + cos(4 * dt + k) * 8, "#FF0000")
+        print(v, center.x + k*4 - 1, center.y + cos(4 * dt + k) * 8, "#FF0000")
+        print(v, center.x + k*4, center.y + cos(4 * dt + k) * 8 + 1, "#FF0000")
+        print(v, center.x + k*4, center.y + cos(4 * dt + k) * 8 - 1, "#FF0000")
+
+        print(v, center.x + k*4, center.y + cos(4 * dt + k) * 8, rnd(8))
+    end
+
+    center.x = prec
+
 end
 
 function _resources()
-    print("LOADED")
+    -- current = loaded
 end
+
+function loading()
+    
+end
+
+function loaded()
+    flash = flash + 1
+end    

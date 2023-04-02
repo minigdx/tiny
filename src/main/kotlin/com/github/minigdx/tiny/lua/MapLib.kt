@@ -13,15 +13,37 @@ class MapLib(private val parent: GameScript) : TwoArgFunction() {
         val map = LuaTable()
         map.set("draw", draw())
         map.set("entity", entity())
+        map.set("flag", flag())
+        map.set("from" ,from())
         arg2.set("map", map)
         arg2.get("package").get("loaded").set("map", map)
         return map
+    }
+
+    // convert screen coordinate into map coordinate
+    inner class from : TwoArgFunction() {
+        override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
+            TODO()
+        }
+    }
+
+    inner class flag : LibFunction() {
+
+        override fun call(a: LuaValue, b: LuaValue): LuaValue {
+            val tileX = a.checkint()
+            val tileY = b.checkint()
+
+            val layer = parent.level?.intLayers?.first { l -> l != null } ?: return NONE
+
+            return valueOf(layer.ints.getOne(tileX, tileY))
+        }
     }
 
     inner class entity : LuaTable() {
 
         override fun get(key: LuaValue): LuaValue {
             val strKey = key.checkjstring() ?: return NIL
+            // TODO: mettre un système de cache pour ne pas iter à chaque fois sur la liste.
             val entities = parent.level?.entities?.get(strKey) ?: return NIL
             val first = LuaTable()
             entities.forEach {

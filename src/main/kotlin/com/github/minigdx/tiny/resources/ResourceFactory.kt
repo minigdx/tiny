@@ -69,13 +69,14 @@ class ResourceFactory(
                 logger.debug("RESOURCE_FACTORY") { level.toString() }
             }.flatMapMerge { level ->
 
-                val pngLayers = (listOf("$name/_composite.png") + level.layers.map { layer -> "$name/$layer" })
+                val layers = listOf("$name/_composite.png") + level.layers.map { layer -> "$name/$layer" }
+                val pngLayers = layers
                     .mapIndexed { index, layer ->
                         LdKtImageLayer(
                             name = layer,
                             index = index,
                             x = level.x,
-                            y = level.x,
+                            y = level.y,
                             width = level.width,
                             height = level.height
                         )
@@ -91,13 +92,45 @@ class ResourceFactory(
                         }
                     }
 
+                val intLayers = layers
+                    .map { layer -> layer.replace(".png", ".csv") }
+                    .mapIndexed { index, layer ->
+                    layer to index
+                }.asFlow()
+                    .flatMapMerge { (layer, index) ->
+                        vfs.watch(FileStream(File(layer))).map { data ->
+                            String(data).lines()
+                                .map { l -> l.split(",").filter { it.isNotBlank() } }
+                                .filterNot { it.isEmpty() }
+                        }.map { lines ->
+                            val l = LdKtIntLayer(
+                                name = layer,
+                                index = index,
+                                x = level.x,
+                                y = level.y,
+                                width = lines.first().size,
+                                height = lines.size
+                            )
+
+                            lines.forEachIndexed { y, columns ->
+                                columns.forEachIndexed { x, i ->
+                                    l.ints.set(x, y, i.toInt())
+                                }
+                            }
+                            l
+                        }
+                    }
+
                 flowOf(GameLevel(GAME_LEVEL, level.layers.size + 1, level))
                     .combine(pngLayers) { l, layer ->
                         l.apply {
                             imageLayers[layer.index] = layer
                         }
+                    }.combine(intLayers) { l, layer ->
+                        l.apply {
+                           this.intLayers[layer.index] = layer
+                        }
                     }
-
             }
     }
 

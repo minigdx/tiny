@@ -15,7 +15,7 @@ class FastGifEncoder(
 
 
     private val colorTable = ColorTable.fromColors(
-        (0 until rgbPalette.size).map { index -> rgbPalette.getGifColor(index) }
+        (0 until rgbPalette.size).map { index -> rgbPalette.getRGAasInt(index) }
             .map { rgb -> Color.fromRgbInt(rgb) }
             .toSet()
     )
