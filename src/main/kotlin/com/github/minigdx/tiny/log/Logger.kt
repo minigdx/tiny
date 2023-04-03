@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.log
 
+import java.time.LocalTime
 
 
 enum class LogLevel {
@@ -34,7 +35,7 @@ class StdOutLogger(override val level: LogLevel = LogLevel.DEBUG) : Logger {
                 LogLevel.WARN -> "⚠️"
                 LogLevel.ERROR -> "💥"
             }
-            println("$l - [$tag] : " + message())
+            println("$l (${LocalTime.now()}) - [$tag] : " + message())
             exception?.printStackTrace()
         }
     }

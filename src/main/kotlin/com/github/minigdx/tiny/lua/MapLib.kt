@@ -35,7 +35,11 @@ class MapLib(private val parent: GameScript) : TwoArgFunction() {
 
             val layer = parent.level?.intLayers?.first { l -> l != null } ?: return NONE
 
-            return valueOf(layer.ints.getOne(tileX, tileY))
+            return if(tileX in 0 until layer.width && tileY in 0 until layer.height) {
+                valueOf(layer.ints.getOne(tileX, tileY))
+            } else {
+                NONE
+            }
         }
     }
 

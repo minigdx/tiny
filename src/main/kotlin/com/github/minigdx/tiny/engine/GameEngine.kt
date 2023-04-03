@@ -50,6 +50,8 @@ class ScriptsCollector(private val events: MutableList<GameScript>) : FlowCollec
                     events.add(gamescript)
                 }
                 bootscriptLoaded = true
+            } else if(bootscriptLoaded) {
+                events.add(value)
             }
         } else {
             // Ignore the script until the bootscript is loaded
@@ -77,6 +79,8 @@ class GameEngine(
 
     private var resources = emptyMap<ResourceType, GameResource>()
     private var spriteSheets = emptyMap<ResourceType, SpriteSheet>()
+    private var levels = emptyMap<ResourceType, GameLevel>()
+
     private var resourcesState: ResourcesState = BOOT
 
     private var current: GameScript? = null
@@ -96,14 +100,14 @@ class GameEngine(
         inputManager = platform.initInputManager()
 
         resourceFactory = ResourceFactory(vfs, platform, logger)
-        val scope = CoroutineScope(Dispatchers.Default)
+        val resourcesScope = CoroutineScope(Dispatchers.IO)
 
         val scripts = listOf(
             resourceFactory.bootscript("src/main/resources/boot.lua", inputHandler, gameOption),
             resourceFactory.gamescript("src/main/resources/test.lua", inputHandler, gameOption)
         )
 
-        scope.launch {
+        resourcesScope.launch {
             scripts.asFlow()
                 .flatMapMerge { script -> script }
                 .collect(ScriptsCollector(events))
@@ -115,7 +119,7 @@ class GameEngine(
             resourceFactory.gameLevel("src/main/resources/platform/simplified/Level_0"),
         )
 
-        scope.launch {
+        resourcesScope.launch {
             resourcesName.asFlow()
                 .flatMapMerge { flow -> flow }
                 .collect { resource ->
@@ -124,7 +128,7 @@ class GameEngine(
                         spriteSheets += resource.type to (resource as SpriteSheet)
                     }
                     if(resource.type == GAME_LEVEL) {
-                        current?.level = resource as GameLevel
+                        levels += resource.type to (resource as GameLevel)
                     }
                     if (resources.size == resourcesName.size && resourcesState == BOOT) {
                         resourcesState = ResourcesState.BOOTED
@@ -144,8 +148,10 @@ class GameEngine(
         workEvents.addAll(events)
 
         workEvents.forEach { gameScript ->
+
             if (!gameScript.reloaded) {
                 // First time script loading. Adding it to the stack of script
+                logger.debug("GAME_ENGINE") { "Add ${gameScript.name} to the game script stack"}
                 scripts.add(gameScript)
                 scriptsByName[gameScript.name] = gameScript
                 if (current == null) {
@@ -170,9 +176,18 @@ class GameEngine(
             if (this == null) return
 
             if (exited) {
+
                 scripts.removeFirst()
-                current = scripts.firstOrNull()
                 val state = getState()
+                current = scripts.firstOrNull()
+
+                logger.debug("GAME_ENGINE") {
+                    "Stop $name to switch the next game script ${current?.name}"
+                }
+
+                current?.spriteSheets = this@GameEngine.spriteSheets
+                current?.level = this@GameEngine.levels[GAME_LEVEL]
+                evaluate()
                 current?.setState(state)
             } else if (loading) {
                 evaluate()
@@ -187,11 +202,16 @@ class GameEngine(
                 spriteSheets.forEach { _, s -> s.reload = false }
                 current?.spriteSheets = this@GameEngine.spriteSheets
             }
+            if (levels.values.any { it.reload }) {
+                levels.forEach { _, s -> s.reload = false }
+                current?.level = this@GameEngine.levels[GAME_LEVEL]
+            }
 
             if (resourcesState == ResourcesState.BOOTED) {
                 resourcesState = ResourcesState.LOADED
                 logger.debug("GAME_ENGINE") { "Resources loaded" }
                 current?.spriteSheets = this@GameEngine.spriteSheets
+                current?.level = this@GameEngine.levels[GAME_LEVEL]
                 current?.resourcesLoaded()
             }
 

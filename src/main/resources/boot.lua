@@ -1,4 +1,4 @@
-function _init(width, height)
+function _init()
     ready = false
     dt = 0
     txt = {"l", "o", "a", "d", "i", "n", "g"}
@@ -11,7 +11,8 @@ function _update()
         waiting = waiting - 1/60
     end
 
-    if(waiting < 0) then 
+    if(waiting < 0) then
+        cls(1)
         exit()
     end
 end
