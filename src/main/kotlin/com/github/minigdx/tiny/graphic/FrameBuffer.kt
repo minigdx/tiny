@@ -7,6 +7,38 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
+class Blender(private val gamePalette: ColorPalette) {
+
+    private val switch: MutableMap<ColorIndex, ColorIndex> = mutableMapOf()
+
+    private var dithering: Boolean = false
+
+    fun dither(patternIndex: Int) {
+        dithering = patternIndex > 0
+    }
+
+    fun pal() {
+        switch.clear()
+    }
+
+    fun pal(source: ColorIndex, target: ColorIndex) {
+        switch[source] = target
+    }
+
+    fun mix(colors: Array<ColorIndex>, x: Pixel, y: Pixel): Array<ColorIndex>? {
+        val color = gamePalette.check(colors[0])
+        colors[0] = switch[gamePalette.check(color)] ?: color
+        // Return null if transparent
+        if(colors[0] == 0x00) return null
+        // Return null if dithering enable every 2 pixels
+        return if(dithering && (x + y) and 0x01 == 0x00) {
+            null
+        } else {
+            colors
+        }
+    }
+
+}
 class FrameBuffer(val width: Pixel, val height: Pixel) {
 
     private val colorIndexBuffer: PixelArray = PixelArray(width, height, PixelFormat.INDEX)
@@ -17,19 +49,21 @@ class FrameBuffer(val width: Pixel, val height: Pixel) {
 
     internal val clipper: Clipper = Clipper(width, height)
 
+    internal val blender = Blender(gamePalette)
+
     fun pixel(x: Pixel, y: Pixel): ColorIndex {
         return colorIndexBuffer.getOne(x, y)
     }
 
     fun pixel(x: Pixel, y: Pixel, colorIndex: ColorIndex) {
-        val index = abs(colorIndex) % gamePalette.size
+        val index = gamePalette.check(colorIndex)
         if (gamePalette.isTransparent(index)) return
         if(!clipper.isIn(x, y)) return
         colorIndexBuffer.set(x, y, index)
     }
 
     fun clear(clearIndx: Int) {
-        val clearIndex = abs(clearIndx) % gamePalette.size
+        val clearIndex = gamePalette.check(clearIndx)
         for (x in 0 until width) {
             for (y in 0 until height) {
                 colorIndexBuffer.set(x, y, clearIndex)
@@ -47,7 +81,7 @@ class FrameBuffer(val width: Pixel, val height: Pixel) {
         height: Pixel = this.height,
         reverseX: Boolean = false,
         reverseY: Boolean = false,
-        blender: (Array<Int>) -> Array<Int>? = { it }
+        blender: (Array<Int>, Pixel, Pixel) -> Array<Int>? = this.blender::mix
     ) {
 
         val clippedX = max(dstX, clipper.left)

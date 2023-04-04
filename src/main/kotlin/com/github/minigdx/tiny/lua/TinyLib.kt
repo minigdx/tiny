@@ -191,7 +191,7 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
                         index * 4,
                         sheetY,
                         4, 4,
-                    ) { pixel: Array<Int> ->
+                    ) { pixel: Array<Int>, _, _ ->
                         if (pixel[0] == 0) {
                             null
                         } else {

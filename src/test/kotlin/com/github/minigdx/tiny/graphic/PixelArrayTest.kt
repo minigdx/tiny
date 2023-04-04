@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.graphic
 
+import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.util.PixelFormat
 import com.github.minigdx.tiny.util.PixelFormat.INDEX
 import com.github.minigdx.tiny.util.PixelFormat.RGBA
@@ -10,6 +11,9 @@ import kotlin.test.assertTrue
 
 class PixelArrayTest {
 
+    private val blender: (Array<Int>, Pixel, Pixel) -> Array<Int> = { c, _, _ ->
+        c
+    }
     @Test
     fun `copyFrom - copy a fragment from a pixel array`() {
         val source = PixelArray(3, 3, INDEX)
@@ -19,7 +23,7 @@ class PixelArrayTest {
 
         val target = PixelArray(3, 3, INDEX)
 
-        target.copyFrom(source, width = 2, height = 2)
+        target.copyFrom(source, width = 2, height = 2, blender = blender)
 
         val exp = PixelArray(3, 3, INDEX)
         exp.set(0, 0, 1)
@@ -34,7 +38,7 @@ class PixelArrayTest {
         source.set(9, 9, 1)
         val target = PixelArray(10, 10, INDEX)
 
-        target.copyFrom(source)
+        target.copyFrom(source, blender = blender)
 
         assertEquals(source.toString(), target.toString())
     }
@@ -45,7 +49,7 @@ class PixelArrayTest {
         source.set(1, 1, 1, 2, 3, 4)
         val target = PixelArray(2, 2, RGBA)
 
-        target.copyFrom(source)
+        target.copyFrom(source, blender = blender)
 
         assertEquals(source.toString(), target.toString())
     }
@@ -56,7 +60,7 @@ class PixelArrayTest {
         source.set(1, 1, 1)
         val target = PixelArray(2, 2, INDEX)
 
-        target.copyFrom(source, 0, 0, 0, 0, 5, 2)
+        target.copyFrom(source, 0, 0, 0, 0, 5, 2, blender = blender)
 
         assertEquals(source.toString(), target.toString())
     }
@@ -91,7 +95,7 @@ class PixelArrayTest {
         source.set(2, 0, 3, 3, 3, 3)
         val target = PixelArray(3, 1, RGBA)
 
-        target.copyFrom(source, reverseX = true)
+        target.copyFrom(source, reverseX = true, blender = blender)
 
         assertEquals(source.toString().reversed().replace("\n", ""), target.toString().replace("\n", ""))
     }
@@ -104,7 +108,7 @@ class PixelArrayTest {
         source.set(0, 2, 3, 3, 3, 3)
         val target = PixelArray(1, 3, RGBA)
 
-        target.copyFrom(source, reverseY = true)
+        target.copyFrom(source, reverseY = true, blender = blender)
 
         assertEquals(source.toString().reversed().replace("\n", ""), target.toString().replace("\n", ""))
     }
@@ -122,7 +126,7 @@ class PixelArrayTest {
         inv.set(1, 1, 2, 2, 2, 2)
         inv.set(2, 2, 1, 1, 1, 1)
 
-        target.copyFrom(source, reverseX = true, reverseY = true)
+        target.copyFrom(source, reverseX = true, reverseY = true, blender = blender)
 
         assertEquals(inv.toString(), target.toString())
     }

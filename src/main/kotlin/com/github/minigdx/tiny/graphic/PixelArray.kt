@@ -44,15 +44,6 @@ class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = Pix
      */
     fun getOne(x: Pixel, y: Pixel): Int = get(x, y)[0]
 
-    private val defaultBlender = { color: Array<Int> ->
-        // it's a transparent color
-        if (color[pixelFormat - 1] == 0x00) {
-            null
-        } else {
-            color
-        }
-    }
-
     fun copyFrom(
         source: PixelArray,
         dstX: Pixel = 0,
@@ -63,7 +54,7 @@ class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = Pix
         height: Pixel = this.height,
         reverseX: Boolean = false,
         reverseY: Boolean = false,
-        blender: (Array<Int>) -> Array<Int>? = { it }
+        blender: (Array<Int>, Pixel, Pixel) -> Array<Int>?
     ) {
         assert(source.pixelFormat == pixelFormat) {
             "Can't copy PixelArray because the pixel format is different between the two PixelArray"
@@ -95,7 +86,7 @@ class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = Pix
                     tmp[index] = source.pixels[sourcePosition + index]
                 }
 
-                val blended = blender(tmp)
+                val blended = blender(tmp, dstX + w, dstY + h)
 
                 if (blended != null) {
                     (0 until pixelFormat).forEach { index ->
@@ -105,8 +96,6 @@ class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = Pix
             }
         }
     }
-
-    fun copyFrom(source: PixelArray) = copyFrom(source, 0, 0, 0, 0, source.width, source.height)
 
     operator fun iterator(): Iterator<Int> = pixels.iterator()
 

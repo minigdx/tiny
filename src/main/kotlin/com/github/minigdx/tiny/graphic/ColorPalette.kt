@@ -2,6 +2,7 @@ package com.github.minigdx.tiny.graphic
 
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.HexColor
+import kotlin.math.abs
 
 /**
  * Color palette used by the game.
@@ -37,6 +38,10 @@ class ColorPalette(colors: List<HexColor>) {
         }
 
         size = rgba.size
+    }
+
+    fun check(color: ColorIndex): ColorIndex {
+        return abs(color) % FrameBuffer.gamePalette.size
     }
 
     private fun hexStringToByteArray(hexString: String): ByteArray {
