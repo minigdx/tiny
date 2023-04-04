@@ -1,5 +1,6 @@
 plugins {
-    kotlin("jvm") version "1.8.0"
+    // kotlin("jvm") version "1.8.0"
+    id("com.github.minigdx.gradle.plugin.developer.mpp") version "DEV-SNAPSHOT"
     kotlin("plugin.serialization") version "1.8.0"
 }
 
@@ -15,42 +16,35 @@ repositories {
 }
 
 dependencies {
-    testImplementation(kotlin("test"))
+    this.commonTestImplementation(kotlin("test"))
+    // testImplementation(kotlin("test"))
+
     // Multiplatform
-    implementation("com.soywiz.korlibs.luak:luak:4.0.0-alpha-2")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-    implementation("com.danielgergely.kgl:kgl:0.6.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
+    this.commonMainImplementation("com.soywiz.korlibs.luak:luak:4.0.0-alpha-2")
+    this.commonMainImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    this.commonMainImplementation("com.danielgergely.kgl:kgl:0.6.1")
+    this.commonMainImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
 
 
     // JVM Specific
-    implementation("com.danielgergely.kgl:kgl-lwjgl:0.6.1")
+    this.jvmMainImplementation("com.danielgergely.kgl:kgl-lwjgl:0.6.1")
 
-    implementation("org.lwjgl:lwjgl-glfw:3.3.1")
-    implementation("org.lwjgl:lwjgl-opengl:3.3.1")
+    this.jvmMainImplementation("org.lwjgl:lwjgl-glfw:3.3.1")
+    this.jvmMainImplementation("org.lwjgl:lwjgl-opengl:3.3.1")
 
-    this.implementation("org.lwjgl:lwjgl:3.3.1:natives-windows")
-    this.implementation("org.lwjgl:lwjgl:3.3.1:natives-linux")
-    this.implementation("org.lwjgl:lwjgl:3.3.1:natives-macos")
+    this.jvmMainImplementation("org.lwjgl:lwjgl:3.3.1:natives-windows")
+    this.jvmMainImplementation("org.lwjgl:lwjgl:3.3.1:natives-linux")
+    this.jvmMainImplementation("org.lwjgl:lwjgl:3.3.1:natives-macos")
 
-    this.implementation("org.lwjgl:lwjgl-glfw:3.3.1")
-    this.implementation("org.lwjgl:lwjgl-glfw:3.3.1:natives-windows")
-    this.implementation("org.lwjgl:lwjgl-glfw:3.3.1:natives-linux")
-    this.implementation("org.lwjgl:lwjgl-glfw:3.3.1:natives-macos")
+    this.jvmMainImplementation("org.lwjgl:lwjgl-glfw:3.3.1")
+    this.jvmMainImplementation("org.lwjgl:lwjgl-glfw:3.3.1:natives-windows")
+    this.jvmMainImplementation("org.lwjgl:lwjgl-glfw:3.3.1:natives-linux")
+    this.jvmMainImplementation("org.lwjgl:lwjgl-glfw:3.3.1:natives-macos")
 
-    this.implementation("org.lwjgl:lwjgl-opengl:3.3.1")
-    this.implementation("org.lwjgl:lwjgl-opengl:3.3.1:natives-windows")
-    this.implementation("org.lwjgl:lwjgl-opengl:3.3.1:natives-linux")
-    this.implementation("org.lwjgl:lwjgl-opengl:3.3.1:natives-macos")
+    this.jvmMainImplementation("org.lwjgl:lwjgl-opengl:3.3.1")
+    this.jvmMainImplementation("org.lwjgl:lwjgl-opengl:3.3.1:natives-windows")
+    this.jvmMainImplementation("org.lwjgl:lwjgl-opengl:3.3.1:natives-linux")
+    this.jvmMainImplementation("org.lwjgl:lwjgl-opengl:3.3.1:natives-macos")
 
-    implementation("org.l33tlabs.twl:pngdecoder:1.0")
-    implementation("com.squareup:gifencoder:0.10.1")
-}
-
-tasks.test {
-    useJUnitPlatform()
-}
-
-kotlin {
-    jvmToolchain(17)
+    this.jvmMainImplementation("com.squareup:gifencoder:0.10.1")
 }

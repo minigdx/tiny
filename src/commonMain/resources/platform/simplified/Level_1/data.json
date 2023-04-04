@@ -1,0 +1,151 @@
+{
+	"identifier": "Level_1",
+	"uniqueIdentifer": "6a4f7c60-c640-11ed-ad69-1d3700144c55",
+	"x": 256,
+	"y": 0,
+	"width": 256,
+	"height": 256,
+	"bgColor": "#696A79",
+	"neighbourLevels": [
+		{
+			"levelIid": "e27024a0-c640-11ed-a105-118cbedb1ebf",
+			"dir": "w"
+		}
+	],
+	"customFields" : {},
+	"layers": [
+		"Collision.png",
+		"Tiles.png",
+		"Tiles2.png",
+		"Collision2.png"
+	],
+	"entities": {
+		"Player": [
+			{
+				"id": "Player",
+				"iid": "79b067f0-c640-11ed-ad69-a379bc3a4982",
+				"layer": "Entities",
+				"x": 64,
+				"y": 48,
+				"width": 16,
+				"height": 16,
+				"color": 12470831,
+				"customFields" : {}
+			}
+		],
+		"BadGuys": [
+			{
+				"id": "BadGuys",
+				"iid": "7b449c80-c640-11ed-ad69-0df28a7aeda0",
+				"layer": "Entities",
+				"x": 144,
+				"y": 48,
+				"width": 16,
+				"height": 16,
+				"color": 16711748,
+				"customFields" : {}
+			},
+			{
+				"id": "BadGuys",
+				"iid": "7bb20450-c640-11ed-ad69-0fff6c1d77de",
+				"layer": "Entities",
+				"x": 224,
+				"y": 144,
+				"width": 16,
+				"height": 16,
+				"color": 16711748,
+				"customFields" : {}
+			},
+			{
+				"id": "BadGuys",
+				"iid": "7c05c9a0-c640-11ed-ad69-a1cf35319937",
+				"layer": "Entities",
+				"x": 176,
+				"y": 192,
+				"width": 16,
+				"height": 16,
+				"color": 16711748,
+				"customFields" : {}
+			},
+			{
+				"id": "BadGuys",
+				"iid": "7c5214e0-c640-11ed-ad69-bdebe8ad168c",
+				"layer": "Entities",
+				"x": 48,
+				"y": 192,
+				"width": 16,
+				"height": 16,
+				"color": 16711748,
+				"customFields" : {}
+			}
+		],
+		"Mouche": [
+			{
+				"id": "Mouche",
+				"iid": "7d48a9e0-c640-11ed-ad69-a52e94fce879",
+				"layer": "Entities",
+				"x": 48,
+				"y": 32,
+				"width": 16,
+				"height": 16,
+				"color": 14120515,
+				"customFields" : {}
+			},
+			{
+				"id": "Mouche",
+				"iid": "7da6cf70-c640-11ed-ad69-b90a82a6c02d",
+				"layer": "Entities",
+				"x": 176,
+				"y": 16,
+				"width": 16,
+				"height": 16,
+				"color": 14120515,
+				"customFields" : {}
+			},
+			{
+				"id": "Mouche",
+				"iid": "7dfd53e0-c640-11ed-ad69-edd1342ae1a7",
+				"layer": "Entities",
+				"x": 208,
+				"y": 80,
+				"width": 16,
+				"height": 16,
+				"color": 14120515,
+				"customFields" : {}
+			},
+			{
+				"id": "Mouche",
+				"iid": "7e562240-c640-11ed-ad69-4b64d61ba906",
+				"layer": "Entities",
+				"x": 176,
+				"y": 176,
+				"width": 16,
+				"height": 16,
+				"color": 14120515,
+				"customFields" : {}
+			},
+			{
+				"id": "Mouche",
+				"iid": "7ea29490-c640-11ed-ad69-0dc00f82b5c2",
+				"layer": "Entities",
+				"x": 96,
+				"y": 160,
+				"width": 16,
+				"height": 16,
+				"color": 14120515,
+				"customFields" : {}
+			},
+			{
+				"id": "Mouche",
+				"iid": "7ef8f1f0-c640-11ed-ad69-4575256ea5b7",
+				"layer": "Entities",
+				"x": 16,
+				"y": 128,
+				"width": 16,
+				"height": 16,
+				"color": 14120515,
+				"customFields" : {}
+			}
+		]
+	}
+}
