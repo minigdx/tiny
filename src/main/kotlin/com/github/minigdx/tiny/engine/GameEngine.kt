@@ -1,13 +1,8 @@
 package com.github.minigdx.tiny.engine
 
 import com.github.minigdx.tiny.Seconds
-import com.github.minigdx.tiny.resources.ResourceType.BOOT_GAMESCRIPT
-import com.github.minigdx.tiny.resources.ResourceType.BOOT_SPRITESHEET
-import com.github.minigdx.tiny.resources.ResourceType.GAME_GAMESCRIPT
-import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
-import com.github.minigdx.tiny.resources.ResourcesState.BOOT
-import com.github.minigdx.tiny.resources.ResourceFactory
 import com.github.minigdx.tiny.file.VirtualFileSystem
+import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.input.Key
@@ -17,9 +12,16 @@ import com.github.minigdx.tiny.platform.RenderContext
 import com.github.minigdx.tiny.resources.GameLevel
 import com.github.minigdx.tiny.resources.GameResource
 import com.github.minigdx.tiny.resources.GameScript
+import com.github.minigdx.tiny.resources.ResourceFactory
 import com.github.minigdx.tiny.resources.ResourceType
+import com.github.minigdx.tiny.resources.ResourceType.BOOT_GAMESCRIPT
+import com.github.minigdx.tiny.resources.ResourceType.BOOT_SPRITESHEET
+import com.github.minigdx.tiny.resources.ResourceType.ENGINE_GAMESCRIPT
+import com.github.minigdx.tiny.resources.ResourceType.GAME_GAMESCRIPT
 import com.github.minigdx.tiny.resources.ResourceType.GAME_LEVEL
+import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
 import com.github.minigdx.tiny.resources.ResourcesState
+import com.github.minigdx.tiny.resources.ResourcesState.BOOT
 import com.github.minigdx.tiny.resources.SpriteSheet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -29,6 +31,7 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.launch
 import org.luaj.vm2.LuaError
+import org.luaj.vm2.LuaValue.Companion.valueOf
 
 class ScriptsCollector(private val events: MutableList<GameScript>) : FlowCollector<GameScript> {
 
@@ -49,13 +52,16 @@ class ScriptsCollector(private val events: MutableList<GameScript>) : FlowCollec
                 scriptsByName[GAME_GAMESCRIPT]?.let { gamescript ->
                     events.add(gamescript)
                 }
+                scriptsByName[ENGINE_GAMESCRIPT]?.let { gameScript ->
+                    events.add(gameScript)
+                }
                 bootscriptLoaded = true
-            } else if(bootscriptLoaded) {
+            } else if (bootscriptLoaded) {
                 events.add(value)
             }
         } else {
             // Ignore the script until the bootscript is loaded
-            if(bootscriptLoaded) {
+            if (bootscriptLoaded) {
                 events.add(value.apply { reloaded = true })
             }
         }
@@ -85,7 +91,11 @@ class GameEngine(
 
     private var current: GameScript? = null
 
+    private val frameBuffer = FrameBuffer(gameOption.width, gameOption.height)
+
     private var accumulator: Seconds = 0f
+
+    private lateinit var engineGameScript: GameScript
 
     private lateinit var renderContext: RenderContext
     private lateinit var inputHandler: InputHandler
@@ -103,8 +113,9 @@ class GameEngine(
         val resourcesScope = CoroutineScope(Dispatchers.IO)
 
         val scripts = listOf(
-            resourceFactory.bootscript("src/main/resources/boot.lua", inputHandler, gameOption),
-            resourceFactory.gamescript("src/main/resources/test.lua", inputHandler, gameOption)
+            resourceFactory.bootscript("src/main/resources/_boot.lua", inputHandler, gameOption),
+            resourceFactory.gamescript("src/main/resources/test.lua", inputHandler, gameOption),
+            resourceFactory.enginescript("src/main/resources/_engine.lua", inputHandler, gameOption),
         )
 
         resourcesScope.launch {
@@ -114,7 +125,7 @@ class GameEngine(
         }
 
         val resourcesName = listOf(
-            resourceFactory.bootSpritesheet("src/main/resources/boot.png"),
+            resourceFactory.bootSpritesheet("src/main/resources/_boot.png"),
             resourceFactory.gameSpritesheet("src/main/resources/test.png"),
             resourceFactory.gameLevel("src/main/resources/platform/simplified/Level_0"),
         )
@@ -127,7 +138,7 @@ class GameEngine(
                     if (resource.type in setOf(BOOT_SPRITESHEET, GAME_SPRITESHEET)) {
                         spriteSheets += resource.type to (resource as SpriteSheet)
                     }
-                    if(resource.type == GAME_LEVEL) {
+                    if (resource.type == GAME_LEVEL) {
                         levels += resource.type to (resource as GameLevel)
                     }
                     if (resources.size == resourcesName.size && resourcesState == BOOT) {
@@ -148,14 +159,21 @@ class GameEngine(
         workEvents.addAll(events)
 
         workEvents.forEach { gameScript ->
-
-            if (!gameScript.reloaded) {
+            // If the script is the engine script, don't add it to the stack.
+            if(gameScript.type == ENGINE_GAMESCRIPT) {
+                engineGameScript = gameScript
+                // Prepare the custom game script used only by the engine
+                engineGameScript.evaluate()
+                engineGameScript.frameBuffer = frameBuffer
+                engineGameScript.spriteSheets = this@GameEngine.spriteSheets
+            } else if (!gameScript.reloaded) {
                 // First time script loading. Adding it to the stack of script
-                logger.debug("GAME_ENGINE") { "Add ${gameScript.name} to the game script stack"}
+                logger.debug("GAME_ENGINE") { "Add ${gameScript.name} to the game script stack" }
                 scripts.add(gameScript)
                 scriptsByName[gameScript.name] = gameScript
                 if (current == null) {
                     current = scripts.firstOrNull()
+                    current?.frameBuffer = frameBuffer
                 }
             } else {
                 // The script is already in the stack. Time to update it.
@@ -184,7 +202,7 @@ class GameEngine(
                 logger.debug("GAME_ENGINE") {
                     "Stop $name to switch the next game script ${current?.name}"
                 }
-
+                current?.frameBuffer = frameBuffer
                 current?.spriteSheets = this@GameEngine.spriteSheets
                 current?.level = this@GameEngine.levels[GAME_LEVEL]
                 evaluate()
@@ -210,6 +228,12 @@ class GameEngine(
             if (resourcesState == ResourcesState.BOOTED) {
                 resourcesState = ResourcesState.LOADED
                 logger.debug("GAME_ENGINE") { "Resources loaded" }
+
+                // Prepare the custom game script used only by the engine
+                engineGameScript.evaluate()
+                engineGameScript.frameBuffer = frameBuffer
+                engineGameScript.spriteSheets = this@GameEngine.spriteSheets
+
                 current?.spriteSheets = this@GameEngine.spriteSheets
                 current?.level = this@GameEngine.levels[GAME_LEVEL]
                 current?.resourcesLoaded()
@@ -220,10 +244,14 @@ class GameEngine(
             if (accumulator >= REFRESH_LIMIT) {
                 inError = try {
                     current?.advance()
+                    engineGameScript.advance()
                     false
                 } catch (ex: LuaError) {
                     if (!inError) { // display the log only once.
-                        logger.warn("TINY", ex) { "The line ${ex.level} trigger an execution error (${ex.getLuaMessage()}). Please fix your script!" }
+                        logger.warn(
+                            "TINY",
+                            ex
+                        ) { "The line ${ex.level} trigger an execution error (${ex.getLuaMessage()}). Please fix your script!" }
                     }
                     true
                 }
@@ -232,9 +260,11 @@ class GameEngine(
         }
 
         // The user hit Ctrl + R(ecord)
-        if(inputHandler.isKeyJustPressed(Key.CTRL) && inputHandler.isKeyPressed(Key.R)) {
+        if (inputHandler.isKeyJustPressed(Key.CTRL) && inputHandler.isKeyPressed(Key.R)) {
+            engineGameScript.invoke("popup", valueOf(0), valueOf("recording GIF"), valueOf(4))
             platform.record()
-        } else if(inputHandler.isKeyJustPressed(Key.R) && inputHandler.isKeyPressed(Key.CTRL)) {
+        } else if (inputHandler.isKeyJustPressed(Key.R) && inputHandler.isKeyPressed(Key.CTRL)) {
+            engineGameScript.invoke("popup", valueOf(0), valueOf("recording GIF"), valueOf(4))
             platform.record()
         }
         inputManager.reset()

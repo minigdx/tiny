@@ -11,6 +11,7 @@ import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.resources.ResourceType.BOOT_GAMESCRIPT
 import com.github.minigdx.tiny.resources.ResourceType.BOOT_SPRITESHEET
+import com.github.minigdx.tiny.resources.ResourceType.ENGINE_GAMESCRIPT
 import com.github.minigdx.tiny.resources.ResourceType.GAME_GAMESCRIPT
 import com.github.minigdx.tiny.resources.ResourceType.GAME_LEVEL
 import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
@@ -136,6 +137,9 @@ class ResourceFactory(
 
     fun gamescript(name: String, inputHandler: InputHandler, gameOption: GameOption) =
         script(name, inputHandler, gameOption, GAME_GAMESCRIPT)
+
+    fun enginescript(name: String, inputHandler: InputHandler, gameOption: GameOption) =
+        script(name, inputHandler, gameOption, ENGINE_GAMESCRIPT)
 
     fun bootscript(name: String, inputHandler: InputHandler, gameOption: GameOption) =
         script(name, inputHandler, gameOption, BOOT_GAMESCRIPT)

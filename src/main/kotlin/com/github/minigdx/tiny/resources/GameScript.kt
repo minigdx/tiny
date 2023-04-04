@@ -12,6 +12,7 @@ import org.luaj.vm2.LoadState
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.LuaValue.Companion.valueOf
+import org.luaj.vm2.Varargs
 import org.luaj.vm2.compiler.LuaC
 import org.luaj.vm2.lib.BaseLib
 import org.luaj.vm2.lib.Bit32Lib
@@ -47,8 +48,7 @@ class GameScript(
 
     private var globals: Globals? = null
 
-    // TODO: putting it out the gamescript and put it in the engine?
-    internal val frameBuffer = FrameBuffer(gameOption.width, gameOption.height)
+    lateinit var frameBuffer: FrameBuffer
 
     class State(val args: LuaValue)
 
@@ -96,6 +96,10 @@ class GameScript(
         setStateFunction = globals?.get("_setState")?.nullIfNil()
 
         initFunction?.call(valueOf(gameOption.width), valueOf(gameOption.height))
+    }
+
+    internal fun invoke(name: String, vararg args: LuaValue) {
+        globals?.get(name)?.nullIfNil()?.invoke(args as Array<LuaValue>)
     }
 
     fun getState(): State? {
