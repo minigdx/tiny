@@ -111,7 +111,6 @@ class FrameBuffer(val width: Pixel, val height: Pixel) {
         gifBuffer = IntArray(height * width)
 
         var pos = 0
-        var posGif = 0
         for (x in 0 until width) {
             for (y in 0 until height) {
                 val index = colorIndexBuffer.getOne(x, y)
@@ -122,7 +121,7 @@ class FrameBuffer(val width: Pixel, val height: Pixel) {
                 buffer[pos++] = color[2]
                 buffer[pos++] = color[3]
 
-                gifBuffer[posGif++] = gamePalette.getRGAasInt(index)
+                gifBuffer[x + y * width] = gamePalette.getRGAasInt(index)
             }
         }
         return buffer
