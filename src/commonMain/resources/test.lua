@@ -112,7 +112,8 @@ function _draw()
         spr(player.sprite, v.x, v.y)
     end
     gfx.pal()
-    
+    -- hot reload !
+    -- gfx.pal(8, 2)
     
     gfx.dither(0)
     

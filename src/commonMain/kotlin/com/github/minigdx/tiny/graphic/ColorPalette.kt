@@ -15,28 +15,28 @@ import kotlin.math.abs
  */
 class ColorPalette(colors: List<HexColor>) {
 
-    private val rgba: Map<Int, ByteArray>
-    private val rgb: Map<Int, ByteArray>
-    private val rgbForGif: Map<Int, Int>
+    private val rgba: Array<ByteArray>
+    private val rgb: Array<ByteArray>
+    private val rgbForGif: Array<Int>
 
     val size: Int
 
     init {
         val rgbaColors = listOf(TRANSPARENT) + colors.map { str -> hexStringToByteArray(str) }
 
-        rgba = rgbaColors.mapIndexed { index, bytes -> index to bytes }.toMap()
-        rgb = rgbaColors.mapIndexed { index, bytes ->
-            val color = byteArrayOf(bytes[0], bytes[1], bytes[2])
-            index to color
-        }.toMap()
+        rgba = Array(rgbaColors.size) { index -> rgbaColors[index] }
+        rgb = Array(rgbaColors.size) { index ->
+            val bytes = rgbaColors[index]
+            byteArrayOf(bytes[0], bytes[1], bytes[2])
+        }
 
-        rgbForGif = rgb.mapValues { (_, color) ->
+        rgbForGif = rgb.map { color ->
             val r = color[0].toInt()
             val g = color[1].toInt()
             val b = color[2].toInt()
             val rgb = ((r and 0xFF) shl 16) or ((g and 0xFF) shl 8) or (b and 0xFF)
             rgb
-        }
+        }.toTypedArray()
 
         size = rgba.size
     }
@@ -68,21 +68,21 @@ class ColorPalette(colors: List<HexColor>) {
      * Get the RGBA value attached to this color index.
      */
     fun getRGBA(index: ColorIndex): ByteArray {
-        return rgba.getOrElse(index) { rgba.getValue(0) }
+        return rgba[index]
     }
 
     /**
      * Get the RGB value attached to this color index.
      */
     fun getRGB(index: ColorIndex): ByteArray {
-        return rgb.getOrElse(index) { rgb.getValue(0) }
+        return rgb[index]
     }
 
     /**
      * Get the RGB value already packed for GIF attached to this color index.
      */
     fun getRGAasInt(index: ColorIndex): Int {
-        return rgbForGif.getOrElse(index) { rgbForGif.getValue(0) }
+        return rgbForGif[index]
     }
 
     fun getColorIndex(hexString: String): Int {
@@ -100,12 +100,20 @@ class ColorPalette(colors: List<HexColor>) {
             return 0
         }
         // Remove the transparent color
-        return rgba.minByOrNull { (_, palette) ->
-            dst(
+        var current = 999999999
+        var index = 0
+        // Look for the index with the closest color.
+        rgba.forEachIndexed { i, palette ->
+            val d = dst(
                 palette[0], palette[1], palette[2], palette[3],
                 color[0], color[1], color[2], color[3]
             )
-        }!!.key
+            if(d < current) {
+                index = i
+                current = d
+            }
+        }
+        return index
     }
 
     /**

@@ -18,7 +18,7 @@ function _update()
 end
 
 function _draw()
-    cls()
+    cls(1)
     for index=1,#txt do
 
         print(txt[index], 2 + index * 4 + 1, 1 + 8 + abs(cos(dt * PI * 2 + index) * 4), "#5f574f")

@@ -8,11 +8,15 @@ import kotlin.math.min
 
 class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = PixelFormat.INDEX) {
 
-    private val pixels = Array(width * height * pixelFormat) { 0 }
+    private var pixels = Array(width * height * pixelFormat) { 0 }
 
     val size = width * height * pixelFormat
 
     private val tmp = Array(pixelFormat) { 0 }
+
+    fun reset(pixel: Int) {
+        pixels = Array(width * height * pixelFormat) { pixel }
+    }
 
     fun set(x: Pixel, y: Pixel, vararg pixel: Int) {
         assert(x in 0 until width) { "x ($x) has to be between 0 and $width " }

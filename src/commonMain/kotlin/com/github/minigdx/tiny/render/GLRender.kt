@@ -103,6 +103,12 @@ class GLRender(
         val gameTexture = gl.createTexture()
         gl.bindTexture(GL_TEXTURE_2D, gameTexture)
 
+        gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+        gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
+
+        gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+
         val vertexData = floatArrayOf(
             -1f, -3f,
             3f, 1f,
@@ -112,6 +118,7 @@ class GLRender(
         val positionBuffer = gl.createBuffer()
         gl.bindBuffer(GL_ARRAY_BUFFER, positionBuffer)
         gl.bufferData(GL_ARRAY_BUFFER, FloatBuffer(vertexData), vertexData.size, GL_STATIC_DRAW)
+
 
         val position = gl.getAttribLocation(shaderProgram, "position")
         gl.vertexAttribPointer(
@@ -180,6 +187,7 @@ class GLRender(
         )
 
         gl.bindTexture(GL_TEXTURE_2D, context.texture)
+
         gl.texImage2D(
             GL_TEXTURE_2D,
             0,
@@ -191,12 +199,6 @@ class GLRender(
             GL_UNSIGNED_BYTE,
             ByteBuffer(image)
         )
-
-        gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
-        gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
-
-        gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-        gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
 
         gl.uniform1i(gl.getUniformLocation(context.program, "image")!!, 0)
 

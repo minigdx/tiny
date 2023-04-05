@@ -9,7 +9,7 @@ import kotlin.math.min
 
 class Blender(private val gamePalette: ColorPalette) {
 
-    private val switch: MutableMap<ColorIndex, ColorIndex> = mutableMapOf()
+    private var switch: Array<ColorIndex> = Array(gamePalette.size) { index -> index }
 
     private var dithering: Boolean = false
 
@@ -18,7 +18,7 @@ class Blender(private val gamePalette: ColorPalette) {
     }
 
     fun pal() {
-        switch.clear()
+        switch = Array(gamePalette.size) { index -> index }
     }
 
     fun pal(source: ColorIndex, target: ColorIndex) {
@@ -27,7 +27,7 @@ class Blender(private val gamePalette: ColorPalette) {
 
     fun mix(colors: Array<ColorIndex>, x: Pixel, y: Pixel): Array<ColorIndex>? {
         val color = gamePalette.check(colors[0])
-        colors[0] = switch[gamePalette.check(color)] ?: color
+        colors[0] = switch[gamePalette.check(color)]
         // Return null if transparent
         if(colors[0] == 0x00) return null
         // Return null if dithering enable every 2 pixels
@@ -64,11 +64,7 @@ class FrameBuffer(val width: Pixel, val height: Pixel) {
 
     fun clear(clearIndx: Int) {
         val clearIndex = gamePalette.check(clearIndx)
-        for (x in 0 until width) {
-            for (y in 0 until height) {
-                colorIndexBuffer.set(x, y, clearIndex)
-            }
-        }
+        colorIndexBuffer.reset(clearIndex)
     }
 
     fun copyFrom(
