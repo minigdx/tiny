@@ -65,7 +65,9 @@ class ResourceFactory(
                 val levelData: LdtkLevel = json.decodeFromString(data.decodeToString())
                 levelData
             }.onEach { level ->
-                logger.debug("RESOURCE_FACTORY") { level.toString() }
+                logger.debug("RESOURCE_FACTORY") {
+                    "Loading level " + level.uniqueIdentifer + " with layers " + level.layers.joinToString(", ")
+                }
             }.flatMapMerge { level ->
 
                 val layers = listOf("$name/_composite.png") + level.layers.map { layer -> "$name/$layer" }
@@ -81,8 +83,8 @@ class ResourceFactory(
                         )
                     }.asFlow()
                     .flatMapMerge { layer ->
-                        vfs.watch(platform.createByteArrayStream(layer.name)).map { data ->
-                            val imageData = platform.extractRGBA(data)
+                        vfs.watch(platform.createImageStream(layer.name)).map { imageData ->
+                            // val imageData = platform.extractRGBA(data)
                             convertToColorIndex(imageData.data, level.width, level.height)
                         }.map { texture ->
                             layer.apply {
@@ -176,8 +178,7 @@ class ResourceFactory(
     }
 
     private fun spritesheet(name: String, resourceType: ResourceType): Flow<SpriteSheet> {
-        return vfs.watch(platform.createByteArrayStream(name)).map { data ->
-            val imageData = platform.extractRGBA(data)
+        return vfs.watch(platform.createImageStream(name)).map { imageData ->
             val sheet = convertToColorIndex(imageData.data, imageData.width, imageData.height)
             SpriteSheet(sheet, imageData.width, imageData.height, resourceType)
         }.onEach {

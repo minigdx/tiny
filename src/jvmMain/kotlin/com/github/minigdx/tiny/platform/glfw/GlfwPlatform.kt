@@ -241,6 +241,18 @@ class GlfwPlatform(
         return FileStream(File("src/commonMain/resources/$name"))
     }
 
+    override fun createImageStream(name: String): SourceStream<ImageData> {
+        return object : SourceStream<ImageData> {
+
+            private val delegate = createByteArrayStream(name)
+            override suspend fun read(): ImageData {
+                return extractRGBA(delegate.read())
+            }
+
+            override fun wasModified(): Boolean = delegate.wasModified()
+        }
+    }
+
     companion object {
         private const val FPS = 60
         private const val RGBA = 4

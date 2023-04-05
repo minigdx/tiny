@@ -6,7 +6,7 @@ interface SourceStream<T> {
 
     fun wasModified(): Boolean = false
 
-    fun read(): T
+    suspend fun read(): T
 }
 
 interface TargetStream<T> {

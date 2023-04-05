@@ -1,15 +1,13 @@
 package com.github.minigdx.tiny.platform
 
 import com.github.minigdx.tiny.Pixel
-import com.github.minigdx.tiny.engine.GameOption
 import com.github.minigdx.tiny.engine.GameLoop
+import com.github.minigdx.tiny.engine.GameOption
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
 import kotlinx.coroutines.CoroutineDispatcher
-
-expect class WindowManager
 
 class ImageData(val data: ByteArray, val width: Pixel, val height: Pixel)
 
@@ -18,6 +16,7 @@ interface Platform {
      * Game Option from the game.
      */
     val gameOption: GameOption
+
     /**
      * Create the window where the game will render
      */
@@ -61,7 +60,19 @@ interface Platform {
     fun initInputHandler(): InputHandler
     fun initInputManager(): InputManager
 
+    /**
+     * Create Coroutine Dispatcher dedicated for the IO.
+     */
     fun io(): CoroutineDispatcher
 
-    fun createByteArrayStream(name: String) : SourceStream<ByteArray>
+    /**
+     * Create a SourceStream from the name of the resource.
+     * Regarding the platform, the name can be adjusted.
+     */
+    fun createByteArrayStream(name: String): SourceStream<ByteArray>
+
+    /**
+     * Create a SourceStream from an image from uncompressed data.
+     */
+    fun createImageStream(name: String): SourceStream<ImageData>
 }

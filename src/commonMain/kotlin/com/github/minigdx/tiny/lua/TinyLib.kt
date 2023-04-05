@@ -168,7 +168,7 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
             val str = a.checkjstring() ?: return NONE
             val x = b.checkint()
             val y = c.checkint()
-            val color = d.checkColorIndex() ?: 1
+            val color = d.checkColorIndex()
 
             val spritesheet = parent.spriteSheets[BOOT_SPRITESHEET] ?: return NONE
 
@@ -345,7 +345,7 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
             val centerX = a.checkint()
             val centerY = b.checkint()
             val radius = c.checkint()
-            val color = d.checkColorIndex() ?: 1
+            val color = d.checkColorIndex()
 
             var x = 0
             var y = radius

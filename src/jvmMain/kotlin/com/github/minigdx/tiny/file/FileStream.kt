@@ -19,7 +19,7 @@ class FileStream(private val origin: File) : SourceStream<ByteArray>, TargetStre
         return wasModified
     }
 
-    override fun read(): ByteArray {
+    override suspend fun read(): ByteArray {
         return origin.readBytes()
     }
 

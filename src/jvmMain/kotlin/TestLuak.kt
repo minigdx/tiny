@@ -3,9 +3,13 @@ import com.github.minigdx.tiny.engine.GameOption
 import com.github.minigdx.tiny.file.CommonVirtualFileSystem
 import com.github.minigdx.tiny.log.StdOutLogger
 import com.github.minigdx.tiny.platform.glfw.GlfwPlatform
+import java.io.File
+import java.util.Base64
 
 fun main(args: Array<String>) {
 
+    val b64 = Base64.getEncoder().encode(File("src/commonMain/resources/_boot.png").readBytes())
+    println(String(b64))
     // https://docs.oracle.com/javase/tutorial/2d/images/saveimage.html
     // https://mkyong.com/java/how-to-convert-bufferedimage-to-byte-in-java/
     // https://github.com/square/gifencoder

@@ -101,6 +101,7 @@ class GameScript(
     }
 
     internal fun invoke(name: String, vararg args: LuaValue) {
+        @Suppress("UNCHECKED_CAST")
         globals?.get(name)?.nullIfNil()?.invoke(args as Array<LuaValue>)
     }
 
