@@ -115,7 +115,7 @@ class GameEngine(
 
         val scripts = listOf(
             resourceFactory.bootscript("_boot.lua", inputHandler, gameOption),
-            resourceFactory.gamescript("test.lua", inputHandler, gameOption),
+            resourceFactory.gamescript("game.lua", inputHandler, gameOption),
             resourceFactory.enginescript("_engine.lua", inputHandler, gameOption),
         )
 
@@ -127,7 +127,7 @@ class GameEngine(
 
         val resourcesName = listOf(
             resourceFactory.bootSpritesheet("_boot.png"),
-            resourceFactory.gameSpritesheet("test.png"),
+            resourceFactory.gameSpritesheet("game.png"),
             resourceFactory.gameLevel("platform/simplified/Level_0"),
         )
 

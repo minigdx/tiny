@@ -1,0 +1,13 @@
+{
+  "version": "V1",
+  "name": "Platform game",
+  "resolution": {
+    "width": 256,
+    "height": 256
+  },
+  "sprites": {
+    "width": 16,
+    "height": 16
+  },
+  "zoom": 2
+}

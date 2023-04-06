@@ -6,8 +6,9 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 class GameOption(
-    val width: Pixel = 256,
-    val height: Pixel = 256,
+    val width: Pixel,
+    val height: Pixel,
+    val palette: List<String>,
     val zoom: Int = 2,
     val record: Seconds = 8f,
     val gutter: Pair<Pixel, Pixel> = 10 to 10,
