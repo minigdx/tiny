@@ -7,6 +7,7 @@ import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOption
 import com.github.minigdx.tiny.file.FileStream
+import com.github.minigdx.tiny.file.InputStreamStream
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.file.VirtualFileSystem
 import com.github.minigdx.tiny.graphic.FrameBuffer
@@ -39,7 +40,8 @@ import kotlin.math.min
 class GlfwPlatform(
     override val gameOption: GameOption,
     private val logger: Logger,
-    private val vfs: VirtualFileSystem
+    private val vfs: VirtualFileSystem,
+    private val workdirectory: File,
 ) : Platform {
 
     private var window: Long = 0
@@ -199,7 +201,7 @@ class GlfwPlatform(
                     gameOption.width,
                     gameOption.height,
                     0,
-                    FrameBuffer.gamePalette
+                    gameOption.colors()
                 )
 
                 buffer.forEach { img ->
@@ -238,13 +240,19 @@ class GlfwPlatform(
     }
 
     override fun createByteArrayStream(name: String): SourceStream<ByteArray> {
-        return FileStream(File("src/commonMain/resources/$name"))
+        val fromJar = ClassLoader.getPlatformClassLoader().getResourceAsStream("/$name")
+        return if(fromJar != null) {
+            InputStreamStream(fromJar)
+        } else {
+            FileStream(workdirectory.resolve(name))
+        }
     }
 
     override fun createImageStream(name: String): SourceStream<ImageData> {
         return object : SourceStream<ImageData> {
 
             private val delegate = createByteArrayStream(name)
+
             override suspend fun read(): ImageData {
                 return extractRGBA(delegate.read())
             }

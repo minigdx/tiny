@@ -32,8 +32,9 @@ class GameParametersV1(
         return GameOption(
             width = resolution.width,
             height = resolution.height,
+            palette = colors,
             spriteSize = sprites.width to sprites.height,
-            zoom = zoom
+            zoom = zoom,
         )
     }
 }

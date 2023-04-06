@@ -335,7 +335,7 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
         return if (this.isnumber()) {
             this.checkint()
         } else {
-            FrameBuffer.gamePalette.getColorIndex(this.checkjstring()!!)
+            parent.frameBuffer.gamePalette.getColorIndex(this.checkjstring()!!)
         }
     }
 

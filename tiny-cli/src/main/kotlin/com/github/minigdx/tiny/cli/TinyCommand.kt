@@ -82,7 +82,7 @@ class TinyCommand : Callable<Int> {
             val gameOption = gameParameters.toGameOptions()
             GameEngine(
                 gameOption = gameOption,
-                platform = GlfwPlatform(gameOption, logger, vfs),
+                platform = GlfwPlatform(gameOption, logger, vfs, dir),
                 vfs = vfs,
                 logger = logger,
             ).main()

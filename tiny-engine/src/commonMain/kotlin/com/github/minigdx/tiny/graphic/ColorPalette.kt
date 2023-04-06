@@ -42,7 +42,7 @@ class ColorPalette(colors: List<HexColor>) {
     }
 
     fun check(color: ColorIndex): ColorIndex {
-        return abs(color) % FrameBuffer.gamePalette.size
+        return abs(color) % size
     }
 
     private fun hexStringToByteArray(hexString: String): ByteArray {

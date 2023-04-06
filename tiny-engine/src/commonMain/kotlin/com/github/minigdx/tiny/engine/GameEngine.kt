@@ -91,7 +91,7 @@ class GameEngine(
 
     private var current: GameScript? = null
 
-    private val frameBuffer = FrameBuffer(gameOption.width, gameOption.height)
+    private val frameBuffer = FrameBuffer(gameOption.width, gameOption.height, gameOption.colors())
 
     private var accumulator: Seconds = 0f
 
@@ -109,7 +109,7 @@ class GameEngine(
         inputHandler = platform.initInputHandler()
         inputManager = platform.initInputManager()
 
-        resourceFactory = ResourceFactory(vfs, platform, logger)
+        resourceFactory = ResourceFactory(vfs, platform, logger, gameOption.colors())
 
         val resourcesScope = CoroutineScope(platform.io())
 

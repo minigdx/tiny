@@ -44,6 +44,7 @@ fun main() {
         val gameOption = GameOption(
             gameWidth,
             gameHeight,
+            emptyList(), // FIXME: get colors from the tinyGameTag
             gameZoom,
             gutter = 0 to 0,
             spriteSize = 16 to 16,

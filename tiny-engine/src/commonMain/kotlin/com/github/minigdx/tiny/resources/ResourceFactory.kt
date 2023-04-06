@@ -3,6 +3,7 @@ package com.github.minigdx.tiny.resources
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameOption
 import com.github.minigdx.tiny.file.VirtualFileSystem
+import com.github.minigdx.tiny.graphic.ColorPalette
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.input.InputHandler
@@ -53,6 +54,7 @@ class ResourceFactory(
     private val vfs: VirtualFileSystem,
     private val platform: Platform,
     private val logger: Logger,
+    private val colorPalette: ColorPalette,
 ) {
 
     private val json = Json { ignoreUnknownKeys = true }
@@ -194,7 +196,7 @@ class ResourceFactory(
         (0 until width).forEach { x ->
             (0 until height).forEach { y ->
                 val coord = (x + y * width) * PixelFormat.RGBA
-                val index = FrameBuffer.gamePalette.fromRGBA(
+                val index = colorPalette.fromRGBA(
                     byteArrayOf(
                         data[coord + 0],
                         data[coord + 1],
