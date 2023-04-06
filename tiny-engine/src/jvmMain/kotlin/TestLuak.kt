@@ -8,11 +8,6 @@ import java.util.Base64
 
 fun main(args: Array<String>) {
 
-    val b64 = Base64.getEncoder().encode(File("src/commonMain/resources/_boot.png").readBytes())
-    println(String(b64))
-    // https://docs.oracle.com/javase/tutorial/2d/images/saveimage.html
-    // https://mkyong.com/java/how-to-convert-bufferedimage-to-byte-in-java/
-    // https://github.com/square/gifencoder
     val logger = StdOutLogger()
     try {
         val vfs = CommonVirtualFileSystem()

@@ -1,5 +1,5 @@
 
-rootProject.name = "test-luak"
+rootProject.name = "tiny"
 
 pluginManagement {
     repositories {
@@ -14,3 +14,6 @@ pluginManagement {
         mavenLocal()
     }
 }
+
+include("tiny-engine")
+include("tiny-cli")
