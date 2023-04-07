@@ -5,7 +5,7 @@ package com.github.minigdx.tiny.platform.glfw
 import com.danielgergely.kgl.KglLwjgl
 import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.engine.GameLoop
-import com.github.minigdx.tiny.engine.GameOption
+import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.file.FileStream
 import com.github.minigdx.tiny.file.InputStreamStream
 import com.github.minigdx.tiny.file.SourceStream
@@ -37,8 +37,9 @@ import java.util.concurrent.TimeUnit
 import javax.imageio.ImageIO
 import kotlin.math.min
 
+
 class GlfwPlatform(
-    override val gameOption: GameOption,
+    override val gameOptions: GameOptions,
     private val logger: Logger,
     private val vfs: VirtualFileSystem,
     private val workdirectory: File,
@@ -48,10 +49,10 @@ class GlfwPlatform(
 
     private var lastFrame: Long = getTime()
 
-    private val render = GLRender(KglLwjgl, logger, gameOption)
+    private val render = GLRender(KglLwjgl, logger, gameOptions)
 
     // Keep 30 seconds at 60 frames per seconds
-    private val gifBufferCache: MutableFixedSizeList<IntArray> = MutableFixedSizeList(gameOption.record.toInt() * FPS)
+    private val gifBufferCache: MutableFixedSizeList<IntArray> = MutableFixedSizeList(gameOptions.record.toInt() * FPS)
 
     private val lwjglInputHandler = LwjglInput()
 
@@ -94,8 +95,8 @@ class GlfwPlatform(
         ) // the window will be resizable
 
         // Create the window
-        val windowWidth = (gameOption.width + gameOption.gutter.first * 2) * gameOption.zoom
-        val windowHeight = (gameOption.height + gameOption.gutter.first * 2) * gameOption.zoom
+        val windowWidth = (gameOptions.width + gameOptions.gutter.first * 2) * gameOptions.zoom
+        val windowHeight = (gameOptions.height + gameOptions.gutter.first * 2) * gameOptions.zoom
         window = GLFW.glfwCreateWindow(
             windowWidth,
             windowHeight,
@@ -198,14 +199,14 @@ class GlfwPlatform(
             ByteArrayOutputStream().use { out ->
                 val encoder = FastGifEncoder(
                     out,
-                    gameOption.width,
-                    gameOption.height,
+                    gameOptions.width,
+                    gameOptions.height,
                     0,
-                    gameOption.colors()
+                    gameOptions.colors()
                 )
 
                 buffer.forEach { img ->
-                    encoder.addImage(img, gameOption.width, options)
+                    encoder.addImage(img, gameOptions.width, options)
                 }
                 encoder.finishEncoding()
                 vfs.save(FileStream(origin), out.toByteArray())
@@ -240,7 +241,7 @@ class GlfwPlatform(
     }
 
     override fun createByteArrayStream(name: String): SourceStream<ByteArray> {
-        val fromJar = ClassLoader.getPlatformClassLoader().getResourceAsStream("/$name")
+        val fromJar = GlfwPlatform::class.java.getResourceAsStream("/$name")
         return if(fromJar != null) {
             InputStreamStream(fromJar)
         } else {

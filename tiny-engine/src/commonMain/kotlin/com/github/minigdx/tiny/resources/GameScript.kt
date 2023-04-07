@@ -1,6 +1,6 @@
 package com.github.minigdx.tiny.resources
 
-import com.github.minigdx.tiny.engine.GameOption
+import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.lua.CtrlLib
@@ -12,7 +12,6 @@ import org.luaj.vm2.LoadState
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.LuaValue.Companion.valueOf
-import org.luaj.vm2.Varargs
 import org.luaj.vm2.compiler.LuaC
 import org.luaj.vm2.lib.BaseLib
 import org.luaj.vm2.lib.Bit32Lib
@@ -23,7 +22,7 @@ import org.luaj.vm2.lib.TableLib
 
 class GameScript(
     val name: String,
-    val gameOption: GameOption,
+    val gameOptions: GameOptions,
     val inputHandler: InputHandler,
     override val type: ResourceType
 ): GameResource {
@@ -97,7 +96,7 @@ class GameScript(
         getStateFunction = globals?.get("_getState")?.nullIfNil()
         setStateFunction = globals?.get("_setState")?.nullIfNil()
 
-        initFunction?.call(valueOf(gameOption.width), valueOf(gameOption.height))
+        initFunction?.call(valueOf(gameOptions.width), valueOf(gameOptions.height))
     }
 
     internal fun invoke(name: String, vararg args: LuaValue) {

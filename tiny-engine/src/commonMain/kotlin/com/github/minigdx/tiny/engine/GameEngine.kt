@@ -24,7 +24,6 @@ import com.github.minigdx.tiny.resources.ResourcesState
 import com.github.minigdx.tiny.resources.ResourcesState.BOOT
 import com.github.minigdx.tiny.resources.SpriteSheet
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.asFlow
@@ -71,7 +70,7 @@ class ScriptsCollector(private val events: MutableList<GameScript>) : FlowCollec
 
 @OptIn(FlowPreview::class)
 class GameEngine(
-    val gameOption: GameOption,
+    val gameOptions: GameOptions,
     val platform: Platform,
     val vfs: VirtualFileSystem,
     val logger: Logger,
@@ -91,7 +90,7 @@ class GameEngine(
 
     private var current: GameScript? = null
 
-    private val frameBuffer = FrameBuffer(gameOption.width, gameOption.height, gameOption.colors())
+    private val frameBuffer = FrameBuffer(gameOptions.width, gameOptions.height, gameOptions.colors())
 
     private var accumulator: Seconds = 0f
 
@@ -109,15 +108,16 @@ class GameEngine(
         inputHandler = platform.initInputHandler()
         inputManager = platform.initInputManager()
 
-        resourceFactory = ResourceFactory(vfs, platform, logger, gameOption.colors())
+        resourceFactory = ResourceFactory(vfs, platform, logger, gameOptions.colors())
 
         val resourcesScope = CoroutineScope(platform.io())
 
         val scripts = listOf(
-            resourceFactory.bootscript("_boot.lua", inputHandler, gameOption),
-            resourceFactory.gamescript("game.lua", inputHandler, gameOption),
-            resourceFactory.enginescript("_engine.lua", inputHandler, gameOption),
-        )
+            resourceFactory.bootscript("_boot.lua", inputHandler, gameOptions),
+            resourceFactory.enginescript("_engine.lua", inputHandler, gameOptions),
+        ) + gameOptions.gameScripts.map { script ->
+            resourceFactory.gamescript(script, inputHandler, gameOptions)
+        }
 
         resourcesScope.launch {
             scripts.asFlow()
@@ -126,10 +126,12 @@ class GameEngine(
         }
 
         val resourcesName = listOf(
-            resourceFactory.bootSpritesheet("_boot.png"),
-            resourceFactory.gameSpritesheet("game.png"),
-            resourceFactory.gameLevel("platform/simplified/Level_0"),
-        )
+            resourceFactory.bootSpritesheet("_boot.png")
+        ) + gameOptions.spriteSheets.map { sheet ->
+            resourceFactory.gameSpritesheet(sheet)
+        } + gameOptions.gameLevels.map {level ->
+            resourceFactory.gameLevel(level)
+        }
 
         resourcesScope.launch {
             resourcesName.asFlow()
@@ -161,7 +163,7 @@ class GameEngine(
 
         workEvents.forEach { gameScript ->
             // If the script is the engine script, don't add it to the stack.
-            if(gameScript.type == ENGINE_GAMESCRIPT) {
+            if (gameScript.type == ENGINE_GAMESCRIPT) {
                 engineGameScript = gameScript
                 // Prepare the custom game script used only by the engine
                 engineGameScript.evaluate()
@@ -206,7 +208,7 @@ class GameEngine(
                 current?.frameBuffer = frameBuffer
                 current?.spriteSheets = this@GameEngine.spriteSheets
                 current?.level = this@GameEngine.levels[GAME_LEVEL]
-                evaluate()
+                current?.evaluate()
                 current?.setState(state)
             } else if (loading) {
                 evaluate()

@@ -1,10 +1,9 @@
 package com.github.minigdx.tiny.resources
 
 import com.github.minigdx.tiny.Pixel
-import com.github.minigdx.tiny.engine.GameOption
+import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.file.VirtualFileSystem
 import com.github.minigdx.tiny.graphic.ColorPalette
-import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.log.Logger
@@ -138,28 +137,28 @@ class ResourceFactory(
             }
     }
 
-    fun gamescript(name: String, inputHandler: InputHandler, gameOption: GameOption) =
-        script(name, inputHandler, gameOption, GAME_GAMESCRIPT)
+    fun gamescript(name: String, inputHandler: InputHandler, gameOptions: GameOptions) =
+        script(name, inputHandler, gameOptions, GAME_GAMESCRIPT)
 
-    fun enginescript(name: String, inputHandler: InputHandler, gameOption: GameOption) =
-        script(name, inputHandler, gameOption, ENGINE_GAMESCRIPT)
+    fun enginescript(name: String, inputHandler: InputHandler, gameOptions: GameOptions) =
+        script(name, inputHandler, gameOptions, ENGINE_GAMESCRIPT)
 
-    fun bootscript(name: String, inputHandler: InputHandler, gameOption: GameOption) =
-        script(name, inputHandler, gameOption, BOOT_GAMESCRIPT)
+    fun bootscript(name: String, inputHandler: InputHandler, gameOptions: GameOptions) =
+        script(name, inputHandler, gameOptions, BOOT_GAMESCRIPT)
 
     private fun script(
         name: String,
         inputHandler: InputHandler,
-        gameOption: GameOption,
+        gameOptions: GameOptions,
         resourceType: ResourceType
     ): Flow<GameScript> {
         // Emit empty game script to install each script ASAP.
-        return flowOf(GameScript(name, gameOption, inputHandler, resourceType).apply {
+        return flowOf(GameScript(name, gameOptions, inputHandler, resourceType).apply {
             loading = true
         }).onCompletion {
             // Lazy loading of the script.
             val lazyScript = vfs.watch(platform.createByteArrayStream(name)).map { content ->
-                GameScript(name, gameOption, inputHandler, resourceType).apply {
+                GameScript(name, gameOptions, inputHandler, resourceType).apply {
                     this.content = content
                 }
             }

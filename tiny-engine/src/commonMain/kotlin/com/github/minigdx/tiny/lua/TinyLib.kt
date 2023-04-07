@@ -2,11 +2,9 @@ package com.github.minigdx.tiny.lua
 
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
-import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.resources.GameScript
 import com.github.minigdx.tiny.resources.ResourceType.BOOT_SPRITESHEET
 import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
-import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
@@ -101,7 +99,7 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
             val y = c.checkint()
             val spritesheet = parent.spriteSheets[GAME_SPRITESHEET] ?: return NONE
 
-            val (sw, sh) = parent.gameOption.spriteSize
+            val (sw, sh) = parent.gameOptions.spriteSize
             val nbSpritePerRow = spritesheet.width / sw
 
             val column = sprN % nbSpritePerRow
@@ -126,7 +124,7 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
 
             val spritesheet = parent.spriteSheets[GAME_SPRITESHEET] ?: return NONE
 
-            val (sw, sh) = parent.gameOption.spriteSize
+            val (sw, sh) = parent.gameOptions.spriteSize
             val nbSpritePerRow = spritesheet.width / sw
 
             val column = sprN % nbSpritePerRow

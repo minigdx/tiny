@@ -11,10 +11,8 @@ import com.danielgergely.kgl.GL_FLOAT
 import com.danielgergely.kgl.GL_FRAGMENT_SHADER
 import com.danielgergely.kgl.GL_LINK_STATUS
 import com.danielgergely.kgl.GL_NEAREST
-import com.danielgergely.kgl.GL_RENDERER
 import com.danielgergely.kgl.GL_REPEAT
 import com.danielgergely.kgl.GL_RGBA
-import com.danielgergely.kgl.GL_SHADING_LANGUAGE_VERSION
 import com.danielgergely.kgl.GL_STATIC_DRAW
 import com.danielgergely.kgl.GL_TEXTURE_2D
 import com.danielgergely.kgl.GL_TEXTURE_MAG_FILTER
@@ -27,7 +25,7 @@ import com.danielgergely.kgl.GL_VERTEX_SHADER
 import com.danielgergely.kgl.Kgl
 import com.danielgergely.kgl.Shader
 import com.github.minigdx.tiny.Pixel
-import com.github.minigdx.tiny.engine.GameOption
+import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.RenderContext
 import com.github.minigdx.tiny.platform.WindowManager
@@ -36,7 +34,7 @@ import com.github.minigdx.tiny.platform.WindowManager
 class GLRender(
     private val gl: Kgl,
     private val logger: Logger,
-    private val gameOption: GameOption,
+    private val gameOptions: GameOptions,
 ) : Render {
 
     private val uvsData = FloatBuffer(
@@ -180,10 +178,10 @@ class GLRender(
         context as GLRenderContext
 
         gl.viewport(
-            gameOption.gutter.first * gameOption.zoom * context.windowManager.ratioWidth,
-            gameOption.gutter.second * gameOption.zoom * context.windowManager.ratioHeight,
-            gameOption.width * gameOption.zoom * context.windowManager.ratioWidth,
-            gameOption.height * gameOption.zoom *  context.windowManager.ratioHeight
+            gameOptions.gutter.first * gameOptions.zoom * context.windowManager.ratioWidth,
+            gameOptions.gutter.second * gameOptions.zoom * context.windowManager.ratioHeight,
+            gameOptions.width * gameOptions.zoom * context.windowManager.ratioWidth,
+            gameOptions.height * gameOptions.zoom *  context.windowManager.ratioHeight
         )
 
         gl.bindTexture(GL_TEXTURE_2D, context.texture)

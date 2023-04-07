@@ -1,7 +1,7 @@
 package com.github.minigdx.tiny
 
 import com.github.minigdx.tiny.engine.GameEngine
-import com.github.minigdx.tiny.engine.GameOption
+import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.file.CommonVirtualFileSystem
 import com.github.minigdx.tiny.log.StdOutLogger
 import com.github.minigdx.tiny.platform.webgl.WebGlPlatform
@@ -41,7 +41,7 @@ fun main() {
         canvas.setAttribute("height", (gameHeight * gameZoom).toString())
         game.appendChild(canvas)
 
-        val gameOption = GameOption(
+        val gameOptions = GameOptions(
             gameWidth,
             gameHeight,
             emptyList(), // FIXME: get colors from the tinyGameTag
@@ -53,8 +53,8 @@ fun main() {
         val logger = StdOutLogger()
 
         GameEngine(
-            gameOption = gameOption,
-            platform = WebGlPlatform(canvas as HTMLCanvasElement, logger, gameOption, rootPath),
+            gameOptions = gameOptions,
+            platform = WebGlPlatform(canvas as HTMLCanvasElement, logger, gameOptions, rootPath),
             vfs = CommonVirtualFileSystem(),
             logger = logger
         ).main()

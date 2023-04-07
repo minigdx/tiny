@@ -22,7 +22,7 @@ class Blender(private val gamePalette: ColorPalette) {
     }
 
     fun pal(source: ColorIndex, target: ColorIndex) {
-        switch[source] = target
+        switch[gamePalette.check(source)] = gamePalette.check(target)
     }
 
     fun mix(colors: Array<ColorIndex>, x: Pixel, y: Pixel): Array<ColorIndex>? {
