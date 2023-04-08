@@ -9,7 +9,6 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 @JsonClassDiscriminator("version")
 sealed class GameParameters() {
     abstract fun toGameOptions(): GameOptions
-
 }
 
 @Serializable
