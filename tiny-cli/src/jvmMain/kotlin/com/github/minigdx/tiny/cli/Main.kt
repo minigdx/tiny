@@ -42,7 +42,8 @@ class CreateCommand : CliktCommand(name = "create") {
         .validate {
             require(
                 it.split(",")
-                    .all { f -> f.trim().endsWith(".png") }) { "Invalid image file $it. Only *.png are supported" }
+                    .all { f -> f.trim().endsWith(".png") }
+            ) { "Invalid image file $it. Only *.png are supported" }
         }
 
     private val palette by option(help = "🎨 The Color palette to use")
@@ -50,9 +51,9 @@ class CreateCommand : CliktCommand(name = "create") {
         .prompt(
             """Please choose a game color palette:
 ${
-                GamePalette.ALL.mapIndexed { index, gamePalette ->
-                    "[$index] ${gamePalette.name}"
-                }.joinToString("\n")
+            GamePalette.ALL.mapIndexed { index, gamePalette ->
+                "[$index] ${gamePalette.name}"
+            }.joinToString("\n")
             }
 """
         )
@@ -63,9 +64,9 @@ ${
         echo()
 
         echo("Game Name: $gameName")
-        echo("Game Resolution: ${gameResolution}")
-        echo("Game Resolution: ${spriteSize}")
-        echo("Sprite Sheet Filenames: ${spritesheets}")
+        echo("Game Resolution: $gameResolution")
+        echo("Game Resolution: $spriteSize")
+        echo("Sprite Sheet Filenames: $spritesheets")
         echo("Folder: ${gameDirectory.absolutePath}")
         echo("palette: $palette")
     }
@@ -118,7 +119,6 @@ class MainCommand : CliktCommand(invokeWithoutSubcommand = true) {
         }
     }
 }
-
 
 fun main(vararg args: String) {
     MainCommand().main(args)

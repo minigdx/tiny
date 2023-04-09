@@ -19,11 +19,9 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -58,7 +56,7 @@ class ResourceFactory(
 
     private val json = Json { ignoreUnknownKeys = true }
 
-    fun gameLevel(name: String): Flow<GameLevel> {
+    fun gameLevel(index: Int, name: String): Flow<GameLevel> {
         return flowOf("$name/data.json")
             .map { platform.createByteArrayStream(it) }
             .flatMapMerge { filestream -> vfs.watch(filestream) }
@@ -97,8 +95,8 @@ class ResourceFactory(
                 val intLayers = layers
                     .map { layer -> layer.replace(".png", ".csv") }
                     .mapIndexed { index, layer ->
-                    layer to index
-                }.asFlow()
+                        layer to index
+                    }.asFlow()
                     .flatMapMerge { (layer, index) ->
                         vfs.watch(platform.createByteArrayStream(layer)).map { data ->
                             data.decodeToString()
@@ -124,45 +122,39 @@ class ResourceFactory(
                         }
                     }
 
-                flowOf(GameLevel(GAME_LEVEL, level.layers.size + 1, level))
+                flowOf(GameLevel(index, GAME_LEVEL, level.layers.size + 1, level))
                     .combine(pngLayers) { l, layer ->
                         l.apply {
                             imageLayers[layer.index] = layer
                         }
                     }.combine(intLayers) { l, layer ->
                         l.apply {
-                           this.intLayers[layer.index] = layer
+                            this.intLayers[layer.index] = layer
                         }
                     }
             }
     }
 
-    fun gamescript(name: String, inputHandler: InputHandler, gameOptions: GameOptions) =
-        script(name, inputHandler, gameOptions, GAME_GAMESCRIPT)
+    fun gamescript(index: Int, name: String, inputHandler: InputHandler, gameOptions: GameOptions) =
+        script(index, name, inputHandler, gameOptions, GAME_GAMESCRIPT)
 
     fun enginescript(name: String, inputHandler: InputHandler, gameOptions: GameOptions) =
-        script(name, inputHandler, gameOptions, ENGINE_GAMESCRIPT)
+        script(0, name, inputHandler, gameOptions, ENGINE_GAMESCRIPT)
 
     fun bootscript(name: String, inputHandler: InputHandler, gameOptions: GameOptions) =
-        script(name, inputHandler, gameOptions, BOOT_GAMESCRIPT)
+        script(0, name, inputHandler, gameOptions, BOOT_GAMESCRIPT)
 
     private fun script(
+        index: Int,
         name: String,
         inputHandler: InputHandler,
         gameOptions: GameOptions,
         resourceType: ResourceType
     ): Flow<GameScript> {
-        // Emit empty game script to install each script ASAP.
-        return flowOf(GameScript(name, gameOptions, inputHandler, resourceType).apply {
-            loading = true
-        }).onCompletion {
-            // Lazy loading of the script.
-            val lazyScript = vfs.watch(platform.createByteArrayStream(name)).map { content ->
-                GameScript(name, gameOptions, inputHandler, resourceType).apply {
-                    this.content = content
-                }
+        return vfs.watch(platform.createByteArrayStream(name)).map { content ->
+            GameScript(index, name, gameOptions, inputHandler, resourceType).apply {
+                this.content = content
             }
-            emitAll(lazyScript)
         }.onEach {
             logger.debug("RESOURCE_FACTORY") {
                 "Loading script '$name'"
@@ -170,18 +162,18 @@ class ResourceFactory(
         }
     }
 
-    fun gameSpritesheet(name: String): Flow<SpriteSheet> {
-        return spritesheet(name, GAME_SPRITESHEET)
+    fun gameSpritesheet(index: Int, name: String): Flow<SpriteSheet> {
+        return spritesheet(index, name, GAME_SPRITESHEET)
     }
 
     fun bootSpritesheet(name: String): Flow<SpriteSheet> {
-        return spritesheet(name, BOOT_SPRITESHEET)
+        return spritesheet(0, name, BOOT_SPRITESHEET)
     }
 
-    private fun spritesheet(name: String, resourceType: ResourceType): Flow<SpriteSheet> {
+    private fun spritesheet(index: Int, name: String, resourceType: ResourceType): Flow<SpriteSheet> {
         return vfs.watch(platform.createImageStream(name)).map { imageData ->
             val sheet = convertToColorIndex(imageData.data, imageData.width, imageData.height)
-            SpriteSheet(sheet, imageData.width, imageData.height, resourceType)
+            SpriteSheet(index, sheet, imageData.width, imageData.height, resourceType)
         }.onEach {
             logger.debug("RESOURCE_FACTORY") {
                 "Loading spritesheet '$name' ($resourceType)"
@@ -209,5 +201,4 @@ class ResourceFactory(
         }
         return result
     }
-
 }

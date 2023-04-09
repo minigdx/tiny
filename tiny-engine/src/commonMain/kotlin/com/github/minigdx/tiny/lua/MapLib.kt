@@ -1,6 +1,6 @@
 package com.github.minigdx.tiny.lua
 
-import com.github.minigdx.tiny.resources.GameScript
+import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.resources.LdtkEntity
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
@@ -8,7 +8,10 @@ import org.luaj.vm2.Varargs
 import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.TwoArgFunction
 
-class MapLib(private val parent: GameScript) : TwoArgFunction() {
+class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() {
+
+    private var currentLevel: Int = 0
+
     override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
         val map = LuaTable()
         map.set("draw", draw())
@@ -33,7 +36,7 @@ class MapLib(private val parent: GameScript) : TwoArgFunction() {
             val tileX = a.checkint()
             val tileY = b.checkint()
 
-            val layer = parent.level?.intLayers?.first { l -> l != null } ?: return NONE
+            val layer = resourceAccess.level(currentLevel)?.intLayers?.first { l -> l != null } ?: return NONE
 
             return if(tileX in 0 until layer.width && tileY in 0 until layer.height) {
                 valueOf(layer.ints.getOne(tileX, tileY))
@@ -48,7 +51,7 @@ class MapLib(private val parent: GameScript) : TwoArgFunction() {
         override fun get(key: LuaValue): LuaValue {
             val strKey = key.checkjstring() ?: return NIL
             // TODO: mettre un système de cache pour ne pas iter à chaque fois sur la liste.
-            val entities = parent.level?.entities?.get(strKey) ?: return NIL
+            val entities = resourceAccess.level(currentLevel)?.entities?.get(strKey) ?: return NIL
             val first = LuaTable()
             entities.forEach {
                 first[it.iid] = it.toLuaTable()
@@ -83,9 +86,9 @@ class MapLib(private val parent: GameScript) : TwoArgFunction() {
             mainCall = true,
         )
         override fun call(): LuaValue {
-            val layer = parent.level?.imageLayers?.get(0)
+            val layer = resourceAccess.level(currentLevel)?.imageLayers?.get(0)
             if (layer != null) {
-                parent.frameBuffer.copyFrom(
+                resourceAccess.frameBuffer.copyFrom(
                     source = layer.pixels,
                     dstX = 0,
                     dstY = 0,
@@ -102,9 +105,9 @@ class MapLib(private val parent: GameScript) : TwoArgFunction() {
             documentation = "Draw the default layer on the screen at the x/y coordinates.",
         )
         override fun call(@DocArg("x") a: LuaValue, @DocArg("y") b: LuaValue): LuaValue {
-            val layer = parent.level?.imageLayers?.get(0)
+            val layer = resourceAccess.level(currentLevel)?.imageLayers?.get(0)
             if (layer != null) {
-                parent.frameBuffer.copyFrom(
+                resourceAccess.frameBuffer.copyFrom(
                     source = layer.pixels,
                     dstX = a.checkint(),
                     dstY = b.checkint(),
@@ -124,9 +127,9 @@ class MapLib(private val parent: GameScript) : TwoArgFunction() {
             @DocArg("x") a: LuaValue, @DocArg("y") b: LuaValue,
             @DocArg("sx") c: LuaValue, @DocArg("sy") d: LuaValue
         ): LuaValue {
-            val layer = parent.level?.imageLayers?.get(0)
+            val layer = resourceAccess.level(currentLevel)?.imageLayers?.get(0)
             if (layer != null) {
-                parent.frameBuffer.copyFrom(
+                resourceAccess.frameBuffer.copyFrom(
                     source = layer.pixels,
                     dstX = a.checkint(),
                     dstY = b.checkint(),
@@ -152,9 +155,9 @@ class MapLib(private val parent: GameScript) : TwoArgFunction() {
             val width = args.arg(5).checkint()
             val height = args.arg(6).checkint()
 
-            val layer = parent.level?.imageLayers?.get(0)
+            val layer = resourceAccess.level(currentLevel)?.imageLayers?.get(0)
             if (layer != null) {
-                parent.frameBuffer.copyFrom(
+                resourceAccess.frameBuffer.copyFrom(
                     source = layer.pixels,
                     dstX = x,
                     dstY = y,
@@ -174,9 +177,9 @@ class MapLib(private val parent: GameScript) : TwoArgFunction() {
         override fun call(
             @DocArg("layer", "index of the layer") a: LuaValue
         ): LuaValue {
-            val layer = parent.level?.imageLayers?.getOrNull(a.checkint())
+            val layer = resourceAccess.level(currentLevel)?.imageLayers?.getOrNull(a.checkint())
             if (layer != null) {
-                parent.frameBuffer.copyFrom(
+                resourceAccess.frameBuffer.copyFrom(
                     source = layer.pixels,
                     dstX = 0,
                     dstY = 0,

@@ -2,9 +2,11 @@ package com.github.minigdx.tiny.lua
 
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
+import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.resources.GameScript
 import com.github.minigdx.tiny.resources.ResourceType.BOOT_SPRITESHEET
 import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
+import kotlinx.coroutines.NonDisposableHandle.parent
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
@@ -22,7 +24,10 @@ import kotlin.math.sin
 import kotlin.random.Random
 
 
-class TinyLib(val parent: GameScript) : TwoArgFunction() {
+class TinyLib(val gameScript: GameScript, val resourceAccess: GameResourceAccess) : TwoArgFunction() {
+
+    private var currentSpritesheet: Int = 0
+
     override fun call(modname: LuaValue, env: LuaValue): LuaValue {
         val tiny = LuaTable()
         env["exit"] = exit()
@@ -72,10 +77,10 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
             val flipX = args.arg(7).optboolean(false)
             val flipY = args.arg(8).optboolean(false)
 
-            val spritesheet = parent.spriteSheets[GAME_SPRITESHEET] ?: return NONE
+            val spritesheet = resourceAccess.spritesheet(currentSpritesheet) ?: return NONE
 
 
-            parent.frameBuffer.copyFrom(
+            resourceAccess.frameBuffer.copyFrom(
                 spritesheet.pixels, x, y, sprX,
                 sprY,
                 sprWidth,
@@ -97,14 +102,14 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
             val sprN = a.checkint()
             val x = b.checkint()
             val y = c.checkint()
-            val spritesheet = parent.spriteSheets[GAME_SPRITESHEET] ?: return NONE
+            val spritesheet = resourceAccess.spritesheet(currentSpritesheet) ?: return NONE
 
-            val (sw, sh) = parent.gameOptions.spriteSize
+            val (sw, sh) = gameScript.gameOptions.spriteSize
             val nbSpritePerRow = spritesheet.width / sw
 
             val column = sprN % nbSpritePerRow
             val row = (sprN - column) / nbSpritePerRow
-            parent.frameBuffer.copyFrom(
+            resourceAccess.frameBuffer.copyFrom(
                 spritesheet.pixels, x, y,
                 column * sw,
                 row * sh,
@@ -122,14 +127,14 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
             val flipX = args.arg(4).optboolean(false)
             val flipY = args.arg(5).optboolean(false)
 
-            val spritesheet = parent.spriteSheets[GAME_SPRITESHEET] ?: return NONE
+            val spritesheet = resourceAccess.spritesheet(currentSpritesheet) ?: return NONE
 
-            val (sw, sh) = parent.gameOptions.spriteSize
+            val (sw, sh) = gameScript.gameOptions.spriteSize
             val nbSpritePerRow = spritesheet.width / sw
 
             val column = sprN % nbSpritePerRow
             val row = (sprN - column) / nbSpritePerRow
-            parent.frameBuffer.copyFrom(
+            resourceAccess.frameBuffer.copyFrom(
                 source = spritesheet.pixels,
                 dstX = x,
                 dstY = y,
@@ -168,7 +173,7 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
             val y = c.checkint()
             val color = d.checkColorIndex()
 
-            val spritesheet = parent.spriteSheets[BOOT_SPRITESHEET] ?: return NONE
+            val spritesheet = resourceAccess.bootSpritesheet ?: return NONE
 
             val space = 4
             var currentX = x
@@ -184,7 +189,7 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
                 }
                 if (coord != null) {
                     val (index, sheetY) = coord
-                    parent.frameBuffer.copyFrom(
+                    resourceAccess.frameBuffer.copyFrom(
                         spritesheet.pixels, currentX, y,
                         index * 4,
                         sheetY,
@@ -280,7 +285,7 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
 
     internal inner class exit : ZeroArgFunction() {
         override fun call(): LuaValue {
-            parent.exited = true
+            gameScript.exited = true
             return NONE
         }
     }
@@ -297,12 +302,12 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
             val height = args.arg(4).checkint()
             val color = args.arg(5).checkint()
             for (i in x until x + width) {
-                parent.frameBuffer.pixel(i, y, color)
-                parent.frameBuffer.pixel(i, y + height - 1, color)
+                resourceAccess.frameBuffer.pixel(i, y, color)
+                resourceAccess.frameBuffer.pixel(i, y + height - 1, color)
             }
             for (i in y until y + height) {
-                parent.frameBuffer.pixel(x, i, color)
-                parent.frameBuffer.pixel(x + width - 1, i, color)
+                resourceAccess.frameBuffer.pixel(x, i, color)
+                resourceAccess.frameBuffer.pixel(x + width - 1, i, color)
             }
             return NONE
         }
@@ -322,7 +327,7 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
 
             for (i in x until x + width) {
                 for (j in y until y + height) {
-                    parent.frameBuffer.pixel(i, j, color)
+                    resourceAccess.frameBuffer.pixel(i, j, color)
                 }
             }
             return NONE
@@ -333,7 +338,7 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
         return if (this.isnumber()) {
             this.checkint()
         } else {
-            parent.frameBuffer.gamePalette.getColorIndex(this.checkjstring()!!)
+            resourceAccess.frameBuffer.gamePalette.getColorIndex(this.checkjstring()!!)
         }
     }
 
@@ -351,23 +356,23 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
 
             while (x <= y) {
                 // Draw the outline of the circle
-                parent.frameBuffer.pixel(centerX + x, centerY + y, color)
-                parent.frameBuffer.pixel(centerX - x, centerY + y, color)
-                parent.frameBuffer.pixel(centerX + x, centerY - y, color)
-                parent.frameBuffer.pixel(centerX - x, centerY - y, color)
-                parent.frameBuffer.pixel(centerX + y, centerY + x, color)
-                parent.frameBuffer.pixel(centerX - y, centerY + x, color)
-                parent.frameBuffer.pixel(centerX + y, centerY - x, color)
-                parent.frameBuffer.pixel(centerX - y, centerY - x, color)
+                resourceAccess.frameBuffer.pixel(centerX + x, centerY + y, color)
+                resourceAccess.frameBuffer.pixel(centerX - x, centerY + y, color)
+                resourceAccess.frameBuffer.pixel(centerX + x, centerY - y, color)
+                resourceAccess.frameBuffer.pixel(centerX - x, centerY - y, color)
+                resourceAccess.frameBuffer.pixel(centerX + y, centerY + x, color)
+                resourceAccess.frameBuffer.pixel(centerX - y, centerY + x, color)
+                resourceAccess.frameBuffer.pixel(centerX + y, centerY - x, color)
+                resourceAccess.frameBuffer.pixel(centerX - y, centerY - x, color)
 
                 // Fill the circle
                 for (i in centerX - x..centerX + x) {
-                    parent.frameBuffer.pixel(i, centerY + y, color)
-                    parent.frameBuffer.pixel(i, centerY - y, color)
+                    resourceAccess.frameBuffer.pixel(i, centerY + y, color)
+                    resourceAccess.frameBuffer.pixel(i, centerY - y, color)
                 }
                 for (i in centerX - y..centerX + y) {
-                    parent.frameBuffer.pixel(i, centerY + x, color)
-                    parent.frameBuffer.pixel(i, centerY - x, color)
+                    resourceAccess.frameBuffer.pixel(i, centerY + x, color)
+                    resourceAccess.frameBuffer.pixel(i, centerY - x, color)
                 }
 
                 if (dst < 0) {
@@ -414,7 +419,7 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
             var y = y0
 
             while (true) {
-                parent.frameBuffer.pixel(x, y, color)
+                resourceAccess.frameBuffer.pixel(x, y, color)
                 if (x == x1 && y == y1) break
                 val e2 = 2 * err
                 if (e2 > -dy) {
@@ -452,14 +457,14 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
             var dst = 3 - 2 * radius
 
             while (x <= y) {
-                parent.frameBuffer.pixel(centerX + x, centerY + y, color)
-                parent.frameBuffer.pixel(centerX - x, centerY + y, color)
-                parent.frameBuffer.pixel(centerX + x, centerY - y, color)
-                parent.frameBuffer.pixel(centerX - x, centerY - y, color)
-                parent.frameBuffer.pixel(centerX + y, centerY + x, color)
-                parent.frameBuffer.pixel(centerX - y, centerY + x, color)
-                parent.frameBuffer.pixel(centerX + y, centerY - x, color)
-                parent.frameBuffer.pixel(centerX - y, centerY - x, color)
+                resourceAccess.frameBuffer.pixel(centerX + x, centerY + y, color)
+                resourceAccess.frameBuffer.pixel(centerX - x, centerY + y, color)
+                resourceAccess.frameBuffer.pixel(centerX + x, centerY - y, color)
+                resourceAccess.frameBuffer.pixel(centerX - x, centerY - y, color)
+                resourceAccess.frameBuffer.pixel(centerX + y, centerY + x, color)
+                resourceAccess.frameBuffer.pixel(centerX - y, centerY + x, color)
+                resourceAccess.frameBuffer.pixel(centerX + y, centerY - x, color)
+                resourceAccess.frameBuffer.pixel(centerX - y, centerY - x, color)
 
                 if (dst < 0) {
                     dst += 4 * x + 6
@@ -475,12 +480,12 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
 
     internal inner class cls : OneArgFunction() {
         override fun call(): LuaValue {
-            parent.frameBuffer.clear(0)
+            resourceAccess.frameBuffer.clear(0)
             return NONE
         }
 
         override fun call(arg: LuaValue): LuaValue {
-            parent.frameBuffer.clear(arg.checkint())
+            resourceAccess.frameBuffer.clear(arg.checkint())
             return NONE
         }
     }
@@ -519,7 +524,7 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
     internal inner class pset : ThreeArgFunction() {
         // x, y, index
         override fun call(arg1: LuaValue, arg2: LuaValue, arg3: LuaValue): LuaValue {
-            parent.frameBuffer.pixel(arg1.checkint(), arg2.checkint(), arg3.checkint())
+            resourceAccess.frameBuffer.pixel(arg1.checkint(), arg2.checkint(), arg3.checkint())
             return NONE
         }
 
@@ -527,7 +532,7 @@ class TinyLib(val parent: GameScript) : TwoArgFunction() {
 
     internal inner class pget : TwoArgFunction() {
         override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
-            val index = parent.frameBuffer.pixel(arg1.checkint(), arg2.checkint())
+            val index = resourceAccess.frameBuffer.pixel(arg1.checkint(), arg2.checkint())
             return valueOf(index)
         }
     }

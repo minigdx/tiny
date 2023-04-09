@@ -1,6 +1,7 @@
 package com.github.minigdx.tiny.resources
 
 import com.github.minigdx.tiny.engine.GameOptions
+import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.lua.CtrlLib
@@ -21,6 +22,13 @@ import org.luaj.vm2.lib.StringLib
 import org.luaj.vm2.lib.TableLib
 
 class GameScript(
+    /**
+     * Index of game script
+     */
+    override val index: Int,
+    /**
+     * Name of the game script
+     */
     val name: String,
     val gameOptions: GameOptions,
     val inputHandler: InputHandler,
@@ -29,17 +37,12 @@ class GameScript(
 
     var exited: Boolean = false
     var evaluated: Boolean = false
-    var loading: Boolean = false
-    var reloaded: Boolean = false
+
+    lateinit var resourceAccess: GameResourceAccess
 
     override var reload: Boolean = false
-    override var isLoaded: Boolean = false
 
     var content: ByteArray = ByteArray(0)
-
-    var spriteSheets: Map<ResourceType, SpriteSheet> = emptyMap()
-
-    var level: GameLevel? = null
 
     private var initFunction: LuaValue? = null
     private var updateFunction: LuaValue? = null
@@ -48,8 +51,6 @@ class GameScript(
     private var getStateFunction: LuaValue? = null
 
     private var globals: Globals? = null
-
-    lateinit var frameBuffer: FrameBuffer
 
     class State(val args: LuaValue)
 
@@ -60,15 +61,15 @@ class GameScript(
         load(TableLib())
         load(StringLib())
         load(CoroutineLib())
-        load(TinyLib(this@GameScript))
-        load(MapLib(this@GameScript))
-        load(GfxLib(this@GameScript))
+        load(TinyLib(this@GameScript, this@GameScript.resourceAccess))
+        load(MapLib(this@GameScript.resourceAccess))
+        load(GfxLib(this@GameScript.resourceAccess))
         load(CtrlLib(inputHandler))
         LoadState.install(this)
         LuaC.install(this)
     }
 
-    fun isValid(content: ByteArray): Boolean {
+    fun isValid(): Boolean {
         return try {
             createLuaGlobals().load(content.decodeToString()).call()
             true
@@ -84,9 +85,8 @@ class GameScript(
         globals = createLuaGlobals()
 
         evaluated = true
-        loading = false
-        reloaded = false
         exited = false
+        reload = false
 
         globals?.load(content.decodeToString())?.call()
 
@@ -138,8 +138,8 @@ class GameScript(
     }
 
     override fun toString(): String {
-        return """--- LUA SCRIPT ($name) ---
-existed: $exited | evaluated: $evaluated | loading: $loading | reloaded: $reloaded |
+        return """--- LUA SCRIPT ($index - $name) ---
+existed: $exited | evaluated: $evaluated | reload: $reload |
 init: ${initFunction != null} | update: ${updateFunction != null} | draw: ${drawFunction != null} |
             ----
             ${content.decodeToString()}

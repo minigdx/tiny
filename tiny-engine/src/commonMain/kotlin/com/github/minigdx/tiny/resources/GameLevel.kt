@@ -3,13 +3,12 @@ package com.github.minigdx.tiny.resources
 import kotlinx.serialization.Serializable
 
 class GameLevel(
+    override val index: Int,
     override val type: ResourceType,
     numberOfLayers: Int,
     private val ldktLevel: LdtkLevel
 ) : GameResource {
-
     override var reload: Boolean = true
-    override var isLoaded: Boolean = false
     val imageLayers: Array<LdKtImageLayer?> = Array(numberOfLayers) { null }
     val intLayers: Array<LdKtIntLayer?> = Array(numberOfLayers) { null }
     val entities = ldktLevel.entities

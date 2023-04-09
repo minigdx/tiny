@@ -20,8 +20,6 @@ import com.github.minigdx.tiny.resources.ResourceType.ENGINE_GAMESCRIPT
 import com.github.minigdx.tiny.resources.ResourceType.GAME_GAMESCRIPT
 import com.github.minigdx.tiny.resources.ResourceType.GAME_LEVEL
 import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
-import com.github.minigdx.tiny.resources.ResourcesState
-import com.github.minigdx.tiny.resources.ResourcesState.BOOT
 import com.github.minigdx.tiny.resources.SpriteSheet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
@@ -31,38 +29,35 @@ import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.launch
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaValue.Companion.valueOf
+import kotlin.math.min
 
-class ScriptsCollector(private val events: MutableList<GameScript>) : FlowCollector<GameScript> {
-
-    private val scriptsByName = mutableMapOf<ResourceType, GameScript>()
+class ScriptsCollector(private val events: MutableList<GameResource>) : FlowCollector<GameResource> {
 
     private var bootscriptLoaded = false
 
-    override suspend fun emit(value: GameScript) {
-        val script = scriptsByName[value.type]
-        // New script. The content will have to be loaded by the GameEngine.
-        // It's added in the script stack
-        if (script == null) {
-            scriptsByName[value.type] = value
-            // The boot script is ready. Let's add everyone!
-            if (value.type == BOOT_GAMESCRIPT && !bootscriptLoaded) {
-                events.add(value) // first the boot script
-                // then the game script.
-                scriptsByName[GAME_GAMESCRIPT]?.let { gamescript ->
-                    events.add(gamescript)
-                }
-                scriptsByName[ENGINE_GAMESCRIPT]?.let { gameScript ->
-                    events.add(gameScript)
-                }
-                bootscriptLoaded = true
-            } else if (bootscriptLoaded) {
-                events.add(value)
-            }
+    private val waitingList: MutableList<GameResource> = mutableListOf()
+
+    private val loadedResources: MutableMap<ResourceType, MutableMap<Int, GameResource>> = mutableMapOf()
+
+    override suspend fun emit(value: GameResource) {
+        // The application has not yet booted.
+        // But the boot script just got loaded
+        if (value.type == BOOT_GAMESCRIPT && !bootscriptLoaded) {
+            events.add(value)
+            events.addAll(waitingList)
+            waitingList.clear()
+            bootscriptLoaded = true
+        } else if (!bootscriptLoaded) {
+            waitingList.add(value)
         } else {
-            // Ignore the script until the bootscript is loaded
-            if (bootscriptLoaded) {
-                events.add(value.apply { reloaded = true })
+            // Check if the resources is loading or reloaded
+            val toReload = loadedResources[value.type]?.containsKey(value.index) == true
+            if(!toReload) {
+                loadedResources.getOrPut(value.type) { mutableMapOf() }[value.index] = value
             }
+            events.add(value.apply {
+                reload = toReload
+            })
         }
     }
 
@@ -74,27 +69,33 @@ class GameEngine(
     val platform: Platform,
     val vfs: VirtualFileSystem,
     val logger: Logger,
-) : GameLoop {
+) : GameLoop, GameResourceAccess {
 
-    private val scripts: MutableList<GameScript> = mutableListOf()
-    private val scriptsByName: MutableMap<String, GameScript> = mutableMapOf()
 
-    private val events: MutableList<GameScript> = mutableListOf()
-    private val workEvents: MutableList<GameScript> = mutableListOf()
+    private val events: MutableList<GameResource> = mutableListOf()
+    private val workEvents: MutableList<GameResource> = mutableListOf()
 
-    private var resources = emptyMap<ResourceType, GameResource>()
-    private var spriteSheets = emptyMap<ResourceType, SpriteSheet>()
-    private var levels = emptyMap<ResourceType, GameLevel>()
+    private var numberOfResources: Int = 0
 
-    private var resourcesState: ResourcesState = BOOT
+    private lateinit var scripts: Array<GameScript?>
+    private lateinit var spriteSheets: Array<SpriteSheet?>
+    private lateinit var levels: Array<GameLevel?>
 
-    private var current: GameScript? = null
-
-    private val frameBuffer = FrameBuffer(gameOptions.width, gameOptions.height, gameOptions.colors())
-
-    private var accumulator: Seconds = 0f
+    override var bootSpritesheet: SpriteSheet? = null
+        private set
 
     private lateinit var engineGameScript: GameScript
+
+    private var inError = false
+
+    /**
+     * Current script by index.
+     */
+    private var current: Int = 0
+
+    override val frameBuffer = FrameBuffer(gameOptions.width, gameOptions.height, gameOptions.colors())
+
+    private var accumulator: Seconds = 0f
 
     private lateinit var renderContext: RenderContext
     private lateinit var inputHandler: InputHandler
@@ -112,43 +113,33 @@ class GameEngine(
 
         val resourcesScope = CoroutineScope(platform.io())
 
-        val scripts = listOf(
+        val gameScripts = gameOptions.gameScripts.mapIndexed { index, script ->
+            resourceFactory.gamescript(index + 1, script, inputHandler, gameOptions)
+        }
+        this.scripts = Array(gameScripts.size + 1) { null }
+
+        val spriteSheets = gameOptions.spriteSheets.mapIndexed { index, sheet ->
+            resourceFactory.gameSpritesheet(index, sheet)
+        }
+        this.spriteSheets = Array(spriteSheets.size) { null }
+
+        val gameLevels = gameOptions.gameLevels.mapIndexed { index, level ->
+            resourceFactory.gameLevel(index, level)
+        }
+        this.levels = Array(gameLevels.size) { null }
+
+        val resources = listOf(
             resourceFactory.bootscript("_boot.lua", inputHandler, gameOptions),
             resourceFactory.enginescript("_engine.lua", inputHandler, gameOptions),
-        ) + gameOptions.gameScripts.map { script ->
-            resourceFactory.gamescript(script, inputHandler, gameOptions)
-        }
-
-        resourcesScope.launch {
-            scripts.asFlow()
-                .flatMapMerge { script -> script }
-                .collect(ScriptsCollector(events))
-        }
-
-        val resourcesName = listOf(
             resourceFactory.bootSpritesheet("_boot.png")
-        ) + gameOptions.spriteSheets.map { sheet ->
-            resourceFactory.gameSpritesheet(sheet)
-        } + gameOptions.gameLevels.map {level ->
-            resourceFactory.gameLevel(level)
-        }
+        ) + gameScripts + spriteSheets + gameLevels
+
+        numberOfResources = resources.size
 
         resourcesScope.launch {
-            resourcesName.asFlow()
-                .flatMapMerge { flow -> flow }
-                .collect { resource ->
-                    resources += resource.type to resource
-                    if (resource.type in setOf(BOOT_SPRITESHEET, GAME_SPRITESHEET)) {
-                        spriteSheets += resource.type to (resource as SpriteSheet)
-                    }
-                    if (resource.type == GAME_LEVEL) {
-                        levels += resource.type to (resource as GameLevel)
-                    }
-                    if (resources.size == resourcesName.size && resourcesState == BOOT) {
-                        resourcesState = ResourcesState.BOOTED
-                    }
-                }
-
+            resources.asFlow()
+                .flatMapMerge { resource -> resource }
+                .collect(ScriptsCollector(events))
         }
 
         renderContext = platform.initRenderManager(windowManager)
@@ -156,34 +147,82 @@ class GameEngine(
         platform.gameLoop(this)
     }
 
-    private var inError = false
-
     override fun advance(delta: Seconds) {
         workEvents.addAll(events)
 
-        workEvents.forEach { gameScript ->
-            // If the script is the engine script, don't add it to the stack.
-            if (gameScript.type == ENGINE_GAMESCRIPT) {
-                engineGameScript = gameScript
-                // Prepare the custom game script used only by the engine
-                engineGameScript.evaluate()
-                engineGameScript.frameBuffer = frameBuffer
-                engineGameScript.spriteSheets = this@GameEngine.spriteSheets
-            } else if (!gameScript.reloaded) {
-                // First time script loading. Adding it to the stack of script
-                logger.debug("GAME_ENGINE") { "Add ${gameScript.name} to the game script stack" }
-                scripts.add(gameScript)
-                scriptsByName[gameScript.name] = gameScript
-                if (current == null) {
-                    current = scripts.firstOrNull()
-                    current?.frameBuffer = frameBuffer
+        workEvents.forEach { resource ->
+            // The resource is loading
+            if (!resource.reload) {
+                when (resource.type) {
+                    BOOT_GAMESCRIPT -> {
+                        // Always put the boot script at the top of the stack
+                        val bootScript = resource as GameScript
+                        bootScript.resourceAccess = this
+                        bootScript.evaluate()
+                        scripts[0] = bootScript
+                    }
+
+                    GAME_GAMESCRIPT -> {
+                        resource as GameScript
+                        resource.resourceAccess = this
+                        resource.evaluate()
+                        scripts[resource.index] = resource
+                    }
+
+                    ENGINE_GAMESCRIPT -> {
+                        // Don't put the engine script in the stack
+                        engineGameScript = resource as GameScript
+                        engineGameScript.resourceAccess = this
+                        engineGameScript.evaluate()
+                    }
+
+                    BOOT_SPRITESHEET -> {
+                        bootSpritesheet = resource as SpriteSheet
+                    }
+
+                    GAME_SPRITESHEET -> {
+                        spriteSheets[resource.index] = resource as SpriteSheet
+                    }
+
+                    GAME_LEVEL -> {
+                        levels[resource.index] = resource as GameLevel
+                    }
+                }
+                numberOfResources--
+                if(numberOfResources == 0) {
+                    scripts[current]?.resourcesLoaded()
                 }
             } else {
-                // The script is already in the stack. Time to update it.
-                scriptsByName[gameScript.name]?.run {
-                    if (isValid(gameScript.content)) {
-                        reloaded = true
-                        content = gameScript.content
+                // The resource already has been loaded.
+                when(resource.type) {
+                    BOOT_GAMESCRIPT -> {
+                        // Always put the boot script at the top of the stack
+                        val bootScript = resource as GameScript
+                        bootScript.resourceAccess = this
+                        bootScript.evaluate()
+                        scripts[0] = bootScript
+                    }
+                    GAME_GAMESCRIPT -> {
+                        resource as GameScript
+                        resource.resourceAccess = this
+                        if(resource.isValid()) {
+                            scripts[resource.index] = resource
+                        }
+                    }
+                    ENGINE_GAMESCRIPT -> {
+                        // Don't put the engine script in the stack
+                        engineGameScript = resource as GameScript
+                        engineGameScript.resourceAccess = this
+                        engineGameScript.evaluate()
+                    }
+                    BOOT_SPRITESHEET -> {
+                        bootSpritesheet = resource as SpriteSheet
+                    }
+                    GAME_SPRITESHEET -> {
+                        spriteSheets[resource.index] = resource as SpriteSheet
+                    }
+                    GAME_LEVEL -> {
+                        levels[resource.index] = resource as GameLevel
                     }
                 }
             }
@@ -193,60 +232,30 @@ class GameEngine(
 
         inputManager.record()
 
-        with(current) {
+        with(scripts[current]) {
             if (this == null) return
 
             if (exited) {
-
-                scripts.removeFirst()
+                // next script
+                current = min(current + 1, scripts.size - 1)
                 val state = getState()
-                current = scripts.firstOrNull()
 
                 logger.debug("GAME_ENGINE") {
-                    "Stop $name to switch the next game script ${current?.name}"
+                    "Stop $name to switch the next game script ${scripts[current]?.name}"
                 }
-                current?.frameBuffer = frameBuffer
-                current?.spriteSheets = this@GameEngine.spriteSheets
-                current?.level = this@GameEngine.levels[GAME_LEVEL]
-                current?.evaluate()
-                current?.setState(state)
-            } else if (loading) {
-                evaluate()
-            } else if (reloaded) {
+                scripts[current]?.setState(state)
+            } else if (reload) {
                 val state = getState()
                 evaluate()
                 setState(state)
                 inError = false
             }
 
-            if (spriteSheets.values.any { it.reload }) {
-                spriteSheets.forEach { (_, s) -> s.reload = false }
-                current?.spriteSheets = this@GameEngine.spriteSheets
-            }
-            if (levels.values.any { it.reload }) {
-                levels.forEach { (_, s) -> s.reload = false }
-                current?.level = this@GameEngine.levels[GAME_LEVEL]
-            }
-
-            if (resourcesState == ResourcesState.BOOTED) {
-                resourcesState = ResourcesState.LOADED
-                logger.debug("GAME_ENGINE") { "Resources loaded" }
-
-                // Prepare the custom game script used only by the engine
-                engineGameScript.evaluate()
-                engineGameScript.frameBuffer = frameBuffer
-                engineGameScript.spriteSheets = this@GameEngine.spriteSheets
-
-                current?.spriteSheets = this@GameEngine.spriteSheets
-                current?.level = this@GameEngine.levels[GAME_LEVEL]
-                current?.resourcesLoaded()
-            }
-
             // Fixed step simulation
             accumulator += delta
             if (accumulator >= REFRESH_LIMIT) {
                 inError = try {
-                    current?.advance()
+                    scripts[current]?.advance()
                     engineGameScript.advance()
                     false
                 } catch (ex: LuaError) {
@@ -273,8 +282,16 @@ class GameEngine(
         inputManager.reset()
     }
 
+    override fun spritesheet(index: Int): SpriteSheet? {
+        return spriteSheets[index]
+    }
+
+    override fun level(index: Int): GameLevel? {
+        return levels[index]
+    }
+
     override fun draw() {
-        with(current) {
+        with(scripts[current]) {
             if (this == null) return
             platform.draw(renderContext, frameBuffer)
         }
