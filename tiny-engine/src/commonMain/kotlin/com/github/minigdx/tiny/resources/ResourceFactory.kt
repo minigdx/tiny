@@ -122,7 +122,7 @@ class ResourceFactory(
                         }
                     }
 
-                flowOf(GameLevel(index, GAME_LEVEL, level.layers.size + 1, level))
+                flowOf(GameLevel(index, GAME_LEVEL, name, level.layers.size + 1, level))
                     .combine(pngLayers) { l, layer ->
                         l.apply {
                             imageLayers[layer.index] = layer
@@ -131,6 +131,8 @@ class ResourceFactory(
                         l.apply {
                             this.intLayers[layer.index] = layer
                         }
+                    }.map {
+                        it.copy()
                     }
             }
     }
@@ -173,7 +175,7 @@ class ResourceFactory(
     private fun spritesheet(index: Int, name: String, resourceType: ResourceType): Flow<SpriteSheet> {
         return vfs.watch(platform.createImageStream(name)).map { imageData ->
             val sheet = convertToColorIndex(imageData.data, imageData.width, imageData.height)
-            SpriteSheet(index, sheet, imageData.width, imageData.height, resourceType)
+            SpriteSheet(index, name, resourceType, sheet, imageData.width, imageData.height)
         }.onEach {
             logger.debug("RESOURCE_FACTORY") {
                 "Loading spritesheet '$name' ($resourceType)"

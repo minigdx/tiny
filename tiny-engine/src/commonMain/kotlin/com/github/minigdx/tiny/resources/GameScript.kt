@@ -28,7 +28,7 @@ class GameScript(
     /**
      * Name of the game script
      */
-    val name: String,
+    override val name: String,
     val gameOptions: GameOptions,
     val inputHandler: InputHandler,
     override val type: ResourceType

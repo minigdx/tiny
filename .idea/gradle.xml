@@ -9,7 +9,9 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/tiny-cli" />
+            <option value="$PROJECT_DIR$/tiny-doc" />
             <option value="$PROJECT_DIR$/tiny-engine" />
+            <option value="$PROJECT_DIR$/tiny-sample" />
           </set>
         </option>
       </GradleProjectSettings>

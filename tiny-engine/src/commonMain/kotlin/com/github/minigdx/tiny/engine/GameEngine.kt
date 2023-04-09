@@ -153,6 +153,7 @@ class GameEngine(
         workEvents.forEach { resource ->
             // The resource is loading
             if (!resource.reload) {
+                logger.info("GAME_ENGINE") { "Loaded ${resource.name} ${resource.type}"}
                 when (resource.type) {
                     BOOT_GAMESCRIPT -> {
                         // Always put the boot script at the top of the stack
@@ -193,6 +194,7 @@ class GameEngine(
                     scripts[current]?.resourcesLoaded()
                 }
             } else {
+                logger.info("GAME_ENGINE") { "Reload ${resource.name} ${resource.type}"}
                 // The resource already has been loaded.
                 when (resource.type) {
                     BOOT_GAMESCRIPT -> {

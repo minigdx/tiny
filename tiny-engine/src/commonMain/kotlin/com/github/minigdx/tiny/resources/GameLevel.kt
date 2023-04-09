@@ -5,13 +5,23 @@ import kotlinx.serialization.Serializable
 class GameLevel(
     override val index: Int,
     override val type: ResourceType,
-    numberOfLayers: Int,
-    private val ldktLevel: LdtkLevel
+    override val name: String,
+    val numberOfLayers: Int,
+    val ldktLevel: LdtkLevel,
 ) : GameResource {
-    override var reload: Boolean = true
+    override var reload: Boolean = false
     val imageLayers: Array<LdKtImageLayer?> = Array(numberOfLayers) { null }
     val intLayers: Array<LdKtIntLayer?> = Array(numberOfLayers) { null }
     val entities = ldktLevel.entities
+
+    fun copy(): GameLevel {
+        val gameLevel = GameLevel(
+            index, type, name, numberOfLayers, ldktLevel
+        )
+        imageLayers.copyInto(gameLevel.imageLayers)
+        intLayers.copyInto(gameLevel.intLayers)
+        return gameLevel
+    }
 }
 
 @Serializable
