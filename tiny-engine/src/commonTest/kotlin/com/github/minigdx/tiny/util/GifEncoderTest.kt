@@ -5,10 +5,9 @@ import com.github.minigdx.tiny.graphic.ColorPalette
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-
 class GifEncoderTest {
 
-    private val encoder = GifEncoder(3, 5, ColorPalette((0 until 255).map {  "#0000" + it.toString(16).uppercase().padStart(2, '0') }))
+    private val encoder = GifEncoder(3, 5, ColorPalette((0 until 255).map { "#0000" + it.toString(16).uppercase().padStart(2, '0') }))
 
     class ByteArrayStream : TargetStream<ByteArray> {
         var output: ByteArray = byteArrayOf()
@@ -26,7 +25,6 @@ class GifEncoderTest {
 
         assertEquals("GIF89a".encodeToByteArray(), output.output)
     }
-
 
     @Test
     fun writeHeader_it_write_the_Logical_screen_header() {

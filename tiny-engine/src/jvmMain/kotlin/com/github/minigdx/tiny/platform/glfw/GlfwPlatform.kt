@@ -19,6 +19,7 @@ import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.RenderContext
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.render.GLRender
+import com.github.minigdx.tiny.render.Render
 import com.github.minigdx.tiny.util.MutableFixedSizeList
 import com.squareup.gifencoder.FastGifEncoder
 import com.squareup.gifencoder.ImageOptions
@@ -37,19 +38,17 @@ import java.util.concurrent.TimeUnit
 import javax.imageio.ImageIO
 import kotlin.math.min
 
-
 class GlfwPlatform(
     override val gameOptions: GameOptions,
     private val logger: Logger,
     private val vfs: VirtualFileSystem,
     private val workdirectory: File,
+    private val render: Render = GLRender(KglLwjgl, logger, gameOptions)
 ) : Platform {
 
     private var window: Long = 0
 
     private var lastFrame: Long = getTime()
-
-    private val render = GLRender(KglLwjgl, logger, gameOptions)
 
     // Keep 30 seconds at 60 frames per seconds
     private val gifBufferCache: MutableFixedSizeList<IntArray> = MutableFixedSizeList(gameOptions.record.toInt() * FPS)
@@ -80,8 +79,7 @@ class GlfwPlatform(
         GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 2)
         GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 0)
         GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE)
-        GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_DEBUG_CONTEXT, GLFW.GLFW_TRUE);
-
+        GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_DEBUG_CONTEXT, GLFW.GLFW_TRUE)
 
         GLFW.glfwDefaultWindowHints() // optional, the current window hints are already the default
 
@@ -117,7 +115,6 @@ class GlfwPlatform(
             (vidmode.width() - windowWidth) / 2,
             (vidmode.height() - windowHeight) / 2
         )
-
 
         // Make the OpenGL context current
         GLFW.glfwMakeContextCurrent(window)
@@ -242,7 +239,7 @@ class GlfwPlatform(
 
     override fun createByteArrayStream(name: String): SourceStream<ByteArray> {
         val fromJar = GlfwPlatform::class.java.getResourceAsStream("/$name")
-        return if(fromJar != null) {
+        return if (fromJar != null) {
             InputStreamStream(fromJar)
         } else {
             FileStream(workdirectory.resolve(name))
@@ -267,4 +264,3 @@ class GlfwPlatform(
         private const val RGBA = 4
     }
 }
-

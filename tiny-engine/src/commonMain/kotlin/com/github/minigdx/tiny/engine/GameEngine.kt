@@ -52,15 +52,16 @@ class ScriptsCollector(private val events: MutableList<GameResource>) : FlowColl
         } else {
             // Check if the resources is loading or reloaded
             val toReload = loadedResources[value.type]?.containsKey(value.index) == true
-            if(!toReload) {
+            if (!toReload) {
                 loadedResources.getOrPut(value.type) { mutableMapOf() }[value.index] = value
             }
-            events.add(value.apply {
-                reload = toReload
-            })
+            events.add(
+                value.apply {
+                    reload = toReload
+                }
+            )
         }
     }
-
 }
 
 @OptIn(FlowPreview::class)
@@ -70,7 +71,6 @@ class GameEngine(
     val vfs: VirtualFileSystem,
     val logger: Logger,
 ) : GameLoop, GameResourceAccess {
-
 
     private val events: MutableList<GameResource> = mutableListOf()
     private val workEvents: MutableList<GameResource> = mutableListOf()
@@ -189,12 +189,12 @@ class GameEngine(
                     }
                 }
                 numberOfResources--
-                if(numberOfResources == 0) {
+                if (numberOfResources == 0) {
                     scripts[current]?.resourcesLoaded()
                 }
             } else {
                 // The resource already has been loaded.
-                when(resource.type) {
+                when (resource.type) {
                     BOOT_GAMESCRIPT -> {
                         // Always put the boot script at the top of the stack
                         val bootScript = resource as GameScript
@@ -205,7 +205,7 @@ class GameEngine(
                     GAME_GAMESCRIPT -> {
                         resource as GameScript
                         resource.resourceAccess = this
-                        if(resource.isValid()) {
+                        if (resource.isValid()) {
                             scripts[resource.index] = resource
                         }
                     }
@@ -300,5 +300,4 @@ class GameEngine(
     companion object {
         private const val REFRESH_LIMIT: Seconds = 1 / 60f
     }
-
 }

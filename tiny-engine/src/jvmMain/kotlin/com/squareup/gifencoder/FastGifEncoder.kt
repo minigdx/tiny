@@ -13,7 +13,6 @@ class FastGifEncoder(
     private val rgbPalette: ColorPalette,
 ) {
 
-
     private val colorTable = ColorTable.fromColors(
         (0 until rgbPalette.size).map { index -> rgbPalette.getRGAasInt(index) }
             .map { rgb -> Color.fromRgbInt(rgb) }
@@ -63,8 +62,10 @@ class FastGifEncoder(
     @Throws(IOException::class)
     fun addImage(image: Image, options: ImageOptions) {
         require(
-            !(options.left + image.width > screenWidth ||
-                options.top + image.height > screenHeight)
+            !(
+                options.left + image.width > screenWidth ||
+                    options.top + image.height > screenHeight
+                )
         ) { "Image does not fit in screen." }
 
         val paddedColorCount = colorTable.paddedSize()
@@ -103,7 +104,6 @@ class FastGifEncoder(
         private const val MAX_COLOR_COUNT = 256
     }
 }
-
 
 /**
  * For background, see Appendix F of the
@@ -236,5 +236,3 @@ internal class FastLzwEncoder(colorTableSize: Int) {
         }
     }
 }
-
-

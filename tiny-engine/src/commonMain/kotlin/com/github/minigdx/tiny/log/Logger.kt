@@ -25,8 +25,8 @@ interface Logger {
 class StdOutLogger(override val level: LogLevel = LogLevel.DEBUG) : Logger {
 
     private fun log(level: LogLevel, tag: String, exception: Throwable?, message: () -> String) {
-        if(level.ordinal >= this.level.ordinal) {
-            val l = when(level) {
+        if (level.ordinal >= this.level.ordinal) {
+            val l = when (level) {
                 LogLevel.DEBUG -> "🧰"
                 LogLevel.INFO -> "ℹ️"
                 LogLevel.WARN -> "⚠️"

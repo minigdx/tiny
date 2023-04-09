@@ -30,5 +30,6 @@ end
 
 function _resources()
     -- current = loaded
+    debug("loaded")
     ready = true
 end 

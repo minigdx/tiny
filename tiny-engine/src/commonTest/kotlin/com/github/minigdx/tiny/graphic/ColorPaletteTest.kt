@@ -33,7 +33,6 @@ class ColorPaletteTest {
         assertEquals(0xFF.toByte(), blue[2])
         assertEquals(0xFF.toByte(), blue[3])
 
-
         val invalid = palette.getRGBA(4)
         assertEquals(0x00.toByte(), invalid[0])
         assertEquals(0x00.toByte(), invalid[1])
@@ -62,7 +61,6 @@ class ColorPaletteTest {
         assertEquals(0x00.toByte(), blue[0])
         assertEquals(0x00.toByte(), blue[1])
         assertEquals(0xFF.toByte(), blue[2])
-
 
         val invalid = palette.getRGB(4)
         assertEquals(0x00.toByte(), invalid[0])

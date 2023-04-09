@@ -1,6 +1,5 @@
 package com.github.minigdx.tiny.input
 
-
 interface InputHandler {
 
     /**

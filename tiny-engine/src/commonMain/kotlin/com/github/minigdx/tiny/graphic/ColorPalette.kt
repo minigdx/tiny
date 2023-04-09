@@ -63,26 +63,25 @@ class ColorPalette(colors: List<HexColor>) {
         return (r + g + b + a).toInt()
     }
 
-
     /**
      * Get the RGBA value attached to this color index.
      */
     fun getRGBA(index: ColorIndex): ByteArray {
-        return rgba[index]
+        return rgba[check(index)]
     }
 
     /**
      * Get the RGB value attached to this color index.
      */
     fun getRGB(index: ColorIndex): ByteArray {
-        return rgb[index]
+        return rgb[check(index)]
     }
 
     /**
      * Get the RGB value already packed for GIF attached to this color index.
      */
     fun getRGAasInt(index: ColorIndex): Int {
-        return rgbForGif[index]
+        return rgbForGif[check(index)]
     }
 
     fun getColorIndex(hexString: String): Int {
@@ -108,7 +107,7 @@ class ColorPalette(colors: List<HexColor>) {
                 palette[0], palette[1], palette[2], palette[3],
                 color[0], color[1], color[2], color[3]
             )
-            if(d < current) {
+            if (d < current) {
                 index = i
                 current = d
             }

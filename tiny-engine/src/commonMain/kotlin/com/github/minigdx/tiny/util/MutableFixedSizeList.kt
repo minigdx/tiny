@@ -17,7 +17,6 @@ class MutableFixedSizeList<T>(override val size: Int) : MutableList<T> {
 
     override fun containsAll(elements: Collection<T>): Boolean = delegate.containsAll(elements)
 
-
     override fun add(element: T): Boolean {
         val result = delegate.add(element)
         evictOldElements()
@@ -34,7 +33,6 @@ class MutableFixedSizeList<T>(override val size: Int) : MutableList<T> {
         evictOldElements()
         return result
     }
-
 
     override fun addAll(elements: Collection<T>): Boolean {
         if (count() + elements.size > size) return false

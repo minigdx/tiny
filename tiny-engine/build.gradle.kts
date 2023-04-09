@@ -12,7 +12,6 @@ repositories {
     maven {
         url = uri("https://maven.danielgergely.com/releases/")
     }
-
 }
 
 dependencies {
@@ -24,7 +23,6 @@ dependencies {
     this.commonMainImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     this.commonMainImplementation("com.danielgergely.kgl:kgl:0.6.1")
     this.commonMainImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
-
 
     // JVM Specific
     this.jvmMainImplementation("com.danielgergely.kgl:kgl-lwjgl:0.6.1")

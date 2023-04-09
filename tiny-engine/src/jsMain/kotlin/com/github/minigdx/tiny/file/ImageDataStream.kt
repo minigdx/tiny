@@ -31,8 +31,8 @@ class ImageDataStream(val url: String) : SourceStream<ImageData> {
 
                         canvas.width = img.width
                         canvas.height = img.height
-                        context.drawImage(img, 0.0, 0.0);
-                        val rawImageData = context.getImageData(0.0, 0.0, img.width.toDouble(), img.height.toDouble());
+                        context.drawImage(img, 0.0, 0.0)
+                        val rawImageData = context.getImageData(0.0, 0.0, img.width.toDouble(), img.height.toDouble())
                         val data = Int8Array(rawImageData.data.buffer).unsafeCast<ByteArray>()
                         continuation.resumeWith(Result.success(ImageData(data, img.width, img.height)))
                     }

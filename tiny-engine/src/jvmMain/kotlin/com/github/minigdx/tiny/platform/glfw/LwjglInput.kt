@@ -77,12 +77,12 @@ class LwjglInput : InputHandler, InputManager {
                 if (touchManager.isTouched(touchSignal) != null) {
                     // val gamePosition = gameContext.convert(b1[0].toFloat(), b2[0].toFloat())
                     // gamePosition?.let { (x, y) ->
-                        touchManager.onTouchMove(touchSignal, 0f, 0f)
-                    //}
+                    touchManager.onTouchMove(touchSignal, 0f, 0f)
+                    // }
                 } else {
                     // val gamePosition = gameContext.convert(b1[0].toFloat(), b2[0].toFloat())
                     // gamePosition?.let { (x, y) ->
-                        touchManager.onTouchDown(touchSignal, 0f, 0f)
+                    touchManager.onTouchDown(touchSignal, 0f, 0f)
                     // }
                 }
             } else if (glfwGetMouseButton(window, glfwMouseButton) == GLFW_RELEASE) {
@@ -97,11 +97,11 @@ class LwjglInput : InputHandler, InputManager {
             // val gamePosition = gameContext.convert(b1[0].toFloat(), b2[0].toFloat())
             if (gamePosition == null) {
                 // the mouse is in the window but NOT in the game screen
-            //    isMouseInsideGameScreen = false
+                //    isMouseInsideGameScreen = false
             } else {
                 isMouseInsideGameScreen = true
-              //  mousePosition.x = gamePosition.first
-              //  mousePosition.y = gamePosition.second
+                //  mousePosition.x = gamePosition.first
+                //  mousePosition.y = gamePosition.second
             }
         } else {
             isMouseInsideGameScreen = false

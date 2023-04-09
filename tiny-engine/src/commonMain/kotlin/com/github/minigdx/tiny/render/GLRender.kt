@@ -30,7 +30,6 @@ import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.RenderContext
 import com.github.minigdx.tiny.platform.WindowManager
 
-
 class GLRender(
     private val gl: Kgl,
     private val logger: Logger,
@@ -61,7 +60,7 @@ class GLRender(
             gl_Position = vec4(position, 1.0);
             texture = uvs;
         }
-    """.trimIndent()
+        """.trimIndent()
 
         val fragmentShader = """
         #ifdef GL_ES
@@ -75,7 +74,7 @@ class GLRender(
         void main() {
             gl_FragColor = texture2D(image, texture);
         }
-    """.trimIndent()
+        """.trimIndent()
 
         val shaderProgram = gl.createProgram()!!
 
@@ -94,8 +93,8 @@ class GLRender(
 
         gl.useProgram(shaderProgram)
 
-        gl.deleteShader(vertexShaderId);
-        gl.deleteShader(fragmentShaderId);
+        gl.deleteShader(vertexShaderId)
+        gl.deleteShader(fragmentShaderId)
 
         // Generate the texture
         val gameTexture = gl.createTexture()
@@ -116,7 +115,6 @@ class GLRender(
         val positionBuffer = gl.createBuffer()
         gl.bindBuffer(GL_ARRAY_BUFFER, positionBuffer)
         gl.bufferData(GL_ARRAY_BUFFER, FloatBuffer(vertexData), vertexData.size, GL_STATIC_DRAW)
-
 
         val position = gl.getAttribLocation(shaderProgram, "position")
         gl.vertexAttribPointer(
@@ -181,7 +179,7 @@ class GLRender(
             gameOptions.gutter.first * gameOptions.zoom * context.windowManager.ratioWidth,
             gameOptions.gutter.second * gameOptions.zoom * context.windowManager.ratioHeight,
             gameOptions.width * gameOptions.zoom * context.windowManager.ratioWidth,
-            gameOptions.height * gameOptions.zoom *  context.windowManager.ratioHeight
+            gameOptions.height * gameOptions.zoom * context.windowManager.ratioHeight
         )
 
         gl.bindTexture(GL_TEXTURE_2D, context.texture)

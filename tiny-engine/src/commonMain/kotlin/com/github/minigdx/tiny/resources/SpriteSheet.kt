@@ -1,9 +1,7 @@
 package com.github.minigdx.tiny.resources
 
 import com.github.minigdx.tiny.Pixel
-import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.graphic.PixelArray
-import kotlin.math.min
 
 class SpriteSheet(
     override val index: Int,

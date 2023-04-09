@@ -4,9 +4,6 @@ import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.resources.GameScript
-import com.github.minigdx.tiny.resources.ResourceType.BOOT_SPRITESHEET
-import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
-import kotlinx.coroutines.NonDisposableHandle.parent
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
@@ -22,7 +19,6 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sin
 import kotlin.random.Random
-
 
 class TinyLib(val gameScript: GameScript, val resourceAccess: GameResourceAccess) : TwoArgFunction() {
 
@@ -58,10 +54,9 @@ class TinyLib(val gameScript: GameScript, val resourceAccess: GameResourceAccess
             println("🐞 -> $arg")
             return NONE
         }
-
     }
 
-    @DocFunction(
+    @TinyFunction(
         name = "sspr",
     )
     internal inner class sspr : LibFunction() {
@@ -79,7 +74,6 @@ class TinyLib(val gameScript: GameScript, val resourceAccess: GameResourceAccess
 
             val spritesheet = resourceAccess.spritesheet(currentSpritesheet) ?: return NONE
 
-
             resourceAccess.frameBuffer.copyFrom(
                 spritesheet.pixels, x, y, sprX,
                 sprY,
@@ -93,7 +87,7 @@ class TinyLib(val gameScript: GameScript, val resourceAccess: GameResourceAccess
         }
     }
 
-    @DocFunction(
+    @TinyFunction(
         name = "spr",
     )
     internal inner class spr : LibFunction() {
@@ -150,12 +144,12 @@ class TinyLib(val gameScript: GameScript, val resourceAccess: GameResourceAccess
         }
     }
 
-    @DocFunction(
+    @TinyFunction(
         name = "print",
     )
     internal inner class print : LibFunction() {
 
-        @DocCall(
+        @TinyCall(
             documentation = "print on the screen a string",
             mainCall = true
         )
@@ -210,53 +204,50 @@ class TinyLib(val gameScript: GameScript, val resourceAccess: GameResourceAccess
         }
     }
 
-    @DocFunction(
+    @TinyFunction(
         name = "abs",
     )
     internal inner class abs : OneArgFunction() {
-        @DocCall(
+        @TinyCall(
             documentation = "absolute value.",
             mainCall = true
         )
         override fun call(arg: LuaValue): LuaValue {
             return valueOf(abs(arg.todouble()))
         }
-
     }
 
-    @DocFunction(
+    @TinyFunction(
         name = "cos",
     )
     internal inner class cos : OneArgFunction() {
-        @DocCall(
+        @TinyCall(
             documentation = "cosinus of the value passed as parameter.",
             mainCall = true
         )
         override fun call(arg: LuaValue): LuaValue {
             return valueOf(cos(arg.todouble()))
         }
-
     }
 
-    @DocFunction(
+    @TinyFunction(
         name = "sin",
     )
     internal inner class sin : OneArgFunction() {
-        @DocCall(
+        @TinyCall(
             documentation = "sinus of the value passed as parameter.",
             mainCall = true
         )
         override fun call(arg: LuaValue): LuaValue {
             return valueOf(sin(arg.todouble()))
         }
-
     }
 
-    @DocFunction(
+    @TinyFunction(
         name = "min",
     )
     internal inner class min : TwoArgFunction() {
-        @DocCall(
+        @TinyCall(
             documentation = "minimun value between two values. Those values can be numbers or string.",
             mainCall = true
         )
@@ -290,10 +281,10 @@ class TinyLib(val gameScript: GameScript, val resourceAccess: GameResourceAccess
         }
     }
 
-    @DocFunction("rect", "Draw a rectangle")
+    @TinyFunction("rect", "Draw a rectangle")
     internal inner class rect : LibFunction() {
         // cornerX: Int, cornerY: Int, width: Int, height: Int, color: Int
-        @DocCall(mainCall = true)
+        @TinyCall(mainCall = true)
         override fun invoke(args: Varargs): Varargs {
             if (args.narg() < 5) return NONE
             val x = args.arg(1).checkint()
@@ -313,10 +304,10 @@ class TinyLib(val gameScript: GameScript, val resourceAccess: GameResourceAccess
         }
     }
 
-    @DocFunction("rectf", "Draw a filled rectangle")
+    @TinyFunction("rectf", "Draw a filled rectangle")
     internal inner class rectf : LibFunction() {
         // cornerX: Int, cornerY: Int, width: Int, height: Int, color: Int
-        @DocCall(mainCall = true)
+        @TinyCall(mainCall = true)
         override fun invoke(args: Varargs): Varargs {
             if (args.narg() < 5) return NONE
             val x = args.arg(1).checkint()
@@ -386,7 +377,6 @@ class TinyLib(val gameScript: GameScript, val resourceAccess: GameResourceAccess
             return NONE
         }
     }
-
 
     internal inner class line : LibFunction() {
 
@@ -490,14 +480,14 @@ class TinyLib(val gameScript: GameScript, val resourceAccess: GameResourceAccess
         }
     }
 
-    @DocFunction("rnd", "generate random values")
+    @TinyFunction("rnd", "generate random values")
     internal inner class rnd : TwoArgFunction() {
-        @DocCall("Generate a random int (negative or positive value)", mainCall = true)
+        @TinyCall("Generate a random int (negative or positive value)", mainCall = true)
         override fun call(): LuaValue {
             return valueOf(Random.nextInt())
         }
 
-        @DocCall(
+        @TinyCall(
             "Generate a random value between 1 and the argument. " +
                 "If a table is passed, it'll return a random element of the table."
         )
@@ -512,7 +502,7 @@ class TinyLib(val gameScript: GameScript, val resourceAccess: GameResourceAccess
             }
         }
 
-        @DocCall("Generate a random value between the first and the second argument.")
+        @TinyCall("Generate a random value between the first and the second argument.")
         override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
             if (arg2.isnil()) {
                 return call(arg1)
@@ -527,7 +517,6 @@ class TinyLib(val gameScript: GameScript, val resourceAccess: GameResourceAccess
             resourceAccess.frameBuffer.pixel(arg1.checkint(), arg2.checkint(), arg3.checkint())
             return NONE
         }
-
     }
 
     internal inner class pget : TwoArgFunction() {

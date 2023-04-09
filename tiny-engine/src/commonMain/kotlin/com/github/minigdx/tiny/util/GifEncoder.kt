@@ -3,7 +3,6 @@ package com.github.minigdx.tiny.util
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.file.TargetStream
 import com.github.minigdx.tiny.graphic.ColorPalette
-import kotlin.experimental.and
 
 class GifEncoder(
     private val width: Pixel,

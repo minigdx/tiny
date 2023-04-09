@@ -14,7 +14,6 @@ fun main() {
     // Look for the first canvas in current page.
     val tinyGameTag = document.getElementsByTagName("tiny-game")
 
-
     if (tinyGameTag.length == 0) {
         throw IllegalArgumentException(
             "No <tiny-game> has been found in the current page. Check that the page including your javascript game" +
@@ -28,10 +27,10 @@ fun main() {
     var rootPath = window.location.protocol + "//" + window.location.host + window.location.pathname
     rootPath = rootPath.replace("index.html", "")
 
-    (0..<tinyGameTag.length).forEach { index ->
+    (0 until tinyGameTag.length).forEach { index ->
 
         val game = tinyGameTag[index]!!
-        val gameName = game.getAttribute("game")
+        // val gameName = game.getAttribute("game")
         val gameWidth = game.getAttribute("width")?.toInt() ?: 128
         val gameHeight = game.getAttribute("height")?.toInt() ?: 128
         val gameZoom = game.getAttribute("zoom")?.toInt() ?: 1
@@ -42,10 +41,13 @@ fun main() {
         game.appendChild(canvas)
 
         val gameOptions = GameOptions(
-            gameWidth,
-            gameHeight,
-            emptyList(), // FIXME: get colors from the tinyGameTag
-            gameZoom,
+            width = gameWidth,
+            height = gameHeight,
+            palette = emptyList(),
+            gameScripts = emptyList(),
+            spriteSheets = emptyList(),
+            gameLevels = emptyList(),
+            zoom = gameZoom,
             gutter = 0 to 0,
             spriteSize = 16 to 16,
         )

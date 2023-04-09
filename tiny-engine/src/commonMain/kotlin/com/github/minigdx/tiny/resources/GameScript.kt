@@ -2,7 +2,6 @@ package com.github.minigdx.tiny.resources
 
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
-import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.lua.CtrlLib
 import com.github.minigdx.tiny.lua.GfxLib
@@ -33,7 +32,7 @@ class GameScript(
     val gameOptions: GameOptions,
     val inputHandler: InputHandler,
     override val type: ResourceType
-): GameResource {
+) : GameResource {
 
     var exited: Boolean = false
     var evaluated: Boolean = false
@@ -80,7 +79,6 @@ class GameScript(
         }
     }
 
-
     fun evaluate() {
         globals = createLuaGlobals()
 
@@ -117,7 +115,6 @@ class GameScript(
         if (state != null) {
             setStateFunction?.call(state.args)
         }
-
     }
 
     fun advance() {

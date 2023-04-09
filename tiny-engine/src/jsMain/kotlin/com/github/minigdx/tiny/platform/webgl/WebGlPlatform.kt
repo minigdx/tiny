@@ -34,7 +34,7 @@ import org.w3c.files.BlobPropertyBag
 class WebGlPlatform(
     private val canvas: HTMLCanvasElement,
     private val logger: Logger,
-    val gameOptions: GameOptions,
+    override val gameOptions: GameOptions,
     val rootUrl: String,
 ) : Platform {
 
@@ -55,9 +55,11 @@ class WebGlPlatform(
 
     override fun initRenderManager(windowManager: WindowManager): RenderContext {
         val context = canvas.getContext("webgl2") as? WebGL2RenderingContext
-            ?: throw IllegalStateException("The canvas context is expected to be a webgl2 context. " +
-                "WebGL2 doesn't seems to be supported by your browser. " +
-                "Please update to a compatible browser to run the game in WebGL2.")
+            ?: throw IllegalStateException(
+                "The canvas context is expected to be a webgl2 context. " +
+                    "WebGL2 doesn't seems to be supported by your browser. " +
+                    "Please update to a compatible browser to run the game in WebGL2."
+            )
         render = GLRender(KglJs(context), logger, gameOptions)
         return render.init(windowManager)
     }
@@ -75,7 +77,6 @@ class WebGlPlatform(
         }
     }
 
-
     override fun draw(context: RenderContext, frameBuffer: FrameBuffer) {
         val image = frameBuffer.generateBuffer()
         render.draw(context, image, frameBuffer.width, frameBuffer.height)
@@ -86,32 +87,33 @@ class WebGlPlatform(
         val context = canvas.getContext("2d") as CanvasRenderingContext2D
 
         val img = Image()
-        img.addEventListener("load", object : EventListener {
-            override fun handleEvent(event: Event) {
-                println("width2 = " + img.width)
-
+        img.addEventListener(
+            "load",
+            object : EventListener {
+                override fun handleEvent(event: Event) {
+                    println("width2 = " + img.width)
+                }
             }
+        )
 
-        })
-
-        img.addEventListener("onload", object : EventListener {
-            override fun handleEvent(event: Event) {
-                println("width2 = " + img.width)
-
+        img.addEventListener(
+            "onload",
+            object : EventListener {
+                override fun handleEvent(event: Event) {
+                    println("width2 = " + img.width)
+                }
             }
-        })
+        )
         img.src = URL.createObjectURL(Blob(imageData.toTypedArray(), BlobPropertyBag(type = "image/png")))
 
-
-        canvas.width = 320;
-        canvas.height = 320;
-        context.drawImage(img, 0.0, 0.0 );
-        val rawImageData = context.getImageData(0.0, 0.0, 256.0, 256.0);
+        canvas.width = 320
+        canvas.height = 320
+        context.drawImage(img, 0.0, 0.0)
+        val rawImageData = context.getImageData(0.0, 0.0, 256.0, 256.0)
         println("raw = " + rawImageData.data.get(0))
         println("raw length = " + rawImageData.data.length)
         val data = Int8Array(rawImageData.data.buffer).unsafeCast<ByteArray>()
         println("data length = " + data.size)
-
 
         println("width = " + img.width)
         println(data[0])

@@ -3,7 +3,6 @@ package com.github.minigdx.tiny.graphic
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.util.PixelFormat
-import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
@@ -29,15 +28,14 @@ class Blender(private val gamePalette: ColorPalette) {
         val color = gamePalette.check(colors[0])
         colors[0] = switch[gamePalette.check(color)]
         // Return null if transparent
-        if(colors[0] == 0x00) return null
+        if (colors[0] == 0x00) return null
         // Return null if dithering enable every 2 pixels
-        return if(dithering && (x + y) and 0x01 == 0x00) {
+        return if (dithering && (x + y) and 0x01 == 0x00) {
             null
         } else {
             colors
         }
     }
-
 }
 class FrameBuffer(
     val width: Pixel,
@@ -62,7 +60,7 @@ class FrameBuffer(
     fun pixel(x: Pixel, y: Pixel, colorIndex: ColorIndex) {
         val index = gamePalette.check(colorIndex)
         if (gamePalette.isTransparent(index)) return
-        if(!clipper.isIn(x, y)) return
+        if (!clipper.isIn(x, y)) return
         colorIndexBuffer.set(x, y, index)
     }
 

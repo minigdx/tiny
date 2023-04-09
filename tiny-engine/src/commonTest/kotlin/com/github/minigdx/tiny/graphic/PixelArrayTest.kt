@@ -8,7 +8,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-
 class PixelArrayTest {
 
     private val blender: (Array<Int>, Pixel, Pixel) -> Array<Int> = { c, _, _ ->
@@ -73,7 +72,6 @@ class PixelArrayTest {
         assertTrue(result.size == 1)
         assertTrue(result[0] == 9)
     }
-
 
     @Test
     fun get_set_get_and_set_a_RGBA_pixel() {

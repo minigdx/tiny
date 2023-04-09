@@ -120,5 +120,4 @@ class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = Pix
         }
         return result.toString()
     }
-
 }

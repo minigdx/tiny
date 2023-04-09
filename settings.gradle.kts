@@ -15,5 +15,7 @@ pluginManagement {
     }
 }
 
-include("tiny-engine")
 include("tiny-cli")
+include("tiny-doc")
+include("tiny-engine")
+include("tiny-sample")

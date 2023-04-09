@@ -2,7 +2,6 @@ package com.github.minigdx.tiny.file
 
 import java.io.File
 
-
 class FileStream(private val origin: File) : SourceStream<ByteArray>, TargetStream<ByteArray> {
     private var lastModified: Long = 0
 

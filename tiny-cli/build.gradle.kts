@@ -26,7 +26,8 @@ application {
 
     // Copy the JARs from the Kotlin MPP dependencies.
     this.applicationDistribution.from(
-        project.configurations.getByName("jvmRuntimeClasspath")) {
+        project.configurations.getByName("jvmRuntimeClasspath")
+    ) {
         val jvmJar by tasks.existing
         this.from(jvmJar)
         this.into("lib")

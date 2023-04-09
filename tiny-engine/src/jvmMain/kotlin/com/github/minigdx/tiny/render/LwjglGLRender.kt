@@ -5,16 +5,18 @@ import com.danielgergely.kgl.GL_RENDERER
 import com.danielgergely.kgl.GL_SHADING_LANGUAGE_VERSION
 import com.danielgergely.kgl.GL_VENDOR
 import com.danielgergely.kgl.GL_VERSION
+import com.danielgergely.kgl.KglLwjgl
 import com.github.minigdx.tiny.Pixel
+import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.RenderContext
 import com.github.minigdx.tiny.platform.WindowManager
 import org.lwjgl.opengl.GL33
 
-
 class LwjglGLRender(
-    private val gl: GLRender,
     private val logger: Logger,
+    private val gameOptions: GameOptions,
+    private val gl: GLRender = GLRender(KglLwjgl, logger, gameOptions),
 ) : Render {
 
     override fun init(windowManager: WindowManager): RenderContext {

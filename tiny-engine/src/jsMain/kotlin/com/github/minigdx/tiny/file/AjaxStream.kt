@@ -1,6 +1,5 @@
 package com.github.minigdx.tiny.file
 
-import kotlinx.browser.window
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Int8Array
 import org.w3c.xhr.ARRAYBUFFER

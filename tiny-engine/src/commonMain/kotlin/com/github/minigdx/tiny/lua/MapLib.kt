@@ -17,7 +17,7 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         map.set("draw", draw())
         map.set("entity", entity())
         map.set("flag", flag())
-        map.set("from" ,from())
+        map.set("from", from())
         arg2.set("map", map)
         arg2.get("package").get("loaded").set("map", map)
         return map
@@ -38,7 +38,7 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
 
             val layer = resourceAccess.level(currentLevel)?.intLayers?.first { l -> l != null } ?: return NONE
 
-            return if(tileX in 0 until layer.width && tileY in 0 until layer.height) {
+            return if (tileX in 0 until layer.width && tileY in 0 until layer.height) {
                 valueOf(layer.ints.getOne(tileX, tileY))
             } else {
                 NONE
@@ -71,7 +71,7 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
             table["color"] = valueOf(color)
             table["customFields"] = customFields.let {
                 val fields = LuaTable()
-                it.forEach {(key, value) ->
+                it.forEach { (key, value) ->
                     fields[key] = valueOf(value)
                 }
                 fields
@@ -81,7 +81,7 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
     }
     inner class draw : LibFunction() {
 
-        @DocCall(
+        @TinyCall(
             documentation = "Draw the default layer on the screen.",
             mainCall = true,
         )
@@ -101,10 +101,10 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
             return NONE
         }
 
-        @DocCall(
+        @TinyCall(
             documentation = "Draw the default layer on the screen at the x/y coordinates.",
         )
-        override fun call(@DocArg("x") a: LuaValue, @DocArg("y") b: LuaValue): LuaValue {
+        override fun call(@TinyArg("x") a: LuaValue, @TinyArg("y") b: LuaValue): LuaValue {
             val layer = resourceAccess.level(currentLevel)?.imageLayers?.get(0)
             if (layer != null) {
                 resourceAccess.frameBuffer.copyFrom(
@@ -120,12 +120,14 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
             return NONE
         }
 
-        @DocCall(
+        @TinyCall(
             documentation = "Draw the default layer on the screen at the x/y coordinates.",
         )
         override fun call(
-            @DocArg("x") a: LuaValue, @DocArg("y") b: LuaValue,
-            @DocArg("sx") c: LuaValue, @DocArg("sy") d: LuaValue
+            @TinyArg("x") a: LuaValue,
+            @TinyArg("y") b: LuaValue,
+            @TinyArg("sx") c: LuaValue,
+            @TinyArg("sy") d: LuaValue
         ): LuaValue {
             val layer = resourceAccess.level(currentLevel)?.imageLayers?.get(0)
             if (layer != null) {
@@ -143,7 +145,7 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         }
 
         override fun invoke(
-            @DocArgs(
+            @TinyArgs(
                 names = ["x", "y", "sx", "sy", "width", "height"]
             ) args: Varargs
         ): Varargs {
@@ -170,12 +172,12 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
             return NONE
         }
 
-        @DocCall(
+        @TinyCall(
             documentation = "Draw the layer on the screen.",
             mainCall = true
         )
         override fun call(
-            @DocArg("layer", "index of the layer") a: LuaValue
+            @TinyArg("layer", "index of the layer") a: LuaValue
         ): LuaValue {
             val layer = resourceAccess.level(currentLevel)?.imageLayers?.getOrNull(a.checkint())
             if (layer != null) {
@@ -192,5 +194,4 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
             return NONE
         }
     }
-
 }

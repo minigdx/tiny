@@ -15,6 +15,7 @@ import com.github.minigdx.tiny.engine.GameEngine
 import com.github.minigdx.tiny.file.CommonVirtualFileSystem
 import com.github.minigdx.tiny.log.StdOutLogger
 import com.github.minigdx.tiny.platform.glfw.GlfwPlatform
+import com.github.minigdx.tiny.render.LwjglGLRender
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import java.io.File
@@ -108,7 +109,7 @@ class MainCommand : CliktCommand(invokeWithoutSubcommand = true) {
                 val gameOption = gameParameters.toGameOptions()
                 GameEngine(
                     gameOptions = gameOption,
-                    platform = GlfwPlatform(gameOption, logger, vfs, gameDirectory),
+                    platform = GlfwPlatform(gameOption, logger, vfs, gameDirectory, LwjglGLRender(logger, gameOption)),
                     vfs = vfs,
                     logger = logger,
                 ).main()

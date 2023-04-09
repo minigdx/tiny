@@ -1,8 +1,6 @@
 package com.github.minigdx.tiny.lua
 
 import com.github.minigdx.tiny.engine.GameResourceAccess
-import com.github.minigdx.tiny.resources.GameScript
-import kotlinx.coroutines.NonDisposableHandle.parent
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.LibFunction
