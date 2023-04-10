@@ -37,7 +37,7 @@ class AsciidocDocument {
     fun generate(): String {
         return buildString {
             if (title != null) {
-                appendLine("= $title")
+                appendLine("== $title")
                 appendLine()
             }
             if (author != null) {
@@ -78,7 +78,7 @@ class AsciidocSection(val title: String?) {
     fun generate(): String {
         return buildString {
             if (title != null) {
-                appendLine("== $title")
+                appendLine("=== $title")
                 appendLine()
             }
             paragraphs.forEach {

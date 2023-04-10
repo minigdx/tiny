@@ -1,0 +1,14 @@
+= 🧸 Tiny
+:toc:
+:sourcedir: ../../../../../../
+
+Welcome to the documentation for "Tiny," the virtual console that offers an easy and efficient way to build games and other applications with its LUA programming support, hot reloading, and 256-color maximum. Despite its modest capabilities,
+
+"Tiny" is designed to help you create and test your ideas quickly and effectively. Not only can you run your games on your desktop computer, but you can also export them for the web, making it easy to share your creations with others.
+
+With "Tiny," you'll be able to get started right away and see your progress in real-time, thanks to its hot reloading feature. This documentation will guide you through the setup and usage of "Tiny," as well as provide you with helpful tips and tricks to make the most out of this powerful tool.
+
+_Let's get started and unleash your creativity!_
+
+
+include::${sourcedir}/tiny-engine/build/generated/ksp/jvm/jvmMain/resources/tiny-api.adoc[]
