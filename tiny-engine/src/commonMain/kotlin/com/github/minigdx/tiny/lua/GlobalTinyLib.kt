@@ -146,7 +146,7 @@ class GlobalTinyLib(val gameScript: GameScript, val resourceAccess: GameResource
     internal inner class print : LibFunction() {
 
         @TinyCall(
-            documentation = "print on the screen a string",
+            description = "print on the screen a string",
             mainCall = true
         )
         override fun call(arg: LuaValue): LuaValue {
@@ -218,7 +218,7 @@ class GlobalTinyLib(val gameScript: GameScript, val resourceAccess: GameResource
     )
     internal inner class abs : OneArgFunction() {
         @TinyCall(
-            documentation = "absolute value.",
+            description = "absolute value.",
             mainCall = true
         )
         override fun call(arg: LuaValue): LuaValue {
@@ -231,7 +231,7 @@ class GlobalTinyLib(val gameScript: GameScript, val resourceAccess: GameResource
     )
     internal inner class cos : OneArgFunction() {
         @TinyCall(
-            documentation = "cosinus of the value passed as parameter.",
+            description = "cosinus of the value passed as parameter.",
             mainCall = true
         )
         override fun call(arg: LuaValue): LuaValue {
@@ -244,7 +244,7 @@ class GlobalTinyLib(val gameScript: GameScript, val resourceAccess: GameResource
     )
     internal inner class sin : OneArgFunction() {
         @TinyCall(
-            documentation = "sinus of the value passed as parameter.",
+            description = "sinus of the value passed as parameter.",
             mainCall = true
         )
         override fun call(arg: LuaValue): LuaValue {
@@ -257,7 +257,7 @@ class GlobalTinyLib(val gameScript: GameScript, val resourceAccess: GameResource
     )
     internal inner class min : TwoArgFunction() {
         @TinyCall(
-            documentation = "minimun value between two values. Those values can be numbers or string.",
+            description = "minimun value between two values. Those values can be numbers or string.",
             mainCall = true
         )
         override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {

@@ -14,14 +14,14 @@ annotation class TinyLib(
 @Retention(AnnotationRetention.SOURCE)
 annotation class TinyFunction(
     /**
+     * Description of the function.
+     */
+    val description: String = "",
+    /**
      * Name of the function.
      * By default, will use the name of the class.
      */
     val name: String = "",
-    /**
-     * Description of the function.
-     */
-    val description: String = "",
     /**
      * LUA Code use as example.
      * This code will be injected in the web documentation.
@@ -48,6 +48,6 @@ annotation class TinyArgs(
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.SOURCE)
 annotation class TinyCall(
-    val documentation: String = "",
+    val description: String = "",
     val mainCall: Boolean = false
 )

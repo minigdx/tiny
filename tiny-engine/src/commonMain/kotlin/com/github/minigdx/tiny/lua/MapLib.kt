@@ -3,6 +3,8 @@ package com.github.minigdx.tiny.lua
 import com.github.mingdx.tiny.doc.TinyArg
 import com.github.mingdx.tiny.doc.TinyArgs
 import com.github.mingdx.tiny.doc.TinyCall
+import com.github.mingdx.tiny.doc.TinyFunction
+import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.resources.LdtkEntity
 import org.luaj.vm2.LuaTable
@@ -11,6 +13,7 @@ import org.luaj.vm2.Varargs
 import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.TwoArgFunction
 
+@TinyLib("map")
 class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() {
 
     private var currentLevel: Int = 0
@@ -33,9 +36,11 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         }
     }
 
+    @TinyFunction("Get the flag from a tile.")
     inner class flag : LibFunction() {
 
-        override fun call(a: LuaValue, b: LuaValue): LuaValue {
+        @TinyCall("Get the flag from the tile at the coordinate x,y.")
+        override fun call(@TinyArg("x") a: LuaValue, @TinyArg("y") b: LuaValue): LuaValue {
             val tileX = a.checkint()
             val tileY = b.checkint()
 
@@ -49,6 +54,7 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         }
     }
 
+    @TinyFunction("Get all entities from a type.")
     inner class entity : LuaTable() {
 
         override fun get(key: LuaValue): LuaValue {
@@ -62,6 +68,7 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
 
             return first
         }
+
         private fun LdtkEntity.toLuaTable(): LuaTable {
             val table = LuaTable()
             table["x"] = valueOf(this.x)
@@ -82,11 +89,12 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
             return table
         }
     }
+
+    @TinyFunction("Draw map tiles on the screen.")
     inner class draw : LibFunction() {
 
         @TinyCall(
-            documentation = "Draw the default layer on the screen.",
-            mainCall = true,
+            description = "Draw the default layer on the screen.",
         )
         override fun call(): LuaValue {
             val layer = resourceAccess.level(currentLevel)?.imageLayers?.get(0)
@@ -105,7 +113,7 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         }
 
         @TinyCall(
-            documentation = "Draw the default layer on the screen at the x/y coordinates.",
+            description = "Draw the default layer on the screen at the x/y coordinates.",
         )
         override fun call(@TinyArg("x") a: LuaValue, @TinyArg("y") b: LuaValue): LuaValue {
             val layer = resourceAccess.level(currentLevel)?.imageLayers?.get(0)
@@ -124,7 +132,7 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         }
 
         @TinyCall(
-            documentation = "Draw the default layer on the screen at the x/y coordinates.",
+            description = "Draw the default layer on the screen at the x/y coordinates.",
         )
         override fun call(
             @TinyArg("x") a: LuaValue,
@@ -176,7 +184,7 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         }
 
         @TinyCall(
-            documentation = "Draw the layer on the screen.",
+            description = "Draw the layer on the screen.",
             mainCall = true
         )
         override fun call(

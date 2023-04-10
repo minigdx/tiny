@@ -19,10 +19,10 @@ class Clipper(private val width: Pixel, private val height: Pixel) {
         private set
 
     fun set(x: Pixel, y: Pixel, width: Pixel, height: Pixel) {
-        left = min(x, width)
-        right = max(x, width)
-        top = min(y, height)
-        bottom = max(y, height)
+        left = max(0, min(x, x + width))
+        right = min(max(x, x + width), this.width)
+        top = max(0, min(y, y + height))
+        bottom = min(max(y, y + height), this.height)
     }
 
     fun isIn(x: Pixel, y: Pixel): Boolean {

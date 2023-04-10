@@ -126,5 +126,5 @@ function _draw()
 
     pset(p1.x, p1.y, 9)
     pset(p2.x, p2.y, 10)
-    print("😀", 10, 10, "#FFFFFF")
+    print("coucou jack", cos(dt) * 10, 10, rnd(8))
 end
