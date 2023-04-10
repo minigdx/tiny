@@ -1,5 +1,7 @@
 package com.github.minigdx.tiny.lua
 
+import com.github.mingdx.tiny.doc.TinyCall
+import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameResourceAccess
@@ -20,7 +22,7 @@ import kotlin.math.min
 import kotlin.math.sin
 import kotlin.random.Random
 
-class TinyLib(val gameScript: GameScript, val resourceAccess: GameResourceAccess) : TwoArgFunction() {
+class GlobalTinyLib(val gameScript: GameScript, val resourceAccess: GameResourceAccess) : TwoArgFunction() {
 
     private var currentSpritesheet: Int = 0
 
@@ -56,9 +58,7 @@ class TinyLib(val gameScript: GameScript, val resourceAccess: GameResourceAccess
         }
     }
 
-    @TinyFunction(
-        name = "sspr",
-    )
+    @TinyFunction
     internal inner class sspr : LibFunction() {
         // x, y, spr x, spr y, width, height, flip x, flip y
         override fun invoke(args: Varargs): Varargs {
@@ -87,9 +87,7 @@ class TinyLib(val gameScript: GameScript, val resourceAccess: GameResourceAccess
         }
     }
 
-    @TinyFunction(
-        name = "spr",
-    )
+    @TinyFunction
     internal inner class spr : LibFunction() {
         // sprn, x, y, flip x, flip y
         override fun call(a: LuaValue, b: LuaValue, c: LuaValue): LuaValue {
@@ -144,9 +142,7 @@ class TinyLib(val gameScript: GameScript, val resourceAccess: GameResourceAccess
         }
     }
 
-    @TinyFunction(
-        name = "print",
-    )
+    @TinyFunction
     internal inner class print : LibFunction() {
 
         @TinyCall(
@@ -172,14 +168,22 @@ class TinyLib(val gameScript: GameScript, val resourceAccess: GameResourceAccess
             val space = 4
             var currentX = x
             str.forEach { char ->
+
                 val coord = if (char.isLetter()) {
-                    val index = char.lowercaseChar() - 'a'
+                    // The character has an accent. Let's try to get rid of it
+                    val l = if(char.hasAccent) {
+                        ACCENT_MAP[char.lowercaseChar()] ?: char.lowercaseChar()
+                    } else {
+                        char.lowercaseChar()
+                    }
+                    val index = l - 'a'
                     index to 0
                 } else if (char.isDigit()) {
                     val index = char.lowercaseChar() - '0'
                     index to 4
                 } else {
-                    null
+                    // Maybe it's an emji: try EMOJI MAP conversion
+                    EMOJI_MAP[char]
                 }
                 if (coord != null) {
                     val (index, sheetY) = coord
@@ -202,7 +206,12 @@ class TinyLib(val gameScript: GameScript, val resourceAccess: GameResourceAccess
 
             return NONE
         }
+
+        val Char.hasAccent: Boolean
+            get() = this.isLetter() && this.lowercaseChar() !in 'a'..'z'
+
     }
+
 
     @TinyFunction(
         name = "abs",
@@ -524,5 +533,23 @@ class TinyLib(val gameScript: GameScript, val resourceAccess: GameResourceAccess
             val index = resourceAccess.frameBuffer.pixel(arg1.checkint(), arg2.checkint())
             return valueOf(index)
         }
+    }
+
+    companion object {
+        val ACCENT_MAP = mapOf(
+            'à' to 'a', 'á' to 'a', 'â' to 'a', 'ã' to 'a', 'ä' to 'a', 'å' to 'a',
+            'ç' to 'c',
+            'è' to 'e', 'é' to 'e', 'ê' to 'e', 'ë' to 'e',
+            'ì' to 'i', 'í' to 'i', 'î' to 'i', 'ï' to 'i',
+            'ñ' to 'n',
+            'ò' to 'o', 'ó' to 'o', 'ô' to 'o', 'õ' to 'o', 'ö' to 'o',
+            'ù' to 'u', 'ú' to 'u', 'û' to 'u', 'ü' to 'u',
+            'ý' to 'y', 'ÿ' to 'y'
+        )
+
+        val EMOJI_MAP = mapOf(
+            '⚠' to (0 to 0),
+        )
+
     }
 }

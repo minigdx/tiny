@@ -1,5 +1,8 @@
 package com.github.minigdx.tiny.lua
 
+import com.github.mingdx.tiny.doc.TinyArg
+import com.github.mingdx.tiny.doc.TinyArgs
+import com.github.mingdx.tiny.doc.TinyCall
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.resources.LdtkEntity
 import org.luaj.vm2.LuaTable

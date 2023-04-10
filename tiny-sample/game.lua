@@ -114,9 +114,9 @@ function _draw()
     gfx.pal()
     -- hot reload !
     -- gfx.pal(8, 2)
-    
+
     gfx.dither(0)
-    
+
     spr(player.sprite, player.x, player.y)
 
     for k, v in pairs(badGuys) do
@@ -126,4 +126,5 @@ function _draw()
 
     pset(p1.x, p1.y, 9)
     pset(p2.x, p2.y, 10)
+    print("😀", 10, 10, "#FFFFFF")
 end

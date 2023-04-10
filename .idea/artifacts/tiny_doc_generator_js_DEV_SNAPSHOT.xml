@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="tiny-doc-generator-js-DEV-SNAPSHOT">
+    <output-path>$PROJECT_DIR$/tiny-doc-generator/build/libs</output-path>
+    <root id="archive" name="tiny-doc-generator-js-DEV-SNAPSHOT.jar">
+      <element id="module-output" name="tiny.tiny-doc-generator.jsMain" />
+    </root>
+  </artifact>
+</component>

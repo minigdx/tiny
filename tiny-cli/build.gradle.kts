@@ -1,5 +1,5 @@
 plugins {
-    id("com.github.minigdx.gradle.plugin.developer.mpp") version "DEV-SNAPSHOT"
+    id("com.github.minigdx.gradle.plugin.developer.mpp")
     kotlin("plugin.serialization") version "1.8.0"
     application
 }

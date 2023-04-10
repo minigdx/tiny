@@ -1,7 +1,8 @@
 plugins {
-    // kotlin("jvm") version "1.8.0"
-    id("com.github.minigdx.gradle.plugin.developer.mpp") version "DEV-SNAPSHOT"
+    id("com.github.minigdx.gradle.plugin.developer.mpp")
     kotlin("plugin.serialization") version "1.8.0"
+
+    id("com.google.devtools.ksp") version "1.8.10-1.0.9"
 }
 
 group = "org.example"
@@ -16,13 +17,13 @@ repositories {
 
 dependencies {
     this.commonTestImplementation(kotlin("test"))
-    // testImplementation(kotlin("test"))
 
     // Multiplatform
     this.commonMainImplementation("com.soywiz.korlibs.luak:luak:4.0.0-alpha-2")
     this.commonMainImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     this.commonMainImplementation("com.danielgergely.kgl:kgl:0.6.1")
     this.commonMainImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
+    this.commonMainImplementation(project(":tiny-doc-annotations"))
 
     // JVM Specific
     this.jvmMainImplementation("com.danielgergely.kgl:kgl-lwjgl:0.6.1")
@@ -45,4 +46,6 @@ dependencies {
     this.jvmMainImplementation("org.lwjgl:lwjgl-opengl:3.3.1:natives-macos")
 
     this.jvmMainImplementation("com.squareup:gifencoder:0.10.1")
+
+    add("kspJvm", project(":tiny-doc-generator"))
 }

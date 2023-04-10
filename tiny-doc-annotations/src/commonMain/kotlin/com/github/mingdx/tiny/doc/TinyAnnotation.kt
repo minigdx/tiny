@@ -1,4 +1,14 @@
-package com.github.minigdx.tiny.lua
+package com.github.mingdx.tiny.doc
+
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.SOURCE)
+annotation class TinyLib(
+    /**
+     * Name of the Library.
+     * By default, will use the name of the class.
+     */
+    val name: String = "",
+)
 
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)

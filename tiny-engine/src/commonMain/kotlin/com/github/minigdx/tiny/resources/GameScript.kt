@@ -6,7 +6,7 @@ import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.lua.CtrlLib
 import com.github.minigdx.tiny.lua.GfxLib
 import com.github.minigdx.tiny.lua.MapLib
-import com.github.minigdx.tiny.lua.TinyLib
+import com.github.minigdx.tiny.lua.GlobalTinyLib
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LoadState
 import org.luaj.vm2.LuaError
@@ -60,7 +60,7 @@ class GameScript(
         load(TableLib())
         load(StringLib())
         load(CoroutineLib())
-        load(TinyLib(this@GameScript, this@GameScript.resourceAccess))
+        load(GlobalTinyLib(this@GameScript, this@GameScript.resourceAccess))
         load(MapLib(this@GameScript.resourceAccess))
         load(GfxLib(this@GameScript.resourceAccess))
         load(CtrlLib(inputHandler))
