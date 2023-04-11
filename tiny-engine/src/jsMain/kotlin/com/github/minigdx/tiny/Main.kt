@@ -53,10 +53,22 @@ fun main() {
         val gameHeight = game.getAttribute("height")?.toInt() ?: 128
         val gameZoom = game.getAttribute("zoom")?.toInt() ?: 1
 
+        val sprWidth = game.getAttribute("spritew")?.toInt() ?: 16
+        val sprHeight = game.getAttribute("spriteh")?.toInt() ?: 16
+
         val scripts = game.getElementsByTagName("tiny-script").map { script ->
             script.getAttribute("name")
         }.filterNotNull()
 
+        val levels = game.getElementsByTagName("tiny-level").map { level ->
+            level.getAttribute("name")
+        }.filterNotNull()
+
+        val spritesheets = game.getElementsByTagName("tiny-spritesheet").map { spritesheet ->
+            spritesheet.getAttribute("name")
+        }.filterNotNull()
+
+        val colors = game.getElementsByTagName("tiny-colors")[0]?.getAttribute("name")?.split(",")?.toList() ?: emptyList()
         val canvas = document.createElement("canvas")
         canvas.setAttribute("width", (gameWidth * gameZoom).toString())
         canvas.setAttribute("height", (gameHeight * gameZoom).toString())
@@ -65,10 +77,10 @@ fun main() {
         val gameOptions = GameOptions(
             width = gameWidth,
             height = gameHeight,
-            palette = listOf("#E0F8D0","#88C070","#346856","#081820"),
+            palette = colors.ifEmpty { listOf("#FFFFFF", "#000000") },
             gameScripts = scripts,
-            spriteSheets = emptyList(),
-            gameLevels = emptyList(),
+            spriteSheets = spritesheets,
+            gameLevels = levels,
             zoom = gameZoom,
             gutter = 0 to 0,
             spriteSize = 16 to 16,

@@ -9,7 +9,13 @@ import com.github.ajalt.clikt.parameters.options.validate
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.minigdx.tiny.cli.GamePalette
+import com.github.minigdx.tiny.cli.config.GameParameters
+import com.github.minigdx.tiny.cli.config.GameParametersV1
+import com.github.minigdx.tiny.cli.config.Size
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToStream
 import java.io.File
+import java.io.FileOutputStream
 
 class CreateCommand : CliktCommand(name = "create") {
 
@@ -28,6 +34,12 @@ class CreateCommand : CliktCommand(name = "create") {
         .prompt(default = "16x16")
         .validate { require(it.matches(Regex("\\d+x\\d+"))) { "Invalid resolution format: $it" } }
 
+    private val zoom by option(help = "🔍 Game zoom")
+        .int()
+        .prompt(default = "2")
+
+
+        // FIXME: crash if spritesheets is empty
     private val spritesheets by option(help = "The filenames of the sprite sheets, separated by a comma (e.g., file1.png, file2.png)")
         .prompt(default = "")
         .validate {
@@ -49,17 +61,39 @@ ${
 """
         )
 
-    override fun run() {
-        echo("Welcome to the game wizard!")
-        echo("Let's create a new game...")
-        echo()
+    internal val json = Json {
+        ignoreUnknownKeys = true
+    }
 
+    override fun run() {
         echo("Game Name: $gameName")
         echo("Game Resolution: $gameResolution")
         echo("Game Resolution: $spriteSize")
         echo("Sprite Sheet Filenames: $spritesheets")
-        echo("Folder: ${gameDirectory.absolutePath}")
-        echo("palette: $palette")
+        echo("palette: ${GamePalette.ALL[palette].name}")
+
+        val configuration = GameParametersV1(
+            name = gameName,
+            resolution = gameResolution.toSize(),
+            sprites = spriteSize.toSize(),
+            zoom = zoom,
+            colors = GamePalette.ALL[palette].colors,
+        ) as GameParameters
+
+        if(!gameDirectory.exists()) gameDirectory.mkdirs()
+
+        val configurationFile = gameDirectory.resolve("_tiny.json")
+        FileOutputStream(configurationFile).use {
+            json.encodeToStream(configuration, it)
+        }
+
+        echo("Game created into: ${gameDirectory.absolutePath}")
+        echo("To run the game: tiny-cli ${gameDirectory.absolutePath}")
+    }
+
+    private fun String.toSize(): Size {
+        val (w, h) = this.split("x")
+        return Size(w.toInt(), h.toInt())
     }
 
     private fun generateRandomGameName(): String {

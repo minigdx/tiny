@@ -7,7 +7,6 @@ import com.github.ajalt.clikt.parameters.types.file
 import com.github.minigdx.tiny.cli.config.GameParameters
 import com.github.minigdx.tiny.cli.config.GameParametersV1
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonNull.content
 import kotlinx.serialization.json.decodeFromStream
 import java.io.File
 import java.io.FileInputStream
@@ -34,7 +33,7 @@ class ExportCommand : CliktCommand("export") {
         val exportedGame = ZipOutputStream(FileOutputStream("export.zip"))
 
         // Add all engine files into the zip
-        TEMPLATES.forEach { name ->
+        ENGINE_FILES.forEach { name ->
             val content = ExportCommand::class.java.getResourceAsStream("/tiny-engine-js/$name")
             exportedGame.putNextEntry(ZipEntry(name))
             exportedGame.write(content!!.readAllBytes())
@@ -42,6 +41,10 @@ class ExportCommand : CliktCommand("export") {
         }
 
         // Add all game specific file into the zip
+        exportedGame.putNextEntry(ZipEntry("_tiny.json"))
+        exportedGame.write(configFile.readBytes())
+        exportedGame.closeEntry()
+
         when (gameParameters) {
             is GameParametersV1 -> {
                 gameParameters.scripts.forEach { name ->
@@ -54,26 +57,61 @@ class ExportCommand : CliktCommand("export") {
                     exportedGame.write(gameDirectory.resolve(name).readBytes())
                     exportedGame.closeEntry()
                 }
-                // TODO: levels??
+                gameParameters.levels.forEach { name ->
+                    val baseDirectory = gameDirectory.resolve(name)
+                    val files = baseDirectory.listFiles() ?: emptyArray()
+                    files.forEach { file ->
+                        if(file.isFile) {
+                            exportedGame.putNextEntry(ZipEntry(name + "/" + file.name))
+                            exportedGame.write(file.readBytes())
+                            exportedGame.closeEntry()
+                        }
+                    }
+                }
+
+                // Add index.html
+                val content = ExportCommand::class.java.getResourceAsStream("/templates/index.html")!!.readAllBytes()
+                var template = content.decodeToString()
+                template = template.replace("{GAME_NAME}", gameParameters.name)
+                template = template.replace("{GAME_WIDTH}", gameParameters.resolution.width.toString())
+                template = template.replace("{GAME_HEIGHT}", gameParameters.resolution.height.toString())
+                template = template.replace("{GAME_ZOOM}", gameParameters.zoom.toString())
+                template = template.replace("{GAME_SPRW}", gameParameters.sprites.width.toString())
+                template = template.replace("{GAME_SPRH}", gameParameters.sprites.height.toString())
+
+                template = replaceList(template, gameParameters.scripts, "{GAME_SCRIPT}", "GAME_SCRIPT")
+                template = replaceList(template, gameParameters.spritesheets, "{GAME_SPRITESHEET}", "GAME_SPRITESHEET")
+                template = replaceList(template, gameParameters.levels, "{GAME_LEVEL}", "GAME_LEVEL")
+
+                template = template.replace("{GAME_COLORS}", gameParameters.colors.joinToString(","))
+
+                exportedGame.putNextEntry(ZipEntry("index.html"))
+                exportedGame.write(template.toByteArray())
+                exportedGame.closeEntry()
             }
         }
 
+
         exportedGame.close()
-        // Generate the JS Template using game parameter.
-        // Output this template in a new directory (Where??)
-        // Copy all files from the game configuration into this directory
-        // Copy engine files into this directory (engine.js, _boot.lua, ...)
-        // Zip this new directory and enjoy?
-        // -> The zip can be created in memory
+    }
+
+    private fun replaceList(template: String, values: List<String>, tag: String, delimiter: String): String {
+        val pattern = ("<!-- $delimiter -->(.*?)<!-- ${delimiter}_END -->").toRegex(RegexOption.DOT_MATCHES_ALL)
+        val delimiterTag = pattern.find(template)!!.groupValues[1]
+
+        var result = ""
+        values.forEach { script ->
+            result += delimiterTag.replace(tag, script)
+        }
+        return template.replace(delimiterTag, result)
     }
 
     companion object {
-        val TEMPLATES = listOf(
+        val ENGINE_FILES = listOf(
             "_boot.lua",
             "_boot.png",
             "_engine.lua",
-            "tiny-engine.js",
-            "index.html", // TO BE REMOVED. The file should be in the CLI.
+            "tiny-engine.js"
         )
     }
 }
