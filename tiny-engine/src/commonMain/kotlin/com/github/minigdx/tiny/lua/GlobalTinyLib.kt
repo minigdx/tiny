@@ -26,28 +26,28 @@ class GlobalTinyLib(val gameScript: GameScript, val resourceAccess: GameResource
 
     private var currentSpritesheet: Int = 0
 
-    override fun call(modname: LuaValue, env: LuaValue): LuaValue {
+    override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
         val tiny = LuaTable()
-        env["exit"] = exit()
-        env["line"] = line()
-        env["pset"] = pset()
-        env["pget"] = pget()
-        env["rnd"] = rnd()
-        env["cls"] = cls()
-        env["cos"] = cos()
-        env["sin"] = sin()
-        env["min"] = min()
-        env["max"] = max()
-        env["abs"] = abs()
-        env["rect"] = rect()
-        env["rectf"] = rectf()
-        env["circle"] = circle()
-        env["circlef"] = circlef()
-        env["sspr"] = sspr()
-        env["spr"] = spr()
-        env["print"] = print()
-        env["debug"] = debug()
-        env["PI"] = valueOf(PI)
+        arg2["exit"] = exit()
+        arg2["line"] = line()
+        arg2["pset"] = pset()
+        arg2["pget"] = pget()
+        arg2["rnd"] = rnd()
+        arg2["cls"] = cls()
+        arg2["cos"] = cos()
+        arg2["sin"] = sin()
+        arg2["min"] = min()
+        arg2["max"] = max()
+        arg2["abs"] = abs()
+        arg2["rect"] = rect()
+        arg2["rectf"] = rectf()
+        arg2["circle"] = circle()
+        arg2["circlef"] = circlef()
+        arg2["sspr"] = sspr()
+        arg2["spr"] = spr()
+        arg2["print"] = print()
+        arg2["debug"] = debug()
+        arg2["PI"] = valueOf(PI)
         return tiny
     }
 
@@ -149,7 +149,7 @@ class GlobalTinyLib(val gameScript: GameScript, val resourceAccess: GameResource
             description = "print on the screen a string",
             mainCall = true
         )
-        override fun call(arg: LuaValue): LuaValue {
+        override fun call(a: LuaValue): LuaValue {
             return NONE
         }
 

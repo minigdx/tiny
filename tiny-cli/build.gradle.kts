@@ -11,6 +11,14 @@ repositories {
     }
 }
 
+configurations.create("tinyWebEngine") {
+    isCanBeResolved = true
+    isCanBeConsumed = false
+    attributes {
+        attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class, "tiny-engine-js-browser-distribution"))
+    }
+}
+
 dependencies {
     commonMainImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
     commonMainImplementation("com.github.ajalt.clikt:clikt:3.5.2")
@@ -18,6 +26,8 @@ dependencies {
     jvmMainImplementation(project(":tiny-engine", "jvmRuntimeElements"))!!
         .because("Depends on the JVM Jar containing commons resources in the JAR.")
     jvmMainImplementation("com.danielgergely.kgl:kgl-lwjgl:0.6.1")
+
+    add("tinyWebEngine", project(":tiny-engine"))
 }
 
 application {
@@ -30,6 +40,7 @@ application {
     ) {
         val jvmJar by tasks.existing
         this.from(jvmJar)
+        this.from(project.configurations.getByName("tinyWebEngine"))
         this.into("lib")
     }
 }
@@ -38,6 +49,7 @@ application {
 project.tasks.withType(CreateStartScripts::class.java).configureEach {
     this.classpath = project.tasks.getByName("jvmJar").outputs.files
         .plus(project.configurations.getByName("jvmRuntimeClasspath"))
+        .plus(project.configurations.getByName("tinyWebEngine"))
 }
 
 // Make the application plugin start with the right classpath
@@ -45,6 +57,7 @@ project.tasks.withType(CreateStartScripts::class.java).configureEach {
 project.tasks.withType(JavaExec::class.java).configureEach {
     val jvmJar by tasks.existing
     val jvmRuntimeClasspath by configurations.existing
+    val tinyWebEngine by configurations.existing
 
-    classpath(jvmJar, jvmRuntimeClasspath)
+    classpath(jvmJar, jvmRuntimeClasspath, tinyWebEngine)
 }
