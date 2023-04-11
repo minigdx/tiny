@@ -11,14 +11,7 @@ class AjaxStream(private val url: String) : SourceStream<ByteArray> {
     // https://youtrack.jetbrains.com/issue/KT-30098
     private fun ArrayBuffer.toByteArray(): ByteArray = Int8Array(this).unsafeCast<ByteArray>()
 
-    private var updated = true
-
-    override fun wasModified(): Boolean {
-        return updated
-    }
-
     override suspend fun read(): ByteArray {
-        updated = false
         return suspendCoroutine { continuation ->
             val jsonFile = XMLHttpRequest()
             jsonFile.responseType = XMLHttpRequestResponseType.Companion.ARRAYBUFFER

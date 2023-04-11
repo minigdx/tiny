@@ -12,13 +12,7 @@ import kotlin.coroutines.suspendCoroutine
 
 class ImageDataStream(val url: String) : SourceStream<ImageData> {
 
-    private var updated = true
-    override fun wasModified(): Boolean {
-        return updated
-    }
-
     override suspend fun read(): ImageData {
-        updated = false
         return suspendCoroutine { continuation ->
 
             val img = Image()

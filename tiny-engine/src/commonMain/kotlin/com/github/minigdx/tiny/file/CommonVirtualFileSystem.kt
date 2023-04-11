@@ -10,6 +10,8 @@ class CommonVirtualFileSystem : VirtualFileSystem {
     private val delay = 1.seconds
     override fun <T> watch(source: SourceStream<T>): Flow<T> {
         return flow {
+            emit(source.read())
+            delay(delay)
             while (true) {
                 if (source.wasModified()) {
                     emit(source.read())
