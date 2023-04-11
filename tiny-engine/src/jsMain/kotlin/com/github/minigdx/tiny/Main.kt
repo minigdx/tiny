@@ -7,7 +7,9 @@ import com.github.minigdx.tiny.log.StdOutLogger
 import com.github.minigdx.tiny.platform.webgl.WebGlPlatform
 import kotlinx.browser.document
 import kotlinx.browser.window
+import org.w3c.dom.Element
 import org.w3c.dom.HTMLCanvasElement
+import org.w3c.dom.HTMLCollection
 import org.w3c.dom.get
 
 fun main() {
@@ -27,13 +29,15 @@ fun main() {
     var rootPath = window.location.protocol + "//" + window.location.host + window.location.pathname
     rootPath = rootPath.replace("index.html", "")
 
-    (0 until tinyGameTag.length).forEach { index ->
+    tinyGameTag.forEach { game ->
 
-        val game = tinyGameTag[index]!!
-        // val gameName = game.getAttribute("game")
         val gameWidth = game.getAttribute("width")?.toInt() ?: 128
         val gameHeight = game.getAttribute("height")?.toInt() ?: 128
         val gameZoom = game.getAttribute("zoom")?.toInt() ?: 1
+
+        val scripts = game.getElementsByTagName("tiny-script").map { script ->
+            script.getAttribute("name")
+        }.filterNotNull()
 
         val canvas = document.createElement("canvas")
         canvas.setAttribute("width", (gameWidth * gameZoom).toString())
@@ -44,7 +48,7 @@ fun main() {
             width = gameWidth,
             height = gameHeight,
             palette = emptyList(),
-            gameScripts = emptyList(),
+            gameScripts = scripts,
             spriteSheets = emptyList(),
             gameLevels = emptyList(),
             zoom = gameZoom,
@@ -60,5 +64,22 @@ fun main() {
             vfs = CommonVirtualFileSystem(),
             logger = logger
         ).main()
+    }
+}
+
+fun <T> HTMLCollection.map(block: (Element) -> T): List<T> {
+    val result = mutableListOf<T>()
+    this.forEach {  elt ->
+        result.add(block(elt))
+    }
+    return result
+}
+
+fun HTMLCollection.forEach(block: (Element) -> Unit) {
+    (0 until this.length).forEach { index ->
+        val elt = this[index]
+        if (elt != null) {
+            block(elt)
+        }
     }
 }

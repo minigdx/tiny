@@ -251,6 +251,8 @@ class GlfwPlatform(
 
             private val delegate = createByteArrayStream(name)
 
+            override suspend fun exists(): Boolean = delegate.exists()
+
             override suspend fun read(): ImageData {
                 return extractRGBA(delegate.read())
             }

@@ -11,7 +11,7 @@ repositories {
     }
 }
 
-configurations.create("tinyWebEngine") {
+configurations.create("tinyEngineJsZip") {
     isCanBeResolved = true
     isCanBeConsumed = false
     attributes {
@@ -27,7 +27,7 @@ dependencies {
         .because("Depends on the JVM Jar containing commons resources in the JAR.")
     jvmMainImplementation("com.danielgergely.kgl:kgl-lwjgl:0.6.1")
 
-    add("tinyWebEngine", project(":tiny-engine"))
+    add("tinyEngineJsZip", project(":tiny-engine"))
 }
 
 application {
@@ -40,7 +40,7 @@ application {
     ) {
         val jvmJar by tasks.existing
         this.from(jvmJar)
-        this.from(project.configurations.getByName("tinyWebEngine"))
+        this.from(project.configurations.getByName("tinyEngineJsZip"))
         this.into("lib")
     }
 }
@@ -49,7 +49,7 @@ application {
 project.tasks.withType(CreateStartScripts::class.java).configureEach {
     this.classpath = project.tasks.getByName("jvmJar").outputs.files
         .plus(project.configurations.getByName("jvmRuntimeClasspath"))
-        .plus(project.configurations.getByName("tinyWebEngine"))
+        .plus(project.configurations.getByName("tinyEngineJsZip"))
 }
 
 // Make the application plugin start with the right classpath
@@ -57,7 +57,7 @@ project.tasks.withType(CreateStartScripts::class.java).configureEach {
 project.tasks.withType(JavaExec::class.java).configureEach {
     val jvmJar by tasks.existing
     val jvmRuntimeClasspath by configurations.existing
-    val tinyWebEngine by configurations.existing
+    val tinyEngineJsZip by configurations.existing
 
-    classpath(jvmJar, jvmRuntimeClasspath, tinyWebEngine)
+    classpath(jvmJar, jvmRuntimeClasspath, tinyEngineJsZip)
 }

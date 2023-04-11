@@ -52,11 +52,10 @@ dependencies {
     }
 }
 
-project.tasks.register("tinyWebEngineZip", Zip::class.java) {
+project.tasks.register("tinyEngineJsZip", Zip::class.java) {
     from(tasks.getByName("jsBrowserDistribution"))
-    this.archiveVersion.set("") // drop the version so it's a no brainer to access the archive in the CLI.
     this.destinationDirectory.set(project.buildDir.resolve("tiny-distributions"))
-    this.into("tiny-web-engine")
+    this.into("tiny-engine-js")
     group = "tiny"
     description = "Build a zip containing all resources to run the Tiny engine in a web application."
 }
@@ -67,5 +66,5 @@ configurations.create("tinyWebEngine") {
     attributes {
         attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class, "tiny-engine-js-browser-distribution"))
     }
-    outgoing.artifact(tasks.getByName("tinyWebEngineZip"))
+    outgoing.artifact(tasks.getByName("tinyEngineJsZip"))
 }

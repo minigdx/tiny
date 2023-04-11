@@ -28,4 +28,18 @@ class AjaxStream(private val url: String) : SourceStream<ByteArray> {
             jsonFile.send()
         }
     }
+
+
+    override suspend fun exists(): Boolean {
+        return suspendCoroutine { continuation ->
+            val jsonFile = XMLHttpRequest()
+            jsonFile.responseType = XMLHttpRequestResponseType.Companion.ARRAYBUFFER
+            jsonFile.open("HEAD", url, true)
+
+            jsonFile.onload = { _ ->
+                continuation.resumeWith(Result.success(jsonFile.status == 200.toShort()))
+            }
+            jsonFile.send()
+        }
+    }
 }

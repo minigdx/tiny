@@ -8,9 +8,25 @@ import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.Image
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventListener
+import org.w3c.xhr.ARRAYBUFFER
+import org.w3c.xhr.XMLHttpRequest
+import org.w3c.xhr.XMLHttpRequestResponseType
 import kotlin.coroutines.suspendCoroutine
 
 class ImageDataStream(val url: String) : SourceStream<ImageData> {
+
+    override suspend fun exists(): Boolean {
+        return suspendCoroutine { continuation ->
+            val jsonFile = XMLHttpRequest()
+            jsonFile.responseType = XMLHttpRequestResponseType.Companion.ARRAYBUFFER
+            jsonFile.open("HEAD", url, true)
+
+            jsonFile.onload = { _ ->
+                continuation.resumeWith(Result.success(jsonFile.status == 200.toShort()))
+            }
+            jsonFile.send()
+        }
+    }
 
     override suspend fun read(): ImageData {
         return suspendCoroutine { continuation ->

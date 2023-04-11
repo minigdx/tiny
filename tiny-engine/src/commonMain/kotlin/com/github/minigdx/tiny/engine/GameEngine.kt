@@ -84,7 +84,7 @@ class GameEngine(
     override var bootSpritesheet: SpriteSheet? = null
         private set
 
-    private lateinit var engineGameScript: GameScript
+    private var engineGameScript: GameScript? = null
 
     private var inError = false
 
@@ -173,8 +173,8 @@ class GameEngine(
                     ENGINE_GAMESCRIPT -> {
                         // Don't put the engine script in the stack
                         engineGameScript = resource as GameScript
-                        engineGameScript.resourceAccess = this
-                        engineGameScript.evaluate()
+                        engineGameScript?.resourceAccess = this
+                        engineGameScript?.evaluate()
                     }
 
                     BOOT_SPRITESHEET -> {
@@ -214,8 +214,8 @@ class GameEngine(
                     ENGINE_GAMESCRIPT -> {
                         // Don't put the engine script in the stack
                         engineGameScript = resource as GameScript
-                        engineGameScript.resourceAccess = this
-                        engineGameScript.evaluate()
+                        engineGameScript?.resourceAccess = this
+                        engineGameScript?.evaluate()
                     }
                     BOOT_SPRITESHEET -> {
                         bootSpritesheet = resource as SpriteSheet
@@ -258,7 +258,7 @@ class GameEngine(
             if (accumulator >= REFRESH_LIMIT) {
                 inError = try {
                     scripts[current]?.advance()
-                    engineGameScript.advance()
+                    engineGameScript?.advance()
                     false
                 } catch (ex: LuaError) {
                     if (!inError) { // display the log only once.
@@ -275,10 +275,10 @@ class GameEngine(
 
         // The user hit Ctrl + R(ecord)
         if (inputHandler.isKeyJustPressed(Key.CTRL) && inputHandler.isKeyPressed(Key.R)) {
-            engineGameScript.invoke("popup", valueOf(0), valueOf("recording GIF"), valueOf(4))
+            engineGameScript?.invoke("popup", valueOf(0), valueOf("recording GIF"), valueOf(4))
             platform.record()
         } else if (inputHandler.isKeyJustPressed(Key.R) && inputHandler.isKeyPressed(Key.CTRL)) {
-            engineGameScript.invoke("popup", valueOf(0), valueOf("recording GIF"), valueOf(4))
+            engineGameScript?.invoke("popup", valueOf(0), valueOf("recording GIF"), valueOf(4))
             platform.record()
         }
         inputManager.reset()
@@ -293,10 +293,7 @@ class GameEngine(
     }
 
     override fun draw() {
-        with(scripts[current]) {
-            if (this == null) return
-            platform.draw(renderContext, frameBuffer)
-        }
+        platform.draw(renderContext, frameBuffer)
     }
 
     companion object {
