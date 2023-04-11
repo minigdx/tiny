@@ -42,7 +42,7 @@ class MainCommand : CliktCommand(invokeWithoutSubcommand = true) {
                 }
                 val gameParameters = json.decodeFromStream<GameParameters>(FileInputStream(configFile))
 
-                val logger = StdOutLogger()
+                val logger = StdOutLogger("tiny-cli")
                 val vfs = CommonVirtualFileSystem()
                 val gameOption = gameParameters.toGameOptions()
                 GameEngine(

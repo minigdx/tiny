@@ -22,7 +22,7 @@ interface Logger {
     fun error(tag: String, exception: Throwable, message: () -> String)
 }
 
-class StdOutLogger(override val level: LogLevel = LogLevel.DEBUG) : Logger {
+class StdOutLogger(val name: String, override val level: LogLevel = LogLevel.DEBUG) : Logger {
 
     private fun log(level: LogLevel, tag: String, exception: Throwable?, message: () -> String) {
         if (level.ordinal >= this.level.ordinal) {
@@ -32,7 +32,7 @@ class StdOutLogger(override val level: LogLevel = LogLevel.DEBUG) : Logger {
                 LogLevel.WARN -> "⚠️"
                 LogLevel.ERROR -> "💥"
             }
-            println("$l - [$tag] : " + message())
+            println("$l |- $name -| - [$tag] : " + message())
             exception?.printStackTrace()
         }
     }

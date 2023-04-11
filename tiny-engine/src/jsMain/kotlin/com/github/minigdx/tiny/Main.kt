@@ -7,6 +7,7 @@ import com.github.minigdx.tiny.log.StdOutLogger
 import com.github.minigdx.tiny.platform.webgl.WebGlPlatform
 import kotlinx.browser.document
 import kotlinx.browser.window
+import kotlinx.dom.appendText
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.HTMLCollection
@@ -18,7 +19,8 @@ fun main() {
 
     if (tinyGameTag.length == 0) {
         throw IllegalArgumentException(
-            "No <tiny-game> has been found in the current page. Check that the page including your javascript game" +
+            "No <tiny-game> has been found in the current page. " +
+                "Check that the page including your javascript game" +
                 "has a least one <tiny-game> tag to render the game in."
         )
     }
@@ -29,6 +31,22 @@ fun main() {
     var rootPath = window.location.protocol + "//" + window.location.host + window.location.pathname
     rootPath = rootPath.replace("index.html", "")
 
+    if(rootPath.startsWith("file://")) {
+        tinyGameTag.forEach {game ->
+            val h1 = document.createElement("h1")
+            h1.appendText("\uD83D\uDEA8 " +
+                "You're accessing the page without a webserver (ie: file:// as URL). " +
+                "Tiny can't run without a webserver. " +
+                "Please start a webserver to serve HTML pages and access it through " +
+                "a valid URL (ie: http://localhost) \uD83D\uDEA8")
+            game.appendChild(h1)
+        }
+        throw IllegalArgumentException("Tiny can't run without a webserver." +
+            "Please run a webserver to serve the files so you can acess it through " +
+            "http://localhost instead of file://some/path.")
+    }
+
+    var index = 0
     tinyGameTag.forEach { game ->
 
         val gameWidth = game.getAttribute("width")?.toInt() ?: 128
@@ -47,7 +65,7 @@ fun main() {
         val gameOptions = GameOptions(
             width = gameWidth,
             height = gameHeight,
-            palette = emptyList(),
+            palette = listOf("#E0F8D0","#88C070","#346856","#081820"),
             gameScripts = scripts,
             spriteSheets = emptyList(),
             gameLevels = emptyList(),
@@ -56,7 +74,9 @@ fun main() {
             spriteSize = 16 to 16,
         )
 
-        val logger = StdOutLogger()
+        val logger = StdOutLogger("game-$index")
+        logger.debug("TINY-JS") { "Boot the game using the URL $rootPath."}
+        index++
 
         GameEngine(
             gameOptions = gameOptions,
