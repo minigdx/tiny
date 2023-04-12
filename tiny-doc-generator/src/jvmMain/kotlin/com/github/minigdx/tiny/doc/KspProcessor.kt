@@ -177,13 +177,16 @@ class KspProcessor(
 
             // Get the name of the class
             val name = function.name.ifBlank {
-                classDeclaration.accept(object : KSDefaultVisitor<Unit, String>() {
-                    override fun defaultHandler(node: KSNode, data: Unit): String = ""
+                classDeclaration.accept(
+                    object : KSDefaultVisitor<Unit, String>() {
+                        override fun defaultHandler(node: KSNode, data: Unit): String = ""
 
-                    override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit): String {
-                        return classDeclaration.simpleName.asString()
-                    }
-                }, Unit)
+                        override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit): String {
+                            return classDeclaration.simpleName.asString()
+                        }
+                    },
+                    Unit
+                )
             }
 
             // Get all TinyCall annotated functions.
@@ -202,7 +205,6 @@ class KspProcessor(
                         val multiArg = multiArgs.firstOrNull()
                         call.args += multiArg?.names?.map { n -> TinyArgDescriptor(n) }
                             ?: emptyList()
-
                     }
                     calls.add(call)
                 }
@@ -247,8 +249,8 @@ class KspProcessor(
 
                         if (func.calls.isNotEmpty()) {
                             val result = func.calls.map { call ->
-                                    "${lib.name}.${func.name}(${call.args.map { it.name }.joinToString(", ")}) " +
-                                        "-- ${call.description}"
+                                "${lib.name}.${func.name}(${call.args.map { it.name }.joinToString(", ")}) " +
+                                    "-- ${call.description}"
                             }.joinToString("\n")
                             code(result)
                         }

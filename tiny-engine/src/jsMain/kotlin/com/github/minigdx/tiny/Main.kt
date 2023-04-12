@@ -31,19 +31,23 @@ fun main() {
     var rootPath = window.location.protocol + "//" + window.location.host + window.location.pathname
     rootPath = rootPath.replace("index.html", "")
 
-    if(rootPath.startsWith("file://")) {
-        tinyGameTag.forEach {game ->
+    if (rootPath.startsWith("file://")) {
+        tinyGameTag.forEach { game ->
             val h1 = document.createElement("h1")
-            h1.appendText("\uD83D\uDEA8 " +
-                "You're accessing the page without a webserver (ie: file:// as URL). " +
-                "Tiny can't run without a webserver. " +
-                "Please start a webserver to serve HTML pages and access it through " +
-                "a valid URL (ie: http://localhost) \uD83D\uDEA8")
+            h1.appendText(
+                "\uD83D\uDEA8 " +
+                    "You're accessing the page without a webserver (ie: file:// as URL). " +
+                    "Tiny can't run without a webserver. " +
+                    "Please start a webserver to serve HTML pages and access it through " +
+                    "a valid URL (ie: http://localhost) \uD83D\uDEA8"
+            )
             game.appendChild(h1)
         }
-        throw IllegalArgumentException("Tiny can't run without a webserver." +
-            "Please run a webserver to serve the files so you can acess it through " +
-            "http://localhost instead of file://some/path.")
+        throw IllegalArgumentException(
+            "Tiny can't run without a webserver." +
+                "Please run a webserver to serve the files so you can acess it through " +
+                "http://localhost instead of file://some/path."
+        )
     }
 
     var index = 0
@@ -83,11 +87,11 @@ fun main() {
             gameLevels = levels,
             zoom = gameZoom,
             gutter = 0 to 0,
-            spriteSize = 16 to 16,
+            spriteSize = sprWidth to sprHeight,
         )
 
         val logger = StdOutLogger("game-$index")
-        logger.debug("TINY-JS") { "Boot the game using the URL $rootPath."}
+        logger.debug("TINY-JS") { "Boot the game using the URL $rootPath." }
         index++
 
         GameEngine(
@@ -101,7 +105,7 @@ fun main() {
 
 fun <T> HTMLCollection.map(block: (Element) -> T): List<T> {
     val result = mutableListOf<T>()
-    this.forEach {  elt ->
+    this.forEach { elt ->
         result.add(block(elt))
     }
     return result

@@ -1,9 +1,5 @@
 package com.github.minigdx.tiny.file
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import java.io.File
 
 class FileStream(private val origin: File) : SourceStream<ByteArray>, TargetStream<ByteArray> {

@@ -38,8 +38,7 @@ class CreateCommand : CliktCommand(name = "create") {
         .int()
         .prompt(default = "2")
 
-
-        // FIXME: crash if spritesheets is empty
+    // FIXME: crash if spritesheets is empty
     private val spritesheets by option(help = "The filenames of the sprite sheets, separated by a comma (e.g., file1.png, file2.png)")
         .prompt(default = "")
         .validate {
@@ -80,7 +79,7 @@ ${
             colors = GamePalette.ALL[palette].colors,
         ) as GameParameters
 
-        if(!gameDirectory.exists()) gameDirectory.mkdirs()
+        if (!gameDirectory.exists()) gameDirectory.mkdirs()
 
         val configurationFile = gameDirectory.resolve("_tiny.json")
         FileOutputStream(configurationFile).use {

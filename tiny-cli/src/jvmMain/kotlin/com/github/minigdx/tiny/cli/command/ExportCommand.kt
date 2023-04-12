@@ -61,7 +61,7 @@ class ExportCommand : CliktCommand("export") {
                     val baseDirectory = gameDirectory.resolve(name)
                     val files = baseDirectory.listFiles() ?: emptyArray()
                     files.forEach { file ->
-                        if(file.isFile) {
+                        if (file.isFile) {
                             exportedGame.putNextEntry(ZipEntry(name + "/" + file.name))
                             exportedGame.write(file.readBytes())
                             exportedGame.closeEntry()
@@ -90,7 +90,6 @@ class ExportCommand : CliktCommand("export") {
                 exportedGame.closeEntry()
             }
         }
-
 
         exportedGame.close()
     }

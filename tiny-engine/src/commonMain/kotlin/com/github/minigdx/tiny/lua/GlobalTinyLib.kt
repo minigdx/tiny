@@ -171,7 +171,7 @@ class GlobalTinyLib(val gameScript: GameScript, val resourceAccess: GameResource
 
                 val coord = if (char.isLetter()) {
                     // The character has an accent. Let's try to get rid of it
-                    val l = if(char.hasAccent) {
+                    val l = if (char.hasAccent) {
                         ACCENT_MAP[char.lowercaseChar()] ?: char.lowercaseChar()
                     } else {
                         char.lowercaseChar()
@@ -209,9 +209,7 @@ class GlobalTinyLib(val gameScript: GameScript, val resourceAccess: GameResource
 
         val Char.hasAccent: Boolean
             get() = this.isLetter() && this.lowercaseChar() !in 'a'..'z'
-
     }
-
 
     @TinyFunction(
         name = "abs",
@@ -550,6 +548,5 @@ class GlobalTinyLib(val gameScript: GameScript, val resourceAccess: GameResource
         val EMOJI_MAP = mapOf(
             '⚠' to (0 to 0),
         )
-
     }
 }

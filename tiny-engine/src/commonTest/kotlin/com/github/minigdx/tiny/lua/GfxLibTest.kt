@@ -29,7 +29,6 @@ class GfxLibTest {
         assertEquals(2 + 4, mockResources.frameBuffer.clipper.bottom)
     }
 
-
     @Test
     fun it_reset_the_clip() {
         val clip = GfxLib(mockResources).clip()

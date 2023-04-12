@@ -29,7 +29,6 @@ class AjaxStream(private val url: String) : SourceStream<ByteArray> {
         }
     }
 
-
     override suspend fun exists(): Boolean {
         return suspendCoroutine { continuation ->
             val jsonFile = XMLHttpRequest()

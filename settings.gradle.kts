@@ -1,4 +1,3 @@
-
 rootProject.name = "tiny"
 
 pluginManagement {
@@ -13,6 +12,10 @@ pluginManagement {
         mavenCentral()
         mavenLocal()
     }
+}
+
+plugins {
+    id("com.gradle.enterprise") version ("3.12.6")
 }
 
 include("tiny-cli")

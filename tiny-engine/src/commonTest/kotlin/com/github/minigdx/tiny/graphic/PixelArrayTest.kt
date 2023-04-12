@@ -13,6 +13,7 @@ class PixelArrayTest {
     private val blender: (Array<Int>, Pixel, Pixel) -> Array<Int> = { c, _, _ ->
         c
     }
+
     @Test
     fun copyFrom_copy_a_fragment_from_a_pixel_array() {
         val source = PixelArray(3, 3, INDEX)
@@ -108,7 +109,13 @@ class PixelArrayTest {
 
         target.copyFrom(source, reverseY = true, blender = blender)
 
-        assertEquals(source.toString().reversed().replace("\n", ""), target.toString().replace("\n", ""))
+        assertEquals(
+            source.toString()
+                .reversed()
+                .replace("\n", ""),
+            target.toString()
+                .replace("\n", "")
+        )
     }
 
     @Test
