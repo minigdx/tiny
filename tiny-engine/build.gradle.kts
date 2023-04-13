@@ -5,9 +5,6 @@ plugins {
     id("com.google.devtools.ksp") version "1.8.20-1.0.10"
 }
 
-group = "org.example"
-version = "1.0-SNAPSHOT"
-
 repositories {
     mavenCentral()
     maven {
