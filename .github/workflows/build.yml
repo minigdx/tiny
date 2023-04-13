@@ -24,6 +24,13 @@ jobs:
           java-version: 11
       - name: build
         run: ./gradlew ktlintCheck build
+      - name: Build examples and generate Asciidoctor HTML pages
+        run: ./gradlew asciidoctor
+      - name: Copy generated content into gh-pages.
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./tiny-doc/build/docs/asciidoc
 
 env:
   GRADLE_OPTS: -Dorg.gradle.configureondemand=true -Dorg.gradle.parallel=true -Dkotlin.incremental=false -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
