@@ -5,8 +5,8 @@ import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.lua.CtrlLib
 import com.github.minigdx.tiny.lua.GfxLib
-import com.github.minigdx.tiny.lua.StdLib
 import com.github.minigdx.tiny.lua.MapLib
+import com.github.minigdx.tiny.lua.StdLib
 import com.github.minigdx.tiny.lua.StdLibListener
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LoadState

@@ -2,7 +2,7 @@ plugins {
     id("com.github.minigdx.gradle.plugin.developer.mpp")
     kotlin("plugin.serialization") version "1.8.0"
 
-    id("com.google.devtools.ksp") version "1.8.10-1.0.9"
+    id("com.google.devtools.ksp") version "1.8.20-1.0.10"
 }
 
 group = "org.example"

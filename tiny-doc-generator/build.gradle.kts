@@ -3,6 +3,6 @@ plugins {
 }
 
 dependencies {
-    jvmMainImplementation("com.google.devtools.ksp:symbol-processing-api:1.8.10-1.0.9")
+    jvmMainImplementation("com.google.devtools.ksp:symbol-processing-api:1.8.20-1.0.10")
     jvmMainImplementation(project(":tiny-doc-annotations"))
 }

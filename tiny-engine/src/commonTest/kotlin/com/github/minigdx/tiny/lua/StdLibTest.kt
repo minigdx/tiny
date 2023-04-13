@@ -39,7 +39,6 @@ class StdLibTest {
 
     private val listener = object : StdLibListener {
         override fun exit(nextScriptIndex: Int) = Unit
-
     }
 
     @Test
