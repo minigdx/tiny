@@ -1,4 +1,4 @@
-name: Build on all platform
+name: Build and tests on every commit
 # This workflow is triggered on pushes to the repository.
 on: [push]
 

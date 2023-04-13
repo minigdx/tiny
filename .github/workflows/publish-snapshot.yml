@@ -1,4 +1,4 @@
-name: Publish snapshot
+name: Publish snapshot after PR
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
       - main
 
 jobs:
-  publish-release:
+  publish-snapshot:
     runs-on: ubuntu-latest
 
     steps:
