@@ -5,8 +5,9 @@ import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.lua.CtrlLib
 import com.github.minigdx.tiny.lua.GfxLib
-import com.github.minigdx.tiny.lua.GlobalTinyLib
+import com.github.minigdx.tiny.lua.StdLib
 import com.github.minigdx.tiny.lua.MapLib
+import com.github.minigdx.tiny.lua.StdLibListener
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LoadState
 import org.luaj.vm2.LuaError
@@ -32,7 +33,7 @@ class GameScript(
     val gameOptions: GameOptions,
     val inputHandler: InputHandler,
     override val type: ResourceType
-) : GameResource {
+) : GameResource, StdLibListener {
 
     var exited: Boolean = false
     var evaluated: Boolean = false
@@ -60,12 +61,17 @@ class GameScript(
         load(TableLib())
         load(StringLib())
         load(CoroutineLib())
-        load(GlobalTinyLib(this@GameScript, this@GameScript.resourceAccess))
+        load(StdLib(this@GameScript.gameOptions, this@GameScript.resourceAccess, this@GameScript))
         load(MapLib(this@GameScript.resourceAccess))
         load(GfxLib(this@GameScript.resourceAccess))
         load(CtrlLib(inputHandler))
         LoadState.install(this)
         LuaC.install(this)
+    }
+
+    override fun exit(nextScriptIndex: Int) {
+        // FIXME: use the script index
+        exited = true
     }
 
     fun isValid(): Boolean {

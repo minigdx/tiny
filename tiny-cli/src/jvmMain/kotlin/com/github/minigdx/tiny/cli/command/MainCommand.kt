@@ -32,6 +32,7 @@ class MainCommand : CliktCommand(invokeWithoutSubcommand = true) {
     }
 
     override fun run() {
+        echo("\uD83E\uDDF8 ʕ　·ᴥ·ʔ TINY - The Tiny Virtual Gaming Console")
         val subcommand = currentContext.invokedSubcommand
         if (subcommand == null) {
             try {

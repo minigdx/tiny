@@ -4,8 +4,8 @@ import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
+import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
-import com.github.minigdx.tiny.resources.GameScript
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
@@ -13,7 +13,6 @@ import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.ThreeArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
-import org.luaj.vm2.lib.ZeroArgFunction
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
@@ -22,7 +21,12 @@ import kotlin.math.min
 import kotlin.math.sin
 import kotlin.random.Random
 
-class GlobalTinyLib(val gameScript: GameScript, val resourceAccess: GameResourceAccess) : TwoArgFunction() {
+interface StdLibListener {
+    fun exit(nextScriptIndex: Int)
+}
+
+class StdLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAccess, val listener: StdLibListener) :
+    TwoArgFunction() {
 
     private var currentSpritesheet: Int = 0
 
@@ -96,7 +100,7 @@ class GlobalTinyLib(val gameScript: GameScript, val resourceAccess: GameResource
             val y = c.checkint()
             val spritesheet = resourceAccess.spritesheet(currentSpritesheet) ?: return NONE
 
-            val (sw, sh) = gameScript.gameOptions.spriteSize
+            val (sw, sh) = gameOptions.spriteSize
             val nbSpritePerRow = spritesheet.width / sw
 
             val column = sprN % nbSpritePerRow
@@ -121,7 +125,7 @@ class GlobalTinyLib(val gameScript: GameScript, val resourceAccess: GameResource
 
             val spritesheet = resourceAccess.spritesheet(currentSpritesheet) ?: return NONE
 
-            val (sw, sh) = gameScript.gameOptions.spriteSize
+            val (sw, sh) = gameOptions.spriteSize
             val nbSpritePerRow = spritesheet.width / sw
 
             val column = sprN % nbSpritePerRow
@@ -154,7 +158,7 @@ class GlobalTinyLib(val gameScript: GameScript, val resourceAccess: GameResource
         }
 
         override fun call(a: LuaValue, b: LuaValue, c: LuaValue): LuaValue {
-            return NONE
+            return call(a, b, c, valueOf("#FFFFFF"))
         }
 
         override fun call(a: LuaValue, b: LuaValue, c: LuaValue, d: LuaValue): LuaValue {
@@ -182,7 +186,7 @@ class GlobalTinyLib(val gameScript: GameScript, val resourceAccess: GameResource
                     val index = char.lowercaseChar() - '0'
                     index to 4
                 } else {
-                    // Maybe it's an emji: try EMOJI MAP conversion
+                    // Maybe it's an emoji: try EMOJI MAP conversion
                     EMOJI_MAP[char]
                 }
                 if (coord != null) {
@@ -281,9 +285,10 @@ class GlobalTinyLib(val gameScript: GameScript, val resourceAccess: GameResource
         }
     }
 
-    internal inner class exit : ZeroArgFunction() {
-        override fun call(): LuaValue {
-            gameScript.exited = true
+    internal inner class exit : OneArgFunction() {
+
+        override fun call(arg: LuaValue): LuaValue {
+            listener.exit(arg.checkint())
             return NONE
         }
     }

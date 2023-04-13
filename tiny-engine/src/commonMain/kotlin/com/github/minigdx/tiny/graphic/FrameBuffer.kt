@@ -43,7 +43,7 @@ class FrameBuffer(
     val gamePalette: ColorPalette
 ) {
 
-    private val colorIndexBuffer: PixelArray = PixelArray(width, height, PixelFormat.INDEX)
+    internal val colorIndexBuffer: PixelArray = PixelArray(width, height, PixelFormat.INDEX)
 
     internal var buffer: ByteArray = ByteArray(height * width * PixelFormat.RGBA)
 

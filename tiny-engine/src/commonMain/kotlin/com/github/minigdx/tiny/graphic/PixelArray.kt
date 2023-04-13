@@ -8,7 +8,7 @@ import kotlin.math.min
 
 class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = PixelFormat.INDEX) {
 
-    private var pixels = Array(width * height * pixelFormat) { 0 }
+    internal var pixels = Array(width * height * pixelFormat) { 0 }
 
     val size = width * height * pixelFormat
 

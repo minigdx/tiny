@@ -13,7 +13,7 @@ function _update()
 
     if(waiting < 0) then
         cls(1)
-        exit()
+        exit(0) -- start the first script in the game script stack
     end
 end
 
