@@ -1,6 +1,11 @@
-= 🧸 Tiny
-:toc:
+:docinfo: shared
+:toc: left
+:toclevels: 5
+:icons: font
+:book:
 :sourcedir: ../../../../../../
+
+= 🧸 Tiny
 
 Welcome to the documentation for "Tiny," the virtual console that offers an easy and efficient way to build games and other applications with its LUA programming support, hot reloading, and 256-color maximum. Despite its modest capabilities,
 
