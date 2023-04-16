@@ -16,20 +16,11 @@ import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.RenderContext
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.render.GLRender
-import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import org.khronos.webgl.Int8Array
 import org.khronos.webgl.get
-import org.w3c.dom.CanvasRenderingContext2D
 import org.w3c.dom.HTMLCanvasElement
-import org.w3c.dom.Image
-import org.w3c.dom.events.Event
-import org.w3c.dom.events.EventListener
-import org.w3c.dom.url.URL
-import org.w3c.files.Blob
-import org.w3c.files.BlobPropertyBag
 
 class WebGlPlatform(
     private val canvas: HTMLCanvasElement,
@@ -82,43 +73,7 @@ class WebGlPlatform(
         render.draw(context, image, frameBuffer.width, frameBuffer.height)
     }
 
-    override fun extractRGBA(imageData: ByteArray): ImageData {
-        val canvas = document.createElement("canvas") as HTMLCanvasElement
-        val context = canvas.getContext("2d") as CanvasRenderingContext2D
-
-        val img = Image()
-        img.addEventListener(
-            "load",
-            object : EventListener {
-                override fun handleEvent(event: Event) {
-                    println("width2 = " + img.width)
-                }
-            }
-        )
-
-        img.addEventListener(
-            "onload",
-            object : EventListener {
-                override fun handleEvent(event: Event) {
-                    println("width2 = " + img.width)
-                }
-            }
-        )
-        img.src = URL.createObjectURL(Blob(imageData.toTypedArray(), BlobPropertyBag(type = "image/png")))
-
-        canvas.width = 320
-        canvas.height = 320
-        context.drawImage(img, 0.0, 0.0)
-        val rawImageData = context.getImageData(0.0, 0.0, 256.0, 256.0)
-        println("raw = " + rawImageData.data.get(0))
-        println("raw length = " + rawImageData.data.length)
-        val data = Int8Array(rawImageData.data.buffer).unsafeCast<ByteArray>()
-        println("data length = " + data.size)
-
-        println("width = " + img.width)
-        println(data[0])
-        return ImageData(data, 256, 256)
-    }
+    override fun extractRGBA(imageData: ByteArray): ImageData = TODO("TO BE REMOVED")
 
     override fun record() = Unit
 

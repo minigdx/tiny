@@ -181,7 +181,11 @@ class JsInputHandler(
         event as KeyboardEvent
         if (event.keyCode in (0..256)) {
             touchManager.onKeyPressed(event.keyCode)
-            event.preventDefault()
+            // TODO: I removed the preventDefault otherwise the event is not send to other elements of the document
+            //       (because keyDown and keyUp are on the documents, not only the canvas which doesn't support
+            //       keyUp / keyDown)
+            //       It's required as for the documentation, there is textarea that listen for whose events.
+            // event.preventDefault()
         }
     }
 
@@ -189,7 +193,11 @@ class JsInputHandler(
         event as KeyboardEvent
         if (event.keyCode in (0..256)) {
             touchManager.onKeyReleased(event.keyCode)
-            event.preventDefault()
+            // TODO: I removed the preventDefault otherwise the event is not send to other elements of the document
+            //       (because keyDown and keyUp are on the documents, not only the canvas which doesn't support
+            //       keyUp / keyDown)
+            //       It's required as for the documentation, there is textarea that listen for whose events.
+            // event.preventDefault()
         }
     }
 
