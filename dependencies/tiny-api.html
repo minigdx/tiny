@@ -475,9 +475,26 @@ end
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-lua" data-lang="lua">gfx.dither() -- Reset dithering pattern.
-gfx.dither(pattern) -- Apply dithering pattern. Only value &gt; 0 are accepted for now.</code></pre>
+gfx.dither(pattern) -- Apply dithering pattern.
+            |The pattern is using the bits value of a 2 octet value.
+            |The first bits is the one on the far left and represent
+            |the pixel of the top left of a 4x4 matrix.
+            |The last bit is the pixel from the bottom right of this matrix.</code></pre>
 </div>
 </div>
+<tiny-editor>
+
+function _draw()
+    cls()
+    gfx.dither()
+    circlef(30, 30, 30, 2)
+    gfx.dither(0xA5A5)
+    circlef(50, 50, 30, 3)
+    gfx.dither(0x0842)
+    circlef(70, 70, 30, 2)
+end
+
+</tiny-editor>
 </div>
 <div class="sect2">
 <h3 id="_gfx_clip">gfx.clip()</h3>
@@ -528,7 +545,7 @@ map.draw(layer) -- Draw the layer on the screen.</code></pre>
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-04-17 14:16:50 UTC
+Last updated 2023-04-17 16:47:47 UTC
 </div>
 </div>
 </body>

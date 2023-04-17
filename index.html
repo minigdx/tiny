@@ -523,9 +523,26 @@ end
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">dither</span><span class="p">()</span> <span class="c1">-- Reset dithering pattern.</span>
-<span class="n">gfx</span><span class="p">.</span><span class="n">dither</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span> <span class="c1">-- Apply dithering pattern. Only value &gt; 0 are accepted for now.</span></code></pre>
+<span class="n">gfx</span><span class="p">.</span><span class="n">dither</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span> <span class="c1">-- Apply dithering pattern.</span>
+            <span class="err">|</span><span class="n">The</span> <span class="n">pattern</span> <span class="n">is</span> <span class="n">using</span> <span class="n">the</span> <span class="n">bits</span> <span class="n">value</span> <span class="n">of</span> <span class="n">a</span> <span class="mi">2</span> <span class="n">octet</span> <span class="n">value</span><span class="p">.</span>
+            <span class="err">|</span><span class="n">The</span> <span class="n">first</span> <span class="n">bits</span> <span class="n">is</span> <span class="n">the</span> <span class="n">one</span> <span class="n">on</span> <span class="n">the</span> <span class="n">far</span> <span class="n">left</span> <span class="ow">and</span> <span class="n">represent</span>
+            <span class="err">|</span><span class="n">the</span> <span class="n">pixel</span> <span class="n">of</span> <span class="n">the</span> <span class="n">top</span> <span class="n">left</span> <span class="n">of</span> <span class="n">a</span> <span class="mi">4</span><span class="n">x4</span> <span class="n">matrix</span><span class="p">.</span>
+            <span class="err">|</span><span class="n">The</span> <span class="n">last</span> <span class="n">bit</span> <span class="n">is</span> <span class="n">the</span> <span class="n">pixel</span> <span class="n">from</span> <span class="n">the</span> <span class="n">bottom</span> <span class="n">right</span> <span class="n">of</span> <span class="n">this</span> <span class="n">matrix</span><span class="p">.</span></code></pre>
 </div>
 </div>
+<tiny-editor>
+
+function _draw()
+    cls()
+    gfx.dither()
+    circlef(30, 30, 30, 2)
+    gfx.dither(0xA5A5)
+    circlef(50, 50, 30, 3)
+    gfx.dither(0x0842)
+    circlef(70, 70, 30, 2)
+end
+
+</tiny-editor>
 </div>
 <div class="sect2">
 <h3 id="_gfx_clip">gfx.clip()</h3>
@@ -576,7 +593,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-04-17 14:14:03 UTC
+Last updated 2023-04-17 16:44:41 UTC
 </div>
 </div>
 <style>
