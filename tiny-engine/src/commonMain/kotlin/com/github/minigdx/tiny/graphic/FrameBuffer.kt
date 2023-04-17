@@ -79,7 +79,7 @@ class FrameBuffer(
         height: Pixel = this.height,
         reverseX: Boolean = false,
         reverseY: Boolean = false,
-        blender: (Array<Int>, Pixel, Pixel) -> Array<Int>? = this.blender::mix
+        blender: (Array<Int>, Pixel, Pixel) -> Array<Int> = { colors, _, _ -> colors }
     ) {
 
         val clippedX = max(dstX, clipper.left)
@@ -96,9 +96,8 @@ class FrameBuffer(
             sourceY + clippedY - dstY,
             clippedWidth,
             clippedHeight,
-            reverseX, reverseY,
-            blender
-        )
+            reverseX, reverseY
+        ) { c, x, y -> this.blender.mix(blender(c, x, y), x, y) }
     }
 
     /**

@@ -198,7 +198,7 @@ class StdLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
                         4, 4,
                     ) { pixel: Array<Int>, _, _ ->
                         if (pixel[0] == 0) {
-                            null
+                            pixel
                         } else {
                             pixel[0] = color
                             pixel

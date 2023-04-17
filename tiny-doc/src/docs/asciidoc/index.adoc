@@ -3,6 +3,7 @@
 :toclevels: 5
 :icons: font
 :book:
+:source-highlighter: rouge
 
 = 🧸 Tiny
 

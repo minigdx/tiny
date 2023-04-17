@@ -70,9 +70,16 @@ class AsciidocSection(val title: String?) {
     }
 
     fun example(lua: String?) {
-        if (lua != null) {
-            paragraphs.add("```\n$lua\n```")
-        }
+        if (lua == null) return
+        paragraph(
+            """
+                >++++
+                ><tiny-editor>
+                >$lua
+                ></tiny-editor>
+                >++++
+               """.trimMargin(">")
+        )
     }
 
     fun generate(): String {

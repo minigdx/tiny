@@ -22,7 +22,10 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         return func
     }
 
-    @TinyFunction("Change a color from the palette to another color.")
+    @TinyFunction(
+        "Change a color from the palette to another color.",
+        example = GFX_PAL_EXAMPLE
+    )
     inner class pal : LibFunction() {
 
         @TinyCall("Reset all previous color changes.")

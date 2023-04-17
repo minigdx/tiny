@@ -25,18 +25,13 @@ external val Prism: PrismClass
 external class PrismClass
 
 fun main() {
-
-    val code = """
-        function _draw()
-           circlef(rnd(256), rnd(256), 20, rnd(12))
-        end
-        
-    """
-
     Prism
     val elts = document.getElementsByTagName("tiny-editor")
 
-    val game = elts.get(0)
+    val game = elts[0]
+    val code = game?.textContent ?: ""
+    // Remove the text content
+    game?.textContent = ""
 
     val editor = document.createElement("code-input").apply {
         setAttribute("class", "line-numbers")

@@ -12,7 +12,7 @@ dependencies {
     this.commonTestImplementation(kotlin("test"))
 
     jsMainImplementation(project(":tiny-engine"))
-    jsMainImplementation(npm("prismjs", "1.23.0 "))
+    jsMainImplementation(npm("prismjs", "1.23.0"))
 }
 
 // FIXME: depends on the _boot.lua, ... from :tiny-engine instead of having a copy here.

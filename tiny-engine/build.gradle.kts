@@ -44,6 +44,8 @@ dependencies {
 
     this.jvmMainImplementation("com.squareup:gifencoder:0.10.1")
 
+    jsMainImplementation(npm("prismjs", "1.23.0"))
+
     add("kspJvm", project(":tiny-doc-generator")) {
         because("KSP will generate the asciidoctor documentation of all LUA libs from Tiny.")
     }
