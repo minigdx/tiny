@@ -65,3 +65,14 @@ configurations.create("tinyWebEngine") {
     }
     outgoing.artifact(tasks.getByName("tinyEngineJsZip"))
 }
+
+configurations.create("tinyApiAsciidoctor") {
+    isCanBeResolved = false
+    isCanBeConsumed = true
+}
+
+artifacts {
+    add("tinyApiAsciidoctor", project.buildDir.resolve("generated/ksp/jvm/jvmMain/resources/tiny-api.adoc")) {
+        builtBy("kspKotlinJvm")
+    }
+}

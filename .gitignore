@@ -40,3 +40,4 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+/tiny-doc/src/docs/asciidoc/dependencies/

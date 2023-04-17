@@ -240,7 +240,7 @@ class KspProcessor(
         )
 
         val result = asciidoc {
-            title = "\uD83E\uDDF8 Tiny API"
+            title = "Tiny API"
             libs.forEach { lib ->
 
                 lib.functions.forEach { func ->
