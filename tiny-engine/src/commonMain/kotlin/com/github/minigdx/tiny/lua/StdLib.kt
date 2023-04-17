@@ -510,7 +510,7 @@ class StdLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
                 table[index]
             } else {
 
-                valueOf(Random.nextInt(arg.checkint()))
+                valueOf(Random.nextInt(abs(arg.checkint())))
             }
         }
 

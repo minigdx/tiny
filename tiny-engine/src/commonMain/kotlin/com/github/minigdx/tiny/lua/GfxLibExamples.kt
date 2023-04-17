@@ -17,9 +17,26 @@ function _draw()
     cls()
     gfx.dither()
     circlef(30, 30, 30, 2)
-    gfx.dither(0xA5A5)
+    gfx.dither(0xA5A5) -- set a dithering pattern
     circlef(50, 50, 30, 3)
-    gfx.dither(0x0842)
+    gfx.dither(0x0842) -- set another dithering pattern
     circlef(70, 70, 30, 2)
+end
+"""
+
+//language=Lua
+const val GFX_CLIP_EXAMPLE = """
+function _draw()
+  cls()
+  -- set a clip area to crop circles
+  gfx.clip(20, 20, 80, 80)
+  circlef(20, 20, 20, 2)
+  circlef(100, 20, 20, 2)
+
+  -- reset the clip area
+  gfx.clip()
+  circlef(20, 20, 10, 3)
+  circlef(100, 20, 10, 3)
+
 end
 """

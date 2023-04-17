@@ -63,7 +63,10 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         }
     }
 
-    @TinyFunction("Clip the draw surface (ie: limit the drawing area).")
+    @TinyFunction(
+        "Clip the draw surface (ie: limit the drawing area).",
+        example = GFX_CLIP_EXAMPLE
+    )
     inner class clip : LibFunction() {
         @TinyCall("Reset the clip and draw on the fullscreen.")
         override fun call(): LuaValue {
