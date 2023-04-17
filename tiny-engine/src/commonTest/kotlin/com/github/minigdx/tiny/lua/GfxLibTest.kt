@@ -30,6 +30,40 @@ class GfxLibTest {
     }
 
     @Test
+    fun it_sets_the_dither() {
+        val dither = GfxLib(mockResources).dither()
+
+        dither.call(valueOf(0xA5A5))
+
+        val a = mockResources.frameBuffer.blender.mix(arrayOf(1), 0, 0)?.get(0) ?: 0
+        val b = mockResources.frameBuffer.blender.mix(arrayOf(1), 1, 0)?.get(0) ?: 0
+        val c = mockResources.frameBuffer.blender.mix(arrayOf(1), 0, 1)?.get(0) ?: 0
+        val d = mockResources.frameBuffer.blender.mix(arrayOf(1), 1, 1)?.get(0) ?: 0
+
+        assertEquals(1, a)
+        assertEquals(0, b)
+        assertEquals(0, c)
+        assertEquals(1, d)
+    }
+
+    @Test
+    fun it_sets_the_dither_pattern_no_effect() {
+        val dither = GfxLib(mockResources).dither()
+
+        dither.call(valueOf(0xFFFF))
+
+        val a = mockResources.frameBuffer.blender.mix(arrayOf(1), 0, 0)?.get(0) ?: 0
+        val b = mockResources.frameBuffer.blender.mix(arrayOf(1), 1, 0)?.get(0) ?: 0
+        val c = mockResources.frameBuffer.blender.mix(arrayOf(1), 0, 1)?.get(0) ?: 0
+        val d = mockResources.frameBuffer.blender.mix(arrayOf(1), 1, 1)?.get(0) ?: 0
+
+        assertEquals(1, a)
+        assertEquals(1, b)
+        assertEquals(1, c)
+        assertEquals(1, d)
+    }
+
+    @Test
     fun it_reset_the_clip() {
         val clip = GfxLib(mockResources).clip()
         clip.call()

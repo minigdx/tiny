@@ -10,10 +10,10 @@ class Blender(private val gamePalette: ColorPalette) {
 
     private var switch: Array<ColorIndex> = Array(gamePalette.size) { index -> index }
 
-    private var dithering: Boolean = false
+    private var dithering: Int = 0xFFFF
 
-    fun dither(patternIndex: Int) {
-        dithering = patternIndex > 0
+    fun dither(pattern: Int) {
+        dithering = pattern and 0xFFFF
     }
 
     fun pal() {
@@ -25,12 +25,18 @@ class Blender(private val gamePalette: ColorPalette) {
     }
 
     fun mix(colors: Array<ColorIndex>, x: Pixel, y: Pixel): Array<ColorIndex>? {
+        fun dither(pattern: Int): Boolean {
+            val a = x % 4
+            val b = (y % 4) * 4
+
+            return (pattern shr (15 - (a + b))) and 0x01 == 0x01
+        }
+
         val color = gamePalette.check(colors[0])
         colors[0] = switch[gamePalette.check(color)]
         // Return null if transparent
-        if (colors[0] == 0x00) return null
-        // Return null if dithering enable every 2 pixels
-        return if (dithering && (x + y) and 0x01 == 0x00) {
+        if (gamePalette.isTransparent(colors[0])) return null
+        return if (!dither(dithering)) {
             null
         } else {
             colors
@@ -53,15 +59,18 @@ class FrameBuffer(
 
     internal val blender = Blender(gamePalette)
 
+    private var tmp = Array<Int>(1) { 0 }
+
     fun pixel(x: Pixel, y: Pixel): ColorIndex {
         return colorIndexBuffer.getOne(x, y)
     }
 
     fun pixel(x: Pixel, y: Pixel, colorIndex: ColorIndex) {
-        val index = gamePalette.check(colorIndex)
-        if (gamePalette.isTransparent(index)) return
         if (!clipper.isIn(x, y)) return
-        colorIndexBuffer.set(x, y, index)
+
+        tmp[0] = gamePalette.check(colorIndex)
+        val index = blender.mix(tmp, x, y) ?: return
+        colorIndexBuffer.set(x, y, index[0])
     }
 
     fun clear(clearIndx: Int) {

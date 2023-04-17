@@ -41,15 +41,22 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         }
     }
 
-    @TinyFunction("Apply a dithering pattern on every new draw call.")
+    @TinyFunction(
+        "Apply a dithering pattern on every new draw call. " +
+            "The pattern is using the bits value of a 2 octet value. " +
+            "The first bits is the one on the far left and represent " +
+            "the pixel of the top left of a 4x4 matrix. " +
+            "The last bit is the pixel from the bottom right of this matrix.",
+        example = GFX_DITHER_EXAMPLE
+    )
     inner class dither : LibFunction() {
         @TinyCall("Reset dithering pattern.")
         override fun call(): LuaValue {
-            resourceAccess.frameBuffer.blender.dither(0)
+            resourceAccess.frameBuffer.blender.dither(0xFFFF)
             return NONE
         }
 
-        @TinyCall("Apply dithering pattern. Only value > 0 are accepted for now.")
+        @TinyCall("Apply dithering pattern.")
         override fun call(@TinyArg("pattern") a: LuaValue): LuaValue {
             resourceAccess.frameBuffer.blender.dither(a.checkint())
             return NONE
