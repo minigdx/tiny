@@ -470,16 +470,12 @@ end
 <div class="sect2">
 <h3 id="_gfx_dither">gfx.dither()</h3>
 <div class="paragraph">
-<p>Apply a dithering pattern on every new draw call.</p>
+<p>Apply a dithering pattern on every new draw call. The pattern is using the bits value of a 2 octet value. The first bits is the one on the far left and represent the pixel of the top left of a 4x4 matrix. The last bit is the pixel from the bottom right of this matrix.</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-lua" data-lang="lua">gfx.dither() -- Reset dithering pattern.
-gfx.dither(pattern) -- Apply dithering pattern.
-            |The pattern is using the bits value of a 2 octet value.
-            |The first bits is the one on the far left and represent
-            |the pixel of the top left of a 4x4 matrix.
-            |The last bit is the pixel from the bottom right of this matrix.</code></pre>
+gfx.dither(pattern) -- Apply dithering pattern.</code></pre>
 </div>
 </div>
 <tiny-editor>
@@ -545,7 +541,7 @@ map.draw(layer) -- Draw the layer on the screen.</code></pre>
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-04-17 16:47:47 UTC
+Last updated 2023-04-17 17:10:31 UTC
 </div>
 </div>
 </body>
