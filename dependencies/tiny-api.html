@@ -484,9 +484,9 @@ function _draw()
     cls()
     gfx.dither()
     circlef(30, 30, 30, 2)
-    gfx.dither(0xA5A5)
+    gfx.dither(0xA5A5) -- set a dithering pattern
     circlef(50, 50, 30, 3)
-    gfx.dither(0x0842)
+    gfx.dither(0x0842) -- set another dithering pattern
     circlef(70, 70, 30, 2)
 end
 
@@ -503,6 +503,23 @@ end
 gfx.clip(x, y, width, height) -- Clip and limit the drawing area.</code></pre>
 </div>
 </div>
+<tiny-editor>
+
+function _draw()
+  cls()
+  -- set a clip area to crop circles
+  gfx.clip(20, 20, 80, 80)
+  circlef(20, 20, 20, 2)
+  circlef(100, 20, 20, 2)
+
+  -- reset the clip area
+  gfx.clip()
+  circlef(20, 20, 10, 3)
+  circlef(100, 20, 10, 3)
+
+end
+
+</tiny-editor>
 </div>
 <div class="sect2">
 <h3 id="_map_flag">map.flag()</h3>
@@ -541,7 +558,7 @@ map.draw(layer) -- Draw the layer on the screen.</code></pre>
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-04-17 17:45:04 UTC
+Last updated 2023-04-17 21:17:44 UTC
 </div>
 </div>
 </body>
