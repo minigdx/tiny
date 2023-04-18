@@ -23,6 +23,7 @@ configurations.create("tinyWebEditorEngine") {
 }
 
 val tinyWebEditor = tasks.register("tinyWebEditor", Zip::class) {
+    group = "tiny"
     from(tasks.getByName("jsBrowserDistribution"))
     this.destinationDirectory.set(project.buildDir.resolve("tiny-dist"))
 }

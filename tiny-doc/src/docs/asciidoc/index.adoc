@@ -16,4 +16,5 @@ With "Tiny," you'll be able to get started right away and see your progress in r
 _Let's get started and unleash your creativity!_
 
 
+include::tiny-cli.adoc[]
 include::dependencies/tiny-api.adoc[]

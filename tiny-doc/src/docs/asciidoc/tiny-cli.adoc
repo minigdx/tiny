@@ -1,0 +1,26 @@
+== Tiny CLI
+
+Introducing the Tiny CLI, a powerful command-line interface that allows you to easily create, run, develop, and export games using the Tiny 2D game engine. With the Tiny CLI, you can quickly and easily create a new game project, add assets, and start developing your game in no time.
+
+To get started, simply install the Tiny CLI on your system and create a new project using the `tiny create` command. This will generate a new project directory with all the necessary files and folder structure to start building your game. You can then add assets to your game using the `tiny add` command, which allows you to import images, audio files, and other resources into your project.
+
+The Tiny CLI also includes a powerful development server that allows you to preview your game in real-time as you develop it. Simply run the tiny command and start to update your game.
+
+When you're ready to share your game with the world, the Tiny CLI makes it easy to export your game for web browsers. You can use the `tiny export` command to generate a distributable version of your game that can be published on the web. You can also try the `export` result by using the command `tiny serve`.
+
+Whether you're a seasoned game developer or just getting started, the Tiny CLI is a powerful tool that can help you create, run, develop, and export amazing 2D games with the Tiny engine. With its intuitive command-line interface and powerful features, the Tiny CLI is the ultimate tool for building your next great game.
+
+=== tiny create
+// TODO: Create a game
+
+=== tiny
+// TODO: Run the game
+
+=== tiny add
+// TODO: Add a resource into _tiny.json
+
+=== tiny export
+// TODO: Export the game as zip
+
+=== tiny serve
+// TODO: run the exported game
