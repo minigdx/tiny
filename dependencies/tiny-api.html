@@ -572,9 +572,17 @@ juice.pow2(start, end, progress) -- Interpolate the value given a start and an e
 </div>
 <tiny-editor>
 
+function _init()
+  t = 0
+end
+
+function _update()
+  t = t + 1/60
+end
+
 function _draw()
   cls()
-  progress = abs(cos(dt))
+  progress = abs(cos(t))
 
   print("pow", 0, 0)
   circlef(juice.pow2(20, 236, progress), 10, 10, 2)
@@ -644,7 +652,7 @@ map.draw(layer) -- Draw the layer on the screen.</code></pre>
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-04-18 08:40:14 UTC
+Last updated 2023-04-18 09:00:41 UTC
 </div>
 </div>
 </body>
