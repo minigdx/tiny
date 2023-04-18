@@ -190,8 +190,11 @@ class GameEngine(
                     }
                 }
                 numberOfResources--
+                logger.debug("GAME_ENGINE") { "Remaining resources to load: $numberOfResources." }
                 if (numberOfResources == 0) {
-                    scripts[current]?.resourcesLoaded()
+                    logger.debug("GAME_ENGINE") { "All resources are loaded. Notify the boot script." }
+                    // Force to notify the boot script
+                    scripts[0]!!.resourcesLoaded()
                 }
             } else {
                 logger.info("GAME_ENGINE") { "Reload ${resource.name} ${resource.type}" }

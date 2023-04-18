@@ -10,5 +10,5 @@ class SpriteSheet(
     var pixels: PixelArray,
     var width: Pixel,
     var height: Pixel,
-    override var reload: Boolean = true,
+    override var reload: Boolean = false,
 ) : GameResource
