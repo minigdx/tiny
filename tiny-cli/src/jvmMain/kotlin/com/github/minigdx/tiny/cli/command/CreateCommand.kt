@@ -10,9 +10,9 @@ import com.github.ajalt.clikt.parameters.types.file
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.minigdx.tiny.cli.GamePalette
 import com.github.minigdx.tiny.cli.config.GameParameters
+import com.github.minigdx.tiny.cli.config.GameParameters.Companion.JSON
 import com.github.minigdx.tiny.cli.config.GameParametersV1
 import com.github.minigdx.tiny.cli.config.Size
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToStream
 import java.io.File
 import java.io.FileOutputStream
@@ -60,10 +60,6 @@ ${
 """
         )
 
-    internal val json = Json {
-        ignoreUnknownKeys = true
-    }
-
     override fun run() {
         echo("Game Name: $gameName")
         echo("Game Resolution: $gameResolution")
@@ -83,7 +79,7 @@ ${
 
         val configurationFile = gameDirectory.resolve("_tiny.json")
         FileOutputStream(configurationFile).use {
-            json.encodeToStream(configuration, it)
+            JSON.encodeToStream(configuration, it)
         }
 
         echo("Game created into: ${gameDirectory.absolutePath}")

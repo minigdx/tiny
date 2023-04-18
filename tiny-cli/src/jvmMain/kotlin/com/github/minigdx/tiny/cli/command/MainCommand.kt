@@ -7,12 +7,12 @@ import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.default
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.minigdx.tiny.cli.config.GameParameters
+import com.github.minigdx.tiny.cli.config.GameParameters.Companion.JSON
 import com.github.minigdx.tiny.engine.GameEngine
 import com.github.minigdx.tiny.file.CommonVirtualFileSystem
 import com.github.minigdx.tiny.log.StdOutLogger
 import com.github.minigdx.tiny.platform.glfw.GlfwPlatform
 import com.github.minigdx.tiny.render.LwjglGLRender
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import java.io.File
 import java.io.FileInputStream
@@ -24,11 +24,7 @@ class MainCommand : CliktCommand(invokeWithoutSubcommand = true) {
         .default(File("."))
 
     init {
-        subcommands(CreateCommand(), ExportCommand())
-    }
-
-    internal val json = Json {
-        ignoreUnknownKeys = true
+        subcommands(CreateCommand(), AddCommand(), ExportCommand())
     }
 
     override fun run() {
@@ -41,7 +37,7 @@ class MainCommand : CliktCommand(invokeWithoutSubcommand = true) {
                     echo("No _tiny.json")
                     throw Abort()
                 }
-                val gameParameters = json.decodeFromStream<GameParameters>(FileInputStream(configFile))
+                val gameParameters = JSON.decodeFromStream<GameParameters>(FileInputStream(configFile))
 
                 val logger = StdOutLogger("tiny-cli")
                 val vfs = CommonVirtualFileSystem()

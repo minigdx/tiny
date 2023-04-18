@@ -3,12 +3,39 @@ package com.github.minigdx.tiny.cli.config
 import com.github.minigdx.tiny.engine.GameOptions
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonClassDiscriminator
+import kotlinx.serialization.json.decodeFromStream
+import kotlinx.serialization.json.encodeToStream
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 
 @Serializable
 @JsonClassDiscriminator("version")
 sealed class GameParameters() {
     abstract fun toGameOptions(): GameOptions
+
+    fun write(output: File) {
+        FileOutputStream(output).use {
+            JSON.encodeToStream(this, it)
+        }
+    }
+
+    abstract fun addLevel(level: String): GameParameters
+    abstract fun addSpritesheet(sprite: String): GameParameters
+
+    abstract fun addScript(script: String): GameParameters
+
+    companion object {
+        val JSON = Json {
+            ignoreUnknownKeys = true
+        }
+
+        fun read(file: File): GameParameters {
+            return JSON.decodeFromStream<GameParameters>(FileInputStream(file))
+        }
+    }
 }
 
 @Serializable
@@ -16,7 +43,7 @@ data class Size(val width: Int, val height: Int)
 
 @SerialName("V1")
 @Serializable
-class GameParametersV1(
+data class GameParametersV1(
     val name: String,
     val resolution: Size,
     val sprites: Size,
@@ -49,5 +76,17 @@ class GameParametersV1(
             gameLevels = levels,
             zoom = zoom,
         )
+    }
+
+    override fun addLevel(level: String): GameParameters {
+        return copy(levels = levels + level)
+    }
+
+    override fun addSpritesheet(sprite: String): GameParameters {
+        return copy(spritesheets = spritesheets + sprite)
+    }
+
+    override fun addScript(script: String): GameParameters {
+        return copy(scripts = scripts + script)
     }
 }

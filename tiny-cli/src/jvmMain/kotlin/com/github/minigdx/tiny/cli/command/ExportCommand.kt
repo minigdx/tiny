@@ -5,8 +5,8 @@ import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.default
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.minigdx.tiny.cli.config.GameParameters
+import com.github.minigdx.tiny.cli.config.GameParameters.Companion.JSON
 import com.github.minigdx.tiny.cli.config.GameParametersV1
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import java.io.File
 import java.io.FileInputStream
@@ -20,15 +20,11 @@ class ExportCommand : CliktCommand("export") {
         .file(mustExist = true, canBeDir = true, canBeFile = false)
         .default(File("."))
 
-    internal val json = Json {
-        ignoreUnknownKeys = true
-    }
-
     override fun run() {
         echo("Export ${gameDirectory.absolutePath}")
 
         val configFile = gameDirectory.resolve("_tiny.json")
-        val gameParameters = json.decodeFromStream<GameParameters>(FileInputStream(configFile))
+        val gameParameters = JSON.decodeFromStream<GameParameters>(FileInputStream(configFile))
 
         val exportedGame = ZipOutputStream(FileOutputStream("export.zip"))
 
