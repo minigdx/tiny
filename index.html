@@ -463,6 +463,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_gfx_pal">gfx.pal()</a></li>
 <li><a href="#_gfx_dither">gfx.dither()</a></li>
 <li><a href="#_gfx_clip">gfx.clip()</a></li>
+<li><a href="#_juice_pow2">juice.pow2()</a></li>
 <li><a href="#_map_flag">map.flag()</a></li>
 <li><a href="#_map_entity">map.entity()</a></li>
 <li><a href="#_map_draw">map.draw()</a></li>
@@ -570,6 +571,92 @@ end
 </tiny-editor>
 </div>
 <div class="sect2">
+<h3 id="_juice_pow2">juice.pow2()</h3>
+<div class="paragraph">
+<p>Interpolation to juice your game.
+All interpolations available:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>pow2, pow3, pow4, pow5,</p>
+</li>
+<li>
+<p>powIn2, powIn3, powIn4, powIn5,</p>
+</li>
+<li>
+<p>powOut2, powOut3, powOut4, powOut5,</p>
+</li>
+<li>
+<p>sine, sineIn, sineOut,</p>
+</li>
+<li>
+<p>circle, circleIn, circleOut,</p>
+</li>
+<li>
+<p>elastic, elasticIn, elasticOut,</p>
+</li>
+<li>
+<p>swing, swingIn, swingOut,</p>
+</li>
+<li>
+<p>bounce, bounceIn, bounceOut,</p>
+</li>
+<li>
+<p>exp10, expIn10, expOut10,</p>
+</li>
+<li>
+<p>exp5, expIn5, expOut5,</p>
+</li>
+<li>
+<p>linear</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">juice</span><span class="p">.</span><span class="n">pow2</span><span class="p">(</span><span class="n">progress</span><span class="p">)</span> <span class="c1">-- Give a percentage (progress) of the interpolation</span>
+<span class="n">juice</span><span class="p">.</span><span class="n">pow2</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="k">end</span><span class="p">,</span> <span class="n">progress</span><span class="p">)</span> <span class="c1">-- Interpolate the value given a start and an end value.</span></code></pre>
+</div>
+</div>
+<tiny-editor>
+
+function _draw()
+  cls()
+  progress = abs(cos(dt))
+
+  print("pow", 0, 0)
+  circlef(juice.pow2(20, 236, progress), 10, 10, 2)
+  circlef(juice.pow3(20, 236, progress), 20, 10, 3)
+  circlef(juice.pow4(20, 236, progress), 30, 10, 4)
+
+
+  print("bounce", 0, 50)
+  circlef(juice.bounce(20, 236, progress), 60, 10, 5)
+
+  print("exp", 0, 80)
+  circlef(juice.exp10(20, 236, progress), 90, 10, 6)
+
+
+  print("swing", 0, 110)
+  circlef(juice.swing(20, 236, progress), 120, 10, 7)
+
+  print("sine", 0, 140)
+  circlef(juice.sine(20, 236, progress), 150, 10, 8)
+
+  print("circle", 0, 170)
+  circlef(juice.circle(20, 236, progress), 180, 10, 9)
+
+  print("elastic", 0, 200)
+  circlef(juice.elastic(20, 236, progress), 210, 10, 10)
+
+  print("linear", 0, 230)
+  circlef(juice.linear(20, 236, progress), 240, 10, 11)
+end
+
+</tiny-editor>
+</div>
+<div class="sect2">
 <h3 id="_map_flag">map.flag()</h3>
 <div class="paragraph">
 <p>Get the flag from a tile.</p>
@@ -606,7 +693,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-04-17 21:14:48 UTC
+Last updated 2023-04-18 08:36:54 UTC
 </div>
 </div>
 <style>
