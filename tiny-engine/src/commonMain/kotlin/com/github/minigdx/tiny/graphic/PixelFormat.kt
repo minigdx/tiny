@@ -1,4 +1,4 @@
-package com.github.minigdx.tiny.util
+package com.github.minigdx.tiny.graphic
 
 object PixelFormat {
     // Color assigned using R (Red) G (Green) B (Blue) component

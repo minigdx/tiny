@@ -1,9 +1,8 @@
 package com.github.minigdx.tiny.graphic
 
 import com.github.minigdx.tiny.Pixel
-import com.github.minigdx.tiny.util.PixelFormat
-import com.github.minigdx.tiny.util.PixelFormat.INDEX
-import com.github.minigdx.tiny.util.PixelFormat.RGBA
+import com.github.minigdx.tiny.graphic.PixelFormat.INDEX
+import com.github.minigdx.tiny.graphic.PixelFormat.RGBA
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

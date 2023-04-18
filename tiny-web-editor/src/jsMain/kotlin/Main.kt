@@ -17,7 +17,6 @@ import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineDispatcher
 import org.w3c.dom.HTMLCanvasElement
-import org.w3c.dom.get
 
 @JsModule("prismjs")
 @JsNonModule
@@ -63,7 +62,25 @@ fun main() {
         val gameOptions = GameOptions(
             width = 256,
             height = 256,
-            palette = listOf("#E0F8D0", "#88C070", "#346856", "#081820"),
+            // https://lospec.com/palette-list/rgr-proto16
+            palette = listOf(
+                "#FFF9B3",
+                "#B9C5CC",
+                "#4774B3",
+                "#144B66",
+                "#8FB347",
+                "#2E994E",
+                "#F29066",
+                "#E65050",
+                "#707D7C",
+                "#293C40",
+                "#170B1A",
+                "#0A010D",
+                "#570932",
+                "#871E2E",
+                "#FFBF40",
+                "#CC1424"
+            ),
             gameScripts = listOf("#editor-$index"),
             spriteSheets = emptyList(),
             gameLevels = emptyList(),
@@ -88,7 +105,8 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
     override val gameOptions: GameOptions = delegate.gameOptions
     override fun initWindowManager(): WindowManager = delegate.initWindowManager()
 
-    override fun initRenderManager(windowManager: WindowManager): RenderContext = delegate.initRenderManager(windowManager)
+    override fun initRenderManager(windowManager: WindowManager): RenderContext =
+        delegate.initRenderManager(windowManager)
 
     override fun gameLoop(gameLoop: GameLoop) = delegate.gameLoop(gameLoop)
 

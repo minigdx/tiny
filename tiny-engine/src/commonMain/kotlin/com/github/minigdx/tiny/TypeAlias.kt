@@ -13,3 +13,8 @@ typealias HexValue = Int
  * ie: #FF0000 (pure red)
  */
 typealias HexColor = String
+
+/**
+ * Value between 0.0 and 1.0
+ */
+typealias Percent = Float

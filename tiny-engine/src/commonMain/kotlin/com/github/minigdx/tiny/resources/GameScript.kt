@@ -5,6 +5,7 @@ import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.lua.CtrlLib
 import com.github.minigdx.tiny.lua.GfxLib
+import com.github.minigdx.tiny.lua.JuiceLib
 import com.github.minigdx.tiny.lua.MapLib
 import com.github.minigdx.tiny.lua.StdLib
 import com.github.minigdx.tiny.lua.StdLibListener
@@ -65,6 +66,7 @@ class GameScript(
         load(MapLib(this@GameScript.resourceAccess))
         load(GfxLib(this@GameScript.resourceAccess))
         load(CtrlLib(inputHandler))
+        load(JuiceLib())
         LoadState.install(this)
         LuaC.install(this)
     }

@@ -5,6 +5,7 @@ import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.file.VirtualFileSystem
 import com.github.minigdx.tiny.graphic.ColorPalette
 import com.github.minigdx.tiny.graphic.PixelArray
+import com.github.minigdx.tiny.graphic.PixelFormat
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.Platform
@@ -14,7 +15,6 @@ import com.github.minigdx.tiny.resources.ResourceType.ENGINE_GAMESCRIPT
 import com.github.minigdx.tiny.resources.ResourceType.GAME_GAMESCRIPT
 import com.github.minigdx.tiny.resources.ResourceType.GAME_LEVEL
 import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
-import com.github.minigdx.tiny.util.PixelFormat
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow

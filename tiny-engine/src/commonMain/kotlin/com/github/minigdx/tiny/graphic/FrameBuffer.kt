@@ -2,7 +2,6 @@ package com.github.minigdx.tiny.graphic
 
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
-import com.github.minigdx.tiny.util.PixelFormat
 import kotlin.math.max
 import kotlin.math.min
 
