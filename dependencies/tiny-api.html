@@ -444,6 +444,18 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="_tiny_api">Tiny API</h2>
 <div class="sectionbody">
 <div class="sect2">
+<h3 id="_ctrl_touch">ctrl.touch()</h3>
+<div class="paragraph">
+<p>Get coordinates of the current touch/mouse. If the mouse/touch is out-of the screen, the coordinates will be the last mouse position/touch. The function return those coordinates as a table {x, y}. A sprite can be draw directly on the mouse position by passing the sprite number.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">ctrl.touch() -- Get the mouse coordinates.
+ctrl.touch(sprN) -- Get the mouse coordinate and draw a sprite on those coordinates.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
 <h3 id="_gfx_pal">gfx.pal()</h3>
 <div class="paragraph">
 <p>Change a color from the palette to another color.</p>
@@ -652,7 +664,7 @@ map.draw(layer) -- Draw the layer on the screen.</code></pre>
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-04-18 15:19:41 UTC
+Last updated 2023-04-19 08:42:02 UTC
 </div>
 </div>
 </body>
