@@ -31,7 +31,7 @@ class WebGlPlatform(
 
     private lateinit var render: GLRender
 
-    private val jsInputHandler = JsInputHandler(canvas)
+    private val jsInputHandler = JsInputHandler(canvas, gameOptions)
 
     private var then: Double = 0.0
 

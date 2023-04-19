@@ -3,6 +3,7 @@ package com.github.minigdx.tiny.platform.glfw
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.input.Key
+import com.github.minigdx.tiny.input.MouseProject
 import com.github.minigdx.tiny.input.TouchManager
 import com.github.minigdx.tiny.input.TouchSignal
 import com.github.minigdx.tiny.input.Vector2
@@ -23,7 +24,7 @@ import org.lwjgl.glfw.GLFWCursorEnterCallback
 import org.lwjgl.glfw.GLFWKeyCallback
 import java.nio.DoubleBuffer
 
-class LwjglInput : InputHandler, InputManager {
+class LwjglInput(private val projector: MouseProject) : InputHandler, InputManager {
 
     private val touchManager = TouchManager(UNKNOWN_KEY)
 
@@ -75,15 +76,15 @@ class LwjglInput : InputHandler, InputManager {
             if (glfwGetMouseButton(window, glfwMouseButton) == GLFW_PRESS) {
                 glfwGetCursorPos(window, b1, b2)
                 if (touchManager.isTouched(touchSignal) != null) {
-                    // val gamePosition = gameContext.convert(b1[0].toFloat(), b2[0].toFloat())
-                    // gamePosition?.let { (x, y) ->
-                    touchManager.onTouchMove(touchSignal, 0f, 0f)
-                    // }
+                    val gamePosition = projector.project(b1[0].toFloat(), b2[0].toFloat())
+                    gamePosition?.let { (x, y) ->
+                        touchManager.onTouchMove(touchSignal, x, y)
+                    }
                 } else {
-                    // val gamePosition = gameContext.convert(b1[0].toFloat(), b2[0].toFloat())
-                    // gamePosition?.let { (x, y) ->
-                    touchManager.onTouchDown(touchSignal, 0f, 0f)
-                    // }
+                    val gamePosition = projector.project(b1[0].toFloat(), b2[0].toFloat())
+                    gamePosition?.let { (x, y) ->
+                        touchManager.onTouchDown(touchSignal, x, y)
+                    }
                 }
             } else if (glfwGetMouseButton(window, glfwMouseButton) == GLFW_RELEASE) {
                 touchManager.onTouchUp(touchSignal)
@@ -93,15 +94,14 @@ class LwjglInput : InputHandler, InputManager {
         // https://www.glfw.org/docs/3.3/input_guide.html#cursor_pos
         if (isMouseInsideWindow) {
             glfwGetCursorPos(window, b1, b2)
-            val gamePosition = null
-            // val gamePosition = gameContext.convert(b1[0].toFloat(), b2[0].toFloat())
+            val gamePosition = projector.project(b1[0].toFloat(), b2[0].toFloat())
             if (gamePosition == null) {
                 // the mouse is in the window but NOT in the game screen
-                //    isMouseInsideGameScreen = false
+                isMouseInsideGameScreen = false
             } else {
                 isMouseInsideGameScreen = true
-                //  mousePosition.x = gamePosition.first
-                //  mousePosition.y = gamePosition.second
+                mousePosition.x = gamePosition.x
+                mousePosition.y = gamePosition.y
             }
         } else {
             isMouseInsideGameScreen = false
@@ -139,5 +139,6 @@ class LwjglInput : InputHandler, InputManager {
         }
     }
 
-    override val currentTouch: Vector2 = Vector2(mousePosition)
+    override val currentTouch: Vector2
+        get() = mousePosition
 }

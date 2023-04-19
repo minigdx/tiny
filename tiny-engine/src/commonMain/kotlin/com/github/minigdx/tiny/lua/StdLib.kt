@@ -185,6 +185,15 @@ class StdLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
                 } else if (char.isDigit()) {
                     val index = char.lowercaseChar() - '0'
                     index to 4
+                } else if (char in '!'..'@') {
+                    val index = char.lowercaseChar() - '!'
+                    index to 8
+                } else if (char in '['..'\'') {
+                    val index = char.lowercaseChar() - '['
+                    index to 12
+                } else if (char in '{'..'~') {
+                    val index = char.lowercaseChar() - '{'
+                    index to 16
                 } else {
                     // Maybe it's an emoji: try EMOJI MAP conversion
                     EMOJI_MAP[char]

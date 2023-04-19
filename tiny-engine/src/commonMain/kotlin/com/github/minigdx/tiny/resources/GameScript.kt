@@ -56,16 +56,18 @@ class GameScript(
     class State(val args: LuaValue)
 
     private fun createLuaGlobals(): Globals = Globals().apply {
+        val stdLib = StdLib(this@GameScript.gameOptions, this@GameScript.resourceAccess, this@GameScript)
+
         load(BaseLib())
         load(PackageLib())
         load(Bit32Lib())
         load(TableLib())
         load(StringLib())
         load(CoroutineLib())
-        load(StdLib(this@GameScript.gameOptions, this@GameScript.resourceAccess, this@GameScript))
+        load(stdLib)
         load(MapLib(this@GameScript.resourceAccess))
         load(GfxLib(this@GameScript.resourceAccess))
-        load(CtrlLib(inputHandler))
+        load(CtrlLib(inputHandler, stdLib))
         load(JuiceLib())
         LoadState.install(this)
         LuaC.install(this)

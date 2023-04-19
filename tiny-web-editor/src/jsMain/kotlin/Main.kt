@@ -52,6 +52,7 @@ fun main() {
         val canvas = document.createElement("canvas").apply {
             setAttribute("width", "512")
             setAttribute("height", "512")
+            setAttribute("style", "cursor: none;") // Hide mouse cursor over canvas
         }
 
         game.appendChild(canvas)

@@ -53,7 +53,7 @@ class GlfwPlatform(
     // Keep 30 seconds at 60 frames per seconds
     private val gifBufferCache: MutableFixedSizeList<IntArray> = MutableFixedSizeList(gameOptions.record.toInt() * FPS)
 
-    private val lwjglInputHandler = LwjglInput()
+    private val lwjglInputHandler = LwjglInput(gameOptions)
 
     /**
      * Get the time in milliseconds

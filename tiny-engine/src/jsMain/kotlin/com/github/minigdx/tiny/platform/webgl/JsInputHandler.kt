@@ -3,6 +3,7 @@ package com.github.minigdx.tiny.platform.webgl
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.input.Key
+import com.github.minigdx.tiny.input.MouseProject
 import com.github.minigdx.tiny.input.TouchManager
 import com.github.minigdx.tiny.input.TouchSignal
 import com.github.minigdx.tiny.input.TouchSignal.TOUCH1
@@ -19,7 +20,8 @@ import org.w3c.dom.get
 import kotlin.experimental.and
 
 class JsInputHandler(
-    private val canvas: HTMLCanvasElement
+    private val canvas: HTMLCanvasElement,
+    private val projector: MouseProject,
 ) : InputHandler, InputManager {
 
     init {
@@ -60,13 +62,10 @@ class JsInputHandler(
                 val x = event.clientX.toFloat() - rect.left.toFloat()
                 val y = event.clientY.toFloat() - rect.top.toFloat()
 
-                /*
-                val gamePosition = gameContext.convert(x, y)
+                val gamePosition = projector.project(x, y)
                 gamePosition?.let { (gameX, gameY) ->
                     touchManager.onTouchDown(touch, gameX, gameY)
                 }
-
-                 */
             }
         }
     }
@@ -89,13 +88,10 @@ class JsInputHandler(
                 val x = event.clientX.toFloat() - rect.left.toFloat()
                 val y = event.clientY.toFloat() - rect.top.toFloat()
 
-                /*
-                val gamePosition = gameContext.convert(x, y)
+                val gamePosition = projector.project(x, y)
                 gamePosition?.let { (gameX, gameY) ->
                     touchManager.onTouchMove(touch, gameX, gameY)
                 }
-
-                 */
             }
         }
 
@@ -104,8 +100,7 @@ class JsInputHandler(
             val x = event.clientX.toFloat() - rect.left.toFloat()
             val y = event.clientY.toFloat() - rect.top.toFloat()
 
-            /*
-            val gamePosition = gameContext.convert(x, y)
+            val gamePosition = projector.project(x, y)
             if (gamePosition == null) {
                 // the mouse is in the canvas but NOT in the game screen.
                 isMouseInsideCanvas = false
@@ -114,8 +109,6 @@ class JsInputHandler(
                 mousePosition.x = gameX
                 mousePosition.y = gameY
             }
-
-             */
         }
     }
 
@@ -139,13 +132,10 @@ class JsInputHandler(
             val x = jsTouch.clientX.toFloat() - rect.left.toFloat()
             val y = jsTouch.clientY.toFloat() - rect.top.toFloat()
 
-            /*
-
-            val gamePosition = gameContext.convert(x, y)
+            val gamePosition = projector.project(x, y)
             gamePosition?.let { (gameX, gameY) ->
                 touchManager.onTouchDown(touch, gameX, gameY)
             }
-             */
         }
     }
 
@@ -167,13 +157,10 @@ class JsInputHandler(
             val rect = canvas.getBoundingClientRect()
             val x = jsTouch.clientX.toFloat() - rect.left.toFloat()
             val y = jsTouch.clientY.toFloat() - rect.top.toFloat()
-            /*
-            val gamePosition = gameContext.convert(x, y)
+            val gamePosition = projector.project(x, y)
             gamePosition?.let { (gameX, gameY) ->
                 touchManager.onTouchMove(touch, gameX, gameY)
             }
-
-             */
         }
     }
 
@@ -225,7 +212,8 @@ class JsInputHandler(
         }
     }
 
-    override val currentTouch: Vector2 = Vector2(mousePosition)
+    override val currentTouch: Vector2
+        get() = mousePosition
 
     override fun record() = Unit
 
