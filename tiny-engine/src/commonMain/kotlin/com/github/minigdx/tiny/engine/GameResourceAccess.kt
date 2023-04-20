@@ -2,6 +2,7 @@ package com.github.minigdx.tiny.engine
 
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.resources.GameLevel
+import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.resources.SpriteSheet
 
 /**
@@ -28,4 +29,6 @@ interface GameResourceAccess {
      * Access a level by it's index.
      */
     fun level(index: Int): GameLevel?
+
+    fun sound(index: Int): Sound?
 }

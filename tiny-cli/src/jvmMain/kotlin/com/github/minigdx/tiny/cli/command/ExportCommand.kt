@@ -53,6 +53,11 @@ class ExportCommand : CliktCommand("export") {
                     exportedGame.write(gameDirectory.resolve(name).readBytes())
                     exportedGame.closeEntry()
                 }
+                gameParameters.sounds.forEach { name ->
+                    exportedGame.putNextEntry(ZipEntry(name))
+                    exportedGame.write(gameDirectory.resolve(name).readBytes())
+                    exportedGame.closeEntry()
+                }
                 gameParameters.levels.forEach { name ->
                     val baseDirectory = gameDirectory.resolve(name)
                     val files = baseDirectory.listFiles() ?: emptyArray()
@@ -78,6 +83,7 @@ class ExportCommand : CliktCommand("export") {
                 template = replaceList(template, gameParameters.scripts, "{GAME_SCRIPT}", "GAME_SCRIPT")
                 template = replaceList(template, gameParameters.spritesheets, "{GAME_SPRITESHEET}", "GAME_SPRITESHEET")
                 template = replaceList(template, gameParameters.levels, "{GAME_LEVEL}", "GAME_LEVEL")
+                template = replaceList(template, gameParameters.sounds, "{GAME_SOUND}", "GAME_SOUND")
 
                 template = template.replace("{GAME_COLORS}", gameParameters.colors.joinToString(","))
 

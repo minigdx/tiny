@@ -8,6 +8,7 @@ import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.graphic.PixelFormat
 import com.github.minigdx.tiny.resources.GameLevel
 import com.github.minigdx.tiny.resources.ResourceType
+import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.resources.SpriteSheet
 import org.luaj.vm2.LuaValue.Companion.valueOf
 import org.luaj.vm2.LuaValue.Companion.varargsOf
@@ -26,6 +27,7 @@ class StdLibTest {
         override val frameBuffer: FrameBuffer = FrameBuffer(10, 10, ColorPalette(colors))
         override fun spritesheet(index: Int): SpriteSheet? = null
         override fun level(index: Int): GameLevel? = null
+        override fun sound(index: Int): Sound? = null
     }
 
     private val gameOptions = GameOptions(

@@ -56,6 +56,16 @@ class ResourceFactory(
 
     private val json = Json { ignoreUnknownKeys = true }
 
+    fun soundEffect(index: Int, name: String): Flow<Sound> {
+        return vfs.watch(platform.createSoundStream(name))
+            .map { soundData -> Sound(index, name, soundData) }
+            .onEach {
+                logger.debug("RESOURCE_FACTORY") {
+                    "Loading sound '$name'"
+                }
+            }
+    }
+
     fun gameLevel(index: Int, name: String): Flow<GameLevel> {
         return flowOf("$name/data.json")
             .map { platform.createByteArrayStream(it) }
@@ -83,7 +93,6 @@ class ResourceFactory(
                     }.asFlow()
                     .flatMapMerge { layer ->
                         vfs.watch(platform.createImageStream(layer.name)).map { imageData ->
-                            // val imageData = platform.extractRGBA(data)
                             convertToColorIndex(imageData.data, level.width, level.height)
                         }.map { texture ->
                             layer.apply {

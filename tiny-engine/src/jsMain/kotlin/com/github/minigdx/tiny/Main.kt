@@ -68,6 +68,10 @@ fun main() {
             level.getAttribute("name")
         }.filterNotNull()
 
+        val sounds = game.getElementsByTagName("tiny-sound").map { level ->
+            level.getAttribute("name")
+        }.filterNotNull()
+
         val spritesheets = game.getElementsByTagName("tiny-spritesheet").map { spritesheet ->
             spritesheet.getAttribute("name")
         }.filterNotNull()
@@ -85,6 +89,7 @@ fun main() {
             gameScripts = scripts,
             spriteSheets = spritesheets,
             gameLevels = levels,
+            sounds = sounds,
             zoom = gameZoom,
             gutter = 0 to 0,
             spriteSize = sprWidth to sprHeight,

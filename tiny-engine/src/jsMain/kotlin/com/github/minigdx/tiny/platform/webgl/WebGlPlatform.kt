@@ -6,6 +6,7 @@ import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.file.AjaxStream
 import com.github.minigdx.tiny.file.ImageDataStream
+import com.github.minigdx.tiny.file.SoundDataSourceStream
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.input.InputHandler
@@ -14,12 +15,13 @@ import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.ImageData
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.RenderContext
+import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.render.GLRender
+import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import org.khronos.webgl.get
 import org.w3c.dom.HTMLCanvasElement
 
 class WebGlPlatform(
@@ -73,8 +75,6 @@ class WebGlPlatform(
         render.draw(context, image, frameBuffer.width, frameBuffer.height)
     }
 
-    override fun extractRGBA(imageData: ByteArray): ImageData = TODO("TO BE REMOVED")
-
     override fun record() = Unit
 
     override fun endGameLoop() = Unit
@@ -93,5 +93,17 @@ class WebGlPlatform(
 
     override fun createImageStream(name: String): SourceStream<ImageData> {
         return ImageDataStream("$rootUrl/$name")
+    }
+
+    private lateinit var soundManager: SoundManager
+
+    override fun initSoundManager(inputHandler: InputHandler): SoundManager {
+        soundManager = PicoAudioSoundMananger()
+        soundManager.initSoundManager(inputHandler)
+        return soundManager
+    }
+
+    override fun createSoundStream(name: String): SourceStream<SoundData> {
+        return SoundDataSourceStream(name, soundManager, createByteArrayStream(name))
     }
 }

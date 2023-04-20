@@ -19,7 +19,9 @@ import com.github.minigdx.tiny.resources.ResourceType.BOOT_SPRITESHEET
 import com.github.minigdx.tiny.resources.ResourceType.ENGINE_GAMESCRIPT
 import com.github.minigdx.tiny.resources.ResourceType.GAME_GAMESCRIPT
 import com.github.minigdx.tiny.resources.ResourceType.GAME_LEVEL
+import com.github.minigdx.tiny.resources.ResourceType.GAME_SOUND
 import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
+import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.resources.SpriteSheet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
@@ -80,6 +82,7 @@ class GameEngine(
     private lateinit var scripts: Array<GameScript?>
     private lateinit var spriteSheets: Array<SpriteSheet?>
     private lateinit var levels: Array<GameLevel?>
+    private lateinit var sounds: Array<Sound?>
 
     override var bootSpritesheet: SpriteSheet? = null
         private set
@@ -108,6 +111,7 @@ class GameEngine(
 
         inputHandler = platform.initInputHandler()
         inputManager = platform.initInputManager()
+        platform.initSoundManager(inputHandler)
 
         resourceFactory = ResourceFactory(vfs, platform, logger, gameOptions.colors())
 
@@ -128,13 +132,20 @@ class GameEngine(
         }
         this.levels = Array(gameLevels.size) { null }
 
+        val sounds = gameOptions.sounds.mapIndexed { index, soundName ->
+            resourceFactory.soundEffect(index, soundName)
+        }
+        this.sounds = Array(sounds.size) { null }
+
         val resources = listOf(
             resourceFactory.bootscript("_boot.lua", inputHandler, gameOptions),
             resourceFactory.enginescript("_engine.lua", inputHandler, gameOptions),
             resourceFactory.bootSpritesheet("_boot.png")
-        ) + gameScripts + spriteSheets + gameLevels
+        ) + gameScripts + spriteSheets + gameLevels + sounds
 
         numberOfResources = resources.size
+
+        logger.debug("GAME_ENGINE") { "Number of resources to load: $numberOfResources" }
 
         resourcesScope.launch {
             resources.asFlow()
@@ -188,6 +199,10 @@ class GameEngine(
                     GAME_LEVEL -> {
                         levels[resource.index] = resource as GameLevel
                     }
+
+                    ResourceType.GAME_SOUND -> {
+                        sounds[resource.index] = resource as Sound
+                    }
                 }
                 numberOfResources--
                 logger.debug("GAME_ENGINE") { "Remaining resources to load: $numberOfResources." }
@@ -228,6 +243,9 @@ class GameEngine(
                     }
                     GAME_LEVEL -> {
                         levels[resource.index] = resource as GameLevel
+                    }
+                    GAME_SOUND -> {
+                        sounds[resource.index] = resource as Sound
                     }
                 }
             }
@@ -293,6 +311,10 @@ class GameEngine(
 
     override fun level(index: Int): GameLevel? {
         return levels[index]
+    }
+
+    override fun sound(index: Int): Sound? {
+        return sounds[index]
     }
 
     override fun draw() {

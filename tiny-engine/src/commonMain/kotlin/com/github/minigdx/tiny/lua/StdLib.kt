@@ -58,6 +58,8 @@ class StdLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
     internal inner class debug : OneArgFunction() {
         override fun call(arg: LuaValue): LuaValue {
             println("🐞 -> $arg")
+            // resourceAccess.sound(0)?.play()
+            resourceAccess.sound(0)?.play()
             return NONE
         }
     }

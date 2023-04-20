@@ -11,8 +11,10 @@ import com.github.minigdx.tiny.log.StdOutLogger
 import com.github.minigdx.tiny.platform.ImageData
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.RenderContext
+import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.webgl.WebGlPlatform
+import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineDispatcher
@@ -113,8 +115,6 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
 
     override fun draw(context: RenderContext, frameBuffer: FrameBuffer) = delegate.draw(context, frameBuffer)
 
-    override fun extractRGBA(imageData: ByteArray): ImageData = delegate.extractRGBA(imageData)
-
     override fun record() = delegate.record()
 
     override fun endGameLoop() = delegate.endGameLoop()
@@ -122,6 +122,7 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
     override fun initInputHandler(): InputHandler = delegate.initInputHandler()
 
     override fun initInputManager(): InputManager = delegate.initInputManager()
+    override fun initSoundManager(inputHandler: InputHandler): SoundManager = delegate.initSoundManager(inputHandler)
 
     override fun io(): CoroutineDispatcher = delegate.io()
 
@@ -134,4 +135,7 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
     }
 
     override fun createImageStream(name: String): SourceStream<ImageData> = delegate.createImageStream(name)
+    override fun createSoundStream(name: String): SourceStream<SoundData> {
+        TODO("Not yet implemented")
+    }
 }

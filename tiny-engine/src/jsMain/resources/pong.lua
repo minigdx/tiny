@@ -16,7 +16,7 @@ function _draw()
 
   pos = ctrl.touch()
   print(pos.x .. "x" .. pos.y, 0, 0, 5)
-  if(not action and pos.x > 126) then
+  if(ctrl.key(0)) then
     debug("test soun2rrd")
     action = true
   end

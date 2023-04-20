@@ -63,7 +63,8 @@ data class GameParametersV1(
      * Level to be loaded.
      * The first level will be the one used by default.
      */
-    val levels: List<String> = emptyList()
+    val levels: List<String> = emptyList(),
+    val sounds: List<String> = emptyList(),
 ) : GameParameters() {
     override fun toGameOptions(): GameOptions {
         return GameOptions(
@@ -75,6 +76,7 @@ data class GameParametersV1(
             spriteSheets = spritesheets,
             gameLevels = levels,
             zoom = zoom,
+            sounds = sounds,
         )
     }
 

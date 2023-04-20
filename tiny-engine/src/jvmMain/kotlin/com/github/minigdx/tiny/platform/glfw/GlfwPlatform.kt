@@ -8,18 +8,22 @@ import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.file.FileStream
 import com.github.minigdx.tiny.file.InputStreamStream
+import com.github.minigdx.tiny.file.SoundDataSourceStream
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.file.VirtualFileSystem
 import com.github.minigdx.tiny.graphic.FrameBuffer
+import com.github.minigdx.tiny.graphic.PixelFormat.RGBA
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.ImageData
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.RenderContext
+import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.render.GLRender
 import com.github.minigdx.tiny.render.Render
+import com.github.minigdx.tiny.sound.SoundManager
 import com.github.minigdx.tiny.util.MutableFixedSizeList
 import com.squareup.gifencoder.FastGifEncoder
 import com.squareup.gifencoder.ImageOptions
@@ -54,6 +58,8 @@ class GlfwPlatform(
     private val gifBufferCache: MutableFixedSizeList<IntArray> = MutableFixedSizeList(gameOptions.record.toInt() * FPS)
 
     private val lwjglInputHandler = LwjglInput(gameOptions)
+
+    private val recordScope = CoroutineScope(Dispatchers.IO)
 
     /**
      * Get the time in milliseconds
@@ -179,8 +185,6 @@ class GlfwPlatform(
 
     override fun endGameLoop() = Unit
 
-    private val recordScope = CoroutineScope(Dispatchers.IO)
-
     override fun record() {
         val origin = File("output.gif")
         logger.info("GLWF") { "Starting to generate GIF in '${origin.absolutePath}' (Wait for it...)" }
@@ -212,7 +216,7 @@ class GlfwPlatform(
         }
     }
 
-    override fun extractRGBA(imageData: ByteArray): ImageData {
+    private fun extractRGBA(imageData: ByteArray): ImageData {
         val image = ImageIO.read(ByteArrayInputStream(imageData))
         val width = image.width
         val height = image.height
@@ -261,8 +265,21 @@ class GlfwPlatform(
         }
     }
 
+    override fun createSoundStream(name: String): SourceStream<SoundData> {
+        return SoundDataSourceStream(name, soundManager, createByteArrayStream(name))
+    }
+
+    private lateinit var soundManager: SoundManager
+
+    override fun initSoundManager(inputHandler: InputHandler): SoundManager {
+        return JavaMidiSoundManager().also {
+            soundManager = it
+        }.also {
+            it.initSoundManager(inputHandler)
+        }
+    }
+
     companion object {
         private const val FPS = 60
-        private const val RGBA = 4
     }
 }

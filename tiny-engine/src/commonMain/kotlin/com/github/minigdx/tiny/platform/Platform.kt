@@ -7,9 +7,12 @@ import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
+import com.github.minigdx.tiny.sound.MidiSound
+import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.coroutines.CoroutineDispatcher
 
 class ImageData(val data: ByteArray, val width: Pixel, val height: Pixel)
+class SoundData(val name: String, val sound: MidiSound)
 
 interface Platform {
     /**
@@ -38,12 +41,6 @@ interface Platform {
     fun draw(context: RenderContext, frameBuffer: FrameBuffer)
 
     /**
-     * Take the compressed image data (ie: PNG) and return
-     * an uncompressed image data with RGBA for each pixel.
-     */
-    fun extractRGBA(imageData: ByteArray): ImageData
-
-    /**
      * Save the last 30 seconds of the game.
      */
     fun record()
@@ -61,6 +58,11 @@ interface Platform {
     fun initInputManager(): InputManager
 
     /**
+     * Initialise the sound manager.
+     */
+    fun initSoundManager(inputHandler: InputHandler): SoundManager
+
+    /**
      * Create Coroutine Dispatcher dedicated for the IO.
      */
     fun io(): CoroutineDispatcher
@@ -75,4 +77,9 @@ interface Platform {
      * Create a SourceStream from an image from uncompressed data.
      */
     fun createImageStream(name: String): SourceStream<ImageData>
+
+    /**
+     * Create a SourceStream from a midi file.
+     */
+    fun createSoundStream(name: String): SourceStream<SoundData>
 }

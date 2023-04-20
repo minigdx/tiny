@@ -7,4 +7,5 @@ enum class ResourceType {
     BOOT_SPRITESHEET,
     GAME_SPRITESHEET,
     GAME_LEVEL,
+    GAME_SOUND,
 }

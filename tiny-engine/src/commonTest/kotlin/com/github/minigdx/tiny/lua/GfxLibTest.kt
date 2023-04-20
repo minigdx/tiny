@@ -4,6 +4,7 @@ import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.graphic.ColorPalette
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.resources.GameLevel
+import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.resources.SpriteSheet
 import org.luaj.vm2.LuaValue.Companion.valueOf
 import kotlin.test.Test
@@ -16,6 +17,7 @@ class GfxLibTest {
         override val frameBuffer: FrameBuffer = FrameBuffer(10, 10, ColorPalette(listOf("#FFFFFF")))
         override fun spritesheet(index: Int): SpriteSheet? = null
         override fun level(index: Int): GameLevel? = null
+        override fun sound(index: Int): Sound? = null
     }
 
     @Test

@@ -7,6 +7,7 @@ import com.github.minigdx.tiny.lua.CtrlLib
 import com.github.minigdx.tiny.lua.GfxLib
 import com.github.minigdx.tiny.lua.JuiceLib
 import com.github.minigdx.tiny.lua.MapLib
+import com.github.minigdx.tiny.lua.SfxLib
 import com.github.minigdx.tiny.lua.StdLib
 import com.github.minigdx.tiny.lua.StdLibListener
 import org.luaj.vm2.Globals
@@ -68,6 +69,7 @@ class GameScript(
         load(MapLib(this@GameScript.resourceAccess))
         load(GfxLib(this@GameScript.resourceAccess))
         load(CtrlLib(inputHandler, stdLib))
+        load(SfxLib(this@GameScript.resourceAccess))
         load(JuiceLib())
         LoadState.install(this)
         LuaC.install(this)
