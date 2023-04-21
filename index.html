@@ -495,7 +495,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_shp_circle">shp.circle()</a></li>
 <li><a href="#_spr_sheet">spr.sheet()</a></li>
 <li><a href="#_spr_sspr">spr.sspr()</a></li>
-<li><a href="#_spr_spr">spr.spr()</a></li>
+<li><a href="#_spr_draw">spr.draw()</a></li>
 <li><a href="#_print">print()</a></li>
 <li><a href="#_abs">abs()</a></li>
 <li><a href="#_cos">cos()</a></li>
@@ -954,8 +954,8 @@ function _draw()
     print("non filled circle", 20, 65)
 
     shp.circle(80, 120, 15, 10)
-    shp.circle(80, 140, 20, 12)
-    shp.circle(80, 160, 30, 13)
+    shp.circle(80, 140, 20, 16)
+    shp.circle(80, 160, 30, 14)
     print("circle with different radius", 20, 115)
 
 end
@@ -1010,13 +1010,13 @@ end
 </div>
 </div>
 <div class="sect2">
-<h3 id="_spr_spr">spr.spr()</h3>
+<h3 id="_spr_draw">spr.draw()</h3>
 <div class="paragraph">
 <p>Draw a sprite.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">spr</span><span class="p">.</span><span class="n">spr</span><span class="p">(</span><span class="n">sprN</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- Draw a sprite.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">spr</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="n">sprN</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- Draw a sprite.</span></code></pre>
 </div>
 </div>
 </div>
@@ -1110,7 +1110,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-04-21 18:00:43 UTC
+Last updated 2023-04-21 18:09:34 UTC
 </div>
 </div>
 <style>
