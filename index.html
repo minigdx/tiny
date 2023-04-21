@@ -477,6 +477,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_map_flag">map.flag()</a></li>
 <li><a href="#_map_entity">map.entity()</a></li>
 <li><a href="#_map_draw">map.draw()</a></li>
+<li><a href="#_sfx_play">sfx.play()</a></li>
+<li><a href="#_sfx_stop">sfx.stop()</a></li>
 </ul>
 </li>
 </ul>
@@ -767,13 +769,37 @@ end
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_sfx_play">sfx.play()</h3>
+<div class="paragraph">
+<p>Play a sound.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">sfx</span><span class="p">.</span><span class="n">play</span><span class="p">()</span> <span class="c1">-- Play the sound at the index 0.</span>
+<span class="n">sfx</span><span class="p">.</span><span class="n">play</span><span class="p">(</span><span class="n">sound</span><span class="p">)</span> <span class="c1">-- Play the sound by it's index.</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_sfx_stop">sfx.stop()</h3>
+<div class="paragraph">
+<p>Stop a sound.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">sfx</span><span class="p">.</span><span class="n">stop</span><span class="p">()</span> <span class="c1">-- Stop the sound at the index 0.</span>
+<span class="n">sfx</span><span class="p">.</span><span class="n">stop</span><span class="p">(</span><span class="n">sound</span><span class="p">)</span> <span class="c1">-- Stop the sound by it's index.</span></code></pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-04-19 12:30:33 UTC
+Last updated 2023-04-21 07:54:24 UTC
 </div>
 </div>
 <style>
