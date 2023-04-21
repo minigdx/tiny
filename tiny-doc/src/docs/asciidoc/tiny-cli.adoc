@@ -23,4 +23,42 @@ Whether you're a seasoned game developer or just getting started, the Tiny CLI i
 // TODO: Export the game as zip
 
 === tiny serve
-// TODO: run the exported game
+
+The tiny serve command is used to launch a local web server that allows you to test a game that has been exported using the tiny export command. This is useful for testing and debugging a game locally before publishing it online.
+
+==== Syntax
+
+To use the tiny serve command, open a terminal or command prompt and navigate to the directory containing the exported game zip file. Then, type the following command:
+
+```bash
+tiny serve [options] game.zip
+```
+
+Where:
+
+`[options]`: Optional arguments to modify the behavior of the command.
+`game.zip`: The path to the exported game zip file.
+
+===== Options
+
+`--port [port number]`: Allows you to specify a custom port number to run the server on. The default port number is 8080.
+
+==== Example Usage
+
+To run the tiny serve command, you can use the following examples:
+
+```bash
+tiny serve myGame.zip
+```
+
+This will launch the local web server on the default port number (`8080`) and serve the game located in the `myGame.zip` file.
+
+```bash
+tiny serve MyGame.zip --port 8081
+```
+
+This will launch the local web server on port number `8081` and serve the game located in the `MyGame.zip` file.
+
+Once the server is running, you can access the game in your web browser by navigating to the URL `http://localhost:[port number]/`. For example, if you used the default port number, you would navigate to `http://localhost:8080/` in your web browser to access the game.
+
+NOTE: The tiny serve command is intended for local testing only and should not be used to serve your game online. When you are ready to publish your game, you should upload the exported game files to a web server and serve them from there.

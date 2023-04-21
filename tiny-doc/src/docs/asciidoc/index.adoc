@@ -13,8 +13,9 @@ Welcome to the documentation for "Tiny," the virtual console that offers an easy
 
 With "Tiny," you'll be able to get started right away and see your progress in real-time, thanks to its hot reloading feature. This documentation will guide you through the setup and usage of "Tiny," as well as provide you with helpful tips and tricks to make the most out of this powerful tool.
 
-_Let's get started and unleash your creativity!_
+> _Let's get started and unleash your creativity!_
 
 
 include::tiny-cli.adoc[]
+
 include::dependencies/tiny-api.adoc[]

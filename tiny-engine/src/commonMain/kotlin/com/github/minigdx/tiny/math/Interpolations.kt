@@ -9,7 +9,7 @@ import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-inline fun pow(x: Float, y: Float) = x.pow(y)
+fun pow(x: Float, y: Float) = x.pow(y)
 
 interface Interpolation {
 

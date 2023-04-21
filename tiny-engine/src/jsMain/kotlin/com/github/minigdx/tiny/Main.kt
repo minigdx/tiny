@@ -31,6 +31,11 @@ fun main() {
     var rootPath = window.location.protocol + "//" + window.location.host + window.location.pathname
     rootPath = rootPath.replace("index.html", "")
 
+    // Remove the last "/" to a avoid double slash when the engine getting resources.
+    if (rootPath.endsWith("/")) {
+        rootPath.dropLast(1)
+    }
+
     if (rootPath.startsWith("file://")) {
         tinyGameTag.forEach { game ->
             val h1 = document.createElement("h1")
@@ -96,7 +101,7 @@ fun main() {
         )
 
         val logger = StdOutLogger("game-$index")
-        logger.debug("TINY-JS") { "Boot the game using the URL $rootPath." }
+        logger.debug("TINY-JS") { "Boot the game using the URL '$rootPath'." }
         index++
 
         GameEngine(

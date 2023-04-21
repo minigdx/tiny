@@ -24,7 +24,7 @@ class MainCommand : CliktCommand(invokeWithoutSubcommand = true) {
         .default(File("."))
 
     init {
-        subcommands(CreateCommand(), AddCommand(), ExportCommand())
+        subcommands(CreateCommand(), AddCommand(), ExportCommand(), ServeCommand())
     }
 
     override fun run() {

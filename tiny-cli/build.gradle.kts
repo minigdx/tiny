@@ -27,7 +27,15 @@ dependencies {
         .because("Depends on the JVM Jar containing commons resources in the JAR.")
     jvmMainImplementation("com.danielgergely.kgl:kgl-lwjgl:0.6.1")
 
-    add("tinyEngineJsZip", project(":tiny-engine"))
+    jvmMainImplementation("io.ktor:ktor-server-core-jvm:2.3.0")
+    jvmMainImplementation("io.ktor:ktor-server-netty-jvm:2.3.0")
+    jvmMainImplementation("io.ktor:ktor-server-status-pages-jvm:2.3.0")
+    jvmMainImplementation("io.ktor:ktor-server-default-headers-jvm:2.3.0")
+
+    add("tinyEngineJsZip", project(":tiny-engine"))?.because(
+        "Embed the JS engine in the CLI " +
+            "so it can be included when the game is exported."
+    )
 }
 
 application {
