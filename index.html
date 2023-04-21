@@ -488,6 +488,21 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_map_draw">map.draw()</a></li>
 <li><a href="#_sfx_play">sfx.play()</a></li>
 <li><a href="#_sfx_stop">sfx.stop()</a></li>
+<li><a href="#_shp_rect">shp.rect()</a></li>
+<li><a href="#_shp_rectf">shp.rectf()</a></li>
+<li><a href="#_shp_circlef">shp.circlef()</a></li>
+<li><a href="#_shp_line">shp.line()</a></li>
+<li><a href="#_shp_circle">shp.circle()</a></li>
+<li><a href="#_spr_sheet">spr.sheet()</a></li>
+<li><a href="#_spr_sspr">spr.sspr()</a></li>
+<li><a href="#_spr_spr">spr.spr()</a></li>
+<li><a href="#_print">print()</a></li>
+<li><a href="#_abs">abs()</a></li>
+<li><a href="#_cos">cos()</a></li>
+<li><a href="#_sin">sin()</a></li>
+<li><a href="#_min">min()</a></li>
+<li><a href="#_cls">cls()</a></li>
+<li><a href="#_rnd">rnd()</a></li>
 </ul>
 </li>
 </ul>
@@ -637,7 +652,7 @@ function _draw()
   cls(2)
   p = ctrl.touch()
   print("coordinates: "..p.x .. "x"..p.y, 1, 1, 4)
-  rectf(p.x, p.y, 5,5, p.x + p.y)
+  shp.rectf(p.x, p.y, 5,5, p.x + p.y)
 end
 
 </tiny-editor>
@@ -682,11 +697,11 @@ end
 function _draw()
     cls()
     gfx.dither()
-    circlef(30, 30, 30, 2)
+    shp.circlef(30, 30, 30, 2)
     gfx.dither(0xA5A5) -- set a dithering pattern
-    circlef(50, 50, 30, 3)
+    shp.circlef(50, 50, 30, 3)
     gfx.dither(0x0842) -- set another dithering pattern
-    circlef(70, 70, 30, 2)
+    shp.circlef(70, 70, 30, 2)
 end
 
 </tiny-editor>
@@ -708,13 +723,13 @@ function _draw()
   cls()
   -- set a clip area to crop circles
   gfx.clip(20, 20, 80, 80)
-  circlef(20, 20, 20, 2)
-  circlef(100, 20, 20, 2)
+  shp.circlef(20, 20, 20, 2)
+  shp.circlef(100, 20, 20, 2)
 
   -- reset the clip area
   gfx.clip()
-  circlef(20, 20, 10, 3)
-  circlef(100, 20, 10, 3)
+  shp.circlef(20, 20, 10, 3)
+  shp.circlef(100, 20, 10, 3)
 
 end
 
@@ -784,32 +799,32 @@ function _draw()
   progress = abs(cos(t))
 
   print("pow", 0, 0)
-  circlef(juice.pow2(20, 236, progress), 10, 10, 2)
-  circlef(juice.pow3(20, 236, progress), 20, 10, 3)
-  circlef(juice.pow4(20, 236, progress), 30, 10, 4)
+  shp.circlef(juice.pow2(20, 236, progress), 10, 10, 2)
+  shp.circlef(juice.pow3(20, 236, progress), 20, 10, 3)
+  shp.circlef(juice.pow4(20, 236, progress), 30, 10, 4)
 
 
   print("bounce", 0, 50)
-  circlef(juice.bounce(20, 236, progress), 60, 10, 5)
+  shp.circlef(juice.bounce(20, 236, progress), 60, 10, 5)
 
   print("exp", 0, 80)
-  circlef(juice.exp10(20, 236, progress), 90, 10, 6)
+  shp.circlef(juice.exp10(20, 236, progress), 90, 10, 6)
 
 
   print("swing", 0, 110)
-  circlef(juice.swing(20, 236, progress), 120, 10, 7)
+  shp.circlef(juice.swing(20, 236, progress), 120, 10, 7)
 
   print("sine", 0, 140)
-  circlef(juice.sine(20, 236, progress), 150, 10, 8)
+  shp.circlef(juice.sine(20, 236, progress), 150, 10, 8)
 
   print("circle", 0, 170)
-  circlef(juice.circle(20, 236, progress), 180, 10, 9)
+  shp.circlef(juice.circle(20, 236, progress), 180, 10, 9)
 
   print("elastic", 0, 200)
-  circlef(juice.elastic(20, 236, progress), 210, 10, 10)
+  shp.circlef(juice.elastic(20, 236, progress), 210, 10, 10)
 
   print("linear", 0, 230)
-  circlef(juice.linear(20, 236, progress), 240, 10, 11)
+  shp.circlef(juice.linear(20, 236, progress), 240, 10, 11)
 end
 
 </tiny-editor>
@@ -869,13 +884,169 @@ end
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_shp_rect">shp.rect()</h3>
+<div class="paragraph">
+<p>Draw a rectangle.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">shp</span><span class="p">.</span><span class="n">rect</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a rectangle.</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_shp_rectf">shp.rectf()</h3>
+<div class="paragraph">
+<p>Draw a filled rectangle.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">shp</span><span class="p">.</span><span class="n">rectf</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a filled rectangle.</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_shp_circlef">shp.circlef()</h3>
+<div class="paragraph">
+<p>Draw a filled circle.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_shp_line">shp.line()</h3>
+<div class="paragraph">
+<p>Draw a line.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">shp</span><span class="p">.</span><span class="n">line</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a line.</span>
+<span class="n">shp</span><span class="p">.</span><span class="n">line</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">)</span> <span class="c1">-- Draw a line with a default color.</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_shp_circle">shp.circle()</h3>
+<div class="paragraph">
+<p>Draw a circle.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">shp</span><span class="p">.</span><span class="n">circle</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="c1">-- Draw a circle with the default color.</span>
+<span class="n">shp</span><span class="p">.</span><span class="n">circle</span><span class="p">(</span><span class="n">centerX</span><span class="p">,</span> <span class="n">centerY</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a circle.</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_spr_sheet">spr.sheet()</h3>
+<div class="paragraph">
+<p>Switch to another spritesheet.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">spr</span><span class="p">.</span><span class="n">sheet</span><span class="p">()</span> <span class="c1">-- Switch to the first spritesheet</span>
+<span class="n">spr</span><span class="p">.</span><span class="n">sheet</span><span class="p">(</span><span class="n">spritesheetN</span><span class="p">)</span> <span class="c1">-- Switch to the N spritesheet</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_spr_sspr">spr.sspr()</h3>
+<div class="paragraph">
+<p>Draw a fragment from the spritesheet.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">spr</span><span class="p">.</span><span class="n">sspr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sprX</span><span class="p">,</span> <span class="n">sprY</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">flipX</span><span class="p">,</span> <span class="n">flipY</span><span class="p">)</span> <span class="c1">-- Draw a fragment from the spritesheet.</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_spr_spr">spr.spr()</h3>
+<div class="paragraph">
+<p>Draw a sprite.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">spr</span><span class="p">.</span><span class="n">spr</span><span class="p">(</span><span class="n">sprN</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- Draw a sprite.</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_print">print()</h3>
+<div class="paragraph">
+<p>Print on the screen a string.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="nb">print</span><span class="p">(</span><span class="n">str</span><span class="p">)</span> <span class="c1">-- print on the screen a string at (0,0) with a default color.</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- print on the screen a string with a default color.</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- print on the screen a string with a specific color.</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_abs">abs()</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">abs</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="c1">-- absolute value.</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_cos">cos()</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">cos</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="c1">-- cosinus of the value passed as parameter.</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_sin">sin()</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">sin</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="c1">-- sinus of the value passed as parameter.</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_min">min()</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">min</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">)</span> <span class="c1">-- minimun value between two values. Those values can be numbers or string.</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_cls">cls()</h3>
+<div class="paragraph">
+<p>clear the screen</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">cls</span><span class="p">()</span> <span class="c1">-- Clear the screen with a default color.</span>
+<span class="n">cls</span><span class="p">(</span><span class="n">color</span><span class="p">)</span> <span class="c1">-- Clear the screen with a color.</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_rnd">rnd()</h3>
+<div class="paragraph">
+<p>generate random values</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">rnd</span><span class="p">()</span> <span class="c1">-- Generate a random int (negative or positive value)</span>
+<span class="n">rnd</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="c1">-- Generate a random value between 1 and the argument. If a table is passed, it'll return a random element of the table.</span>
+<span class="n">rnd</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">)</span> <span class="c1">-- Generate a random value between the first and the second argument.</span></code></pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-04-21 12:52:17 UTC
+Last updated 2023-04-21 17:29:14 UTC
 </div>
 </div>
 <style>
