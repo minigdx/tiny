@@ -19,6 +19,8 @@ class ColorPalette(colors: List<HexColor>) {
     private val rgb: Array<ByteArray>
     private val rgbForGif: Array<Int>
 
+    private val hexToColorCache: MutableMap<String, Int> = mutableMapOf()
+
     val size: Int
 
     init {
@@ -84,9 +86,11 @@ class ColorPalette(colors: List<HexColor>) {
         return rgbForGif[check(index)]
     }
 
+    /**
+     * Return the color index of the closest color matching the hexadecimal color.
+     */
     fun getColorIndex(hexString: String): Int {
-        val color = hexStringToByteArray(hexString)
-        return fromRGBA(color)
+        return hexToColorCache.getOrPut(hexString) { fromRGBA(hexStringToByteArray(hexString)) }
     }
 
     /**

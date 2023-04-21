@@ -5,7 +5,6 @@ package com.github.mingdx.tiny.doc
 annotation class TinyLib(
     /**
      * Name of the Library.
-     * By default, will use the name of the class.
      */
     val name: String = "",
 )

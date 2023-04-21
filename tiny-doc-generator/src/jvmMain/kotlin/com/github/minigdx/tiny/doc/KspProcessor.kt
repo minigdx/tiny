@@ -251,12 +251,17 @@ class KspProcessor(
             libs.forEach { lib ->
 
                 lib.functions.forEach { func ->
-                    section("${lib.name}.${func.name}()") {
+                    val prefix = if (lib.name.isBlank()) {
+                        func.name
+                    } else {
+                        "${lib.name}.${func.name}"
+                    }
+                    section("$prefix()") {
                         paragraph(func.description)
 
                         if (func.calls.isNotEmpty()) {
                             val result = func.calls.map { call ->
-                                "${lib.name}.${func.name}(${call.args.map { it.name }.joinToString(", ")}) " +
+                                "$prefix(${call.args.map { it.name }.joinToString(", ")}) " +
                                     "-- ${call.description}"
                             }.joinToString("\n")
                             code(result)

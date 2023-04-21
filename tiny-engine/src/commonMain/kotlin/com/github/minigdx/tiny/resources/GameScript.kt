@@ -8,6 +8,8 @@ import com.github.minigdx.tiny.lua.GfxLib
 import com.github.minigdx.tiny.lua.JuiceLib
 import com.github.minigdx.tiny.lua.MapLib
 import com.github.minigdx.tiny.lua.SfxLib
+import com.github.minigdx.tiny.lua.ShpLib
+import com.github.minigdx.tiny.lua.SprLib
 import com.github.minigdx.tiny.lua.StdLib
 import com.github.minigdx.tiny.lua.StdLibListener
 import org.luaj.vm2.Globals
@@ -57,7 +59,7 @@ class GameScript(
     class State(val args: LuaValue)
 
     private fun createLuaGlobals(): Globals = Globals().apply {
-        val stdLib = StdLib(this@GameScript.gameOptions, this@GameScript.resourceAccess, this@GameScript)
+        val sprLib = SprLib(this@GameScript.gameOptions, this@GameScript.resourceAccess)
 
         load(BaseLib())
         load(PackageLib())
@@ -65,11 +67,13 @@ class GameScript(
         load(TableLib())
         load(StringLib())
         load(CoroutineLib())
-        load(stdLib)
+        load(StdLib(gameOptions, resourceAccess, this@GameScript))
         load(MapLib(this@GameScript.resourceAccess))
         load(GfxLib(this@GameScript.resourceAccess))
-        load(CtrlLib(inputHandler, stdLib))
+        load(CtrlLib(inputHandler, sprLib))
         load(SfxLib(this@GameScript.resourceAccess))
+        load(ShpLib(this@GameScript.resourceAccess))
+        load(sprLib)
         load(JuiceLib())
         LoadState.install(this)
         LuaC.install(this)

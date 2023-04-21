@@ -15,7 +15,7 @@ import org.luaj.vm2.lib.TwoArgFunction
 @TinyLib("ctrl")
 class CtrlLib(
     private val inputHandler: InputHandler,
-    private val stdLib: StdLib,
+    sprLib: SprLib,
 ) : TwoArgFunction() {
     override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
         val ctrl = LuaTable()
@@ -33,7 +33,7 @@ class CtrlLib(
 
     private val keys = listOf(Key.ARROW_LEFT, Key.ARROW_UP, Key.ARROW_RIGHT, Key.ARROW_DOWN)
 
-    private val spr = stdLib.spr()
+    private val spr = sprLib.draw()
 
     @TinyFunction(
         "Get coordinates of the current touch/mouse. " +

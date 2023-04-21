@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.launch
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaValue.Companion.valueOf
+import kotlin.math.max
 import kotlin.math.min
 
 class ScriptsCollector(private val events: MutableList<GameResource>) : FlowCollector<GameResource> {
@@ -306,15 +307,18 @@ class GameEngine(
     }
 
     override fun spritesheet(index: Int): SpriteSheet? {
-        return spriteSheets[index]
+        val protected = max(0, min(index, spriteSheets.size - 1))
+        return spriteSheets[protected]
     }
 
     override fun level(index: Int): GameLevel? {
-        return levels[index]
+        val protected = max(0, min(index, levels.size - 1))
+        return levels[protected]
     }
 
     override fun sound(index: Int): Sound? {
-        return sounds[index]
+        val protected = max(0, min(index, sounds.size - 1))
+        return sounds[protected]
     }
 
     override fun draw() {
