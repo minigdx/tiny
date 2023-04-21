@@ -476,7 +476,70 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div class="sect2">
 <h3 id="_tiny_serve">tiny serve</h3>
-
+<div class="paragraph">
+<p>The tiny serve command is used to launch a local web server that allows you to test a game that has been exported using the tiny export command. This is useful for testing and debugging a game locally before publishing it online.</p>
+</div>
+<div class="sect3">
+<h4 id="_syntax">Syntax</h4>
+<div class="paragraph">
+<p>To use the tiny serve command, open a terminal or command prompt and navigate to the directory containing the exported game zip file. Then, type the following command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">tiny serve [options] game.zip</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Where:</p>
+</div>
+<div class="paragraph">
+<p><code>[options]</code>: Optional arguments to modify the behavior of the command.
+<code>game.zip</code>: The path to the exported game zip file.</p>
+</div>
+<div class="sect4">
+<h5 id="_options">Options</h5>
+<div class="paragraph">
+<p><code>--port [port number]</code>: Allows you to specify a custom port number to run the server on. The default port number is 8080.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_example_usage">Example Usage</h4>
+<div class="paragraph">
+<p>To run the tiny serve command, you can use the following examples:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">tiny serve myGame.zip</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will launch the local web server on the default port number (<code>8080</code>) and serve the game located in the <code>myGame.zip</code> file.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">tiny serve MyGame.zip --port 8081</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will launch the local web server on port number <code>8081</code> and serve the game located in the <code>MyGame.zip</code> file.</p>
+</div>
+<div class="paragraph">
+<p>Once the server is running, you can access the game in your web browser by navigating to the URL <code><a href="http://localhost:">port number</a>/</code>. For example, if you used the default port number, you would navigate to <code><a href="http://localhost:8080/" class="bare">http://localhost:8080/</a></code> in your web browser to access the game.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+The tiny serve command is intended for local testing only and should not be used to serve your game online. When you are ready to publish your game, you should upload the exported game files to a web server and serve them from there.
+</td>
+</tr>
+</table>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -484,7 +547,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-04-21 07:54:24 UTC
+Last updated 2023-04-21 12:40:21 UTC
 </div>
 </div>
 </body>
