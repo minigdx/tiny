@@ -824,7 +824,7 @@ function _draw()
   shp.circlef(juice.elastic(20, 236, progress), 210, 10, 10)
 
   print("linear", 0, 230)
-  shp.circlef(juice.linear(20, 236, progress), 240, 10, 11)
+  shp.circlef(juice.linear(20, 236, progress), 240, 10, 1)
 end
 
 </tiny-editor>
@@ -905,12 +905,62 @@ end
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">shp</span><span class="p">.</span><span class="n">rectf</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a filled rectangle.</span></code></pre>
 </div>
 </div>
+<tiny-editor>
+
+function _draw()
+  cls()
+
+  -- filled rectangle
+  print("filled rectangle", 20, 10)
+  shp.rectf(20, 20, 20, 20, 4)
+  shp.rectf(30, 30, 20, 20, 5)
+  shp.rectf(40, 40, 20, 20, 6)
+
+  print("non filled rectangle", 20, 65)
+  -- non filled rectangle
+  shp.rect(50, 70, 20, 20, 7)
+  shp.rect(60, 80, 20, 20, 8)
+  shp.rect(70, 90, 20, 20, 9)
+
+  print("rectangle with different width", 20, 115)
+  shp.rect(20, 120, 30, 20, 10)
+  shp.rect(20, 140, 40, 20, 12)
+  shp.rect(20, 160, 60, 20, 13)
+
+end
+
+</tiny-editor>
 </div>
 <div class="sect2">
 <h3 id="_shp_circlef">shp.circlef()</h3>
 <div class="paragraph">
 <p>Draw a filled circle.</p>
 </div>
+<tiny-editor>
+
+function _draw()
+    cls()
+
+    -- filled circle
+    shp.circlef(20, 20, 20, 4)
+    shp.circlef(30, 30, 20, 5)
+    shp.circlef(40, 40, 20, 6)
+    print("filled circle", 20, 10)
+
+    -- non filled circle
+    shp.circle(50, 70, 10, 7)
+    shp.circle(60, 80, 10, 8)
+    shp.circle(70, 90, 10, 9)
+    print("non filled circle", 20, 65)
+
+    shp.circle(80, 120, 15, 10)
+    shp.circle(80, 140, 20, 12)
+    shp.circle(80, 160, 30, 13)
+    print("circle with different radius", 20, 115)
+
+end
+
+</tiny-editor>
 </div>
 <div class="sect2">
 <h3 id="_shp_line">shp.line()</h3>
@@ -982,6 +1032,20 @@ end
 <span class="nb">print</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- print on the screen a string with a specific color.</span></code></pre>
 </div>
 </div>
+<tiny-editor>
+
+function _draw()
+    cls()
+    -- every character is a sprite 4x4 pixels.
+    print("hello")
+    print("world", 10, 10)
+    print("how", 10, 20, 4)
+    print("are", 26, 20, 5)
+    print("you", 42, 20, 6)
+    print("...", 58, 20, rnd(10))
+end
+
+</tiny-editor>
 </div>
 <div class="sect2">
 <h3 id="_abs">abs()</h3>
@@ -1046,7 +1110,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-04-21 17:29:14 UTC
+Last updated 2023-04-21 18:00:43 UTC
 </div>
 </div>
 <style>
