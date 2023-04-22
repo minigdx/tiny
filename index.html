@@ -460,7 +460,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <ul class="sectlevel1">
 <li><a href="#_tiny_cli">Tiny CLI</a>
 <ul class="sectlevel2">
-<li><a href="#_the_tiny_create_command">the <code>tiny create</code> command</a>
+<li><a href="#_the_tiny_cli_create_command">the <code>tiny-cli create</code> command</a>
 <ul class="sectlevel3">
 <li><a href="#_usage">Usage</a></li>
 <li><a href="#_creating_a_new_game">Creating a New Game</a></li>
@@ -573,7 +573,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <p>Whether you&#8217;re a seasoned game developer or just getting started, the Tiny CLI is a powerful tool that can help you create, run, develop, and export amazing 2D games with the Tiny engine. With its intuitive command-line interface and powerful features, the Tiny CLI is the ultimate tool for building your next great game.</p>
 </div>
 <div class="sect2">
-<h3 id="_the_tiny_create_command">the <code>tiny create</code> command</h3>
+<h3 id="_the_tiny_cli_create_command">the <code>tiny-cli create</code> command</h3>
 <div class="paragraph">
 <p>The <code>tiny-cli create</code> command is a helpful tool for creating new games for the tiny game engine. This command allows you to easily create a new game by prompting you for a few details about the game you want to create.</p>
 </div>
@@ -1185,20 +1185,20 @@ function _draw()
 
   -- filled rectangle
   print("filled rectangle", 20, 10)
-  shp.rectf(20, 20, 20, 20, 4)
-  shp.rectf(30, 30, 20, 20, 5)
-  shp.rectf(40, 40, 20, 20, 6)
+  shape.rectf(20, 20, 20, 20, 4)
+  shape.rectf(30, 30, 20, 20, 5)
+  shape.rectf(40, 40, 20, 20, 6)
 
   print("non filled rectangle", 20, 65)
   -- non filled rectangle
-  shp.rect(50, 70, 20, 20, 7)
-  shp.rect(60, 80, 20, 20, 8)
-  shp.rect(70, 90, 20, 20, 9)
+  shape.rect(50, 70, 20, 20, 7)
+  shape.rect(60, 80, 20, 20, 8)
+  shape.rect(70, 90, 20, 20, 9)
 
   print("rectangle with different width", 20, 115)
-  shp.rect(20, 120, 30, 20, 10)
-  shp.rect(20, 140, 40, 20, 12)
-  shp.rect(20, 160, 60, 20, 13)
+  shape.rect(20, 120, 30, 20, 10)
+  shape.rect(20, 140, 40, 20, 12)
+  shape.rect(20, 160, 60, 20, 13)
 
 end
 
@@ -1383,7 +1383,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-04-22 13:57:12 UTC
+Last updated 2023-04-22 14:05:21 UTC
 </div>
 </div>
 <style>
