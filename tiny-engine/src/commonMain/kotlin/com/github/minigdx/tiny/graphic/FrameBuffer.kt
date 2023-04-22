@@ -78,30 +78,62 @@ class FrameBuffer(
     }
 
     fun copyFrom(
+        /**
+         * Source to copy.
+         */
         source: PixelArray,
+        /**
+         * X coordinate where the data will be copied in this frame buffer
+         */
         dstX: Pixel = 0,
+        /**
+         * Y coordinate where the data will be copied in this frame buffer
+         */
         dstY: Pixel = 0,
+        /**
+         * X coordinate where the data will be consumed in the source.
+         */
         sourceX: Pixel = 0,
+        /**
+         * Y coordinate where the data will be consumed in the source.
+         */
         sourceY: Pixel = 0,
+        /**
+         * Width of the fragment to copy
+         */
         width: Pixel = this.width,
+        /**
+         * Height of the fragment to copy
+         */
         height: Pixel = this.height,
+        /**
+         * Flip horizontally
+         */
         reverseX: Boolean = false,
+        /**
+         * Flip vertically
+         */
         reverseY: Boolean = false,
+        /**
+         * Blend function
+         */
         blender: (Array<Int>, Pixel, Pixel) -> Array<Int> = { colors, _, _ -> colors }
     ) {
 
         val clippedX = max(dstX, clipper.left)
-        val clippedWidth = min(dstX + width, clipper.right) - dstX
+        val clippedWidthLeft = width - (clippedX - dstX)
+        val clippedWidth = min(dstX + clippedWidthLeft, clipper.right) - dstX
 
         val clippedY = max(dstY, clipper.top)
-        val clippedHeight = min(dstY + height, clipper.bottom) - dstY
+        val clippedHeightTop = height - (clippedY - dstY)
+        val clippedHeight = min(dstY + clippedHeightTop, clipper.bottom) - dstY
 
         colorIndexBuffer.copyFrom(
             source,
             clippedX,
             clippedY,
-            sourceX + clippedX - dstX,
-            sourceY + clippedY - dstY,
+            sourceX + width - clippedWidthLeft,
+            sourceY + height - clippedHeightTop,
             clippedWidth,
             clippedHeight,
             reverseX, reverseY

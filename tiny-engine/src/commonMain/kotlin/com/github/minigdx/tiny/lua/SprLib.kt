@@ -96,8 +96,7 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
             @TinyArg("x") b: LuaValue,
             @TinyArg("y") c: LuaValue
         ): LuaValue {
-            invoke(arrayOf(a, b, c, valueOf(false), valueOf(false)))
-            return NONE
+            return invoke(arrayOf(a, b, c, valueOf(false), valueOf(false))).arg1()
         }
 
         override fun invoke(@TinyArgs(arrayOf("sprN", "x", "y", "flipX", "flipY")) args: Varargs): Varargs {
