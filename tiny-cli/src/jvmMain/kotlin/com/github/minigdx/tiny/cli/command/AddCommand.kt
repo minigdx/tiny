@@ -38,6 +38,9 @@ class AddCommand : CliktCommand(name = "add") {
             } else if (r.endsWith("lua")) {
                 // Add script
                 gameParameters = gameParameters.addScript(r)
+            } else if (r.endsWith("mid") || r.endsWith("midi")) {
+                // Add midi
+                gameParameters = gameParameters.addSound(r)
             } else {
                 val file = File(r)
                 if (file.isDirectory && file.resolve("data.json").isFile) {

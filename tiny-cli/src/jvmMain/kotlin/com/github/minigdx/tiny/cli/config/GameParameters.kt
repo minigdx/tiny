@@ -27,6 +27,8 @@ sealed class GameParameters() {
 
     abstract fun addScript(script: String): GameParameters
 
+    abstract fun addSound(sound: String): GameParameters
+
     companion object {
         val JSON = Json {
             ignoreUnknownKeys = true
@@ -90,5 +92,9 @@ data class GameParametersV1(
 
     override fun addScript(script: String): GameParameters {
         return copy(scripts = scripts + script)
+    }
+
+    override fun addSound(sound: String): GameParameters {
+        return copy(sounds = sounds + sound)
     }
 }
