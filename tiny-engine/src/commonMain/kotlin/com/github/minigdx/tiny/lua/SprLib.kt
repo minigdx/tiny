@@ -21,7 +21,7 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
 
     override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
         val sprTable = LuaTable()
-        sprTable["sspr"] = sspr()
+        sprTable["sdraw"] = sdraw()
         sprTable["draw"] = draw()
         sprTable["sheet"] = sheet()
         arg2.set("spr", sprTable)
@@ -44,8 +44,8 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
         }
     }
 
-    @TinyFunction("Draw a fragment from the spritesheet.")
-    internal inner class sspr : LibFunction() {
+    @TinyFunction("S(uper) Draw a fragment from the spritesheet.")
+    internal inner class sdraw : LibFunction() {
         // x, y, spr x, spr y, width, height, flip x, flip y
         @TinyCall("Draw a fragment from the spritesheet.")
         override fun invoke(

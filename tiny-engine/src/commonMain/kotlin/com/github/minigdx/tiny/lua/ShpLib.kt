@@ -20,6 +20,8 @@ class ShpLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
     override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
         val shp = LuaTable()
         shp["line"] = line()
+        shp["oval"] = oval()
+        shp["ovalf"] = ovalf()
         shp["rect"] = rect()
         shp["rectf"] = rectf()
         shp["circle"] = circle()
@@ -47,6 +49,153 @@ class ShpLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
             for (i in y until y + height) {
                 resourceAccess.frameBuffer.pixel(x, i, color)
                 resourceAccess.frameBuffer.pixel(x + width - 1, i, color)
+            }
+            return NONE
+        }
+    }
+
+    @TinyFunction("Draw an oval.")
+    internal inner class oval : LibFunction() {
+        @TinyCall("Draw an oval using the default color.")
+        override fun call(
+            @TinyArg("centerX") a: LuaValue,
+            @TinyArg("centerY") b: LuaValue,
+            @TinyArg("radiusX") c: LuaValue,
+            @TinyArg("radiusY") d: LuaValue,
+        ): LuaValue {
+            return super.invoke(arrayOf(a, b, c, d, valueOf("#FFFFFF"))).arg1()
+        }
+
+        @TinyCall("Draw an oval using the specified color.")
+        override fun invoke(
+            @TinyArgs(
+                arrayOf(
+                    "centerX",
+                    "centerY",
+                    "radiusX",
+                    "radiusY",
+                    "color"
+                )
+            ) args: Varargs
+        ): Varargs {
+            val centerX = args.checkint(1)
+            val centerY = args.checkint(2)
+            val radiusX = args.checkint(3)
+            val radiusY = args.checkint(4)
+            val color = args.arg(5).checkColorIndex()
+
+            val frameBuffer = resourceAccess.frameBuffer
+
+            var x = 0
+            var y = radiusY
+            var p: Int = (radiusY * radiusY) - (radiusX * radiusX * radiusY) + ((radiusX * radiusX) / 4)
+
+            while (2 * x * radiusY * radiusY <= 2 * y * radiusX * radiusX) {
+                frameBuffer.pixel(centerX + x, centerY + y, color)
+                frameBuffer.pixel(centerX - x, centerY + y, color)
+                frameBuffer.pixel(centerX + x, centerY - y, color)
+                frameBuffer.pixel(centerX - x, centerY - y, color)
+
+                x++
+
+                if (p < 0) {
+                    p += 2 * radiusY * radiusY * x + radiusY * radiusY
+                } else {
+                    y--
+                    p += 2 * radiusY * radiusY * x - 2 * radiusX * radiusX * y + radiusY * radiusY
+                }
+            }
+
+            p =
+                (radiusY * radiusY) * (x * x + x) + (radiusX * radiusX) * (y * y - y) - (radiusX * radiusX * radiusY * radiusY)
+
+            while (y >= 0) {
+                frameBuffer.pixel(centerX + x, centerY + y, color)
+                frameBuffer.pixel(centerX - x, centerY + y, color)
+                frameBuffer.pixel(centerX + x, centerY - y, color)
+                frameBuffer.pixel(centerX - x, centerY - y, color)
+
+                y--
+
+                if (p > 0) {
+                    p -= 2 * radiusX * radiusX * y + radiusX * radiusX
+                } else {
+                    x++
+                    p += 2 * radiusY * radiusY * x - 2 * radiusX * radiusX * y + radiusX * radiusX
+                }
+            }
+            return NONE
+        }
+    }
+
+    @TinyFunction("Draw an oval filled.")
+    internal inner class ovalf : LibFunction() {
+        @TinyCall("Draw a filled oval using the default color.")
+        override fun call(
+            @TinyArg("centerX") a: LuaValue,
+            @TinyArg("centerY") b: LuaValue,
+            @TinyArg("radiusX") c: LuaValue,
+            @TinyArg("radiusY") d: LuaValue,
+        ): LuaValue {
+            return super.invoke(arrayOf(a, b, c, d, valueOf("#FFFFFF"))).arg1()
+        }
+
+        @TinyCall("Draw a filled oval using the specified color.")
+        override fun invoke(
+            @TinyArgs(
+                arrayOf(
+                    "centerX",
+                    "centerY",
+                    "radiusX",
+                    "radiusY",
+                    "color"
+                )
+            ) args: Varargs
+        ): Varargs {
+            val centerX = args.checkint(1)
+            val centerY = args.checkint(2)
+            val radiusX = args.checkint(3)
+            val radiusY = args.checkint(4)
+            val color = args.arg(5).checkColorIndex()
+
+            val frameBuffer = resourceAccess.frameBuffer
+
+            var x = 0
+            var y = radiusY
+            var p = (radiusY * radiusY) - (radiusX * radiusX * radiusY) + ((radiusX * radiusX) / 4)
+
+            while (2 * x * radiusY * radiusY <= 2 * y * radiusX * radiusX) {
+                for (i in centerX - x..centerX + x) {
+                    frameBuffer.pixel(i, centerY + y, color)
+                    frameBuffer.pixel(i, centerY - y, color)
+                }
+
+                x++
+
+                if (p < 0) {
+                    p += 2 * radiusY * radiusY * x + radiusY * radiusY
+                } else {
+                    y--
+                    p += 2 * radiusY * radiusY * x - 2 * radiusX * radiusX * y + radiusY * radiusY
+                }
+            }
+
+            p = (radiusY * radiusY) * (x * x + x) + (radiusX * radiusX) * (y * y - y) - (radiusX * radiusX * radiusY * radiusY)
+
+            while (y >= 0) {
+                for (i in centerX - x..centerX + x) {
+                    frameBuffer.pixel(i, centerY + y, color)
+                    frameBuffer.pixel(i, centerY - y, color)
+                }
+
+                y--
+
+                if (p > 0) {
+                    p -= 2 * radiusX * radiusX * y + radiusX * radiusX
+                } else {
+                    x++
+                    p += 2 * radiusY * radiusY * x - 2 * radiusX * radiusX * y + radiusX * radiusX
+                }
             }
             return NONE
         }
