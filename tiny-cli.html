@@ -447,35 +447,259 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <p>Introducing the Tiny CLI, a powerful command-line interface that allows you to easily create, run, develop, and export games using the Tiny 2D game engine. With the Tiny CLI, you can quickly and easily create a new game project, add assets, and start developing your game in no time.</p>
 </div>
 <div class="paragraph">
-<p>To get started, simply install the Tiny CLI on your system and create a new project using the <code>tiny create</code> command. This will generate a new project directory with all the necessary files and folder structure to start building your game. You can then add assets to your game using the <code>tiny add</code> command, which allows you to import images, audio files, and other resources into your project.</p>
+<p>To get started, simply install the Tiny CLI on your system and create a new project using the <code>tiny-cli create</code> command. This will generate a new project directory with all the necessary files and folder structure to start building your game. You can then add assets to your game using the <code>tiny-cli add</code> command, which allows you to import images, audio files, and other resources into your project.</p>
 </div>
 <div class="paragraph">
 <p>The Tiny CLI also includes a powerful development server that allows you to preview your game in real-time as you develop it. Simply run the tiny command and start to update your game.</p>
 </div>
 <div class="paragraph">
-<p>When you&#8217;re ready to share your game with the world, the Tiny CLI makes it easy to export your game for web browsers. You can use the <code>tiny export</code> command to generate a distributable version of your game that can be published on the web. You can also try the <code>export</code> result by using the command <code>tiny serve</code>.</p>
+<p>When you&#8217;re ready to share your game with the world, the Tiny CLI makes it easy to export your game for web browsers. You can use the <code>tiny-cli export</code> command to generate a distributable version of your game that can be published on the web. You can also try the <code>export</code> result by using the command <code>tiny-cli serve</code>.</p>
 </div>
 <div class="paragraph">
 <p>Whether you&#8217;re a seasoned game developer or just getting started, the Tiny CLI is a powerful tool that can help you create, run, develop, and export amazing 2D games with the Tiny engine. With its intuitive command-line interface and powerful features, the Tiny CLI is the ultimate tool for building your next great game.</p>
 </div>
 <div class="sect2">
-<h3 id="_tiny_create">tiny create</h3>
-
+<h3 id="_the_tiny_create_command">the <code>tiny create</code> command</h3>
+<div class="paragraph">
+<p>The <code>tiny-cli create</code> command is a helpful tool for creating new games for the tiny game engine. This command allows you to easily create a new game by prompting you for a few details about the game you want to create.</p>
+</div>
+<div class="sect3">
+<h4 id="_usage">Usage</h4>
+<div class="paragraph">
+<p>To use the <code>tiny-cli create</code> command, simply open your terminal and type the following command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">tiny-cli create</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will launch the game creation process and prompt you to enter a name for your new game, along with other parameters to configure it.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_creating_a_new_game">Creating a New Game</h4>
+<div class="paragraph">
+<p>To create a new game using the <code>tiny-cli create</code> command, follow these steps:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Open your terminal and navigate to the directory where you want to create your new game.</p>
+</li>
+<li>
+<p>Type the following command and press Enter: `tiny-cli create
+`</p>
+</li>
+<li>
+<p>Follow the prompts to enter a name for your new game and configure other parameters such as the game&#8217;s screen resolution, background color, and more.</p>
+</li>
+<li>
+<p>Once you have entered all the required information, the <code>tiny-cli create</code> command will create a new folder with the name of your game in the current directory.</p>
+</li>
+<li>
+<p>You can now open this folder and begin developing your new game using the tiny game engine.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_running_your_game">Running Your Game</h4>
+<div class="paragraph">
+<p>To run your newly created game, use the <code>tiny-cli</code> command followed by the name of your game&#8217;s folder. For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">tiny-cli my-game</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will launch your game and allow you to begin testing and refining your gameplay mechanics.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_adding_resources">Adding Resources</h4>
+<div class="paragraph">
+<p>You can also add resources such as images, sounds, and other assets to your game using the <code>tiny-cli add</code> command. For more information on how to use this command, please refer to the associated documentation.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+With the <code>tiny-cli create</code> command, you can quickly and easily create new games for the tiny game engine, giving you the flexibility and control you need to bring your game ideas to life.
+</td>
+</tr>
+</table>
+</div>
+</div>
 </div>
 <div class="sect2">
-<h3 id="_tiny">tiny</h3>
-
+<h3 id="_the_default_tiny_cli_command">The default <code>tiny-cli</code> command</h3>
+<div class="paragraph">
+<p>The <code>tiny-cli</code> command is a command line tool for running and testing your tiny game. This command takes only one parameter: the path to the directory containing your game&#8217;s assets and <code>_tiny.json</code> file.</p>
+</div>
+<div class="sect3">
+<h4 id="_usage_2">Usage</h4>
+<div class="paragraph">
+<p>To use the <code>tiny-cli</code> command, simply open your terminal and type the following command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>tiny-cli &lt;game folder&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>where <code>&lt;game folder&gt;</code> is the path to the directory containing your game&#8217;s assets and <code>_tiny.json</code> file.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_running_a_game">Running a Game</h4>
+<div class="paragraph">
+<p>To run your game using the <code>tiny-cli</code> command, follow these steps:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Open your terminal and navigate to the directory where your game&#8217;s <code>_tiny.json</code> file is located.</p>
+</li>
+<li>
+<p>Type the following command and press Enter, replacing <code>&lt;game folder&gt;</code> with the path to your game&#8217;s folder: <code>tiny-cli &lt;game folder&gt;</code></p>
+</li>
+<li>
+<p>The <code>tiny-cli</code> command will start your game and display it in a new window.</p>
+</li>
+<li>
+<p>If you make changes to your game&#8217;s Lua scripts or update any spritesheets, the game will automatically reload to use the latest version of those resources.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>With the <code>tiny-cli</code> command, you can quickly test and run your tiny game, making it easy to iterate and refine your game as you develop it.</p>
+</div>
+</div>
 </div>
 <div class="sect2">
-<h3 id="_tiny_add">tiny add</h3>
-
+<h3 id="_the_tiny_cli_add_command">The <code>tiny-cli add</code> command</h3>
+<div class="paragraph">
+<p>The <code>tiny-cli add</code> command allows you to quickly and easily add new spritesheets, sounds, and other assets to your game, making it easy to customize and improve your game&#8217;s functionality.</p>
+</div>
+<div class="sect3">
+<h4 id="_usage_3">Usage</h4>
+<div class="paragraph">
+<p>To use the <code>tiny-cli add</code> command, simply open your terminal and type the following command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>tiny-cli add &lt;resource&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>where <code>&lt;resource&gt;</code> is the path to the resource you want to add to your game. The resource can be a png file (which will be added as a spritesheet), a midi file (which will be added as a sound), or any other asset that can be used in the tiny game engine.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_adding_a_resource">Adding a Resource</h4>
+<div class="paragraph">
+<p>To add a resource to your game using the <code>tiny-cli add</code> command, follow these steps:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Open your terminal and navigate to the directory where your game&#8217;s <code>_tiny.json</code> file is located.</p>
+</li>
+<li>
+<p>Type the following command and press Enter, replacing <code>&lt;resource&gt;</code> with the path to the resource you want to add: <code>tiny-cli add &lt;resource&gt;</code></p>
+</li>
+<li>
+<p>The <code>tiny-cli add</code> command will automatically detect the type of resource you are adding and add it to your game accordingly. For example, if you add a png file, it will be added as a spritesheet.</p>
+</li>
+<li>
+<p>The added resource will be reflected in the <code>_tiny.json</code> file in the <code>"spritesheets"</code>, <code>"sounds"</code>, or <code>"levels"</code> array, depending on the type of resource you added.</p>
+</li>
+</ol>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Warning</div>
+</td>
+<td class="content">
+Note that the added resource is not automatically copied to your game&#8217;s folder and needs to be in the same directory as the <code>_tiny.json</code> file.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_editing_the_tiny_json_file">Editing the <code>_tiny.json</code> File</h4>
+<div class="paragraph">
+<p>Alternatively, you can also manually add resources to your game by editing the <code>_tiny.json</code> file directly. Simply open the file in a text editor and add the resource to the appropriate array.</p>
+</div>
+<div class="paragraph">
+<p>With the <code>tiny-cli add</code> command, you can easily add new resources to your game and customize its functionality and appearance. Whether you are adding new spritesheets, sounds, or fonts, this command makes it easy to create the game of your dreams with the tiny game engine.</p>
+</div>
+</div>
 </div>
 <div class="sect2">
-<h3 id="_tiny_export">tiny export</h3>
-
+<h3 id="_the_tiny_cli_export_command">The <code>tiny-cli export</code> command</h3>
+<div class="paragraph">
+<p>The <code>tiny-cli export</code> command is a tool for exporting your tiny game to a zip file, which includes all the assets needed to run the game in a browser. This command makes it easy to distribute your game and share it with others.</p>
+</div>
+<div class="sect3">
+<h4 id="_usage_4">Usage</h4>
+<div class="paragraph">
+<p>To use the <code>tiny-cli export</code> command, simply open your terminal and type the following command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">tiny-cli export &lt;game folder&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>where <code>&lt;game folder&gt;</code> is the path to the folder containing your game&#8217;s assets and <code>_tiny.json</code> file.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_exporting_a_game">Exporting a Game</h4>
+<div class="paragraph">
+<p>To export your game using the <code>tiny-cli export</code> command, follow these steps:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Open your terminal and navigate to the directory where your game&#8217;s <code>_tiny.json</code> file is located.</p>
+</li>
+<li>
+<p>Type the following command and press Enter, replacing <code>&lt;game folder&gt;</code> with the path to your game&#8217;s folder: <code>tiny-cli export &lt;game folder&gt;</code></p>
+</li>
+<li>
+<p>The <code>tiny-cli export</code> command will generate a zip file containing all the assets needed to run your game in a browser.</p>
+</li>
+<li>
+<p>The generated zip file will be saved in the same directory as the <code>_tiny.json</code> file with the name <code>&lt;game folder&gt;.zip</code>.</p>
+</li>
+<li>
+<p>You can now upload the generated zip file to a game hosting platform like itch.io to share your game with others.</p>
+</li>
+<li>
+<p>To run the exported game in a browser, use the <code>tiny-cli serve</code> command, which will serve the game from a local server. Type the following command and press Enter: <code>tiny-cli serve &lt;game folder&gt;.zip</code></p>
+</li>
+<li>
+<p>Open your browser and navigate to <code><a href="http://localhost:8080" class="bare">http://localhost:8080</a></code> to play the exported game.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>With the <code>tiny-cli export</code> command, you can easily export your tiny game and share it with others. Whether you want to distribute your game on itch.io or share it with friends, this command makes it easy to package your game and get it into the hands of others.</p>
+</div>
+</div>
 </div>
 <div class="sect2">
-<h3 id="_tiny_serve">tiny serve</h3>
+<h3 id="_the_tiny_cli_serve_command">the <code>tiny-cli serve</code> command</h3>
 <div class="paragraph">
 <p>The tiny serve command is used to launch a local web server that allows you to test a game that has been exported using the tiny export command. This is useful for testing and debugging a game locally before publishing it online.</p>
 </div>
@@ -486,7 +710,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">tiny serve [options] game.zip</code></pre>
+<pre class="highlight"><code class="language-bash" data-lang="bash">tiny-cli serve [options] game.zip</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -510,7 +734,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">tiny serve myGame.zip</code></pre>
+<pre class="highlight"><code class="language-bash" data-lang="bash">tiny-cli serve myGame.zip</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -518,7 +742,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">tiny serve MyGame.zip --port 8081</code></pre>
+<pre class="highlight"><code class="language-bash" data-lang="bash">tiny-cli serve MyGame.zip --port 8081</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -547,7 +771,7 @@ The tiny serve command is intended for local testing only and should not be used
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-04-21 18:09:34 UTC
+Last updated 2023-04-22 13:57:12 UTC
 </div>
 </div>
 </body>

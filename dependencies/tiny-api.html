@@ -460,7 +460,7 @@ function _draw()
   cls(2)
   p = ctrl.touch()
   print("coordinates: "..p.x .. "x"..p.y, 1, 1, 4)
-  shp.rectf(p.x, p.y, 5,5, p.x + p.y)
+  shape.rectf(p.x, p.y, 5,5, p.x + p.y)
 end
 
 </tiny-editor>
@@ -505,11 +505,11 @@ gfx.dither(pattern) -- Apply dithering pattern.</code></pre>
 function _draw()
     cls()
     gfx.dither()
-    shp.circlef(30, 30, 30, 2)
+    shape.circlef(30, 30, 30, 2)
     gfx.dither(0xA5A5) -- set a dithering pattern
-    shp.circlef(50, 50, 30, 3)
+    shape.circlef(50, 50, 30, 3)
     gfx.dither(0x0842) -- set another dithering pattern
-    shp.circlef(70, 70, 30, 2)
+    shape.circlef(70, 70, 30, 2)
 end
 
 </tiny-editor>
@@ -531,13 +531,13 @@ function _draw()
   cls()
   -- set a clip area to crop circles
   gfx.clip(20, 20, 80, 80)
-  shp.circlef(20, 20, 20, 2)
-  shp.circlef(100, 20, 20, 2)
+  shape.circlef(20, 20, 20, 2)
+  shape.circlef(100, 20, 20, 2)
 
   -- reset the clip area
   gfx.clip()
-  shp.circlef(20, 20, 10, 3)
-  shp.circlef(100, 20, 10, 3)
+  shape.circlef(20, 20, 10, 3)
+  shape.circlef(100, 20, 10, 3)
 
 end
 
@@ -607,32 +607,32 @@ function _draw()
   progress = abs(cos(t))
 
   print("pow", 0, 0)
-  shp.circlef(juice.pow2(20, 236, progress), 10, 10, 2)
-  shp.circlef(juice.pow3(20, 236, progress), 20, 10, 3)
-  shp.circlef(juice.pow4(20, 236, progress), 30, 10, 4)
+  shape.circlef(juice.pow2(20, 236, progress), 10, 10, 2)
+  shape.circlef(juice.pow3(20, 236, progress), 20, 10, 3)
+  shape.circlef(juice.pow4(20, 236, progress), 30, 10, 4)
 
 
   print("bounce", 0, 50)
-  shp.circlef(juice.bounce(20, 236, progress), 60, 10, 5)
+  shape.circlef(juice.bounce(20, 236, progress), 60, 10, 5)
 
   print("exp", 0, 80)
-  shp.circlef(juice.exp10(20, 236, progress), 90, 10, 6)
+  shape.circlef(juice.exp10(20, 236, progress), 90, 10, 6)
 
 
   print("swing", 0, 110)
-  shp.circlef(juice.swing(20, 236, progress), 120, 10, 7)
+  shape.circlef(juice.swing(20, 236, progress), 120, 10, 7)
 
   print("sine", 0, 140)
-  shp.circlef(juice.sine(20, 236, progress), 150, 10, 8)
+  shape.circlef(juice.sine(20, 236, progress), 150, 10, 8)
 
   print("circle", 0, 170)
-  shp.circlef(juice.circle(20, 236, progress), 180, 10, 9)
+  shape.circlef(juice.circle(20, 236, progress), 180, 10, 9)
 
   print("elastic", 0, 200)
-  shp.circlef(juice.elastic(20, 236, progress), 210, 10, 10)
+  shape.circlef(juice.elastic(20, 236, progress), 210, 10, 10)
 
   print("linear", 0, 230)
-  shp.circlef(juice.linear(20, 236, progress), 240, 10, 1)
+  shape.circlef(juice.linear(20, 236, progress), 240, 10, 1)
 end
 
 </tiny-editor>
@@ -693,24 +693,48 @@ sfx.stop(sound) -- Stop the sound by it's index.</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_shp_rect">shp.rect()</h3>
+<h3 id="_shape_rect">shape.rect()</h3>
 <div class="paragraph">
 <p>Draw a rectangle.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">shp.rect(args, x, y, width, height, color) -- Draw a rectangle.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">shape.rect(args, x, y, width, height, color) -- Draw a rectangle.</code></pre>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_shp_rectf">shp.rectf()</h3>
+<h3 id="_shape_oval">shape.oval()</h3>
+<div class="paragraph">
+<p>Draw an oval.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">shape.oval(centerX, centerY, radiusX, radiusY) -- Draw an oval using the default color.
+shape.oval(args, centerX, centerY, radiusX, radiusY, color) -- Draw an oval using the specified color.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_shape_ovalf">shape.ovalf()</h3>
+<div class="paragraph">
+<p>Draw an oval filled.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">shape.ovalf(centerX, centerY, radiusX, radiusY) -- Draw a filled oval using the default color.
+shape.ovalf(args, centerX, centerY, radiusX, radiusY, color) -- Draw a filled oval using the specified color.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_shape_rectf">shape.rectf()</h3>
 <div class="paragraph">
 <p>Draw a filled rectangle.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">shp.rectf(args, x, y, width, height, color) -- Draw a filled rectangle.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">shape.rectf(args, x, y, width, height, color) -- Draw a filled rectangle.</code></pre>
 </div>
 </div>
 <tiny-editor>
@@ -740,7 +764,7 @@ end
 </tiny-editor>
 </div>
 <div class="sect2">
-<h3 id="_shp_circlef">shp.circlef()</h3>
+<h3 id="_shape_circlef">shape.circlef()</h3>
 <div class="paragraph">
 <p>Draw a filled circle.</p>
 </div>
@@ -750,20 +774,20 @@ function _draw()
     cls()
 
     -- filled circle
-    shp.circlef(20, 20, 20, 4)
-    shp.circlef(30, 30, 20, 5)
-    shp.circlef(40, 40, 20, 6)
+    shape.circlef(20, 20, 20, 4)
+    shape.circlef(30, 30, 20, 5)
+    shape.circlef(40, 40, 20, 6)
     print("filled circle", 20, 10)
 
     -- non filled circle
-    shp.circle(50, 70, 10, 7)
-    shp.circle(60, 80, 10, 8)
-    shp.circle(70, 90, 10, 9)
+    shape.circle(50, 70, 10, 7)
+    shape.circle(60, 80, 10, 8)
+    shape.circle(70, 90, 10, 9)
     print("non filled circle", 20, 65)
 
-    shp.circle(80, 120, 15, 10)
-    shp.circle(80, 140, 20, 16)
-    shp.circle(80, 160, 30, 14)
+    shape.circle(80, 120, 15, 10)
+    shape.circle(80, 140, 20, 16)
+    shape.circle(80, 160, 30, 14)
     print("circle with different radius", 20, 115)
 
 end
@@ -771,26 +795,26 @@ end
 </tiny-editor>
 </div>
 <div class="sect2">
-<h3 id="_shp_line">shp.line()</h3>
+<h3 id="_shape_line">shape.line()</h3>
 <div class="paragraph">
 <p>Draw a line.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">shp.line(args, x0, y0, x1, y2, color) -- Draw a line.
-shp.line(x0, y0, x1, y1) -- Draw a line with a default color.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">shape.line(args, x0, y0, x1, y2, color) -- Draw a line.
+shape.line(x0, y0, x1, y1) -- Draw a line with a default color.</code></pre>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_shp_circle">shp.circle()</h3>
+<h3 id="_shape_circle">shape.circle()</h3>
 <div class="paragraph">
 <p>Draw a circle.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">shp.circle(a, b, c) -- Draw a circle with the default color.
-shp.circle(centerX, centerY, radius, color) -- Draw a circle.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">shape.circle(a, b, c) -- Draw a circle with the default color.
+shape.circle(centerX, centerY, radius, color) -- Draw a circle.</code></pre>
 </div>
 </div>
 </div>
@@ -807,13 +831,13 @@ spr.sheet(spritesheetN) -- Switch to the N spritesheet</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_spr_sspr">spr.sspr()</h3>
+<h3 id="_spr_sdraw">spr.sdraw()</h3>
 <div class="paragraph">
-<p>Draw a fragment from the spritesheet.</p>
+<p>S(uper) Draw a fragment from the spritesheet.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">spr.sspr(args, x, y, sprX, sprY, width, height, flipX, flipY) -- Draw a fragment from the spritesheet.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">spr.sdraw(args, x, y, sprX, sprY, width, height, flipX, flipY) -- Draw a fragment from the spritesheet.</code></pre>
 </div>
 </div>
 </div>
@@ -918,7 +942,7 @@ rnd(arg1, arg2) -- Generate a random value between the first and the second argu
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-04-21 18:12:56 UTC
+Last updated 2023-04-22 14:00:14 UTC
 </div>
 </div>
 </body>
