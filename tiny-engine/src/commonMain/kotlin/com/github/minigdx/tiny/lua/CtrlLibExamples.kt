@@ -6,6 +6,6 @@ function _draw()
   cls(2)
   p = ctrl.touch()
   print("coordinates: "..p.x .. "x"..p.y, 1, 1, 4)
-  shp.rectf(p.x, p.y, 5,5, p.x + p.y)
+  shape.rectf(p.x, p.y, 5,5, p.x + p.y)
 end
 """

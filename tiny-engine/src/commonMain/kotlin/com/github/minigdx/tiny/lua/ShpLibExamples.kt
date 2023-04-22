@@ -31,20 +31,20 @@ function _draw()
     cls()
 
     -- filled circle
-    shp.circlef(20, 20, 20, 4)
-    shp.circlef(30, 30, 20, 5)
-    shp.circlef(40, 40, 20, 6)
+    shape.circlef(20, 20, 20, 4)
+    shape.circlef(30, 30, 20, 5)
+    shape.circlef(40, 40, 20, 6)
     print("filled circle", 20, 10)
 
     -- non filled circle
-    shp.circle(50, 70, 10, 7)
-    shp.circle(60, 80, 10, 8)
-    shp.circle(70, 90, 10, 9)
+    shape.circle(50, 70, 10, 7)
+    shape.circle(60, 80, 10, 8)
+    shape.circle(70, 90, 10, 9)
     print("non filled circle", 20, 65)
 
-    shp.circle(80, 120, 15, 10)
-    shp.circle(80, 140, 20, 16)
-    shp.circle(80, 160, 30, 14)
+    shape.circle(80, 120, 15, 10)
+    shape.circle(80, 140, 20, 16)
+    shape.circle(80, 160, 30, 14)
     print("circle with different radius", 20, 115)
 
 end

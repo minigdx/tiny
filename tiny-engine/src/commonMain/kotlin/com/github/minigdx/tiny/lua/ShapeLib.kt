@@ -15,8 +15,8 @@ import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import kotlin.math.abs
 
-@TinyLib("shp")
-class ShpLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() {
+@TinyLib("shape")
+class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() {
     override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
         val shp = LuaTable()
         shp["line"] = line()
@@ -27,8 +27,8 @@ class ShpLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         shp["circle"] = circle()
         shp["circlef"] = circlef()
 
-        arg2.set("shp", shp)
-        arg2.get("package").get("loaded").set("shp", shp)
+        arg2.set("shape", shp)
+        arg2.get("package").get("loaded").set("shape", shp)
         return shp
     }
 

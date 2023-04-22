@@ -8,7 +8,7 @@ import com.github.minigdx.tiny.lua.GfxLib
 import com.github.minigdx.tiny.lua.JuiceLib
 import com.github.minigdx.tiny.lua.MapLib
 import com.github.minigdx.tiny.lua.SfxLib
-import com.github.minigdx.tiny.lua.ShpLib
+import com.github.minigdx.tiny.lua.ShapeLib
 import com.github.minigdx.tiny.lua.SprLib
 import com.github.minigdx.tiny.lua.StdLib
 import com.github.minigdx.tiny.lua.StdLibListener
@@ -72,7 +72,7 @@ class GameScript(
         load(GfxLib(this@GameScript.resourceAccess))
         load(CtrlLib(inputHandler, sprLib))
         load(SfxLib(this@GameScript.resourceAccess))
-        load(ShpLib(this@GameScript.resourceAccess))
+        load(ShapeLib(this@GameScript.resourceAccess))
         load(sprLib)
         load(JuiceLib())
         LoadState.install(this)
