@@ -201,7 +201,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
         }
     }
 
-    @TinyFunction("Draw a filled rectangle.", example = SHP_RECTF_EXAMPLE)
+    @TinyFunction("Draw a filled rectangle.", example = SHAPE_RECTF_EXAMPLE)
     internal inner class rectf : LibFunction() {
         // cornerX: Int, cornerY: Int, width: Int, height: Int, color: Int
         @TinyCall("Draw a filled rectangle.")
@@ -230,7 +230,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
         }
     }
 
-    @TinyFunction("Draw a filled circle.", example = SHP_CIRCLEF_EXAMPLE)
+    @TinyFunction("Draw a filled circle.", example = SHAPE_CIRCLEF_EXAMPLE)
     internal inner class circlef : LibFunction() {
         // centerX: Int, centerY: Int, radius: Int, color: Int
         override fun call(
