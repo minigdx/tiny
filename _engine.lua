@@ -17,8 +17,8 @@ end
 
 function _draw()
     if dt > 0 then
-        rectf(0, 0, width, 6, msg.color)
-    -- TODO: display the logo
-    print(msg.text, 6, 1, "#FFFFFF")
+        shape.rectf(0, 0, width, 6, msg.color)
+        -- TODO: display the logo
+        print(msg.text, 6, 1, "#FFFFFF")
     end
 end

@@ -509,6 +509,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_map_flag">map.flag()</a></li>
 <li><a href="#_map_entity">map.entity()</a></li>
 <li><a href="#_map_draw">map.draw()</a></li>
+<li><a href="#_math_clamp">math.clamp()</a></li>
+<li><a href="#_math_dst">math.dst()</a></li>
+<li><a href="#_math_dst2">math.dst2()</a></li>
+<li><a href="#_math_rnd">math.rnd()</a></li>
 <li><a href="#_sfx_play">sfx.play()</a></li>
 <li><a href="#_sfx_stop">sfx.stop()</a></li>
 <li><a href="#_shape_rect">shape.rect()</a></li>
@@ -523,12 +527,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_spr_draw">spr.draw()</a></li>
 <li><a href="#_all">all()</a></li>
 <li><a href="#_print">print()</a></li>
-<li><a href="#_abs">abs()</a></li>
-<li><a href="#_cos">cos()</a></li>
-<li><a href="#_sin">sin()</a></li>
-<li><a href="#_min">min()</a></li>
 <li><a href="#_cls">cls()</a></li>
-<li><a href="#_rnd">rnd()</a></li>
 </ul>
 </li>
 </ul>
@@ -1111,6 +1110,52 @@ end
 </div>
 </div>
 <div class="sect2">
+<h3 id="_math_clamp">math.clamp()</h3>
+<div class="paragraph">
+<p>Clamp the value between 2 values.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">math</span><span class="p">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">,</span> <span class="n">arg3</span><span class="p">)</span> <span class="c1">-- Clamp the value between a and b.</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_math_dst">math.dst()</h3>
+<div class="paragraph">
+<p>Compute the distance between two points.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">math</span><span class="p">.</span><span class="n">dst</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">)</span> <span class="c1">-- Distance between (x1, y1) and (x2, y2).</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_math_dst2">math.dst2()</h3>
+<div class="paragraph">
+<p>Compute the distance between two points not squared. Use this method to know if an coordinate is closer than another.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">math</span><span class="p">.</span><span class="n">dst2</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">)</span> <span class="c1">-- Distance not squared between (x1, y1) and (x2, y2).</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_math_rnd">math.rnd()</h3>
+<div class="paragraph">
+<p>Generate random values</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">math</span><span class="p">.</span><span class="n">rnd</span><span class="p">()</span> <span class="c1">-- Generate a random int (negative or positive value)</span>
+<span class="n">math</span><span class="p">.</span><span class="n">rnd</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="c1">-- Generate a random value between 1 and the argument. If a table is passed, it'll return a random element of the table.</span>
+<span class="n">math</span><span class="p">.</span><span class="n">rnd</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">)</span> <span class="c1">-- Generate a random value between the first and the second argument.</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
 <h3 id="_sfx_play">sfx.play()</h3>
 <div class="paragraph">
 <p>Play a sound.</p>
@@ -1333,38 +1378,6 @@ end
 </tiny-editor>
 </div>
 <div class="sect2">
-<h3 id="_abs">abs()</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">abs</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="c1">-- absolute value.</span></code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_cos">cos()</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">cos</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="c1">-- cosinus of the value passed as parameter.</span></code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_sin">sin()</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">sin</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="c1">-- sinus of the value passed as parameter.</span></code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_min">min()</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">min</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">)</span> <span class="c1">-- minimun value between two values. Those values can be numbers or string.</span></code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
 <h3 id="_cls">cls()</h3>
 <div class="paragraph">
 <p>clear the screen</p>
@@ -1376,26 +1389,13 @@ end
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_rnd">rnd()</h3>
-<div class="paragraph">
-<p>generate random values</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">rnd</span><span class="p">()</span> <span class="c1">-- Generate a random int (negative or positive value)</span>
-<span class="n">rnd</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="c1">-- Generate a random value between 1 and the argument. If a table is passed, it'll return a random element of the table.</span>
-<span class="n">rnd</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">)</span> <span class="c1">-- Generate a random value between the first and the second argument.</span></code></pre>
-</div>
-</div>
-</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-04-23 12:45:22 UTC
+Last updated 2023-04-23 15:53:20 UTC
 </div>
 </div>
 <style>

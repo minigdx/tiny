@@ -669,6 +669,52 @@ map.draw(layer) -- Draw the layer on the screen.</code></pre>
 </div>
 </div>
 <div class="sect2">
+<h3 id="_math_clamp">math.clamp()</h3>
+<div class="paragraph">
+<p>Clamp the value between 2 values.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">math.clamp(arg1, arg2, arg3) -- Clamp the value between a and b.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_math_dst">math.dst()</h3>
+<div class="paragraph">
+<p>Compute the distance between two points.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">math.dst(x1, y1, x2, y2) -- Distance between (x1, y1) and (x2, y2).</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_math_dst2">math.dst2()</h3>
+<div class="paragraph">
+<p>Compute the distance between two points not squared. Use this method to know if an coordinate is closer than another.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">math.dst2(x1, y1, x2, y2) -- Distance not squared between (x1, y1) and (x2, y2).</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_math_rnd">math.rnd()</h3>
+<div class="paragraph">
+<p>Generate random values</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">math.rnd() -- Generate a random int (negative or positive value)
+math.rnd(arg) -- Generate a random value between 1 and the argument. If a table is passed, it'll return a random element of the table.
+math.rnd(arg1, arg2) -- Generate a random value between the first and the second argument.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
 <h3 id="_sfx_play">sfx.play()</h3>
 <div class="paragraph">
 <p>Play a sound.</p>
@@ -891,38 +937,6 @@ end
 </tiny-editor>
 </div>
 <div class="sect2">
-<h3 id="_abs">abs()</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">abs(arg) -- absolute value.</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_cos">cos()</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">cos(arg) -- cosinus of the value passed as parameter.</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_sin">sin()</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">sin(arg) -- sinus of the value passed as parameter.</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_min">min()</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">min(arg1, arg2) -- minimun value between two values. Those values can be numbers or string.</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
 <h3 id="_cls">cls()</h3>
 <div class="paragraph">
 <p>clear the screen</p>
@@ -934,26 +948,13 @@ cls(color) -- Clear the screen with a color.</code></pre>
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_rnd">rnd()</h3>
-<div class="paragraph">
-<p>generate random values</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">rnd() -- Generate a random int (negative or positive value)
-rnd(arg) -- Generate a random value between 1 and the argument. If a table is passed, it'll return a random element of the table.
-rnd(arg1, arg2) -- Generate a random value between the first and the second argument.</code></pre>
-</div>
-</div>
-</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-04-23 12:49:05 UTC
+Last updated 2023-04-23 15:57:09 UTC
 </div>
 </div>
 </body>
