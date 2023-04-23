@@ -35,6 +35,7 @@ import kotlinx.coroutines.launch
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.opengl.GL
 import org.lwjgl.system.MemoryUtil
+import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -56,6 +57,7 @@ class GlfwPlatform(
 
     // Keep 30 seconds at 60 frames per seconds
     private val gifBufferCache: MutableFixedSizeList<IntArray> = MutableFixedSizeList(gameOptions.record.toInt() * FPS)
+    private var lastBuffer: FrameBuffer? = null
 
     private val lwjglInputHandler = LwjglInput(gameOptions)
 
@@ -181,12 +183,14 @@ class GlfwPlatform(
         val image = frameBuffer.generateBuffer()
         render.draw(context, image, frameBuffer.width, frameBuffer.height)
         gifBufferCache.add(frameBuffer.gifBuffer)
+        lastBuffer = frameBuffer
     }
 
     override fun endGameLoop() = Unit
 
     override fun record() {
-        val origin = File("output.gif")
+        val origin = newFile("video", "gif")
+
         logger.info("GLWF") { "Starting to generate GIF in '${origin.absolutePath}' (Wait for it...)" }
         val buffer = mutableListOf<IntArray>().apply {
             addAll(gifBufferCache)
@@ -213,6 +217,46 @@ class GlfwPlatform(
                 vfs.save(FileStream(origin), out.toByteArray())
             }
             logger.info("GLFW") { "Screen recorded in '${origin.absolutePath}' in ${System.currentTimeMillis() - now} ms" }
+        }
+    }
+
+    private fun newFile(prefixName: String, extension: String): File {
+        var index = 0
+        var origin = workdirectory.resolve("output_${index.toString().padStart(3, '0')}.$extension")
+        while (origin.exists()) {
+            index++
+            if (index >= 999) throw IllegalStateException(
+                "Too many file '${prefixName}_xxx.$extension' generated! " +
+                    "You might need to delete some"
+            )
+            origin = workdirectory.resolve("output_${index.toString().padStart(3, '0')}.$extension")
+        }
+        return origin
+    }
+
+    override fun screenshot() {
+        val buffer = lastBuffer ?: return
+
+        recordScope.launch {
+            val origin = newFile("screenshoot", "png")
+            val width = buffer.width
+            val height = buffer.height
+            val image = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
+            val colorData = buffer.buffer
+
+            for (y in 0 until height) {
+                for (x in 0 until width) {
+                    val i = y * width + x
+                    val r = colorData[i * 4 + 0].toInt() and 0xff
+                    val g = colorData[i * 4 + 1].toInt() and 0xff
+                    val b = colorData[i * 4 + 2].toInt() and 0xff
+                    val a = colorData[i * 4 + 3].toInt() and 0xff
+                    val color = (a shl 24) or (r shl 16) or (g shl 8) or b
+                    image.setRGB(x, y, color)
+                }
+            }
+
+            ImageIO.write(image, "png", origin)
         }
     }
 

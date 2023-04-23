@@ -37,6 +37,10 @@ interface InputHandler {
      */
     fun isNoneKeysPressed(vararg keys: Key): Boolean = keys.none { isKeyPressed(it) }
 
+    fun isCombinationPressed(key1: Key, key2: Key): Boolean {
+        return (isKeyJustPressed(key1) && isKeyPressed(key2)) || (isKeyJustPressed(key2) && isKeyPressed(key1))
+    }
+
     /**
      * Is [signal] touched on the screen?
      *

@@ -296,12 +296,12 @@ class GameEngine(
         }
 
         // The user hit Ctrl + R(ecord)
-        if (inputHandler.isKeyJustPressed(Key.CTRL) && inputHandler.isKeyPressed(Key.R)) {
+        if (inputHandler.isCombinationPressed(Key.CTRL, Key.R)) {
             engineGameScript?.invoke("popup", valueOf(0), valueOf("recording GIF"), valueOf(4))
             platform.record()
-        } else if (inputHandler.isKeyJustPressed(Key.R) && inputHandler.isKeyPressed(Key.CTRL)) {
-            engineGameScript?.invoke("popup", valueOf(0), valueOf("recording GIF"), valueOf(4))
-            platform.record()
+        } else if (inputHandler.isCombinationPressed(Key.CTRL, Key.S)) {
+            engineGameScript?.invoke("popup", valueOf(0), valueOf("screenshot PNG"), valueOf(4))
+            platform.screenshot()
         }
         inputManager.reset()
     }

@@ -43,7 +43,12 @@ interface Platform {
     /**
      * Save the last 30 seconds of the game.
      */
-    fun record()
+    fun record() = Unit
+
+    /**
+     * Generate a screenshoot of the actual frame.
+     */
+    fun screenshot() = Unit
 
     /**
      * The game loop stopped.

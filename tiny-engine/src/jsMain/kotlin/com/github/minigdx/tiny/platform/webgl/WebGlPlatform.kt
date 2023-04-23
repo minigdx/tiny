@@ -75,8 +75,6 @@ class WebGlPlatform(
         render.draw(context, image, frameBuffer.width, frameBuffer.height)
     }
 
-    override fun record() = Unit
-
     override fun endGameLoop() = Unit
 
     override fun initInputHandler(): InputHandler = jsInputHandler

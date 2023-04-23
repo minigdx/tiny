@@ -115,8 +115,6 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
 
     override fun draw(context: RenderContext, frameBuffer: FrameBuffer) = delegate.draw(context, frameBuffer)
 
-    override fun record() = delegate.record()
-
     override fun endGameLoop() = delegate.endGameLoop()
 
     override fun initInputHandler(): InputHandler = delegate.initInputHandler()
