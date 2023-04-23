@@ -1,6 +1,7 @@
 package com.github.minigdx.tiny.lua
 
 import com.github.mingdx.tiny.doc.TinyArg
+import com.github.mingdx.tiny.doc.TinyArgs
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
@@ -8,10 +9,12 @@ import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
+import org.luaj.vm2.Varargs
 import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.ThreeArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
+import org.luaj.vm2.lib.VarArgFunction
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
@@ -34,19 +37,50 @@ class StdLib(
     override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
         val tiny = LuaTable()
         arg2["exit"] = exit()
-        arg2["pset"] = pset()
-        arg2["pget"] = pget()
-        arg2["rnd"] = rnd()
-        arg2["cls"] = cls()
-        arg2["cos"] = cos()
-        arg2["sin"] = sin()
-        arg2["min"] = min()
-        arg2["max"] = max()
-        arg2["abs"] = abs()
+        arg2["pset"] = pset() // move to gfx
+        arg2["pget"] = pget() // move to gfx
+        arg2["rnd"] = rnd() // move to math
+        arg2["cls"] = cls() // move to gfx
+        arg2["cos"] = cos() // move to math
+        arg2["sin"] = sin() // move to math
+        arg2["min"] = min() // move to math
+        arg2["max"] = max() // move to math
+        arg2["abs"] = abs() // move to math
+        arg2["all"] = all()
         arg2["print"] = print()
         arg2["debug"] = debug()
-        arg2["PI"] = valueOf(PI)
+        arg2["PI"] = valueOf(PI) // move to math
         return tiny
+    }
+
+    @TinyFunction(
+        "Iterate over values of a table. " +
+            "If you want to iterate over keys, use pairs(table). " +
+            "If you want to iterate over index, use ipairs(table). "
+    )
+    internal inner class all : VarArgFunction() {
+
+        @TinyCall("Iterate over the values of the table")
+        override fun invoke(@TinyArgs(arrayOf("table")) args: Varargs): Varargs {
+            val iterator = object : VarArgFunction() {
+
+                var index = 0
+
+                override fun invoke(args: Varargs): Varargs {
+                    val table = args.checktable(1)!!
+                    index += 1
+
+                    val luaValue = table[index]
+                    if (luaValue.isnil()) return NONE
+
+                    // Return only the value.
+                    return varargsOf(arrayOf(luaValue))
+                }
+            }
+            val table = args.checktable(1)!!
+            // iterator, object to iterate, seed value.
+            return varargsOf(iterator, table, valueOf(0))
+        }
     }
 
     internal inner class debug : OneArgFunction() {
@@ -62,21 +96,26 @@ class StdLib(
         @TinyCall(
             description = "print on the screen a string at (0,0) with a default color.",
         )
-        override fun call(@TinyArg("str")a: LuaValue): LuaValue {
+        override fun call(@TinyArg("str") a: LuaValue): LuaValue {
             return call(a, valueOf(0), valueOf(0), valueOf("#FFFFFF"))
         }
 
         @TinyCall(
             description = "print on the screen a string with a default color.",
         )
-        override fun call(@TinyArg("str")a: LuaValue, @TinyArg("x")b: LuaValue, @TinyArg("y")c: LuaValue): LuaValue {
+        override fun call(@TinyArg("str") a: LuaValue, @TinyArg("x") b: LuaValue, @TinyArg("y") c: LuaValue): LuaValue {
             return call(a, b, c, valueOf("#FFFFFF"))
         }
 
         @TinyCall(
             description = "print on the screen a string with a specific color.",
         )
-        override fun call(@TinyArg("str")a: LuaValue, @TinyArg("x")b: LuaValue, @TinyArg("y")c: LuaValue, @TinyArg("color")d: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("str") a: LuaValue,
+            @TinyArg("x") b: LuaValue,
+            @TinyArg("y") c: LuaValue,
+            @TinyArg("color") d: LuaValue
+        ): LuaValue {
             val str = a.checkjstring() ?: return NONE
             val x = b.checkint()
             val y = c.checkint()
@@ -224,7 +263,7 @@ class StdLib(
         }
 
         @TinyCall("Clear the screen with a color.")
-        override fun call(@TinyArg("color")arg: LuaValue): LuaValue {
+        override fun call(@TinyArg("color") arg: LuaValue): LuaValue {
             resourceAccess.frameBuffer.clear(arg.checkColorIndex())
             return NONE
         }
