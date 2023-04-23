@@ -14,7 +14,7 @@ function _update()
     end
 
     if (waiting < 0) then
-        cls(1)
+        cls("#000000")
         exit(0) -- start the first script in the game script stack
     end
 end
@@ -43,7 +43,7 @@ function letter(x, l, index, move)
     end
 end
 function _draw()
-    cls(1)
+    cls("#000000")
 
     for index = 1, #prefix do
         letter(2, prefix[index], index, false)
