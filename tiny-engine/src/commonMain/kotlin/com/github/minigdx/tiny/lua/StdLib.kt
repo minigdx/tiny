@@ -16,12 +16,6 @@ import org.luaj.vm2.lib.ThreeArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.VarArgFunction
 import kotlin.math.PI
-import kotlin.math.abs
-import kotlin.math.cos
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.sin
-import kotlin.random.Random
 
 interface StdLibListener {
     fun exit(nextScriptIndex: Int)
@@ -39,13 +33,7 @@ class StdLib(
         arg2["exit"] = exit()
         arg2["pset"] = pset() // move to gfx
         arg2["pget"] = pget() // move to gfx
-        arg2["rnd"] = rnd() // move to math
         arg2["cls"] = cls() // move to gfx
-        arg2["cos"] = cos() // move to math
-        arg2["sin"] = sin() // move to math
-        arg2["min"] = min() // move to math
-        arg2["max"] = max() // move to math
-        arg2["abs"] = abs() // move to math
         arg2["all"] = all()
         arg2["print"] = print()
         arg2["debug"] = debug()
@@ -178,67 +166,6 @@ class StdLib(
             get() = this.isLetter() && this.lowercaseChar() !in 'a'..'z'
     }
 
-    @TinyFunction()
-    internal inner class abs : OneArgFunction() {
-        @TinyCall(
-            description = "absolute value.",
-        )
-        override fun call(arg: LuaValue): LuaValue {
-            return valueOf(abs(arg.todouble()))
-        }
-    }
-
-    @TinyFunction()
-    internal inner class cos : OneArgFunction() {
-        @TinyCall(
-            description = "cosinus of the value passed as parameter.",
-            mainCall = true
-        )
-        override fun call(arg: LuaValue): LuaValue {
-            return valueOf(cos(arg.todouble()))
-        }
-    }
-
-    @TinyFunction()
-    internal inner class sin : OneArgFunction() {
-        @TinyCall(
-            description = "sinus of the value passed as parameter.",
-            mainCall = true
-        )
-        override fun call(arg: LuaValue): LuaValue {
-            return valueOf(sin(arg.todouble()))
-        }
-    }
-
-    @TinyFunction()
-    internal inner class min : TwoArgFunction() {
-        @TinyCall(
-            description = "minimun value between two values. Those values can be numbers or string.",
-            mainCall = true
-        )
-        override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
-            return if (arg1.isint() || arg1.islong()) {
-                valueOf(min(arg1.checkint(), arg2.checkint()))
-            } else if (arg1.isnumber()) {
-                valueOf(min(arg1.checkdouble(), arg2.checkdouble()))
-            } else {
-                valueOf(listOf(arg1.checkjstring() ?: "", arg2.checkjstring() ?: "").sorted().first())
-            }
-        }
-    }
-
-    internal inner class max : TwoArgFunction() {
-        override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
-            return if (arg1.isint() || arg1.islong()) {
-                valueOf(max(arg1.checkint(), arg2.checkint()))
-            } else if (arg1.isnumber()) {
-                valueOf(max(arg1.checkdouble(), arg2.checkdouble()))
-            } else {
-                valueOf(listOf(arg1.checkjstring() ?: "", arg2.checkjstring() ?: "").sorted().last())
-            }
-        }
-    }
-
     internal inner class exit : OneArgFunction() {
 
         override fun call(arg: LuaValue): LuaValue {
@@ -266,37 +193,6 @@ class StdLib(
         override fun call(@TinyArg("color") arg: LuaValue): LuaValue {
             resourceAccess.frameBuffer.clear(arg.checkColorIndex())
             return NONE
-        }
-    }
-
-    @TinyFunction("generate random values")
-    internal inner class rnd : TwoArgFunction() {
-        @TinyCall("Generate a random int (negative or positive value)", mainCall = true)
-        override fun call(): LuaValue {
-            return valueOf(Random.nextInt())
-        }
-
-        @TinyCall(
-            "Generate a random value between 1 and the argument. " +
-                "If a table is passed, it'll return a random element of the table."
-        )
-        override fun call(arg: LuaValue): LuaValue {
-            return if (arg.istable()) {
-                val table = arg.checktable()!!
-                val index = Random.nextInt(1, table.arrayLength + 1)
-                table[index]
-            } else {
-
-                valueOf(Random.nextInt(abs(arg.checkint())))
-            }
-        }
-
-        @TinyCall("Generate a random value between the first and the second argument.")
-        override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
-            if (arg2.isnil()) {
-                return call(arg1)
-            }
-            return valueOf(Random.nextInt(arg1.checkint(), arg2.checkint()))
         }
     }
 

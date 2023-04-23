@@ -22,7 +22,7 @@ end
 function letter(x, l, index, move)
     local offset = 3
     if move then
-        offset = abs(cos(dt * PI * 2 + index) * 4)
+        offset = math.abs(math.cos(dt * math.pi * 2 + index) * 4)
     end
     if ((not ready) and (l ~= " ")) then
         shape.rectf(
