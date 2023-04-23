@@ -188,8 +188,10 @@ class GLRender(
             GL_TEXTURE_2D,
             0,
             GL_RGBA,
-            width,
+            // I think that the texture format is not in the format OpenGL expect it (column first or line first)
+            // So I swap the height and the width so it's working even with non square game resolution.
             height,
+            width,
             0,
             GL_RGBA,
             GL_UNSIGNED_BYTE,
