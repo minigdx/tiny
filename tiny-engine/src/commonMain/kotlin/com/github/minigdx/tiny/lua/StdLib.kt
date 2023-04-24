@@ -35,6 +35,7 @@ class StdLib(
         arg2["pget"] = pget() // move to gfx
         arg2["cls"] = cls() // move to gfx
         arg2["all"] = all()
+        arg2["rpairs"] = rpairs()
         arg2["print"] = print()
         arg2["debug"] = debug()
         arg2["PI"] = valueOf(PI) // move to math
@@ -68,6 +69,37 @@ class StdLib(
             val table = args.checktable(1)!!
             // iterator, object to iterate, seed value.
             return varargsOf(iterator, table, valueOf(0))
+        }
+    }
+
+    @TinyFunction(
+        "Iterate over values of a table in reverse order. " +
+            "The iterator return an index and the value. " +
+            "The method is useful to remove elements from a table while " +
+            "iterating on it."
+    )
+    internal inner class rpairs : VarArgFunction() {
+
+        @TinyCall("Iterate over the values of the table")
+        override fun invoke(@TinyArgs(arrayOf("table")) args: Varargs): Varargs {
+            val iterator = object : VarArgFunction() {
+
+                override fun invoke(args: Varargs): Varargs {
+                    val table = args.checktable(1)!!
+                    val index = args.checkint(2) - 1
+
+                    if (index < 1) return NONE
+
+                    val luaValue = table[index]
+                    if (luaValue.isnil()) return NONE
+
+                    // Return only the value.
+                    return varargsOf(arrayOf(valueOf(index), luaValue))
+                }
+            }
+            val table = args.checktable(1)!!
+            // iterator, object to iterate, seed value.
+            return varargsOf(iterator, table, valueOf(table.length() + 1))
         }
     }
 
