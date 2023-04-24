@@ -12,7 +12,7 @@ end
 
 function _draw()
   cls()
-  progress = abs(cos(t))
+  progress = math.abs(math.cos(t))
 
   print("pow", 0, 0) 
   shape.circlef(juice.pow2(20, 236, progress), 10, 10, 2)

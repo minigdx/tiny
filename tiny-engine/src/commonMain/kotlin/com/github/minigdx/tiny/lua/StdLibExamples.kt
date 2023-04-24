@@ -10,6 +10,6 @@ function _draw()
     print("how", 10, 20, 4)
     print("are", 26, 20, 5)
     print("you", 42, 20, 6)
-    print("...", 58, 20, rnd(10))
+    print("...", 58, 20, math.rnd(10))
 end
 """
