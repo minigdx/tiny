@@ -627,7 +627,7 @@ end
 
 function _draw()
   cls()
-  progress = abs(cos(t))
+  progress = math.abs(math.cos(t))
 
   print("pow", 0, 0)
   shape.circlef(juice.pow2(20, 236, progress), 10, 10, 2)
@@ -980,7 +980,7 @@ function _draw()
     print("how", 10, 20, 4)
     print("are", 26, 20, 5)
     print("you", 42, 20, 6)
-    print("...", 58, 20, rnd(10))
+    print("...", 58, 20, math.rnd(10))
 end
 
 </tiny-editor>
@@ -1003,7 +1003,7 @@ cls(color) -- Clear the screen with a color.</code></pre>
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-04-24 22:27:06 UTC
+Last updated 2023-04-24 22:38:08 UTC
 </div>
 </div>
 </body>
