@@ -515,6 +515,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_math_dst2">math.dst2()</a></li>
 <li><a href="#_math_rnd">math.rnd()</a></li>
 <li><a href="#_sfx_play">sfx.play()</a></li>
+<li><a href="#_sfx_loop">sfx.loop()</a></li>
 <li><a href="#_sfx_stop">sfx.stop()</a></li>
 <li><a href="#_shape_rect">shape.rect()</a></li>
 <li><a href="#_shape_oval">shape.oval()</a></li>
@@ -1182,6 +1183,18 @@ end
 </div>
 </div>
 <div class="sect2">
+<h3 id="_sfx_loop">sfx.loop()</h3>
+<div class="paragraph">
+<p>Play a sound and loop over it.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">sfx</span><span class="p">.</span><span class="n">loop</span><span class="p">()</span> <span class="c1">-- Play the sound at the index 0.</span>
+<span class="n">sfx</span><span class="p">.</span><span class="n">loop</span><span class="p">(</span><span class="n">sound</span><span class="p">)</span> <span class="c1">-- Play the sound by it's index.</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
 <h3 id="_sfx_stop">sfx.stop()</h3>
 <div class="paragraph">
 <p>Stop a sound.</p>
@@ -1420,7 +1433,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-04-24 12:00:58 UTC
+Last updated 2023-04-24 13:29:33 UTC
 </div>
 </div>
 <style>
