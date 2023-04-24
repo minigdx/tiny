@@ -13,8 +13,24 @@ class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = Pix
 
     private val tmp = Array(pixelFormat) { 0 }
 
-    fun reset(pixel: Int) {
-        pixels = Array(width * height * pixelFormat) { pixel }
+    fun reset(pixel: Int, left: Int = 0, top: Int = 0, right: Int = width, bottom: Int = height) {
+        val cleft = 0 - left
+        val cright = right + 2 * cleft
+
+        val ctop = 0 - top
+        val cbottom = bottom + 2 * ctop
+
+        pixels = Array(width * height * pixelFormat) { index ->
+            val p = index / pixelFormat
+            val x = p % width
+            val y = p / width
+
+            if (x in cleft..cright && y in ctop..cbottom) {
+                pixel
+            } else {
+                0
+            }
+        }
     }
 
     fun set(x: Pixel, y: Pixel, vararg pixel: Int) {

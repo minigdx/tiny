@@ -17,6 +17,7 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         func.set("clip", clip())
         func.set("dither", dither())
         func.set("pal", pal())
+        func.set("camera", camera())
         arg2.set("gfx", func)
         arg2.get("package").get("loaded").set("gfx", func)
         return func
@@ -37,6 +38,22 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         @TinyCall("Replace the color a for the color b.")
         override fun call(a: LuaValue, b: LuaValue): LuaValue {
             resourceAccess.frameBuffer.blender.pal(a.checkint(), b.checkint())
+            return NONE
+        }
+    }
+
+    @TinyFunction("Move the game camera.")
+    inner class camera : TwoArgFunction() {
+
+        @TinyCall("Reset the game camera to it's default position (0,0).")
+        override fun call(): LuaValue {
+            resourceAccess.frameBuffer.camera.set(0, 0)
+            return NONE
+        }
+
+        @TinyCall("Set game camera to the position x, y.")
+        override fun call(@TinyArg("x") arg1: LuaValue, @TinyArg("y") arg2: LuaValue): LuaValue {
+            resourceAccess.frameBuffer.camera.set(arg1.toint(), arg2.toint())
             return NONE
         }
     }

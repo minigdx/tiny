@@ -42,6 +42,27 @@ class Blender(private val gamePalette: ColorPalette) {
         }
     }
 }
+
+class Camera() {
+    var x = 0
+        internal set
+    var y = 0
+        internal set
+
+    fun set(x: Int, y: Int) {
+        this.x = x
+        this.y = y
+    }
+
+    fun cx(x: Int): Int {
+        return x - this.x
+    }
+
+    fun cy(y: Int): Int {
+        return y - this.y
+    }
+}
+
 class FrameBuffer(
     val width: Pixel,
     val height: Pixel,
@@ -58,23 +79,29 @@ class FrameBuffer(
 
     internal val blender = Blender(gamePalette)
 
-    private var tmp = Array<Int>(1) { 0 }
+    internal val camera = Camera()
+
+    private var tmp = Array(1) { 0 }
 
     fun pixel(x: Pixel, y: Pixel): ColorIndex {
-        return colorIndexBuffer.getOne(x, y)
+        val cx = camera.cx(x)
+        val cy = camera.cy(y)
+        return colorIndexBuffer.getOne(cx, cy)
     }
 
     fun pixel(x: Pixel, y: Pixel, colorIndex: ColorIndex) {
-        if (!clipper.isIn(x, y)) return
+        val cx = camera.cx(x)
+        val cy = camera.cy(y)
+        if (!clipper.isIn(cx, cy)) return
 
         tmp[0] = gamePalette.check(colorIndex)
-        val index = blender.mix(tmp, x, y) ?: return
-        colorIndexBuffer.set(x, y, index[0])
+        val index = blender.mix(tmp, cx, cy) ?: return
+        colorIndexBuffer.set(cx, cy, index[0])
     }
 
     fun clear(clearIndx: Int) {
         val clearIndex = gamePalette.check(clearIndx)
-        colorIndexBuffer.reset(clearIndex)
+        colorIndexBuffer.reset(clearIndex, camera.x, camera.y, camera.x + width, camera.y + height)
     }
 
     fun copyFrom(
@@ -119,14 +146,16 @@ class FrameBuffer(
          */
         blender: (Array<Int>, Pixel, Pixel) -> Array<Int> = { colors, _, _ -> colors }
     ) {
+        val cx = camera.cx(dstX)
+        val cy = camera.cy(dstY)
 
-        val clippedX = max(dstX, clipper.left)
-        val clippedWidthLeft = width - (clippedX - dstX)
-        val clippedWidth = min(dstX + clippedWidthLeft, clipper.right) - dstX
+        val clippedX = max(cx, clipper.left)
+        val clippedWidthLeft = width - (clippedX - cx)
+        val clippedWidth = min(cx + clippedWidthLeft, clipper.right) - cx
 
-        val clippedY = max(dstY, clipper.top)
-        val clippedHeightTop = height - (clippedY - dstY)
-        val clippedHeight = min(dstY + clippedHeightTop, clipper.bottom) - dstY
+        val clippedY = max(cy, clipper.top)
+        val clippedHeightTop = height - (clippedY - cy)
+        val clippedHeight = min(cy + clippedHeightTop, clipper.bottom) - cy
 
         colorIndexBuffer.copyFrom(
             source,
