@@ -16,6 +16,7 @@ class GfxLibTest {
         override val bootSpritesheet: SpriteSheet? = null
         override val frameBuffer: FrameBuffer = FrameBuffer(10, 10, ColorPalette(listOf("#FFFFFF")))
         override fun spritesheet(index: Int): SpriteSheet? = null
+        override fun spritesheet(sheet: SpriteSheet) = Unit
         override fun level(index: Int): GameLevel? = null
         override fun sound(index: Int): Sound? = null
     }
@@ -37,10 +38,10 @@ class GfxLibTest {
 
         dither.call(valueOf(0xA5A5))
 
-        val a = mockResources.frameBuffer.blender.mix(arrayOf(1), 0, 0)?.get(0) ?: 0
-        val b = mockResources.frameBuffer.blender.mix(arrayOf(1), 1, 0)?.get(0) ?: 0
-        val c = mockResources.frameBuffer.blender.mix(arrayOf(1), 0, 1)?.get(0) ?: 0
-        val d = mockResources.frameBuffer.blender.mix(arrayOf(1), 1, 1)?.get(0) ?: 0
+        val a = mockResources.frameBuffer.blender.mix(arrayOf(1), 0, 0, null)?.get(0) ?: 0
+        val b = mockResources.frameBuffer.blender.mix(arrayOf(1), 1, 0, null)?.get(0) ?: 0
+        val c = mockResources.frameBuffer.blender.mix(arrayOf(1), 0, 1, null)?.get(0) ?: 0
+        val d = mockResources.frameBuffer.blender.mix(arrayOf(1), 1, 1, null)?.get(0) ?: 0
 
         assertEquals(1, a)
         assertEquals(0, b)
@@ -54,10 +55,10 @@ class GfxLibTest {
 
         dither.call(valueOf(0xFFFF))
 
-        val a = mockResources.frameBuffer.blender.mix(arrayOf(1), 0, 0)?.get(0) ?: 0
-        val b = mockResources.frameBuffer.blender.mix(arrayOf(1), 1, 0)?.get(0) ?: 0
-        val c = mockResources.frameBuffer.blender.mix(arrayOf(1), 0, 1)?.get(0) ?: 0
-        val d = mockResources.frameBuffer.blender.mix(arrayOf(1), 1, 1)?.get(0) ?: 0
+        val a = mockResources.frameBuffer.blender.mix(arrayOf(1), 0, 0, null)?.get(0) ?: 0
+        val b = mockResources.frameBuffer.blender.mix(arrayOf(1), 1, 0, null)?.get(0) ?: 0
+        val c = mockResources.frameBuffer.blender.mix(arrayOf(1), 0, 1, null)?.get(0) ?: 0
+        val d = mockResources.frameBuffer.blender.mix(arrayOf(1), 1, 1, null)?.get(0) ?: 0
 
         assertEquals(1, a)
         assertEquals(1, b)

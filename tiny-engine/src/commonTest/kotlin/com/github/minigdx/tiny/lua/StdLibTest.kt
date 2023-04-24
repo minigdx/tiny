@@ -26,6 +26,7 @@ class StdLibTest {
         )
         override val frameBuffer: FrameBuffer = FrameBuffer(10, 10, ColorPalette(colors))
         override fun spritesheet(index: Int): SpriteSheet? = null
+        override fun spritesheet(sheet: SpriteSheet) = Unit
         override fun level(index: Int): GameLevel? = null
         override fun sound(index: Int): Sound? = null
     }
