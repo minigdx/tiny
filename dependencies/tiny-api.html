@@ -490,6 +490,30 @@ end
 </tiny-editor>
 </div>
 <div class="sect2">
+<h3 id="_gfx_camera">gfx.camera()</h3>
+<div class="paragraph">
+<p>Move the game camera.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">gfx.camera() -- Reset the game camera to it's default position (0,0).
+gfx.camera(x, y) -- Set game camera to the position x, y.</code></pre>
+</div>
+</div>
+<tiny-editor>
+
+function _draw()
+    cls()
+    print("example", 10, 10, 2) -- print using the color index 2
+    gfx.pal(2, 3) -- switch the text color to another color
+    print("example", 10, 20, 2) -- print using the color index 2
+    gfx.pal() -- reset the palette
+    print("example", 10, 30, 2) -- print using the color index 2
+end
+
+</tiny-editor>
+</div>
+<div class="sect2">
 <h3 id="_gfx_dither">gfx.dither()</h3>
 <div class="paragraph">
 <p>Apply a dithering pattern on every new draw call. The pattern is using the bits value of a 2 octet value. The first bits is the one on the far left and represent the pixel of the top left of a 4x4 matrix. The last bit is the pixel from the bottom right of this matrix.</p>
@@ -954,7 +978,7 @@ cls(color) -- Clear the screen with a color.</code></pre>
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-04-23 16:23:18 UTC
+Last updated 2023-04-24 07:47:33 UTC
 </div>
 </div>
 </body>

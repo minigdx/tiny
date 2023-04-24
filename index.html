@@ -503,6 +503,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <ul class="sectlevel2">
 <li><a href="#_ctrl_touch">ctrl.touch()</a></li>
 <li><a href="#_gfx_pal">gfx.pal()</a></li>
+<li><a href="#_gfx_camera">gfx.camera()</a></li>
 <li><a href="#_gfx_dither">gfx.dither()</a></li>
 <li><a href="#_gfx_clip">gfx.clip()</a></li>
 <li><a href="#_juice_pow2">juice.pow2()</a></li>
@@ -915,6 +916,30 @@ end
 <div class="content">
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">pal</span><span class="p">()</span> <span class="c1">-- Reset all previous color changes.</span>
 <span class="n">gfx</span><span class="p">.</span><span class="n">pal</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="c1">-- Replace the color a for the color b.</span></code></pre>
+</div>
+</div>
+<tiny-editor>
+
+function _draw()
+    cls()
+    print("example", 10, 10, 2) -- print using the color index 2
+    gfx.pal(2, 3) -- switch the text color to another color
+    print("example", 10, 20, 2) -- print using the color index 2
+    gfx.pal() -- reset the palette
+    print("example", 10, 30, 2) -- print using the color index 2
+end
+
+</tiny-editor>
+</div>
+<div class="sect2">
+<h3 id="_gfx_camera">gfx.camera()</h3>
+<div class="paragraph">
+<p>Move the game camera.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">camera</span><span class="p">()</span> <span class="c1">-- Reset the game camera to it's default position (0,0).</span>
+<span class="n">gfx</span><span class="p">.</span><span class="n">camera</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- Set game camera to the position x, y.</span></code></pre>
 </div>
 </div>
 <tiny-editor>
@@ -1395,7 +1420,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-04-23 16:19:09 UTC
+Last updated 2023-04-24 07:44:28 UTC
 </div>
 </div>
 <style>
