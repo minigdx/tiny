@@ -204,14 +204,15 @@ class KspProcessor(
                     val call = TinyCallDescriptor()
                     call.description = f.getAnnotationsByType(TinyCall::class).firstOrNull()?.description ?: ""
                     f.parameters.map { p ->
-                        val args = p.getAnnotationsByType(TinyArg::class)
-                        val arg = args.firstOrNull()?.name ?: p.name?.asString() ?: ""
-                        call.args += TinyArgDescriptor(arg)
-
                         val multiArgs = p.getAnnotationsByType(TinyArgs::class)
                         val multiArg = multiArgs.firstOrNull()
-                        call.args += multiArg?.names?.map { n -> TinyArgDescriptor(n) }
-                            ?: emptyList()
+                        if (multiArg != null) {
+                            call.args += multiArg.names.map { n -> TinyArgDescriptor(n) }
+                        } else {
+                            val args = p.getAnnotationsByType(TinyArg::class)
+                            val arg = args.firstOrNull()?.name ?: p.name?.asString() ?: ""
+                            call.args += TinyArgDescriptor(arg)
+                        }
                     }
                     calls.add(call)
                 }
