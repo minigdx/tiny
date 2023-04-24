@@ -36,6 +36,7 @@ class JavaMidiSound(private val data: ByteArray) : MidiSound {
 
     override fun stop() {
         sequencer?.stop()
+        sequencer?.close()
     }
 }
 

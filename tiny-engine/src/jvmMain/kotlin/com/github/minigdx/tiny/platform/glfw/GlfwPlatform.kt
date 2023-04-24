@@ -1,5 +1,3 @@
-@file:OptIn(FlowPreview::class)
-
 package com.github.minigdx.tiny.platform.glfw
 
 import com.danielgergely.kgl.KglLwjgl
@@ -30,7 +28,6 @@ import com.squareup.gifencoder.ImageOptions
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.opengl.GL
@@ -176,6 +173,7 @@ class GlfwPlatform(
             GLFW.glfwSwapBuffers(window) // swap the color buffers
             GLFW.glfwPollEvents()
         }
+        gameLoop.end()
         GLFW.glfwTerminate()
     }
 

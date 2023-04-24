@@ -11,4 +11,9 @@ interface GameLoop {
     fun advance(delta: Seconds)
 
     fun draw()
+
+    /**
+     * End of the game loop. Time to stop the game
+     */
+    fun end() = Unit
 }

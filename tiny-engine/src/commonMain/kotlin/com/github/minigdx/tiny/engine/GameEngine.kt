@@ -308,6 +308,7 @@ class GameEngine(
 
     override fun spritesheet(index: Int): SpriteSheet? {
         val protected = max(0, min(index, spriteSheets.size - 1))
+        if (protected >= spriteSheets.size) return null
         return spriteSheets[protected]
     }
 
@@ -322,16 +323,22 @@ class GameEngine(
 
     override fun level(index: Int): GameLevel? {
         val protected = max(0, min(index, levels.size - 1))
+        if (protected >= levels.size) return null
         return levels[protected]
     }
 
     override fun sound(index: Int): Sound? {
         val protected = max(0, min(index, sounds.size - 1))
+        if (protected >= sounds.size) return null
         return sounds[protected]
     }
 
     override fun draw() {
         platform.draw(renderContext, frameBuffer)
+    }
+
+    override fun end() {
+        sounds.forEach { it?.stop() }
     }
 
     companion object {
