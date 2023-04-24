@@ -14,8 +14,8 @@ data class Sound(
         data.sound.play()
     }
 
-    fun loop(loop: Int) {
-        data.sound.loop(loop)
+    fun loop() {
+        data.sound.loop()
     }
 
     fun stop() {

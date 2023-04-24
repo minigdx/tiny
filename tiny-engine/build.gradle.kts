@@ -49,6 +49,7 @@ dependencies {
             "KotlinJS doesn't support well two KotlinJS application with different dependencies."
     )
 
+    // See https://github.com/cagpie/PicoAudio.js
     jsMainImplementation(npm("picoaudio", "1.1.2"))?.because("get midi over web audio API.")
 
     add("kspJvm", project(":tiny-doc-generator")) {

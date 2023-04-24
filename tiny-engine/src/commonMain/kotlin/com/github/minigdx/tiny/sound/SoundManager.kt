@@ -5,7 +5,7 @@ import com.github.minigdx.tiny.input.InputHandler
 interface MidiSound {
     fun play()
 
-    fun loop(loop: Int)
+    fun loop()
 
     fun stop()
 }

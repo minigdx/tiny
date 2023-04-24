@@ -11,7 +11,7 @@ class PicoAudioSound(val audio: dynamic, val smf: dynamic) : MidiSound {
         audio.play()
     }
 
-    override fun loop(loop: Int) {
+    override fun loop() {
         audio.init()
         audio.setData(smf)
         audio.play(true)

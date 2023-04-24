@@ -6,12 +6,13 @@ import com.github.minigdx.tiny.sound.SoundManager
 import java.io.ByteArrayInputStream
 import javax.sound.midi.MidiSystem
 import javax.sound.midi.Sequencer
+import javax.sound.midi.Sequencer.LOOP_CONTINUOUSLY
 
 class JavaMidiSound(private val data: ByteArray) : MidiSound {
 
     private var sequencer: Sequencer? = null
 
-    override fun play() {
+    private fun _play(loop: Int) {
         val seq: Sequencer = MidiSystem.getSequencer()
 
         seq.open()
@@ -20,11 +21,17 @@ class JavaMidiSound(private val data: ByteArray) : MidiSound {
         seq.sequence = sequence
 
         sequencer = seq
+
+        seq.loopCount = loop
         seq.start()
     }
 
-    override fun loop(loop: Int) {
-        TODO("Not yet implemented")
+    override fun play() {
+        _play(0)
+    }
+
+    override fun loop() {
+        _play(LOOP_CONTINUOUSLY)
     }
 
     override fun stop() {
