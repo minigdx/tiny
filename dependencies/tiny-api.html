@@ -466,6 +466,17 @@ end
 </tiny-editor>
 </div>
 <div class="sect2">
+<h3 id="_gfx_to_sheet">gfx.to_sheet()</h3>
+<div class="paragraph">
+<p>Transform the current frame buffer into a spritesheeet.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">gfx.to_sheet(sheet) -- Copy the current frame buffer to an existing sheet index.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
 <h3 id="_gfx_pal">gfx.pal()</h3>
 <div class="paragraph">
 <p>Change a color from the palette to another color.</p>
@@ -769,7 +780,7 @@ sfx.stop(sound) -- Stop the sound by it's index.</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">shape.rect(args, x, y, width, height, color) -- Draw a rectangle.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">shape.rect(x, y, width, height, color) -- Draw a rectangle.</code></pre>
 </div>
 </div>
 </div>
@@ -781,7 +792,7 @@ sfx.stop(sound) -- Stop the sound by it's index.</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-lua" data-lang="lua">shape.oval(centerX, centerY, radiusX, radiusY) -- Draw an oval using the default color.
-shape.oval(args, centerX, centerY, radiusX, radiusY, color) -- Draw an oval using the specified color.</code></pre>
+shape.oval(centerX, centerY, radiusX, radiusY, color) -- Draw an oval using the specified color.</code></pre>
 </div>
 </div>
 </div>
@@ -793,7 +804,7 @@ shape.oval(args, centerX, centerY, radiusX, radiusY, color) -- Draw an oval usin
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-lua" data-lang="lua">shape.ovalf(centerX, centerY, radiusX, radiusY) -- Draw a filled oval using the default color.
-shape.ovalf(args, centerX, centerY, radiusX, radiusY, color) -- Draw a filled oval using the specified color.</code></pre>
+shape.ovalf(centerX, centerY, radiusX, radiusY, color) -- Draw a filled oval using the specified color.</code></pre>
 </div>
 </div>
 </div>
@@ -804,7 +815,7 @@ shape.ovalf(args, centerX, centerY, radiusX, radiusY, color) -- Draw a filled ov
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">shape.rectf(args, x, y, width, height, color) -- Draw a filled rectangle.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">shape.rectf(x, y, width, height, color) -- Draw a filled rectangle.</code></pre>
 </div>
 </div>
 <tiny-editor>
@@ -871,7 +882,7 @@ end
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">shape.line(args, x0, y0, x1, y2, color) -- Draw a line.
+<pre class="highlight"><code class="language-lua" data-lang="lua">shape.line(x0, y0, x1, y2, color) -- Draw a line.
 shape.line(x0, y0, x1, y1) -- Draw a line with a default color.</code></pre>
 </div>
 </div>
@@ -907,7 +918,10 @@ spr.sheet(spritesheetN) -- Switch to the N spritesheet</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">spr.sdraw(args, x, y, sprX, sprY, width, height, flipX, flipY) -- Draw a fragment from the spritesheet.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">spr.sdraw() -- Draw the full spritesheet at default coordinate (0, 0)
+spr.sdraw(x, y) -- Draw the full spritesheet at default coordinate (x, y)
+spr.sdraw(x, y, sprX, sprY) -- Draw the full spritesheet at default coordinate (x, y) from the sprite (sprX, sprY)
+spr.sdraw(x, y, sprX, sprY, width, height, flipX, flipY) -- Draw a fragment from the spritesheet.</code></pre>
 </div>
 </div>
 </div>
@@ -929,7 +943,7 @@ spr.sheet(spritesheetN) -- Switch to the N spritesheet</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">all(args, table) -- Iterate over the values of the table</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">all(table) -- Iterate over the values of the table</code></pre>
 </div>
 </div>
 </div>
@@ -940,7 +954,7 @@ spr.sheet(spritesheetN) -- Switch to the N spritesheet</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">rpairs(args, table) -- Iterate over the values of the table</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">rpairs(table) -- Iterate over the values of the table</code></pre>
 </div>
 </div>
 </div>
@@ -989,7 +1003,7 @@ cls(color) -- Clear the screen with a color.</code></pre>
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-04-24 13:32:37 UTC
+Last updated 2023-04-24 22:27:06 UTC
 </div>
 </div>
 </body>

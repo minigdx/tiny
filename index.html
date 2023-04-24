@@ -502,6 +502,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_tiny_api">Tiny API</a>
 <ul class="sectlevel2">
 <li><a href="#_ctrl_touch">ctrl.touch()</a></li>
+<li><a href="#_gfx_to_sheet">gfx.to_sheet()</a></li>
 <li><a href="#_gfx_pal">gfx.pal()</a></li>
 <li><a href="#_gfx_camera">gfx.camera()</a></li>
 <li><a href="#_gfx_dither">gfx.dither()</a></li>
@@ -910,6 +911,17 @@ end
 </tiny-editor>
 </div>
 <div class="sect2">
+<h3 id="_gfx_to_sheet">gfx.to_sheet()</h3>
+<div class="paragraph">
+<p>Transform the current frame buffer into a spritesheeet.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">to_sheet</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span> <span class="c1">-- Copy the current frame buffer to an existing sheet index.</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
 <h3 id="_gfx_pal">gfx.pal()</h3>
 <div class="paragraph">
 <p>Change a color from the palette to another color.</p>
@@ -1213,7 +1225,7 @@ end
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">rect</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a rectangle.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">rect</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a rectangle.</span></code></pre>
 </div>
 </div>
 </div>
@@ -1225,7 +1237,7 @@ end
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">oval</span><span class="p">(</span><span class="n">centerX</span><span class="p">,</span> <span class="n">centerY</span><span class="p">,</span> <span class="n">radiusX</span><span class="p">,</span> <span class="n">radiusY</span><span class="p">)</span> <span class="c1">-- Draw an oval using the default color.</span>
-<span class="n">shape</span><span class="p">.</span><span class="n">oval</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">centerX</span><span class="p">,</span> <span class="n">centerY</span><span class="p">,</span> <span class="n">radiusX</span><span class="p">,</span> <span class="n">radiusY</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw an oval using the specified color.</span></code></pre>
+<span class="n">shape</span><span class="p">.</span><span class="n">oval</span><span class="p">(</span><span class="n">centerX</span><span class="p">,</span> <span class="n">centerY</span><span class="p">,</span> <span class="n">radiusX</span><span class="p">,</span> <span class="n">radiusY</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw an oval using the specified color.</span></code></pre>
 </div>
 </div>
 </div>
@@ -1237,7 +1249,7 @@ end
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">ovalf</span><span class="p">(</span><span class="n">centerX</span><span class="p">,</span> <span class="n">centerY</span><span class="p">,</span> <span class="n">radiusX</span><span class="p">,</span> <span class="n">radiusY</span><span class="p">)</span> <span class="c1">-- Draw a filled oval using the default color.</span>
-<span class="n">shape</span><span class="p">.</span><span class="n">ovalf</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">centerX</span><span class="p">,</span> <span class="n">centerY</span><span class="p">,</span> <span class="n">radiusX</span><span class="p">,</span> <span class="n">radiusY</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a filled oval using the specified color.</span></code></pre>
+<span class="n">shape</span><span class="p">.</span><span class="n">ovalf</span><span class="p">(</span><span class="n">centerX</span><span class="p">,</span> <span class="n">centerY</span><span class="p">,</span> <span class="n">radiusX</span><span class="p">,</span> <span class="n">radiusY</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a filled oval using the specified color.</span></code></pre>
 </div>
 </div>
 </div>
@@ -1248,7 +1260,7 @@ end
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">rectf</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a filled rectangle.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">rectf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a filled rectangle.</span></code></pre>
 </div>
 </div>
 <tiny-editor>
@@ -1315,7 +1327,7 @@ end
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">line</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a line.</span>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">line</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a line.</span>
 <span class="n">shape</span><span class="p">.</span><span class="n">line</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">)</span> <span class="c1">-- Draw a line with a default color.</span></code></pre>
 </div>
 </div>
@@ -1351,7 +1363,10 @@ end
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">spr</span><span class="p">.</span><span class="n">sdraw</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sprX</span><span class="p">,</span> <span class="n">sprY</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">flipX</span><span class="p">,</span> <span class="n">flipY</span><span class="p">)</span> <span class="c1">-- Draw a fragment from the spritesheet.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">spr</span><span class="p">.</span><span class="n">sdraw</span><span class="p">()</span> <span class="c1">-- Draw the full spritesheet at default coordinate (0, 0)</span>
+<span class="n">spr</span><span class="p">.</span><span class="n">sdraw</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- Draw the full spritesheet at default coordinate (x, y)</span>
+<span class="n">spr</span><span class="p">.</span><span class="n">sdraw</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sprX</span><span class="p">,</span> <span class="n">sprY</span><span class="p">)</span> <span class="c1">-- Draw the full spritesheet at default coordinate (x, y) from the sprite (sprX, sprY)</span>
+<span class="n">spr</span><span class="p">.</span><span class="n">sdraw</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sprX</span><span class="p">,</span> <span class="n">sprY</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">flipX</span><span class="p">,</span> <span class="n">flipY</span><span class="p">)</span> <span class="c1">-- Draw a fragment from the spritesheet.</span></code></pre>
 </div>
 </div>
 </div>
@@ -1373,7 +1388,7 @@ end
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">all</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span> <span class="c1">-- Iterate over the values of the table</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">all</span><span class="p">(</span><span class="n">table</span><span class="p">)</span> <span class="c1">-- Iterate over the values of the table</span></code></pre>
 </div>
 </div>
 </div>
@@ -1384,7 +1399,7 @@ end
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">rpairs</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span> <span class="c1">-- Iterate over the values of the table</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">rpairs</span><span class="p">(</span><span class="n">table</span><span class="p">)</span> <span class="c1">-- Iterate over the values of the table</span></code></pre>
 </div>
 </div>
 </div>
@@ -1433,7 +1448,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-04-24 13:29:33 UTC
+Last updated 2023-04-24 22:24:18 UTC
 </div>
 </div>
 <style>
