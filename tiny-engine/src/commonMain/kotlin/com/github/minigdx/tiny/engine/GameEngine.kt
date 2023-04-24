@@ -311,6 +311,15 @@ class GameEngine(
         return spriteSheets[protected]
     }
 
+    override fun spritesheet(sheet: SpriteSheet) {
+        if (sheet.index >= spriteSheets.size || sheet.index < 0) {
+            spriteSheets = spriteSheets.copyOf(spriteSheets.size + 1)
+            spriteSheets[spriteSheets.size - 1] = sheet
+        } else {
+            spriteSheets[sheet.index] = sheet
+        }
+    }
+
     override fun level(index: Int): GameLevel? {
         val protected = max(0, min(index, levels.size - 1))
         return levels[protected]

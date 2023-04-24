@@ -23,7 +23,7 @@ class Blender(private val gamePalette: ColorPalette) {
         switch[gamePalette.check(source)] = gamePalette.check(target)
     }
 
-    fun mix(colors: Array<ColorIndex>, x: Pixel, y: Pixel): Array<ColorIndex>? {
+    fun mix(colors: Array<ColorIndex>, x: Pixel, y: Pixel, transparency: Array<Int>?): Array<ColorIndex>? {
         fun dither(pattern: Int): Boolean {
             val a = x % 4
             val b = (y % 4) * 4
@@ -34,7 +34,7 @@ class Blender(private val gamePalette: ColorPalette) {
         val color = gamePalette.check(colors[0])
         colors[0] = switch[gamePalette.check(color)]
         // Return null if transparent
-        if (gamePalette.isTransparent(colors[0])) return null
+        if (transparency == null && gamePalette.isTransparent(colors[0])) return null
         return if (!dither(dithering)) {
             null
         } else {
@@ -83,6 +83,8 @@ class FrameBuffer(
 
     private var tmp = Array(1) { 0 }
 
+    private val transparency = arrayOf(0)
+
     fun pixel(x: Pixel, y: Pixel): ColorIndex {
         val cx = camera.cx(x)
         val cy = camera.cy(y)
@@ -95,7 +97,7 @@ class FrameBuffer(
         if (!clipper.isIn(cx, cy)) return
 
         tmp[0] = gamePalette.check(colorIndex)
-        val index = blender.mix(tmp, cx, cy) ?: return
+        val index = blender.mix(tmp, cx, cy, transparency) ?: return
         colorIndexBuffer.set(cx, cy, index[0])
     }
 
@@ -166,7 +168,7 @@ class FrameBuffer(
             clippedWidth,
             clippedHeight,
             reverseX, reverseY
-        ) { c, x, y -> this.blender.mix(blender(c, x, y), x, y) }
+        ) { c, x, y -> this.blender.mix(blender(c, x, y), x, y, null) }
     }
 
     /**

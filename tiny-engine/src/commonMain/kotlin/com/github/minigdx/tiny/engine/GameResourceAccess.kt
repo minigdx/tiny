@@ -25,6 +25,8 @@ interface GameResourceAccess {
      */
     fun spritesheet(index: Int): SpriteSheet?
 
+    fun spritesheet(sheet: SpriteSheet)
+
     /**
      * Access a level by it's index.
      */

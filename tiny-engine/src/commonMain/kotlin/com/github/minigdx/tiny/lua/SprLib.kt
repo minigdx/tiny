@@ -46,7 +46,26 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
 
     @TinyFunction("S(uper) Draw a fragment from the spritesheet.")
     internal inner class sdraw : LibFunction() {
-        // x, y, spr x, spr y, width, height, flip x, flip y
+        @TinyCall("Draw the full spritesheet at default coordinate (0, 0)")
+        override fun call(): LuaValue {
+            return invoke(varargsOf(arrayOf(NIL, NIL, NIL, NIL, NIL, NIL, NIL, NIL))).arg1()
+        }
+
+        @TinyCall("Draw the full spritesheet at default coordinate (x, y)")
+        override fun call(@TinyArg("x") a: LuaValue, @TinyArg("y") b: LuaValue): LuaValue {
+            return invoke(varargsOf(arrayOf(a, b, NIL, NIL, NIL, NIL, NIL, NIL))).arg1()
+        }
+
+        @TinyCall("Draw the full spritesheet at default coordinate (x, y) from the sprite (sprX, sprY)")
+        override fun call(
+            @TinyArg("x") a: LuaValue,
+            @TinyArg("y") b: LuaValue,
+            @TinyArg("sprX") c: LuaValue,
+            @TinyArg("sprY") d: LuaValue
+        ): LuaValue {
+            return invoke(varargsOf(arrayOf(a, b, c, d, NIL, NIL, NIL, NIL))).arg1()
+        }
+
         @TinyCall("Draw a fragment from the spritesheet.")
         override fun invoke(
             @TinyArgs(
@@ -62,17 +81,16 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
                 )
             ) args: Varargs
         ): Varargs {
-            if (args.narg() < 6) return NONE
-            val x = args.arg(1).checkint()
-            val y = args.arg(2).checkint()
-            val sprX = args.arg(3).checkint()
-            val sprY = args.arg(4).checkint()
-            val sprWidth = args.arg(5).checkint()
-            val sprHeight = args.arg(6).checkint()
+            val spritesheet = resourceAccess.spritesheet(currentSpritesheet) ?: return NONE
+
+            val x = args.arg(1).optint(0)
+            val y = args.arg(2).optint(0)
+            val sprX = args.arg(3).optint(0)
+            val sprY = args.arg(4).optint(0)
+            val sprWidth = args.arg(5).optint(spritesheet.width)
+            val sprHeight = args.arg(6).optint(spritesheet.height)
             val flipX = args.arg(7).optboolean(false)
             val flipY = args.arg(8).optboolean(false)
-
-            val spritesheet = resourceAccess.spritesheet(currentSpritesheet) ?: return NONE
 
             resourceAccess.frameBuffer.copyFrom(
                 spritesheet.pixels, x, y, sprX,

@@ -5,24 +5,53 @@ import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.engine.GameResourceAccess
+import com.github.minigdx.tiny.graphic.PixelArray
+import com.github.minigdx.tiny.resources.ResourceType
+import com.github.minigdx.tiny.resources.SpriteSheet
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.LibFunction
+import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 
 @TinyLib("gfx")
 class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() {
     override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
         val func = LuaTable()
-        func.set("clip", clip())
-        func.set("dither", dither())
-        func.set("pal", pal())
-        func.set("camera", camera())
-        arg2.set("gfx", func)
-        arg2.get("package").get("loaded").set("gfx", func)
+        func["clip"] = clip()
+        func["dither"] = dither()
+        func["pal"] = pal()
+        func["camera"] = camera()
+        func["to_sheet"] = toSheet()
+        arg2["gfx"] = func
+        arg2["package"]["loaded"]["gfx"] = func
         return func
     }
 
+    @TinyFunction(
+        "Transform the current frame buffer into a spritesheeet.",
+        "to_sheet"
+    )
+    inner class toSheet : OneArgFunction() {
+
+        @TinyCall("Copy the current frame buffer to an existing sheet index.")
+        override fun call(@TinyArg("sheet") arg: LuaValue): LuaValue {
+            val frameBuffer = resourceAccess.frameBuffer
+            val copy = PixelArray(frameBuffer.width, frameBuffer.height).apply {
+                copyFrom(frameBuffer.colorIndexBuffer) { index, _, _ -> index }
+            }
+            val sheet = SpriteSheet(
+                arg.checkint(),
+                "frame_buffer",
+                ResourceType.GAME_SPRITESHEET,
+                copy,
+                copy.width,
+                copy.height
+            )
+            resourceAccess.spritesheet(sheet)
+            return arg
+        }
+    }
     @TinyFunction(
         "Change a color from the palette to another color.",
         example = GFX_PAL_EXAMPLE
