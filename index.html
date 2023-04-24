@@ -527,6 +527,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_spr_sdraw">spr.sdraw()</a></li>
 <li><a href="#_spr_draw">spr.draw()</a></li>
 <li><a href="#_all">all()</a></li>
+<li><a href="#_rpairs">rpairs()</a></li>
 <li><a href="#_print">print()</a></li>
 <li><a href="#_cls">cls()</a></li>
 </ul>
@@ -1364,6 +1365,17 @@ end
 </div>
 </div>
 <div class="sect2">
+<h3 id="_rpairs">rpairs()</h3>
+<div class="paragraph">
+<p>Iterate over values of a table in reverse order. The iterator return an index and the value. The method is useful to remove elements from a table while iterating on it.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">rpairs</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span> <span class="c1">-- Iterate over the values of the table</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
 <h3 id="_print">print()</h3>
 <div class="paragraph">
 <p>Print on the screen a string.</p>
@@ -1408,7 +1420,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-04-24 11:36:15 UTC
+Last updated 2023-04-24 12:00:58 UTC
 </div>
 </div>
 <style>
