@@ -929,6 +929,28 @@ end
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">to_sheet</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span> <span class="c1">-- Copy the current frame buffer to an existing sheet index.</span></code></pre>
 </div>
 </div>
+<tiny-editor style="display: none;">
+
+function _draw()
+    cls(1)
+    -- draw a transparent circle (like a hole)
+    shape.circlef(64, 128, 20, 0)
+    -- keep the result as spritesheet 0
+    gfx.to_sheet(0)
+
+    cls(1)
+    -- draw some circles
+    shape.circlef(64, 108, 20, 8)
+    shape.circlef(44, 128, 20, 9)
+    shape.circlef(64, 148, 20, 10)
+    shape.circlef(84, 128, 20, 11)
+
+    -- draw over the circles
+    -- the mask generated before.
+    spr.sheet(0)
+    spr.sdraw()
+end
+</tiny-editor>
 </div>
 <div class="sect2">
 <h3 id="_gfx_pal">gfx.pal()</h3>
@@ -1303,6 +1325,11 @@ end
 <div class="paragraph">
 <p>Draw a filled circle.</p>
 </div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">circlef</span><span class="p">(</span><span class="n">centerX</span><span class="p">,</span> <span class="n">centerY</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a circle at the coordinate (centerX, centerY) with the radius and the color.</span></code></pre>
+</div>
+</div>
 <tiny-editor style="display: none;">
 
 function _draw()
@@ -1457,7 +1484,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-04-25 13:29:07 UTC
+Last updated 2023-04-25 17:31:42 UTC
 </div>
 </div>
 <style>
