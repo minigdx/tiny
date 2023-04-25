@@ -35,8 +35,13 @@ class JavaMidiSound(private val data: ByteArray) : MidiSound {
     }
 
     override fun stop() {
-        sequencer?.stop()
-        sequencer?.close()
+        sequencer?.run {
+            if (isRunning) {
+                stop()
+            }
+            if (isOpen)
+                close()
+        }
     }
 }
 

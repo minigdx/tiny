@@ -223,6 +223,7 @@ class GameEngine(
                         bootScript.evaluate()
                         scripts[0] = bootScript
                     }
+
                     GAME_GAMESCRIPT -> {
                         resource as GameScript
                         resource.resourceAccess = this
@@ -230,21 +231,26 @@ class GameEngine(
                             scripts[resource.index] = resource
                         }
                     }
+
                     ENGINE_GAMESCRIPT -> {
                         // Don't put the engine script in the stack
                         engineGameScript = resource as GameScript
                         engineGameScript?.resourceAccess = this
                         engineGameScript?.evaluate()
                     }
+
                     BOOT_SPRITESHEET -> {
                         bootSpritesheet = resource as SpriteSheet
                     }
+
                     GAME_SPRITESHEET -> {
                         spriteSheets[resource.index] = resource as SpriteSheet
                     }
+
                     GAME_LEVEL -> {
                         levels[resource.index] = resource as GameLevel
                     }
+
                     GAME_SOUND -> {
                         sounds[resource.index] = resource as Sound
                     }
@@ -269,6 +275,8 @@ class GameEngine(
                 }
                 scripts[current]?.setState(state)
             } else if (reload) {
+                // Stop all sounds to avoid annoying sound loop
+                sounds.forEach { s -> s?.stop() }
                 val state = getState()
                 evaluate()
                 setState(state)
