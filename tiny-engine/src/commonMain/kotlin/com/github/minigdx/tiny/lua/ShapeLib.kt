@@ -232,7 +232,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
 
     @TinyFunction("Draw a filled circle.", example = SHAPE_CIRCLEF_EXAMPLE)
     internal inner class circlef : LibFunction() {
-        // centerX: Int, centerY: Int, radius: Int, color: Int
+        @TinyCall("Draw a circle at the coordinate (centerX, centerY) with the radius and the color.")
         override fun call(
             @TinyArg("centerX") a: LuaValue,
             @TinyArg("centerY") b: LuaValue,

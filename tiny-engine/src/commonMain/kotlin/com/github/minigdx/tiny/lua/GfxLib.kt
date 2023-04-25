@@ -30,7 +30,8 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
 
     @TinyFunction(
         "Transform the current frame buffer into a spritesheeet.",
-        "to_sheet"
+        "to_sheet",
+        example = GFX_TO_SHEET_EXAMPLE
     )
     inner class toSheet : OneArgFunction() {
 
