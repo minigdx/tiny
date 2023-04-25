@@ -444,7 +444,12 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="_tiny_api">Tiny API</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_ctrl_touch">ctrl.touch()</h3>
+<h3 id="_ctrl">ctrl</h3>
+<div class="paragraph">
+<p>Access to controllers like touch/mouse events or accessing which key is pressed by the user.</p>
+</div>
+<div class="sect3">
+<h4 id="_ctrl_touch">ctrl.touch()</h4>
 <div class="paragraph">
 <p>Get coordinates of the current touch/mouse. If the mouse/touch is out-of the screen, the coordinates will be the last mouse position/touch. The function return those coordinates as a table {x, y}. A sprite can be draw directly on the mouse position by passing the sprite number.</p>
 </div>
@@ -457,7 +462,7 @@ ctrl.touch(sprN) -- Get the mouse coordinate and draw a sprite on those coordina
 <tiny-editor style="display: none;">
 
 function _draw()
-  cls(2)
+  gfx.cls(2)
   p = ctrl.touch()
   print("coordinates: "..p.x .. "x"..p.y, 1, 1, 4)
   shape.rectf(p.x, p.y, 5,5, p.x + p.y)
@@ -465,8 +470,48 @@ end
 
 </tiny-editor>
 </div>
+</div>
 <div class="sect2">
-<h3 id="_gfx_to_sheet">gfx.to_sheet()</h3>
+<h3 id="_gfx">gfx</h3>
+<div class="paragraph">
+<p>Access to graphical API like updating the color palette or applying a dithering pattern.</p>
+</div>
+<div class="sect3">
+<h4 id="_gfx_cls">gfx.cls()</h4>
+<div class="paragraph">
+<p>clear the screen</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">gfx.cls() -- Clear the screen with a default color.
+gfx.cls(color) -- Clear the screen with a color.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_gfx_pset">gfx.pset()</h4>
+<div class="paragraph">
+<p>Set the color index at the coordinate (x,y).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">gfx.pset(x, y, color) -- set the color index at the coordinate (x,y).</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_gfx_pget">gfx.pget()</h4>
+<div class="paragraph">
+<p>Get the color index at the coordinate (x,y).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">gfx.pget(x, y) -- get the color index at the coordinate (x,y).</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_gfx_to_sheet">gfx.to_sheet()</h4>
 <div class="paragraph">
 <p>Transform the current frame buffer into a spritesheeet.</p>
 </div>
@@ -478,13 +523,13 @@ end
 <tiny-editor style="display: none;">
 
 function _draw()
-    cls(1)
+    gfx.cls(1)
     -- draw a transparent circle (like a hole)
     shape.circlef(64, 128, 20, 0)
     -- keep the result as spritesheet 0
     gfx.to_sheet(0)
 
-    cls(1)
+    gfx.cls(1)
     -- draw some circles
     shape.circlef(64, 108, 20, 8)
     shape.circlef(44, 128, 20, 9)
@@ -498,8 +543,8 @@ function _draw()
 end
 </tiny-editor>
 </div>
-<div class="sect2">
-<h3 id="_gfx_pal">gfx.pal()</h3>
+<div class="sect3">
+<h4 id="_gfx_pal">gfx.pal()</h4>
 <div class="paragraph">
 <p>Change a color from the palette to another color.</p>
 </div>
@@ -512,7 +557,7 @@ gfx.pal(a, b) -- Replace the color a for the color b.</code></pre>
 <tiny-editor style="display: none;">
 
 function _draw()
-    cls()
+    gfx.cls()
     print("example", 10, 10, 2) -- print using the color index 2
     gfx.pal(2, 3) -- switch the text color to another color
     print("example", 10, 20, 2) -- print using the color index 2
@@ -522,8 +567,8 @@ end
 
 </tiny-editor>
 </div>
-<div class="sect2">
-<h3 id="_gfx_camera">gfx.camera()</h3>
+<div class="sect3">
+<h4 id="_gfx_camera">gfx.camera()</h4>
 <div class="paragraph">
 <p>Move the game camera.</p>
 </div>
@@ -534,8 +579,8 @@ gfx.camera(x, y) -- Set game camera to the position x, y.</code></pre>
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_gfx_dither">gfx.dither()</h3>
+<div class="sect3">
+<h4 id="_gfx_dither">gfx.dither()</h4>
 <div class="paragraph">
 <p>Apply a dithering pattern on every new draw call. The pattern is using the bits value of a 2 octet value. The first bits is the one on the far left and represent the pixel of the top left of a 4x4 matrix. The last bit is the pixel from the bottom right of this matrix.</p>
 </div>
@@ -548,7 +593,7 @@ gfx.dither(pattern) -- Apply dithering pattern.</code></pre>
 <tiny-editor style="display: none;">
 
 function _draw()
-    cls()
+    gfx.cls()
     gfx.dither()
     shape.circlef(30, 30, 30, 2)
     gfx.dither(0xA5A5) -- set a dithering pattern
@@ -559,8 +604,8 @@ end
 
 </tiny-editor>
 </div>
-<div class="sect2">
-<h3 id="_gfx_clip">gfx.clip()</h3>
+<div class="sect3">
+<h4 id="_gfx_clip">gfx.clip()</h4>
 <div class="paragraph">
 <p>Clip the draw surface (ie: limit the drawing area).</p>
 </div>
@@ -573,7 +618,7 @@ gfx.clip(x, y, width, height) -- Clip and limit the drawing area.</code></pre>
 <tiny-editor style="display: none;">
 
 function _draw()
-  cls()
+  gfx.cls()
   -- set a clip area to crop circles
   gfx.clip(20, 20, 80, 80)
   shape.circlef(20, 20, 20, 2)
@@ -588,8 +633,14 @@ end
 
 </tiny-editor>
 </div>
+</div>
 <div class="sect2">
-<h3 id="_juice_pow2">juice.pow2()</h3>
+<h3 id="_juice">juice</h3>
+<div class="paragraph">
+<p>Easing functions to 'juice' a game.</p>
+</div>
+<div class="sect3">
+<h4 id="_juice_pow2">juice.pow2()</h4>
 <div class="paragraph">
 <p>Interpolation to juice your game.
 All interpolations available:</p>
@@ -648,7 +699,7 @@ function _update()
 end
 
 function _draw()
-  cls()
+  gfx.cls()
   progress = math.abs(math.cos(t))
 
   print("pow", 0, 0)
@@ -682,8 +733,14 @@ end
 
 </tiny-editor>
 </div>
+</div>
 <div class="sect2">
-<h3 id="_map_flag">map.flag()</h3>
+<h3 id="_map">map</h3>
+<div class="paragraph">
+<p>Map API to accessing maps data configured in a game.</p>
+</div>
+<div class="sect3">
+<h4 id="_map_flag">map.flag()</h4>
 <div class="paragraph">
 <p>Get the flag from a tile.</p>
 </div>
@@ -693,14 +750,14 @@ end
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_map_entity">map.entity()</h3>
+<div class="sect3">
+<h4 id="_map_entity">map.entity()</h4>
 <div class="paragraph">
 <p>Get all entities from a type.</p>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_map_draw">map.draw()</h3>
+<div class="sect3">
+<h4 id="_map_draw">map.draw()</h4>
 <div class="paragraph">
 <p>Draw map tiles on the screen.</p>
 </div>
@@ -713,8 +770,14 @@ map.draw(layer) -- Draw the layer on the screen.</code></pre>
 </div>
 </div>
 </div>
+</div>
 <div class="sect2">
-<h3 id="_math_clamp">math.clamp()</h3>
+<h3 id="_math">math</h3>
+<div class="paragraph">
+<p>Math functions. Please note that standard LUA math methods are also available.</p>
+</div>
+<div class="sect3">
+<h4 id="_math_clamp">math.clamp()</h4>
 <div class="paragraph">
 <p>Clamp the value between 2 values.</p>
 </div>
@@ -724,8 +787,8 @@ map.draw(layer) -- Draw the layer on the screen.</code></pre>
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_math_dst">math.dst()</h3>
+<div class="sect3">
+<h4 id="_math_dst">math.dst()</h4>
 <div class="paragraph">
 <p>Compute the distance between two points.</p>
 </div>
@@ -735,8 +798,8 @@ map.draw(layer) -- Draw the layer on the screen.</code></pre>
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_math_dst2">math.dst2()</h3>
+<div class="sect3">
+<h4 id="_math_dst2">math.dst2()</h4>
 <div class="paragraph">
 <p>Compute the distance between two points not squared. Use this method to know if an coordinate is closer than another.</p>
 </div>
@@ -746,8 +809,8 @@ map.draw(layer) -- Draw the layer on the screen.</code></pre>
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_math_rnd">math.rnd()</h3>
+<div class="sect3">
+<h4 id="_math_rnd">math.rnd()</h4>
 <div class="paragraph">
 <p>Generate random values</p>
 </div>
@@ -759,8 +822,14 @@ math.rnd(arg1, arg2) -- Generate a random value between the first and the second
 </div>
 </div>
 </div>
+</div>
 <div class="sect2">
-<h3 id="_sfx_play">sfx.play()</h3>
+<h3 id="_sfx">sfx</h3>
+<div class="paragraph">
+<p>Sound API to play/loop/stop a sound.</p>
+</div>
+<div class="sect3">
+<h4 id="_sfx_play">sfx.play()</h4>
 <div class="paragraph">
 <p>Play a sound.</p>
 </div>
@@ -771,8 +840,8 @@ sfx.play(sound) -- Play the sound by it's index.</code></pre>
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_sfx_loop">sfx.loop()</h3>
+<div class="sect3">
+<h4 id="_sfx_loop">sfx.loop()</h4>
 <div class="paragraph">
 <p>Play a sound and loop over it.</p>
 </div>
@@ -783,8 +852,8 @@ sfx.loop(sound) -- Play the sound by it's index.</code></pre>
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_sfx_stop">sfx.stop()</h3>
+<div class="sect3">
+<h4 id="_sfx_stop">sfx.stop()</h4>
 <div class="paragraph">
 <p>Stop a sound.</p>
 </div>
@@ -795,8 +864,14 @@ sfx.stop(sound) -- Stop the sound by it's index.</code></pre>
 </div>
 </div>
 </div>
+</div>
 <div class="sect2">
-<h3 id="_shape_rect">shape.rect()</h3>
+<h3 id="_shape">shape</h3>
+<div class="paragraph">
+<p>Shape API to draw&#8230;&#8203;shapes. Those shapes can be circle, rectangle, line or oval.All shapes can be draw filed or not filed.</p>
+</div>
+<div class="sect3">
+<h4 id="_shape_rect">shape.rect()</h4>
 <div class="paragraph">
 <p>Draw a rectangle.</p>
 </div>
@@ -806,8 +881,8 @@ sfx.stop(sound) -- Stop the sound by it's index.</code></pre>
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_shape_oval">shape.oval()</h3>
+<div class="sect3">
+<h4 id="_shape_oval">shape.oval()</h4>
 <div class="paragraph">
 <p>Draw an oval.</p>
 </div>
@@ -818,8 +893,8 @@ shape.oval(centerX, centerY, radiusX, radiusY, color) -- Draw an oval using the 
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_shape_ovalf">shape.ovalf()</h3>
+<div class="sect3">
+<h4 id="_shape_ovalf">shape.ovalf()</h4>
 <div class="paragraph">
 <p>Draw an oval filled.</p>
 </div>
@@ -830,8 +905,8 @@ shape.ovalf(centerX, centerY, radiusX, radiusY, color) -- Draw a filled oval usi
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_shape_rectf">shape.rectf()</h3>
+<div class="sect3">
+<h4 id="_shape_rectf">shape.rectf()</h4>
 <div class="paragraph">
 <p>Draw a filled rectangle.</p>
 </div>
@@ -843,7 +918,7 @@ shape.ovalf(centerX, centerY, radiusX, radiusY, color) -- Draw a filled oval usi
 <tiny-editor style="display: none;">
 
 function _draw()
-  cls()
+  gfx.cls()
 
   -- filled rectangle
   print("filled rectangle", 20, 10)
@@ -866,8 +941,8 @@ end
 
 </tiny-editor>
 </div>
-<div class="sect2">
-<h3 id="_shape_circlef">shape.circlef()</h3>
+<div class="sect3">
+<h4 id="_shape_circlef">shape.circlef()</h4>
 <div class="paragraph">
 <p>Draw a filled circle.</p>
 </div>
@@ -879,7 +954,7 @@ end
 <tiny-editor style="display: none;">
 
 function _draw()
-    cls()
+    gfx.cls()
 
     -- filled circle
     shape.circlef(20, 20, 20, 4)
@@ -902,8 +977,8 @@ end
 
 </tiny-editor>
 </div>
-<div class="sect2">
-<h3 id="_shape_line">shape.line()</h3>
+<div class="sect3">
+<h4 id="_shape_line">shape.line()</h4>
 <div class="paragraph">
 <p>Draw a line.</p>
 </div>
@@ -914,8 +989,8 @@ shape.line(x0, y0, x1, y1) -- Draw a line with a default color.</code></pre>
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_shape_circle">shape.circle()</h3>
+<div class="sect3">
+<h4 id="_shape_circle">shape.circle()</h4>
 <div class="paragraph">
 <p>Draw a circle.</p>
 </div>
@@ -926,8 +1001,36 @@ shape.circle(centerX, centerY, radius, color) -- Draw a circle.</code></pre>
 </div>
 </div>
 </div>
+</div>
 <div class="sect2">
-<h3 id="_spr_sheet">spr.sheet()</h3>
+<h3 id="_spr">spr</h3>
+<div class="paragraph">
+<p>Sprite API to draw or update sprites.</p>
+</div>
+<div class="sect3">
+<h4 id="_spr_pget">spr.pget()</h4>
+<div class="paragraph">
+<p>Get the color index at the coordinate (x,y) from the current spritesheet.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">spr.pget(x, y) -- get the color index at the coordinate (x,y) from the current spritesheet.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_spr_pset">spr.pset()</h4>
+<div class="paragraph">
+<p>Set the color index at the coordinate (x,y) in the current spritesheet.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">spr.pset(x, y, color) -- Set the color index at the coordinate (x,y) in the current spritesheet.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_spr_sheet">spr.sheet()</h4>
 <div class="paragraph">
 <p>Switch to another spritesheet.</p>
 </div>
@@ -938,8 +1041,8 @@ spr.sheet(spritesheetN) -- Switch to the N spritesheet</code></pre>
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_spr_sdraw">spr.sdraw()</h3>
+<div class="sect3">
+<h4 id="_spr_sdraw">spr.sdraw()</h4>
 <div class="paragraph">
 <p>S(uper) Draw a fragment from the spritesheet.</p>
 </div>
@@ -952,8 +1055,8 @@ spr.sdraw(x, y, sprX, sprY, width, height, flipX, flipY) -- Draw a fragment from
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_spr_draw">spr.draw()</h3>
+<div class="sect3">
+<h4 id="_spr_draw">spr.draw()</h4>
 <div class="paragraph">
 <p>Draw a sprite.</p>
 </div>
@@ -963,8 +1066,14 @@ spr.sdraw(x, y, sprX, sprY, width, height, flipX, flipY) -- Draw a fragment from
 </div>
 </div>
 </div>
+</div>
 <div class="sect2">
-<h3 id="_all">all()</h3>
+<h3 id="_std">std</h3>
+<div class="paragraph">
+<p>Standard library.</p>
+</div>
+<div class="sect3">
+<h4 id="_all">all()</h4>
 <div class="paragraph">
 <p>Iterate over values of a table. If you want to iterate over keys, use pairs(table). If you want to iterate over index, use ipairs(table).</p>
 </div>
@@ -974,8 +1083,8 @@ spr.sdraw(x, y, sprX, sprY, width, height, flipX, flipY) -- Draw a fragment from
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_rpairs">rpairs()</h3>
+<div class="sect3">
+<h4 id="_rpairs">rpairs()</h4>
 <div class="paragraph">
 <p>Iterate over values of a table in reverse order. The iterator return an index and the value. The method is useful to remove elements from a table while iterating on it.</p>
 </div>
@@ -985,8 +1094,8 @@ spr.sdraw(x, y, sprX, sprY, width, height, flipX, flipY) -- Draw a fragment from
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_print">print()</h3>
+<div class="sect3">
+<h4 id="_print">print()</h4>
 <div class="paragraph">
 <p>Print on the screen a string.</p>
 </div>
@@ -1000,7 +1109,7 @@ print(str, x, y, color) -- print on the screen a string with a specific color.</
 <tiny-editor style="display: none;">
 
 function _draw()
-    cls()
+    gfx.cls()
     -- every character is a sprite 4x4 pixels.
     print("hello")
     print("world", 10, 10)
@@ -1012,17 +1121,6 @@ end
 
 </tiny-editor>
 </div>
-<div class="sect2">
-<h3 id="_cls">cls()</h3>
-<div class="paragraph">
-<p>clear the screen</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">cls() -- Clear the screen with a default color.
-cls(color) -- Clear the screen with a color.</code></pre>
-</div>
-</div>
 </div>
 </div>
 </div>
@@ -1030,7 +1128,7 @@ cls(color) -- Clear the screen with a color.</code></pre>
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-04-25 17:34:29 UTC
+Last updated 2023-04-25 20:06:49 UTC
 </div>
 </div>
 </body>
