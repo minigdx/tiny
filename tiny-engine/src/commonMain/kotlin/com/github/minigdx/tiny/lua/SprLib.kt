@@ -12,6 +12,7 @@ import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
 import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.OneArgFunction
+import org.luaj.vm2.lib.ThreeArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 
 @TinyLib("spr")
@@ -23,10 +24,39 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
         val sprTable = LuaTable()
         sprTable["sdraw"] = sdraw()
         sprTable["draw"] = draw()
+        sprTable["pset"] = pset()
+        sprTable["pget"] = pget()
         sprTable["sheet"] = sheet()
         arg2.set("spr", sprTable)
         arg2.get("package").get("loaded").set("spr", sprTable)
         return sprTable
+    }
+
+    @TinyFunction("Get the color index at the coordinate (x,y).")
+    private inner class pget : TwoArgFunction() {
+        @TinyCall("get the color index at the coordinate (x,y).")
+        override fun call(@TinyArg("x") arg1: LuaValue, @TinyArg("y") arg2: LuaValue): LuaValue {
+            val index = resourceAccess.spritesheet(currentSpritesheet)?.pixels?.get(arg1.checkint(), arg2.checkint())
+            val colorIndex = index?.get(0) ?: 0
+            return valueOf(colorIndex)
+        }
+    }
+
+    @TinyFunction("Set the color index at the coordinate (x,y).")
+    private inner class pset : ThreeArgFunction() {
+        @TinyCall("Set the color index at the coordinate (x,y).")
+        override fun call(
+            @TinyArg("x") arg1: LuaValue,
+            @TinyArg("y") arg2: LuaValue,
+            @TinyArg("color") arg3: LuaValue
+        ): LuaValue {
+            resourceAccess.spritesheet(currentSpritesheet)?.pixels?.set(
+                arg1.checkint(),
+                arg2.checkint(),
+                arg3.checkint()
+            )
+            return arg3
+        }
     }
 
     @TinyFunction("Switch to another spritesheet.")
