@@ -438,18 +438,27 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body class="article toc2 toc-left">
-<!--Prism-->
-<link id="import-theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/themes/prism.css"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/components/prism-core.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/plugins/line-numbers/prism-line-numbers.min.css"/>
+<style>
+    .tiny-container {
+        display: flex;
+    }
 
-<!--Code-input is on GitHub ==> https://github.com/WebCoder49/code-input-->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/WebCoder49/code-input@1.3/code-input.css">
-<script src="https://cdn.jsdelivr.net/gh/WebCoder49/code-input@1.3/code-input.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/WebCoder49/code-input@1.3/plugins/indent.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/WebCoder49/code-input@1.3/plugins/prism-line-numbers.css">
+    .tiny-play {
+        display: block;
+    }
+
+    .tiny-canvas {
+        border: 1px solid black;
+        cursor: none;
+    }
+
+    .tiny-textarea {
+        height: 512px;
+        width: 100%;
+        font-family: monospace;
+        resize:none;
+    }
+</style>
 <div id="header">
 <h1>🧸 Tiny</h1>
 <div class="details">
@@ -899,7 +908,7 @@ The tiny serve command is intended for local testing only and should not be used
 <span class="n">ctrl</span><span class="p">.</span><span class="n">touch</span><span class="p">(</span><span class="n">sprN</span><span class="p">)</span> <span class="c1">-- Get the mouse coordinate and draw a sprite on those coordinates.</span></code></pre>
 </div>
 </div>
-<tiny-editor>
+<tiny-editor style="display: none;">
 
 function _draw()
   cls(2)
@@ -932,7 +941,7 @@ end
 <span class="n">gfx</span><span class="p">.</span><span class="n">pal</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="c1">-- Replace the color a for the color b.</span></code></pre>
 </div>
 </div>
-<tiny-editor>
+<tiny-editor style="display: none;">
 
 function _draw()
     cls()
@@ -968,7 +977,7 @@ end
 <span class="n">gfx</span><span class="p">.</span><span class="n">dither</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span> <span class="c1">-- Apply dithering pattern.</span></code></pre>
 </div>
 </div>
-<tiny-editor>
+<tiny-editor style="display: none;">
 
 function _draw()
     cls()
@@ -993,7 +1002,7 @@ end
 <span class="n">gfx</span><span class="p">.</span><span class="n">clip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span> <span class="c1">-- Clip and limit the drawing area.</span></code></pre>
 </div>
 </div>
-<tiny-editor>
+<tiny-editor style="display: none;">
 
 function _draw()
   cls()
@@ -1060,7 +1069,7 @@ All interpolations available:</p>
 <span class="n">juice</span><span class="p">.</span><span class="n">pow2</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="k">end</span><span class="p">,</span> <span class="n">progress</span><span class="p">)</span> <span class="c1">-- Interpolate the value given a start and an end value.</span></code></pre>
 </div>
 </div>
-<tiny-editor>
+<tiny-editor style="display: none;">
 
 function _init()
   t = 0
@@ -1263,7 +1272,7 @@ end
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">rectf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a filled rectangle.</span></code></pre>
 </div>
 </div>
-<tiny-editor>
+<tiny-editor style="display: none;">
 
 function _draw()
   cls()
@@ -1294,7 +1303,7 @@ end
 <div class="paragraph">
 <p>Draw a filled circle.</p>
 </div>
-<tiny-editor>
+<tiny-editor style="display: none;">
 
 function _draw()
     cls()
@@ -1415,7 +1424,7 @@ end
 <span class="nb">print</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- print on the screen a string with a specific color.</span></code></pre>
 </div>
 </div>
-<tiny-editor>
+<tiny-editor style="display: none;">
 
 function _draw()
     cls()
@@ -1448,7 +1457,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-04-25 07:51:47 UTC
+Last updated 2023-04-25 13:29:07 UTC
 </div>
 </div>
 <style>
