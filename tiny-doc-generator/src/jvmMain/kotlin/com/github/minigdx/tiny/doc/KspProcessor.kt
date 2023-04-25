@@ -74,7 +74,7 @@ class AsciidocSection(val title: String?) {
         paragraph(
             """
                 >++++
-                ><tiny-editor>
+                ><tiny-editor style="display: none;">
                 >$lua
                 ></tiny-editor>
                 >++++

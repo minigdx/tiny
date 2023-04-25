@@ -129,3 +129,12 @@ fun HTMLCollection.forEach(block: (Element) -> Unit) {
         }
     }
 }
+
+fun HTMLCollection.forEachIndexed(block: (index: Int, Element) -> Unit) {
+    (0 until this.length).forEach { index ->
+        val elt = this[index]
+        if (elt != null) {
+            block(index, elt)
+        }
+    }
+}

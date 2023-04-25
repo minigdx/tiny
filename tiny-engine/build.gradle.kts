@@ -44,11 +44,6 @@ dependencies {
 
     this.jvmMainImplementation("com.squareup:gifencoder:0.10.1")
 
-    jsMainImplementation(npm("prismjs", "1.23.0"))?.because(
-        "tiny-web-editor require it. " +
-            "KotlinJS doesn't support well two KotlinJS application with different dependencies."
-    )
-
     // See https://github.com/cagpie/PicoAudio.js
     jsMainImplementation(npm("picoaudio", "1.1.2"))?.because("get midi over web audio API.")
 

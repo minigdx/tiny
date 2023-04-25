@@ -13,14 +13,13 @@ class EditorStream(val field: String) : SourceStream<ByteArray> {
     var textarea: HTMLTextAreaElement? = null
 
     init {
-        val codeInput = document.getElementById(field.replace("#", ""))
-        if (codeInput == null) {
+        val textarea = document.getElementById(field.replace("#", "")) as? HTMLTextAreaElement
+        if (textarea == null) {
             exist = false
         } else {
             exist = true
-            val textareas = codeInput.getElementsByTagName("textarea")
-            textarea = textareas[0] as HTMLTextAreaElement
-            textarea?.addEventListener("input", {
+            this.textarea = textarea
+            textarea.addEventListener("input", {
                 updated = true
                 timeout = Date.now() + 2000 // add 2 seconds
             }, null)

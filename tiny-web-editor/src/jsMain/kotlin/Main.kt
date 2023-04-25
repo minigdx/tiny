@@ -3,7 +3,7 @@ import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.file.CommonVirtualFileSystem
 import com.github.minigdx.tiny.file.SourceStream
-import com.github.minigdx.tiny.forEach
+import com.github.minigdx.tiny.forEachIndexed
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
@@ -18,89 +18,104 @@ import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.dom.createElement
+import org.w3c.dom.Element
+import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLCanvasElement
-
-@JsModule("prismjs")
-@JsNonModule
-external val Prism: PrismClass
-
-external class PrismClass
+import org.w3c.dom.HTMLTextAreaElement
 
 fun main() {
-    Prism
-
     // This portion may need to be customized regarding the service where the game is deployed (itch.io, ...)
     var rootPath = window.location.protocol + "//" + window.location.host + window.location.pathname
     rootPath = rootPath.replace("index.html", "")
 
-    js("codeInput.registerTemplate(\"code-input\", codeInput.templates.prism(Prism, [new codeInput.plugins.Indent()]));")
-
     val elts = document.getElementsByTagName("tiny-editor")
-    var index = 0
-    elts.forEach { game ->
+    elts.forEachIndexed { index, game ->
         val code = game.textContent ?: ""
-        // Remove the text content
-        game.textContent = ""
 
-        val editor = document.createElement("code-input").apply {
-            setAttribute("class", "line-numbers")
-            setAttribute("style", "resize: both; overflow: hidden; width: 100%")
-            setAttribute("lang", "LUA")
-            setAttribute("value", code)
-            setAttribute("template", "code-input")
-            setAttribute("id", "editor-$index")
+        val link = document.createElement("a") {
+            setAttribute("id", "link-editor-$index")
+            setAttribute("class", "tiny-play")
+            setAttribute("href", "#link-editor-$index")
+        } as HTMLAnchorElement
+        game.before(link)
+
+        val playLink = document.createElement("div").apply {
+            setAttribute("class", "tiny-container")
         }
+        link.after(playLink)
 
-        val canvas = document.createElement("canvas").apply {
-            setAttribute("width", "512")
-            setAttribute("height", "512")
-            setAttribute("style", "cursor: none;") // Hide mouse cursor over canvas
+        var clicked = false
+        link.textContent = "\uD83D\uDC7E ▶ Try an example"
+        link.onclick = { _ ->
+            if (!clicked) {
+                createGame(playLink, index, code, rootPath)
+                clicked = true
+            }
+            true
         }
-
-        game.appendChild(canvas)
-        game.appendChild(editor)
-
-        val logger = StdOutLogger("tiny-editor-$index")
-
-        val gameOptions = GameOptions(
-            width = 256,
-            height = 256,
-            // https://lospec.com/palette-list/rgr-proto16
-            palette = listOf(
-                "#FFF9B3",
-                "#B9C5CC",
-                "#4774B3",
-                "#144B66",
-                "#8FB347",
-                "#2E994E",
-                "#F29066",
-                "#E65050",
-                "#707D7C",
-                "#293C40",
-                "#170B1A",
-                "#0A010D",
-                "#570932",
-                "#871E2E",
-                "#FFBF40",
-                "#CC1424"
-            ),
-            gameScripts = listOf("#editor-$index"),
-            spriteSheets = emptyList(),
-            gameLevels = emptyList(),
-            zoom = 2,
-            gutter = 0 to 0,
-            spriteSize = 16 to 16,
-        )
-
-        GameEngine(
-            gameOptions = gameOptions,
-            platform = EditorWebGlPlatform(WebGlPlatform(canvas as HTMLCanvasElement, logger, gameOptions, rootPath)),
-            vfs = CommonVirtualFileSystem(),
-            logger = logger
-        ).main()
-
-        index++
     }
+}
+
+private fun createGame(
+    container: Element,
+    index: Int,
+    code: String,
+    rootPath: String
+) {
+    val canvas = document.createElement("canvas").apply {
+        setAttribute("width", "512")
+        setAttribute("height", "512")
+        setAttribute("class", "tiny-canvas")
+    }
+    container.appendChild(canvas)
+
+    val textarea = (document.createElement("textarea") as HTMLTextAreaElement).apply {
+        setAttribute("id", "editor-$index")
+        setAttribute("spellcheck", "false")
+        setAttribute("class", "tiny-textarea")
+        innerHTML = code
+    }
+    container.appendChild(textarea)
+
+    val logger = StdOutLogger("tiny-editor-$index")
+
+    val gameOptions = GameOptions(
+        width = 256,
+        height = 256,
+        // https://lospec.com/palette-list/rgr-proto16
+        palette = listOf(
+            "#FFF9B3",
+            "#B9C5CC",
+            "#4774B3",
+            "#144B66",
+            "#8FB347",
+            "#2E994E",
+            "#F29066",
+            "#E65050",
+            "#707D7C",
+            "#293C40",
+            "#170B1A",
+            "#0A010D",
+            "#570932",
+            "#871E2E",
+            "#FFBF40",
+            "#CC1424"
+        ),
+        gameScripts = listOf("#editor-$index"),
+        spriteSheets = emptyList(),
+        gameLevels = emptyList(),
+        zoom = 2,
+        gutter = 0 to 0,
+        spriteSize = 16 to 16,
+    )
+
+    GameEngine(
+        gameOptions = gameOptions,
+        platform = EditorWebGlPlatform(WebGlPlatform(canvas as HTMLCanvasElement, logger, gameOptions, rootPath)),
+        vfs = CommonVirtualFileSystem(),
+        logger = logger
+    ).main()
 }
 
 class EditorWebGlPlatform(val delegate: Platform) : Platform {
