@@ -12,7 +12,10 @@ import kotlin.math.abs
 import kotlin.math.sqrt
 import kotlin.random.Random
 
-@TinyLib("math")
+@TinyLib(
+    "math",
+    "Math functions. Please note that standard LUA math methods are also available."
+)
 class MathLib : org.luaj.vm2.lib.MathLib() {
 
     override fun call(modname: LuaValue, env: LuaValue): LuaValue {

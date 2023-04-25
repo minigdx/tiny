@@ -3,7 +3,7 @@ package com.github.minigdx.tiny.lua
 //language=Lua
 const val STD_PRINT_EXAMPLE = """
 function _draw()
-    cls()
+    gfx.cls()
     -- every character is a sprite 4x4 pixels.
     print("hello")
     print("world", 10, 10)

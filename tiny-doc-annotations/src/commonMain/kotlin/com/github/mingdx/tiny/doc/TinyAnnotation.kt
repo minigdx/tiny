@@ -7,6 +7,11 @@ annotation class TinyLib(
      * Name of the Library.
      */
     val name: String = "",
+
+    /**
+     * Description of the Library.
+     */
+    val description: String = ""
 )
 
 @Target(AnnotationTarget.CLASS)

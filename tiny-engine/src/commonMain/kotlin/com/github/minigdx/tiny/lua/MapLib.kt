@@ -13,7 +13,10 @@ import org.luaj.vm2.Varargs
 import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.TwoArgFunction
 
-@TinyLib("map")
+@TinyLib(
+    "map",
+    "Map API to accessing maps data configured in a game."
+)
 class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() {
 
     private var currentLevel: Int = 0

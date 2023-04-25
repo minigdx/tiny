@@ -12,16 +12,14 @@ import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
 import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.OneArgFunction
-import org.luaj.vm2.lib.ThreeArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.VarArgFunction
-import kotlin.math.PI
 
 interface StdLibListener {
     fun exit(nextScriptIndex: Int)
 }
 
-@TinyLib
+@TinyLib(description = "Standard library.")
 class StdLib(
     val gameOptions: GameOptions,
     val resourceAccess: GameResourceAccess,
@@ -31,14 +29,10 @@ class StdLib(
     override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
         val tiny = LuaTable()
         arg2["exit"] = exit()
-        arg2["pset"] = pset() // move to gfx
-        arg2["pget"] = pget() // move to gfx
-        arg2["cls"] = cls() // move to gfx
         arg2["all"] = all()
         arg2["rpairs"] = rpairs()
         arg2["print"] = print()
         arg2["debug"] = debug()
-        arg2["PI"] = valueOf(PI) // move to math
         return tiny
     }
 
@@ -214,35 +208,6 @@ class StdLib(
             this.checkint()
         } else {
             resourceAccess.frameBuffer.gamePalette.getColorIndex(this.checkjstring()!!)
-        }
-    }
-
-    @TinyFunction("clear the screen")
-    internal inner class cls : OneArgFunction() {
-        @TinyCall("Clear the screen with a default color.")
-        override fun call(): LuaValue {
-            return call(valueOf("#000000"))
-        }
-
-        @TinyCall("Clear the screen with a color.")
-        override fun call(@TinyArg("color") arg: LuaValue): LuaValue {
-            resourceAccess.frameBuffer.clear(arg.checkColorIndex())
-            return NONE
-        }
-    }
-
-    internal inner class pset : ThreeArgFunction() {
-        // x, y, index
-        override fun call(arg1: LuaValue, arg2: LuaValue, arg3: LuaValue): LuaValue {
-            resourceAccess.frameBuffer.pixel(arg1.checkint(), arg2.checkint(), arg3.checkint())
-            return NONE
-        }
-    }
-
-    internal inner class pget : TwoArgFunction() {
-        override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
-            val index = resourceAccess.frameBuffer.pixel(arg1.checkint(), arg2.checkint())
-            return valueOf(index)
         }
     }
 

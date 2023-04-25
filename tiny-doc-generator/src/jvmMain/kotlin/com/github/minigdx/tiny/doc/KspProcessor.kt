@@ -18,6 +18,7 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSNode
 import com.google.devtools.ksp.visitor.KSDefaultVisitor
+import kotlin.text.Typography.paragraph
 
 @DslMarker
 annotation class AsciidocDslMarker
@@ -28,8 +29,8 @@ class AsciidocDocument {
     var author: String? = null
     val sections = mutableListOf<AsciidocSection>()
 
-    fun section(title: String? = null, block: AsciidocSection.() -> Unit) {
-        val section = AsciidocSection(title)
+    fun section(title: String? = null, description: String? = null, block: AsciidocSection.() -> Unit) {
+        val section = AsciidocSection(title, description)
         section.block()
         sections.add(section)
     }
@@ -52,7 +53,37 @@ class AsciidocDocument {
 }
 
 @AsciidocDslMarker
-class AsciidocSection(val title: String?) {
+class AsciidocSection(val title: String?, val description: String?) {
+
+    val childs = mutableListOf<AsciidocLibSection>()
+
+    fun lib(title: String? = null, block: AsciidocLibSection.() -> Unit) {
+        val libSection = AsciidocLibSection(title)
+        libSection.block()
+        childs.add(libSection)
+    }
+
+    fun generate(): String {
+        return buildString {
+            if (title != null) {
+                appendLine("=== $title")
+                appendLine()
+            }
+
+            if (description != null && description.isNotBlank()) {
+                appendLine(description)
+                appendLine()
+            }
+
+            childs.forEach {
+                appendLine(it.generate())
+            }
+        }
+    }
+}
+
+@AsciidocDslMarker
+class AsciidocLibSection(val title: String?) {
     val paragraphs = mutableListOf<String>()
 
     fun paragraph(text: String) {
@@ -85,7 +116,7 @@ class AsciidocSection(val title: String?) {
     fun generate(): String {
         return buildString {
             if (title != null) {
-                appendLine("=== $title")
+                appendLine("==== $title")
                 appendLine()
             }
             paragraphs.forEach {
@@ -117,6 +148,7 @@ data class TinyFunctionDescriptor(
 
 class TinyLibDescriptor(
     var name: String = "",
+    var description: String = "",
     var functions: List<TinyFunctionDescriptor> = emptyList()
 )
 
@@ -133,6 +165,7 @@ class KspProcessor(
             val lib = libAnnotation.firstOrNull() ?: return data
 
             data.name = lib.name
+            data.description = lib.description
 
             return super.visitAnnotated(annotated, data)
         }
@@ -250,25 +283,26 @@ class KspProcessor(
         val result = asciidoc {
             title = "Tiny API"
             libs.forEach { lib ->
-
-                lib.functions.forEach { func ->
-                    val prefix = if (lib.name.isBlank()) {
-                        func.name
-                    } else {
-                        "${lib.name}.${func.name}"
-                    }
-                    section("$prefix()") {
-                        paragraph(func.description)
-
-                        if (func.calls.isNotEmpty()) {
-                            val result = func.calls.map { call ->
-                                "$prefix(${call.args.map { it.name }.joinToString(", ")}) " +
-                                    "-- ${call.description}"
-                            }.joinToString("\n")
-                            code(result)
+                section(lib.name.ifBlank { "std" }, lib.description) {
+                    lib.functions.forEach { func ->
+                        val prefix = if (lib.name.isBlank()) {
+                            func.name
+                        } else {
+                            "${lib.name}.${func.name}"
                         }
+                        lib("$prefix()") {
+                            paragraph(func.description)
 
-                        example(func.example)
+                            if (func.calls.isNotEmpty()) {
+                                val result = func.calls.map { call ->
+                                    "$prefix(${call.args.map { it.name }.joinToString(", ")}) " +
+                                        "-- ${call.description}"
+                                }.joinToString("\n")
+                                code(result)
+                            }
+
+                            example(func.example)
+                        }
                     }
                 }
             }

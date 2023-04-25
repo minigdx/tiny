@@ -3,7 +3,7 @@ package com.github.minigdx.tiny.lua
 //language=Lua
 const val GFX_PAL_EXAMPLE = """
 function _draw()
-    cls()
+    gfx.cls()
     print("example", 10, 10, 2) -- print using the color index 2
     gfx.pal(2, 3) -- switch the text color to another color
     print("example", 10, 20, 2) -- print using the color index 2
@@ -14,7 +14,7 @@ end
 //language=Lua
 const val GFX_DITHER_EXAMPLE = """
 function _draw()
-    cls()
+    gfx.cls()
     gfx.dither()
     shape.circlef(30, 30, 30, 2)
     gfx.dither(0xA5A5) -- set a dithering pattern
@@ -27,7 +27,7 @@ end
 //language=Lua
 const val GFX_CLIP_EXAMPLE = """
 function _draw()
-  cls()
+  gfx.cls()
   -- set a clip area to crop circles
   gfx.clip(20, 20, 80, 80)
   shape.circlef(20, 20, 20, 2)
@@ -44,13 +44,13 @@ end
 //language=Lua
 const val GFX_TO_SHEET_EXAMPLE = """
 function _draw()
-    cls(1)
+    gfx.cls(1)
     -- draw a transparent circle (like a hole)
     shape.circlef(64, 128, 20, 0)
     -- keep the result as spritesheet 0
     gfx.to_sheet(0)
 
-    cls(1)
+    gfx.cls(1)
     -- draw some circles
     shape.circlef(64, 108, 20, 8)
     shape.circlef(44, 128, 20, 9)

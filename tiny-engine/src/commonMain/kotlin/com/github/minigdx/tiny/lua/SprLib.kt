@@ -15,7 +15,7 @@ import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.ThreeArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 
-@TinyLib("spr")
+@TinyLib("spr", "Sprite API to draw or update sprites.")
 class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAccess) : TwoArgFunction() {
 
     private var currentSpritesheet: Int = 0
@@ -32,9 +32,9 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
         return sprTable
     }
 
-    @TinyFunction("Get the color index at the coordinate (x,y).")
+    @TinyFunction("Get the color index at the coordinate (x,y) from the current spritesheet.")
     private inner class pget : TwoArgFunction() {
-        @TinyCall("get the color index at the coordinate (x,y).")
+        @TinyCall("get the color index at the coordinate (x,y) from the current spritesheet.")
         override fun call(@TinyArg("x") arg1: LuaValue, @TinyArg("y") arg2: LuaValue): LuaValue {
             val index = resourceAccess.spritesheet(currentSpritesheet)?.pixels?.get(arg1.checkint(), arg2.checkint())
             val colorIndex = index?.get(0) ?: 0
@@ -42,9 +42,9 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
         }
     }
 
-    @TinyFunction("Set the color index at the coordinate (x,y).")
+    @TinyFunction("Set the color index at the coordinate (x,y) in the current spritesheet.")
     private inner class pset : ThreeArgFunction() {
-        @TinyCall("Set the color index at the coordinate (x,y).")
+        @TinyCall("Set the color index at the coordinate (x,y) in the current spritesheet.")
         override fun call(
             @TinyArg("x") arg1: LuaValue,
             @TinyArg("y") arg2: LuaValue,

@@ -12,9 +12,13 @@ import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.OneArgFunction
+import org.luaj.vm2.lib.ThreeArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 
-@TinyLib("gfx")
+@TinyLib(
+    "gfx",
+    "Access to graphical API like updating the color palette or applying a dithering pattern."
+)
 class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() {
     override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
         val func = LuaTable()
@@ -23,9 +27,45 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         func["pal"] = pal()
         func["camera"] = camera()
         func["to_sheet"] = toSheet()
+        func["pset"] = pset()
+        func["pget"] = pget()
+        func["cls"] = cls()
+
         arg2["gfx"] = func
         arg2["package"]["loaded"]["gfx"] = func
         return func
+    }
+
+    @TinyFunction("clear the screen")
+    internal inner class cls : OneArgFunction() {
+        @TinyCall("Clear the screen with a default color.")
+        override fun call(): LuaValue {
+            return call(valueOf("#000000"))
+        }
+
+        @TinyCall("Clear the screen with a color.")
+        override fun call(@TinyArg("color") arg: LuaValue): LuaValue {
+            resourceAccess.frameBuffer.clear(arg.checkColorIndex())
+            return NONE
+        }
+    }
+
+    @TinyFunction("Set the color index at the coordinate (x,y).",)
+    internal inner class pset : ThreeArgFunction() {
+        @TinyCall("set the color index at the coordinate (x,y).",)
+        override fun call(@TinyArg("x")arg1: LuaValue, @TinyArg("y")arg2: LuaValue, @TinyArg("color")arg3: LuaValue): LuaValue {
+            resourceAccess.frameBuffer.pixel(arg1.checkint(), arg2.checkint(), arg3.checkint())
+            return NONE
+        }
+    }
+
+    @TinyFunction("Get the color index at the coordinate (x,y).",)
+    internal inner class pget : TwoArgFunction() {
+        @TinyCall("get the color index at the coordinate (x,y).",)
+        override fun call(@TinyArg("x")arg1: LuaValue, @TinyArg("y")arg2: LuaValue): LuaValue {
+            val index = resourceAccess.frameBuffer.pixel(arg1.checkint(), arg2.checkint())
+            return valueOf(index)
+        }
     }
 
     @TinyFunction(
@@ -130,6 +170,14 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         ): LuaValue {
             resourceAccess.frameBuffer.clipper.set(a.checkint(), b.checkint(), c.checkint(), d.checkint())
             return NONE
+        }
+    }
+
+    private fun LuaValue.checkColorIndex(): Int {
+        return if (this.isnumber()) {
+            this.checkint()
+        } else {
+            resourceAccess.frameBuffer.gamePalette.getColorIndex(this.checkjstring()!!)
         }
     }
 }

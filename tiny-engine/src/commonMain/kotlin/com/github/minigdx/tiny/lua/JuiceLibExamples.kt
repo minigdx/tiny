@@ -11,7 +11,7 @@ function _update()
 end
 
 function _draw()
-  cls()
+  gfx.cls()
   progress = math.abs(math.cos(t))
 
   print("pow", 0, 0) 

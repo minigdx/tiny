@@ -11,7 +11,10 @@ import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.TwoArgFunction
 
-@TinyLib("juice")
+@TinyLib(
+    "juice",
+    "Easing functions to 'juice' a game."
+)
 class JuiceLib : TwoArgFunction() {
     override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
         val func = LuaTable()

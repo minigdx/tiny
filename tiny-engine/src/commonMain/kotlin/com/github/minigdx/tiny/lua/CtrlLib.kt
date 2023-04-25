@@ -12,7 +12,10 @@ import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 
-@TinyLib("ctrl")
+@TinyLib(
+    "ctrl",
+    "Access to controllers like touch/mouse events or accessing which key is pressed by the user."
+)
 class CtrlLib(
     private val inputHandler: InputHandler,
     sprLib: SprLib,

@@ -3,7 +3,7 @@ package com.github.minigdx.tiny.lua
 //language=Lua
 const val SHAPE_RECTF_EXAMPLE = """
 function _draw()
-  cls()
+  gfx.cls()
 
   -- filled rectangle
   print("filled rectangle", 20, 10)
@@ -28,7 +28,7 @@ end
 //language=Lua
 const val SHAPE_CIRCLEF_EXAMPLE = """
 function _draw()
-    cls()
+    gfx.cls()
 
     -- filled circle
     shape.circlef(20, 20, 20, 4)

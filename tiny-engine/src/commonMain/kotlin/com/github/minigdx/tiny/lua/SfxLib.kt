@@ -10,7 +10,7 @@ import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 
-@TinyLib("sfx")
+@TinyLib("sfx", "Sound API to play/loop/stop a sound.")
 class SfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() {
     override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
         val ctrl = LuaTable()

@@ -15,7 +15,12 @@ import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import kotlin.math.abs
 
-@TinyLib("shape")
+@TinyLib(
+    "shape",
+    "Shape API to draw...shapes. " +
+        "Those shapes can be circle, rectangle, line or oval." +
+        "All shapes can be draw filed or not filed."
+)
 class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() {
     override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
         val shp = LuaTable()
@@ -180,7 +185,8 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
                 }
             }
 
-            p = (radiusY * radiusY) * (x * x + x) + (radiusX * radiusX) * (y * y - y) - (radiusX * radiusX * radiusY * radiusY)
+            p =
+                (radiusY * radiusY) * (x * x + x) + (radiusX * radiusX) * (y * y - y) - (radiusX * radiusX * radiusY * radiusY)
 
             while (y >= 0) {
                 for (i in centerX - x..centerX + x) {
