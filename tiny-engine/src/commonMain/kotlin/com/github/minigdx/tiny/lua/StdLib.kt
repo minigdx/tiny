@@ -158,26 +158,29 @@ class StdLib(
                     index to 0
                 } else if (char.isDigit()) {
                     val index = char.lowercaseChar() - '0'
-                    index to 4
-                } else if (char in '!'..'@') {
+                    index to 1
+                } else if (char in '!'..'/') {
                     val index = char.lowercaseChar() - '!'
-                    index to 8
-                } else if (char in '['..'\'') {
+                    index to 2
+                } else if (char in '['..'`') {
                     val index = char.lowercaseChar() - '['
-                    index to 12
+                    index to 3
                 } else if (char in '{'..'~') {
                     val index = char.lowercaseChar() - '{'
-                    index to 16
+                    index to 4
+                } else if (char in ':'..'@') {
+                    val index = char.lowercaseChar() - ':'
+                    index to 5
                 } else {
                     // Maybe it's an emoji: try EMOJI MAP conversion
                     EMOJI_MAP[char]
                 }
                 if (coord != null) {
-                    val (index, sheetY) = coord
+                    val (indexX, indexY) = coord
                     resourceAccess.frameBuffer.copyFrom(
                         spritesheet.pixels, currentX, y,
-                        index * 4,
-                        sheetY,
+                        indexX * 4,
+                        indexY * 4,
                         4, 4,
                     ) { pixel: Array<Int>, _, _ ->
                         if (pixel[0] == 0) {
