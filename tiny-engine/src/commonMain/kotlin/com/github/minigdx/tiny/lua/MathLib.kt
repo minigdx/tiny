@@ -6,6 +6,7 @@ import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.LibFunction
+import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.ThreeArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import kotlin.math.abs
@@ -24,15 +25,27 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
         math["clamp"] = clamp()
         math["dst"] = dst()
         math["dst2"] = dst2()
+        math["sign"] = sign()
         return math
+    }
+
+    @TinyFunction("Return the sign of the number: -1 if negative. 1 otherwise.")
+    internal inner class sign : OneArgFunction() {
+
+        @TinyCall("Return the sign of the number.")
+        override fun call(arg: LuaValue): LuaValue {
+            return if (arg.toint() >= 0) {
+                valueOf(1)
+            } else {
+                valueOf(-1)
+            }
+        }
     }
 
     @TinyFunction("Clamp the value between 2 values.")
     internal inner class clamp : ThreeArgFunction() {
 
-        @TinyCall(
-            description = "Clamp the value between a and b.",
-        )
+        @TinyCall("Clamp the value between a and b.")
         override fun call(arg1: LuaValue, arg2: LuaValue, arg3: LuaValue): LuaValue {
             val max = if (arg1.todouble() > arg2.todouble()) {
                 arg1
