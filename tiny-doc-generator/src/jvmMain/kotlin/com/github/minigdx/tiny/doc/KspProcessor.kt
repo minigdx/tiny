@@ -177,8 +177,8 @@ class KspProcessor(
             if (!classDeclaration.isAnnotationPresent(TinyLib::class)) return data
 
             val functions = classDeclaration.declarations.map { declaration ->
-                declaration.accept(FunctionVisitor(), TinyFunctionDescriptor())
-            }.filter { it.name.isNotBlank() }
+                declaration.accept(FunctionVisitor(), mutableListOf())
+            }.flatMap { functions -> functions }.filter { f -> f.name.isNotBlank() }
 
             data.functions = functions.toList()
 
@@ -205,58 +205,75 @@ class KspProcessor(
      *     }
      * ```
      */
-    inner class FunctionVisitor : KSDefaultVisitor<TinyFunctionDescriptor, TinyFunctionDescriptor>() {
-        override fun defaultHandler(node: KSNode, data: TinyFunctionDescriptor): TinyFunctionDescriptor = data
+    inner class FunctionVisitor : KSDefaultVisitor<MutableList<TinyFunctionDescriptor>, MutableList<TinyFunctionDescriptor>>() {
+        override fun defaultHandler(node: KSNode, data: MutableList<TinyFunctionDescriptor>): MutableList<TinyFunctionDescriptor> = data
 
         override fun visitClassDeclaration(
             classDeclaration: KSClassDeclaration,
-            data: TinyFunctionDescriptor
-        ): TinyFunctionDescriptor {
+            data: MutableList<TinyFunctionDescriptor>
+        ): MutableList<TinyFunctionDescriptor> {
             val functions = classDeclaration.getAnnotationsByType(TinyFunction::class)
-            val function = functions.firstOrNull() ?: return data
+            if (functions.count() == 0) return data
 
-            // Get the name of the class
-            val name = function.name.ifBlank {
-                classDeclaration.accept(
-                    object : KSDefaultVisitor<Unit, String>() {
-                        override fun defaultHandler(node: KSNode, data: Unit): String = ""
+            val defaultName = classDeclaration.accept(
+                object : KSDefaultVisitor<Unit, String>() {
+                    override fun defaultHandler(node: KSNode, data: Unit): String = ""
 
-                        override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit): String {
-                            return classDeclaration.simpleName.asString()
-                        }
-                    },
-                    Unit
-                )
-            }
-
-            // Get all TinyCall annotated functions.
-            val calls = mutableListOf<TinyCallDescriptor>()
-            classDeclaration.getDeclaredFunctions()
-                .filter { f -> f.isAnnotationPresent(TinyCall::class) }
-                .forEach { f ->
-                    val call = TinyCallDescriptor()
-                    call.description = f.getAnnotationsByType(TinyCall::class).firstOrNull()?.description ?: ""
-                    f.parameters.map { p ->
-                        val multiArgs = p.getAnnotationsByType(TinyArgs::class)
-                        val multiArg = multiArgs.firstOrNull()
-                        if (multiArg != null) {
-                            call.args += multiArg.names.map { n -> TinyArgDescriptor(n) }
-                        } else {
-                            val args = p.getAnnotationsByType(TinyArg::class)
-                            val arg = args.firstOrNull()?.name ?: p.name?.asString() ?: ""
-                            call.args += TinyArgDescriptor(arg)
-                        }
+                    override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit): String {
+                        return classDeclaration.simpleName.asString()
                     }
-                    calls.add(call)
+                },
+                Unit
+            )
+
+            val result = functions.map { function ->
+                // Get the name of the class
+                val name = function.name.ifBlank {
+                    classDeclaration.accept(
+                        object : KSDefaultVisitor<Unit, String>() {
+                            override fun defaultHandler(node: KSNode, data: Unit): String = ""
+
+                            override fun visitClassDeclaration(
+                                classDeclaration: KSClassDeclaration,
+                                data: Unit
+                            ): String {
+                                return classDeclaration.simpleName.asString()
+                            }
+                        },
+                        Unit
+                    )
                 }
 
-            val example = function.example.ifBlank { null }
-            data.run {
-                this.example = example
-                this.name = name
-                this.description = function.description
-                this.calls = calls
+                // Get all TinyCall annotated functions.
+                val calls = mutableListOf<TinyCallDescriptor>()
+                classDeclaration.getDeclaredFunctions()
+                    .filter { f -> f.isAnnotationPresent(TinyCall::class) }
+                    .forEach { f ->
+                        val call = TinyCallDescriptor()
+                        call.description = f.getAnnotationsByType(TinyCall::class).firstOrNull()?.description ?: ""
+                        f.parameters.map { p ->
+                            val multiArgs = p.getAnnotationsByType(TinyArgs::class)
+                            val multiArg = multiArgs.firstOrNull()
+                            if (multiArg != null) {
+                                call.args += multiArg.names.map { n -> TinyArgDescriptor(n) }
+                            } else {
+                                val args = p.getAnnotationsByType(TinyArg::class)
+                                val arg = args.firstOrNull()?.name ?: p.name?.asString() ?: ""
+                                call.args += TinyArgDescriptor(arg)
+                            }
+                        }
+                        calls.add(call)
+                    }
+
+                val example = function.example.ifBlank { null }
+                TinyFunctionDescriptor(
+                    example = example,
+                    name = name.ifBlank { defaultName },
+                    description = function.description,
+                    calls = calls,
+                )
             }
+            data.addAll(result)
             return super.visitAnnotated(classDeclaration, data)
         }
     }

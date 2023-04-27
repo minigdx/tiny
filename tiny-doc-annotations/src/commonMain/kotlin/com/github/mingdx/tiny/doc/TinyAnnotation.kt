@@ -16,6 +16,7 @@ annotation class TinyLib(
 
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
+@Repeatable
 annotation class TinyFunction(
     /**
      * Description of the function.
