@@ -637,12 +637,7 @@ end
 <div class="sect2">
 <h3 id="_juice">juice</h3>
 <div class="paragraph">
-<p>Easing functions to 'juice' a game.</p>
-</div>
-<div class="sect3">
-<h4 id="_juice_pow2">juice.pow2()</h4>
-<div class="paragraph">
-<p>Interpolation to juice your game.
+<p>Easing functions to 'juice' a game. Interpolation to juice your game.
 All interpolations available:</p>
 </div>
 <div class="ulist">
@@ -682,6 +677,8 @@ All interpolations available:</p>
 </li>
 </ul>
 </div>
+<div class="sect3">
+<h4 id="_juice_pow2">juice.pow2()</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-lua" data-lang="lua">juice.pow2(progress) -- Give a percentage (progress) of the interpolation
@@ -732,6 +729,303 @@ function _draw()
 end
 
 </tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_juice_pow3">juice.pow3()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.pow3(progress) -- Give a percentage (progress) of the interpolation
+juice.pow3(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_pow4">juice.pow4()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.pow4(progress) -- Give a percentage (progress) of the interpolation
+juice.pow4(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_pow5">juice.pow5()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.pow5(progress) -- Give a percentage (progress) of the interpolation
+juice.pow5(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_powin2">juice.powIn2()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.powIn2(progress) -- Give a percentage (progress) of the interpolation
+juice.powIn2(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_powin3">juice.powIn3()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.powIn3(progress) -- Give a percentage (progress) of the interpolation
+juice.powIn3(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_powin4">juice.powIn4()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.powIn4(progress) -- Give a percentage (progress) of the interpolation
+juice.powIn4(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_powin5">juice.powIn5()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.powIn5(progress) -- Give a percentage (progress) of the interpolation
+juice.powIn5(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_powout2">juice.powOut2()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.powOut2(progress) -- Give a percentage (progress) of the interpolation
+juice.powOut2(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_powout3">juice.powOut3()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.powOut3(progress) -- Give a percentage (progress) of the interpolation
+juice.powOut3(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_powout4">juice.powOut4()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.powOut4(progress) -- Give a percentage (progress) of the interpolation
+juice.powOut4(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_powout5">juice.powOut5()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.powOut5(progress) -- Give a percentage (progress) of the interpolation
+juice.powOut5(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_sine">juice.sine()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.sine(progress) -- Give a percentage (progress) of the interpolation
+juice.sine(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_sinein">juice.sineIn()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.sineIn(progress) -- Give a percentage (progress) of the interpolation
+juice.sineIn(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_sineout">juice.sineOut()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.sineOut(progress) -- Give a percentage (progress) of the interpolation
+juice.sineOut(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_circle">juice.circle()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.circle(progress) -- Give a percentage (progress) of the interpolation
+juice.circle(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_circlein">juice.circleIn()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.circleIn(progress) -- Give a percentage (progress) of the interpolation
+juice.circleIn(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_circleout">juice.circleOut()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.circleOut(progress) -- Give a percentage (progress) of the interpolation
+juice.circleOut(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_elastic">juice.elastic()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.elastic(progress) -- Give a percentage (progress) of the interpolation
+juice.elastic(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_elasticin">juice.elasticIn()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.elasticIn(progress) -- Give a percentage (progress) of the interpolation
+juice.elasticIn(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_elasticout">juice.elasticOut()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.elasticOut(progress) -- Give a percentage (progress) of the interpolation
+juice.elasticOut(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_swing">juice.swing()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.swing(progress) -- Give a percentage (progress) of the interpolation
+juice.swing(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_swingin">juice.swingIn()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.swingIn(progress) -- Give a percentage (progress) of the interpolation
+juice.swingIn(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_swingout">juice.swingOut()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.swingOut(progress) -- Give a percentage (progress) of the interpolation
+juice.swingOut(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_bounce">juice.bounce()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.bounce(progress) -- Give a percentage (progress) of the interpolation
+juice.bounce(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_bouncein">juice.bounceIn()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.bounceIn(progress) -- Give a percentage (progress) of the interpolation
+juice.bounceIn(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_bounceout">juice.bounceOut()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.bounceOut(progress) -- Give a percentage (progress) of the interpolation
+juice.bounceOut(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_exp10">juice.exp10()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.exp10(progress) -- Give a percentage (progress) of the interpolation
+juice.exp10(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_expin10">juice.expIn10()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.expIn10(progress) -- Give a percentage (progress) of the interpolation
+juice.expIn10(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_expout10">juice.expOut10()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.expOut10(progress) -- Give a percentage (progress) of the interpolation
+juice.expOut10(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_exp5">juice.exp5()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.exp5(progress) -- Give a percentage (progress) of the interpolation
+juice.exp5(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_expin5">juice.expIn5()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.expIn5(progress) -- Give a percentage (progress) of the interpolation
+juice.expIn5(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_expout5">juice.expOut5()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.expOut5(progress) -- Give a percentage (progress) of the interpolation
+juice.expOut5(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_juice_linear">juice.linear()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.linear(progress) -- Give a percentage (progress) of the interpolation
+juice.linear(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -1139,7 +1433,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-04-27 13:11:05 UTC
+Last updated 2023-04-27 15:25:17 UTC
 </div>
 </div>
 </body>
