@@ -2,6 +2,8 @@
 
 Tiny is a lightweight, multiplatform game engine that allows developers to create games using the scripting language Lua. It is designed for creating small, short games, making it ideal for game jams and quick game development.
 
+![Breakout created with Tiny Game Engine](./images/breakout.gif)
+
 ## Features
 
 - Multiplatform: Tiny can be used on both desktop and web platforms.
