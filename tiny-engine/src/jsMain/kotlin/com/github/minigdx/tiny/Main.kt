@@ -13,18 +13,7 @@ import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.HTMLCollection
 import org.w3c.dom.get
 
-fun main() {
-    // Look for the first canvas in current page.
-    val tinyGameTag = document.getElementsByTagName("tiny-game")
-
-    if (tinyGameTag.length == 0) {
-        throw IllegalArgumentException(
-            "No <tiny-game> has been found in the current page. " +
-                "Check that the page including your javascript game" +
-                "has a least one <tiny-game> tag to render the game in."
-        )
-    }
-
+fun getRootPath(): String {
     // Get the actual root path and compute the root path to let the game load the resources from
     // the correct URL.
     // This portion may need to be customized regarding the service where the game is deployed (itch.io, ...)
@@ -34,6 +23,23 @@ fun main() {
     // Remove the last "/" to a avoid double slash when the engine getting resources.
     if (rootPath.endsWith("/")) {
         rootPath.dropLast(1)
+    }
+    return rootPath
+}
+
+fun main() {
+    val rootPath = getRootPath()
+    val tinyGameTag = document.getElementsByTagName("tiny-game")
+    setupGames(rootPath, tinyGameTag)
+}
+
+fun setupGames(rootPath: String, tinyGameTag: HTMLCollection) {
+    if (tinyGameTag.length == 0) {
+        throw IllegalArgumentException(
+            "No <tiny-game> has been found in the current page. " +
+                "Check that the page including your javascript game" +
+                "has a least one <tiny-game> tag to render the game in."
+        )
     }
 
     if (rootPath.startsWith("file://")) {
@@ -81,7 +87,8 @@ fun main() {
             spritesheet.getAttribute("name")
         }.filterNotNull()
 
-        val colors = game.getElementsByTagName("tiny-colors")[0]?.getAttribute("name")?.split(",")?.toList() ?: emptyList()
+        val colors =
+            game.getElementsByTagName("tiny-colors")[0]?.getAttribute("name")?.split(",")?.toList() ?: emptyList()
         val canvas = document.createElement("canvas")
         canvas.setAttribute("width", (gameWidth * gameZoom).toString())
         canvas.setAttribute("height", (gameHeight * gameZoom).toString())

@@ -4,6 +4,7 @@ import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.file.CommonVirtualFileSystem
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.forEachIndexed
+import com.github.minigdx.tiny.getRootPath
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
@@ -16,7 +17,6 @@ import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.webgl.WebGlPlatform
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.browser.document
-import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.dom.createElement
 import org.w3c.dom.Element
@@ -25,9 +25,7 @@ import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.HTMLTextAreaElement
 
 fun main() {
-    // This portion may need to be customized regarding the service where the game is deployed (itch.io, ...)
-    var rootPath = window.location.protocol + "//" + window.location.host + window.location.pathname
-    rootPath = rootPath.replace("index.html", "")
+    val rootPath = getRootPath()
 
     val elts = document.getElementsByTagName("tiny-editor")
     elts.forEachIndexed { index, game ->

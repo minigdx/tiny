@@ -15,6 +15,9 @@ With "Tiny," you'll be able to get started right away and see your progress in r
 
 > _Let's get started and unleash your creativity!_
 
+++++
+<iframe class="no-resize" title="Breakout example" width="536" height="536" src="sample/index.html"></iframe>
+++++
 
 include::tiny-cli.adoc[]
 
