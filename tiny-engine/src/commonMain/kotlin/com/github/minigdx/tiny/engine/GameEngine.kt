@@ -7,6 +7,7 @@ import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.input.Key
 import com.github.minigdx.tiny.log.Logger
+import com.github.minigdx.tiny.lua.errorLine
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.RenderContext
 import com.github.minigdx.tiny.resources.GameLevel
@@ -293,9 +294,11 @@ class GameEngine(
                 } catch (ex: LuaError) {
                     if (!inError) { // display the log only once.
                         logger.warn(
-                            "TINY",
-                            ex
-                        ) { "The line ${ex.level} trigger an execution error (${ex.getLuaMessage()}). Please fix your script!" }
+                            "TINY"
+                        ) {
+                            val error = ex.errorLine()?.let { (l, line) -> "line $l:$line <-- the \uD83D\uDC1E is around here (${ex.getLuaMessage()})" }
+                            "The line ${ex.level} trigger an execution error (${ex.getLuaMessage()}). Please fix your script!\n" + error
+                        }
                     }
                     true
                 }

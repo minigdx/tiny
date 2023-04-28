@@ -13,6 +13,7 @@ import com.github.minigdx.tiny.lua.ShapeLib
 import com.github.minigdx.tiny.lua.SprLib
 import com.github.minigdx.tiny.lua.StdLib
 import com.github.minigdx.tiny.lua.StdLibListener
+import com.github.minigdx.tiny.lua.errorLine
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LoadState
 import org.luaj.vm2.LuaError
@@ -92,6 +93,9 @@ class GameScript(
             true
         } catch (exception: LuaError) {
             println("Can't parse '$name' as the file is not valid.")
+            exception.errorLine()?.let { (lineNumber, line) ->
+                println("Error on line $lineNumber:$line")
+            }
             exception.printStackTrace()
             false
         }
