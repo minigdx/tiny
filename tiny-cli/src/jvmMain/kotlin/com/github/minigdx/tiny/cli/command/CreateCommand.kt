@@ -14,9 +14,26 @@ import com.github.minigdx.tiny.cli.config.GameParameters.Companion.JSON
 import com.github.minigdx.tiny.cli.config.GameParametersV1
 import com.github.minigdx.tiny.cli.config.Size
 import kotlinx.serialization.json.encodeToStream
+import org.intellij.lang.annotations.Language
 import java.io.File
 import java.io.FileOutputStream
 
+@Language("Lua")
+private const val DEFAULT_GAME_SCRIPT = """
+function _init()
+    
+end
+    
+    
+function _update()
+    
+end
+    
+    
+function _draw()
+
+end
+"""
 class CreateCommand : CliktCommand(name = "create") {
 
     val gameDirectory by argument(help = "The directory containing all game information")
@@ -30,6 +47,10 @@ class CreateCommand : CliktCommand(name = "create") {
         .prompt(default = "256x256")
         .validate { require(it.matches(Regex("\\d+x\\d+"))) { "Invalid resolution format: $it" } }
 
+    private val gameScript by option(help = "\uD83D\uDCDD Name of the default game script")
+        .prompt(default = "game.lua")
+        .validate { require(it.endsWith(".lua")) { "Invalid game script extension: $it" } }
+
     private val spriteSize by option(help = "📐 The sprite size (e.g., 16x16)")
         .prompt(default = "16x16")
         .validate { require(it.matches(Regex("\\d+x\\d+"))) { "Invalid resolution format: $it" } }
@@ -38,12 +59,11 @@ class CreateCommand : CliktCommand(name = "create") {
         .int()
         .prompt(default = "2")
 
-    // FIXME: crash if spritesheets is empty
     private val spritesheets by option(help = "\uD83D\uDCC4 The filenames of the sprite sheets, separated by a comma (e.g., file1.png, file2.png)")
         .prompt(default = "")
         .validate {
             require(
-                it.split(",")
+                it.isEmpty() || it.split(",")
                     .all { f -> f.trim().endsWith(".png") }
             ) { "Invalid image file $it. Only *.png are supported" }
         }
@@ -64,7 +84,7 @@ ${
         echo("Game Name: $gameName")
         echo("Game Resolution: $gameResolution")
         echo("Game Resolution: $spriteSize")
-        echo("Sprite Sheet Filenames: $spritesheets")
+        echo("Sprite Sheet Filenames: ${spritesheets.ifBlank { "No spritesheet added!" }}")
         echo("Color palette: ${GamePalette.ALL[palette].name}")
 
         val configuration = GameParametersV1(
@@ -73,6 +93,7 @@ ${
             sprites = spriteSize.toSize(),
             zoom = zoom,
             colors = GamePalette.ALL[palette].colors,
+            scripts = listOf(gameScript)
         ) as GameParameters
 
         if (!gameDirectory.exists()) gameDirectory.mkdirs()
@@ -82,8 +103,10 @@ ${
             JSON.encodeToStream(configuration, it)
         }
 
+        gameDirectory.resolve(gameScript).writeText(DEFAULT_GAME_SCRIPT)
+
         echo("Game created into: ${gameDirectory.absolutePath}")
-        echo("To run the game: tiny-cli ${gameDirectory.absolutePath}")
+        echo("To run the game: tiny-cli run ${gameDirectory.absolutePath}")
     }
 
     private fun String.toSize(): Size {
