@@ -55,33 +55,33 @@ You can also add resources such as images, sounds, and other assets to your game
 
 TIP: With the `tiny-cli create` command, you can quickly and easily create new games for the tiny game engine, giving you the flexibility and control you need to bring your game ideas to life.
 
-=== The default `tiny-cli` command
+=== The `tiny-cli run` command
 
-The `tiny-cli` command is a command line tool for running and testing your tiny game. This command takes only one parameter: the path to the directory containing your game's assets and `_tiny.json` file.
+The `tiny-cli run` command is a command line tool for running and testing your tiny game. This command takes only one parameter: the path to the directory containing your game's assets and `_tiny.json` file.
 
 ==== Usage
 
-To use the `tiny-cli` command, simply open your terminal and type the following command:
+To use the `tiny-cli run` command, simply open your terminal and type the following command:
 
 ```
-tiny-cli <game folder>
+tiny-cli run <game folder>
 ```
 
 where `<game folder>` is the path to the directory containing your game's assets and `_tiny.json` file.
 
 ==== Running a Game
 
-To run your game using the `tiny-cli` command, follow these steps:
+To run your game using the `tiny-cli run` command, follow these steps:
 
 1. Open your terminal and navigate to the directory where your game's `_tiny.json` file is located.
 
-2. Type the following command and press Enter, replacing `<game folder>` with the path to your game's folder: `tiny-cli <game folder>`
+2. Type the following command and press Enter, replacing `<game folder>` with the path to your game's folder: `tiny-cli run <game folder>`
 
 3. The `tiny-cli` command will start your game and display it in a new window.
 
 4. If you make changes to your game's Lua scripts or update any spritesheets, the game will automatically reload to use the latest version of those resources.
 
-With the `tiny-cli` command, you can quickly test and run your tiny game, making it easy to iterate and refine your game as you develop it.
+With the `tiny-cli run` command, you can quickly test and run your tiny game, making it easy to iterate and refine your game as you develop it.
 
 === The `tiny-cli add` command
 

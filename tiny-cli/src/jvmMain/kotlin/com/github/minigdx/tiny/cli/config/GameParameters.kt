@@ -55,12 +55,12 @@ data class GameParametersV1(
      * Script used by the game.
      * The first script will be the first to be ran after the boot sequence.
      */
-    val scripts: List<String> = listOf("game.lua"),
+    val scripts: List<String> = emptyList(),
     /**
      * Sprite sheets to be loaded.
      * The first spritesheet will be the one used by default.
      */
-    val spritesheets: List<String> = listOf("game.png"),
+    val spritesheets: List<String> = emptyList(),
     /**
      * Level to be loaded.
      * The first level will be the one used by default.

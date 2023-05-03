@@ -19,39 +19,17 @@ import java.io.FileInputStream
 
 class MainCommand : CliktCommand(invokeWithoutSubcommand = true) {
 
-    val gameDirectory by argument(help = "The directory containing all game information")
-        .file(mustExist = true, canBeDir = true, canBeFile = false)
-        .default(File("."))
-
     init {
-        subcommands(CreateCommand(), AddCommand(), ExportCommand(), ServeCommand())
+        subcommands(
+            CreateCommand(),
+            RunCommand(),
+            AddCommand(),
+            ExportCommand(),
+            ServeCommand()
+        )
     }
 
     override fun run() {
         echo("\uD83E\uDDF8 ʕ　·ᴥ·ʔ TINY - The Tiny Virtual Gaming Console")
-        val subcommand = currentContext.invokedSubcommand
-        if (subcommand == null) {
-            try {
-                val configFile = gameDirectory.resolve("_tiny.json")
-                if (!configFile.exists()) {
-                    echo("No _tiny.json")
-                    throw Abort()
-                }
-                val gameParameters = JSON.decodeFromStream<GameParameters>(FileInputStream(configFile))
-
-                val logger = StdOutLogger("tiny-cli")
-                val vfs = CommonVirtualFileSystem()
-                val gameOption = gameParameters.toGameOptions()
-                GameEngine(
-                    gameOptions = gameOption,
-                    platform = GlfwPlatform(gameOption, logger, vfs, gameDirectory, LwjglGLRender(logger, gameOption)),
-                    vfs = vfs,
-                    logger = logger,
-                ).main()
-            } catch (ex: Exception) {
-                echo("An unexpected exception occurred. The application will stop. It might be a bug in Tiny. If so, please report it.")
-                ex.printStackTrace()
-            }
-        }
     }
 }
