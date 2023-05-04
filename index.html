@@ -481,7 +481,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_adding_resources">Adding Resources</a></li>
 </ul>
 </li>
-<li><a href="#_the_default_tiny_cli_command">The default <code>tiny-cli</code> command</a>
+<li><a href="#_the_tiny_cli_run_command">The <code>tiny-cli run</code> command</a>
 <ul class="sectlevel3">
 <li><a href="#_usage_2">Usage</a></li>
 <li><a href="#_running_a_game">Running a Game</a></li>
@@ -517,6 +517,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_ctrl">ctrl</a>
 <ul class="sectlevel3">
 <li><a href="#_ctrl_touch">ctrl.touch()</a></li>
+<li><a href="#_ctrl_pressed">ctrl.pressed()</a></li>
+<li><a href="#_ctrl_pressing">ctrl.pressing()</a></li>
 </ul>
 </li>
 <li><a href="#_gfx">gfx</a>
@@ -569,6 +571,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_juice_linear">juice.linear()</a></li>
 </ul>
 </li>
+<li><a href="#_keys">keys</a></li>
 <li><a href="#_map">map</a>
 <ul class="sectlevel3">
 <li><a href="#_map_flag">map.flag()</a></li>
@@ -743,18 +746,18 @@ With the <code>tiny-cli create</code> command, you can quickly and easily create
 </div>
 </div>
 <div class="sect2">
-<h3 id="_the_default_tiny_cli_command">The default <code>tiny-cli</code> command</h3>
+<h3 id="_the_tiny_cli_run_command">The <code>tiny-cli run</code> command</h3>
 <div class="paragraph">
-<p>The <code>tiny-cli</code> command is a command line tool for running and testing your tiny game. This command takes only one parameter: the path to the directory containing your game&#8217;s assets and <code>_tiny.json</code> file.</p>
+<p>The <code>tiny-cli run</code> command is a command line tool for running and testing your tiny game. This command takes only one parameter: the path to the directory containing your game&#8217;s assets and <code>_tiny.json</code> file.</p>
 </div>
 <div class="sect3">
 <h4 id="_usage_2">Usage</h4>
 <div class="paragraph">
-<p>To use the <code>tiny-cli</code> command, simply open your terminal and type the following command:</p>
+<p>To use the <code>tiny-cli run</code> command, simply open your terminal and type the following command:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code>tiny-cli &lt;game folder&gt;</code></pre>
+<pre class="rouge highlight"><code>tiny-cli run &lt;game folder&gt;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -764,7 +767,7 @@ With the <code>tiny-cli create</code> command, you can quickly and easily create
 <div class="sect3">
 <h4 id="_running_a_game">Running a Game</h4>
 <div class="paragraph">
-<p>To run your game using the <code>tiny-cli</code> command, follow these steps:</p>
+<p>To run your game using the <code>tiny-cli run</code> command, follow these steps:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
@@ -772,7 +775,7 @@ With the <code>tiny-cli create</code> command, you can quickly and easily create
 <p>Open your terminal and navigate to the directory where your game&#8217;s <code>_tiny.json</code> file is located.</p>
 </li>
 <li>
-<p>Type the following command and press Enter, replacing <code>&lt;game folder&gt;</code> with the path to your game&#8217;s folder: <code>tiny-cli &lt;game folder&gt;</code></p>
+<p>Type the following command and press Enter, replacing <code>&lt;game folder&gt;</code> with the path to your game&#8217;s folder: <code>tiny-cli run &lt;game folder&gt;</code></p>
 </li>
 <li>
 <p>The <code>tiny-cli</code> command will start your game and display it in a new window.</p>
@@ -783,7 +786,7 @@ With the <code>tiny-cli create</code> command, you can quickly and easily create
 </ol>
 </div>
 <div class="paragraph">
-<p>With the <code>tiny-cli</code> command, you can quickly test and run your tiny game, making it easy to iterate and refine your game as you develop it.</p>
+<p>With the <code>tiny-cli run</code> command, you can quickly test and run your tiny game, making it easy to iterate and refine your game as you develop it.</p>
 </div>
 </div>
 </div>
@@ -999,6 +1002,68 @@ function _draw()
   p = ctrl.touch()
   print("coordinates: "..p.x .. "x"..p.y, 1, 1, 4)
   shape.rectf(p.x, p.y, 5,5, p.x + p.y)
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_ctrl_pressed">ctrl.pressed()</h4>
+<div class="paragraph">
+<p>Return if the key was pressed during the last frame. If you need to check that the key is still pressed, see ctrl.pressing instead.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">ctrl</span><span class="p">.</span><span class="n">pressed</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="c1">-- Is the key was pressed?</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_ctrl_pressing">ctrl.pressing()</h4>
+<div class="paragraph">
+<p>Return if the key is still pressed.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">ctrl</span><span class="p">.</span><span class="n">pressing</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="c1">-- Is the key is still pressed?</span></code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;">
+
+function _init()
+    circle = {
+        x = 256 * 0.5,
+        y = 256 * 0.5,
+        radius = 10
+    }
+end
+
+function _update()
+    -- check keys for horizontal move
+    if (ctrl.pressing(keys.left)) then
+        circle.x = math.max(circle.x - 1, 0)
+    elseif (ctrl.pressing(keys.right)) then
+        circle.x = math.min(circle.x + 1, 256)
+    end
+
+    -- check keys for vertical move
+    if (ctrl.pressing(keys.up)) then
+        circle.y = math.max(circle.y - 1, 0)
+    elseif (ctrl.pressing(keys.down)) then
+        circle.y = math.min(circle.y + 1, 256)
+    end
+
+    -- check keys for update circle size
+    if (ctrl.pressing(keys.space)) then
+        circle.radius = math.min(circle.radius + 1, 256)
+    elseif (ctrl.pressing(keys.enter)) then
+        circle.radius = math.max(circle.radius - 1, 0)
+    end
+end
+
+function _draw()
+    gfx.cls(1)
+    shape.circlef(circle.x, circle.y, circle.radius, 8)
+    shape.circle(circle.x, circle.y, 2, 9)
 end
 
 </tiny-editor>
@@ -1562,6 +1627,12 @@ end
 </div>
 </div>
 <div class="sect2">
+<h3 id="_keys">keys</h3>
+<div class="paragraph">
+<p>List of the available keys. To be used with ctrl.</p>
+</div>
+</div>
+<div class="sect2">
 <h3 id="_map">map</h3>
 <div class="paragraph">
 <p>Map API to accessing maps data configured in a game.</p>
@@ -1966,7 +2037,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-04-28 17:31:14 UTC
+Last updated 2023-05-04 12:37:39 UTC
 </div>
 </div>
 <style>

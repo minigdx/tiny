@@ -470,6 +470,68 @@ end
 
 </tiny-editor>
 </div>
+<div class="sect3">
+<h4 id="_ctrl_pressed">ctrl.pressed()</h4>
+<div class="paragraph">
+<p>Return if the key was pressed during the last frame. If you need to check that the key is still pressed, see ctrl.pressing instead.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">ctrl.pressed(key) -- Is the key was pressed?</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_ctrl_pressing">ctrl.pressing()</h4>
+<div class="paragraph">
+<p>Return if the key is still pressed.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">ctrl.pressing(key) -- Is the key is still pressed?</code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;">
+
+function _init()
+    circle = {
+        x = 256 * 0.5,
+        y = 256 * 0.5,
+        radius = 10
+    }
+end
+
+function _update()
+    -- check keys for horizontal move
+    if (ctrl.pressing(keys.left)) then
+        circle.x = math.max(circle.x - 1, 0)
+    elseif (ctrl.pressing(keys.right)) then
+        circle.x = math.min(circle.x + 1, 256)
+    end
+
+    -- check keys for vertical move
+    if (ctrl.pressing(keys.up)) then
+        circle.y = math.max(circle.y - 1, 0)
+    elseif (ctrl.pressing(keys.down)) then
+        circle.y = math.min(circle.y + 1, 256)
+    end
+
+    -- check keys for update circle size
+    if (ctrl.pressing(keys.space)) then
+        circle.radius = math.min(circle.radius + 1, 256)
+    elseif (ctrl.pressing(keys.enter)) then
+        circle.radius = math.max(circle.radius - 1, 0)
+    end
+end
+
+function _draw()
+    gfx.cls(1)
+    shape.circlef(circle.x, circle.y, circle.radius, 8)
+    shape.circle(circle.x, circle.y, 2, 9)
+end
+
+</tiny-editor>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_gfx">gfx</h3>
@@ -1029,6 +1091,12 @@ juice.linear(start, end, progress) -- Interpolate the value given a start and an
 </div>
 </div>
 <div class="sect2">
+<h3 id="_keys">keys</h3>
+<div class="paragraph">
+<p>List of the available keys. To be used with ctrl.</p>
+</div>
+</div>
+<div class="sect2">
 <h3 id="_map">map</h3>
 <div class="paragraph">
 <p>Map API to accessing maps data configured in a game.</p>
@@ -1433,7 +1501,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-04-28 17:34:43 UTC
+Last updated 2023-05-04 12:40:45 UTC
 </div>
 </div>
 </body>
