@@ -131,10 +131,10 @@ function boobles_update(booble)
 end
 
 function update_raquette(raquette)
-    if ctrl.down(0) then
+    if ctrl.pressing(ctrl.keys.left) then
         raquette.x = math.max(0, raquette.x - raquette.speed)
         raquette.direction = 0
-    elseif ctrl.down(2) then
+    elseif ctrl.pressing(ctrl.keys.right) then
         raquette.x = math.min(raquette.x + raquette.speed, 256 - raquette.width)
         raquette.direction = 1
     end
@@ -222,7 +222,7 @@ function build_particle(x, y, tx, ty)
 end
 
 function _update()
-    if(ctrl.down(1)) then
+    if(ctrl.pressing(keys.up)) then
         game.started = true
     end
 
@@ -236,7 +236,7 @@ function _update()
         b.accept_move_x = true
         b.accept_move_y = true
 
-        if ctrl.down(1) then
+        if ctrl.pressing(keys.up) then
             b.glue_to = false
         end
         if b.glue_to then
@@ -244,9 +244,9 @@ function _update()
             b.new_x = r.x + r.width * 0.5 - 7 * 0.5
             b.new_y = r.y - 7
 
-            if ctrl.down(0) then
+            if ctrl.pressing(keys.left) then
                 b.speed.x = -1
-            elseif ctrl.down(2) then
+            elseif ctrl.pressing(keys.right) then
                 b.speed.x = 1
             end
         else

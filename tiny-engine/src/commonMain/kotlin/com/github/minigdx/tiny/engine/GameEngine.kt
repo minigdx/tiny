@@ -240,7 +240,7 @@ class GameEngine(
                             }
                             false
                         }
-                        if(isValid) scripts[resource.index] = resource
+                        if (isValid) scripts[resource.index] = resource
                     }
 
                     ENGINE_GAMESCRIPT -> {

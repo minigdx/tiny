@@ -8,7 +8,6 @@ import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.Key
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
-import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 
@@ -22,19 +21,15 @@ class CtrlLib(
 ) : TwoArgFunction() {
     override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
         val ctrl = LuaTable()
-        ctrl.set("key", key())
-        ctrl.set("down", down())
-        ctrl.set("x", todo())
-        ctrl.set("y", todo())
+
+        ctrl["pressed"] = pressed()
+        ctrl["pressing"] = pressing()
+
         ctrl.set("touch", touch())
-        ctrl.set("touched", todo())
-        ctrl.set("touching", todo())
         arg2.set("ctrl", ctrl)
         arg2.get("package").get("loaded").set("ctrl", ctrl)
         return ctrl
     }
-
-    private val keys = listOf(Key.ARROW_LEFT, Key.ARROW_UP, Key.ARROW_RIGHT, Key.ARROW_DOWN)
 
     private val spr = sprLib.draw()
 
@@ -73,23 +68,32 @@ class CtrlLib(
         }
     }
 
-    inner class key : OneArgFunction() {
-        override fun call(arg: LuaValue): LuaValue {
-            val int = arg.checkint()
-            val k = keys.getOrNull(int) ?: return valueOf(false)
+    @TinyFunction(
+        "Return if the key was pressed during the last frame. " +
+            "If you need to check that the key is still pressed, see ctrl.pressing instead."
+    )
+    inner class pressed : OneArgFunction() {
 
+        @TinyCall("Is the key was pressed?")
+        override fun call(@TinyArg("key") arg: LuaValue): LuaValue {
+            val int = arg.checkint()
+            // get the key by its ordinal.
+            val k = Key.values()[int]
             return valueOf(inputHandler.isKeyJustPressed(k))
         }
     }
 
-    inner class down : OneArgFunction() {
-        override fun call(arg: LuaValue): LuaValue {
+    @TinyFunction(
+        "Return if the key is still pressed. ",
+        example = CTRL_PRESSING_EXAMPLE
+    )
+    inner class pressing : OneArgFunction() {
+        @TinyCall("Is the key is still pressed?")
+        override fun call(@TinyArg("key") arg: LuaValue): LuaValue {
             val int = arg.checkint()
-            val k = keys.getOrNull(int) ?: return valueOf(false)
-
+            // get the key by its ordinal.
+            val k = Key.values()[int]
             return valueOf(inputHandler.isKeyPressed(k))
         }
     }
-
-    inner class todo() : LibFunction()
 }

@@ -28,7 +28,7 @@ class StdLib(
 
     override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
         val tiny = LuaTable()
-        arg2["exit"] = exit()
+        arg2["exit"] = exit() // FIXME: move into game lib with t and dt?
         arg2["all"] = all()
         arg2["rpairs"] = rpairs()
         arg2["print"] = print()
