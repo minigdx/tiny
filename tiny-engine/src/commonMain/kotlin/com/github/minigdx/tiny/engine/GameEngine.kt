@@ -228,9 +228,19 @@ class GameEngine(
                     GAME_GAMESCRIPT -> {
                         resource as GameScript
                         resource.resourceAccess = this
-                        if (resource.isValid()) {
-                            scripts[resource.index] = resource
+                        val isValid = try {
+                            resource.isValid()
+                            true
+                        } catch (ex: LuaError) {
+                            logger.warn(
+                                "TINY"
+                            ) {
+                                val error = ex.errorLine()?.let { (l, line) -> "line $l:$line <-- the \uD83D\uDC1E is around here (${ex.getLuaMessage()})" }
+                                "The line ${ex.level} trigger an execution error (${ex.getLuaMessage()}). Please fix your script!\n" + error
+                            }
+                            false
                         }
+                        if(isValid) scripts[resource.index] = resource
                     }
 
                     ENGINE_GAMESCRIPT -> {

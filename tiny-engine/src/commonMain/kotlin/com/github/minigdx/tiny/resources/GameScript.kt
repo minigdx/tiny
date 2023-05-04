@@ -13,10 +13,8 @@ import com.github.minigdx.tiny.lua.ShapeLib
 import com.github.minigdx.tiny.lua.SprLib
 import com.github.minigdx.tiny.lua.StdLib
 import com.github.minigdx.tiny.lua.StdLibListener
-import com.github.minigdx.tiny.lua.errorLine
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LoadState
-import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.LuaValue.Companion.valueOf
 import org.luaj.vm2.compiler.LuaC
@@ -88,17 +86,11 @@ class GameScript(
     }
 
     fun isValid(): Boolean {
-        return try {
-            createLuaGlobals().load(content.decodeToString()).call()
-            true
-        } catch (exception: LuaError) {
-            println("Can't parse '$name' as the file is not valid.")
-            exception.errorLine()?.let { (lineNumber, line) ->
-                println("Error on line $lineNumber:$line")
-            }
-            exception.printStackTrace()
-            false
+        with(createLuaGlobals()) {
+            load(content.decodeToString()).call()
+            get("_init").nullIfNil()?.call(valueOf(gameOptions.width), valueOf(gameOptions.height))
         }
+        return true
     }
 
     fun evaluate() {
