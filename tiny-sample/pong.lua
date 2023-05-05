@@ -1,43 +1,123 @@
-function game_init_lost()
-    game.update = game_update_lost
-    game.draw = game_draw_lost
-    game.cooldown = 0
-    game.restart_cooldown = 1.2
-    game.radius_title = 256
+local Nope = {
+    update = function()
+    end,
+    draw = function()
+    end
+}
+
+
+local GameOut = {
+    radius = 0,
+    speed = 5,
+    start = false
+}
+
+function GameOut:new()
+    local n = {}
+    setmetatable(n, self)
+    self.__index = self
+    return n
 end
 
-function game_draw_lost()
-    gfx.cls(1)
-    shape.circlef(raquettes[1].x + raquettes[1].width * 0.5, raquettes[1].y, game.radius_title, 0)
-    gfx.to_sheet(2)
+
+function Nope:new()
+    local n = {}
+    setmetatable(n, self)
+    self.__index = self
+    return n
 end
 
-function game_update_lost()
-    game.cooldown = math.min(game.cooldown + 1/60, 1)
-    game.restart_cooldown = math.max(game.restart_cooldown - 1/60, 0)
-    game.radius_title = juice.powOut5(256, 40, game.cooldown / 1)
+local EndOut = {
+    start_radius = 40,
+    radius = 0,
+    target_radius = 300,
+    duration = 1,
+    t = 0
+}
 
-    if(game.restart_cooldown <= 0) then
-        game.update = game_update_restart
-        game.cooldown = 0
+function EndOut:new()
+    local n = {}
+    setmetatable(n, self)
+    self.__index = self
+    return n
+end
+
+function EndOut:update()
+    self.t = self.t + 1 / 60
+    self.radius = juice.powIn5(self.start_radius, self.target_radius, self.t / self.duration)
+
+    if (self.radius >= 300) then
+        transition = GameOut:new()
     end
 end
 
-function game_update_restart()
-    game.cooldown = math.min(game.cooldown + 1/60, 1)
-    game.radius_title = juice.powIn5(40, 256, game.cooldown / 1)
+function EndOut:draw()
+    gfx.cls(1)
+    shape.circlef(256 * 0.5, 212, self.radius, 0)
+    spr.sheet(0)
+    spr.sdraw(0, 100, 0, 208, 256, 3 * 16)
+
+    gfx.to_sheet(2)
+end
+
+local EndIn = {
+    start_radius = 256,
+    radius = 256,
+    target_radius = 40,
+    duration = 1,
+    t = 0
+}
+
+function EndIn:new()
+    local n = {}
+    setmetatable(n, self)
+    self.__index = self
+    return n
+end
+
+function EndIn:update()
+    self.t = self.t + 1 / 60
+    self.radius = juice.powOut5(self.start_radius, self.target_radius, self.t / self.duration)
+
+    if (self.radius <= 40) then
+        transition = EndOut:new()
+    end
+end
+
+function EndIn:draw()
+    gfx.cls(1)
+
+    shape.circlef(256 * 0.5, 212, self.radius, 0)
+    gfx.to_sheet(2)
 end
 
 
+function GameOut:update()
+    if (self.start) then
+        self.radius = self.radius + self.speed
+
+        if (self.radius > 300) then
+            transition = Nope:new()
+        end
+    end
+end
+
+function GameOut:draw()
+    gfx.cls(0)
+    spr.sheet(0)
+    spr.sdraw(0, 100, 0, 208, 256, 3 * 16)
+    shape.circlef(256 * 0.5, 212, self.radius, 0)
+    gfx.to_sheet(2)
+end
 
 function _init()
+    transition = GameOut:new()
+
     game = {
         radius_title = 0,
         started = false,
         lost = false,
-        cooldown = 0,
-        update = function()  end,
-        draw = function()  end
+        cooldown = 0
     }
 
     dt = 1 / 60
@@ -131,10 +211,10 @@ function boobles_update(booble)
 end
 
 function update_raquette(raquette)
-    if ctrl.pressing(ctrl.keys.left) then
+    if ctrl.pressing(keys.left) then
         raquette.x = math.max(0, raquette.x - raquette.speed)
         raquette.direction = 0
-    elseif ctrl.pressing(ctrl.keys.right) then
+    elseif ctrl.pressing(keys.right) then
         raquette.x = math.min(raquette.x + raquette.speed, 256 - raquette.width)
         raquette.direction = 1
     end
@@ -222,13 +302,12 @@ function build_particle(x, y, tx, ty)
 end
 
 function _update()
-    if(ctrl.pressing(keys.up)) then
+    if (ctrl.pressing(keys.up) and not game.started) then
         game.started = true
+        transition.start = true
     end
 
-    if(game.started) then
-        game.radius_title = math.min(game.radius_title + 5, 256)
-    end
+    transition:update()
 
     update_raquettes()
 
@@ -323,7 +402,7 @@ function _update()
         end
     end
 
-    for index,b in rpairs(balls) do
+    for index, b in rpairs(balls) do
         if b.accept_move_x then
             b.x = b.new_x
         end
@@ -337,7 +416,8 @@ function _update()
             end
         end
         if b.y > 256 then
-            game_init_lost()
+            game.lost = true
+            transition = EndIn:new()
             table.remove(balls, index)
         end
     end
@@ -355,19 +435,11 @@ function _update()
         end
     end
 
-    game.update()
 end
 
 function _draw()
-    -- title screen
-    gfx.cls(0) -- clear the screen
+    transition:draw()
 
-    -- TODO: replace with real title
-    shape.rectf(10, 50, 236, 80, 9)
-    shape.circlef(256 * 0.5, 212, game.radius_title, 0)
-    gfx.to_sheet(2)
-
-    game.draw()
     -- game
     gfx.cls(13)
     spr.sheet()
