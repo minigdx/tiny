@@ -541,6 +541,18 @@ With the <code>tiny-cli create</code> command, you can quickly and easily create
 <div class="paragraph">
 <p>The <code>tiny-cli run</code> command is a command line tool for running and testing your tiny game. This command takes only one parameter: the path to the directory containing your game&#8217;s assets and <code>_tiny.json</code> file.</p>
 </div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Warning</div>
+</td>
+<td class="content">
+If the command is run on Mac OS and some JRE/JDK, the command might not work as it requires to use the JVM option <code>-XstartOnFirstThread</code>. In such case, instead of <code>tiny-cli</code>, use <code>tiny-cli-mac</code> which add this option.
+</td>
+</tr>
+</table>
+</div>
 <div class="sect3">
 <h4 id="_usage_2">Usage</h4>
 <div class="paragraph">
@@ -771,7 +783,7 @@ The tiny serve command is intended for local testing only and should not be used
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-05-07 11:40:19 UTC
+Last updated 2023-05-07 22:47:26 UTC
 </div>
 </div>
 </body>
