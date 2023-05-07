@@ -59,6 +59,8 @@ TIP: With the `tiny-cli create` command, you can quickly and easily create new g
 
 The `tiny-cli run` command is a command line tool for running and testing your tiny game. This command takes only one parameter: the path to the directory containing your game's assets and `_tiny.json` file.
 
+WARNING: If the command is run on Mac OS and some JRE/JDK, the command might not work as it requires to use the JVM option `-XstartOnFirstThread`. In such case, instead of `tiny-cli`, use `tiny-cli-mac` which add this option.
+
 ==== Usage
 
 To use the `tiny-cli run` command, simply open your terminal and type the following command:

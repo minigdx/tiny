@@ -40,7 +40,7 @@ dependencies {
 
 application {
     mainClass.set("com.github.minigdx.tiny.cli.MainKt")
-    applicationDefaultJvmArgs = listOf("-XstartOnFirstThread")
+    // applicationDefaultJvmArgs = listOf("-XstartOnFirstThread")
 
     // Copy the JARs from the Kotlin MPP dependencies.
     this.applicationDistribution.from(
@@ -68,4 +68,22 @@ project.tasks.withType(JavaExec::class.java).configureEach {
     val tinyEngineJsZip by configurations.existing
 
     classpath(jvmJar, jvmRuntimeClasspath, tinyEngineJsZip)
+}
+
+// Create custom script for Mac + LWJGL with "-XstartOnFirstThread" JVM option.
+val macStartScripts = project.tasks.register("startScriptsForMac", CreateStartScripts::class.java) {
+    val startScripts = project.tasks.getByName("startScripts", CreateStartScripts::class)
+
+    description = "Create Mac OS custom start script"
+    classpath = startScripts.classpath
+
+    mainModule.set(startScripts.mainModule)
+    mainClass.set(startScripts.mainClass)
+
+    conventionMapping.map("applicationName") { startScripts.conventionMapping.getConventionValue(null as String?, "applicationName", false) + "-mac"}
+    conventionMapping.map("outputDir") { startScripts.conventionMapping.getConventionValue(null as File?, "outputDir", false) }
+    conventionMapping.map("executableDir") { startScripts.conventionMapping.getConventionValue(null as String?, "executableDir", false) }
+    conventionMapping.map("defaultJvmOpts") { listOf("-XstartOnFirstThread") }
+
+    modularity.inferModulePath.convention(startScripts.modularity.inferModulePath)
 }
