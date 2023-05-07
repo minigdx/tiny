@@ -5,27 +5,11 @@ local Nope = {
     end
 }
 
-
 local GameOut = {
     radius = 0,
     speed = 5,
     start = false
 }
-
-function GameOut:new()
-    local n = {}
-    setmetatable(n, self)
-    self.__index = self
-    return n
-end
-
-
-function Nope:new()
-    local n = {}
-    setmetatable(n, self)
-    self.__index = self
-    return n
-end
 
 local EndOut = {
     start_radius = 40,
@@ -35,19 +19,12 @@ local EndOut = {
     t = 0
 }
 
-function EndOut:new()
-    local n = {}
-    setmetatable(n, self)
-    self.__index = self
-    return n
-end
-
 function EndOut:update()
     self.t = self.t + 1 / 60
     self.radius = juice.powIn5(self.start_radius, self.target_radius, self.t / self.duration)
 
     if (self.radius >= 300) then
-        transition = GameOut:new()
+        transition = new(GameOut)
     end
 end
 
@@ -68,19 +45,12 @@ local EndIn = {
     t = 0
 }
 
-function EndIn:new()
-    local n = {}
-    setmetatable(n, self)
-    self.__index = self
-    return n
-end
-
 function EndIn:update()
     self.t = self.t + 1 / 60
     self.radius = juice.powOut5(self.start_radius, self.target_radius, self.t / self.duration)
 
     if (self.radius <= 40) then
-        transition = EndOut:new()
+        transition = new(EndOut)
     end
 end
 
@@ -91,13 +61,12 @@ function EndIn:draw()
     gfx.to_sheet(2)
 end
 
-
 function GameOut:update()
     if (self.start) then
         self.radius = self.radius + self.speed
 
         if (self.radius > 300) then
-            transition = Nope:new()
+            transition = new(Nope)
         end
     end
 end
@@ -111,7 +80,7 @@ function GameOut:draw()
 end
 
 function _init()
-    transition = GameOut:new()
+    transition = new(GameOut)
 
     game = {
         radius_title = 0,
@@ -417,7 +386,7 @@ function _update()
         end
         if b.y > 256 then
             game.lost = true
-            transition = EndIn:new()
+            transition = new(EndIn)
             table.remove(balls, index)
         end
     end

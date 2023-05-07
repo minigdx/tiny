@@ -33,7 +33,41 @@ class StdLib(
         arg2["rpairs"] = rpairs()
         arg2["print"] = print()
         arg2["debug"] = debug()
+        arg2["new"] = new()
         return tiny
+    }
+
+    @TinyFunction(
+        "Create new instance of a class by creating a new table and setting the metatable. " +
+            "It's a shortcut of the following code and allow to create kind of Object Oriented Programming. " +
+            "```lua" +
+            "function Class:new()\n" +
+            "    local n = {}\n" +
+            "    setmetatable(n, self)\n" +
+            "    self.__index = self\n" +
+            "    return n\n" +
+            "end" +
+            "```"
+    )
+    inner class new : TwoArgFunction() {
+
+        @TinyCall("Create new instance of class.")
+        override fun call(arg: LuaValue): LuaValue {
+            return super.call(arg)
+        }
+
+        @TinyCall("Create new instance of class using default values.")
+        override fun call(@TinyArg("class") arg1: LuaValue, @TinyArg("default") arg2: LuaValue): LuaValue {
+            val default = if(arg2.istable()) {
+                arg2.checktable()!!
+            } else {
+                LuaTable()
+            }
+            default.setmetatable(arg1)
+            arg1.rawset("__index", arg1)
+            return default
+        }
+
     }
 
     @TinyFunction(
