@@ -39,15 +39,8 @@ class StdLib(
 
     @TinyFunction(
         "Create new instance of a class by creating a new table and setting the metatable. " +
-            "It's a shortcut of the following code and allow to create kind of Object Oriented Programming. " +
-            "```lua" +
-            "function Class:new()\n" +
-            "    local n = {}\n" +
-            "    setmetatable(n, self)\n" +
-            "    self.__index = self\n" +
-            "    return n\n" +
-            "end" +
-            "```"
+            "It allow to create kind of Object Oriented Programming.\n\n ",
+        example = STD_NEW_EXAMPLE
     )
     inner class new : TwoArgFunction() {
 
@@ -58,7 +51,7 @@ class StdLib(
 
         @TinyCall("Create new instance of class using default values.")
         override fun call(@TinyArg("class") arg1: LuaValue, @TinyArg("default") arg2: LuaValue): LuaValue {
-            val default = if(arg2.istable()) {
+            val default = if (arg2.istable()) {
                 arg2.checktable()!!
             } else {
                 LuaTable()
@@ -67,13 +60,13 @@ class StdLib(
             arg1.rawset("__index", arg1)
             return default
         }
-
     }
 
     @TinyFunction(
-        "Iterate over values of a table. " +
-            "If you want to iterate over keys, use pairs(table). " +
-            "If you want to iterate over index, use ipairs(table). "
+        "Iterate over values of a table.\n\n" +
+            "- If you want to iterate over keys, use pairs(table).\n " +
+            "- If you want to iterate over index, use ipairs(table).\n " +
+            "- If you want to iterate in reverse, use rpairs(table).\n"
     )
     internal inner class all : VarArgFunction() {
 
@@ -104,7 +97,8 @@ class StdLib(
         "Iterate over values of a table in reverse order. " +
             "The iterator return an index and the value. " +
             "The method is useful to remove elements from a table while " +
-            "iterating on it."
+            "iterating on it.",
+        example = STD_RPAIRS_EXAMPLE
     )
     internal inner class rpairs : VarArgFunction() {
 
@@ -131,7 +125,10 @@ class StdLib(
         }
     }
 
+    @TinyFunction("Print in the console a value to help debugging")
     internal inner class debug : OneArgFunction() {
+
+        @TinyCall("Print in the console a value")
         override fun call(arg: LuaValue): LuaValue {
             println("🐞 -> $arg")
             return NONE
