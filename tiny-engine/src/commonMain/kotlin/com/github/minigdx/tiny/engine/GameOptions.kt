@@ -18,8 +18,14 @@ class GameOptions(
     val record: Seconds = 8f,
     val gutter: Pair<Pixel, Pixel> = 10 to 10,
     val spriteSize: Pair<Pixel, Pixel> = 8 to 8,
-
 ) : MouseProject {
+
+    init {
+        require(width > 0) { "The width needs to be a positive number." }
+        require(height > 0) { "The height needs to be a positive number." }
+        require(palette.size < 256) { "The number of colors should be less than 256." }
+        require(zoom > 0) { "The zoom needs to be a positive non null value." }
+    }
 
     fun colors(): ColorPalette {
         return ColorPalette(palette)
