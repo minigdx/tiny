@@ -40,7 +40,7 @@ dependencies {
 
 application {
     mainClass.set("com.github.minigdx.tiny.cli.MainKt")
-    // applicationDefaultJvmArgs = listOf("-XstartOnFirstThread")
+    applicationDefaultJvmArgs = listOf("-XstartOnFirstThread")
 
     // Copy the JARs from the Kotlin MPP dependencies.
     this.applicationDistribution.from(
@@ -80,7 +80,7 @@ val macStartScripts = project.tasks.register("startScriptsForMac", CreateStartSc
     mainModule.set(startScripts.mainModule)
     mainClass.set(startScripts.mainClass)
 
-    conventionMapping.map("applicationName") { startScripts.conventionMapping.getConventionValue(null as String?, "applicationName", false) + "-mac"}
+    conventionMapping.map("applicationName") { startScripts.conventionMapping.getConventionValue(null as String?, "applicationName", false) + "-mac" }
     conventionMapping.map("outputDir") { startScripts.conventionMapping.getConventionValue(null as File?, "outputDir", false) }
     conventionMapping.map("executableDir") { startScripts.conventionMapping.getConventionValue(null as String?, "executableDir", false) }
     conventionMapping.map("defaultJvmOpts") { listOf("-XstartOnFirstThread") }

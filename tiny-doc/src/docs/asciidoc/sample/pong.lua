@@ -1,20 +1,132 @@
--- == master plan ==
--- afficher les briques
--- afficher la balle
--- faire une raquette avec shape.rectf
--- bouger la raquette avec les touches
+-- TRANSITIONS --
+local Nope = {
+    update = function()
+    end,
+    draw = function()
+    end
+}
+
+local GameOut = {
+    radius = 0,
+    speed = 5,
+    start = false
+}
+
+local EndOut = {
+    start_radius = 40,
+    radius = 0,
+    target_radius = 300,
+    duration = 1,
+    t = 0
+}
+
+function EndOut:update()
+    self.t = self.t + 1 / 60
+    self.radius = juice.powIn5(self.start_radius, self.target_radius, self.t / self.duration)
+
+    if (self.radius >= 300) then
+        transition = new(GameOut)
+    end
+end
+
+function EndOut:draw()
+    gfx.cls(1)
+    shape.circlef(256 * 0.5, 212, self.radius, 0)
+    spr.sheet(0)
+    spr.sdraw(0, 100, 0, 208, 256, 3 * 16)
+
+    gfx.to_sheet(2)
+end
+
+local EndIn = {
+    start_radius = 256,
+    radius = 256,
+    target_radius = 40,
+    duration = 1,
+    t = 0
+}
+
+function EndIn:update()
+    self.t = self.t + 1 / 60
+    self.radius = juice.powOut5(self.start_radius, self.target_radius, self.t / self.duration)
+
+    if (self.radius <= 40) then
+        transition = new(EndOut)
+    end
+end
+
+function EndIn:draw()
+    gfx.cls(1)
+
+    shape.circlef(256 * 0.5, 212, self.radius, 0)
+    gfx.to_sheet(2)
+end
+
+function GameOut:update()
+    if (self.start) then
+        self.radius = self.radius + self.speed
+
+        if (self.radius > 300) then
+            transition = new(Nope)
+        end
+    end
+end
+
+function GameOut:draw()
+    gfx.cls(0)
+    spr.sheet(0)
+    spr.sdraw(0, 100, 0, 208, 256, 3 * 16)
+    shape.circlef(256 * 0.5, 212, self.radius, 0)
+    gfx.to_sheet(2)
+end
+
+-- PARTICLES --
+local Particle = {
+    x = 0,
+    y = 0,
+    dir = { x = 0, y = 0, r = 0 },
+    radius = 1,
+    ttl = 0.5,
+    color = 1
+}
+
+function Particle:update()
+    self.x = self.x + self.dir.x
+    self.y = self.y + self.dir.y
+    self.radius = self.radius + self.dir.r
+    self.ttl = self.ttl - 1 / 60
+    return self.ttl < 0
+end
+
+function Particle:draw()
+    shape.circlef(self.x, self.y, self.radius, self.color)
+end
 
 function _init()
+    transition = new(GameOut)
+
+    game = {
+        radius_title = 0,
+        started = false,
+        lost = false,
+        cooldown = 0
+    }
+
+    dt = 1 / 60
+    longueurCode = 100
+    longueurSegment = 10
+    numSegments = longueurCode / longueurSegment
+    gravite = 29.8
+    rigidite = 1 -- 0.8
+    amortissement = 0.9
 
     raquettes = {
-        {
-            x = 128 - 16, -- center the raquette
-            y = 232,
-            width = 32,
-            height = 4,
-            color = 8,
-            speed = 6
-        }
+        create_raquette(216),
+        create_raquette(224),
+        create_raquette(232),
+        create_raquette(240),
+        create_raquette(248),
+        create_raquette(256),
     }
 
     local r = raquettes[1]
@@ -50,49 +162,78 @@ function _init()
     end
 
     particles = {}
-    boobles = {}
 end
 
-function boobles_create(x, y, radius, target_radius, ttl, color, filled)
+function create_raquette(y)
     return {
-        x = x,
+        x = 128 - 16, -- center the raquette
         y = y,
-        radius = radius,
-        target_radius = target_radius,
-        ttl = ttl,
-        t = 0,
-        color = color,
-        filled = filled
+        prevX = 128 - 16,
+        prevY = y,
+        width = 24,
+        height = 8,
+        color = 8,
+        speed = 6,
+        direction = 1,
     }
 end
 
-function boobles_update(booble)
-    booble.t = booble.t + 1 / 60
-    if booble.t >= booble.ttl then
-        return true
-    end
-
-    booble.y = booble.y + 0.3
-    return false
-end
-
 function update_raquette(raquette)
-    if ctrl.down(0) then
+    if ctrl.pressing(keys.left) then
         raquette.x = math.max(0, raquette.x - raquette.speed)
-    elseif ctrl.down(2) then
+        raquette.direction = 0
+    elseif ctrl.pressing(keys.right) then
         raquette.x = math.min(raquette.x + raquette.speed, 256 - raquette.width)
+        raquette.direction = 1
     end
+    raquette.y = 216
 end
 
 function update_raquettes()
-    for index, r in rpairs(raquettes) do
-        local to_delete = update_raquette(r)
-        if to_delete then
-            table.remove(raquettes, index)
-        end
+    update_raquette(raquettes[1])
+
+    for i = 2, #raquettes do
+        local segment = raquettes[i]
+        local segmentPrecedent = raquettes[i - 1]
+
+        segment.y = segment.y + gravite * dt
+
+        -- integration de verlet
+        local vx = segment.x - segment.prevX
+        local vy = segment.y - segment.prevY
+
+        segment.prevX = segment.x
+        segment.prevY = segment.y
+
+        segment.x = segment.x + vx * amortissement
+        segment.y = segment.y + vy * amortissement
+
+        -- contraintes
+        local dx = segment.x - segmentPrecedent.x
+        local dy = segment.y - segmentPrecedent.y
+
+        local distance = math.sqrt(dx * dx + dy * dy)
+        local difference = longueurSegment - distance
+        local pourcentage = difference / distance / 2
+
+        local decalageX = dx * pourcentage * rigidite
+        local decalageY = dy * pourcentage * rigidite
+
+        segment.x = segment.x + decalageX
+        segment.y = segment.y + decalageY
+
+        segmentPrecedent.x = segmentPrecedent.x - decalageX
+        segmentPrecedent.y = segmentPrecedent.y - decalageY
+    end
+
+    for i = 2, #raquettes - 1 do
+        local segment = raquettes[i]
+        local segmentNext = raquettes[i + 1]
+
+        segment.height = math.abs(segment.y - segmentNext.y)
+
     end
 end
-
 function check_collision(rect1, rect2)
     local rect1Right = rect1.x + rect1.width
     local rect1Bottom = rect1.y + rect1.height
@@ -124,11 +265,13 @@ function check_collision(rect1, rect2)
     return nil  -- No collision
 end
 
-function build_particle(x, y, tx, ty)
-    return { x = x, y = y, tx = tx, ty = ty, ttl = 0.2 }
-end
-
 function _update()
+    if (ctrl.pressing(keys.space) and not game.started) then
+        game.started = true
+        transition.start = true
+    end
+
+    transition:update()
 
     update_raquettes()
 
@@ -136,7 +279,7 @@ function _update()
         b.accept_move_x = true
         b.accept_move_y = true
 
-        if ctrl.down(1) then
+        if ctrl.pressing(keys.space) then
             b.glue_to = false
         end
         if b.glue_to then
@@ -144,9 +287,9 @@ function _update()
             b.new_x = r.x + r.width * 0.5 - 7 * 0.5
             b.new_y = r.y - 7
 
-            if ctrl.down(0) then
+            if ctrl.pressing(keys.left) then
                 b.speed.x = -1
-            elseif ctrl.down(2) then
+            elseif ctrl.pressing(keys.right) then
                 b.speed.x = 1
             end
         else
@@ -182,8 +325,15 @@ function _update()
 
                 end
             end
-            local p = build_particle(b.x + 3, b.y + 3, b.x + 3 + b.speed.x, b.y + 3 + b.speed.y)
-            table.insert(particles, p)
+
+            table.insert(particles, new(Particle, {
+                x = b.x + 3 + math.rnd(-2, 2),
+                y = b.y + 3 + math.rnd(-2, 2),
+                ttl = 0.4,
+                dir = { x = 0, y = 0, r = -0.3 },
+                radius = 4,
+                color = 8
+            }))
         end
     end
 
@@ -223,7 +373,7 @@ function _update()
         end
     end
 
-    for b in all(balls) do
+    for index, b in rpairs(balls) do
         if b.accept_move_x then
             b.x = b.new_x
         end
@@ -232,47 +382,47 @@ function _update()
         end
 
         if not b.accept_move_x or not b.accept_move_y then
-            for i=1,3 do
-                table.insert(boobles, boobles_create(b.x + math.rnd(-2, 2), b.y + math.rnd(-2, 2), 3, 0, 1, math.rnd({8, 7, 14}), true))
+            for i = 1, 3 do
+                table.insert(particles, new(Particle, {
+                    x = b.x + 3 + math.rnd(-1, 1),
+                    y = b.y + 3 + math.rnd(-1, 1),
+                    ttl = 1.5,
+                    dir = { x = -b.speed.x * 0.1, y = -b.speed.y * 0.1, r = -0.1 },
+                    radius = 5,
+                    color = math.rnd({ 8, 7, 14 })
+                }))
             end
         end
         if b.y > 256 then
-            _init() -- restart the game
+            game.lost = true
+            transition = new(EndIn)
+            table.remove(balls, index)
         end
     end
 
     for index, p in rpairs(particles) do
-        p.ttl = p.ttl - 1 / 60
-        if p.ttl < 0 then
+        if p:update() then
             table.remove(particles, index)
         end
     end
-
-    for index, b in rpairs(boobles) do
-        if boobles_update(b) then
-            table.remove(boobles, index)
-        end
-    end
 end
+
 function _draw()
+    transition:draw()
+
+    -- game
     gfx.cls(13)
+    spr.sheet()
 
     for b in all(bricks) do
-        spr.sdraw(b.x, b.y, 0, b.color * 8, 16, 8)
+        spr.sdraw(b.x, b.y, 16, b.color * 8, 16, 8)
         if b.hit then
             shape.rectf(b.x, b.y, 16, 8, 8 + b.hit)
         end
     end
 
     for p in all(particles) do
-        -- gfx.pset(p.x, p.y, 8)
-        shape.line(p.x, p.y, p.tx, p.ty, 8)
-    end
-
-    for b in all(boobles) do
-        if b.filled then
-            shape.circlef(b.x, b.y, juice.pow2(b.radius, b.target_radius, b.t / b.ttl), b.color)
-        end
+        p:draw()
     end
 
     for b in all(balls) do
@@ -287,10 +437,19 @@ function _draw()
         spr.sdraw(b.x, b.y, 0, 16, 8, 8)
     end
 
-    for r in all(raquettes) do
-        -- shadow
-        shape.rectf(r.x + 1, r.y + 1, r.width, r.height, 2)
-        -- raquette
-        shape.rectf(r.x, r.y, r.width, r.height, r.color)
+    for i = 1, #raquettes - 1 do
+        local r = raquettes[i]
+        local next_r = raquettes[i + 1]
+
+        -- todo: add arms??
+        if i == 1 then
+            shape.rectf(r.x + r.width, r.y + 3, 1, r.height - 3, 2)
+            spr.sdraw(r.x, r.y, 0, 32, r.width, r.height, r.direction == 1)
+        else
+            shape.rectf(r.x, r.y, r.width, math.ceil(r.height), 10)
+        end
     end
+
+    spr.sheet(2)
+    spr.sdraw()
 end

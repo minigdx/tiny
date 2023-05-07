@@ -1,3 +1,4 @@
+-- TRANSITIONS --
 local Nope = {
     update = function()
     end,
@@ -79,6 +80,28 @@ function GameOut:draw()
     gfx.to_sheet(2)
 end
 
+-- PARTICLES --
+local Particle = {
+    x = 0,
+    y = 0,
+    dir = { x = 0, y = 0, r = 0 },
+    radius = 1,
+    ttl = 0.5,
+    color = 1
+}
+
+function Particle:update()
+    self.x = self.x + self.dir.x
+    self.y = self.y + self.dir.y
+    self.radius = self.radius + self.dir.r
+    self.ttl = self.ttl - 1 / 60
+    return self.ttl < 0
+end
+
+function Particle:draw()
+    shape.circlef(self.x, self.y, self.radius, self.color)
+end
+
 function _init()
     transition = new(GameOut)
 
@@ -139,7 +162,6 @@ function _init()
     end
 
     particles = {}
-    boobles = {}
 end
 
 function create_raquette(y)
@@ -154,29 +176,6 @@ function create_raquette(y)
         speed = 6,
         direction = 1,
     }
-end
-
-function boobles_create(x, y, radius, target_radius, ttl, color, filled)
-    return {
-        x = x,
-        y = y,
-        radius = radius,
-        target_radius = target_radius,
-        ttl = ttl,
-        t = 0,
-        color = color,
-        filled = filled
-    }
-end
-
-function boobles_update(booble)
-    booble.t = booble.t + 1 / 60
-    if booble.t >= booble.ttl then
-        return true
-    end
-
-    booble.y = booble.y + 0.3
-    return false
 end
 
 function update_raquette(raquette)
@@ -266,12 +265,8 @@ function check_collision(rect1, rect2)
     return nil  -- No collision
 end
 
-function build_particle(x, y, tx, ty)
-    return { x = x, y = y, tx = tx, ty = ty, ttl = 0.2 }
-end
-
 function _update()
-    if (ctrl.pressing(keys.up) and not game.started) then
+    if (ctrl.pressing(keys.space) and not game.started) then
         game.started = true
         transition.start = true
     end
@@ -284,7 +279,7 @@ function _update()
         b.accept_move_x = true
         b.accept_move_y = true
 
-        if ctrl.pressing(keys.up) then
+        if ctrl.pressing(keys.space) then
             b.glue_to = false
         end
         if b.glue_to then
@@ -330,8 +325,15 @@ function _update()
 
                 end
             end
-            local p = build_particle(b.x + 3, b.y + 3, b.x + 3 + b.speed.x, b.y + 3 + b.speed.y)
-            table.insert(particles, p)
+
+            table.insert(particles, new(Particle, {
+                x = b.x + 3 + math.rnd(-2, 2),
+                y = b.y + 3 + math.rnd(-2, 2),
+                ttl = 0.4,
+                dir = { x = 0, y = 0, r = -0.3 },
+                radius = 4,
+                color = 8
+            }))
         end
     end
 
@@ -381,7 +383,14 @@ function _update()
 
         if not b.accept_move_x or not b.accept_move_y then
             for i = 1, 3 do
-                table.insert(boobles, boobles_create(b.x + math.rnd(-2, 2), b.y + math.rnd(-2, 2), 3, 0, 1, math.rnd({ 8, 7, 14 }), true))
+                table.insert(particles, new(Particle, {
+                    x = b.x + 3 + math.rnd(-1, 1),
+                    y = b.y + 3 + math.rnd(-1, 1),
+                    ttl = 1.5,
+                    dir = { x = -b.speed.x * 0.1, y = -b.speed.y * 0.1, r = -0.1 },
+                    radius = 5,
+                    color = math.rnd({ 8, 7, 14 })
+                }))
             end
         end
         if b.y > 256 then
@@ -392,18 +401,10 @@ function _update()
     end
 
     for index, p in rpairs(particles) do
-        p.ttl = p.ttl - 1 / 60
-        if p.ttl < 0 then
+        if p:update() then
             table.remove(particles, index)
         end
     end
-
-    for index, b in rpairs(boobles) do
-        if boobles_update(b) then
-            table.remove(boobles, index)
-        end
-    end
-
 end
 
 function _draw()
@@ -421,14 +422,7 @@ function _draw()
     end
 
     for p in all(particles) do
-        -- gfx.pset(p.x, p.y, 8)
-        shape.line(p.x, p.y, p.tx, p.ty, 8)
-    end
-
-    for b in all(boobles) do
-        if b.filled then
-            shape.circlef(b.x, b.y, juice.pow2(b.radius, b.target_radius, b.t / b.ttl), b.color)
-        end
+        p:draw()
     end
 
     for b in all(balls) do
