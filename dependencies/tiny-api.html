@@ -1446,9 +1446,52 @@ spr.sdraw(x, y, sprX, sprY, width, height, flipX, flipY) -- Draw a fragment from
 <p>Standard library.</p>
 </div>
 <div class="sect3">
+<h4 id="_new">new()</h4>
+<div class="paragraph">
+<p>Create new instance of a class by creating a new table and setting the metatable. It&#8217;s a shortcut of the following code and allow to create kind of Object Oriented Programming. <code><code>luafunction Class:new()
+    local n = {}
+    setmetatable(n, self)
+    self.__index = self
+    return n
+end</code></code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">new(arg) -- Create new instance of class.
+new(class, default) -- Create new instance of class using default values.</code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;">
+
+local Player = {
+    x = 128,
+    y = 128,
+    color = 8
+}
+
+function Player:draw()
+    shape.rectf(self.x, self.y, 10, 10, self.color)
+end
+
+function _init()
+    -- create a new player
+    player = new(Player)
+    -- create a new player with default vaules
+    player2 = new(Player, {x = 200, y = 200, color = 9})
+end
+
+function _draw()
+    gfx.cls(0)
+    player:draw() -- call the draw method on the player instance.
+    player2:draw() -- call the draw method on the player2 instance.
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
 <h4 id="_all">all()</h4>
 <div class="paragraph">
-<p>Iterate over values of a table. If you want to iterate over keys, use pairs(table). If you want to iterate over index, use ipairs(table).</p>
+<p>Iterate over values of a table. If you want to iterate over keys, use pairs(table). If you want to iterate over index, use ipairs(table). If you want to iterate in reverse, use rpairs(table).</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1464,6 +1507,35 @@ spr.sdraw(x, y, sprX, sprY, width, height, flipX, flipY) -- Draw a fragment from
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-lua" data-lang="lua">rpairs(table) -- Iterate over the values of the table</code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;">
+
+function _draw()
+    gfx.cls(0)
+    local data = {
+        { name = "riri" },
+        { name = "fifi" },
+        { name = "loulou" }
+    }
+
+    local y = 0
+    for index, key in rpairs(data) do
+        print(index .. " - " .. key.name, 10, y)
+        y = y + 10
+    end
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_debug">debug()</h4>
+<div class="paragraph">
+<p>Print in the console a value to help debugging</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">debug(arg) -- Print in the console a value</code></pre>
 </div>
 </div>
 </div>
@@ -1501,7 +1573,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-05-04 12:40:45 UTC
+Last updated 2023-05-07 10:54:25 UTC
 </div>
 </div>
 </body>
