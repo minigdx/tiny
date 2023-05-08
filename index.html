@@ -474,6 +474,13 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
+<li><a href="#_tiny_tutorial">Tiny Tutorial</a>
+<ul class="sectlevel2">
+<li><a href="#_step_1_initialize_the_game_state">Step 1: Initialize the Game State</a></li>
+<li><a href="#_step_2_update_the_game_state">Step 2: Update the Game State</a></li>
+<li><a href="#_step_3_draw_the_game">Step 3: Draw the Game</a></li>
+</ul>
+</li>
 <li><a href="#_tiny_cli">Tiny CLI</a>
 <ul class="sectlevel2">
 <li><a href="#_the_tiny_cli_create_command">the <code>tiny-cli create</code> command</a>
@@ -652,6 +659,163 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </blockquote>
 </div>
 <iframe class="no-resize" title="Breakout example" width="536" height="536" src="sample/index.html"></iframe>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_tiny_tutorial">Tiny Tutorial</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this tutorial, we&#8217;ll be creating a simple Pong game using the Lua programming language and the <code>🧸 Tiny</code> game engine.</p>
+</div>
+<div class="paragraph">
+<p>Pong is a classic 2D arcade game where two players control paddles on opposite sides of the screen, and try to hit a ball back and forth without letting it pass their paddle. The game ends when one player misses the ball, and the other player scores a point.</p>
+</div>
+<div class="paragraph">
+<p>Our implementation of Pong will have a fixed screen size of 256 pixels for width and height, and we&#8217;ll use the <code>ctrl.pressing()</code> function to check for key presses.</p>
+</div>
+<div class="paragraph">
+<p>We&#8217;ll cover four main steps: initializing the game state with the <code>_init()</code> function, updating the game state with the <code>_update()</code> function and drawing the game with the <code>_draw()</code> function.</p>
+</div>
+<div class="paragraph">
+<p>By the end of this tutorial, you should have a basic Pong game that you can customize and build upon.</p>
+</div>
+<div class="sect2">
+<h3 id="_step_1_initialize_the_game_state">Step 1: Initialize the Game State</h3>
+<div class="paragraph">
+<p>First, we need to initialize the game state. We&#8217;ll define the position and size of the paddles, the position and size of the ball, and the initial velocity of the ball.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="k">function</span> <span class="nf">_init</span><span class="p">()</span>
+    <span class="n">paddle_width</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">paddle_height</span> <span class="o">=</span> <span class="mi">32</span>
+    <span class="n">ball_radius</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">ball_speed</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">ball_velocity</span> <span class="o">=</span> <span class="p">{</span> <span class="n">x</span> <span class="o">=</span> <span class="n">ball_speed</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">ball_speed</span> <span class="p">}</span>
+    <span class="n">player1_pos</span> <span class="o">=</span> <span class="p">{</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="mi">96</span> <span class="o">-</span> <span class="n">paddle_height</span> <span class="o">/</span> <span class="mi">2</span> <span class="p">}</span>
+    <span class="n">player2_pos</span> <span class="o">=</span> <span class="p">{</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">244</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="mi">96</span> <span class="o">-</span> <span class="n">paddle_height</span> <span class="o">/</span> <span class="mi">2</span> <span class="p">}</span>
+    <span class="n">ball_pos</span> <span class="o">=</span> <span class="p">{</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">128</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="mi">96</span> <span class="p">}</span>
+<span class="k">end</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_step_2_update_the_game_state">Step 2: Update the Game State</h3>
+<div class="paragraph">
+<p>In the <code>_update()</code> callback, we&#8217;ll update the game state by moving the paddles and the ball. We&#8217;ll also check for collisions between the ball and the paddles, and update the ball&#8217;s velocity accordingly.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="k">function</span> <span class="nf">_update</span><span class="p">()</span>
+    <span class="c1">-- Update game state</span>
+    <span class="n">player1_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">player1_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">ctrl</span><span class="p">.</span><span class="n">pressing</span><span class="p">(</span><span class="n">keys</span><span class="p">.</span><span class="n">up</span><span class="p">)</span>
+    <span class="n">player1_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">player1_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">ctrl</span><span class="p">.</span><span class="n">pressing</span><span class="p">(</span><span class="n">keys</span><span class="p">.</span><span class="n">down</span><span class="p">)</span>
+    <span class="n">player2_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">player2_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">ctrl</span><span class="p">.</span><span class="n">pressing</span><span class="p">(</span><span class="n">keys</span><span class="p">.</span><span class="n">z</span><span class="p">)</span>
+    <span class="n">player2_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">player2_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">ctrl</span><span class="p">.</span><span class="n">pressing</span><span class="p">(</span><span class="n">keys</span><span class="p">.</span><span class="n">s</span><span class="p">)</span>
+
+    <span class="n">ball_pos</span><span class="p">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">ball_pos</span><span class="p">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">ball_velocity</span><span class="p">.</span><span class="n">x</span>
+    <span class="n">ball_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">ball_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">ball_velocity</span><span class="p">.</span><span class="n">y</span>
+
+    <span class="c1">-- Check for collisions with walls</span>
+    <span class="k">if</span> <span class="n">ball_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">&lt;</span> <span class="n">ball_radius</span> <span class="ow">or</span> <span class="n">ball_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">&gt;</span> <span class="mi">256</span> <span class="o">-</span> <span class="n">ball_radius</span> <span class="k">then</span>
+        <span class="n">ball_velocity</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="o">-</span><span class="n">ball_velocity</span><span class="p">.</span><span class="n">y</span>
+    <span class="k">end</span>
+
+    <span class="c1">-- Check for collisions with paddles</span>
+    <span class="k">if</span> <span class="n">ball_pos</span><span class="p">.</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">player1_pos</span><span class="p">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">paddle_width</span> <span class="ow">and</span>
+            <span class="n">ball_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">&gt;</span> <span class="n">player1_pos</span><span class="p">.</span><span class="n">y</span> <span class="ow">and</span>
+            <span class="n">ball_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">&lt;</span> <span class="n">player1_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">paddle_height</span> <span class="k">then</span>
+        <span class="n">ball_velocity</span><span class="p">.</span><span class="n">x</span> <span class="o">=</span> <span class="o">-</span><span class="n">ball_velocity</span><span class="p">.</span><span class="n">x</span>
+    <span class="k">end</span>
+
+    <span class="k">if</span> <span class="n">ball_pos</span><span class="p">.</span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">player2_pos</span><span class="p">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">ball_radius</span> <span class="ow">and</span>
+            <span class="n">ball_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">&gt;</span> <span class="n">player2_pos</span><span class="p">.</span><span class="n">y</span> <span class="ow">and</span>
+            <span class="n">ball_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">&lt;</span> <span class="n">player2_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">paddle_height</span> <span class="k">then</span>
+        <span class="n">ball_velocity</span><span class="p">.</span><span class="n">x</span> <span class="o">=</span> <span class="o">-</span><span class="n">ball_velocity</span><span class="p">.</span><span class="n">x</span>
+    <span class="k">end</span>
+
+    <span class="c1">-- Check if the ball is inside the screen</span>
+    <span class="k">if</span> <span class="n">ball_pos</span><span class="p">.</span><span class="n">x</span> <span class="o">~=</span> <span class="n">math</span><span class="p">.</span><span class="n">clamp</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ball_pos</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span> <span class="ow">or</span> <span class="n">ball_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">~=</span> <span class="n">math</span><span class="p">.</span><span class="n">clamp</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ball_pos</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span> <span class="k">then</span>
+        <span class="n">_init</span><span class="p">()</span>
+    <span class="k">end</span>
+<span class="k">end</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_step_3_draw_the_game">Step 3: Draw the Game</h3>
+<div class="paragraph">
+<p>In the <code>_draw()</code> callback, we&#8217;ll draw the paddles and the ball using the <code>shape.rectf()</code> and <code>shape.circlef()</code> functions.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="k">function</span> <span class="nf">_draw</span><span class="p">()</span>
+  <span class="c1">-- Draw game</span>
+  <span class="n">gfx</span><span class="p">.</span><span class="n">cls</span><span class="p">()</span>
+  <span class="n">shape</span><span class="p">.</span><span class="n">rectf</span><span class="p">(</span><span class="n">player1_pos</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">player1_pos</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="n">paddle_width</span><span class="p">,</span> <span class="n">paddle_height</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+  <span class="n">shape</span><span class="p">.</span><span class="n">rectf</span><span class="p">(</span><span class="n">player2_pos</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">player2_pos</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="n">paddle_width</span><span class="p">,</span> <span class="n">paddle_height</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+  <span class="n">shape</span><span class="p">.</span><span class="n">circlef</span><span class="p">(</span><span class="n">ball_pos</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">ball_pos</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="n">ball_radius</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+<span class="k">end</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And that&#8217;s it! With these three steps, you should have a basic Pong game up and running in Lua. Feel free to experiment with the game state, update function, and drawing function to customize the game to your liking.</p>
+</div>
+<tiny-editor style="display: none;">
+function _init()
+    paddle_width = 4
+    paddle_height = 32
+    ball_radius = 4
+    ball_speed = 2
+    ball_velocity = { x = ball_speed, y = ball_speed }
+    player1_pos = { x = 8, y = 96 - paddle_height / 2 }
+    player2_pos = { x = 244, y = 96 - paddle_height / 2 }
+    ball_pos = { x = 128, y = 96 }
+end
+
+function _update()
+    -- Update game state
+    player1_pos.y = player1_pos.y - 4 * ctrl.pressing(keys.up)
+    player1_pos.y = player1_pos.y + 4 * ctrl.pressing(keys.down)
+    player2_pos.y = player2_pos.y - 4 * ctrl.pressing(keys.z)
+    player2_pos.y = player2_pos.y + 4 * ctrl.pressing(keys.s)
+
+    ball_pos.x = ball_pos.x + ball_velocity.x
+    ball_pos.y = ball_pos.y + ball_velocity.y
+
+    -- Check for collisions with walls
+    if ball_pos.y < ball_radius or ball_pos.y > 256 - ball_radius then
+        ball_velocity.y = -ball_velocity.y
+    end
+
+    -- Check for collisions with paddles
+    if ball_pos.x < player1_pos.x + paddle_width and
+            ball_pos.y > player1_pos.y and
+            ball_pos.y < player1_pos.y + paddle_height then
+        ball_velocity.x = -ball_velocity.x
+    end
+
+    if ball_pos.x > player2_pos.x - ball_radius and
+            ball_pos.y > player2_pos.y and
+            ball_pos.y < player2_pos.y + paddle_height then
+        ball_velocity.x = -ball_velocity.x
+    end
+
+    -- Check if the ball is inside the screen
+    if ball_pos.x ~= math.clamp(0, ball_pos.x, 256) or ball_pos.y ~= math.clamp(0, ball_pos.y, 256) then
+        _init()
+    end
+end
+
+function _draw()
+    -- Draw game
+    gfx.cls()
+    shape.rectf(player1_pos.x, player1_pos.y, paddle_width, paddle_height, 7)
+    shape.rectf(player2_pos.x, player2_pos.y, paddle_width, paddle_height, 7)
+    shape.circlef(ball_pos.x, ball_pos.y, ball_radius, 7)
+end
+</tiny-editor>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -2134,7 +2298,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-05-07 22:47:26 UTC
+Last updated 2023-05-08 17:03:45 UTC
 </div>
 </div>
 <style>
