@@ -485,12 +485,17 @@ end</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">function _update()
+<pre class="highlight"><code class="language-lua" data-lang="lua">-- convert bool to number
+function num(var)
+    return var and 1 or 0
+end
+
+function _update()
     -- Update game state
-    player1_pos.y = player1_pos.y - 4 * ctrl.pressing(keys.up)
-    player1_pos.y = player1_pos.y + 4 * ctrl.pressing(keys.down)
-    player2_pos.y = player2_pos.y - 4 * ctrl.pressing(keys.z)
-    player2_pos.y = player2_pos.y + 4 * ctrl.pressing(keys.s)
+    player1_pos.y = player1_pos.y - 4 * num(ctrl.pressing(keys.up))
+    player1_pos.y = player1_pos.y + 4 * num(ctrl.pressing(keys.down))
+    player2_pos.y = player2_pos.y - 4 * num(ctrl.pressing(keys.z))
+    player2_pos.y = player2_pos.y + 4 * num(ctrl.pressing(keys.s))
 
     ball_pos.x = ball_pos.x + ball_velocity.x
     ball_pos.y = ball_pos.y + ball_velocity.y
@@ -552,12 +557,17 @@ function _init()
     ball_pos = { x = 128, y = 96 }
 end
 
+-- convert bool to number
+function num(var)
+    return var and 1 or 0
+end
+
 function _update()
     -- Update game state
-    player1_pos.y = player1_pos.y - 4 * ctrl.pressing(keys.up)
-    player1_pos.y = player1_pos.y + 4 * ctrl.pressing(keys.down)
-    player2_pos.y = player2_pos.y - 4 * ctrl.pressing(keys.z)
-    player2_pos.y = player2_pos.y + 4 * ctrl.pressing(keys.s)
+    player1_pos.y = player1_pos.y - 4 * num(ctrl.pressing(keys.up))
+    player1_pos.y = player1_pos.y + 4 * num(ctrl.pressing(keys.down))
+    player2_pos.y = player2_pos.y - 4 * num(ctrl.pressing(keys.z))
+    player2_pos.y = player2_pos.y + 4 * num(ctrl.pressing(keys.s))
 
     ball_pos.x = ball_pos.x + ball_velocity.x
     ball_pos.y = ball_pos.y + ball_velocity.y
@@ -601,7 +611,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-05-08 17:03:45 UTC
+Last updated 2023-05-08 17:34:59 UTC
 </div>
 </div>
 </body>

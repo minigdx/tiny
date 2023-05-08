@@ -1145,7 +1145,7 @@ map.draw(layer) -- Draw the layer on the screen.</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">math.sign(arg) -- Return the sign of the number.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">math.sign(number) -- Return the sign of the number.</code></pre>
 </div>
 </div>
 </div>
@@ -1156,7 +1156,7 @@ map.draw(layer) -- Draw the layer on the screen.</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">math.clamp(arg1, arg2, arg3) -- Clamp the value between a and b.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">math.clamp(a, value, b) -- Clamp the value between a and b.</code></pre>
 </div>
 </div>
 </div>
@@ -1190,8 +1190,8 @@ map.draw(layer) -- Draw the layer on the screen.</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-lua" data-lang="lua">math.rnd() -- Generate a random int (negative or positive value)
-math.rnd(arg) -- Generate a random value between 1 and the argument. If a table is passed, it'll return a random element of the table.
-math.rnd(arg1, arg2) -- Generate a random value between the first and the second argument.</code></pre>
+math.rnd(until) -- Generate a random value between 1 until the argument. If a table is passed, it'll return a random element of the table.
+math.rnd(a, b) -- Generate a random value between a and b.</code></pre>
 </div>
 </div>
 </div>
@@ -1452,7 +1452,7 @@ spr.sdraw(x, y, sprX, sprY, width, height, flipX, flipY) -- Draw a fragment from
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">new(arg) -- Create new instance of class.
+<pre class="highlight"><code class="language-lua" data-lang="lua">new(class) -- Create new instance of class.
 new(class, default) -- Create new instance of class using default values.</code></pre>
 </div>
 </div>
@@ -1581,7 +1581,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-05-08 17:06:45 UTC
+Last updated 2023-05-08 17:39:30 UTC
 </div>
 </div>
 </body>

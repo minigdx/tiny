@@ -706,12 +706,17 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="k">function</span> <span class="nf">_update</span><span class="p">()</span>
+<pre class="rouge highlight"><code data-lang="lua"><span class="c1">-- convert bool to number</span>
+<span class="k">function</span> <span class="nf">num</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">var</span> <span class="ow">and</span> <span class="mi">1</span> <span class="ow">or</span> <span class="mi">0</span>
+<span class="k">end</span>
+
+<span class="k">function</span> <span class="nf">_update</span><span class="p">()</span>
     <span class="c1">-- Update game state</span>
-    <span class="n">player1_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">player1_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">ctrl</span><span class="p">.</span><span class="n">pressing</span><span class="p">(</span><span class="n">keys</span><span class="p">.</span><span class="n">up</span><span class="p">)</span>
-    <span class="n">player1_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">player1_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">ctrl</span><span class="p">.</span><span class="n">pressing</span><span class="p">(</span><span class="n">keys</span><span class="p">.</span><span class="n">down</span><span class="p">)</span>
-    <span class="n">player2_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">player2_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">ctrl</span><span class="p">.</span><span class="n">pressing</span><span class="p">(</span><span class="n">keys</span><span class="p">.</span><span class="n">z</span><span class="p">)</span>
-    <span class="n">player2_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">player2_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">ctrl</span><span class="p">.</span><span class="n">pressing</span><span class="p">(</span><span class="n">keys</span><span class="p">.</span><span class="n">s</span><span class="p">)</span>
+    <span class="n">player1_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">player1_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">num</span><span class="p">(</span><span class="n">ctrl</span><span class="p">.</span><span class="n">pressing</span><span class="p">(</span><span class="n">keys</span><span class="p">.</span><span class="n">up</span><span class="p">))</span>
+    <span class="n">player1_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">player1_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">num</span><span class="p">(</span><span class="n">ctrl</span><span class="p">.</span><span class="n">pressing</span><span class="p">(</span><span class="n">keys</span><span class="p">.</span><span class="n">down</span><span class="p">))</span>
+    <span class="n">player2_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">player2_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">num</span><span class="p">(</span><span class="n">ctrl</span><span class="p">.</span><span class="n">pressing</span><span class="p">(</span><span class="n">keys</span><span class="p">.</span><span class="n">z</span><span class="p">))</span>
+    <span class="n">player2_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">player2_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">num</span><span class="p">(</span><span class="n">ctrl</span><span class="p">.</span><span class="n">pressing</span><span class="p">(</span><span class="n">keys</span><span class="p">.</span><span class="n">s</span><span class="p">))</span>
 
     <span class="n">ball_pos</span><span class="p">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">ball_pos</span><span class="p">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">ball_velocity</span><span class="p">.</span><span class="n">x</span>
     <span class="n">ball_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">ball_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">ball_velocity</span><span class="p">.</span><span class="n">y</span>
@@ -773,12 +778,17 @@ function _init()
     ball_pos = { x = 128, y = 96 }
 end
 
+-- convert bool to number
+function num(var)
+    return var and 1 or 0
+end
+
 function _update()
     -- Update game state
-    player1_pos.y = player1_pos.y - 4 * ctrl.pressing(keys.up)
-    player1_pos.y = player1_pos.y + 4 * ctrl.pressing(keys.down)
-    player2_pos.y = player2_pos.y - 4 * ctrl.pressing(keys.z)
-    player2_pos.y = player2_pos.y + 4 * ctrl.pressing(keys.s)
+    player1_pos.y = player1_pos.y - 4 * num(ctrl.pressing(keys.up))
+    player1_pos.y = player1_pos.y + 4 * num(ctrl.pressing(keys.down))
+    player2_pos.y = player2_pos.y - 4 * num(ctrl.pressing(keys.z))
+    player2_pos.y = player2_pos.y + 4 * num(ctrl.pressing(keys.s))
 
     ball_pos.x = ball_pos.x + ball_velocity.x
     ball_pos.y = ball_pos.y + ball_velocity.y
@@ -1862,7 +1872,7 @@ end
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">math</span><span class="p">.</span><span class="n">sign</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="c1">-- Return the sign of the number.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">math</span><span class="p">.</span><span class="n">sign</span><span class="p">(</span><span class="n">number</span><span class="p">)</span> <span class="c1">-- Return the sign of the number.</span></code></pre>
 </div>
 </div>
 </div>
@@ -1873,7 +1883,7 @@ end
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">math</span><span class="p">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">,</span> <span class="n">arg3</span><span class="p">)</span> <span class="c1">-- Clamp the value between a and b.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">math</span><span class="p">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="c1">-- Clamp the value between a and b.</span></code></pre>
 </div>
 </div>
 </div>
@@ -1907,8 +1917,8 @@ end
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">math</span><span class="p">.</span><span class="n">rnd</span><span class="p">()</span> <span class="c1">-- Generate a random int (negative or positive value)</span>
-<span class="n">math</span><span class="p">.</span><span class="n">rnd</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="c1">-- Generate a random value between 1 and the argument. If a table is passed, it'll return a random element of the table.</span>
-<span class="n">math</span><span class="p">.</span><span class="n">rnd</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">)</span> <span class="c1">-- Generate a random value between the first and the second argument.</span></code></pre>
+<span class="n">math</span><span class="p">.</span><span class="n">rnd</span><span class="p">(</span><span class="k">until</span><span class="p">)</span> <span class="c1">-- Generate a random value between 1 until the argument. If a table is passed, it'll return a random element of the table.</span>
+<span class="n">math</span><span class="p">.</span><span class="n">rnd</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="c1">-- Generate a random value between a and b.</span></code></pre>
 </div>
 </div>
 </div>
@@ -2169,7 +2179,7 @@ end
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">new</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="c1">-- Create new instance of class.</span>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">new</span><span class="p">(</span><span class="n">class</span><span class="p">)</span> <span class="c1">-- Create new instance of class.</span>
 <span class="n">new</span><span class="p">(</span><span class="n">class</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span> <span class="c1">-- Create new instance of class using default values.</span></code></pre>
 </div>
 </div>
@@ -2298,7 +2308,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-05-08 17:03:45 UTC
+Last updated 2023-05-08 17:34:59 UTC
 </div>
 </div>
 <style>
