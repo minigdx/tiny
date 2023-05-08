@@ -45,7 +45,7 @@ class StdLib(
     inner class new : TwoArgFunction() {
 
         @TinyCall("Create new instance of class.")
-        override fun call(arg: LuaValue): LuaValue {
+        override fun call(@TinyArg("class") arg: LuaValue): LuaValue {
             return super.call(arg)
         }
 

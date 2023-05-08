@@ -33,7 +33,7 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
     internal inner class sign : OneArgFunction() {
 
         @TinyCall("Return the sign of the number.")
-        override fun call(arg: LuaValue): LuaValue {
+        override fun call(@TinyArg("number") arg: LuaValue): LuaValue {
             return if (arg.toint() >= 0) {
                 valueOf(1)
             } else {
@@ -46,7 +46,11 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
     internal inner class clamp : ThreeArgFunction() {
 
         @TinyCall("Clamp the value between a and b.")
-        override fun call(arg1: LuaValue, arg2: LuaValue, arg3: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("a") arg1: LuaValue,
+            @TinyArg("value") arg2: LuaValue,
+            @TinyArg("b") arg3: LuaValue
+        ): LuaValue {
             val max = if (arg1.todouble() > arg2.todouble()) {
                 arg1
             } else {
@@ -109,10 +113,10 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
         }
 
         @TinyCall(
-            "Generate a random value between 1 and the argument. " +
+            "Generate a random value between 1 until the argument. " +
                 "If a table is passed, it'll return a random element of the table."
         )
-        override fun call(arg: LuaValue): LuaValue {
+        override fun call(@TinyArg("until")arg: LuaValue): LuaValue {
             return if (arg.istable()) {
                 val table = arg.checktable()!!
                 val index = Random.nextInt(1, table.length() + 1)
@@ -126,8 +130,8 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
             }
         }
 
-        @TinyCall("Generate a random value between the first and the second argument.")
-        override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
+        @TinyCall("Generate a random value between a and b.")
+        override fun call(@TinyArg("a")arg1: LuaValue, @TinyArg("b")arg2: LuaValue): LuaValue {
             if (arg2.isnil()) {
                 return call(arg1)
             }
