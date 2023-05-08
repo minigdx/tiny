@@ -202,7 +202,7 @@ class GameEngine(
                         levels[resource.index] = resource as GameLevel
                     }
 
-                    ResourceType.GAME_SOUND -> {
+                    GAME_SOUND -> {
                         sounds[resource.index] = resource as Sound
                     }
                 }
@@ -232,15 +232,25 @@ class GameEngine(
                             resource.isValid()
                             true
                         } catch (ex: LuaError) {
+                            val errorLine = ex.errorLine()
                             logger.warn(
                                 "TINY"
                             ) {
-                                val error = ex.errorLine()?.let { (l, line) -> "line $l:$line <-- the \uD83D\uDC1E is around here (${ex.getLuaMessage()})" }
+                                val error =
+                                    errorLine?.let { (l, line) -> "line $l:$line <-- the \uD83D\uDC1E is around here (${ex.getLuaMessage()})" }
                                 "The line ${ex.level} trigger an execution error (${ex.getLuaMessage()}). Please fix your script!\n" + error
                             }
+
+                            errorLine?.let { (l, line) ->
+                                popup("error line $l:$line (${ex.getLuaMessage()})", "#FF0000", true)
+                            }
+
                             false
                         }
-                        if (isValid) scripts[resource.index] = resource
+                        if (isValid) {
+                            scripts[resource.index] = resource
+                            clear()
+                        }
                     }
 
                     ENGINE_GAMESCRIPT -> {
@@ -286,6 +296,7 @@ class GameEngine(
                 }
                 scripts[current]?.setState(state)
             } else if (reload) {
+                clear()
                 // Stop all sounds to avoid annoying sound loop
                 sounds.forEach { s -> s?.stop() }
                 val state = getState()
@@ -299,32 +310,46 @@ class GameEngine(
             if (accumulator >= REFRESH_LIMIT) {
                 inError = try {
                     scripts[current]?.advance()
-                    engineGameScript?.advance()
                     false
                 } catch (ex: LuaError) {
                     if (!inError) { // display the log only once.
+                        val errorLine = ex.errorLine()
                         logger.warn(
                             "TINY"
                         ) {
-                            val error = ex.errorLine()?.let { (l, line) -> "line $l:$line <-- the \uD83D\uDC1E is around here (${ex.getLuaMessage()})" }
+                            val error =
+                                errorLine?.let { (l, line) -> "line $l:$line <-- the \uD83D\uDC1E is around here (${ex.getLuaMessage()})" }
                             "The line ${ex.level} trigger an execution error (${ex.getLuaMessage()}). Please fix your script!\n" + error
+                        }
+                        errorLine?.let { (l, line) ->
+                            popup("error line $l:$line (${ex.getLuaMessage()})", "#FF0000", forever = true)
                         }
                     }
                     true
                 }
+                engineGameScript?.advance()
                 accumulator -= REFRESH_LIMIT
             }
         }
 
         // The user hit Ctrl + R(ecord)
         if (inputHandler.isCombinationPressed(Key.CTRL, Key.R)) {
-            engineGameScript?.invoke("popup", valueOf(0), valueOf("recording GIF"), valueOf(4))
+            popup("recording GIF", "#00FF00")
             platform.record()
+            // The user hit Ctrl + S(creenshot)
         } else if (inputHandler.isCombinationPressed(Key.CTRL, Key.S)) {
-            engineGameScript?.invoke("popup", valueOf(0), valueOf("screenshot PNG"), valueOf(4))
+            popup("screenshot PNG", "#00FF00")
             platform.screenshot()
         }
         inputManager.reset()
+    }
+
+    private fun popup(message: String, color: String, forever: Boolean = false) {
+        engineGameScript?.invoke("popup", valueOf(0), valueOf(message), valueOf(color), valueOf(forever))
+    }
+
+    private fun clear() {
+        engineGameScript?.invoke("clear")
     }
 
     override fun spritesheet(index: Int): SpriteSheet? {

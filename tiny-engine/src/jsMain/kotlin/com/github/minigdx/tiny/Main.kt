@@ -18,7 +18,7 @@ fun getRootPath(): String {
     // the correct URL.
     // This portion may need to be customized regarding the service where the game is deployed (itch.io, ...)
     var rootPath = window.location.protocol + "//" + window.location.host + window.location.pathname
-    rootPath = rootPath.replace("index.html", "")
+    rootPath = rootPath.substring(0, rootPath.lastIndexOf('/'))
 
     // Remove the last "/" to a avoid double slash when the engine getting resources.
     if (rootPath.endsWith("/")) {
