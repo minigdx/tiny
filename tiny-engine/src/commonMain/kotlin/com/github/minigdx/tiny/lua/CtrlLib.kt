@@ -79,7 +79,7 @@ class CtrlLib(
             val int = arg.checkint()
             // get the key by its ordinal.
             val k = Key.values()[int]
-            return valueOf(inputHandler.isKeyJustPressed(k))
+            return booleanToInt(inputHandler.isKeyJustPressed(k))
         }
     }
 
@@ -93,7 +93,13 @@ class CtrlLib(
             val int = arg.checkint()
             // get the key by its ordinal.
             val k = Key.values()[int]
-            return valueOf(inputHandler.isKeyPressed(k))
+            return booleanToInt(inputHandler.isKeyPressed(k))
         }
+    }
+
+    private fun booleanToInt(keyPressed: Boolean) = if (keyPressed) {
+        ONE
+    } else {
+        ZERO
     }
 }

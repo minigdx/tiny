@@ -4,13 +4,13 @@ import org.w3c.dom.HTMLTextAreaElement
 import org.w3c.dom.get
 import kotlin.js.Date
 
-class EditorStream(val field: String) : SourceStream<ByteArray> {
+class EditorStream(field: String) : SourceStream<ByteArray> {
 
-    val exist: Boolean
-    var updated: Boolean = false
-    var timeout: Double = 0.0
+    private val exist: Boolean
+    private var updated: Boolean = false
+    private var timeout: Double = 0.0
 
-    var textarea: HTMLTextAreaElement? = null
+    private var textarea: HTMLTextAreaElement? = null
 
     init {
         val textarea = document.getElementById(field.replace("#", "")) as? HTMLTextAreaElement
@@ -21,7 +21,7 @@ class EditorStream(val field: String) : SourceStream<ByteArray> {
             this.textarea = textarea
             textarea.addEventListener("input", {
                 updated = true
-                timeout = Date.now() + 2000 // add 2 seconds
+                timeout = Date.now() + 1500 // add 1.5 second
             }, null)
         }
     }

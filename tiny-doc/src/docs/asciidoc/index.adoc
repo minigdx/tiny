@@ -20,6 +20,7 @@ With "Tiny," you'll be able to get started right away and see your progress in r
 <iframe class="no-resize" title="Breakout example" width="536" height="536" src="sample/index.html"></iframe>
 ++++
 
+include::tiny-tutorial.adoc[]
 include::tiny-cli.adoc[]
 
 include::dependencies/tiny-api.adoc[]

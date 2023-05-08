@@ -72,7 +72,7 @@ private fun createGame(
         setAttribute("id", "editor-$index")
         setAttribute("spellcheck", "false")
         setAttribute("class", "tiny-textarea")
-        innerHTML = code
+        innerHTML = "-- Update the code to update the game!\n" + code
     }
     container.appendChild(textarea)
 

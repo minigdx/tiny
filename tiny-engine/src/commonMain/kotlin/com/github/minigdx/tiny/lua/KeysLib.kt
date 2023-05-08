@@ -16,13 +16,13 @@ class KeysLib : TwoArgFunction() {
         val keys = LuaTable()
         // chars
         ('a'..'z').forEach { char ->
-            val index = 'a' - char
+            val index = char - 'a'
             keys[char.toString()] = LuaInteger.valueOf(Key.A.ordinal + index)
         }
 
         // numbers
         ('0'..'9').forEach { char ->
-            val index = '0' - char
+            val index = char - '0'
             keys[char.toString()] = LuaInteger.valueOf(Key.NUM0.ordinal + index)
         }
 
