@@ -30,12 +30,17 @@ end
 In the `_update()` callback, we'll update the game state by moving the paddles and the ball. We'll also check for collisions between the ball and the paddles, and update the ball's velocity accordingly.
 
 ```lua
+-- convert bool to number
+function num(var)
+    return var and 1 or 0
+end
+
 function _update()
     -- Update game state
-    player1_pos.y = player1_pos.y - 4 * ctrl.pressing(keys.up)
-    player1_pos.y = player1_pos.y + 4 * ctrl.pressing(keys.down)
-    player2_pos.y = player2_pos.y - 4 * ctrl.pressing(keys.z)
-    player2_pos.y = player2_pos.y + 4 * ctrl.pressing(keys.s)
+    player1_pos.y = player1_pos.y - 4 * num(ctrl.pressing(keys.up))
+    player1_pos.y = player1_pos.y + 4 * num(ctrl.pressing(keys.down))
+    player2_pos.y = player2_pos.y - 4 * num(ctrl.pressing(keys.z))
+    player2_pos.y = player2_pos.y + 4 * num(ctrl.pressing(keys.s))
 
     ball_pos.x = ball_pos.x + ball_velocity.x
     ball_pos.y = ball_pos.y + ball_velocity.y
@@ -93,12 +98,17 @@ function _init()
     ball_pos = { x = 128, y = 96 }
 end
 
+-- convert bool to number
+function num(var)
+    return var and 1 or 0
+end
+
 function _update()
     -- Update game state
-    player1_pos.y = player1_pos.y - 4 * ctrl.pressing(keys.up)
-    player1_pos.y = player1_pos.y + 4 * ctrl.pressing(keys.down)
-    player2_pos.y = player2_pos.y - 4 * ctrl.pressing(keys.z)
-    player2_pos.y = player2_pos.y + 4 * ctrl.pressing(keys.s)
+    player1_pos.y = player1_pos.y - 4 * num(ctrl.pressing(keys.up))
+    player1_pos.y = player1_pos.y + 4 * num(ctrl.pressing(keys.down))
+    player2_pos.y = player2_pos.y - 4 * num(ctrl.pressing(keys.z))
+    player2_pos.y = player2_pos.y + 4 * num(ctrl.pressing(keys.s))
 
     ball_pos.x = ball_pos.x + ball_velocity.x
     ball_pos.y = ball_pos.y + ball_velocity.y

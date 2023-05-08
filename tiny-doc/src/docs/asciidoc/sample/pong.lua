@@ -75,7 +75,16 @@ end
 function GameOut:draw()
     gfx.cls(0)
     spr.sheet(0)
+    -- title
     spr.sdraw(0, 100, 0, 208, 256, 3 * 16)
+    -- space
+    spr.sdraw(80, 150, 0, 128, 3 * 16, 16)
+    -- left and right
+    spr.sdraw(88, 150 + 16, 4 * 16, 128, 16, 16)
+    spr.sdraw(88 + 16, 150 + 16, 3 * 16, 128, 16, 16)
+    print("launch the ball", 80 + 3 * 16, 154, 2)
+    print("move the paddle", 80 + 3 * 16, 154 + 16, 2)
+
     shape.circlef(256 * 0.5, 212, self.radius, 0)
     gfx.to_sheet(2)
 end
@@ -267,6 +276,9 @@ end
 
 function _update()
     if (ctrl.pressing(keys.space) and not game.started) then
+        debug(game.started)
+        debug(ctrl.pressing(keys.space) )
+
         game.started = true
         transition.start = true
     end
