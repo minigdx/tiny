@@ -15,7 +15,7 @@ function _update()
 
     if (waiting < 0) then
         gfx.cls("#000000")
-        exit(0) -- start the first script in the game script stack
+        tiny.exit(0) -- start the first script in the game script stack
     end
 end
 
