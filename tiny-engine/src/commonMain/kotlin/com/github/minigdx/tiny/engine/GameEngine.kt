@@ -286,9 +286,9 @@ class GameEngine(
         with(scripts[current]) {
             if (this == null) return
 
-            if (exited) {
+            if (exited >= 0) {
                 // next script
-                current = min(current + 1, scripts.size - 1)
+                current = min(exited + 1, scripts.size - 1)
                 val state = getState()
 
                 logger.debug("GAME_ENGINE") {

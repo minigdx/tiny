@@ -14,6 +14,7 @@ import com.github.minigdx.tiny.lua.ShapeLib
 import com.github.minigdx.tiny.lua.SprLib
 import com.github.minigdx.tiny.lua.StdLib
 import com.github.minigdx.tiny.lua.StdLibListener
+import com.github.minigdx.tiny.lua.TinyLib
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LoadState
 import org.luaj.vm2.LuaValue
@@ -40,7 +41,7 @@ class GameScript(
     override val type: ResourceType
 ) : GameResource, StdLibListener {
 
-    var exited: Boolean = false
+    var exited: Int = -1
     var evaluated: Boolean = false
 
     lateinit var resourceAccess: GameResourceAccess
@@ -56,6 +57,8 @@ class GameScript(
     private var getStateFunction: LuaValue? = null
 
     private var globals: Globals? = null
+
+    private val tinyLib: TinyLib = TinyLib(this)
 
     class State(val args: LuaValue)
 
@@ -76,6 +79,7 @@ class GameScript(
         load(ShapeLib(this@GameScript.resourceAccess))
         load(KeysLib())
         load(MathLib())
+        load(tinyLib)
         load(sprLib)
         load(JuiceLib())
         LoadState.install(this)
@@ -83,8 +87,7 @@ class GameScript(
     }
 
     override fun exit(nextScriptIndex: Int) {
-        // FIXME: use the script index
-        exited = true
+        exited = nextScriptIndex
     }
 
     fun isValid(): Boolean {
@@ -99,7 +102,7 @@ class GameScript(
         globals = createLuaGlobals()
 
         evaluated = true
-        exited = false
+        exited = -1
         reload = false
 
         globals?.load(content.decodeToString())?.call()
@@ -134,6 +137,7 @@ class GameScript(
     }
 
     fun advance() {
+        tinyLib.advance()
         updateFunction?.call()
         drawFunction?.call()
     }

@@ -28,7 +28,6 @@ class StdLib(
 
     override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
         val tiny = LuaTable()
-        arg2["exit"] = exit() // FIXME: move into game lib with t and dt?
         arg2["all"] = all()
         arg2["rpairs"] = rpairs()
         arg2["print"] = print()
@@ -226,13 +225,7 @@ class StdLib(
             get() = this.isLetter() && this.lowercaseChar() !in 'a'..'z'
     }
 
-    internal inner class exit : OneArgFunction() {
 
-        override fun call(arg: LuaValue): LuaValue {
-            listener.exit(arg.checkint())
-            return NONE
-        }
-    }
 
     private fun LuaValue.checkColorIndex(): Int {
         return if (this.isnumber()) {
