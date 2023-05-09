@@ -124,18 +124,22 @@ class JsInputHandler(
     private fun touchStart(event: Event) {
         event as TouchEvent
         (0 until event.targetTouches.length).forEach {
-            val jsTouch = event.targetTouches[it]!!
-            val touch = touchManager.getTouchSignal(jsTouch.identifier)
+            val defaultTouch = TouchSignal.signal(it)
+            if (defaultTouch != null) {
+                val jsTouch = event.targetTouches[it]!!
 
-            val rect = canvas.getBoundingClientRect()
-            val x = jsTouch.clientX.toFloat() - rect.left.toFloat()
-            val y = jsTouch.clientY.toFloat() - rect.top.toFloat()
+                val touch = touchManager.getTouchSignal(jsTouch.identifier, defaultTouch)
 
-            val gamePosition = projector.project(x, y)
-            gamePosition?.let { (gameX, gameY) ->
-                touchManager.onTouchDown(touch, gameX, gameY)
-                mousePosition.x = gameX
-                mousePosition.y = gameY
+                val rect = canvas.getBoundingClientRect()
+                val x = jsTouch.clientX.toFloat() - rect.left.toFloat()
+                val y = jsTouch.clientY.toFloat() - rect.top.toFloat()
+
+                val gamePosition = projector.project(x, y)
+                gamePosition?.let { (gameX, gameY) ->
+                    touchManager.onTouchDown(touch, gameX, gameY)
+                    mousePosition.x = gameX
+                    mousePosition.y = gameY
+                }
             }
         }
         if (event.cancelable && event.target == canvas) event.preventDefault()
@@ -144,9 +148,12 @@ class JsInputHandler(
     private fun touchEnd(event: Event) {
         event as TouchEvent
         (0 until event.changedTouches.length).forEach {
-            val jsTouch = event.changedTouches[it]!!
-            val touch = touchManager.getTouchSignal(jsTouch.identifier)
-            touchManager.onTouchUp(touch)
+            val defaultTouch = TouchSignal.signal(it)
+            if (defaultTouch != null) {
+                val jsTouch = event.changedTouches[it]!!
+                val touch = touchManager.getTouchSignal(jsTouch.identifier, defaultTouch)
+                touchManager.onTouchUp(touch)
+            }
         }
         if (event.cancelable && event.target == canvas) event.preventDefault()
     }
@@ -154,17 +161,20 @@ class JsInputHandler(
     private fun touchMove(event: Event) {
         event as TouchEvent
         (0 until event.targetTouches.length).forEach {
-            val jsTouch = event.targetTouches[it]!!
-            val touch = touchManager.getTouchSignal(jsTouch.identifier)
+            val defaultTouch = TouchSignal.signal(it)
+            if (defaultTouch != null) {
+                val jsTouch = event.targetTouches[it]!!
+                val touch = touchManager.getTouchSignal(jsTouch.identifier, defaultTouch)
 
-            val rect = canvas.getBoundingClientRect()
-            val x = jsTouch.clientX.toFloat() - rect.left.toFloat()
-            val y = jsTouch.clientY.toFloat() - rect.top.toFloat()
-            val gamePosition = projector.project(x, y)
-            gamePosition?.let { (gameX, gameY) ->
-                touchManager.onTouchMove(touch, gameX, gameY)
-                mousePosition.x = gameX
-                mousePosition.y = gameY
+                val rect = canvas.getBoundingClientRect()
+                val x = jsTouch.clientX.toFloat() - rect.left.toFloat()
+                val y = jsTouch.clientY.toFloat() - rect.top.toFloat()
+                val gamePosition = projector.project(x, y)
+                gamePosition?.let { (gameX, gameY) ->
+                    touchManager.onTouchMove(touch, gameX, gameY)
+                    mousePosition.x = gameX
+                    mousePosition.y = gameY
+                }
             }
         }
 

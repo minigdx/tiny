@@ -55,20 +55,18 @@ class TouchManager(lastKeyCode: KeyCode) {
     /**
      * Converting the platform specific touch [id] into a [TouchSignal].
      */
-    fun getTouchSignal(id: Any): TouchSignal {
+    fun getTouchSignal(id: Any, default: TouchSignal): TouchSignal {
         type.forEachIndexed { index, savedId ->
             if (id == savedId) {
                 return touchSignalCache[index]
             }
         }
-        return assignTouchSignal(id)
+        return assignTouchSignal(id, default)
     }
 
-    private fun assignTouchSignal(id: Any): TouchSignal {
-        val ordinal = type.indexOfFirst { it == null }
-        val touchSignal = touchSignalCache[ordinal]
-        type[ordinal] = id
-        return touchSignal
+    private fun assignTouchSignal(id: Any, default: TouchSignal): TouchSignal {
+        type[default.ordinal] = id
+        return default
     }
 
     /**
