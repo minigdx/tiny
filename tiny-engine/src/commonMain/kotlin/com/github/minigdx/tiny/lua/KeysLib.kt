@@ -9,7 +9,10 @@ import org.luaj.vm2.lib.TwoArgFunction
 
 @TinyLib(
     "keys",
-    "List of the available keys. To be used with ctrl."
+    "List of the available keys. To be used with ctrl.\n\n" +
+        "- `keys.up`, `keys.down`, `keys.left`, `keys.right` for directions.\n" +
+        "- `keys.a` to `keys.z` and `keys.0` to `keys.9` for letters and numbers.\n" +
+        "- `keys.space` and `keys.enter` for other keys.\n"
 )
 class KeysLib : TwoArgFunction() {
     override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
