@@ -108,7 +108,11 @@ class CtrlLib(
     @TinyFunction(
         "Return the position of the touch (as `{x, y}`)" +
             "if the screen was touched or the mouse button was pressed during the last frame. " +
-            "`nil` otherwise." +
+            "`nil` otherwise.\n" +
+            "The touch can be : \n\n" +
+            "- 0: left click or one finger\n" +
+            "- 1: right click or two fingers\n" +
+            "- 2: middle click or three fingers\n\n " +
             "If you need to check that the touch/mouse button is still active, see `ctrl.touching` instead."
     )
     inner class touched : OneArgFunction() {
@@ -136,7 +140,12 @@ class CtrlLib(
     @TinyFunction(
         "Return the position of the touch (as `{x, y}`)" +
             "if the screen is still touched or the mouse button is still pressed. " +
-            "`nil` otherwise."
+            "`nil` otherwise.\n" +
+            "The touch can be : \n\n" +
+            "- 0: left click or one finger\n" +
+            "- 1: right click or two fingers\n" +
+            "- 2: middle click or three fingers\n\n ",
+        example = CTRL_TOUCHING_EXAMPLE
     )
     inner class touching : OneArgFunction() {
         @TinyCall("Is the screen is still touched or mouse button is still pressed?")

@@ -65,6 +65,7 @@ private fun createGame(
         setAttribute("width", "512")
         setAttribute("height", "512")
         setAttribute("class", "tiny-canvas")
+        setAttribute("tabindex", "1")
     }
     container.appendChild(canvas)
 

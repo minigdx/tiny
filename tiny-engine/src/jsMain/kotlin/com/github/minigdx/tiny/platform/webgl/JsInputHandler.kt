@@ -10,7 +10,6 @@ import com.github.minigdx.tiny.input.TouchSignal.TOUCH1
 import com.github.minigdx.tiny.input.TouchSignal.TOUCH2
 import com.github.minigdx.tiny.input.TouchSignal.TOUCH3
 import com.github.minigdx.tiny.input.Vector2
-import kotlinx.browser.document
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.TouchEvent
 import org.w3c.dom.events.Event
@@ -25,8 +24,8 @@ class JsInputHandler(
 ) : InputHandler, InputManager {
 
     init {
-        document.addEventListener("keydown", ::keyDown, false)
-        document.addEventListener("keyup", ::keyUp, false)
+        canvas.addEventListener("keydown", ::keyDown, false)
+        canvas.addEventListener("keyup", ::keyUp, false)
         canvas.addEventListener("touchstart", ::touchStart, false)
         canvas.addEventListener("touchend", ::touchEnd, false)
         canvas.addEventListener("touchmove", ::touchMove, false)
@@ -135,17 +134,21 @@ class JsInputHandler(
             val gamePosition = projector.project(x, y)
             gamePosition?.let { (gameX, gameY) ->
                 touchManager.onTouchDown(touch, gameX, gameY)
+                mousePosition.x = gameX
+                mousePosition.y = gameY
             }
         }
+        if (event.cancelable && event.target == canvas) event.preventDefault()
     }
 
     private fun touchEnd(event: Event) {
         event as TouchEvent
-        (0 until event.targetTouches.length).forEach {
-            val jsTouch = event.targetTouches[it]!!
+        (0 until event.changedTouches.length).forEach {
+            val jsTouch = event.changedTouches[it]!!
             val touch = touchManager.getTouchSignal(jsTouch.identifier)
             touchManager.onTouchUp(touch)
         }
+        if (event.cancelable && event.target == canvas) event.preventDefault()
     }
 
     private fun touchMove(event: Event) {
@@ -160,19 +163,22 @@ class JsInputHandler(
             val gamePosition = projector.project(x, y)
             gamePosition?.let { (gameX, gameY) ->
                 touchManager.onTouchMove(touch, gameX, gameY)
+                mousePosition.x = gameX
+                mousePosition.y = gameY
             }
         }
+
+        if (event.cancelable && event.target == canvas) event.preventDefault()
     }
 
     private fun keyDown(event: Event) {
         event as KeyboardEvent
         if (event.keyCode in (0..256)) {
             touchManager.onKeyPressed(event.keyCode)
-            // TODO: I removed the preventDefault otherwise the event is not send to other elements of the document
-            //       (because keyDown and keyUp are on the documents, not only the canvas which doesn't support
-            //       keyUp / keyDown)
-            //       It's required as for the documentation, there is textarea that listen for whose events.
-            // event.preventDefault()
+        }
+
+        if (event.target == canvas) {
+            event.preventDefault()
         }
     }
 
@@ -180,11 +186,9 @@ class JsInputHandler(
         event as KeyboardEvent
         if (event.keyCode in (0..256)) {
             touchManager.onKeyReleased(event.keyCode)
-            // TODO: I removed the preventDefault otherwise the event is not send to other elements of the document
-            //       (because keyDown and keyUp are on the documents, not only the canvas which doesn't support
-            //       keyUp / keyDown)
-            //       It's required as for the documentation, there is textarea that listen for whose events.
-            // event.preventDefault()
+        }
+        if (event.target == canvas) {
+            event.preventDefault()
         }
     }
 

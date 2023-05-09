@@ -48,3 +48,36 @@ function _draw()
     shape.circle(circle.x, circle.y, 2, 9)
 end
 """
+
+const val CTRL_TOUCHING_EXAMPLE = """
+function _init()
+   t = {}
+end
+
+function _update()
+    local touch = ctrl.touching(0)
+    if(touch) then
+       table.insert(t, {str = " touching "..touch.x.."-"..touch.y, ttl = 3})
+    end
+
+for i,s in rpairs(t) do
+    s.ttl = s.ttl - 1/60
+    if s.ttl < 0 then
+      table.remove(t, i)
+    end
+end
+end
+
+function _draw()
+    gfx.cls()
+
+    local p = 0
+    for i, s in rpairs(t) do
+      print(i..s.str, 10, 6 * p, 2)
+      p = p + 1
+    end
+
+    local touch = ctrl.touch()
+    shape.circlef(touch.x, touch.y, 2, 8)
+end
+"""

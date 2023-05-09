@@ -92,6 +92,7 @@ fun setupGames(rootPath: String, tinyGameTag: HTMLCollection) {
         val canvas = document.createElement("canvas")
         canvas.setAttribute("width", (gameWidth * gameZoom).toString())
         canvas.setAttribute("height", (gameHeight * gameZoom).toString())
+        canvas.setAttribute("tabindex", "1")
         game.appendChild(canvas)
 
         val gameOptions = GameOptions(
