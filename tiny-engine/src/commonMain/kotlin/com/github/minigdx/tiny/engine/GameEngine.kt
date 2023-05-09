@@ -241,9 +241,11 @@ class GameEngine(
                                 "The line ${ex.level} trigger an execution error (${ex.getLuaMessage()}). Please fix your script!\n" + error
                             }
 
-                            errorLine?.let { (l, line) ->
-                                popup("error line $l:$line (${ex.getLuaMessage()})", "#FF0000", true)
-                            }
+                            val msg = errorLine?.let { (l, line) ->
+                                "error line $l:$line (${ex.getLuaMessage()})"
+                            } ?: "Error: ${ex.getLuaMessage()}"
+
+                            popup(msg, "#FF0000", true)
 
                             false
                         }
@@ -321,9 +323,12 @@ class GameEngine(
                                 errorLine?.let { (l, line) -> "line $l:$line <-- the \uD83D\uDC1E is around here (${ex.getLuaMessage()})" }
                             "The line ${ex.level} trigger an execution error (${ex.getLuaMessage()}). Please fix your script!\n" + error
                         }
-                        errorLine?.let { (l, line) ->
-                            popup("error line $l:$line (${ex.getLuaMessage()})", "#FF0000", forever = true)
-                        }
+
+                        val msg = errorLine?.let { (l, line) ->
+                            "error line $l:$line (${ex.getLuaMessage()})"
+                        } ?: "Error: ${ex.getLuaMessage()}"
+
+                        popup(msg, "#FF0000", true)
                     }
                     true
                 }
