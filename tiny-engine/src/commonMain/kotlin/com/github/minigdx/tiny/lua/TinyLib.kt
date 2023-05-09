@@ -28,7 +28,6 @@ class TinyLib(private val listener: StdLibListener) : TwoArgFunction() {
         tiny.set("frame", valueOf(frame))
     }
 
-
     override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
         tiny.set("dt", valueOf(1 / 60.0))
         tiny.set("t", valueOf(time))
@@ -39,8 +38,10 @@ class TinyLib(private val listener: StdLibListener) : TwoArgFunction() {
         return tiny
     }
 
-    @TinyFunction("Exit the actual script to switch to another one. " +
-        "The next script to use is identified by it's index.")
+    @TinyFunction(
+        "Exit the actual script to switch to another one. " +
+            "The next script to use is identified by it's index."
+    )
     internal inner class exit : OneArgFunction() {
 
         @TinyCall("Exit the actual script to switch to another one.")

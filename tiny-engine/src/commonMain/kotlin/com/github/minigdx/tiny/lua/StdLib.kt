@@ -225,8 +225,6 @@ class StdLib(
             get() = this.isLetter() && this.lowercaseChar() !in 'a'..'z'
     }
 
-
-
     private fun LuaValue.checkColorIndex(): Int {
         return if (this.isnumber()) {
             this.checkint()
