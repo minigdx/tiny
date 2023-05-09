@@ -139,7 +139,10 @@ class GameScript(
     fun advance() {
         tinyLib.advance()
         updateFunction?.call()
-        drawFunction?.call()
+        // Skip the draw call if the game script just exited.
+        if (exited == -1) {
+            drawFunction?.call()
+        }
     }
 
     fun resourcesLoaded() {
