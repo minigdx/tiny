@@ -1095,6 +1095,19 @@ juice.linear(start, end, progress) -- Interpolate the value given a start and an
 <div class="paragraph">
 <p>List of the available keys. To be used with ctrl.</p>
 </div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>keys.up</code>, <code>keys.down</code>, <code>keys.left</code>, <code>keys.right</code> for directions.</p>
+</li>
+<li>
+<p><code>keys.a</code> to <code>keys.z</code> and <code>keys.0</code> to <code>keys.9</code> for letters and numbers.</p>
+</li>
+<li>
+<p><code>keys.space</code> and <code>keys.enter</code> for other keys.</p>
+</li>
+</ul>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_map">map</h3>
@@ -1575,13 +1588,30 @@ end
 </tiny-editor>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_tiny">tiny</h3>
+<div class="paragraph">
+<p>Tiny Lib which offer offer the current frame (<code>tiny.frame</code>), the current time (<code>tiny.time</code>), delta time (<code>tiny.dt</code>) and to switch to another script using <code>exit</code>.</p>
+</div>
+<div class="sect3">
+<h4 id="_tiny_exit">tiny.exit()</h4>
+<div class="paragraph">
+<p>Exit the actual script to switch to another one. The next script to use is identified by it&#8217;s index.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">tiny.exit(scriptIndex) -- Exit the actual script to switch to another one.</code></pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-05-08 20:36:48 UTC
+Last updated 2023-05-09 07:32:21 UTC
 </div>
 </div>
 </body>
