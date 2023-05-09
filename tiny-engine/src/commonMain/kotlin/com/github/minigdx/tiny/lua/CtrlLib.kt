@@ -6,6 +6,7 @@ import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.Key
+import com.github.minigdx.tiny.input.TouchSignal
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.OneArgFunction
@@ -24,10 +25,12 @@ class CtrlLib(
 
         ctrl["pressed"] = pressed()
         ctrl["pressing"] = pressing()
+        ctrl["touch"] = touch()
+        ctrl["touched"] = touched()
+        ctrl["touching"] = touching()
 
-        ctrl.set("touch", touch())
-        arg2.set("ctrl", ctrl)
-        arg2.get("package").get("loaded").set("ctrl", ctrl)
+        arg2["ctrl"] = ctrl
+        arg2["package"]["loaded"]["ctrl"] = ctrl
         return ctrl
     }
 
@@ -69,31 +72,90 @@ class CtrlLib(
     }
 
     @TinyFunction(
-        "Return if the key was pressed during the last frame. " +
-            "If you need to check that the key is still pressed, see ctrl.pressing instead."
+        "Return true if the key was pressed during the last frame. " +
+            "If you need to check that the key is still pressed, see `ctrl.pressing` instead."
     )
     inner class pressed : OneArgFunction() {
 
         @TinyCall("Is the key was pressed?")
         override fun call(@TinyArg("key") arg: LuaValue): LuaValue {
+            val values = Key.values()
             val int = arg.checkint()
+            if (int >= values.size || int < 0) return BFALSE
+
             // get the key by its ordinal.
-            val k = Key.values()[int]
+            val k = values[int]
             return valueOf(inputHandler.isKeyJustPressed(k))
         }
     }
 
     @TinyFunction(
-        "Return if the key is still pressed. ",
+        "Return true if the key is still pressed. ",
         example = CTRL_PRESSING_EXAMPLE
     )
     inner class pressing : OneArgFunction() {
         @TinyCall("Is the key is still pressed?")
         override fun call(@TinyArg("key") arg: LuaValue): LuaValue {
+            val values = Key.values()
             val int = arg.checkint()
+            if (int >= values.size || int < 0) return BFALSE
             // get the key by its ordinal.
-            val k = Key.values()[int]
+            val k = values[int]
             return valueOf(inputHandler.isKeyPressed(k))
+        }
+    }
+
+    @TinyFunction(
+        "Return the position of the touch (as `{x, y}`)" +
+            "if the screen was touched or the mouse button was pressed during the last frame. " +
+            "`nil` otherwise." +
+            "If you need to check that the touch/mouse button is still active, see `ctrl.touching` instead."
+    )
+    inner class touched : OneArgFunction() {
+
+        @TinyCall("Is the screen was touched or mouse button was pressed?")
+        override fun call(@TinyArg("touch") arg: LuaValue): LuaValue {
+            val values = TouchSignal.values()
+            val int = arg.checkint()
+            if (int >= values.size || int < 0) return BFALSE
+            // get the key by its ordinal.
+            val touchSignal = TouchSignal.values()[int]
+            val touched = inputHandler.isJustTouched(touchSignal)
+
+            val coordinates = touched?.let {
+                val result = LuaTable()
+                result["x"] = touched.x.toInt()
+                result["y"] = touched.y.toInt()
+                result
+            } ?: NIL
+
+            return coordinates
+        }
+    }
+
+    @TinyFunction(
+        "Return the position of the touch (as `{x, y}`)" +
+            "if the screen is still touched or the mouse button is still pressed. " +
+            "`nil` otherwise."
+    )
+    inner class touching : OneArgFunction() {
+        @TinyCall("Is the screen is still touched or mouse button is still pressed?")
+        override fun call(@TinyArg("touch") arg: LuaValue): LuaValue {
+            val values = TouchSignal.values()
+            val int = arg.checkint()
+            if (int >= values.size || int < 0) return BFALSE
+            // get the key by its ordinal.
+            val touchSignal = TouchSignal.values()[int]
+            val touched = inputHandler.isTouched(touchSignal)
+
+            val coordinates = touched?.let {
+                val result = LuaTable()
+                result["x"] = touched.x.toInt()
+                result["y"] = touched.y.toInt()
+                result
+            } ?: NIL
+
+            return coordinates
         }
     }
 }

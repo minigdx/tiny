@@ -16,12 +16,13 @@ import org.lwjgl.glfw.GLFW.GLFW_RELEASE
 import org.lwjgl.glfw.GLFW.GLFW_STICKY_KEYS
 import org.lwjgl.glfw.GLFW.GLFW_TRUE
 import org.lwjgl.glfw.GLFW.glfwGetCursorPos
-import org.lwjgl.glfw.GLFW.glfwGetMouseButton
 import org.lwjgl.glfw.GLFW.glfwSetCursorEnterCallback
 import org.lwjgl.glfw.GLFW.glfwSetInputMode
 import org.lwjgl.glfw.GLFW.glfwSetKeyCallback
+import org.lwjgl.glfw.GLFW.glfwSetMouseButtonCallback
 import org.lwjgl.glfw.GLFWCursorEnterCallback
 import org.lwjgl.glfw.GLFWKeyCallback
+import org.lwjgl.glfw.GLFWMouseButtonCallback
 import java.nio.DoubleBuffer
 
 class LwjglInput(private val projector: MouseProject) : InputHandler, InputManager {
@@ -68,28 +69,39 @@ class LwjglInput(private val projector: MouseProject) : InputHandler, InputManag
                 }
             }
         )
+        // see https://github.com/LWJGL/lwjgl3-wiki/wiki/2.6.3-Input-handling-with-GLFW
+        glfwSetMouseButtonCallback(
+            windowAddress,
+            object : GLFWMouseButtonCallback() {
+                override fun invoke(window: Long, button: Int, action: Int, mods: Int) {
+                    val touchSignal = when (button) {
+                        GLFW_MOUSE_BUTTON_1 -> TouchSignal.TOUCH1
+                        GLFW_MOUSE_BUTTON_2 -> TouchSignal.TOUCH2
+                        GLFW_MOUSE_BUTTON_3 -> TouchSignal.TOUCH3
+                        else -> return
+                    }
+                    glfwGetCursorPos(window, b1, b2)
+                    val gamePosition = projector.project(b1[0].toFloat(), b2[0].toFloat())
+
+                    if (action == GLFW_PRESS) {
+                        gamePosition?.let { (x, y) ->
+                            touchManager.onTouchDown(touchSignal, x, y)
+                        }
+                    } else if (action == GLFW_RELEASE) {
+                        touchManager.onTouchUp(touchSignal)
+                    }
+
+                    if (touchManager.isTouched(touchSignal) != null) {
+                        gamePosition?.let { (x, y) ->
+                            touchManager.onTouchMove(touchSignal, x, y)
+                        }
+                    }
+                }
+            }
+        )
     }
 
     override fun record() {
-        fun touchStatus(glfwMouseButton: Int, touchSignal: TouchSignal) {
-            // see https://github.com/LWJGL/lwjgl3-wiki/wiki/2.6.3-Input-handling-with-GLFW
-            if (glfwGetMouseButton(window, glfwMouseButton) == GLFW_PRESS) {
-                glfwGetCursorPos(window, b1, b2)
-                if (touchManager.isTouched(touchSignal) != null) {
-                    val gamePosition = projector.project(b1[0].toFloat(), b2[0].toFloat())
-                    gamePosition?.let { (x, y) ->
-                        touchManager.onTouchMove(touchSignal, x, y)
-                    }
-                } else {
-                    val gamePosition = projector.project(b1[0].toFloat(), b2[0].toFloat())
-                    gamePosition?.let { (x, y) ->
-                        touchManager.onTouchDown(touchSignal, x, y)
-                    }
-                }
-            } else if (glfwGetMouseButton(window, glfwMouseButton) == GLFW_RELEASE) {
-                touchManager.onTouchUp(touchSignal)
-            }
-        }
         // Update mouse position
         // https://www.glfw.org/docs/3.3/input_guide.html#cursor_pos
         if (isMouseInsideWindow) {
@@ -106,11 +118,6 @@ class LwjglInput(private val projector: MouseProject) : InputHandler, InputManag
         } else {
             isMouseInsideGameScreen = false
         }
-
-        // Update touch status
-        touchStatus(GLFW_MOUSE_BUTTON_1, TouchSignal.TOUCH1)
-        touchStatus(GLFW_MOUSE_BUTTON_2, TouchSignal.TOUCH2)
-        touchStatus(GLFW_MOUSE_BUTTON_3, TouchSignal.TOUCH3)
     }
 
     override fun reset() = touchManager.processReceivedEvent()

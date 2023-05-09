@@ -188,10 +188,15 @@ function create_raquette(y)
 end
 
 function update_raquette(raquette)
-    if ctrl.pressing(keys.left) then
+    local touching = ctrl.touching(0)
+    local touch = ctrl.touch()
+    local mleft = touching and touch.x < (raquette.x + raquette.width * 0.5)
+    local mright = touching and touch.x >= (raquette.x + raquette.width * 0.5)
+
+    if ctrl.pressing(keys.left) or mleft then
         raquette.x = math.max(0, raquette.x - raquette.speed)
         raquette.direction = 0
-    elseif ctrl.pressing(keys.right) then
+    elseif ctrl.pressing(keys.right) or mright then
         raquette.x = math.min(raquette.x + raquette.speed, 256 - raquette.width)
         raquette.direction = 1
     end
@@ -275,10 +280,7 @@ function check_collision(rect1, rect2)
 end
 
 function _update()
-    if (ctrl.pressing(keys.space) and not game.started) then
-        debug(game.started)
-        debug(ctrl.pressing(keys.space) )
-
+    if ((ctrl.touched(0) or ctrl.pressed(keys.space)) and not game.started) then
         game.started = true
         transition.start = true
     end
@@ -291,7 +293,7 @@ function _update()
         b.accept_move_x = true
         b.accept_move_y = true
 
-        if ctrl.pressing(keys.space) then
+        if (ctrl.touched(0) or ctrl.pressed(keys.space)) then
             b.glue_to = false
         end
         if b.glue_to then
@@ -303,6 +305,15 @@ function _update()
                 b.speed.x = -1
             elseif ctrl.pressing(keys.right) then
                 b.speed.x = 1
+            end
+
+            local touch = ctrl.touching(0)
+            if touch then
+                if touch.x < (r.x + r.width * 0.5) then
+                    b.speed.x = -1
+                else
+                    b.speed.x = 1
+                end
             end
         else
             b.new_x = b.x + b.speed.x

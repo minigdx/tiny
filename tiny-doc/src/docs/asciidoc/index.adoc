@@ -22,6 +22,8 @@ With "Tiny," you'll be able to get started right away and see your progress in r
 <iframe class="no-resize" title="Breakout example" width="536" height="536" src="sample/index.html"></iframe>
 ++++
 
+NOTE: The code source of this sample is available in the https://github.com/minigdx/tiny/tree/main/tiny-sample[Tiny git repository].
+
 == Tiny Sandbox
 
 You can try to create a game right away the Tiny Game engine using xref:sandbox.adoc[the Sandbox] or you can just try the engine by updating examples available in this page.

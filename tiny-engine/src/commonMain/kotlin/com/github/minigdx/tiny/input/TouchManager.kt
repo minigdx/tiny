@@ -45,7 +45,9 @@ class TouchManager(lastKeyCode: KeyCode) {
             return InternalTouchEvent()
         }
 
-        override fun destroyInstance(obj: InternalTouchEvent) = Unit
+        override fun destroyInstance(obj: InternalTouchEvent) {
+            obj.keycode = null
+        }
     }
 
     private val queueEvents = mutableListOf<InternalTouchEvent>()
@@ -102,7 +104,7 @@ class TouchManager(lastKeyCode: KeyCode) {
      * The coordinates [x] and [y] are screen coordinates.
      */
     fun onTouchMove(touchSignal: TouchSignal, x: Float, y: Float) {
-        val event = eventsPool.newInstance()
+        val event = eventsPool.obtain()
         event.way = InternalTouchEventWay.MOVE
         event.position.x = x
         event.position.y = y
@@ -119,7 +121,7 @@ class TouchManager(lastKeyCode: KeyCode) {
      * The coordinates [x] and [y] are screen coordinates.
      */
     fun onTouchUp(touchSignal: TouchSignal) {
-        val event = eventsPool.newInstance()
+        val event = eventsPool.obtain()
         event.way = InternalTouchEventWay.UP
         event.touchSignal = touchSignal
         queueEvents.add(event)
@@ -138,14 +140,14 @@ class TouchManager(lastKeyCode: KeyCode) {
     fun isKeyJustPressed(keyCode: KeyCode): Boolean = justKeyPressed[keyCode]
 
     fun onKeyPressed(keyCode: KeyCode) {
-        val event = eventsPool.newInstance()
+        val event = eventsPool.obtain()
         event.way = InternalTouchEventWay.DOWN
         event.keycode = keyCode
         queueEvents.add(event)
     }
 
     fun onKeyReleased(keyCode: KeyCode) {
-        val event = eventsPool.newInstance()
+        val event = eventsPool.obtain()
         event.way = InternalTouchEventWay.UP
         event.keycode = keyCode
         queueEvents.add(event)
