@@ -535,7 +535,26 @@ end
 <div class="sect3">
 <h4 id="_ctrl_touched">ctrl.touched()</h4>
 <div class="paragraph">
-<p>Return the position of the touch (as <code>{x, y}</code>)if the screen was touched or the mouse button was pressed during the last frame. <code>nil</code> otherwise.If you need to check that the touch/mouse button is still active, see <code>ctrl.touching</code> instead.</p>
+<p>Return the position of the touch (as <code>{x, y}</code>)if the screen was touched or the mouse button was pressed during the last frame. <code>nil</code> otherwise.
+The touch can be :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>0: left click or one finger</p>
+</li>
+<li>
+<p>1: right click or two fingers</p>
+</li>
+<li>
+<p>2: middle click or three fingers</p>
+<div class="literalblock">
+<div class="content">
+<pre>If you need to check that the touch/mouse button is still active, see `ctrl.touching` instead.</pre>
+</div>
+</div>
+</li>
+</ul>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -546,13 +565,61 @@ end
 <div class="sect3">
 <h4 id="_ctrl_touching">ctrl.touching()</h4>
 <div class="paragraph">
-<p>Return the position of the touch (as <code>{x, y}</code>)if the screen is still touched or the mouse button is still pressed. <code>nil</code> otherwise.</p>
+<p>Return the position of the touch (as <code>{x, y}</code>)if the screen is still touched or the mouse button is still pressed. <code>nil</code> otherwise.
+The touch can be :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>0: left click or one finger</p>
+</li>
+<li>
+<p>1: right click or two fingers</p>
+</li>
+<li>
+<p>2: middle click or three fingers</p>
+</li>
+</ul>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-lua" data-lang="lua">ctrl.touching(touch) -- Is the screen is still touched or mouse button is still pressed?</code></pre>
 </div>
 </div>
+<tiny-editor style="display: none;">
+
+function _init()
+   t = {}
+end
+
+function _update()
+    local touch = ctrl.touching(0)
+    if(touch) then
+       table.insert(t, {str = " touching "..touch.x.."-"..touch.y, ttl = 3})
+    end
+
+for i,s in rpairs(t) do
+    s.ttl = s.ttl - 1/60
+    if s.ttl < 0 then
+      table.remove(t, i)
+    end
+end
+end
+
+function _draw()
+    gfx.cls()
+
+    local p = 0
+    for i, s in rpairs(t) do
+      print(i..s.str, 10, 6 * p, 2)
+      p = p + 1
+    end
+
+    local touch = ctrl.touch()
+    shape.circlef(touch.x, touch.y, 2, 8)
+end
+
+</tiny-editor>
 </div>
 </div>
 <div class="sect2">
@@ -1633,7 +1700,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version DEV-SNAPSHOT<br>
-Last updated 2023-05-09 10:16:22 UTC
+Last updated 2023-05-09 16:35:39 UTC
 </div>
 </div>
 </body>
