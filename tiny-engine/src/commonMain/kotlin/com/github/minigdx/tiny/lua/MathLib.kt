@@ -117,6 +117,7 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
                 "If a table is passed, it'll return a random element of the table."
         )
         override fun call(@TinyArg("until")arg: LuaValue): LuaValue {
+            if (arg.isnil()) return call()
             return if (arg.istable()) {
                 val table = arg.checktable()!!
                 val index = Random.nextInt(1, table.length() + 1)
