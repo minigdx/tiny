@@ -111,6 +111,56 @@ function Particle:draw()
     shape.circlef(self.x, self.y, self.radius, self.color)
 end
 
+-- Bricks
+local Brick = {
+    -- position
+    x = 0,
+    y = 0,
+    start_y = 0,
+    -- size
+    width = 16,
+    height = 8,
+    -- sprite
+    color = 0,
+    hit = nil,
+    offset = -4,
+    progress = 0,
+}
+
+function Brick:update()
+    self.progress = self.progress + 1 / 20
+    self.y = juice.pow2(self.start_y - 20, self.start_y, math.min(1.0, self.progress))
+
+    if self.hit then
+        self.hit = self.hit - 1
+        return self.hit <= 0 -- is the brick should be destroyed?
+    end
+    for ball in all(balls) do
+        local collisionX = check_collision(
+                { x = self.x, y = self.y, width = 16, height = 8 },
+                { x = ball.new_x, y = ball.y, width = ball.width, height = ball.height }
+        )
+        local collisionY = check_collision(
+                { x = self.x, y = self.y, width = 16, height = 8 },
+                { x = ball.x, y = ball.new_y, width = ball.width, height = ball.height }
+        )
+        if collisionX then
+            ball.accept_move_x = false
+            ball.speed.x = ball.speed.x * -1
+        end
+
+        if collisionY then
+            ball.accept_move_y = false
+            ball.speed.y = ball.speed.y * -1
+        end
+
+        if collisionX or collisionY then
+            self.hit = 6
+        end
+    end
+    return false
+end
+
 function _init()
     transition = new(GameOut)
 
@@ -158,21 +208,20 @@ function _init()
     bricks = {}
     for y = 1, 6 do
         for x = 1, 14 do
-            table.insert(bricks, {
+            table.insert(bricks, new(Brick, {
                 x = x * 16,
-                yy = y * 8,
                 y = y * 8,
+                start_y = y * 8,
                 color = math.rnd(2),
-                offset = -4,
                 progress = x * -0.2 + y * -0.08,
-                hit = nil,
-            })
+            }))
         end
     end
 
     particles = {}
 end
 
+-- FIXME: replace with class and use the term paddle
 function create_raquette(y)
     return {
         x = 128 - 16, -- center the raquette
@@ -361,38 +410,8 @@ function _update()
     end
 
     for index, b in rpairs(bricks) do
-        b.progress = b.progress + 1 / 20
-        b.y = juice.pow2(b.yy - 20, b.yy, math.min(1.0, b.progress))
-
-        if b.hit then
-            b.hit = b.hit - 1
-            if b.hit <= 0 then
-                table.remove(bricks, index)
-            end
-        else
-            for ball in all(balls) do
-                local collisionX = check_collision(
-                        { x = b.x, y = b.y, width = 16, height = 8 },
-                        { x = ball.new_x, y = ball.y, width = ball.width, height = ball.height }
-                )
-                local collisionY = check_collision(
-                        { x = b.x, y = b.y, width = 16, height = 8 },
-                        { x = ball.x, y = ball.new_y, width = ball.width, height = ball.height }
-                )
-                if collisionX then
-                    ball.accept_move_x = false
-                    ball.speed.x = ball.speed.x * -1
-                end
-
-                if collisionY then
-                    ball.accept_move_y = false
-                    ball.speed.y = ball.speed.y * -1
-                end
-
-                if collisionX or collisionY then
-                    b.hit = 6
-                end
-            end
+        if b:update() then
+            table.remove(bricks, index)
         end
     end
 
