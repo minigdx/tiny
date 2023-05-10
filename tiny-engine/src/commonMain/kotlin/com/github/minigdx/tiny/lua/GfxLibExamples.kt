@@ -26,18 +26,21 @@ end
 
 //language=Lua
 const val GFX_CLIP_EXAMPLE = """
+function _init()
+  c = {}
+  for i=1,100 do
+    table.insert(c, {x=math.rnd(256), y=math.rnd(256), c = math.rnd(1,12)})
+end
+
+end
 function _draw()
   gfx.cls()
+  local pos = ctrl.touch()
   -- set a clip area to crop circles
-  gfx.clip(20, 20, 80, 80)
-  shape.circlef(20, 20, 20, 2)
-  shape.circlef(100, 20, 20, 2)
-
-  -- reset the clip area
-  gfx.clip()
-  shape.circlef(20, 20, 10, 3)
-  shape.circlef(100, 20, 10, 3)
-
+  gfx.clip(pos.x - 20, pos.y - 20, 40, 40)
+  for circle in all(c) do
+    shape.circlef(circle.x, circle.y, 10, circle.c)
+  end
 end
 """
 
