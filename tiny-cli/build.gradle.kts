@@ -40,7 +40,6 @@ dependencies {
 
 application {
     mainClass.set("com.github.minigdx.tiny.cli.MainKt")
-    applicationDefaultJvmArgs = listOf("-XstartOnFirstThread")
 
     // Copy the JARs from the Kotlin MPP dependencies.
     this.applicationDistribution.from(
