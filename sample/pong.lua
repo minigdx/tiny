@@ -25,7 +25,11 @@ function EndOut:update()
     self.radius = juice.powIn5(self.start_radius, self.target_radius, self.t / self.duration)
 
     if (self.radius >= 300) then
+        for b in all(balls) do
+            b:reset()
+        end
         transition = new(GameOut)
+        game.started = false
     end
 end
 
@@ -111,6 +115,196 @@ function Particle:draw()
     shape.circlef(self.x, self.y, self.radius, self.color)
 end
 
+-- Bricks
+local Brick = {
+    -- position
+    x = 0,
+    y = 0,
+    start_y = 0,
+    -- size
+    width = 16,
+    height = 8,
+    -- sprite
+    color = 0,
+    hit = nil,
+    offset = -4,
+    progress = 0,
+}
+
+function Brick:update()
+    self.progress = self.progress + 1 / 20
+    self.y = juice.pow2(self.start_y - 20, self.start_y, math.min(1.0, self.progress))
+
+    if self.hit then
+        self.hit = self.hit - 1
+        return self.hit <= 0 -- is the brick should be destroyed?
+    end
+    for ball in all(balls) do
+        local collisionX = check_collision(
+                { x = self.x, y = self.y, width = 16, height = 8 },
+                { x = ball.new_x, y = ball.y, width = ball.width, height = ball.height }
+        )
+        local collisionY = check_collision(
+                { x = self.x, y = self.y, width = 16, height = 8 },
+                { x = ball.x, y = ball.new_y, width = ball.width, height = ball.height }
+        )
+        if collisionX then
+            ball.accept_move_x = false
+            ball.speed.x = ball.speed.x * -1
+        end
+
+        if collisionY then
+            ball.accept_move_y = false
+            ball.speed.y = ball.speed.y * -1
+        end
+
+        if collisionX or collisionY then
+            self.hit = 6
+
+            table.insert(particles, new(Particle,
+                    {
+                        x = self.x,
+                        y = self.y,
+                        dir = { x = 0, y = -0.2, r = 0 },
+                        draw = function(self)
+                            local c = 2
+                            print("+1", self.x + 1, self.y, c)
+                            print("+1", self.x - 1, self.y, c)
+                            print("+1", self.x, self.y + 1, c)
+                            print("+1", self.x, self.y - 1, c)
+                            print("+1", self.x, self.y, math.rnd({ 8, 7, 14 }))
+                        end
+                    }
+            ))
+        end
+    end
+    return false
+end
+
+local Ball = {
+    x = 0,
+    y = 0,
+    width = 7,
+    height = 7,
+    speed = { x = 3, y = -3 },
+    glue_to = true,
+    new_x = 0,
+    new_y = 0,
+    accept_move_x = true,
+    accept_move_y = true,
+}
+
+function Ball:reset()
+    local r = raquettes[1]
+
+    self.x = r.x + r.width * 0.5 - 7 * 0.5
+    self.y = r.y - 7
+    self.speed = { x = 3, y = -3 }
+    self.new_x = r.x + r.width * 0.5 - 7 * 0.5
+    self.new_y = r.y - 7
+    self.accept_move_x = true
+    self.accept_move_y = true
+    self.glue_to = true
+
+    return self
+end
+
+function Ball:update()
+    self.accept_move_x = true
+    self.accept_move_y = true
+
+    if (ctrl.touched(0) or ctrl.pressed(keys.space)) then
+        -- release the ball
+        self.glue_to = false
+    end
+
+    if self.glue_to then
+        local r = raquettes[1]
+        self.new_x = r.x + r.width * 0.5 - 7 * 0.5
+        self.new_y = r.y - 7
+
+        if ctrl.pressing(keys.left) then
+            self.speed.x = -1
+        elseif ctrl.pressing(keys.right) then
+            self.speed.x = 1
+        end
+
+        local touch = ctrl.touching(0)
+        if touch then
+            if touch.x < (r.x + r.width * 0.5) then
+                self.speed.x = -1
+            else
+                self.speed.x = 1
+            end
+        end
+    else
+        self.new_x = self.x + self.speed.x
+        self.new_y = self.y + self.speed.y
+
+        -- hit walls?
+        if self.new_x > 256 then
+            self.speed.x = -self.speed.x
+            self.accept_move_x = false
+        elseif self.new_x < 0 then
+            self.speed.x = -self.speed.x
+            self.accept_move_x = false
+        end
+
+        if self.new_y < 0 then
+            self.speed.y = -self.speed.y
+            self.accept_move_y = false
+        end
+
+        -- hit paddles ?
+        if self.new_y >= raquettes[1].y then
+            for r in all(raquettes) do
+                -- raquette collision
+                local collision = check_collision(
+                        { x = r.x, y = r.y, width = 32, height = 8 },
+                        { x = self.new_x, y = self.new_y, width = self.width, height = self.height }
+                )
+                if collision then
+                    self.speed.y = -self.speed.y
+                    self.accept_move_y = false
+                end
+
+            end
+        end
+
+        table.insert(particles, new(Particle, {
+            x = self.x + 3 + math.rnd(-2, 2),
+            y = self.y + 3 + math.rnd(-2, 2),
+            ttl = 0.4,
+            dir = { x = 0, y = 0, r = -0.3 },
+            radius = 4,
+            color = 8
+        }))
+    end
+end
+
+function Ball:valid_move()
+    if self.accept_move_x then
+        self.x = self.new_x
+    end
+    if self.accept_move_y then
+        self.y = self.new_y
+    end
+
+    if not self.accept_move_x or not self.accept_move_y then
+        for i = 1, 3 do
+            table.insert(particles, new(Particle, {
+                x = self.x + 3 + math.rnd(-1, 1),
+                y = self.y + 3 + math.rnd(-1, 1),
+                ttl = 1.5,
+                dir = { x = -self.speed.x * 0.1, y = -self.speed.y * 0.1, r = -0.1 },
+                radius = 5,
+                color = math.rnd({ 8, 7, 14 })
+            }))
+        end
+    end
+    return self.y > 256
+end
+
 function _init()
     transition = new(GameOut)
 
@@ -141,38 +335,26 @@ function _init()
     local r = raquettes[1]
 
     balls = {
-        {
-            x = r.x + r.width * 0.5 - 7 * 0.5,
-            y = r.y - 7,
-            width = 7,
-            height = 7,
-            speed = { x = 3, y = -3 },
-            glue_to = true,
-            new_x = r.x + r.width * 0.5 - 7 * 0.5,
-            new_y = r.y - 7,
-            accept_move_x = true,
-            accept_move_y = true,
-        }
+        new(Ball):reset()
     }
 
     bricks = {}
     for y = 1, 6 do
         for x = 1, 14 do
-            table.insert(bricks, {
+            table.insert(bricks, new(Brick, {
                 x = x * 16,
-                yy = y * 8,
                 y = y * 8,
+                start_y = y * 8,
                 color = math.rnd(2),
-                offset = -4,
                 progress = x * -0.2 + y * -0.08,
-                hit = nil,
-            })
+            }))
         end
     end
 
     particles = {}
 end
 
+-- FIXME: replace with class and use the term paddle
 function create_raquette(y)
     return {
         x = 128 - 16, -- center the raquette
@@ -290,136 +472,20 @@ function _update()
     update_raquettes()
 
     for index, b in rpairs(balls) do
-        b.accept_move_x = true
-        b.accept_move_y = true
-
-        if (ctrl.touched(0) or ctrl.pressed(keys.space)) then
-            b.glue_to = false
-        end
-        if b.glue_to then
-            local r = raquettes[1]
-            b.new_x = r.x + r.width * 0.5 - 7 * 0.5
-            b.new_y = r.y - 7
-
-            if ctrl.pressing(keys.left) then
-                b.speed.x = -1
-            elseif ctrl.pressing(keys.right) then
-                b.speed.x = 1
-            end
-
-            local touch = ctrl.touching(0)
-            if touch then
-                if touch.x < (r.x + r.width * 0.5) then
-                    b.speed.x = -1
-                else
-                    b.speed.x = 1
-                end
-            end
-        else
-            b.new_x = b.x + b.speed.x
-            b.new_y = b.y + b.speed.y
-
-            -- hit walls?
-            if b.new_x > 256 then
-                b.speed.x = -b.speed.x
-                b.accept_move_x = false
-            elseif b.new_x < 0 then
-                b.speed.x = -b.speed.x
-                b.accept_move_x = false
-            end
-
-            if b.new_y < 0 then
-                b.speed.y = -b.speed.y
-                b.accept_move_y = false
-            end
-
-            -- hit raquettes ?
-            if b.new_y >= 220 then
-                for r in all(raquettes) do
-                    -- raquette collision
-                    local collision = check_collision(
-                            { x = r.x, y = r.y, width = 32, height = 8 },
-                            { x = b.new_x, y = b.new_y, width = b.width, height = b.height }
-                    )
-                    if collision then
-                        b.speed.y = -b.speed.y
-                        b.accept_move_y = false
-                    end
-
-                end
-            end
-
-            table.insert(particles, new(Particle, {
-                x = b.x + 3 + math.rnd(-2, 2),
-                y = b.y + 3 + math.rnd(-2, 2),
-                ttl = 0.4,
-                dir = { x = 0, y = 0, r = -0.3 },
-                radius = 4,
-                color = 8
-            }))
-        end
+        b:update()
     end
 
     for index, b in rpairs(bricks) do
-        b.progress = b.progress + 1 / 20
-        b.y = juice.pow2(b.yy - 20, b.yy, math.min(1.0, b.progress))
-
-        if b.hit then
-            b.hit = b.hit - 1
-            if b.hit <= 0 then
-                table.remove(bricks, index)
-            end
-        else
-            for ball in all(balls) do
-                local collisionX = check_collision(
-                        { x = b.x, y = b.y, width = 16, height = 8 },
-                        { x = ball.new_x, y = ball.y, width = ball.width, height = ball.height }
-                )
-                local collisionY = check_collision(
-                        { x = b.x, y = b.y, width = 16, height = 8 },
-                        { x = ball.x, y = ball.new_y, width = ball.width, height = ball.height }
-                )
-                if collisionX then
-                    ball.accept_move_x = false
-                    ball.speed.x = ball.speed.x * -1
-                end
-
-                if collisionY then
-                    ball.accept_move_y = false
-                    ball.speed.y = ball.speed.y * -1
-                end
-
-                if collisionX or collisionY then
-                    b.hit = 6
-                end
-            end
+        if b:update() then
+            table.remove(bricks, index)
         end
     end
 
     for index, b in rpairs(balls) do
-        if b.accept_move_x then
-            b.x = b.new_x
-        end
-        if b.accept_move_y then
-            b.y = b.new_y
-        end
-
-        if not b.accept_move_x or not b.accept_move_y then
-            for i = 1, 3 do
-                table.insert(particles, new(Particle, {
-                    x = b.x + 3 + math.rnd(-1, 1),
-                    y = b.y + 3 + math.rnd(-1, 1),
-                    ttl = 1.5,
-                    dir = { x = -b.speed.x * 0.1, y = -b.speed.y * 0.1, r = -0.1 },
-                    radius = 5,
-                    color = math.rnd({ 8, 7, 14 })
-                }))
-            end
-        end
-        if b.y > 256 then
+        if b:valid_move() then
+            b:reset()
             game.lost = true
             transition = new(EndIn)
-            table.remove(balls, index)
         end
     end
 
