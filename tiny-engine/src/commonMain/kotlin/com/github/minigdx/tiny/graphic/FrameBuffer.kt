@@ -11,6 +11,11 @@ class Blender(private val gamePalette: ColorPalette) {
 
     private var dithering: Int = 0xFFFF
 
+    internal val hasDithering: Boolean
+        get() {
+            return dithering != 0xFFFF
+        }
+
     fun dither(pattern: Int) {
         dithering = pattern and 0xFFFF
     }
@@ -99,6 +104,33 @@ class FrameBuffer(
         tmp[0] = gamePalette.check(colorIndex)
         val index = blender.mix(tmp, cx, cy, transparency) ?: return
         colorIndexBuffer.set(cx, cy, index[0])
+    }
+
+    fun fill(startX: Pixel, endX: Pixel, y: Pixel, colorIndex: ColorIndex) {
+        val cy = camera.cy(y)
+        val leftX = min(startX, endX)
+        val rightX = max(startX, endX)
+        // fill outside the screen?
+        if (cy !in clipper.top..clipper.bottom - 1) return
+        val left = max(camera.cx(leftX), clipper.left)
+        val right = min(camera.cx(rightX), clipper.right)
+
+        // nothing to do because out of the screen or no pixel.
+        if (left == right || left >= clipper.right || right < clipper.left) {
+            return
+        }
+        val color = gamePalette.check(colorIndex)
+
+        // can't optimise if there is some dithering
+        if (blender.hasDithering) {
+            (left..right).forEach { x ->
+                pixel(x, y, colorIndex)
+            }
+        } else {
+            tmp[0] = color
+            val targetColor = blender.mix(tmp, 0, 0, transparency) ?: return
+            colorIndexBuffer.fill(left, right, cy, targetColor[0])
+        }
     }
 
     fun clear(clearIndx: Int) {

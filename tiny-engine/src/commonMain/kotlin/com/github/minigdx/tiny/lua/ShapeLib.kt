@@ -170,10 +170,9 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
             var p = (radiusY * radiusY) - (radiusX * radiusX * radiusY) + ((radiusX * radiusX) / 4)
 
             while (2 * x * radiusY * radiusY <= 2 * y * radiusX * radiusX) {
-                for (i in centerX - x..centerX + x) {
-                    frameBuffer.pixel(i, centerY + y, color)
-                    frameBuffer.pixel(i, centerY - y, color)
-                }
+                // filled oval
+                frameBuffer.fill(centerX - x, centerX + x, centerY + y, color)
+                frameBuffer.fill(centerX - x, centerX + x, centerY - y, color)
 
                 x++
 
@@ -189,10 +188,9 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
                 (radiusY * radiusY) * (x * x + x) + (radiusX * radiusX) * (y * y - y) - (radiusX * radiusX * radiusY * radiusY)
 
             while (y >= 0) {
-                for (i in centerX - x..centerX + x) {
-                    frameBuffer.pixel(i, centerY + y, color)
-                    frameBuffer.pixel(i, centerY - y, color)
-                }
+                // filled oval
+                frameBuffer.fill(centerX - x, centerX + x, centerY + y, color)
+                frameBuffer.fill(centerX - x, centerX + x, centerY - y, color)
 
                 y--
 
@@ -219,10 +217,8 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
             val height = args.arg(4).checkint()
             val color = args.arg(5).checkColorIndex()
 
-            for (i in x until x + width) {
-                for (j in y until y + height) {
-                    resourceAccess.frameBuffer.pixel(i, j, color)
-                }
+            for (j in y until y + height) {
+                resourceAccess.frameBuffer.fill(x, x + width, j, color)
             }
             return NONE
         }
@@ -266,14 +262,10 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
                 resourceAccess.frameBuffer.pixel(centerX - y, centerY - x, color)
 
                 // Fill the circle
-                for (i in centerX - x..centerX + x) {
-                    resourceAccess.frameBuffer.pixel(i, centerY + y, color)
-                    resourceAccess.frameBuffer.pixel(i, centerY - y, color)
-                }
-                for (i in centerX - y..centerX + y) {
-                    resourceAccess.frameBuffer.pixel(i, centerY + x, color)
-                    resourceAccess.frameBuffer.pixel(i, centerY - x, color)
-                }
+                resourceAccess.frameBuffer.fill(centerX - x, centerX + x, centerY + y, color)
+                resourceAccess.frameBuffer.fill(centerX - x, centerX + x, centerY - y, color)
+                resourceAccess.frameBuffer.fill(centerX - y, centerX + y, centerY + x, color)
+                resourceAccess.frameBuffer.fill(centerX - y, centerX + y, centerY - x, color)
 
                 if (dst < 0) {
                     dst += 4 * x + 6

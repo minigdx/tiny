@@ -134,4 +134,17 @@ class PixelArrayTest {
 
         assertEquals(inv.toString(), target.toString())
     }
+
+    @Test
+    fun fill_fill_a_line() {
+        val source = PixelArray(3, 3, RGBA)
+        source.fill(0, 3, 0, 2)
+
+        val target = PixelArray(3, 3, RGBA)
+        target.set(0, 0, 2, 2, 2, 2)
+        target.set(1, 0, 2, 2, 2, 2)
+        target.set(2, 0, 2, 2, 2, 2)
+
+        assertEquals(target.toString(), source.toString())
+    }
 }

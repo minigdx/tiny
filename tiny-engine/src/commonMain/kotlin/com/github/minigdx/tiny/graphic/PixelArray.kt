@@ -119,6 +119,11 @@ class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = Pix
 
     operator fun iterator(): Iterator<Int> = pixels.iterator()
 
+    fun fill(startX: Int, endX: Int, y: Int, value: Int) {
+        val yy = (y * width * pixelFormat)
+        pixels.fill(value, yy + startX * pixelFormat, yy + endX * pixelFormat)
+    }
+
     override fun toString(): String {
         val lineSize = width * pixelFormat
         var current = 0
