@@ -17,17 +17,28 @@ import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.webgl.WebGlPlatform
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.browser.document
+import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.dom.createElement
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.HTMLTextAreaElement
+import org.w3c.dom.url.URLSearchParams
 
 fun main() {
     val rootPath = getRootPath()
 
     val elts = document.getElementsByTagName("tiny-editor")
+
+    val url = URLSearchParams(window.location.search)
+    val savedCode = url.get("game")
+    val decodedCode = if (savedCode?.isNotBlank() == true) {
+        window.atob(savedCode)
+    } else {
+        null
+    }
+
     elts.forEachIndexed { index, game ->
         val code = game.textContent ?: ""
 
@@ -43,14 +54,21 @@ fun main() {
         }
         link.after(playLink)
 
+        val codeToUse = decodedCode ?: "-- Update the code to update the game!\n$code"
+
         var clicked = false
         link.textContent = "\uD83D\uDC7E ▶ Try an example"
         link.onclick = { _ ->
             if (!clicked) {
-                createGame(playLink, index, code, rootPath)
+                createGame(playLink, index, codeToUse, rootPath)
                 clicked = true
             }
             true
+        }
+
+        // There is a user code. Let's unfold the game.
+        if (savedCode != null) {
+            createGame(playLink, index, codeToUse, rootPath)
         }
     }
 }
@@ -73,9 +91,19 @@ private fun createGame(
         setAttribute("id", "editor-$index")
         setAttribute("spellcheck", "false")
         setAttribute("class", "tiny-textarea")
-        innerHTML = "-- Update the code to update the game!\n" + code
+
+        innerHTML = code
     }
     container.appendChild(textarea)
+
+    val link = (document.createElement("a") as HTMLAnchorElement).apply {
+        val b64 = window.btoa(code)
+        id = "share-$index"
+        href = "sandbox.html?game=$b64"
+        textContent = "\uD83D\uDD17 Share this game!"
+    }
+
+    container.after(link)
 
     val logger = StdOutLogger("tiny-editor-$index")
 
@@ -147,7 +175,5 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
     }
 
     override fun createImageStream(name: String): SourceStream<ImageData> = delegate.createImageStream(name)
-    override fun createSoundStream(name: String): SourceStream<SoundData> {
-        TODO("Not yet implemented")
-    }
+    override fun createSoundStream(name: String): SourceStream<SoundData> = delegate.createSoundStream(name)
 }
