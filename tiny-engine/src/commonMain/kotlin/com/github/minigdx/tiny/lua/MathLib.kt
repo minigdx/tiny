@@ -34,10 +34,10 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
 
         @TinyCall("Return the sign of the number.")
         override fun call(@TinyArg("number") arg: LuaValue): LuaValue {
-            return if (arg.toint() >= 0) {
-                valueOf(1)
+            return if (arg.todouble() >= 0) {
+                ONE
             } else {
-                valueOf(-1)
+                MINUS_ONE
             }
         }
     }
@@ -116,7 +116,7 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
             "Generate a random value between 1 until the argument. " +
                 "If a table is passed, it'll return a random element of the table."
         )
-        override fun call(@TinyArg("until")arg: LuaValue): LuaValue {
+        override fun call(@TinyArg("until") arg: LuaValue): LuaValue {
             if (arg.isnil()) return call()
             return if (arg.istable()) {
                 val table = arg.checktable()!!
@@ -132,11 +132,16 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
         }
 
         @TinyCall("Generate a random value between a and b.")
-        override fun call(@TinyArg("a")arg1: LuaValue, @TinyArg("b")arg2: LuaValue): LuaValue {
+        override fun call(@TinyArg("a") arg1: LuaValue, @TinyArg("b") arg2: LuaValue): LuaValue {
             if (arg2.isnil()) {
                 return call(arg1)
             }
             return valueOf(Random.nextInt(arg1.toint(), arg2.toint()))
         }
+    }
+
+    companion object {
+
+        private val MINUS_ONE = valueOf(-1)
     }
 }
