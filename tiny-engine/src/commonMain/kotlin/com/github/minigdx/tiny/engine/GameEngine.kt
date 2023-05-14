@@ -296,6 +296,8 @@ class GameEngine(
                 logger.debug("GAME_ENGINE") {
                     "Stop $name to switch the next game script ${scripts[current]?.name}"
                 }
+                // Reevaluate the game to flush the previous state.
+                scripts[current]?.evaluate()
                 scripts[current]?.setState(state)
             } else if (reload) {
                 clear()
