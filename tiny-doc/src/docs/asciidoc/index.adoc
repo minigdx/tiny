@@ -36,6 +36,8 @@ Contributions from the community are welcome, and can help to improve the overal
 
 TIP: You can improve this documentation by updating https://github.com/minigdx/tiny/tree/main/tiny-doc/src/docs/asciidoc[the code of this documentation]
 
+include::tiny-install.adoc[]
+
 include::tiny-tutorial.adoc[]
 
 include::tiny-cli.adoc[]
