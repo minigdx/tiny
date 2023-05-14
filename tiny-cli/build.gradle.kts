@@ -40,6 +40,7 @@ dependencies {
 
 application {
     mainClass.set("com.github.minigdx.tiny.cli.MainKt")
+    // applicationDefaultJvmArgs = listOf("-XstartOnFirstThread")
 
     // Copy the JARs from the Kotlin MPP dependencies.
     this.applicationDistribution.from(
@@ -85,4 +86,9 @@ val macStartScripts = project.tasks.register("startScriptsForMac", CreateStartSc
     conventionMapping.map("defaultJvmOpts") { listOf("-XstartOnFirstThread") }
 
     modularity.inferModulePath.convention(startScripts.modularity.inferModulePath)
+}
+
+project.afterEvaluate {
+    project.tasks["distTar"].dependsOn(macStartScripts)
+    project.tasks["distZip"].dependsOn(macStartScripts)
 }

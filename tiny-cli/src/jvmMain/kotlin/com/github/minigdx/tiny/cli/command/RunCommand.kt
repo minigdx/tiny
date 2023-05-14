@@ -21,11 +21,26 @@ class RunCommand : CliktCommand("run") {
         .file(mustExist = true, canBeDir = true, canBeFile = false)
         .default(File("."))
 
+    fun isOracleOrOpenJDK(): Boolean {
+        val vendor = System.getProperty("java.vendor")?.lowercase()
+        return vendor?.contains("oracle") == true || vendor?.contains("eclipse") == true || vendor?.contains("openjdk") == true
+    }
+
+    fun isMacOS(): Boolean {
+        val os = System.getProperty("os.name").lowercase()
+        return os.contains("mac") || os.contains("darwin")
+    }
+
     override fun run() {
+        if (isMacOS() && isOracleOrOpenJDK()) {
+            echo("\uD83D\uDEA7 === The Tiny CLI on Mac with require a special option.")
+            echo("\uD83D\uDEA7 === If the application crash ➡ use the command 'tiny-cli-mac' instead.")
+        }
+
         try {
             val configFile = gameDirectory.resolve("_tiny.json")
             if (!configFile.exists()) {
-                echo("No _tiny.json")
+                echo("\uD83D\uDE2D No _tiny.json found! Can't run the game without.")
                 throw Abort()
             }
             val gameParameters = GameParameters.JSON.decodeFromStream<GameParameters>(FileInputStream(configFile))
