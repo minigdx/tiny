@@ -37,10 +37,15 @@ class ServeCommand : CliktCommand(name = "serve") {
 
     override fun run() {
         // Get the zip
-        if (game.isDirectory) TODO("Game as directory not supported yet")
+        val zipFile = if (game.isDirectory) {
+            GameExporter().export(game, "tiny-export.zip")
+            game.resolve("tiny-export.zip")
+        } else {
+            game
+        }
 
         // Uncompressed in memory
-        val zip = ZipInputStream(FileInputStream(game))
+        val zip = ZipInputStream(FileInputStream(zipFile))
 
         var entry = zip.nextEntry
         while (entry != null) {

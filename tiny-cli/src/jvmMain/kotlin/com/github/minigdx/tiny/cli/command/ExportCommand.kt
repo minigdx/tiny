@@ -25,8 +25,20 @@ class ExportCommand : CliktCommand("export") {
     val archive by option(help = "The name of the exported archive.")
         .default("tiny-export.zip")
 
+    private val gameExporter = GameExporter()
+
     override fun run() {
         echo("\uD83D\uDC77 Export ${gameDirectory.absolutePath}")
+
+        gameExporter.export(gameDirectory, archive)
+
+        echo("\uD83C\uDF89 Congratulation! Your game has been exported in the $archive file.")
+    }
+}
+
+class GameExporter {
+
+    fun export(gameDirectory: File, archive: String) {
 
         val configFile = gameDirectory.resolve("_tiny.json")
         val gameParameters = JSON.decodeFromStream<GameParameters>(FileInputStream(configFile))
@@ -99,7 +111,6 @@ class ExportCommand : CliktCommand("export") {
         }
 
         exportedGame.close()
-        echo("\uD83C\uDF89 Congratulation! Your game has been exported in the $archive file.")
     }
 
     private fun replaceList(template: String, values: List<String>, tag: String, delimiter: String): String {
