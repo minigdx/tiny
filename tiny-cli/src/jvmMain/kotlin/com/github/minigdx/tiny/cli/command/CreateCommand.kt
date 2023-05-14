@@ -74,25 +74,25 @@ class CreateCommand : CliktCommand(name = "create") {
             """Please choose a game color palette:
 ${
             GamePalette.ALL.mapIndexed { index, gamePalette ->
-                "[$index] ${gamePalette.name}"
+                "[${index + 1}] ${gamePalette.name}"
             }.joinToString("\n")
             }
 """
         )
 
     override fun run() {
-        echo("Game Name: $gameName")
-        echo("Game Resolution: $gameResolution")
-        echo("Game Resolution: $spriteSize")
-        echo("Sprite Sheet Filenames: ${spritesheets.ifBlank { "No spritesheet added!" }}")
-        echo("Color palette: ${GamePalette.ALL[palette].name}")
+        echo("➡\uFE0F Game Name: $gameName")
+        echo("➡\uFE0F Game Resolution: $gameResolution")
+        echo("➡\uFE0F Game Resolution: $spriteSize")
+        echo("➡\uFE0F Sprite Sheet Filenames: ${spritesheets.ifBlank { "No spritesheet added!" }}")
+        echo("➡\uFE0F Color palette: ${GamePalette.ALL[palette - 1].name}")
 
         val configuration = GameParametersV1(
             name = gameName,
             resolution = gameResolution.toSize(),
             sprites = spriteSize.toSize(),
             zoom = zoom,
-            colors = GamePalette.ALL[palette].colors,
+            colors = GamePalette.ALL[palette - 1].colors,
             scripts = listOf(gameScript)
         ) as GameParameters
 
@@ -105,8 +105,8 @@ ${
 
         gameDirectory.resolve(gameScript).writeText(DEFAULT_GAME_SCRIPT)
 
-        echo("Game created into: ${gameDirectory.absolutePath}")
-        echo("To run the game: tiny-cli run ${gameDirectory.absolutePath}")
+        echo("\uD83C\uDFD7\uFE0F  Game created into: ${gameDirectory.absolutePath}")
+        echo("\uD83C\uDFC3\u200D♂\uFE0F To run the game: tiny-cli run ${gameDirectory.absolutePath}")
     }
 
     private fun String.toSize(): Size {

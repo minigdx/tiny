@@ -3,6 +3,8 @@ package com.github.minigdx.tiny.cli.command
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.default
+import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.minigdx.tiny.cli.config.GameParameters
 import com.github.minigdx.tiny.cli.config.GameParameters.Companion.JSON
@@ -20,13 +22,16 @@ class ExportCommand : CliktCommand("export") {
         .file(mustExist = true, canBeDir = true, canBeFile = false)
         .default(File("."))
 
+    val archive by option(help = "The name of the exported archive.")
+        .default("tiny-export.zip")
+
     override fun run() {
-        echo("Export ${gameDirectory.absolutePath}")
+        echo("\uD83D\uDC77 Export ${gameDirectory.absolutePath}")
 
         val configFile = gameDirectory.resolve("_tiny.json")
         val gameParameters = JSON.decodeFromStream<GameParameters>(FileInputStream(configFile))
 
-        val exportedGame = ZipOutputStream(FileOutputStream("export.zip"))
+        val exportedGame = ZipOutputStream(FileOutputStream(archive))
 
         // Add all engine files into the zip
         ENGINE_FILES.forEach { name ->
@@ -94,6 +99,7 @@ class ExportCommand : CliktCommand("export") {
         }
 
         exportedGame.close()
+        echo("\uD83C\uDF89 Congratulation! Your game has been exported in the $archive file.")
     }
 
     private fun replaceList(template: String, values: List<String>, tag: String, delimiter: String): String {

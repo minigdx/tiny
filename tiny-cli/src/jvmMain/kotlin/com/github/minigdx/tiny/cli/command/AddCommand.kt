@@ -48,6 +48,7 @@ class AddCommand : CliktCommand(name = "add") {
                     gameParameters = gameParameters.addLevel(r)
                 }
             }
+            echo("➕$r added into your game!")
         }
 
         // Save the updated _tiny.json

@@ -40,7 +40,7 @@ class RunCommand : CliktCommand("run") {
                 logger = logger,
             ).main()
         } catch (ex: Exception) {
-            echo("An unexpected exception occurred. The application will stop. It might be a bug in Tiny. If so, please report it.")
+            echo("\uD83E\uDDE8 An unexpected exception occurred. The application will stop. It might be a bug in Tiny. If so, please report it.")
             ex.printStackTrace()
         }
     }

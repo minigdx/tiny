@@ -101,6 +101,8 @@ class ServeCommand : CliktCommand(name = "serve") {
         // Start a webserver using ktor
         // Creates a Netty server
         val server = embeddedServer(Netty, port = port, module = method)
+
+        echo("\uD83D\uDE80 Try your game on http://localhost:$port with your browser.")
         // Starts the server and waits for the engine to stop and exits.
         server.start(wait = true)
         // start a browser to the address
