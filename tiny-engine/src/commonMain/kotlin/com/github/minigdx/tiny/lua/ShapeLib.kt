@@ -8,8 +8,10 @@ import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameResourceAccess
+import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
+import org.luaj.vm2.LuaValue.Companion.valueOf
 import org.luaj.vm2.Varargs
 import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.TwoArgFunction
@@ -31,6 +33,8 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
         shp["rectf"] = rectf()
         shp["circle"] = circle()
         shp["circlef"] = circlef()
+        shp["trianglef"] = trianglef()
+        shp["triangle"] = triangle()
 
         arg2.set("shape", shp)
         arg2.get("package").get("loaded").set("shape", shp)
@@ -385,6 +389,111 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
                 }
                 x++
             }
+            return NONE
+        }
+    }
+
+    @TinyFunction("Draw a filled triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3) and color.")
+    inner class trianglef : LibFunction() {
+
+        @TinyCall("Draw a filled triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).")
+        override fun invoke(
+            @TinyArgs(arrayOf("x1", "y1", "x2", "y2", "x3", "y3", "color")) args: Varargs
+        ): Varargs {
+            if (args.narg() < 7) throw LuaError("Expected 7 args")
+
+            val x1 = args.checkint(1)
+            val y1 = args.checkint(2)
+            val x2 = args.checkint(3)
+            val y2 = args.checkint(4)
+            val x3 = args.checkint(5)
+            val y3 = args.checkint(6)
+            val color = args.arg(7).checkColorIndex()
+
+            // Sort the vertices from top to bottom
+            val vertices = listOf(Pair(x1, y1), Pair(x2, y2), Pair(x3, y3))
+            val sortedVertices = vertices.sortedBy { it.second }
+
+            // Retrieve the sorted vertices
+            val topVertex = sortedVertices[0]
+            val middleVertex = sortedVertices[1]
+            val bottomVertex = sortedVertices[2]
+
+            // Calculate the slopes of the two sides of the triangle
+            val slope1 = (middleVertex.first - topVertex.first).toFloat() / (middleVertex.second - topVertex.second)
+            val slope2 = (bottomVertex.first - topVertex.first).toFloat() / (bottomVertex.second - topVertex.second)
+
+            // Draw the upper part of the triangle
+            for (y in topVertex.second until middleVertex.second) {
+                val xx1 = topVertex.first + ((y - topVertex.second) * slope1).toInt()
+                val xx2 = topVertex.first + ((y - topVertex.second) * slope2).toInt()
+                resourceAccess.frameBuffer.fill(xx1, xx2, y, color)
+            }
+
+            // Calculate the slopes of the two sides of the bottom part of the triangle
+            val slope3 = (bottomVertex.first - middleVertex.first).toFloat() / (bottomVertex.second - middleVertex.second)
+            val slope4 = (bottomVertex.first - topVertex.first).toFloat() / (bottomVertex.second - topVertex.second)
+
+            // Draw the lower part of the triangle
+            for (y in middleVertex.second until bottomVertex.second) {
+                val xx1 = middleVertex.first + ((y - middleVertex.second) * slope3).toInt()
+                val xx2 = topVertex.first + ((y - topVertex.second) * slope4).toInt()
+                resourceAccess.frameBuffer.fill(xx1, xx2, y, color)
+            }
+
+            return NONE
+        }
+    }
+
+    @TinyFunction("Draw a triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3) and color.")
+    inner class triangle : LibFunction() {
+
+        private val line = line()
+
+        @TinyCall("Draw a triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).")
+        override fun invoke(
+            @TinyArgs(arrayOf("x1", "y1", "x2", "y2", "x3", "y3", "color")) args: Varargs
+        ): Varargs {
+            if (args.narg() < 7) throw LuaError("Expected 7 args")
+
+            val x1 = args.checkint(1)
+            val y1 = args.checkint(2)
+            val x2 = args.checkint(3)
+            val y2 = args.checkint(4)
+            val x3 = args.checkint(5)
+            val y3 = args.checkint(6)
+            val color = args.arg(7).checkColorIndex()
+
+            line.invoke(
+                varargsOf(
+                    arrayOf(
+                        valueOf(x1), valueOf(y1),
+                        valueOf(x2), valueOf(y2),
+                        valueOf(color)
+                    )
+                )
+            )
+
+            line.invoke(
+                varargsOf(
+                    arrayOf(
+                        valueOf(x2), valueOf(y2),
+                        valueOf(x3), valueOf(y3),
+                        valueOf(color)
+                    )
+                )
+            )
+
+            line.invoke(
+                varargsOf(
+                    arrayOf(
+                        valueOf(x3), valueOf(y3),
+                        valueOf(x1), valueOf(y1),
+                        valueOf(color)
+                    )
+                )
+            )
+
             return NONE
         }
     }
