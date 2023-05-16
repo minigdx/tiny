@@ -6,9 +6,6 @@ plugins {
 
 repositories {
     mavenCentral()
-    maven {
-        url = uri("https://maven.danielgergely.com/releases/")
-    }
 }
 
 configurations.create("tinyEngineJsZip") {
@@ -25,7 +22,7 @@ dependencies {
 
     jvmMainImplementation(project(":tiny-engine", "jvmRuntimeElements"))!!
         .because("Depends on the JVM Jar containing commons resources in the JAR.")
-    jvmMainImplementation("com.danielgergely.kgl:kgl-lwjgl:0.6.1")
+    jvmMainImplementation("com.github.minigdx:kgl-lwjgl:0.7.2")
 
     jvmMainImplementation("io.ktor:ktor-server-core-jvm:2.3.0")
     jvmMainImplementation("io.ktor:ktor-server-netty-jvm:2.3.0")

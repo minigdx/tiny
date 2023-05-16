@@ -7,9 +7,6 @@ plugins {
 
 repositories {
     mavenCentral()
-    maven {
-        url = uri("https://maven.danielgergely.com/releases/")
-    }
 }
 
 dependencies {
@@ -18,12 +15,12 @@ dependencies {
     // Multiplatform
     this.commonMainImplementation("com.soywiz.korlibs.luak:luak:4.0.0-alpha-2")
     this.commonMainImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-    this.commonMainImplementation("com.danielgergely.kgl:kgl:0.6.1")
+    this.commonMainImplementation("com.github.minigdx:kgl:0.7.2")
     this.commonMainImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
     this.commonMainImplementation(project(":tiny-doc-annotations"))
 
     // JVM Specific
-    this.jvmMainImplementation("com.danielgergely.kgl:kgl-lwjgl:0.6.1")
+    this.jvmMainImplementation("com.github.minigdx:kgl-lwjgl:0.7.2")
 
     this.jvmMainImplementation("org.lwjgl:lwjgl-glfw:3.3.1")
     this.jvmMainImplementation("org.lwjgl:lwjgl-opengl:3.3.1")
@@ -48,7 +45,7 @@ dependencies {
     jsMainImplementation(npm("picoaudio", "1.1.2"))?.because("get midi over web audio API.")
 
     add("kspJvm", project(":tiny-doc-generator")) {
-        because("KSP will generate the asciidoctor documentation of all LUA libs from Tiny.")
+        because("KSP will generate the asciidoctor documentation of all Lua libs from Tiny.")
     }
 }
 

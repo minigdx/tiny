@@ -3,9 +3,6 @@ plugins {
 }
 repositories {
     mavenCentral()
-    maven {
-        url = uri("https://maven.danielgergely.com/releases/")
-    }
 }
 
 dependencies {
