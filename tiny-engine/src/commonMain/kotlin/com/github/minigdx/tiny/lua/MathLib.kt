@@ -15,7 +15,7 @@ import kotlin.random.Random
 
 @TinyLib(
     "math",
-    "Math functions. Please note that standard LUA math methods are also available."
+    "Math functions. Please note that standard Lua math methods are also available."
 )
 class MathLib : org.luaj.vm2.lib.MathLib() {
 

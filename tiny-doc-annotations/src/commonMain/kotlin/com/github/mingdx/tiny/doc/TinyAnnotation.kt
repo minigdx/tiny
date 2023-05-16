@@ -28,7 +28,7 @@ annotation class TinyFunction(
      */
     val name: String = "",
     /**
-     * LUA Code use as example.
+     * Lua Code use as example.
      * This code will be injected in the web documentation.
      */
     val example: String = "",

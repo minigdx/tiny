@@ -158,7 +158,7 @@ class GameScript(
     }
 
     override fun toString(): String {
-        return """--- LUA SCRIPT ($index - $name) ---
+        return """--- Lua SCRIPT ($index - $name) ---
 existed: $exited | evaluated: $evaluated | reload: $reload |
 init: ${initFunction != null} | update: ${updateFunction != null} | draw: ${drawFunction != null} |
             ----

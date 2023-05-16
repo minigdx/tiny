@@ -5,7 +5,7 @@ plugins {
 
 minigdxDeveloper {
     this.name.set("\uD83E\uDDF8 Tiny")
-    this.description.set("Multiplatform 2D Game Engine with fast loop development using Kotlin Multiplatform and LUA")
+    this.description.set("Multiplatform 2D Game Engine with fast loop development using Kotlin Multiplatform and Lua")
     this.projectUrl.set("https://github.com/minigdx/tiny")
     this.licence {
         name.set("MIT Licence")

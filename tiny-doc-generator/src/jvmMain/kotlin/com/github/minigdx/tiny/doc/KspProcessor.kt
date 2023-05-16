@@ -187,7 +187,7 @@ class KspProcessor(
     }
 
     /**
-     * Visit a LUA Function which is defined in Kotlin as follow:
+     * Visit a Lua Function which is defined in Kotlin as follow:
      *
      *
      * ```
