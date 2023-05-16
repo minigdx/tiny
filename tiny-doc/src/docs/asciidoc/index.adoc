@@ -12,9 +12,9 @@ Welcome to the documentation for "Tiny," the virtual console that offers an easy
 
 == Tiny Engine
 
-Despite its modest capabilities, "Tiny" is designed to help you create and test your ideas quickly and effectively. Not only can you run your games on your desktop computer, but you can also export them for the web, making it easy to share your creations with others.
+Despite its modest capabilities, `🧸 Tiny` is designed to help you create and test your ideas quickly and effectively. Not only can you run your games on your desktop computer, but you can also export them for the web, making it easy to share your creations with others.
 
-With "Tiny," you'll be able to get started right away and see your progress in real-time, thanks to its hot reloading feature. This documentation will guide you through the setup and usage of "Tiny," as well as provide you with helpful tips and tricks to make the most out of this powerful tool.
+With `🧸 Tiny`, you'll be able to get started right away and see your progress in real-time, thanks to its hot reloading feature. This documentation will guide you through the setup and usage of `🧸 Tiny` as well as provide you with helpful tips and tricks to make the most out of this powerful tool.
 
 > _Let's get started and unleash your creativity!_
 
@@ -26,11 +26,11 @@ NOTE: The code source of this sample is available in the https://github.com/mini
 
 == Tiny Sandbox
 
-You can try to create a game right away the Tiny Game engine using link:sandbox.html?game=[the Sandbox] or you can just try the engine by updating examples available in this page.
+You can try to create a game right away `🧸 Tiny` using link:sandbox.html?game=[the Sandbox] or you can just try it by updating examples available in this page.
 
 == Tiny is open source
 
-The Tiny Game Engine is an open-source project. Users can contribute to the project by reporting issues, suggesting improvements, and even submitting code changes. https://github.com/minigdx/tiny[Check the code source on Github].
+`🧸 Tiny` is an open-source project. Users can contribute to the project by reporting issues, suggesting improvements, and even submitting code changes. https://github.com/minigdx/tiny[Check the code source on Github].
 
 Contributions from the community are welcome, and can help to improve the overall functionality and usability of the game engine!
 

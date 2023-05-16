@@ -1,6 +1,6 @@
 == Tiny Install
 
-Tiny is a game engine that can be run through its client.
+`🧸 Tiny` is a game engine that can be run through its client.
 Once installed, you can run and develop games in no time!
 
 - Download Tiny CLI on the Github page

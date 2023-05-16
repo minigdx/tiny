@@ -1,6 +1,6 @@
 == Tiny Tutorial
 
-In this tutorial, we'll be creating a simple Pong game using the Lua programming language and the `🧸 Tiny` game engine.
+In this tutorial, we'll be creating a simple Pong game using the Lua programming language and `🧸 Tiny`.
 
 Pong is a classic 2D arcade game where two players control paddles on opposite sides of the screen, and try to hit a ball back and forth without letting it pass their paddle. The game ends when one player misses the ball, and the other player scores a point.
 

@@ -6,11 +6,11 @@
 
 = Tiny Sandbox 🧸
 
-Welcome to our sandbox page where you can try out the Tiny Engine online! The Tiny Engine is a lightweight game engine that allows you to create 2D games with ease.
+Welcome to our sandbox page where you can try out `🧸 Tiny` online! `🧸 Tiny` is a lightweight game engine that allows you to create 2D games with ease.
 
 With our sandbox page, you can experiment with the engine's features and get a feel for how it works.
 
-Whether you're a seasoned game developer or just starting out, our sandbox page is the perfect place to test out the Tiny Engine and see what it can do. So come on in, play around, and let your creativity run wild!
+Whether you're a seasoned game developer or just starting out, our sandbox page is the perfect place to test out `🧸 Tiny` and see what it can do. So come on in, play around, and let your creativity run wild!
 
 Need help? xref:index.adoc[Check out the documentation]!
 
