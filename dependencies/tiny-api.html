@@ -1261,6 +1261,7 @@ map.draw(layer) -- Draw the layer on the screen.</code></pre>
 </div>
 <tiny-editor style="display: none;">
 function _update()
+    gfx.cls()
     print(math.pi, 10, 10) -- value of pi (~3.14)
 end
 </tiny-editor>
@@ -1272,6 +1273,7 @@ end
 </div>
 <tiny-editor style="display: none;">
 function _update()
+    gfx.cls()
     print(math.huge, 10, 10) -- positive infinity value.
 end
 </tiny-editor>
@@ -1747,6 +1749,7 @@ end
 </div>
 <tiny-editor style="display: none;">
 function _update()
+    gfx.cls()
     print(tiny.dt, 10, 10) -- Delta time between two frame. As Tiny is a fixed frame engine, it's always equal to 1/60
 end
 </tiny-editor>
@@ -1758,6 +1761,7 @@ end
 </div>
 <tiny-editor style="display: none;">
 function _update()
+    gfx.cls()
     print(tiny.t, 10, 10) -- Time elapsed since the start of the game.
 end
 </tiny-editor>
@@ -1769,6 +1773,7 @@ end
 </div>
 <tiny-editor style="display: none;">
 function _update()
+    gfx.cls()
     print(tiny.frame, 10, 10) -- Number of frames elapsed since the start of the game.
 end
 </tiny-editor>
@@ -1791,7 +1796,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version main<br>
-Last updated 2023-05-17 07:04:41 UTC
+Last updated 2023-05-17 07:27:22 UTC
 </div>
 </div>
 </body>
