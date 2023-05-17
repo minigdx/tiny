@@ -597,6 +597,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#_math">math</a>
 <ul class="sectlevel3">
+<li><a href="#_math_pi">math.pi</a></li>
+<li><a href="#_math_huge">math.huge</a></li>
 <li><a href="#_math_sign">math.sign()</a></li>
 <li><a href="#_math_clamp">math.clamp()</a></li>
 <li><a href="#_math_dst">math.dst()</a></li>
@@ -644,6 +646,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#_tiny">tiny</a>
 <ul class="sectlevel3">
+<li><a href="#_tiny_dt">tiny.dt</a></li>
+<li><a href="#_tiny_t">tiny.t</a></li>
+<li><a href="#_tiny_frame">tiny.frame</a></li>
 <li><a href="#_tiny_exit">tiny.exit()</a></li>
 </ul>
 </li>
@@ -1361,13 +1366,11 @@ The touch can be :</p>
 </li>
 <li>
 <p>2: middle click or three fingers</p>
-<div class="literalblock">
-<div class="content">
-<pre>If you need to check that the touch/mouse button is still active, see `ctrl.touching` instead.</pre>
-</div>
-</div>
 </li>
 </ul>
+</div>
+<div class="paragraph">
+<p>If you need to check that the touch/mouse button is still active, see <code>ctrl.touching</code> instead.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1479,9 +1482,22 @@ end
 <div class="paragraph">
 <p>Transform the current frame buffer into a spritesheeet.</p>
 </div>
+<div class="ulist">
+<ul>
+<li>
+<p>If the index of the spritesheet already exist, the spritesheet will be replaced</p>
+</li>
+<li>
+<p>If the index of the spritesheet doesn&#8217;t exist, a new spritesheet at this index will be created</p>
+</li>
+<li>
+<p>If the index of the spritesheet is negative, a new spritesheet will be created at the last positive index.</p>
+</li>
+</ul>
+</div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">to_sheet</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span> <span class="c1">-- Copy the current frame buffer to an existing sheet index.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">to_sheet</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span> <span class="c1">-- Copy the current frame buffer to an new or existing sheet index.</span></code></pre>
 </div>
 </div>
 <tiny-editor style="display: none;">
@@ -2057,6 +2073,28 @@ end
 <p>Math functions. Please note that standard Lua math methods are also available.</p>
 </div>
 <div class="sect3">
+<h4 id="_math_pi">math.pi</h4>
+<div class="paragraph">
+<p>value of pi (~3.14)</p>
+</div>
+<tiny-editor style="display: none;">
+function _update()
+    print(math.pi, 10, 10) -- value of pi (~3.14)
+end
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_math_huge">math.huge</h4>
+<div class="paragraph">
+<p>positive infinity value.</p>
+</div>
+<tiny-editor style="display: none;">
+function _update()
+    print(math.huge, 10, 10) -- positive infinity value.
+end
+</tiny-editor>
+</div>
+<div class="sect3">
 <h4 id="_math_sign">math.sign()</h4>
 <div class="paragraph">
 <p>Return the sign of the number: -1 if negative. 1 otherwise.</p>
@@ -2122,7 +2160,7 @@ end
 <div class="sect3">
 <h4 id="_sfx_play">sfx.play()</h4>
 <div class="paragraph">
-<p>Play a sound.</p>
+<p>Play a sound by it&#8217;s index. The index of a sound is given by it&#8217;s position in the sounds field from the <code>_tiny.json</code> file.The first sound is at the index 0.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -2345,7 +2383,7 @@ end
 <div class="sect3">
 <h4 id="_spr_sheet">spr.sheet()</h4>
 <div class="paragraph">
-<p>Switch to another spritesheet.</p>
+<p>Switch to another spritesheet. The index of the spritesheet is given by it&#8217;s position in the spritesheets field from the <code>_tiny.json</code> file.The first spritesheet is at the index 0.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -2521,9 +2559,42 @@ end
 <p>Tiny Lib which offer offer the current frame (<code>tiny.frame</code>), the current time (<code>tiny.time</code>), delta time (<code>tiny.dt</code>) and to switch to another script using <code>exit</code>.</p>
 </div>
 <div class="sect3">
+<h4 id="_tiny_dt">tiny.dt</h4>
+<div class="paragraph">
+<p>Delta time between two frame. As Tiny is a fixed frame engine, it&#8217;s always equal to 1/60</p>
+</div>
+<tiny-editor style="display: none;">
+function _update()
+    print(tiny.dt, 10, 10) -- Delta time between two frame. As Tiny is a fixed frame engine, it's always equal to 1/60
+end
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_tiny_t">tiny.t</h4>
+<div class="paragraph">
+<p>Time elapsed since the start of the game.</p>
+</div>
+<tiny-editor style="display: none;">
+function _update()
+    print(tiny.t, 10, 10) -- Time elapsed since the start of the game.
+end
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_tiny_frame">tiny.frame</h4>
+<div class="paragraph">
+<p>Number of frames elapsed since the start of the game.</p>
+</div>
+<tiny-editor style="display: none;">
+function _update()
+    print(tiny.frame, 10, 10) -- Number of frames elapsed since the start of the game.
+end
+</tiny-editor>
+</div>
+<div class="sect3">
 <h4 id="_tiny_exit">tiny.exit()</h4>
 <div class="paragraph">
-<p>Exit the actual script to switch to another one. The next script to use is identified by it&#8217;s index.</p>
+<p>Exit the actual script to switch to another one. The next script to use is identified by it&#8217;s index. The index of the script is the index of it in the list of scripts from the <code>_tiny.json</code> file.The first script is at the index 0.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -2538,7 +2609,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version main<br>
-Last updated 2023-05-16 12:05:46 UTC
+Last updated 2023-05-17 07:01:15 UTC
 </div>
 </div>
 <style>
