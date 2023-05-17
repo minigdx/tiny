@@ -4,6 +4,7 @@ import com.github.mingdx.tiny.doc.TinyArg
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
+import com.github.mingdx.tiny.doc.TinyVariable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.OneArgFunction
@@ -19,6 +20,9 @@ import kotlin.random.Random
 )
 class MathLib : org.luaj.vm2.lib.MathLib() {
 
+    @TinyVariable("pi", "value of pi (~3.14)")
+    // Provided by Luak Math lib.
+    @TinyVariable("huge", "positive infinity value.")
     override fun call(modname: LuaValue, env: LuaValue): LuaValue {
         val math = super.call(modname, env)
         math["rnd"] = rnd()

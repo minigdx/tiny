@@ -5,6 +5,7 @@ import com.github.mingdx.tiny.doc.TinyArgs
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
+import com.github.mingdx.tiny.doc.TinyVariable
 import com.google.devtools.ksp.KspExperimental
 import com.google.devtools.ksp.getAnnotationsByType
 import com.google.devtools.ksp.getDeclaredFunctions
@@ -149,7 +150,13 @@ data class TinyFunctionDescriptor(
 class TinyLibDescriptor(
     var name: String = "",
     var description: String = "",
-    var functions: List<TinyFunctionDescriptor> = emptyList()
+    var functions: List<TinyFunctionDescriptor> = emptyList(),
+    var variables: List<TinyVariableDescriptor> = emptyList(),
+)
+
+class TinyVariableDescriptor(
+    var name: String = "",
+    var description: String = "",
 )
 
 @OptIn(KspExperimental::class)
@@ -180,7 +187,12 @@ class KspProcessor(
                 declaration.accept(FunctionVisitor(), mutableListOf())
             }.flatMap { functions -> functions }.filter { f -> f.name.isNotBlank() }
 
+            val variables = classDeclaration.getDeclaredFunctions()
+                .flatMap { f -> f.getAnnotationsByType(TinyVariable::class) }
+                .map { annotation -> TinyVariableDescriptor(annotation.name, annotation.description) }
+
             data.functions = functions.toList()
+            data.variables = variables.toList()
 
             return super.visitClassDeclaration(classDeclaration, data)
         }
@@ -301,6 +313,24 @@ class KspProcessor(
             title = "Tiny API"
             libs.forEach { lib ->
                 section(lib.name.ifBlank { "std" }, lib.description) {
+                    lib.variables.forEach { variable ->
+                        val prefix = if (lib.name.isBlank()) {
+                            variable.name
+                        } else {
+                            "${lib.name}.${variable.name}"
+                        }
+                        lib(prefix) {
+                            paragraph(variable.description)
+                            example(
+                                """
+                                function _update()
+                                    gfx.cls()
+                                    print($prefix, 10, 10) -- ${variable.description}
+                                end
+                                """.trimIndent()
+                            )
+                        }
+                    }
                     lib.functions.forEach { func ->
                         val prefix = if (lib.name.isBlank()) {
                             func.name

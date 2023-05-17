@@ -187,8 +187,7 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         }
 
         @TinyCall(
-            description = "Draw the layer on the screen.",
-            mainCall = true
+            description = "Draw the layer on the screen."
         )
         override fun call(
             @TinyArg("layer", "index of the layer") a: LuaValue

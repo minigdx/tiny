@@ -69,13 +69,17 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
     }
 
     @TinyFunction(
-        "Transform the current frame buffer into a spritesheeet.",
+        "Transform the current frame buffer into a spritesheeet. \n\n" +
+            "- If the index of the spritesheet already exist, the spritesheet will be replaced\n" +
+            "- If the index of the spritesheet doesn't exist, a new spritesheet at this index will be created\n" +
+            "- If the index of the spritesheet is negative, " +
+            "a new spritesheet will be created at the last positive index.\n",
         "to_sheet",
         example = GFX_TO_SHEET_EXAMPLE
     )
     inner class toSheet : OneArgFunction() {
 
-        @TinyCall("Copy the current frame buffer to an existing sheet index.")
+        @TinyCall("Copy the current frame buffer to an new or existing sheet index.")
         override fun call(@TinyArg("sheet") arg: LuaValue): LuaValue {
             val frameBuffer = resourceAccess.frameBuffer
             val copy = PixelArray(frameBuffer.width, frameBuffer.height).apply {

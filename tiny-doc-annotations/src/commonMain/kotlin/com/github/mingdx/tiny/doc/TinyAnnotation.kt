@@ -38,7 +38,13 @@ annotation class TinyFunction(
 @Retention(AnnotationRetention.SOURCE)
 @Repeatable
 annotation class TinyArg(
+    /**
+     * Name of the argument
+     */
     val name: String,
+    /**
+     * Description of the argument
+     */
     val description: String = "",
 )
 
@@ -46,6 +52,9 @@ annotation class TinyArg(
 @Retention(AnnotationRetention.SOURCE)
 @Repeatable
 annotation class TinyArgs(
+    /**
+     * Name of the arguments, in order.
+     */
     val names: Array<String>,
     val documentations: Array<String> = [],
 )
@@ -53,6 +62,22 @@ annotation class TinyArgs(
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.SOURCE)
 annotation class TinyCall(
-    val description: String = "",
-    val mainCall: Boolean = false
+    /**
+     * Description of the call when called with those arguments.
+     */
+    val description: String = ""
+)
+
+@Target(AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.SOURCE)
+@Repeatable
+annotation class TinyVariable(
+    /**
+     * Name of the variable
+     */
+    val name: String,
+    /**
+     * Description of the variable
+     */
+    val description: String,
 )

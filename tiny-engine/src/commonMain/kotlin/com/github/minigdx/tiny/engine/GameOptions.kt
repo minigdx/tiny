@@ -24,6 +24,7 @@ class GameOptions(
         require(width > 0) { "The width needs to be a positive number." }
         require(height > 0) { "The height needs to be a positive number." }
         require(palette.size < 256) { "The number of colors should be less than 256." }
+        require(spriteSheets.size <= 256) { "The number of spritesheets is limited to 256." }
         require(zoom > 0) { "The zoom needs to be a positive non null value." }
     }
 

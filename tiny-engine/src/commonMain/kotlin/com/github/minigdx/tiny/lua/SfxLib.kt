@@ -22,7 +22,11 @@ class SfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         return ctrl
     }
 
-    @TinyFunction("Play a sound.")
+    @TinyFunction(
+        "Play a sound by it's index. " +
+            "The index of a sound is given by it's position in the sounds field from the `_tiny.json` file." +
+            "The first sound is at the index 0."
+    )
     inner class play : OneArgFunction() {
 
         @TinyCall("Play the sound at the index 0.")

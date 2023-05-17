@@ -366,9 +366,14 @@ class GameEngine(
     }
 
     override fun spritesheet(sheet: SpriteSheet) {
-        if (sheet.index >= spriteSheets.size || sheet.index < 0) {
+        if (sheet.index < 0) {
+            // The index is negative. Let's copy it at the last place.
             spriteSheets = spriteSheets.copyOf(spriteSheets.size + 1)
             spriteSheets[spriteSheets.size - 1] = sheet
+        } else if (sheet.index >= spriteSheets.size) {
+            require(sheet.index <= 256) { "Tiny support only 256 spritesheets" }
+            spriteSheets = spriteSheets.copyOf(sheet.index + 1)
+            spriteSheets[sheet.index] = sheet
         } else {
             spriteSheets[sheet.index] = sheet
         }
