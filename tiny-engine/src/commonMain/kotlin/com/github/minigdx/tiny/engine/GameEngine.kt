@@ -179,7 +179,7 @@ class GameEngine(
                     GAME_GAMESCRIPT -> {
                         resource as GameScript
                         resource.resourceAccess = this
-                        resource.evaluate()
+                        // Game script will be evaluated when the boot script will exit
                         scripts[resource.index] = resource
                     }
 

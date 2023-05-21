@@ -10,12 +10,17 @@ class FileStream(private val origin: File) : SourceStream<ByteArray>, TargetStre
         if (!origin.exists()) {
             return false
         }
-        val wasModified = if (origin.lastModified() != lastModified) {
+        val wasModified = if (lastModified == 0L) {
+            // first read.
+            lastModified = origin.lastModified()
+            false
+        } else if (origin.lastModified() != lastModified) {
             lastModified = origin.lastModified()
             true
         } else {
             false
         }
+
         return wasModified
     }
 

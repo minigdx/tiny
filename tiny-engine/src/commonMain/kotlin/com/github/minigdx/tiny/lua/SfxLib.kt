@@ -5,13 +5,18 @@ import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.engine.GameResourceAccess
+import com.github.minigdx.tiny.resources.Sound
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 
 @TinyLib("sfx", "Sound API to play/loop/stop a sound.")
-class SfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() {
+class SfxLib(
+    private val resourceAccess: GameResourceAccess,
+    // When validating the script, don't play sound
+    private val playSound: Boolean = true
+) : TwoArgFunction() {
     override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
         val ctrl = LuaTable()
         ctrl.set("play", play())
@@ -39,7 +44,7 @@ class SfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
             } else {
                 0
             }
-            resourceAccess.sound(index)?.play()
+            canPlay(resourceAccess.sound(index))?.play()
             return NIL
         }
     }
@@ -57,7 +62,7 @@ class SfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
             } else {
                 0
             }
-            resourceAccess.sound(index)?.loop()
+            canPlay(resourceAccess.sound(index))?.loop()
             return NIL
         }
     }
@@ -75,8 +80,16 @@ class SfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
             } else {
                 0
             }
-            resourceAccess.sound(index)?.stop()
+            canPlay(resourceAccess.sound(index))?.stop()
             return NIL
+        }
+    }
+
+    private fun canPlay(sound: Sound?): Sound? {
+        return if(playSound) {
+            sound
+        } else {
+            null
         }
     }
 }

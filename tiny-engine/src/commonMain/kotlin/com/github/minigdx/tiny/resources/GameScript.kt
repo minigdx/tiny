@@ -62,7 +62,7 @@ class GameScript(
 
     class State(val args: LuaValue)
 
-    private fun createLuaGlobals(): Globals = Globals().apply {
+    private fun createLuaGlobals(forValidation: Boolean = false): Globals = Globals().apply {
         val sprLib = SprLib(this@GameScript.gameOptions, this@GameScript.resourceAccess)
 
         load(BaseLib())
@@ -75,7 +75,7 @@ class GameScript(
         load(MapLib(this@GameScript.resourceAccess))
         load(GfxLib(this@GameScript.resourceAccess))
         load(CtrlLib(inputHandler, sprLib))
-        load(SfxLib(this@GameScript.resourceAccess))
+        load(SfxLib(this@GameScript.resourceAccess , playSound = !forValidation))
         load(ShapeLib(this@GameScript.resourceAccess))
         load(KeysLib())
         load(MathLib())
@@ -91,7 +91,7 @@ class GameScript(
     }
 
     fun isValid(): Boolean {
-        with(createLuaGlobals()) {
+        with(createLuaGlobals(forValidation = true)) {
             load(content.decodeToString()).call()
             get("_init").nullIfNil()?.call(valueOf(gameOptions.width), valueOf(gameOptions.height))
         }
