@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
+
 plugins {
     id("com.github.minigdx.gradle.plugin.developer.mpp")
     kotlin("plugin.serialization") version "1.8.0"
@@ -37,7 +39,11 @@ dependencies {
 
 application {
     mainClass.set("com.github.minigdx.tiny.cli.MainKt")
-    // applicationDefaultJvmArgs = listOf("-XstartOnFirstThread")
+    applicationDefaultJvmArgs = if(System.getProperty("os.name").toLowerCaseAsciiOnly().contains("mac")) {
+        listOf("-XstartOnFirstThread")
+    } else {
+        emptyList()
+    }
 
     // Copy the JARs from the Kotlin MPP dependencies.
     this.applicationDistribution.from(
