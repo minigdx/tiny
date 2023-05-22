@@ -39,7 +39,7 @@ dependencies {
 
 application {
     mainClass.set("com.github.minigdx.tiny.cli.MainKt")
-    applicationDefaultJvmArgs = if(System.getProperty("os.name").toLowerCaseAsciiOnly().contains("mac")) {
+    applicationDefaultJvmArgs = if (System.getProperty("os.name").toLowerCaseAsciiOnly().contains("mac")) {
         listOf("-XstartOnFirstThread")
     } else {
         emptyList()

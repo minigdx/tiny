@@ -75,7 +75,7 @@ class GameScript(
         load(MapLib(this@GameScript.resourceAccess))
         load(GfxLib(this@GameScript.resourceAccess))
         load(CtrlLib(inputHandler, sprLib))
-        load(SfxLib(this@GameScript.resourceAccess , playSound = !forValidation))
+        load(SfxLib(this@GameScript.resourceAccess, playSound = !forValidation))
         load(ShapeLib(this@GameScript.resourceAccess))
         load(KeysLib())
         load(MathLib())

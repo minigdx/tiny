@@ -11,7 +11,7 @@ class MutableFixedSizeListTest {
     fun add_it_adds_an_element() {
         val list = MutableFixedSizeList<Int>(3)
         list.add(1)
-        assertEquals(3, list.size)
+        assertEquals(1, list.size)
         assertTrue(list.contains(1))
     }
 

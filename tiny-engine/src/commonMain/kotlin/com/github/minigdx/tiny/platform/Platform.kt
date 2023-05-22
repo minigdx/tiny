@@ -11,7 +11,14 @@ import com.github.minigdx.tiny.sound.MidiSound
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.coroutines.CoroutineDispatcher
 
-class ImageData(val data: ByteArray, val width: Pixel, val height: Pixel)
+class ImageData(
+    // Array of byte of RGBA color
+    val data: ByteArray,
+    // Width of the Image
+    val width: Pixel,
+    // Height of the Image
+    val height: Pixel
+)
 class SoundData(val name: String, val sound: MidiSound)
 
 interface Platform {

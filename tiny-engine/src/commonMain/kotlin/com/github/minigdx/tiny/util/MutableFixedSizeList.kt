@@ -2,12 +2,17 @@ package com.github.minigdx.tiny.util
 
 import kotlin.math.max
 
-class MutableFixedSizeList<T>(override val size: Int) : MutableList<T> {
+class MutableFixedSizeList<T>(val maxSize: Int) : MutableList<T> {
 
-    private val delegate: MutableList<T> = ArrayList<T>(size)
+    private val delegate: MutableList<T> = ArrayList<T>(maxSize)
+
+    override val size: Int
+        get() {
+            return delegate.size
+        }
 
     private fun evictOldElements() {
-        val eltToRemove = max(0, delegate.size - size)
+        val eltToRemove = max(0, delegate.size - maxSize)
         (0 until eltToRemove).forEach { _ ->
             removeAt(0)
         }
@@ -35,7 +40,7 @@ class MutableFixedSizeList<T>(override val size: Int) : MutableList<T> {
     }
 
     override fun addAll(elements: Collection<T>): Boolean {
-        if (count() + elements.size > size) return false
+        if (count() + elements.size > maxSize) return false
         return delegate.addAll(elements)
     }
 
