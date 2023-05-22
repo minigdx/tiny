@@ -13,6 +13,10 @@ class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = Pix
 
     private val tmp = Array(pixelFormat) { 0 }
 
+    fun copyFrom(array: PixelArray) {
+        pixels = array.pixels.copyOf()
+    }
+
     fun reset(pixel: Int, left: Int = 0, top: Int = 0, right: Int = width, bottom: Int = height) {
         val cleft = 0 - left
         val cright = right + 2 * cleft

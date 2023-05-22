@@ -86,7 +86,7 @@ class SfxLib(
     }
 
     private fun canPlay(sound: Sound?): Sound? {
-        return if(playSound) {
+        return if (playSound) {
             sound
         } else {
             null
