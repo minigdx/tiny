@@ -67,13 +67,15 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
     internal inner class sheet : OneArgFunction() {
 
         @TinyCall("Switch to the first spritesheet")
-        override fun call(): LuaValue {
-            return call(valueOf(0))
-        }
+        override fun call(): LuaValue = super.call()
 
         @TinyCall("Switch to the N spritesheet")
         override fun call(@TinyArg("spritesheetN") arg: LuaValue): LuaValue {
-            currentSpritesheet = arg.checkint()
+            currentSpritesheet = if (arg.isnil()) {
+                0
+            } else {
+                arg.checkint()
+            }
             return NONE
         }
     }

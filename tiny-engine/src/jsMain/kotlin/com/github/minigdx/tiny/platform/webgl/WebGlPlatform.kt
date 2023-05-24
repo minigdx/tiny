@@ -21,7 +21,9 @@ import com.github.minigdx.tiny.render.GLRender
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.w3c.dom.HTMLCanvasElement
 
 class WebGlPlatform(
@@ -36,6 +38,8 @@ class WebGlPlatform(
     private val jsInputHandler = JsInputHandler(canvas, gameOptions)
 
     private var then: Double = 0.0
+
+    private val uiScope = CoroutineScope(Dispatchers.Main)
 
     override fun initWindowManager(): WindowManager {
         return WindowManager(
@@ -63,7 +67,10 @@ class WebGlPlatform(
             val delta = nowInSeconds - then
             then = nowInSeconds
 
-            gameLoop.advance(delta.toFloat())
+            uiScope.launch {
+
+                gameLoop.advance(delta.toFloat())
+            }
             gameLoop.draw()
 
             gameLoop(gameLoop)

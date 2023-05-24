@@ -13,8 +13,8 @@ dependencies {
     this.commonTestImplementation(kotlin("test"))
 
     // Multiplatform
-    this.commonMainImplementation("com.soywiz.korlibs.luak:luak:4.0.0-alpha-2")
-    this.commonMainImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    this.commonMainImplementation("com.github.minigdx:luak:1.0.0-alpha2")
+    this.commonMainImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
     this.commonMainImplementation("com.github.minigdx:kgl:0.7.2")
     this.commonMainImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
     this.commonMainImplementation(project(":tiny-doc-annotations"))

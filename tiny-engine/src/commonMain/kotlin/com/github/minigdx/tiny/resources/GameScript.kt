@@ -90,22 +90,22 @@ class GameScript(
         exited = nextScriptIndex
     }
 
-    fun isValid(): Boolean {
+    suspend fun isValid(): Boolean {
         with(createLuaGlobals(forValidation = true)) {
             load(content.decodeToString()).call()
-            get("_init").nullIfNil()?.call(valueOf(gameOptions.width), valueOf(gameOptions.height))
+            get("_init").nullIfNil()?.callSuspend(valueOf(gameOptions.width), valueOf(gameOptions.height))
         }
         return true
     }
 
-    fun evaluate() {
+    suspend fun evaluate() {
         globals = createLuaGlobals()
 
         evaluated = true
         exited = -1
         reload = false
 
-        globals?.load(content.decodeToString())?.call()
+        globals?.load(content.decodeToString())?.callSuspend()
 
         initFunction = globals?.get("_init")?.nullIfNil()
         updateFunction = globals?.get("_update")?.nullIfNil()
@@ -113,16 +113,16 @@ class GameScript(
         getStateFunction = globals?.get("_getState")?.nullIfNil()
         setStateFunction = globals?.get("_setState")?.nullIfNil()
 
-        initFunction?.call(valueOf(gameOptions.width), valueOf(gameOptions.height))
+        initFunction?.callSuspend(valueOf(gameOptions.width), valueOf(gameOptions.height))
     }
 
-    internal fun invoke(name: String, vararg args: LuaValue) {
+    internal suspend fun invoke(name: String, vararg args: LuaValue) {
         @Suppress("UNCHECKED_CAST")
-        globals?.get(name)?.nullIfNil()?.invoke(args as Array<LuaValue>)
+        globals?.get(name)?.nullIfNil()?.invokeSuspend(args as Array<LuaValue>)
     }
 
-    fun getState(): State? {
-        val data = getStateFunction?.call()
+    suspend fun getState(): State? {
+        val data = getStateFunction?.callSuspend()
         return if (data != null && !data.isnil()) {
             return State(data)
         } else {
@@ -130,23 +130,23 @@ class GameScript(
         }
     }
 
-    fun setState(state: State? = null) {
+    suspend fun setState(state: State? = null) {
         if (state != null) {
-            setStateFunction?.call(state.args)
+            setStateFunction?.callSuspend(state.args)
         }
     }
 
-    fun advance() {
+    suspend fun advance() {
         tinyLib.advance()
-        updateFunction?.call()
+        updateFunction?.callSuspend()
         // Skip the draw call if the game script just exited.
         if (exited == -1) {
-            drawFunction?.call()
+            drawFunction?.callSuspend()
         }
     }
 
-    fun resourcesLoaded() {
-        globals?.get("_resources")?.nullIfNil()?.call()
+    suspend fun resourcesLoaded() {
+        globals?.get("_resources")?.nullIfNil()?.callSuspend()
     }
 
     private fun LuaValue.nullIfNil(): LuaValue? {

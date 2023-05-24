@@ -29,6 +29,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.opengl.GL
 import org.lwjgl.system.MemoryUtil
@@ -166,12 +167,15 @@ class GlfwPlatform(
 
     override fun gameLoop(gameLoop: GameLoop) {
         // Render loop
-        while (!GLFW.glfwWindowShouldClose(window)) {
-            gameLoop.advance(getDelta())
-            gameLoop.draw()
+        runBlocking {
+            while (!GLFW.glfwWindowShouldClose(window)) {
 
-            GLFW.glfwSwapBuffers(window) // swap the color buffers
-            GLFW.glfwPollEvents()
+                gameLoop.advance(getDelta())
+                gameLoop.draw()
+
+                GLFW.glfwSwapBuffers(window) // swap the color buffers
+                GLFW.glfwPollEvents()
+            }
         }
         gameLoop.end()
         GLFW.glfwTerminate()

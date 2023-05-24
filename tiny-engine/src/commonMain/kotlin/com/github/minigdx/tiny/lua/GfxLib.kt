@@ -39,13 +39,16 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
     @TinyFunction("clear the screen")
     internal inner class cls : OneArgFunction() {
         @TinyCall("Clear the screen with a default color.")
-        override fun call(): LuaValue {
-            return call(valueOf("#000000"))
-        }
+        override fun call(): LuaValue = super.call()
 
         @TinyCall("Clear the screen with a color.")
         override fun call(@TinyArg("color") arg: LuaValue): LuaValue {
-            resourceAccess.frameBuffer.clear(arg.checkColorIndex())
+            val color = if (arg.isnil()) {
+                valueOf("#000000").checkColorIndex()
+            } else {
+                arg.checkColorIndex()
+            }
+            resourceAccess.frameBuffer.clear(color)
             return NONE
         }
     }

@@ -8,7 +8,7 @@ interface GameLoop {
      *
      * The delta is passed so the game engine can make the game run at a fixed speed.
      */
-    fun advance(delta: Seconds)
+    suspend fun advance(delta: Seconds)
 
     fun draw()
 

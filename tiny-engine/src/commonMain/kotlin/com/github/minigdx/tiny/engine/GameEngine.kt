@@ -160,7 +160,7 @@ class GameEngine(
         platform.gameLoop(this)
     }
 
-    override fun advance(delta: Seconds) {
+    override suspend fun advance(delta: Seconds) {
         workEvents.addAll(events)
 
         workEvents.forEach { resource ->
@@ -351,11 +351,11 @@ class GameEngine(
         inputManager.reset()
     }
 
-    private fun popup(message: String, color: String, forever: Boolean = false) {
+    private suspend fun popup(message: String, color: String, forever: Boolean = false) {
         engineGameScript?.invoke("popup", valueOf(0), valueOf(message), valueOf(color), valueOf(forever))
     }
 
-    private fun clear() {
+    private suspend fun clear() {
         engineGameScript?.invoke("clear")
     }
 

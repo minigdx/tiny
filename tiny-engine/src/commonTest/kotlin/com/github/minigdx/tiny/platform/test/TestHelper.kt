@@ -6,6 +6,9 @@ import com.github.minigdx.tiny.file.CommonVirtualFileSystem
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.log.StdOutLogger
 import com.github.minigdx.tiny.platform.ImageData
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlin.test.assertEquals
 
 expect fun toGif(name: String, animation: List<FrameBuffer>)
@@ -16,11 +19,13 @@ object TestHelper {
         assertEquals(expected.trim(), current.colorIndexBuffer.toString().trim())
     }
 
-    fun test(name: String, script: String, block: (platform: HeadlessPlatform) -> Unit) {
+    fun test(name: String, script: String, block: suspend (platform: HeadlessPlatform) -> Unit) {
         test(name, script, 10 to 10, block)
     }
 
-    fun test(name: String, script: String, size: Pair<Int, Int>, block: (platform: HeadlessPlatform) -> Unit) {
+    val testScope = CoroutineScope(Dispatchers.Unconfined)
+
+    fun test(name: String, script: String, size: Pair<Int, Int>, block: suspend (platform: HeadlessPlatform) -> Unit) {
         val colors = listOf(
             "#000000",
             "#FFFFFF",
@@ -46,7 +51,7 @@ object TestHelper {
 
         ).main()
 
-        block(platform)
+        testScope.launch { block(platform) }
 
         platform.saveAnimation(name)
     }

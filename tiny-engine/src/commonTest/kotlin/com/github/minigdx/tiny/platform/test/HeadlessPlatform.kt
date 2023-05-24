@@ -41,7 +41,7 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
         return NoopRenderContext()
     }
 
-    fun advance() {
+    suspend fun advance() {
         gameLoop?.advance(1f)
         gameLoop?.draw()
     }
@@ -91,7 +91,8 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
     }
 
     override fun createByteArrayStream(name: String): SourceStream<ByteArray> {
-        val data = (resources[name] as? String?)?.encodeToByteArray() ?: resources[name] as? ByteArray ?: throw IllegalStateException("$name is not a valid ByteArray.")
+        val data = (resources[name] as? String?)?.encodeToByteArray() ?: resources[name] as? ByteArray
+            ?: throw IllegalStateException("$name is not a valid ByteArray.")
         return ObjectStream(data)
     }
 
