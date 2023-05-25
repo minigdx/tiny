@@ -8,7 +8,7 @@
 
 = Tiny 🧸
 
-Welcome to the documentation for "Tiny," the virtual console that offers an easy and efficient way to build games and other applications with its Lua programming support, hot reloading, and 256-color maximum.
+Welcome to the documentation for `🧸 Tiny`, the virtual console that offers an easy and efficient way to build games and other applications with its Lua programming support, hot reloading, and 256-color maximum.
 
 == Tiny Engine
 
@@ -39,6 +39,8 @@ TIP: You can improve this documentation by updating https://github.com/minigdx/t
 include::tiny-install.adoc[]
 
 include::tiny-tutorial.adoc[]
+
+include::tiny-showcase.adoc[]
 
 include::tiny-cli.adoc[]
 
