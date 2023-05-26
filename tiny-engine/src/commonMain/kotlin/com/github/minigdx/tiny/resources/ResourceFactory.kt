@@ -15,6 +15,7 @@ import com.github.minigdx.tiny.resources.ResourceType.ENGINE_GAMESCRIPT
 import com.github.minigdx.tiny.resources.ResourceType.GAME_GAMESCRIPT
 import com.github.minigdx.tiny.resources.ResourceType.GAME_LEVEL
 import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -46,7 +47,7 @@ class LdKtImageLayer(
     var pixels: PixelArray = PixelArray(width, height),
 )
 
-@FlowPreview
+@OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 class ResourceFactory(
     private val vfs: VirtualFileSystem,
     private val platform: Platform,
