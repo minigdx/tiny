@@ -7,6 +7,7 @@ import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.graphic.PixelFormat
 import com.github.minigdx.tiny.resources.GameLevel
+import com.github.minigdx.tiny.resources.GameScript
 import com.github.minigdx.tiny.resources.ResourceType
 import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.resources.SpriteSheet
@@ -29,6 +30,7 @@ class StdLibTest {
         override fun spritesheet(sheet: SpriteSheet) = Unit
         override fun level(index: Int): GameLevel? = null
         override fun sound(index: Int): Sound? = null
+        override fun script(name: String): GameScript? = null
     }
 
     private val gameOptions = GameOptions(

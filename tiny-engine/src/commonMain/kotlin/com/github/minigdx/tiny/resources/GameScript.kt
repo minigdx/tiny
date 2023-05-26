@@ -14,13 +14,13 @@ import com.github.minigdx.tiny.lua.ShapeLib
 import com.github.minigdx.tiny.lua.SprLib
 import com.github.minigdx.tiny.lua.StdLib
 import com.github.minigdx.tiny.lua.StdLibListener
+import com.github.minigdx.tiny.lua.TinyBaseLib
 import com.github.minigdx.tiny.lua.TinyLib
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LoadState
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.LuaValue.Companion.valueOf
 import org.luaj.vm2.compiler.LuaC
-import org.luaj.vm2.lib.BaseLib
 import org.luaj.vm2.lib.Bit32Lib
 import org.luaj.vm2.lib.CoroutineLib
 import org.luaj.vm2.lib.PackageLib
@@ -65,7 +65,7 @@ class GameScript(
     private fun createLuaGlobals(forValidation: Boolean = false): Globals = Globals().apply {
         val sprLib = SprLib(this@GameScript.gameOptions, this@GameScript.resourceAccess)
 
-        load(BaseLib())
+        load(TinyBaseLib(this@GameScript.resourceAccess))
         load(PackageLib())
         load(Bit32Lib())
         load(TableLib())

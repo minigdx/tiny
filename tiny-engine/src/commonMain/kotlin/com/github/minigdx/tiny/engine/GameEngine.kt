@@ -391,6 +391,12 @@ class GameEngine(
         return sounds[protected]
     }
 
+    override fun script(name: String): GameScript? {
+        return scripts
+            .drop(1) // drop the _boot.lua
+            .firstOrNull { script -> script?.name == name }
+    }
+
     override fun draw() {
         platform.draw(renderContext, frameBuffer)
     }
