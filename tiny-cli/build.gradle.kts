@@ -31,6 +31,8 @@ dependencies {
     jvmMainImplementation("io.ktor:ktor-server-status-pages-jvm:2.3.0")
     jvmMainImplementation("io.ktor:ktor-server-default-headers-jvm:2.3.0")
 
+    jvmMainImplementation("org.slf4j:slf4j-simple:2.0.7")
+
     add("tinyEngineJsZip", project(":tiny-engine"))?.because(
         "Embed the JS engine in the CLI " +
             "so it can be included when the game is exported."
