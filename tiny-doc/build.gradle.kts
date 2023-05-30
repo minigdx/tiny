@@ -1,8 +1,9 @@
 import org.asciidoctor.gradle.jvm.AsciidoctorTask
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id("org.asciidoctor.jvm.convert") version "3.3.2"
-    id("com.github.minigdx.gradle.plugin.developer")
+    alias(libs.plugins.asciidoctorj)
+    alias(libs.plugins.minigdx.developer)
 }
 
 val asciidoctorResources by configurations.creating {

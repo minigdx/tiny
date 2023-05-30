@@ -1,6 +1,7 @@
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id("com.github.minigdx.gradle.plugin.developer.mpp") version "1.3.1" apply false
-    id("com.github.minigdx.gradle.plugin.developer") version "1.3.1"
+    alias(libs.plugins.minigdx.mpp).apply(false)
+    alias(libs.plugins.minigdx.developer)
 }
 
 minigdxDeveloper {

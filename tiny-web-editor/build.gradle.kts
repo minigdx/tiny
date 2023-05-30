@@ -1,12 +1,10 @@
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id("com.github.minigdx.gradle.plugin.developer.mpp")
-}
-repositories {
-    mavenCentral()
+    alias(libs.plugins.minigdx.mpp)
 }
 
 dependencies {
-    this.commonTestImplementation(kotlin("test"))
+    commonTestImplementation(kotlin("test"))
 
     jsMainImplementation(project(":tiny-engine"))
 }

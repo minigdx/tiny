@@ -1,13 +1,10 @@
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id("com.github.minigdx.gradle.plugin.developer.mpp")
-    kotlin("plugin.serialization") version "1.8.0"
+    alias(libs.plugins.minigdx.mpp)
+    alias(libs.plugins.kotlin.serialization)
     application
-}
-
-repositories {
-    mavenCentral()
 }
 
 configurations.create("tinyEngineJsZip") {
@@ -19,19 +16,16 @@ configurations.create("tinyEngineJsZip") {
 }
 
 dependencies {
-    commonMainImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
-    commonMainImplementation("com.github.ajalt.clikt:clikt:3.5.2")
+    commonMainImplementation(libs.kotlin.serialization.json)
+    commonMainImplementation(libs.clikt)
 
     jvmMainImplementation(project(":tiny-engine", "jvmRuntimeElements"))!!
         .because("Depends on the JVM Jar containing commons resources in the JAR.")
-    jvmMainImplementation("com.github.minigdx:kgl-lwjgl:0.7.2")
 
-    jvmMainImplementation("io.ktor:ktor-server-core-jvm:2.3.0")
-    jvmMainImplementation("io.ktor:ktor-server-netty-jvm:2.3.0")
-    jvmMainImplementation("io.ktor:ktor-server-status-pages-jvm:2.3.0")
-    jvmMainImplementation("io.ktor:ktor-server-default-headers-jvm:2.3.0")
+    jvmMainImplementation(libs.kgl.lwjgl)
 
-    jvmMainImplementation("org.slf4j:slf4j-simple:2.0.7")
+    jvmMainImplementation(libs.bundles.jvm.ktor.server)
+    jvmMainImplementation(libs.bundles.jvm.ktor.client)
 
     add("tinyEngineJsZip", project(":tiny-engine"))?.because(
         "Embed the JS engine in the CLI " +

@@ -1,8 +1,9 @@
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id("com.github.minigdx.gradle.plugin.developer.mpp")
+    alias(libs.plugins.minigdx.mpp)
 }
 
 dependencies {
-    jvmMainImplementation("com.google.devtools.ksp:symbol-processing-api:1.8.20-1.0.10")
+    jvmMainImplementation(libs.ksp.symbol.processing.api)
     jvmMainImplementation(project(":tiny-doc-annotations"))
 }

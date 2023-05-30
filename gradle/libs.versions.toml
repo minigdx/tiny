@@ -1,0 +1,63 @@
+[versions]
+asciidoctorj = "3.3.2"
+clikt = "3.5.2"
+gifencoder = "0.10.1"
+kgl = "0.7.2"
+kotlin-coroutines = "1.7.1"
+kotlin-ksp = "1.8.20-1.0.10"
+kotlin-serialization = "1.8.0"
+kotlin-serialization-json = "1.5.1"
+ktor = "2.3.0"
+luak = "1.0.0-alpha2"
+lwjgl = "3.3.1"
+minigdx-developer = "1.3.2"
+slf4j = "2.0.7"
+
+
+[libraries]
+clikt = { module = "com.github.ajalt.clikt:clikt", version.ref = "clikt" }
+
+kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
+kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization-json" }
+
+luak = { module = "com.github.minigdx:luak", version.ref = "luak" }
+
+lwjgl-core = { module = "org.lwjgl:lwjgl", version.ref = "lwjgl" }
+lwjgl-glfw = { module = "org.lwjgl:lwjgl-glfw", version.ref = "lwjgl" }
+lwjgl-opengl = { module = "org.lwjgl:lwjgl-opengl", version.ref = "lwjgl" }
+
+kgl-core = { module = "com.github.minigdx:kgl", version.ref = "kgl" }
+kgl-lwjgl = { module = "com.github.minigdx:kgl-lwjgl", version.ref = "kgl" }
+ksp-symbol-processing-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "kotlin-ksp" }
+
+jvm-gifencoder = { module = "com.squareup:gifencoder", version.ref = "gifencoder" }
+
+jvm-ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+jvm-ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+
+jvm-slf4j = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
+jvm-ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
+jvm-ktor-server-netty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor" }
+jvm-ktor-server-status-pages = { module = "io.ktor:ktor-server-status-pages-jvm", version.ref = "ktor" }
+jvm-ktor-server-default-headers = { module = "io.ktor:ktor-server-default-headers-jvm", version.ref = "ktor" }
+
+[bundles]
+jvm-ktor-server = [
+    "jvm-slf4j",
+    "jvm-ktor-server-core",
+    "jvm-ktor-server-netty",
+    "jvm-ktor-server-status-pages",
+    "jvm-ktor-server-default-headers"
+]
+jvm-ktor-client = [
+    "jvm-ktor-client-okhttp",
+    "jvm-ktor-client-core"
+]
+
+[plugins]
+asciidoctorj = { id = "org.asciidoctor.jvm.convert", version.ref = "asciidoctorj" }
+minigdx-mpp = { id = "com.github.minigdx.gradle.plugin.developer.mpp", version.ref = "minigdx-developer" }
+minigdx-developer = { id = "com.github.minigdx.gradle.plugin.developer", version.ref = "minigdx-developer" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin-serialization" }
+kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "kotlin-ksp" }
+

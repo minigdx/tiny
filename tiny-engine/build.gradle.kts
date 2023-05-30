@@ -1,45 +1,39 @@
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id("com.github.minigdx.gradle.plugin.developer.mpp")
-    kotlin("plugin.serialization") version "1.8.0"
-
-    id("com.google.devtools.ksp") version "1.8.20-1.0.10"
-}
-
-repositories {
-    mavenCentral()
+    alias(libs.plugins.minigdx.mpp)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.kotlin.ksp)
 }
 
 dependencies {
     this.commonTestImplementation(kotlin("test"))
 
     // Multiplatform
-    this.commonMainImplementation("com.github.minigdx:luak:1.0.0-alpha2")
-    this.commonMainImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
-    this.commonMainImplementation("com.github.minigdx:kgl:0.7.2")
-    this.commonMainImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
+    this.commonMainImplementation(libs.luak)
+    this.commonMainImplementation(libs.kotlin.coroutines)
+    this.commonMainImplementation(libs.kotlin.serialization.json)
+    this.commonMainImplementation(libs.kgl.core)
     this.commonMainImplementation(project(":tiny-doc-annotations"))
 
     // JVM Specific
-    this.jvmMainImplementation("com.github.minigdx:kgl-lwjgl:0.7.2")
+    this.jvmMainImplementation(libs.kgl.lwjgl)
 
-    this.jvmMainImplementation("org.lwjgl:lwjgl-glfw:3.3.1")
-    this.jvmMainImplementation("org.lwjgl:lwjgl-opengl:3.3.1")
+    this.jvmMainImplementation(libs.lwjgl.core)
+    this.jvmMainImplementation(variantOf(libs.lwjgl.core) { classifier("natives-windows") })
+    this.jvmMainImplementation(variantOf(libs.lwjgl.core) { classifier("natives-linux") })
+    this.jvmMainImplementation(variantOf(libs.lwjgl.core) { classifier("natives-macos") })
 
-    this.jvmMainImplementation("org.lwjgl:lwjgl:3.3.1:natives-windows")
-    this.jvmMainImplementation("org.lwjgl:lwjgl:3.3.1:natives-linux")
-    this.jvmMainImplementation("org.lwjgl:lwjgl:3.3.1:natives-macos")
+    this.jvmMainImplementation(libs.lwjgl.glfw)
+    this.jvmMainImplementation(variantOf(libs.lwjgl.glfw) { classifier("natives-windows") })
+    this.jvmMainImplementation(variantOf(libs.lwjgl.glfw) { classifier("natives-linux") })
+    this.jvmMainImplementation(variantOf(libs.lwjgl.glfw) { classifier("natives-macos") })
 
-    this.jvmMainImplementation("org.lwjgl:lwjgl-glfw:3.3.1")
-    this.jvmMainImplementation("org.lwjgl:lwjgl-glfw:3.3.1:natives-windows")
-    this.jvmMainImplementation("org.lwjgl:lwjgl-glfw:3.3.1:natives-linux")
-    this.jvmMainImplementation("org.lwjgl:lwjgl-glfw:3.3.1:natives-macos")
+    this.jvmMainImplementation(libs.lwjgl.opengl)
+    this.jvmMainImplementation(variantOf(libs.lwjgl.opengl) { classifier("natives-windows") })
+    this.jvmMainImplementation(variantOf(libs.lwjgl.opengl) { classifier("natives-linux") })
+    this.jvmMainImplementation(variantOf(libs.lwjgl.opengl) { classifier("natives-macos") })
 
-    this.jvmMainImplementation("org.lwjgl:lwjgl-opengl:3.3.1")
-    this.jvmMainImplementation("org.lwjgl:lwjgl-opengl:3.3.1:natives-windows")
-    this.jvmMainImplementation("org.lwjgl:lwjgl-opengl:3.3.1:natives-linux")
-    this.jvmMainImplementation("org.lwjgl:lwjgl-opengl:3.3.1:natives-macos")
-
-    this.jvmMainImplementation("com.squareup:gifencoder:0.10.1")
+    this.jvmMainImplementation(libs.jvm.gifencoder)
 
     // See https://github.com/cagpie/PicoAudio.js
     jsMainImplementation(npm("picoaudio", "1.1.2"))?.because("get midi over web audio API.")
