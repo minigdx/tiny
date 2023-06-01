@@ -11,9 +11,7 @@ import com.github.minigdx.tiny.file.CommonVirtualFileSystem
 import com.github.minigdx.tiny.log.StdOutLogger
 import com.github.minigdx.tiny.platform.glfw.GlfwPlatform
 import com.github.minigdx.tiny.render.LwjglGLRender
-import kotlinx.serialization.json.decodeFromStream
 import java.io.File
-import java.io.FileInputStream
 
 class RunCommand : CliktCommand("run") {
 
@@ -43,7 +41,7 @@ class RunCommand : CliktCommand("run") {
                 echo("\uD83D\uDE2D No _tiny.json found! Can't run the game without.")
                 throw Abort()
             }
-            val gameParameters = GameParameters.JSON.decodeFromStream<GameParameters>(FileInputStream(configFile))
+            val gameParameters = GameParameters.read(configFile)
 
             val logger = StdOutLogger("tiny-cli")
             val vfs = CommonVirtualFileSystem()

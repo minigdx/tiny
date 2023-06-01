@@ -12,6 +12,7 @@ class MainCommand : CliktCommand(invokeWithoutSubcommand = true) {
             AddCommand(),
             ExportCommand(),
             ServeCommand(),
+            LibCommand(),
         )
     }
 

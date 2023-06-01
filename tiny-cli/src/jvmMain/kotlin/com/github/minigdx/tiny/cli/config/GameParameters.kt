@@ -29,6 +29,16 @@ sealed class GameParameters() {
 
     abstract fun addSound(sound: String): GameParameters
 
+    /**
+     * Return the list of the user Lua script to load.
+     */
+    abstract fun getAllScripts(): List<String>
+
+    /**
+     * Add library.
+     */
+    abstract fun addLibrary(lib: String): GameParameters
+
     companion object {
         val JSON = Json {
             ignoreUnknownKeys = true
@@ -66,7 +76,17 @@ data class GameParametersV1(
      * The first level will be the one used by default.
      */
     val levels: List<String> = emptyList(),
+    /**
+     * List of MIDI sounds.
+     */
     val sounds: List<String> = emptyList(),
+    /**
+     * Libraries configured. It will contains the name of the library and the version (optional).
+     * The file name still has to be computed from the name (ie: particules@commitHash -> particules.lua)
+     *
+     * The libraries will be added at the end of the scripts lists.
+     */
+    val libraries: List<String> = emptyList(),
 ) : GameParameters() {
     override fun toGameOptions(): GameOptions {
         return GameOptions(
@@ -74,12 +94,27 @@ data class GameParametersV1(
             height = resolution.height,
             palette = colors,
             spriteSize = sprites.width to sprites.height,
-            gameScripts = scripts,
+            gameScripts = getAllScripts(),
             spriteSheets = spritesheets,
             gameLevels = levels,
             zoom = zoom,
             sounds = sounds,
         )
+    }
+
+    override fun getAllScripts(): List<String> {
+        fun extractName(name: String): String {
+            val atIndex = name.indexOf("@")
+            return if (atIndex != -1) {
+                name.substring(0, atIndex)
+            } else {
+                name
+            }
+        }
+
+        return scripts + libraries.map { lib ->
+            extractName(lib) + ".lua"
+        }
     }
 
     override fun addLevel(level: String): GameParameters {
@@ -96,5 +131,9 @@ data class GameParametersV1(
 
     override fun addSound(sound: String): GameParameters {
         return copy(sounds = sounds + sound)
+    }
+
+    override fun addLibrary(lib: String): GameParameters {
+        return copy(libraries = libraries + lib)
     }
 }
