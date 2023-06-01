@@ -36,7 +36,7 @@ class CoroutineTest {
 2222222222
 2222222222
 """,
-            platform.frames.last()
+            platform.frames.last(),
         )
 
         platform.advance()
@@ -54,7 +54,7 @@ class CoroutineTest {
 1111111111
 1111111111
 """,
-            platform.frames.last()
+            platform.frames.last(),
         )
     }
 }

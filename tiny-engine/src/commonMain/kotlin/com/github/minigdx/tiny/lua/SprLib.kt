@@ -48,12 +48,12 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
         override fun call(
             @TinyArg("x") arg1: LuaValue,
             @TinyArg("y") arg2: LuaValue,
-            @TinyArg("color") arg3: LuaValue
+            @TinyArg("color") arg3: LuaValue,
         ): LuaValue {
             resourceAccess.spritesheet(currentSpritesheet)?.pixels?.set(
                 arg1.checkint(),
                 arg2.checkint(),
-                arg3.checkint()
+                arg3.checkint(),
             )
             return arg3
         }
@@ -62,7 +62,7 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
     @TinyFunction(
         "Switch to another spritesheet. " +
             "The index of the spritesheet is given by it's position in the spritesheets field from the `_tiny.json` file." +
-            "The first spritesheet is at the index 0."
+            "The first spritesheet is at the index 0.",
     )
     internal inner class sheet : OneArgFunction() {
 
@@ -97,7 +97,7 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
             @TinyArg("x") a: LuaValue,
             @TinyArg("y") b: LuaValue,
             @TinyArg("sprX") c: LuaValue,
-            @TinyArg("sprY") d: LuaValue
+            @TinyArg("sprY") d: LuaValue,
         ): LuaValue {
             return invoke(varargsOf(arrayOf(a, b, c, d, NIL, NIL, NIL, NIL))).arg1()
         }
@@ -113,9 +113,9 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
                     "width",
                     "height",
                     "flipX",
-                    "flipY"
-                )
-            ) args: Varargs
+                    "flipY",
+                ),
+            ) args: Varargs,
         ): Varargs {
             val spritesheet = resourceAccess.spritesheet(currentSpritesheet) ?: return NONE
 
@@ -148,7 +148,7 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
         override fun call(
             @TinyArg("sprN") a: LuaValue,
             @TinyArg("x") b: LuaValue,
-            @TinyArg("y") c: LuaValue
+            @TinyArg("y") c: LuaValue,
         ): LuaValue {
             return invoke(arrayOf(a, b, c, valueOf(false), valueOf(false))).arg1()
         }
@@ -177,7 +177,7 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
                 width = sw,
                 height = sh,
                 reverseX = flipX,
-                reverseY = flipY
+                reverseY = flipY,
             )
 
             return NONE

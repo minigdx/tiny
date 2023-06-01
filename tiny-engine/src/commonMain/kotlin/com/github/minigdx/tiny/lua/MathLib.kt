@@ -16,7 +16,7 @@ import kotlin.random.Random
 
 @TinyLib(
     "math",
-    "Math functions. Please note that standard Lua math methods are also available."
+    "Math functions. Please note that standard Lua math methods are also available.",
 )
 class MathLib : org.luaj.vm2.lib.MathLib() {
 
@@ -53,7 +53,7 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
         override fun call(
             @TinyArg("a") arg1: LuaValue,
             @TinyArg("value") arg2: LuaValue,
-            @TinyArg("b") arg3: LuaValue
+            @TinyArg("b") arg3: LuaValue,
         ): LuaValue {
             val max = if (arg1.todouble() > arg2.todouble()) {
                 arg1
@@ -81,7 +81,7 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
             @TinyArg("x1") a: LuaValue,
             @TinyArg("y1") b: LuaValue,
             @TinyArg("x2") c: LuaValue,
-            @TinyArg("y2") d: LuaValue
+            @TinyArg("y2") d: LuaValue,
         ): LuaValue {
             val luaValue = dst2.call(a, b, c, d)
             return valueOf(sqrt(luaValue.todouble()))
@@ -90,7 +90,7 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
 
     @TinyFunction(
         "Compute the distance between two points not squared. " +
-            "Use this method to know if an coordinate is closer than another."
+            "Use this method to know if an coordinate is closer than another.",
     )
     internal inner class dst2 : LibFunction() {
 
@@ -101,7 +101,7 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
             @TinyArg("x1") a: LuaValue,
             @TinyArg("y1") b: LuaValue,
             @TinyArg("x2") c: LuaValue,
-            @TinyArg("y2") d: LuaValue
+            @TinyArg("y2") d: LuaValue,
         ): LuaValue {
             val xDiff = c.todouble() - a.todouble()
             val yDiff = d.todouble() - b.todouble()
@@ -118,7 +118,7 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
 
         @TinyCall(
             "Generate a random value between 1 until the argument. " +
-                "If a table is passed, it'll return a random element of the table."
+                "If a table is passed, it'll return a random element of the table.",
         )
         override fun call(@TinyArg("until") arg: LuaValue): LuaValue {
             if (arg.isnil()) return call()

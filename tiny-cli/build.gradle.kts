@@ -29,7 +29,7 @@ dependencies {
 
     add("tinyEngineJsZip", project(":tiny-engine"))?.because(
         "Embed the JS engine in the CLI " +
-            "so it can be included when the game is exported."
+            "so it can be included when the game is exported.",
     )
 }
 
@@ -43,7 +43,7 @@ application {
 
     // Copy the JARs from the Kotlin MPP dependencies.
     this.applicationDistribution.from(
-        project.configurations.getByName("jvmRuntimeClasspath")
+        project.configurations.getByName("jvmRuntimeClasspath"),
     ) {
         val jvmJar by tasks.existing
         this.from(jvmJar)

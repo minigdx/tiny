@@ -14,7 +14,7 @@ import org.luaj.vm2.lib.TwoArgFunction
     "tiny",
     "Tiny Lib which offer offer the current frame (`tiny.frame`), " +
         "the current time (`tiny.time`), delta time (`tiny.dt`) and " +
-        "to switch to another script using `exit`."
+        "to switch to another script using `exit`.",
 )
 class TinyLib(private val listener: StdLibListener) : TwoArgFunction() {
 
@@ -32,7 +32,7 @@ class TinyLib(private val listener: StdLibListener) : TwoArgFunction() {
     @TinyVariable(
         "dt",
         "Delta time between two frame. " +
-            "As Tiny is a fixed frame engine, it's always equal to 1/60"
+            "As Tiny is a fixed frame engine, it's always equal to 1/60",
     )
     @TinyVariable("t", "Time elapsed since the start of the game.")
     @TinyVariable("frame", "Number of frames elapsed since the start of the game.")
@@ -50,7 +50,7 @@ class TinyLib(private val listener: StdLibListener) : TwoArgFunction() {
         "Exit the actual script to switch to another one. " +
             "The next script to use is identified by it's index. " +
             "The index of the script is the index of it in the list of scripts from the `_tiny.json` file." +
-            "The first script is at the index 0."
+            "The first script is at the index 0.",
     )
     internal inner class exit : OneArgFunction() {
 

@@ -38,7 +38,7 @@ fun setupGames(rootPath: String, tinyGameTag: HTMLCollection) {
         throw IllegalArgumentException(
             "No <tiny-game> has been found in the current page. " +
                 "Check that the page including your javascript game" +
-                "has a least one <tiny-game> tag to render the game in."
+                "has a least one <tiny-game> tag to render the game in.",
         )
     }
 
@@ -50,14 +50,14 @@ fun setupGames(rootPath: String, tinyGameTag: HTMLCollection) {
                     "You're accessing the page without a webserver (ie: file:// as URL). " +
                     "Tiny can't run without a webserver. " +
                     "Please start a webserver to serve HTML pages and access it through " +
-                    "a valid URL (ie: http://localhost) \uD83D\uDEA8"
+                    "a valid URL (ie: http://localhost) \uD83D\uDEA8",
             )
             game.appendChild(h1)
         }
         throw IllegalArgumentException(
             "Tiny can't run without a webserver." +
                 "Please run a webserver to serve the files so you can acess it through " +
-                "http://localhost instead of file://some/path."
+                "http://localhost instead of file://some/path.",
         )
     }
 
@@ -116,7 +116,7 @@ fun setupGames(rootPath: String, tinyGameTag: HTMLCollection) {
             gameOptions = gameOptions,
             platform = WebGlPlatform(canvas as HTMLCanvasElement, logger, gameOptions, rootPath),
             vfs = CommonVirtualFileSystem(),
-            logger = logger
+            logger = logger,
         ).main()
     }
 }

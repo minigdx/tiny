@@ -11,6 +11,7 @@ function _draw()
     print("example", 10, 30, 2) -- print using the color index 2
 end
 """
+
 //language=Lua
 const val GFX_DITHER_EXAMPLE = """
 function _draw()

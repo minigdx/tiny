@@ -30,7 +30,7 @@ class GfxTest {
 2222222222
 2222222222
 """,
-            platform.frames.last()
+            platform.frames.last(),
         )
     }
 }

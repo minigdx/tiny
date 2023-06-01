@@ -78,7 +78,7 @@ class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = Pix
         height: Pixel = this.height,
         reverseX: Boolean = false,
         reverseY: Boolean = false,
-        blender: (Array<Int>, Pixel, Pixel) -> Array<Int>?
+        blender: (Array<Int>, Pixel, Pixel) -> Array<Int>?,
     ) {
         assert(source.pixelFormat == pixelFormat) {
             "Can't copy PixelArray because the pixel format is different between the two PixelArray"

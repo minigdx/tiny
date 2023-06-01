@@ -10,6 +10,7 @@ interface GameResource {
      * Name of the resource.
      */
     val name: String
+
     /**
      * Type of the resource.
      */

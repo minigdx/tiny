@@ -19,7 +19,6 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSNode
 import com.google.devtools.ksp.visitor.KSDefaultVisitor
-import kotlin.text.Typography.paragraph
 
 @DslMarker
 annotation class AsciidocDslMarker
@@ -97,7 +96,7 @@ class AsciidocLibSection(val title: String?) {
                 >```lua
                 >$code
                 >```
-               """.trimMargin(">")
+               """.trimMargin(">"),
         )
     }
 
@@ -110,7 +109,7 @@ class AsciidocLibSection(val title: String?) {
                 >$lua
                 ></tiny-editor>
                 >++++
-               """.trimMargin(">")
+               """.trimMargin(">"),
         )
     }
 
@@ -137,7 +136,7 @@ fun asciidoc(block: AsciidocDocument.() -> Unit): AsciidocDocument {
 class TinyArgDescriptor(var name: String)
 class TinyCallDescriptor(
     var description: String = "",
-    var args: List<TinyArgDescriptor> = emptyList()
+    var args: List<TinyArgDescriptor> = emptyList(),
 )
 
 data class TinyFunctionDescriptor(
@@ -161,7 +160,7 @@ class TinyVariableDescriptor(
 
 @OptIn(KspExperimental::class)
 class KspProcessor(
-    val env: SymbolProcessorEnvironment
+    val env: SymbolProcessorEnvironment,
 ) : SymbolProcessor {
 
     inner class LibVisitor : KSDefaultVisitor<TinyLibDescriptor, TinyLibDescriptor>() {
@@ -179,7 +178,7 @@ class KspProcessor(
 
         override fun visitClassDeclaration(
             classDeclaration: KSClassDeclaration,
-            data: TinyLibDescriptor
+            data: TinyLibDescriptor,
         ): TinyLibDescriptor {
             if (!classDeclaration.isAnnotationPresent(TinyLib::class)) return data
 
@@ -222,7 +221,7 @@ class KspProcessor(
 
         override fun visitClassDeclaration(
             classDeclaration: KSClassDeclaration,
-            data: MutableList<TinyFunctionDescriptor>
+            data: MutableList<TinyFunctionDescriptor>,
         ): MutableList<TinyFunctionDescriptor> {
             val functions = classDeclaration.getAnnotationsByType(TinyFunction::class)
             if (functions.count() == 0) return data
@@ -235,7 +234,7 @@ class KspProcessor(
                         return classDeclaration.simpleName.asString()
                     }
                 },
-                Unit
+                Unit,
             )
 
             val result = functions.map { function ->
@@ -247,12 +246,12 @@ class KspProcessor(
 
                             override fun visitClassDeclaration(
                                 classDeclaration: KSClassDeclaration,
-                                data: Unit
+                                data: Unit,
                             ): String {
                                 return classDeclaration.simpleName.asString()
                             }
                         },
-                        Unit
+                        Unit,
                     )
                 }
 
@@ -306,7 +305,7 @@ class KspProcessor(
             Dependencies(false),
             "/",
             "tiny-api",
-            "adoc"
+            "adoc",
         )
 
         val result = asciidoc {
@@ -327,7 +326,7 @@ class KspProcessor(
                                     gfx.cls()
                                     print($prefix, 10, 10) -- ${variable.description}
                                 end
-                                """.trimIndent()
+                                """.trimIndent(),
                             )
                         }
                     }
@@ -362,7 +361,7 @@ class KspProcessor(
 
 class KspProcessorProvider : SymbolProcessorProvider {
     override fun create(
-        environment: SymbolProcessorEnvironment
+        environment: SymbolProcessorEnvironment,
     ): SymbolProcessor {
         return KspProcessor(environment)
     }

@@ -113,7 +113,7 @@ class PixelArrayTest {
                 .reversed()
                 .replace("\n", ""),
             target.toString()
-                .replace("\n", "")
+                .replace("\n", ""),
         )
     }
 

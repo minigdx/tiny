@@ -15,7 +15,7 @@ import org.luaj.vm2.lib.TwoArgFunction
 class SfxLib(
     private val resourceAccess: GameResourceAccess,
     // When validating the script, don't play sound
-    private val playSound: Boolean = true
+    private val playSound: Boolean = true,
 ) : TwoArgFunction() {
     override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
         val ctrl = LuaTable()
@@ -30,7 +30,7 @@ class SfxLib(
     @TinyFunction(
         "Play a sound by it's index. " +
             "The index of a sound is given by it's position in the sounds field from the `_tiny.json` file." +
-            "The first sound is at the index 0."
+            "The first sound is at the index 0.",
     )
     inner class play : OneArgFunction() {
 

@@ -59,7 +59,7 @@ class LwjglInput(private val projector: MouseProject) : InputHandler, InputManag
                         keyUp(key)
                     }
                 }
-            }
+            },
         )
         glfwSetCursorEnterCallback(
             windowAddress,
@@ -67,7 +67,7 @@ class LwjglInput(private val projector: MouseProject) : InputHandler, InputManag
                 override fun invoke(window: Long, entered: Boolean) {
                     isMouseInsideWindow = entered
                 }
-            }
+            },
         )
         // see https://github.com/LWJGL/lwjgl3-wiki/wiki/2.6.3-Input-handling-with-GLFW
         glfwSetMouseButtonCallback(
@@ -97,7 +97,7 @@ class LwjglInput(private val projector: MouseProject) : InputHandler, InputManag
                         }
                     }
                 }
-            }
+            },
         )
     }
 

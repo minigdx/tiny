@@ -16,7 +16,11 @@ class GameLevel(
 
     fun copy(): GameLevel {
         val gameLevel = GameLevel(
-            index, type, name, numberOfLayers, ldktLevel
+            index,
+            type,
+            name,
+            numberOfLayers,
+            ldktLevel,
         )
         imageLayers.copyInto(gameLevel.imageLayers)
         intLayers.copyInto(gameLevel.intLayers)

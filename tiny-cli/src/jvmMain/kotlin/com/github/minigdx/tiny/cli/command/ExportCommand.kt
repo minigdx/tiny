@@ -39,7 +39,6 @@ class ExportCommand : CliktCommand("export") {
 class GameExporter {
 
     fun export(gameDirectory: File, archive: String) {
-
         val configFile = gameDirectory.resolve("_tiny.json")
         val gameParameters = JSON.decodeFromStream<GameParameters>(FileInputStream(configFile))
 

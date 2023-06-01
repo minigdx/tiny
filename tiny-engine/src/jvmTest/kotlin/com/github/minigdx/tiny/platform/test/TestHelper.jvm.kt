@@ -17,7 +17,7 @@ actual fun toGif(name: String, animation: List<FrameBuffer>) {
             reference.width,
             reference.height,
             0,
-            reference.gamePalette
+            reference.gamePalette,
         )
 
         animation.forEach { img ->

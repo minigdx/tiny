@@ -15,7 +15,7 @@ import org.luaj.vm2.lib.TwoArgFunction
 
 @TinyLib(
     "map",
-    "Map API to accessing maps data configured in a game."
+    "Map API to accessing maps data configured in a game.",
 )
 class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() {
 
@@ -109,7 +109,7 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
                     sourceX = 0,
                     sourceY = 0,
                     width = layer.width,
-                    height = layer.height
+                    height = layer.height,
                 )
             }
             return NONE
@@ -128,7 +128,7 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
                     sourceX = 0,
                     sourceY = 0,
                     width = layer.width,
-                    height = layer.height
+                    height = layer.height,
                 )
             }
             return NONE
@@ -141,7 +141,7 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
             @TinyArg("x") a: LuaValue,
             @TinyArg("y") b: LuaValue,
             @TinyArg("sx") c: LuaValue,
-            @TinyArg("sy") d: LuaValue
+            @TinyArg("sy") d: LuaValue,
         ): LuaValue {
             val layer = resourceAccess.level(currentLevel)?.imageLayers?.get(0)
             if (layer != null) {
@@ -152,7 +152,7 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
                     sourceX = c.checkint(),
                     sourceY = d.checkint(),
                     width = layer.width,
-                    height = layer.height
+                    height = layer.height,
                 )
             }
             return NONE
@@ -160,8 +160,8 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
 
         override fun invoke(
             @TinyArgs(
-                names = ["x", "y", "sx", "sy", "width", "height"]
-            ) args: Varargs
+                names = ["x", "y", "sx", "sy", "width", "height"],
+            ) args: Varargs,
         ): Varargs {
             if (args.narg() < 6) return super.invoke(args)
             val x = args.arg(1).checkint()
@@ -180,17 +180,17 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
                     sourceX = sx,
                     sourceY = sy,
                     width = width,
-                    height = height
+                    height = height,
                 )
             }
             return NONE
         }
 
         @TinyCall(
-            description = "Draw the layer on the screen."
+            description = "Draw the layer on the screen.",
         )
         override fun call(
-            @TinyArg("layer", "index of the layer") a: LuaValue
+            @TinyArg("layer", "index of the layer") a: LuaValue,
         ): LuaValue {
             val layer = resourceAccess.level(currentLevel)?.imageLayers?.getOrNull(a.checkint())
             if (layer != null) {
@@ -201,7 +201,7 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
                     sourceX = 0,
                     sourceY = 0,
                     width = layer.width,
-                    height = layer.height
+                    height = layer.height,
                 )
             }
             return NONE

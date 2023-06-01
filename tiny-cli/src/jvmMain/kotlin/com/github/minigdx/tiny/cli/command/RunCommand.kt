@@ -52,7 +52,7 @@ class RunCommand : CliktCommand("run") {
                 gameOptions = gameOption,
                 platform = GlfwPlatform(gameOption, logger, vfs, gameDirectory, LwjglGLRender(logger, gameOption)),
                 vfs = vfs,
-                logger = logger,
+                logger = logger
             ).main()
         } catch (ex: Exception) {
             echo("\uD83E\uDDE8 An unexpected exception occurred. The application will stop. It might be a bug in Tiny. If so, please report it.")

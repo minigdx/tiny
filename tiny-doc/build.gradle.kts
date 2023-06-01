@@ -22,9 +22,9 @@ dependencies {
         project(
             mapOf(
                 "path" to ":tiny-web-editor",
-                "configuration" to "tinyWebEditorEngine"
-            )
-        )
+                "configuration" to "tinyWebEditorEngine",
+            ),
+        ),
     )
 
     add(
@@ -32,9 +32,9 @@ dependencies {
         project(
             mapOf(
                 "path" to ":tiny-engine",
-                "configuration" to "tinyApiAsciidoctor"
-            )
-        )
+                "configuration" to "tinyApiAsciidoctor",
+            ),
+        ),
     )
 }
 

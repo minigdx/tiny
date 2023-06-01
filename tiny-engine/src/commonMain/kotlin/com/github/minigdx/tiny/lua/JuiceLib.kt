@@ -27,7 +27,7 @@ import org.luaj.vm2.lib.TwoArgFunction
         "- bounce, bounceIn, bounceOut,\n" +
         "- exp10, expIn10, expOut10,\n" +
         "- exp5, expIn5, expOut5,\n" +
-        "- linear "
+        "- linear ",
 
 )
 class JuiceLib : TwoArgFunction() {
@@ -76,14 +76,14 @@ class JuiceLib : TwoArgFunction() {
         override fun call(
             @TinyArg("start") a: LuaValue,
             @TinyArg("end") b: LuaValue,
-            @TinyArg("progress") c: LuaValue
+            @TinyArg("progress") c: LuaValue,
         ): LuaValue {
             return valueOf(
                 interpolation.interpolate(
                     a.tofloat(),
                     b.tofloat(),
-                    c.tofloat()
-                ).toDouble()
+                    c.tofloat(),
+                ).toDouble(),
             )
         }
     }

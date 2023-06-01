@@ -43,7 +43,7 @@ class JsInputHandler(
     private val touchSignals = arrayListOf(
         TOUCH1,
         TOUCH2,
-        TOUCH3
+        TOUCH3,
     )
     private val touchManager = TouchManager(UNKNOWN_KEY)
 

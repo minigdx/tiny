@@ -17,7 +17,7 @@ class ImageData(
     // Width of the Image
     val width: Pixel,
     // Height of the Image
-    val height: Pixel
+    val height: Pixel,
 )
 class SoundData(val name: String, val sound: MidiSound)
 

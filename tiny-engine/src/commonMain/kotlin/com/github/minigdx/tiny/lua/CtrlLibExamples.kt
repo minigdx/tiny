@@ -9,6 +9,7 @@ function _draw()
   shape.rectf(p.x, p.y, 5,5, p.x + p.y)
 end
 """
+
 //language=Lua
 const val CTRL_PRESSING_EXAMPLE = """
 function _init()

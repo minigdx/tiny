@@ -52,7 +52,9 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
 
     override fun draw(context: RenderContext, frameBuffer: FrameBuffer) {
         val newBuffer = FrameBuffer(
-            frameBuffer.width, frameBuffer.height, frameBuffer.gamePalette
+            frameBuffer.width,
+            frameBuffer.height,
+            frameBuffer.gamePalette,
         ).apply {
             colorIndexBuffer.copyFrom(frameBuffer.colorIndexBuffer)
             generateBuffer()

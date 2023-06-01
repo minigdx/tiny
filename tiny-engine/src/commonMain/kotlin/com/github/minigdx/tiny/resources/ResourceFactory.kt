@@ -89,7 +89,7 @@ class ResourceFactory(
                             x = level.x,
                             y = level.y,
                             width = level.width,
-                            height = level.height
+                            height = level.height,
                         )
                     }.asFlow()
                     .flatMapMerge { layer ->
@@ -120,7 +120,7 @@ class ResourceFactory(
                                 x = level.x,
                                 y = level.y,
                                 width = lines.first().size,
-                                height = lines.size
+                                height = lines.size,
                             )
 
                             lines.forEachIndexed { y, columns ->
@@ -161,7 +161,7 @@ class ResourceFactory(
         name: String,
         inputHandler: InputHandler,
         gameOptions: GameOptions,
-        resourceType: ResourceType
+        resourceType: ResourceType,
     ): Flow<GameScript> {
         return vfs.watch(platform.createByteArrayStream(name)).map { content ->
             GameScript(index, name, gameOptions, inputHandler, resourceType).apply {
@@ -205,7 +205,7 @@ class ResourceFactory(
                         data[coord + 1],
                         data[coord + 2],
                         data[coord + 3],
-                    )
+                    ),
                 )
 
                 result.set(x, y, index)

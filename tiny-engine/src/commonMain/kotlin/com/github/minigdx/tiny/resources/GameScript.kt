@@ -38,7 +38,7 @@ class GameScript(
     override val name: String,
     val gameOptions: GameOptions,
     val inputHandler: InputHandler,
-    override val type: ResourceType
+    override val type: ResourceType,
 ) : GameResource, StdLibListener {
 
     var exited: Int = -1

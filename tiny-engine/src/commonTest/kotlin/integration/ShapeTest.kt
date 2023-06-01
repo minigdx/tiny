@@ -31,7 +31,7 @@ class ShapeTest {
 1111222111
 1111111111
 """,
-            platform.frames.last()
+            platform.frames.last(),
         )
     }
 
@@ -60,7 +60,7 @@ class ShapeTest {
 2211111111
 2111111111
 """,
-            platform.frames.last()
+            platform.frames.last(),
         )
     }
 
@@ -89,7 +89,7 @@ class ShapeTest {
 2222211111
 2222211111
 """,
-            platform.frames.last()
+            platform.frames.last(),
         )
     }
 }

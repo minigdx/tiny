@@ -36,7 +36,7 @@ object TestHelper {
             "game.lua" to script,
             "_boot.lua" to "tiny.exit(0)",
             "_engine.lua" to "",
-            "_boot.png" to ImageData(ByteArray(0), 0, 0)
+            "_boot.png" to ImageData(ByteArray(0), 0, 0),
         )
 
         val (w, h) = size
@@ -47,7 +47,7 @@ object TestHelper {
             gameOptions = gameOptions,
             platform = platform,
             vfs = CommonVirtualFileSystem(),
-            logger = StdOutLogger("test")
+            logger = StdOutLogger("test"),
 
         ).main()
 

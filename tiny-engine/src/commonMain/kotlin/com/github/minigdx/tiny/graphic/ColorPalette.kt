@@ -108,8 +108,14 @@ class ColorPalette(colors: List<HexColor>) {
         // Look for the index with the closest color.
         rgba.forEachIndexed { i, palette ->
             val d = dst(
-                palette[0], palette[1], palette[2], palette[3],
-                color[0], color[1], color[2], color[3]
+                palette[0],
+                palette[1],
+                palette[2],
+                palette[3],
+                color[0],
+                color[1],
+                color[2],
+                color[3],
             )
             if (d < current) {
                 index = i

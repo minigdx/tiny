@@ -63,7 +63,7 @@ class ScriptsCollector(private val events: MutableList<GameResource>) : FlowColl
             events.add(
                 value.apply {
                     reload = toReload
-                }
+                },
             )
         }
     }
@@ -143,7 +143,7 @@ class GameEngine(
         val resources = listOf(
             resourceFactory.bootscript("_boot.lua", inputHandler, gameOptions),
             resourceFactory.enginescript("_engine.lua", inputHandler, gameOptions),
-            resourceFactory.bootSpritesheet("_boot.png")
+            resourceFactory.bootSpritesheet("_boot.png"),
         ) + gameScripts + spriteSheets + gameLevels + sounds
 
         numberOfResources = resources.size
@@ -235,7 +235,7 @@ class GameEngine(
                         } catch (ex: LuaError) {
                             val errorLine = ex.errorLine()
                             logger.warn(
-                                "TINY"
+                                "TINY",
                             ) {
                                 val error =
                                     errorLine?.let { (l, line) -> "line $l:$line <-- the \uD83D\uDC1E is around here (${ex.getLuaMessage()})" }
@@ -320,7 +320,7 @@ class GameEngine(
                     if (!inError) { // display the log only once.
                         val errorLine = ex.errorLine()
                         logger.warn(
-                            "TINY"
+                            "TINY",
                         ) {
                             val error =
                                 errorLine?.let { (l, line) -> "line $l:$line <-- the \uD83D\uDC1E is around here (${ex.getLuaMessage()})" }

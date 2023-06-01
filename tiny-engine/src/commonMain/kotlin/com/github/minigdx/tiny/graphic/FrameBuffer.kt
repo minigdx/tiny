@@ -71,7 +71,7 @@ class Camera() {
 class FrameBuffer(
     val width: Pixel,
     val height: Pixel,
-    val gamePalette: ColorPalette
+    val gamePalette: ColorPalette,
 ) {
 
     internal val colorIndexBuffer: PixelArray = PixelArray(width, height, PixelFormat.INDEX)
@@ -178,7 +178,7 @@ class FrameBuffer(
         /**
          * Blend function
          */
-        blender: (Array<Int>, Pixel, Pixel) -> Array<Int> = { colors, _, _ -> colors }
+        blender: (Array<Int>, Pixel, Pixel) -> Array<Int> = { colors, _, _ -> colors },
     ) {
         val cx = camera.cx(dstX)
         val cy = camera.cy(dstY)
@@ -199,7 +199,7 @@ class FrameBuffer(
             sourceY + height - clippedHeightTop,
             clippedWidth,
             clippedHeight,
-            reverseX, reverseY
+            reverseX, reverseY,
         ) { c, x, y -> this.blender.mix(blender(c, x, y), x, y, null) }
     }
 

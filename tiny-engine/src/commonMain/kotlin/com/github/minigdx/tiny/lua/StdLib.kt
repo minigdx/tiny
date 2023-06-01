@@ -23,7 +23,7 @@ interface StdLibListener {
 class StdLib(
     val gameOptions: GameOptions,
     val resourceAccess: GameResourceAccess,
-    val listener: StdLibListener
+    val listener: StdLibListener,
 ) : TwoArgFunction() {
 
     override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
@@ -39,7 +39,7 @@ class StdLib(
     @TinyFunction(
         "Create new instance of a class by creating a new table and setting the metatable. " +
             "It allow to create kind of Object Oriented Programming.\n\n ",
-        example = STD_NEW_EXAMPLE
+        example = STD_NEW_EXAMPLE,
     )
     inner class new : TwoArgFunction() {
 
@@ -65,7 +65,7 @@ class StdLib(
         "Iterate over values of a table.\n\n" +
             "- If you want to iterate over keys, use pairs(table).\n " +
             "- If you want to iterate over index, use ipairs(table).\n " +
-            "- If you want to iterate in reverse, use rpairs(table).\n"
+            "- If you want to iterate in reverse, use rpairs(table).\n",
     )
     internal inner class all : VarArgFunction() {
 
@@ -97,7 +97,7 @@ class StdLib(
             "The iterator return an index and the value. " +
             "The method is useful to remove elements from a table while " +
             "iterating on it.",
-        example = STD_RPAIRS_EXAMPLE
+        example = STD_RPAIRS_EXAMPLE,
     )
     internal inner class rpairs : VarArgFunction() {
 
@@ -158,7 +158,7 @@ class StdLib(
             @TinyArg("str") a: LuaValue,
             @TinyArg("x") b: LuaValue,
             @TinyArg("y") c: LuaValue,
-            @TinyArg("color") d: LuaValue
+            @TinyArg("color") d: LuaValue,
         ): LuaValue {
             val str = a.checkjstring() ?: return NONE
             val x = b.checkint()
@@ -202,10 +202,13 @@ class StdLib(
                 if (coord != null) {
                     val (indexX, indexY) = coord
                     resourceAccess.frameBuffer.copyFrom(
-                        spritesheet.pixels, currentX, y,
+                        spritesheet.pixels,
+                        currentX,
+                        y,
                         indexX * 4,
                         indexY * 4,
-                        4, 4,
+                        4,
+                        4,
                     ) { pixel: Array<Int>, _, _ ->
                         if (pixel[0] == 0) {
                             pixel
@@ -242,7 +245,7 @@ class StdLib(
             'ñ' to 'n',
             'ò' to 'o', 'ó' to 'o', 'ô' to 'o', 'õ' to 'o', 'ö' to 'o',
             'ù' to 'u', 'ú' to 'u', 'û' to 'u', 'ü' to 'u',
-            'ý' to 'y', 'ÿ' to 'y'
+            'ý' to 'y', 'ÿ' to 'y',
         )
 
         val EMOJI_MAP = mapOf(

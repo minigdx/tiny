@@ -17,7 +17,7 @@ import org.luaj.vm2.lib.TwoArgFunction
 
 @TinyLib(
     "gfx",
-    "Access to graphical API like updating the color palette or applying a dithering pattern."
+    "Access to graphical API like updating the color palette or applying a dithering pattern.",
 )
 class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() {
     override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
@@ -53,18 +53,18 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         }
     }
 
-    @TinyFunction("Set the color index at the coordinate (x,y).",)
+    @TinyFunction("Set the color index at the coordinate (x,y).")
     internal inner class pset : ThreeArgFunction() {
-        @TinyCall("set the color index at the coordinate (x,y).",)
+        @TinyCall("set the color index at the coordinate (x,y).")
         override fun call(@TinyArg("x")arg1: LuaValue, @TinyArg("y")arg2: LuaValue, @TinyArg("color")arg3: LuaValue): LuaValue {
             resourceAccess.frameBuffer.pixel(arg1.checkint(), arg2.checkint(), arg3.checkint())
             return NONE
         }
     }
 
-    @TinyFunction("Get the color index at the coordinate (x,y).",)
+    @TinyFunction("Get the color index at the coordinate (x,y).")
     internal inner class pget : TwoArgFunction() {
-        @TinyCall("get the color index at the coordinate (x,y).",)
+        @TinyCall("get the color index at the coordinate (x,y).")
         override fun call(@TinyArg("x")arg1: LuaValue, @TinyArg("y")arg2: LuaValue): LuaValue {
             val index = resourceAccess.frameBuffer.pixel(arg1.checkint(), arg2.checkint())
             return valueOf(index)
@@ -78,7 +78,7 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
             "- If the index of the spritesheet is negative, " +
             "a new spritesheet will be created at the last positive index.\n",
         "to_sheet",
-        example = GFX_TO_SHEET_EXAMPLE
+        example = GFX_TO_SHEET_EXAMPLE,
     )
     inner class toSheet : OneArgFunction() {
 
@@ -94,15 +94,16 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
                 ResourceType.GAME_SPRITESHEET,
                 copy,
                 copy.width,
-                copy.height
+                copy.height,
             )
             resourceAccess.spritesheet(sheet)
             return arg
         }
     }
+
     @TinyFunction(
         "Change a color from the palette to another color.",
-        example = GFX_PAL_EXAMPLE
+        example = GFX_PAL_EXAMPLE,
     )
     inner class pal : LibFunction() {
 
@@ -141,7 +142,7 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
             "The first bits is the one on the far left and represent " +
             "the pixel of the top left of a 4x4 matrix. " +
             "The last bit is the pixel from the bottom right of this matrix.",
-        example = GFX_DITHER_EXAMPLE
+        example = GFX_DITHER_EXAMPLE,
     )
     inner class dither : LibFunction() {
         @TinyCall("Reset dithering pattern.")
@@ -159,7 +160,7 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
 
     @TinyFunction(
         "Clip the draw surface (ie: limit the drawing area).",
-        example = GFX_CLIP_EXAMPLE
+        example = GFX_CLIP_EXAMPLE,
     )
     inner class clip : LibFunction() {
         @TinyCall("Reset the clip and draw on the fullscreen.")
@@ -173,7 +174,7 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
             @TinyArg("x") a: LuaValue,
             @TinyArg("y") b: LuaValue,
             @TinyArg("width") c: LuaValue,
-            @TinyArg("height") d: LuaValue
+            @TinyArg("height") d: LuaValue,
         ): LuaValue {
             resourceAccess.frameBuffer.clipper.set(a.checkint(), b.checkint(), c.checkint(), d.checkint())
             return NONE

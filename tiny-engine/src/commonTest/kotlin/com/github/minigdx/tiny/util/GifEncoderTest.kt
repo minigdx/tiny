@@ -50,7 +50,7 @@ class GifEncoderTest {
                 expected[index],
                 actual[index],
                 "Byte (${expected[index].toHex()}) " +
-                    "at the index $index is different (${actual[index].toHex()})"
+                    "at the index $index is different (${actual[index].toHex()})",
             )
         }
     }

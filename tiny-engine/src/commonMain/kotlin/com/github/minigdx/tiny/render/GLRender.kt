@@ -38,10 +38,13 @@ class GLRender(
 
     private val uvsData = FloatBuffer(
         floatArrayOf(
-            2f, 0f,
-            0f, 2f,
-            0f, 0f,
-        )
+            2f,
+            0f,
+            0f,
+            2f,
+            0f,
+            0f,
+        ),
     )
 
     override fun init(windowManager: WindowManager): RenderContext {
@@ -107,9 +110,12 @@ class GLRender(
         gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
 
         val vertexData = floatArrayOf(
-            -1f, -3f,
-            3f, 1f,
-            -1f, 1f
+            -1f,
+            -3f,
+            3f,
+            1f,
+            -1f,
+            1f,
         )
 
         val positionBuffer = gl.createBuffer()
@@ -123,7 +129,7 @@ class GLRender(
             type = GL_FLOAT,
             normalized = false,
             stride = 0,
-            offset = 0
+            offset = 0,
         )
         gl.enableVertexAttribArray(position)
 
@@ -134,7 +140,7 @@ class GLRender(
             GL_ARRAY_BUFFER,
             uvsData,
             6,
-            GL_STATIC_DRAW
+            GL_STATIC_DRAW,
         )
 
         val uvs = gl.getAttribLocation(shaderProgram, "uvs")
@@ -144,7 +150,7 @@ class GLRender(
             type = GL_FLOAT,
             normalized = false,
             stride = 0,
-            offset = 0
+            offset = 0,
         )
         gl.enableVertexAttribArray(uvs)
 
@@ -166,7 +172,7 @@ class GLRender(
                 "Shader compilation error: $log \n" +
                     "---------- \n" +
                     "Shader code in error: \n" +
-                    vertexShader
+                    vertexShader,
             )
         }
         return vertexShaderId
@@ -179,7 +185,7 @@ class GLRender(
             gameOptions.gutter.first * gameOptions.zoom * context.windowManager.ratioWidth,
             gameOptions.gutter.second * gameOptions.zoom * context.windowManager.ratioHeight,
             gameOptions.width * gameOptions.zoom * context.windowManager.ratioWidth,
-            gameOptions.height * gameOptions.zoom * context.windowManager.ratioHeight
+            gameOptions.height * gameOptions.zoom * context.windowManager.ratioHeight,
         )
 
         gl.bindTexture(GL_TEXTURE_2D, context.texture)
@@ -195,7 +201,7 @@ class GLRender(
             0,
             GL_RGBA,
             GL_UNSIGNED_BYTE,
-            ByteBuffer(image)
+            ByteBuffer(image),
         )
 
         gl.uniform1i(gl.getUniformLocation(context.program, "image")!!, 0)

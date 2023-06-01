@@ -11,7 +11,7 @@ annotation class TinyLib(
     /**
      * Description of the Library.
      */
-    val description: String = ""
+    val description: String = "",
 )
 
 @Target(AnnotationTarget.CLASS)
@@ -65,7 +65,7 @@ annotation class TinyCall(
     /**
      * Description of the call when called with those arguments.
      */
-    val description: String = ""
+    val description: String = "",
 )
 
 @Target(AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.FUNCTION)

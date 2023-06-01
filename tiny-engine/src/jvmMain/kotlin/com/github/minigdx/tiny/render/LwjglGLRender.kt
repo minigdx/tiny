@@ -32,6 +32,6 @@ class LwjglGLRender(
         context: RenderContext,
         image: ByteArray,
         width: Pixel,
-        height: Pixel
+        height: Pixel,
     ) = gl.draw(context, image, width, height)
 }

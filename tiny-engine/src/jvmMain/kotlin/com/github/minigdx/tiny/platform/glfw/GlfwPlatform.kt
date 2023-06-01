@@ -46,7 +46,7 @@ class GlfwPlatform(
     private val logger: Logger,
     private val vfs: VirtualFileSystem,
     private val workdirectory: File,
-    private val render: Render = GLRender(KglLwjgl, logger, gameOptions)
+    private val render: Render = GLRender(KglLwjgl, logger, gameOptions),
 ) : Platform {
 
     private var window: Long = 0
@@ -91,11 +91,11 @@ class GlfwPlatform(
 
         GLFW.glfwWindowHint(
             GLFW.GLFW_VISIBLE,
-            GLFW.GLFW_FALSE
+            GLFW.GLFW_FALSE,
         ) // the window will stay hidden after creation
         GLFW.glfwWindowHint(
             GLFW.GLFW_RESIZABLE,
-            GLFW.GLFW_FALSE
+            GLFW.GLFW_FALSE,
         ) // the window will be resizable
 
         // Create the window
@@ -106,7 +106,7 @@ class GlfwPlatform(
             windowHeight,
             "Tiny",
             MemoryUtil.NULL,
-            MemoryUtil.NULL
+            MemoryUtil.NULL,
         )
         if (window == MemoryUtil.NULL) {
             throw IllegalStateException("Failed to create the GLFW window")
@@ -119,7 +119,7 @@ class GlfwPlatform(
         GLFW.glfwSetWindowPos(
             window,
             (vidmode.width() - windowWidth) / 2,
-            (vidmode.height() - windowHeight) / 2
+            (vidmode.height() - windowHeight) / 2,
         )
 
         // Make the OpenGL context current
@@ -169,7 +169,6 @@ class GlfwPlatform(
         // Render loop
         runBlocking {
             while (!GLFW.glfwWindowShouldClose(window)) {
-
                 gameLoop.advance(getDelta())
                 gameLoop.draw()
 
@@ -209,7 +208,7 @@ class GlfwPlatform(
                     gameOptions.width,
                     gameOptions.height,
                     0,
-                    gameOptions.colors()
+                    gameOptions.colors(),
                 )
 
                 buffer.forEach { img ->
@@ -227,10 +226,12 @@ class GlfwPlatform(
         var origin = workdirectory.resolve("output_${index.toString().padStart(3, '0')}.$extension")
         while (origin.exists()) {
             index++
-            if (index >= 999) throw IllegalStateException(
-                "Too many file '${prefixName}_xxx.$extension' generated! " +
-                    "You might need to delete some"
-            )
+            if (index >= 999) {
+                throw IllegalStateException(
+                    "Too many file '${prefixName}_xxx.$extension' generated! " +
+                        "You might need to delete some",
+                )
+            }
             origin = workdirectory.resolve("output_${index.toString().padStart(3, '0')}.$extension")
         }
         return origin

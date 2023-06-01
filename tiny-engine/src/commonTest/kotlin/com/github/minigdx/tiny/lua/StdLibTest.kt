@@ -22,8 +22,12 @@ class StdLibTest {
 
     private val mockResources = object : GameResourceAccess {
         override val bootSpritesheet: SpriteSheet = SpriteSheet(
-            0, "boot", ResourceType.BOOT_SPRITESHEET,
-            PixelArray(1, 1, PixelFormat.INDEX), 1, 1,
+            0,
+            "boot",
+            ResourceType.BOOT_SPRITESHEET,
+            PixelArray(1, 1, PixelFormat.INDEX),
+            1,
+            1,
         )
         override val frameBuffer: FrameBuffer = FrameBuffer(10, 10, ColorPalette(colors))
         override fun spritesheet(index: Int): SpriteSheet? = null
@@ -39,7 +43,7 @@ class StdLibTest {
         colors,
         gameScripts = emptyList(),
         spriteSheets = emptyList(),
-        gameLevels = emptyList()
+        gameLevels = emptyList(),
     )
 
     private val listener = object : StdLibListener {

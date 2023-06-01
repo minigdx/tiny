@@ -134,7 +134,7 @@ private fun createGame(
         gameLevels = emptyList(),
         zoom = 2,
         gutter = 0 to 0,
-        spriteSize = 16 to 16,
+        spriteSize = 16 to 16
     )
 
     GameEngine(

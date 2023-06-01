@@ -39,8 +39,9 @@ class JavaMidiSound(private val data: ByteArray) : MidiSound {
             if (isRunning) {
                 stop()
             }
-            if (isOpen)
+            if (isOpen) {
                 close()
+            }
         }
     }
 }

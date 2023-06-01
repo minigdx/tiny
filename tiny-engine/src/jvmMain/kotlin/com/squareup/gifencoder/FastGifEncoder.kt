@@ -16,14 +16,14 @@ class FastGifEncoder(
     private val colorTable = ColorTable.fromColors(
         (0 until rgbPalette.size).map { index -> rgbPalette.getRGAasInt(index) }
             .map { rgb -> Color.fromRgbInt(rgb) }
-            .toSet()
+            .toSet(),
     )
 
     init {
         HeaderBlock.write(outputStream)
         LogicalScreenDescriptorBlock.write(
             outputStream, screenWidth, screenHeight, false, 1, false, 0,
-            0, 0
+            0, 0,
         )
         NetscapeLoopingExtensionBlock.write(outputStream, loopCount)
     }
@@ -65,18 +65,22 @@ class FastGifEncoder(
             !(
                 options.left + image.width > screenWidth ||
                     options.top + image.height > screenHeight
-                )
+                ),
         ) { "Image does not fit in screen." }
 
         val paddedColorCount = colorTable.paddedSize()
         val colorIndices = colorTable.getIndices(image)
         GraphicsControlExtensionBlock.write(
-            outputStream, options.disposalMethod, false, false,
-            options.delayCentiseconds, 0
+            outputStream,
+            options.disposalMethod,
+            false,
+            false,
+            options.delayCentiseconds,
+            0,
         )
         ImageDescriptorBlock.write(
             outputStream, options.left, options.top, image.width,
-            image.height, true, false, false, getColorTableSizeField(paddedColorCount)
+            image.height, true, false, false, getColorTableSizeField(paddedColorCount),
         )
         colorTable.write(outputStream)
 

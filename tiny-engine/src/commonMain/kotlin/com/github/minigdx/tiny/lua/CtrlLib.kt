@@ -14,7 +14,7 @@ import org.luaj.vm2.lib.TwoArgFunction
 
 @TinyLib(
     "ctrl",
-    "Access to controllers like touch/mouse events or accessing which key is pressed by the user."
+    "Access to controllers like touch/mouse events or accessing which key is pressed by the user.",
 )
 class CtrlLib(
     private val inputHandler: InputHandler,
@@ -42,7 +42,7 @@ class CtrlLib(
             "the coordinates will be the last mouse position/touch. " +
             "The function return those coordinates as a table {x, y}. " +
             "A sprite can be draw directly on the mouse position by passing the sprite number. ",
-        example = CTRL_TOUCH_EXAMPLE
+        example = CTRL_TOUCH_EXAMPLE,
     )
     inner class touch : OneArgFunction() {
 
@@ -73,7 +73,7 @@ class CtrlLib(
 
     @TinyFunction(
         "Return true if the key was pressed during the last frame. " +
-            "If you need to check that the key is still pressed, see `ctrl.pressing` instead."
+            "If you need to check that the key is still pressed, see `ctrl.pressing` instead.",
     )
     inner class pressed : OneArgFunction() {
 
@@ -91,7 +91,7 @@ class CtrlLib(
 
     @TinyFunction(
         "Return true if the key is still pressed. ",
-        example = CTRL_PRESSING_EXAMPLE
+        example = CTRL_PRESSING_EXAMPLE,
     )
     inner class pressing : OneArgFunction() {
         @TinyCall("Is the key is still pressed?")
@@ -113,7 +113,7 @@ class CtrlLib(
             "- 0: left click or one finger\n" +
             "- 1: right click or two fingers\n" +
             "- 2: middle click or three fingers\n\n" +
-            "If you need to check that the touch/mouse button is still active, see `ctrl.touching` instead."
+            "If you need to check that the touch/mouse button is still active, see `ctrl.touching` instead.",
     )
     inner class touched : OneArgFunction() {
 
@@ -145,7 +145,7 @@ class CtrlLib(
             "- 0: left click or one finger\n" +
             "- 1: right click or two fingers\n" +
             "- 2: middle click or three fingers\n\n",
-        example = CTRL_TOUCHING_EXAMPLE
+        example = CTRL_TOUCHING_EXAMPLE,
     )
     inner class touching : OneArgFunction() {
         @TinyCall("Is the screen is still touched or mouse button is still pressed?")

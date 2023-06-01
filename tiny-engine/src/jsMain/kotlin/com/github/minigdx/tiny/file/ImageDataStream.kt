@@ -46,7 +46,7 @@ class ImageDataStream(val url: String) : SourceStream<ImageData> {
                         val data = Int8Array(rawImageData.data.buffer).unsafeCast<ByteArray>()
                         continuation.resumeWith(Result.success(ImageData(data, img.width, img.height)))
                     }
-                }
+                },
             )
             img.src = url
         }

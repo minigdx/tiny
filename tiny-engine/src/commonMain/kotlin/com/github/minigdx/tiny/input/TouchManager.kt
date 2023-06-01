@@ -25,6 +25,7 @@ class TouchManager(lastKeyCode: KeyCode) {
      * If more than 0, it means that a least one key is pressed.
      */
     private var numberOfKeyPressed = 0
+
     /**
      * Is any key is currently pressed?
      */

@@ -21,7 +21,7 @@ import kotlin.math.abs
     "shape",
     "Shape API to draw...shapes. " +
         "Those shapes can be circle, rectangle, line or oval." +
-        "All shapes can be draw filed or not filed."
+        "All shapes can be draw filed or not filed.",
 )
 class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() {
     override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
@@ -83,9 +83,9 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
                     "centerY",
                     "radiusX",
                     "radiusY",
-                    "color"
-                )
-            ) args: Varargs
+                    "color",
+                ),
+            ) args: Varargs,
         ): Varargs {
             val centerX = args.checkint(1)
             val centerY = args.checkint(2)
@@ -157,9 +157,9 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
                     "centerY",
                     "radiusX",
                     "radiusY",
-                    "color"
-                )
-            ) args: Varargs
+                    "color",
+                ),
+            ) args: Varargs,
         ): Varargs {
             val centerX = args.checkint(1)
             val centerY = args.checkint(2)
@@ -243,7 +243,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
             @TinyArg("centerX") a: LuaValue,
             @TinyArg("centerY") b: LuaValue,
             @TinyArg("radius") c: LuaValue,
-            @TinyArg("color") d: LuaValue
+            @TinyArg("color") d: LuaValue,
         ): LuaValue {
             val centerX = a.checkint()
             val centerY = b.checkint()
@@ -289,7 +289,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
         @TinyCall("Draw a line.")
         override fun invoke(
             @TinyArgs(arrayOf("x0", "y0", "x1", "y2", "color"))
-            args: Varargs
+            args: Varargs,
         ): Varargs {
             return when (args.narg()) {
                 0 -> call()
@@ -302,7 +302,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
                     args.arg(2).checkint(),
                     args.arg(3).checkint(),
                     args.arg(4).checkint(),
-                    args.arg(5).checkColorIndex()
+                    args.arg(5).checkColorIndex(),
                 )
             }
         }
@@ -339,7 +339,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
             @TinyArg("x0") a: LuaValue,
             @TinyArg("y0") b: LuaValue,
             @TinyArg("x1") c: LuaValue,
-            @TinyArg("y1") d: LuaValue
+            @TinyArg("y1") d: LuaValue,
         ): LuaValue {
             val args: Array<LuaValue> = arrayOf(a, b, c, d, valueOf("#FFFFFF"))
             invoke(args)
@@ -360,7 +360,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
             @TinyArg("centerX") a: LuaValue,
             @TinyArg("centerY") b: LuaValue,
             @TinyArg("radius") c: LuaValue,
-            @TinyArg("color") d: LuaValue
+            @TinyArg("color") d: LuaValue,
         ): LuaValue {
             val centerX = a.checkint()
             val centerY = b.checkint()
@@ -398,7 +398,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
 
         @TinyCall("Draw a filled triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).")
         override fun invoke(
-            @TinyArgs(arrayOf("x1", "y1", "x2", "y2", "x3", "y3", "color")) args: Varargs
+            @TinyArgs(arrayOf("x1", "y1", "x2", "y2", "x3", "y3", "color")) args: Varargs,
         ): Varargs {
             if (args.narg() < 7) throw LuaError("Expected 7 args")
 
@@ -452,7 +452,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
 
         @TinyCall("Draw a triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).")
         override fun invoke(
-            @TinyArgs(arrayOf("x1", "y1", "x2", "y2", "x3", "y3", "color")) args: Varargs
+            @TinyArgs(arrayOf("x1", "y1", "x2", "y2", "x3", "y3", "color")) args: Varargs,
         ): Varargs {
             if (args.narg() < 7) throw LuaError("Expected 7 args")
 
@@ -467,31 +467,37 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
             line.invoke(
                 varargsOf(
                     arrayOf(
-                        valueOf(x1), valueOf(y1),
-                        valueOf(x2), valueOf(y2),
-                        valueOf(color)
-                    )
-                )
+                        valueOf(x1),
+                        valueOf(y1),
+                        valueOf(x2),
+                        valueOf(y2),
+                        valueOf(color),
+                    ),
+                ),
             )
 
             line.invoke(
                 varargsOf(
                     arrayOf(
-                        valueOf(x2), valueOf(y2),
-                        valueOf(x3), valueOf(y3),
-                        valueOf(color)
-                    )
-                )
+                        valueOf(x2),
+                        valueOf(y2),
+                        valueOf(x3),
+                        valueOf(y3),
+                        valueOf(color),
+                    ),
+                ),
             )
 
             line.invoke(
                 varargsOf(
                     arrayOf(
-                        valueOf(x3), valueOf(y3),
-                        valueOf(x1), valueOf(y1),
-                        valueOf(color)
-                    )
-                )
+                        valueOf(x3),
+                        valueOf(y3),
+                        valueOf(x1),
+                        valueOf(y1),
+                        valueOf(color),
+                    ),
+                ),
             )
 
             return NONE

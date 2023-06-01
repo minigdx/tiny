@@ -103,5 +103,5 @@ enum class Key {
     BACK_SLASH,
     CLOSE_BRAKET,
     SINGLE_QUOTE,
-    DPAD_CENTER
+    DPAD_CENTER,
 }

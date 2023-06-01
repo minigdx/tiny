@@ -25,13 +25,17 @@ interface Interpolation {
 private class PowInterpolation(private val power: Int) : Interpolation {
 
     override fun interpolate(percent: Percent): Float {
-        return if (percent <= 0.5f) pow(
-            (percent * 2f),
-            power.toFloat()
-        ) / 2 else pow(
-            ((percent - 1) * 2f),
-            power.toFloat()
-        ) / (if (power % 2 == 0) -2 else 2) + 1
+        return if (percent <= 0.5f) {
+            pow(
+                (percent * 2f),
+                power.toFloat(),
+            ) / 2
+        } else {
+            pow(
+                ((percent - 1) * 2f),
+                power.toFloat(),
+            ) / (if (power % 2 == 0) -2 else 2) + 1
+        }
     }
 
     override fun toString(): String = "pow$power"
@@ -122,7 +126,7 @@ private open class ElasticInterpolation(
     protected val value: Float,
     protected val power: Float,
     bounces: Int,
-    protected val scale: Float
+    protected val scale: Float,
 ) : Interpolation {
 
     protected val bounces: Float = bounces * PI.toFloat() * if (bounces % 2 == 0) 1f else -1f
@@ -133,14 +137,14 @@ private open class ElasticInterpolation(
             a *= 2f
             return pow(
                 value,
-                (power * (a - 1))
+                (power * (a - 1)),
             ) * sin(a * bounces) * scale / 2
         }
         a = 1 - a
         a *= 2f
         return 1 - pow(
             value,
-            (power * (a - 1))
+            (power * (a - 1)),
         ) * sin(a * bounces) * scale / 2
     }
     override fun toString(): String = "elastic"
@@ -150,7 +154,7 @@ private class ElasticInInterpolation(
     value: Float,
     power: Float,
     bounces: Int,
-    scale: Float
+    scale: Float,
 ) : ElasticInterpolation(value, power, bounces, scale) {
 
     override fun interpolate(percent: Percent): Float {
@@ -164,7 +168,7 @@ private class ElasticOutInterpolation(
     value: Float,
     power: Float,
     bounces: Int,
-    scale: Float
+    scale: Float,
 ) : ElasticInterpolation(value, power, bounces, scale) {
 
     override fun interpolate(percent: Percent): Float {
@@ -427,7 +431,7 @@ object Interpolations {
         exp10, exp10In, exp10Out,
         exp5, exp5In, exp5Out,
 
-        linear
+        linear,
     )
 
     fun lerp(target: Float, current: Float, step: Float = 0.9f): Float {
