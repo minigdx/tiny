@@ -8,6 +8,6 @@ class MissingTinyConfigurationException(message: String? = null, cause: Throwabl
         "The file '${file.absolutePath}' doesn't exist. " +
             "It's required to load the game configuration. " +
             "Can you check if the file is not located in another path? " +
-            "Without a valid file, the game will not be able to run."
+            "Without a valid file, the game will not be able to run.",
     )
 }

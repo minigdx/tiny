@@ -11,7 +11,7 @@ class MainCommand : CliktCommand(invokeWithoutSubcommand = true) {
             RunCommand(),
             AddCommand(),
             ExportCommand(),
-            ServeCommand()
+            ServeCommand(),
         )
     }
 

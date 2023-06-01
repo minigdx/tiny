@@ -13,13 +13,13 @@ import java.io.File
 class AddCommand : CliktCommand(name = "add") {
 
     val game by option(
-        help = "The directory containing all game information"
+        help = "The directory containing all game information",
     )
         .file(mustExist = true, canBeDir = true, canBeFile = false)
         .default(File("."))
 
     val resources by argument(
-        help = "The resource to add to the game. The kind of resource will be deducted from the file extension."
+        help = "The resource to add to the game. The kind of resource will be deducted from the file extension.",
     ).multiple(required = true)
 
     override fun run() {

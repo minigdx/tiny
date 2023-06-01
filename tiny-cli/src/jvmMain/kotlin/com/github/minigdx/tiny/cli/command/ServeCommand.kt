@@ -29,7 +29,7 @@ class ServeCommand : CliktCommand(name = "serve") {
     private val game by argument(
         help =
         "The game to serve. It has to be a tiny game exported " +
-            "by the export command (ie: zip file)."
+            "by the export command (ie: zip file).",
     )
         .file(mustExist = true, canBeDir = true, canBeFile = true)
 

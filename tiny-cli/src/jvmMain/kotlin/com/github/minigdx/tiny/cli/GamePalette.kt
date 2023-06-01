@@ -4,7 +4,7 @@ class GamePalette(val name: String, val colors: List<String>) {
     companion object {
         val ONE_BIT = GamePalette(
             "1bit",
-            listOf("#000000", "#FFFFFF")
+            listOf("#000000", "#FFFFFF"),
         )
         val PICO8 = GamePalette(
             "pico8",
@@ -24,8 +24,8 @@ class GamePalette(val name: String, val colors: List<String>) {
                 "#29ADFF",
                 "#83769C",
                 "#FF77A8",
-                "#FFCCAA"
-            )
+                "#FFCCAA",
+            ),
         )
 
         val GAMEBOY = GamePalette(
@@ -34,8 +34,8 @@ class GamePalette(val name: String, val colors: List<String>) {
                 "#E0F8D0", // Lightest
                 "#88C070",
                 "#346856",
-                "#081820" // Darkest
-            )
+                "#081820", // Darkest
+            ),
         )
 
         // https://lospec.com/palette-list/rgr-proto16
@@ -57,8 +57,8 @@ class GamePalette(val name: String, val colors: List<String>) {
                 "#570932",
                 "#871E2E",
                 "#FFBF40",
-                "#CC1424"
-            )
+                "#CC1424",
+            ),
         )
         val ALL = listOf(ONE_BIT, PICO8, GAMEBOY, RGR_PROTO16)
     }

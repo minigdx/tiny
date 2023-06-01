@@ -64,7 +64,7 @@ class CreateCommand : CliktCommand(name = "create") {
         .validate {
             require(
                 it.isEmpty() || it.split(",")
-                    .all { f -> f.trim().endsWith(".png") }
+                    .all { f -> f.trim().endsWith(".png") },
             ) { "Invalid image file $it. Only *.png are supported" }
         }
 
@@ -77,7 +77,7 @@ ${
                 "[${index + 1}] ${gamePalette.name}"
             }.joinToString("\n")
             }
-"""
+""",
         )
 
     override fun run() {
@@ -93,7 +93,7 @@ ${
             sprites = spriteSize.toSize(),
             zoom = zoom,
             colors = GamePalette.ALL[palette - 1].colors,
-            scripts = listOf(gameScript)
+            scripts = listOf(gameScript),
         ) as GameParameters
 
         if (!gameDirectory.exists()) gameDirectory.mkdirs()
