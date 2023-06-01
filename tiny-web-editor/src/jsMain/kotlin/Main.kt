@@ -77,7 +77,7 @@ private fun createGame(
     container: Element,
     index: Int,
     code: String,
-    rootPath: String
+    rootPath: String,
 ) {
     val canvas = document.createElement("canvas").apply {
         setAttribute("width", "512")
@@ -127,21 +127,21 @@ private fun createGame(
             "#570932",
             "#871E2E",
             "#FFBF40",
-            "#CC1424"
+            "#CC1424",
         ),
         gameScripts = listOf("#editor-$index"),
         spriteSheets = emptyList(),
         gameLevels = emptyList(),
         zoom = 2,
         gutter = 0 to 0,
-        spriteSize = 16 to 16
+        spriteSize = 16 to 16,
     )
 
     GameEngine(
         gameOptions = gameOptions,
         platform = EditorWebGlPlatform(WebGlPlatform(canvas as HTMLCanvasElement, logger, gameOptions, rootPath)),
         vfs = CommonVirtualFileSystem(),
-        logger = logger
+        logger = logger,
     ).main()
 }
 

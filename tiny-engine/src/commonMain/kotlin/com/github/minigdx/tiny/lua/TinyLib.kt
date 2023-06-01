@@ -5,6 +5,7 @@ import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.mingdx.tiny.doc.TinyVariable
+import com.github.minigdx.tiny.engine.Exit
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.OneArgFunction
@@ -16,7 +17,7 @@ import org.luaj.vm2.lib.TwoArgFunction
         "the current time (`tiny.time`), delta time (`tiny.dt`) and " +
         "to switch to another script using `exit`.",
 )
-class TinyLib(private val listener: StdLibListener) : TwoArgFunction() {
+class TinyLib : TwoArgFunction() {
 
     private var time: Double = 0.0
     private var frame: Int = 0
@@ -55,9 +56,8 @@ class TinyLib(private val listener: StdLibListener) : TwoArgFunction() {
     internal inner class exit : OneArgFunction() {
 
         @TinyCall("Exit the actual script to switch to another one.")
-        override fun call(@TinyArg("scriptIndex")arg: LuaValue): LuaValue {
-            listener.exit(arg.checkint())
-            return NONE
+        override fun call(@TinyArg("scriptIndex") arg: LuaValue): LuaValue {
+            throw Exit(arg.checkint())
         }
     }
 }

@@ -128,7 +128,7 @@ class GameExporter {
             "_boot.lua",
             "_boot.png",
             "_engine.lua",
-            "tiny-engine.js"
+            "tiny-engine.js",
         )
     }
 }

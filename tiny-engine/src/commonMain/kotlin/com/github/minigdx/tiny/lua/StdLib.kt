@@ -15,15 +15,10 @@ import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.VarArgFunction
 
-interface StdLibListener {
-    fun exit(nextScriptIndex: Int)
-}
-
 @TinyLib(description = "Standard library.")
 class StdLib(
     val gameOptions: GameOptions,
     val resourceAccess: GameResourceAccess,
-    val listener: StdLibListener,
 ) : TwoArgFunction() {
 
     override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {

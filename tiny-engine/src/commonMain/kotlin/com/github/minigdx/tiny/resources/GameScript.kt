@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.resources
 
+import com.github.minigdx.tiny.engine.Exit
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.input.InputHandler
@@ -13,11 +14,11 @@ import com.github.minigdx.tiny.lua.SfxLib
 import com.github.minigdx.tiny.lua.ShapeLib
 import com.github.minigdx.tiny.lua.SprLib
 import com.github.minigdx.tiny.lua.StdLib
-import com.github.minigdx.tiny.lua.StdLibListener
 import com.github.minigdx.tiny.lua.TinyBaseLib
 import com.github.minigdx.tiny.lua.TinyLib
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LoadState
+import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.LuaValue.Companion.valueOf
 import org.luaj.vm2.compiler.LuaC
@@ -39,7 +40,7 @@ class GameScript(
     val gameOptions: GameOptions,
     val inputHandler: InputHandler,
     override val type: ResourceType,
-) : GameResource, StdLibListener {
+) : GameResource {
 
     var exited: Int = -1
     var evaluated: Boolean = false
@@ -58,7 +59,7 @@ class GameScript(
 
     private var globals: Globals? = null
 
-    private val tinyLib: TinyLib = TinyLib(this)
+    private val tinyLib: TinyLib = TinyLib()
 
     class State(val args: LuaValue)
 
@@ -71,7 +72,7 @@ class GameScript(
         load(TableLib())
         load(StringLib())
         load(CoroutineLib())
-        load(StdLib(gameOptions, resourceAccess, this@GameScript))
+        load(StdLib(gameOptions, resourceAccess))
         load(MapLib(this@GameScript.resourceAccess))
         load(GfxLib(this@GameScript.resourceAccess))
         load(CtrlLib(inputHandler, sprLib))
@@ -84,10 +85,6 @@ class GameScript(
         load(JuiceLib())
         LoadState.install(this)
         LuaC.install(this)
-    }
-
-    override fun exit(nextScriptIndex: Int) {
-        exited = nextScriptIndex
     }
 
     suspend fun isValid(): Boolean {
@@ -138,10 +135,17 @@ class GameScript(
 
     suspend fun advance() {
         tinyLib.advance()
-        updateFunction?.callSuspend()
-        // Skip the draw call if the game script just exited.
-        if (exited == -1) {
+        try {
+            updateFunction?.callSuspend()
             drawFunction?.callSuspend()
+        } catch (ex: LuaError) {
+            val luaCause = ex.luaCause
+            // The user want to load another script.
+            if (luaCause is Exit) {
+                exited = luaCause.script
+            } else {
+                throw ex
+            }
         }
     }
 
