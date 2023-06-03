@@ -46,16 +46,12 @@ class StdLibTest {
         gameLevels = emptyList(),
     )
 
-    private val listener = object : StdLibListener {
-        override fun exit(nextScriptIndex: Int) = Unit
-    }
-
     @Test
     fun it_print_text() {
         mockResources.frameBuffer.clear(0)
         mockResources.bootSpritesheet.pixels.set(0, 0, 1)
 
-        val print = StdLib(gameOptions, mockResources, listener).print()
+        val print = StdLib(gameOptions, mockResources).print()
         // only a is an accepted letter as for the test, the bootspritesheet is too small
         print.invoke(varargsOf(arrayOf(valueOf("a"), valueOf(0), valueOf(0), valueOf(2))))
 
@@ -70,7 +66,7 @@ class StdLibTest {
         mockResources.frameBuffer.clear(0)
         mockResources.bootSpritesheet.pixels.set(0, 0, 1)
 
-        val print = StdLib(gameOptions, mockResources, listener).print()
+        val print = StdLib(gameOptions, mockResources).print()
         print.invoke(varargsOf(arrayOf(valueOf("a"), valueOf(0), valueOf(0))))
 
         val grouped = mockResources.frameBuffer.colorIndexBuffer.pixels.toSet()

@@ -101,16 +101,25 @@ class GameScript(
         evaluated = true
         exited = -1
         reload = false
+        try {
+            globals?.load(content.decodeToString())?.callSuspend()
 
-        globals?.load(content.decodeToString())?.callSuspend()
+            initFunction = globals?.get("_init")?.nullIfNil()
+            updateFunction = globals?.get("_update")?.nullIfNil()
+            drawFunction = globals?.get("_draw")?.nullIfNil()
+            getStateFunction = globals?.get("_getState")?.nullIfNil()
+            setStateFunction = globals?.get("_setState")?.nullIfNil()
 
-        initFunction = globals?.get("_init")?.nullIfNil()
-        updateFunction = globals?.get("_update")?.nullIfNil()
-        drawFunction = globals?.get("_draw")?.nullIfNil()
-        getStateFunction = globals?.get("_getState")?.nullIfNil()
-        setStateFunction = globals?.get("_setState")?.nullIfNil()
-
-        initFunction?.callSuspend(valueOf(gameOptions.width), valueOf(gameOptions.height))
+            initFunction?.callSuspend(valueOf(gameOptions.width), valueOf(gameOptions.height))
+        } catch (ex: LuaError) {
+            val luaCause = ex.luaCause
+            // The user want to load another script.
+            if (luaCause is Exit) {
+                exited = luaCause.script
+            } else {
+                throw ex
+            }
+        }
     }
 
     internal suspend fun invoke(name: String, vararg args: LuaValue) {
