@@ -193,3 +193,38 @@ This will launch the local web server on port number `8081` and serve the game l
 Once the server is running, you can access the game in your web browser by navigating to the URL `http://localhost:[port number]/`. For example, if you used the default port number, you would navigate to `http://localhost:8080/` in your web browser to access the game.
 
 NOTE: The tiny serve command is intended for local testing only and should not be used to serve your game online. When you are ready to publish your game, you should upload the exported game files to a web server and serve them from there.
+
+=== the `tiny-cli lib` command
+
+The tiny-cli lib command is used to download and add Lua libraries to your `🧸 Tiny` game. This command provides an easy way to enhance the functionality of your game by incorporating libraries.
+
+==== Usage
+
+To use the `tiny-cli lib` command, follow the syntax:
+
+[source,shell]
+tiny-cli lib <library_name>
+Replace <library_name> with the name of the library you want to download and add to your game.
+
+For example, to download and add the particles library to your game, you would run the following command:
+
+[source,shell]
+tiny-cli lib particles
+This command will download the particles library and add it to your game.
+
+==== Library Repository
+
+The libraries are downloaded from the following URL:
+
+https://github.com/minigdx/tiny/tree/main/tiny-repository-libs
+
+This repository contains a collection of Lua libraries that can be used with Tiny games. Each library is maintained separately and provides additional features and functionality to enhance your game development process.
+
+==== Examples
+
+Here are a few examples to illustrate how to use the `tiny-cli lib` command:
+
+Download and add the particles library to your game:
+[source,shell]
+tiny-cli lib particles
+This command will download the particles library from the repository and add it to your game.
