@@ -49,11 +49,11 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
     @TinyFunction("Clamp the value between 2 values.")
     internal inner class clamp : ThreeArgFunction() {
 
-        @TinyCall("Clamp the value between a and b.")
+        @TinyCall("Clamp the value between a and b. If a is greater than b, then b will be returned.")
         override fun call(
-            @TinyArg("a") arg1: LuaValue,
-            @TinyArg("value") arg2: LuaValue,
-            @TinyArg("b") arg3: LuaValue,
+            @TinyArg("a", "The minimum value.") arg1: LuaValue,
+            @TinyArg("value", "The value to be clamped.") arg2: LuaValue,
+            @TinyArg("b", "The maximum value.") arg3: LuaValue,
         ): LuaValue {
             val max = if (arg1.todouble() > arg2.todouble()) {
                 arg1
@@ -61,7 +61,7 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
                 arg2
             }
             val min = if (max.todouble() < arg3.todouble()) {
-                arg2
+                max
             } else {
                 arg3
             }
