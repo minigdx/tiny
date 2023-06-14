@@ -761,6 +761,13 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <li><a href="#_example_usage">Example Usage</a></li>
 </ul>
 </li>
+<li><a href="#_the_tiny_cli_lib_command">the <code>tiny-cli lib</code> command</a>
+<ul class="sectlevel3">
+<li><a href="#_usage_5">Usage</a></li>
+<li><a href="#_library_repository">Library Repository</a></li>
+<li><a href="#_examples">Examples</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#_tiny_api">Tiny API</a>
@@ -1514,6 +1521,60 @@ The tiny serve command is intended for local testing only and should not be used
 </td>
 </tr>
 </table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_the_tiny_cli_lib_command">the <code>tiny-cli lib</code> command</h3>
+<div class="paragraph">
+<p>The tiny-cli lib command is used to download and add Lua libraries to your <code>🧸 Tiny</code> game. This command provides an easy way to enhance the functionality of your game by incorporating libraries.</p>
+</div>
+<div class="sect3">
+<h4 id="_usage_5">Usage</h4>
+<div class="paragraph">
+<p>To use the <code>tiny-cli lib</code> command, follow the syntax:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="shell">tiny-cli lib &lt;library_name&gt;
+Replace &lt;library_name&gt; with the name of the library you want to download and add to your game.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For example, to download and add the particles library to your game, you would run the following command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="shell">tiny-cli lib particles
+This <span class="nb">command </span>will download the particles library and add it to your game.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_library_repository">Library Repository</h4>
+<div class="paragraph">
+<p>The libraries are downloaded from the following URL:</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/minigdx/tiny/tree/main/tiny-repository-libs" class="bare">https://github.com/minigdx/tiny/tree/main/tiny-repository-libs</a></p>
+</div>
+<div class="paragraph">
+<p>This repository contains a collection of Lua libraries that can be used with Tiny games. Each library is maintained separately and provides additional features and functionality to enhance your game development process.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_examples">Examples</h4>
+<div class="paragraph">
+<p>Here are a few examples to illustrate how to use the <code>tiny-cli lib</code> command:</p>
+</div>
+<div class="paragraph">
+<p>Download and add the particles library to your game:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="shell">tiny-cli lib particles
+This <span class="nb">command </span>will download the particles library from the repository and add it to your game.</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -2875,7 +2936,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version main<br>
-Last updated 2023-06-03 12:48:04 UTC
+Last updated 2023-06-14 14:04:27 UTC
 </div>
 </div>
 <style>
