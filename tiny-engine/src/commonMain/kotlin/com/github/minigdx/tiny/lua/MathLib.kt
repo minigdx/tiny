@@ -11,6 +11,7 @@ import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.ThreeArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import kotlin.math.abs
+import kotlin.math.floor
 import kotlin.math.sqrt
 import kotlin.random.Random
 
@@ -30,6 +31,7 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
         math["dst"] = dst()
         math["dst2"] = dst2()
         math["sign"] = sign()
+        math["perlin"] = perlin(Random.nextLong())
         return math
     }
 
@@ -141,6 +143,82 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
                 return call(arg1)
             }
             return valueOf(Random.nextInt(arg1.toint(), arg2.toint()))
+        }
+    }
+
+    @TinyFunction("Perlin noise. The random generated value is between 0 and 1.")
+    inner class perlin(seed: Long) : ThreeArgFunction() {
+
+        private val permutation: MutableList<Int>
+
+        init {
+            val source = (0..255).toList().shuffled(Random(seed))
+            permutation = mutableListOf<Int>().apply {
+                repeat(512) {
+                    add(source[it and 255])
+                }
+            }
+        }
+
+        fun noise(x: Double, y: Double, z: Double): Double {
+            val xi = floor(x).toInt() and 255
+            val yi = floor(y).toInt() and 255
+            val zi = floor(z).toInt() and 255
+
+            val xf = x - floor(x)
+            val yf = y - floor(y)
+            val zf = z - floor(z)
+
+            val u = fade(xf)
+            val v = fade(yf)
+            val w = fade(zf)
+
+            val aaa = permutation[permutation[permutation[xi] + yi] + zi]
+            val aba = permutation[permutation[permutation[xi] + inc(yi)] + zi]
+            val aab = permutation[permutation[permutation[xi] + yi] + inc(zi)]
+            val abb = permutation[permutation[permutation[xi] + inc(yi)] + inc(zi)]
+            val baa = permutation[permutation[permutation[inc(xi)] + yi] + zi]
+            val bba = permutation[permutation[permutation[inc(xi)] + inc(yi)] + zi]
+            val bab = permutation[permutation[permutation[inc(xi)] + yi] + inc(zi)]
+            val bbb = permutation[permutation[permutation[inc(xi)] + inc(yi)] + inc(zi)]
+
+            val x1 = lerp(grad(aaa, xf, yf, zf), grad(baa, xf - 1, yf, zf), u)
+            val x2 = lerp(grad(aba, xf, yf - 1, zf), grad(bba, xf - 1, yf - 1, zf), u)
+            val y1 = lerp(x1, x2, v)
+
+            val x3 = lerp(grad(aab, xf, yf, zf - 1), grad(bab, xf - 1, yf, zf - 1), u)
+            val x4 = lerp(grad(abb, xf, yf - 1, zf - 1), grad(bbb, xf - 1, yf - 1, zf - 1), u)
+            val y2 = lerp(x3, x4, v)
+
+            return (lerp(y1, y2, w) + 1) / 2
+        }
+
+        private fun fade(t: Double): Double {
+            return t * t * t * (t * (t * 6 - 15) + 10)
+        }
+
+        private fun inc(num: Int): Int {
+            return (num + 1) and 255
+        }
+
+        private fun grad(hash: Int, x: Double, y: Double, z: Double): Double {
+            val h = hash and 15
+            val u = if (h < 8) x else y
+            val v = if (h < 4) y else if (h == 12 || h == 14) x else z
+            return (if (h and 1 == 0) u else -u) + (if (h and 2 == 0) v else -v)
+        }
+
+        private fun lerp(a: Double, b: Double, t: Double): Double {
+            return a + t * (b - a)
+        }
+
+        @TinyCall("Generate a random value regarding the parameters x,y and z.")
+        override fun call(
+            @TinyArg("x") arg1: LuaValue,
+            @TinyArg("y") arg2: LuaValue,
+            @TinyArg("z") arg3: LuaValue
+        ): LuaValue {
+            return valueOf(noise(arg1.todouble(), arg2.todouble(), arg3.todouble()))
         }
     }
 
