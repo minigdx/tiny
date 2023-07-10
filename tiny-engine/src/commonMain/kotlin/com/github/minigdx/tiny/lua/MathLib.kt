@@ -216,7 +216,7 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
         override fun call(
             @TinyArg("x") arg1: LuaValue,
             @TinyArg("y") arg2: LuaValue,
-            @TinyArg("z") arg3: LuaValue
+            @TinyArg("z") arg3: LuaValue,
         ): LuaValue {
             return valueOf(noise(arg1.todouble(), arg2.todouble(), arg3.todouble()))
         }
