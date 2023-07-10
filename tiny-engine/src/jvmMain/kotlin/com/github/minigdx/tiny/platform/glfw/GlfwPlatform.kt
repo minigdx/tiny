@@ -255,7 +255,7 @@ class GlfwPlatform(
                     val b = colorData[i * 4 + 2].toInt() and 0xff
                     val a = colorData[i * 4 + 3].toInt() and 0xff
                     val color = (a shl 24) or (r shl 16) or (g shl 8) or b
-                    image.setRGB(x, y, color)
+                    image.setRGB(y, x, color)
                 }
             }
 
