@@ -59,7 +59,7 @@ class GameExporter {
 
         when (gameParameters) {
             is GameParametersV1 -> {
-                (gameParameters.scripts + gameParameters.libraries).forEach { name ->
+                (gameParameters.scripts + gameParameters.libraries.map { "$it.lua" }).forEach { name ->
                     exportedGame.putNextEntry(ZipEntry(name))
                     exportedGame.write(gameDirectory.resolve(name).readBytes())
                     exportedGame.closeEntry()
@@ -96,7 +96,7 @@ class GameExporter {
                 template = template.replace("{GAME_SPRW}", gameParameters.sprites.width.toString())
                 template = template.replace("{GAME_SPRH}", gameParameters.sprites.height.toString())
 
-                template = replaceList(template, (gameParameters.scripts + gameParameters.libraries), "{GAME_SCRIPT}", "GAME_SCRIPT")
+                template = replaceList(template, (gameParameters.scripts + gameParameters.libraries.map { "$it.lua" }), "{GAME_SCRIPT}", "GAME_SCRIPT")
                 template = replaceList(template, gameParameters.spritesheets, "{GAME_SPRITESHEET}", "GAME_SPRITESHEET")
                 template = replaceList(template, gameParameters.levels, "{GAME_LEVEL}", "GAME_LEVEL")
                 template = replaceList(template, gameParameters.sounds, "{GAME_SOUND}", "GAME_SOUND")
