@@ -9,8 +9,10 @@ import com.github.minigdx.tiny.cli.config.GameParameters
 import com.github.minigdx.tiny.engine.GameEngine
 import com.github.minigdx.tiny.file.CommonVirtualFileSystem
 import com.github.minigdx.tiny.log.StdOutLogger
+import com.github.minigdx.tiny.lua.errorLine
 import com.github.minigdx.tiny.platform.glfw.GlfwPlatform
 import com.github.minigdx.tiny.render.LwjglGLRender
+import org.luaj.vm2.LuaError
 import java.io.File
 
 class RunCommand : CliktCommand("run") {
@@ -54,6 +56,13 @@ class RunCommand : CliktCommand("run") {
             ).main()
         } catch (ex: Exception) {
             echo("\uD83E\uDDE8 An unexpected exception occurred. The application will stop. It might be a bug in Tiny. If so, please report it.")
+            when (ex) {
+                is LuaError -> {
+                    val (nb, line) = ex.errorLine() ?: (null to null)
+                    echo("Error found line $nb:$line")
+                }
+            }
+            echo()
             ex.printStackTrace()
         }
     }
