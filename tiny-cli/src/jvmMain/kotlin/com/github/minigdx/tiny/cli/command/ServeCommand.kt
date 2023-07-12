@@ -20,7 +20,7 @@ import io.ktor.server.routing.routing
 import java.io.FileInputStream
 import java.util.zip.ZipInputStream
 
-class ServeCommand : CliktCommand(name = "serve") {
+class ServeCommand : CliktCommand(name = "serve", help = "Run your game as a web game.") {
 
     private val port by option(help = "Port of the local webserver.")
         .int()

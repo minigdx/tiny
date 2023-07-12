@@ -15,7 +15,7 @@ import com.github.minigdx.tiny.render.LwjglGLRender
 import org.luaj.vm2.LuaError
 import java.io.File
 
-class RunCommand : CliktCommand("run") {
+class RunCommand : CliktCommand(name = "run", help = "Run your game.") {
 
     val gameDirectory by argument(help = "The directory containing all game information")
         .file(mustExist = true, canBeDir = true, canBeFile = false)

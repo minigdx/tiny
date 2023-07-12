@@ -19,7 +19,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import java.io.File
 
-class LibCommand : CliktCommand(name = "lib") {
+class LibCommand : CliktCommand(name = "lib", help = "Download a library for your game.") {
 
     val game by option(
         help = "The directory containing all game information",

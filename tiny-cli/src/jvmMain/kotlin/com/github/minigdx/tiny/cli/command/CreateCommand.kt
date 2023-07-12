@@ -34,7 +34,7 @@ function _draw()
 
 end
 """
-class CreateCommand : CliktCommand(name = "create") {
+class CreateCommand : CliktCommand(name = "create", help = "Create a new game.") {
 
     val gameDirectory by argument(help = "The directory containing all game information")
         .file(mustExist = false, canBeDir = true, canBeFile = false)

@@ -16,7 +16,7 @@ import java.io.FileOutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
-class ExportCommand : CliktCommand("export") {
+class ExportCommand : CliktCommand(name = "export", help = "Export your game as a web game.") {
 
     val gameDirectory by argument(help = "The directory containing all game information")
         .file(mustExist = true, canBeDir = true, canBeFile = false)
