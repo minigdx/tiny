@@ -85,6 +85,8 @@ To run your game using the `tiny-cli run` command, follow these steps:
 
 With the `tiny-cli run` command, you can quickly test and run your tiny game, making it easy to iterate and refine your game as you develop it.
 
+TIP: Using `tiny-cli run`, You can press Ctrl + R (or ⌘ + R) to record a GIF of the last 8 seconds of your game or Ctrl + S (or ⌘ + S) to take a screenshot.
+
 === The `tiny-cli add` command
 
 The `tiny-cli add` command allows you to quickly and easily add new spritesheets, sounds, and other assets to your game, making it easy to customize and improve your game's functionality.
