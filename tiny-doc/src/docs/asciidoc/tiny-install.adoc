@@ -3,7 +3,7 @@
 `🧸 Tiny` is a game engine that can be run through its client.
 Once installed, you can run and develop games in no time!
 
-- Download Tiny CLI on the Github page
+- Download Tiny CLI from https://github.com/minigdx/tiny/releases[the release Github page]
 - Unzip it and put the `bin` directory in your path (ie: `export PATH=$PATH:<tiny-cli-path>/bin`)
 - Create your first game using `tiny-cli create my-first-game`
 

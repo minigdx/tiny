@@ -11,6 +11,9 @@ Tiny is a lightweight, multiplatform game engine that allows developers to creat
 - Hot Reload: The engine supports hot reload, making it easy for developers to quickly make changes and see the results immediately.
 - Simple and Lightweight: The engine is designed to be simple and lightweight, making it ideal for small and short games.
 
+## Download
+
+- Latest version can be downloaded on [the release page](https://github.com/minigdx/tiny/releases). 
 ## Documentation
 
 The Tiny game engine comes with extensive documentation that covers everything from installing the engine to creating games. The documentation is available on the [GitHub website](https://minigdx.github.io/tiny/).
