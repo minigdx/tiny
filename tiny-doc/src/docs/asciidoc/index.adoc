@@ -46,3 +46,8 @@ include::tiny-showcase.adoc[]
 include::tiny-cli.adoc[]
 
 include::dependencies/tiny-api.adoc[]
+
+== Links
+
+- https://tomhalligan.substack.com/p/tinkering-with-tiny[Tinkering with Tiny]
+- https://tomhalligan.substack.com/p/tiny-gardening[Tiny Gardening]
