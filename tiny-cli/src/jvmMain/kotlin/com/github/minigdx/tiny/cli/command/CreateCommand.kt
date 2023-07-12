@@ -31,7 +31,8 @@ end
     
     
 function _draw()
-
+    gfx.cls()
+    print("Congratulation! Your game is running!")
 end
 """
 class CreateCommand : CliktCommand(name = "create", help = "Create a new game.") {
@@ -81,11 +82,11 @@ ${
         )
 
     override fun run() {
-        echo("➡\uFE0F Game Name: $gameName")
-        echo("➡\uFE0F Game Resolution: $gameResolution")
-        echo("➡\uFE0F Game Resolution: $spriteSize")
-        echo("➡\uFE0F Sprite Sheet Filenames: ${spritesheets.ifBlank { "No spritesheet added!" }}")
-        echo("➡\uFE0F Color palette: ${GamePalette.ALL[palette - 1].name}")
+        echo("➡\uFE0F  Game Name: $gameName")
+        echo("➡\uFE0F  Game Resolution: $gameResolution")
+        echo("➡\uFE0F  Game Resolution: $spriteSize")
+        echo("➡\uFE0F  Sprite Sheet Filenames: ${spritesheets.ifBlank { "No spritesheet added!" }}")
+        echo("➡\uFE0F  Color palette: ${GamePalette.ALL[palette - 1].name}")
 
         val configuration = GameParametersV1(
             name = gameName,
@@ -106,7 +107,7 @@ ${
         gameDirectory.resolve(gameScript).writeText(DEFAULT_GAME_SCRIPT)
 
         echo("\uD83C\uDFD7\uFE0F  Game created into: ${gameDirectory.absolutePath}")
-        echo("\uD83C\uDFC3\u200D♂\uFE0F To run the game: tiny-cli run ${gameDirectory.absolutePath}")
+        echo("\uD83C\uDFC3\u200D♂\uFE0F To run the game: tiny-cli run ${computePath(gameDirectory)}")
     }
 
     private fun String.toSize(): Size {
@@ -118,5 +119,10 @@ ${
         val adjectives = listOf("Funny", "Awesome", "Crazy", "Epic", "Mystical", "Magical")
         val nouns = listOf("Unicorns", "Pandas", "Robots", "Dragons", "Ninjas", "Pirates")
         return "${adjectives.random()} ${nouns.random()} Game"
+    }
+
+    private fun computePath(gamePath: File): String {
+        val currentPath = File(".")
+        return gamePath.relativeTo(currentPath).path
     }
 }
