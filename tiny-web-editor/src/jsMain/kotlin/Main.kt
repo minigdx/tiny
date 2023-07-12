@@ -57,7 +57,7 @@ fun main() {
         val codeToUse = decodedCode ?: "-- Update the code to update the game!\n$code"
 
         var clicked = false
-        link.textContent = "\uD83D\uDC7E ▶ Try an example"
+        link.textContent = "\uD83D\uDC7E ▶ Run and tweak an example"
         link.onclick = { _ ->
             if (!clicked) {
                 createGame(playLink, index, codeToUse, rootPath)
