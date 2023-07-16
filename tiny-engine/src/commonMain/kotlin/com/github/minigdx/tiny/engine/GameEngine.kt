@@ -50,9 +50,9 @@ class ScriptsCollector(private val events: MutableList<GameResource>) : FlowColl
         if (value.type == BOOT_GAMESCRIPT && !bootscriptLoaded) {
             events.add(value)
             waitingList.forEach {
-                val toReload = loadedResources[value.type]?.containsKey(value.index) == true
+                val toReload = loadedResources[it.type]?.containsKey(it.index) == true
                 if (!toReload) {
-                    loadedResources.getOrPut(value.type) { mutableMapOf() }[value.index] = value
+                    loadedResources.getOrPut(it.type) { mutableMapOf() }[it.index] = it
                 }
             }
             events.addAll(waitingList)
