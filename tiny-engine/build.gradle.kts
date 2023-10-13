@@ -22,16 +22,19 @@ dependencies {
     this.jvmMainImplementation(variantOf(libs.lwjgl.core) { classifier("natives-windows") })
     this.jvmMainImplementation(variantOf(libs.lwjgl.core) { classifier("natives-linux") })
     this.jvmMainImplementation(variantOf(libs.lwjgl.core) { classifier("natives-macos") })
+    this.jvmMainImplementation(variantOf(libs.lwjgl.core) { classifier("natives-macos-arm64") })
 
     this.jvmMainImplementation(libs.lwjgl.glfw)
     this.jvmMainImplementation(variantOf(libs.lwjgl.glfw) { classifier("natives-windows") })
     this.jvmMainImplementation(variantOf(libs.lwjgl.glfw) { classifier("natives-linux") })
     this.jvmMainImplementation(variantOf(libs.lwjgl.glfw) { classifier("natives-macos") })
+    this.jvmMainImplementation(variantOf(libs.lwjgl.glfw) { classifier("natives-macos-arm64") })
 
     this.jvmMainImplementation(libs.lwjgl.opengl)
     this.jvmMainImplementation(variantOf(libs.lwjgl.opengl) { classifier("natives-windows") })
     this.jvmMainImplementation(variantOf(libs.lwjgl.opengl) { classifier("natives-linux") })
     this.jvmMainImplementation(variantOf(libs.lwjgl.opengl) { classifier("natives-macos") })
+    this.jvmMainImplementation(variantOf(libs.lwjgl.opengl) { classifier("natives-macos-arm64") })
 
     this.jvmMainImplementation(libs.jvm.gifencoder)
 
