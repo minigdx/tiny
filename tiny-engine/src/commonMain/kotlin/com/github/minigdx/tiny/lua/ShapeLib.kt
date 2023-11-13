@@ -11,7 +11,6 @@ import com.github.minigdx.tiny.engine.GameResourceAccess
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
-import org.luaj.vm2.LuaValue.Companion.valueOf
 import org.luaj.vm2.Varargs
 import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.TwoArgFunction
@@ -35,6 +34,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
         shp["circlef"] = circlef()
         shp["trianglef"] = trianglef()
         shp["triangle"] = triangle()
+        shp["gradient"] = gradient()
 
         arg2.set("shape", shp)
         arg2.get("package").get("loaded").set("shape", shp)
@@ -431,7 +431,8 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
             }
 
             // Calculate the slopes of the two sides of the bottom part of the triangle
-            val slope3 = (bottomVertex.first - middleVertex.first).toFloat() / (bottomVertex.second - middleVertex.second)
+            val slope3 =
+                (bottomVertex.first - middleVertex.first).toFloat() / (bottomVertex.second - middleVertex.second)
             val slope4 = (bottomVertex.first - topVertex.first).toFloat() / (bottomVertex.second - topVertex.second)
 
             // Draw the lower part of the triangle
@@ -499,6 +500,90 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
                     ),
                 ),
             )
+
+            return NONE
+        }
+    }
+
+    @TinyFunction(
+        "Draw a gradient using dithering, only from color c1 to color c2.",
+        example = SHAPE_GRADIENT_EXAMPLE,
+    )
+    inner class gradient : LibFunction() {
+
+        private val dithering = listOf(
+            0x0000,
+            0x0001,
+            0x0401,
+            0x0405,
+            0x0505,
+            0x0525,
+            0x8525,
+            0x85A5,
+            0xA5A5,
+            0xA5A7,
+            0xADA7,
+            0xADAF,
+            0xAFAF,
+            0xAFBF,
+            0xEFBF,
+            0xEFFF,
+            0xFFFF,
+        ).map { v -> valueOf(v) }
+
+        private val rectf = rectf()
+
+        private val dither = GfxLib(resourceAccess).dither()
+
+        @TinyCall("Draw a gradient using dithering, only from color c1 to color c2.")
+        override fun invoke(
+            @TinyArgs(arrayOf("x", "y", "width", "height", "color1", "color2", "is_horizontal")) args: Varargs,
+        ): Varargs {
+            if (args.narg() < 6) throw LuaError("Expected 6  args")
+
+            val x = args.checkint(1)
+            val y = args.checkint(2)
+            val width = args.checkint(3)
+            val height = args.checkint(4)
+
+            val color2 = args.arg(6).checkColorIndex()
+
+            val isHorizontal = args.optboolean(7, false)
+
+            // Draw the background color
+            rectf.invoke(arrayOf(args.arg(1), args.arg(2), args.arg(3), args.arg(4), args.arg(5)))
+
+            val previous = dither.call()
+            dithering.forEachIndexed { index, pattern ->
+                if (isHorizontal) {
+                    val xx = x + width * index / dithering.size
+                    val xx2 = x + width * (index + 1) / dithering.size
+                    dither.call(pattern)
+                    rectf.invoke(
+                        arrayOf(
+                            valueOf(xx),
+                            valueOf(y),
+                            valueOf(xx2 - xx),
+                            valueOf(height),
+                            valueOf(color2),
+                        ),
+                    )
+                } else {
+                    val yy = y + height * index / dithering.size
+                    val yy2 = y + height * (index + 1) / dithering.size
+                    dither.call(pattern)
+                    rectf.invoke(
+                        arrayOf(
+                            valueOf(x),
+                            valueOf(yy),
+                            valueOf(width),
+                            valueOf(yy2 - yy),
+                            valueOf(color2),
+                        ),
+                    )
+                }
+            }
+            dither.call(previous)
 
             return NONE
         }

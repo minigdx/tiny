@@ -92,4 +92,33 @@ class ShapeTest {
             platform.frames.last(),
         )
     }
+
+    //language=Lua
+    private val gradientScript = """
+       function _draw()
+           gfx.cls(1)
+           shape.gradient(0, 0, 5, 10, 2, 3)
+       end 
+    """.trimIndent()
+
+    @Test
+    fun gradient() = test("gradient", gradientScript) { platform ->
+        platform.advance()
+
+        TestHelper.assertEquals(
+            """
+2222211111
+2322231111
+2232211111
+2323231111
+3232311111
+3323331111
+3232311111
+3333331111
+3332331111
+3333311111
+""",
+            platform.frames.last(),
+        )
+    }
 }

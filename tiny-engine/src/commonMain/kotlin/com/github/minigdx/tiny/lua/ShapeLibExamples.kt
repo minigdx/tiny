@@ -49,3 +49,19 @@ function _draw()
 
 end
 """
+
+//language=Lua
+const val SHAPE_GRADIENT_EXAMPLE = """
+function _draw()
+    
+ local c1 = 2
+ local c2 = 3   
+
+    gfx.cls(c1)
+    shape.rectf(0, 256 - 16, 256, 16, c2)
+    for x=0,240,16 do
+        shape.gradient(x, 16 * math.cos(2 * 3.14 * (x / 256) + tiny.t * 2), 16, 256, c1, c2, false)
+    end
+      
+end
+"""

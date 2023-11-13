@@ -8,7 +8,8 @@ import com.github.minigdx.tiny.log.StdOutLogger
 import com.github.minigdx.tiny.platform.ImageData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlin.test.assertEquals
 
 expect fun toGif(name: String, animation: List<FrameBuffer>)
@@ -25,6 +26,7 @@ object TestHelper {
 
     val testScope = CoroutineScope(Dispatchers.Unconfined)
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun test(name: String, script: String, size: Pair<Int, Int>, block: suspend (platform: HeadlessPlatform) -> Unit) {
         val colors = listOf(
             "#000000",
@@ -51,8 +53,14 @@ object TestHelper {
 
         ).main()
 
-        testScope.launch { block(platform) }
+        val result = CoroutineScope(Dispatchers.Unconfined).async {
+            block(platform)
+        }
 
         platform.saveAnimation(name)
+
+        if (result.isCancelled) {
+            throw result.getCompletionExceptionOrNull()!!
+        }
     }
 }

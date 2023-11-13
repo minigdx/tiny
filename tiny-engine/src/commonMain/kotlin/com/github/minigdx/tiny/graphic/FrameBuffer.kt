@@ -16,8 +16,10 @@ class Blender(private val gamePalette: ColorPalette) {
             return dithering != 0xFFFF
         }
 
-    fun dither(pattern: Int) {
+    fun dither(pattern: Int): Int {
+        val prec = dithering
         dithering = pattern and 0xFFFF
+        return prec
     }
 
     fun pal() {
