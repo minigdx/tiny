@@ -748,8 +748,8 @@ gfx.camera(x, y) -- Set game camera to the position x, y.</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">gfx.dither() -- Reset dithering pattern.
-gfx.dither(pattern) -- Apply dithering pattern.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">gfx.dither() -- Reset dithering pattern. The previous dithering pattern is returned.
+gfx.dither(pattern) -- Apply dithering pattern. The previous dithering pattern is returned.</code></pre>
 </div>
 </div>
 <tiny-editor style="display: none;">
@@ -1547,6 +1547,33 @@ shape.circle(centerX, centerY, radius, color) -- Draw a circle.</code></pre>
 </div>
 </div>
 </div>
+<div class="sect3">
+<h4 id="_shape_gradient">shape.gradient()</h4>
+<div class="paragraph">
+<p>Draw a gradient using dithering, only from color c1 to color c2.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">shape.gradient(x, y, width, height, color1, color2, is_horizontal) -- Draw a gradient using dithering, only from color c1 to color c2.</code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;">
+
+function _draw()
+
+ local c1 = 2
+ local c2 = 3
+
+    gfx.cls(c1)
+    shape.rectf(0, 256 - 16, 256, 16, c2)
+    for x=0,240,16 do
+        shape.gradient(x, 16 * math.cos(2 * 3.14 * (x / 256) + tiny.t * 2), 16, 256, c1, c2, false)
+    end
+
+end
+
+</tiny-editor>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_spr">spr</h3>
@@ -1807,7 +1834,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version main<br>
-Last updated 2023-10-29 13:55:03 UTC
+Last updated 2023-11-13 00:05:51 UTC
 </div>
 </div>
 </body>

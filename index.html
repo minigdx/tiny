@@ -869,6 +869,7 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <li><a href="#_shape_circle">shape.circle()</a></li>
 <li><a href="#_shape_trianglef">shape.trianglef()</a></li>
 <li><a href="#_shape_triangle">shape.triangle()</a></li>
+<li><a href="#_shape_gradient">shape.gradient()</a></li>
 </ul>
 </li>
 <li><a href="#_spr">spr</a>
@@ -1902,8 +1903,8 @@ end
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">dither</span><span class="p">()</span> <span class="c1">-- Reset dithering pattern.</span>
-<span class="n">gfx</span><span class="p">.</span><span class="n">dither</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span> <span class="c1">-- Apply dithering pattern.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">dither</span><span class="p">()</span> <span class="c1">-- Reset dithering pattern. The previous dithering pattern is returned.</span>
+<span class="n">gfx</span><span class="p">.</span><span class="n">dither</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span> <span class="c1">-- Apply dithering pattern. The previous dithering pattern is returned.</span></code></pre>
 </div>
 </div>
 <tiny-editor style="display: none;">
@@ -2701,6 +2702,33 @@ end
 </div>
 </div>
 </div>
+<div class="sect3">
+<h4 id="_shape_gradient">shape.gradient()</h4>
+<div class="paragraph">
+<p>Draw a gradient using dithering, only from color c1 to color c2.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">color1</span><span class="p">,</span> <span class="n">color2</span><span class="p">,</span> <span class="n">is_horizontal</span><span class="p">)</span> <span class="c1">-- Draw a gradient using dithering, only from color c1 to color c2.</span></code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;">
+
+function _draw()
+
+ local c1 = 2
+ local c2 = 3
+
+    gfx.cls(c1)
+    shape.rectf(0, 256 - 16, 256, 16, c2)
+    for x=0,240,16 do
+        shape.gradient(x, 16 * math.cos(2 * 3.14 * (x / 256) + tiny.t * 2), 16, 256, c1, c2, false)
+    end
+
+end
+
+</tiny-editor>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_spr">spr</h3>
@@ -2976,7 +3004,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version main<br>
-Last updated 2023-10-29 13:50:28 UTC
+Last updated 2023-11-13 00:01:22 UTC
 </div>
 </div>
 <style>
