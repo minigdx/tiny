@@ -153,7 +153,7 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
             return invoke(arrayOf(a, b, c, valueOf(false), valueOf(false))).arg1()
         }
 
-        override fun invoke(@TinyArgs(arrayOf("sprN", "x", "y", "flipX", "flipY")) args: Varargs): Varargs {
+        override fun invoke(@TinyArgs(["sprN", "x", "y", "flipX", "flipY"]) args: Varargs): Varargs {
             if (args.narg() < 3) return NONE
             val sprN = args.arg(1).checkint()
             val x = args.arg(2).checkint()

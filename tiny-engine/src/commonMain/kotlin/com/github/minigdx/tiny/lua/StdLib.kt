@@ -65,7 +65,7 @@ class StdLib(
     internal inner class all : VarArgFunction() {
 
         @TinyCall("Iterate over the values of the table")
-        override fun invoke(@TinyArgs(arrayOf("table")) args: Varargs): Varargs {
+        override fun invoke(@TinyArgs(["table"]) args: Varargs): Varargs {
             val iterator = object : VarArgFunction() {
 
                 var index = 0
@@ -97,7 +97,7 @@ class StdLib(
     internal inner class rpairs : VarArgFunction() {
 
         @TinyCall("Iterate over the values of the table")
-        override fun invoke(@TinyArgs(arrayOf("table")) args: Varargs): Varargs {
+        override fun invoke(@TinyArgs(["table"]) args: Varargs): Varargs {
             val iterator = object : VarArgFunction() {
 
                 override fun invoke(args: Varargs): Varargs {

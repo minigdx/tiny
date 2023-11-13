@@ -44,7 +44,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
     @TinyFunction("Draw a rectangle.")
     internal inner class rect : LibFunction() {
         @TinyCall("Draw a rectangle.")
-        override fun invoke(@TinyArgs(arrayOf("x", "y", "width", "height", "color")) args: Varargs): Varargs {
+        override fun invoke(@TinyArgs(["x", "y", "width", "height", "color"]) args: Varargs): Varargs {
             if (args.narg() < 5) return NONE
             val x = args.arg(1).checkint()
             val y = args.arg(2).checkint()
@@ -213,7 +213,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
     internal inner class rectf : LibFunction() {
         // cornerX: Int, cornerY: Int, width: Int, height: Int, color: Int
         @TinyCall("Draw a filled rectangle.")
-        override fun invoke(@TinyArgs(arrayOf("x", "y", "width", "height", "color")) args: Varargs): Varargs {
+        override fun invoke(@TinyArgs(["x", "y", "width", "height", "color"]) args: Varargs): Varargs {
             if (args.narg() < 5) return NONE
             val x = args.arg(1).checkint()
             val y = args.arg(2).checkint()
@@ -288,7 +288,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
 
         @TinyCall("Draw a line.")
         override fun invoke(
-            @TinyArgs(arrayOf("x0", "y0", "x1", "y2", "color"))
+            @TinyArgs(["x0", "y0", "x1", "y2", "color"])
             args: Varargs,
         ): Varargs {
             return when (args.narg()) {
@@ -398,7 +398,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
 
         @TinyCall("Draw a filled triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).")
         override fun invoke(
-            @TinyArgs(arrayOf("x1", "y1", "x2", "y2", "x3", "y3", "color")) args: Varargs,
+            @TinyArgs(["x1", "y1", "x2", "y2", "x3", "y3", "color"]) args: Varargs,
         ): Varargs {
             if (args.narg() < 7) throw LuaError("Expected 7 args")
 
@@ -453,7 +453,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
 
         @TinyCall("Draw a triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).")
         override fun invoke(
-            @TinyArgs(arrayOf("x1", "y1", "x2", "y2", "x3", "y3", "color")) args: Varargs,
+            @TinyArgs(["x1", "y1", "x2", "y2", "x3", "y3", "color"]) args: Varargs,
         ): Varargs {
             if (args.narg() < 7) throw LuaError("Expected 7 args")
 
@@ -537,7 +537,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
 
         @TinyCall("Draw a gradient using dithering, only from color c1 to color c2.")
         override fun invoke(
-            @TinyArgs(arrayOf("x", "y", "width", "height", "color1", "color2", "is_horizontal")) args: Varargs,
+            @TinyArgs(["x", "y", "width", "height", "color1", "color2", "is_horizontal"]) args: Varargs,
         ): Varargs {
             if (args.narg() < 6) throw LuaError("Expected 6  args")
 
