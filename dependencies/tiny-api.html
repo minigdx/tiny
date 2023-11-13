@@ -1215,7 +1215,19 @@ juice.linear(start, end, progress) -- Interpolate the value given a start and an
 <div class="sect2">
 <h3 id="_map">map</h3>
 <div class="paragraph">
-<p>Map API to accessing maps data configured in a game.</p>
+<p>Map API to accessing maps data configured in a game. Map can be created using LDTk ( <a href="https://ldtk.io/" class="bare">https://ldtk.io/</a> ). <em>Projects need to be exported using (<a href="https://ldtk.io/docs/game-dev/super-simple-export/" class="bare">https://ldtk.io/docs/game-dev/super-simple-export/</a>)['Super simple export'}</em></p>
+</div>
+<div class="sect3">
+<h4 id="_map_layer">map.layer()</h4>
+<div class="paragraph">
+<p>Set the current layer to be draw.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">map.layer(layer_index) -- Set the current index layer to be draw. Return the previous layer index.
+map.layer() -- Reset the current layer to be draw to the first available layer (index 0).</code></pre>
+</div>
+</div>
 </div>
 <div class="sect3">
 <h4 id="_map_flag">map.flag()</h4>
@@ -1244,7 +1256,7 @@ juice.linear(start, end, progress) -- Interpolate the value given a start and an
 <pre class="highlight"><code class="language-lua" data-lang="lua">map.draw() -- Draw the default layer on the screen.
 map.draw(x, y) -- Draw the default layer on the screen at the x/y coordinates.
 map.draw(x, y, sx, sy) -- Draw the default layer on the screen at the x/y coordinates.
-map.draw(layer) -- Draw the layer on the screen.</code></pre>
+map.draw(layer) -- Draw the layer on the screen by it's index.</code></pre>
 </div>
 </div>
 </div>
@@ -1834,7 +1846,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version main<br>
-Last updated 2023-11-13 00:05:51 UTC
+Last updated 2023-11-13 09:58:25 UTC
 </div>
 </div>
 </body>

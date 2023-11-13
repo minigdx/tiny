@@ -834,6 +834,7 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <li><a href="#_keys">keys</a></li>
 <li><a href="#_map">map</a>
 <ul class="sectlevel3">
+<li><a href="#_map_layer">map.layer()</a></li>
 <li><a href="#_map_flag">map.flag()</a></li>
 <li><a href="#_map_entity">map.entity()</a></li>
 <li><a href="#_map_draw">map.draw()</a></li>
@@ -2370,7 +2371,19 @@ end
 <div class="sect2">
 <h3 id="_map">map</h3>
 <div class="paragraph">
-<p>Map API to accessing maps data configured in a game.</p>
+<p>Map API to accessing maps data configured in a game. Map can be created using LDTk ( <a href="https://ldtk.io/" class="bare">https://ldtk.io/</a> ). <em>Projects need to be exported using (<a href="https://ldtk.io/docs/game-dev/super-simple-export/" class="bare">https://ldtk.io/docs/game-dev/super-simple-export/</a>)['Super simple export'}</em></p>
+</div>
+<div class="sect3">
+<h4 id="_map_layer">map.layer()</h4>
+<div class="paragraph">
+<p>Set the current layer to be draw.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">map</span><span class="p">.</span><span class="n">layer</span><span class="p">(</span><span class="n">layer_index</span><span class="p">)</span> <span class="c1">-- Set the current index layer to be draw. Return the previous layer index.</span>
+<span class="n">map</span><span class="p">.</span><span class="n">layer</span><span class="p">()</span> <span class="c1">-- Reset the current layer to be draw to the first available layer (index 0).</span></code></pre>
+</div>
+</div>
 </div>
 <div class="sect3">
 <h4 id="_map_flag">map.flag()</h4>
@@ -2399,7 +2412,7 @@ end
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">map</span><span class="p">.</span><span class="n">draw</span><span class="p">()</span> <span class="c1">-- Draw the default layer on the screen.</span>
 <span class="n">map</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- Draw the default layer on the screen at the x/y coordinates.</span>
 <span class="n">map</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sx</span><span class="p">,</span> <span class="n">sy</span><span class="p">)</span> <span class="c1">-- Draw the default layer on the screen at the x/y coordinates.</span>
-<span class="n">map</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span> <span class="c1">-- Draw the layer on the screen.</span></code></pre>
+<span class="n">map</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span> <span class="c1">-- Draw the layer on the screen by it's index.</span></code></pre>
 </div>
 </div>
 </div>
@@ -3004,7 +3017,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version main<br>
-Last updated 2023-11-13 00:01:22 UTC
+Last updated 2023-11-13 09:55:05 UTC
 </div>
 </div>
 <style>
