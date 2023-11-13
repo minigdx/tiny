@@ -1,6 +1,7 @@
 package com.github.minigdx.tiny.resources
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 
 class GameLevel(
     override val index: Int,
@@ -52,5 +53,5 @@ data class LdtkEntity(
     val width: Int,
     val height: Int,
     val color: Int,
-    val customFields: Map<String, String>,
+    val customFields: JsonElement,
 )

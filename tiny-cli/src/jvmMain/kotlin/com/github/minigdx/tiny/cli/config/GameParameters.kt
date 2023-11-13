@@ -63,7 +63,7 @@ data class GameParametersV1(
     val colors: List<String>,
     /**
      * Script used by the game.
-     * The first script will be the first to be ran after the boot sequence.
+     * The first script will be the first to be run after the boot sequence.
      */
     val scripts: List<String> = emptyList(),
     /**
@@ -81,7 +81,7 @@ data class GameParametersV1(
      */
     val sounds: List<String> = emptyList(),
     /**
-     * Libraries configured. It will contains the name of the library and the version (optional).
+     * Libraries configured. It will contain the name of the library and the version (optional).
      * The file name still has to be computed from the name (ie: particules@commitHash -> particules.lua)
      *
      * The libraries will be added at the end of the scripts lists.

@@ -7,29 +7,58 @@ import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.resources.LdtkEntity
+import kotlinx.serialization.json.jsonObject
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
 import org.luaj.vm2.lib.LibFunction
+import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
+import kotlin.math.max
+import kotlin.math.min
 
 @TinyLib(
     "map",
-    "Map API to accessing maps data configured in a game.",
+    "Map API to accessing maps data configured in a game. " +
+        "Map can be created using LDTk ( https://ldtk.io/ ). \n\n" +
+        "WARNING: Projects need to be exported using " +
+        "https://ldtk.io/docs/game-dev/super-simple-export/['Super simple export']",
 )
 class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() {
 
     private var currentLevel: Int = 0
 
+    private var currentLayer: Int = 0
+
     override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
         val map = LuaTable()
-        map.set("draw", draw())
-        map.set("entity", entity())
-        map.set("flag", flag())
-        map.set("from", from())
-        arg2.set("map", map)
-        arg2.get("package").get("loaded").set("map", map)
+        map["draw"] = draw()
+        map["layer"] = layer()
+        map["entity"] = entity()
+        map["flag"] = flag()
+        map["from"] = from()
+        arg2["map"] = map
+        arg2["package"]["loaded"]["map"] = map
         return map
+    }
+
+    @TinyFunction("Set the current layer to draw.")
+    inner class layer : OneArgFunction() {
+        @TinyCall("Set the current index layer to draw. Return the previous layer index.")
+        override fun call(@TinyArg("layer_index") arg: LuaValue): LuaValue {
+            val prec = currentLayer
+            currentLayer = if (arg.isnil()) {
+                0
+            } else {
+                val nbLayers = resourceAccess.level(currentLevel)?.numberOfLayers ?: 1
+                min(max(0, arg.checkint()), nbLayers - 1)
+            }
+
+            return valueOf(prec)
+        }
+
+        @TinyCall("Reset the current layer to draw to the first available layer (index 0).")
+        override fun call(): LuaValue = super.call()
     }
 
     // convert screen coordinate into map coordinate
@@ -84,8 +113,9 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
             table["color"] = valueOf(color)
             table["customFields"] = customFields.let {
                 val fields = LuaTable()
-                it.forEach { (key, value) ->
-                    fields[key] = valueOf(value)
+                it.jsonObject.forEach { (key, value) ->
+                    println("$key => $value")
+                    // fields[key.to] = valueOf(value)
                 }
                 fields
             }
@@ -100,7 +130,7 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
             description = "Draw the default layer on the screen.",
         )
         override fun call(): LuaValue {
-            val layer = resourceAccess.level(currentLevel)?.imageLayers?.get(0)
+            val layer = resourceAccess.level(currentLevel)?.imageLayers?.get(currentLayer)
             if (layer != null) {
                 resourceAccess.frameBuffer.copyFrom(
                     source = layer.pixels,
@@ -119,7 +149,7 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
             description = "Draw the default layer on the screen at the x/y coordinates.",
         )
         override fun call(@TinyArg("x") a: LuaValue, @TinyArg("y") b: LuaValue): LuaValue {
-            val layer = resourceAccess.level(currentLevel)?.imageLayers?.get(0)
+            val layer = resourceAccess.level(currentLevel)?.imageLayers?.get(currentLayer)
             if (layer != null) {
                 resourceAccess.frameBuffer.copyFrom(
                     source = layer.pixels,
@@ -143,7 +173,7 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
             @TinyArg("sx") c: LuaValue,
             @TinyArg("sy") d: LuaValue,
         ): LuaValue {
-            val layer = resourceAccess.level(currentLevel)?.imageLayers?.get(0)
+            val layer = resourceAccess.level(currentLevel)?.imageLayers?.get(currentLayer)
             if (layer != null) {
                 resourceAccess.frameBuffer.copyFrom(
                     source = layer.pixels,
@@ -171,7 +201,7 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
             val width = args.arg(5).checkint()
             val height = args.arg(6).checkint()
 
-            val layer = resourceAccess.level(currentLevel)?.imageLayers?.get(0)
+            val layer = resourceAccess.level(currentLevel)?.imageLayers?.get(currentLayer)
             if (layer != null) {
                 resourceAccess.frameBuffer.copyFrom(
                     source = layer.pixels,
@@ -187,7 +217,7 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         }
 
         @TinyCall(
-            description = "Draw the layer on the screen.",
+            description = "Draw the layer on the screen by it's index.",
         )
         override fun call(
             @TinyArg("layer", "index of the layer") a: LuaValue,
