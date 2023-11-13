@@ -60,7 +60,6 @@ class ServeCommand : CliktCommand(name = "serve", help = "Run your game as a web
                     call.respond(HttpStatusCode.OK)
                 }
                 get("/{...}") {
-
                     val key = call.request.local.uri.let { k ->
                         // Small hack as the engine add a /.
                         // Need to fix it...
