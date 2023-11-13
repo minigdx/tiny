@@ -56,11 +56,12 @@ class ServeCommand : CliktCommand(name = "serve", help = "Run your game as a web
 
         val method = fun Application.() {
             routing {
-                head("/{key}") {
+                head("/{...}") {
                     call.respond(HttpStatusCode.OK)
                 }
-                get("/{key}") {
-                    val key = call.parameters["key"]?.let { k ->
+                get("/{...}") {
+
+                    val key = call.request.local.uri.let { k ->
                         // Small hack as the engine add a /.
                         // Need to fix it...
                         if (k.startsWith("/")) {
@@ -69,7 +70,7 @@ class ServeCommand : CliktCommand(name = "serve", help = "Run your game as a web
                             k
                         }
                     }
-                    if (key != null && resources.containsKey(key)) {
+                    if (resources.containsKey(key)) {
                         val value = resources[key]
                         if (value != null) {
                             val contentType = if (key.endsWith(".js")) {
