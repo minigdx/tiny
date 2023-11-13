@@ -7,7 +7,14 @@ import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.resources.LdtkEntity
-import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.doubleOrNull
+import kotlinx.serialization.json.intOrNull
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
@@ -34,7 +41,7 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         val map = LuaTable()
         map["draw"] = draw()
         map["layer"] = layer()
-        map["entity"] = entity()
+        map["entities"] = entities()
         map["flag"] = flag()
         map["from"] = from()
         arg2["map"] = map
@@ -86,19 +93,38 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         }
     }
 
-    @TinyFunction("Get all entities from a type.")
-    inner class entity : LuaTable() {
+    @TinyFunction("Table with all entities by type (ie: `map.entities[\"player\"]`).")
+    inner class entities : LuaTable() {
 
-        override fun get(key: LuaValue): LuaValue {
-            val strKey = key.checkjstring() ?: return NIL
-            // TODO: mettre un système de cache pour ne pas iter à chaque fois sur la liste.
-            val entities = resourceAccess.level(currentLevel)?.entities?.get(strKey) ?: return NIL
-            val first = LuaTable()
-            entities.forEach {
-                first[it.iid] = it.toLuaTable()
+        private val cachedEntities: MutableMap<Int, LuaValue> = mutableMapOf()
+
+        private val entities: LuaValue
+            get() {
+                return cachedEntities[currentLevel] ?: cacheMe(resourceAccess.level(currentLevel)?.entities)
             }
 
-            return first
+        private fun cacheMe(entities: Map<String, List<LdtkEntity>>?): LuaValue {
+            // Transform the list of entities into a table in Lua.
+            val toCache = LuaTable()
+            entities?.forEach { (key, v) ->
+                val entitiesOfType = LuaTable()
+                v.forEach {
+                    entitiesOfType[it.iid] = it.toLuaTable()
+                }
+                toCache[key] = entitiesOfType
+            }
+
+            cachedEntities[currentLevel] = toCache
+            return toCache
+        }
+
+        override fun get(key: LuaValue): LuaValue {
+            if (key.isnil()) {
+                return entities
+            }
+            val strKey = key.checkjstring() ?: return NIL
+
+            return this.entities[strKey]
         }
 
         private fun LdtkEntity.toLuaTable(): LuaTable {
@@ -111,15 +137,46 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
             table["width"] = valueOf(width)
             table["height"] = valueOf(height)
             table["color"] = valueOf(color)
-            table["customFields"] = customFields.let {
-                val fields = LuaTable()
-                it.jsonObject.forEach { (key, value) ->
-                    println("$key => $value")
-                    // fields[key.to] = valueOf(value)
-                }
-                fields
-            }
+            table["customFields"] = customFields.toLua()
             return table
+        }
+
+        private fun JsonElement.toLua(): LuaValue {
+            return when (this) {
+                is JsonArray -> this.toLua()
+                is JsonObject -> this.toLua()
+                is JsonPrimitive -> this.toLua()
+                is JsonNull -> this.toLua()
+            }
+        }
+
+        private fun JsonNull.toLua(): LuaValue {
+            return NIL
+        }
+
+        private fun JsonObject.toLua(): LuaTable {
+            val result = LuaTable()
+            this.forEach { (key, value) ->
+                result[key] = value.toLua()
+            }
+            return result
+        }
+
+        private fun JsonPrimitive.toLua(): LuaValue {
+            return if (this.isString) {
+                return valueOf(this.content)
+            } else {
+                this.intOrNull?.let { valueOf(it) } ?: this.doubleOrNull?.let { valueOf(it) }
+                    ?: this.booleanOrNull?.let { valueOf(it) } ?: valueOf(this.content)
+            }
+        }
+
+        private fun JsonArray.toLua(): LuaTable {
+            val result = LuaTable()
+            this.forEach {
+                result.insert(0, it.toLua())
+            }
+            return result
         }
     }
 
@@ -168,10 +225,10 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
             description = "Draw the default layer on the screen at the x/y coordinates.",
         )
         override fun call(
-            @TinyArg("x") a: LuaValue,
-            @TinyArg("y") b: LuaValue,
-            @TinyArg("sx") c: LuaValue,
-            @TinyArg("sy") d: LuaValue,
+            @TinyArg("x", "x screen coordinate") a: LuaValue,
+            @TinyArg("y", "y screen coordinate") b: LuaValue,
+            @TinyArg("sx", "x map coordinate") c: LuaValue,
+            @TinyArg("sy", "y map coordinate") d: LuaValue,
         ): LuaValue {
             val layer = resourceAccess.level(currentLevel)?.imageLayers?.get(currentLayer)
             if (layer != null) {
