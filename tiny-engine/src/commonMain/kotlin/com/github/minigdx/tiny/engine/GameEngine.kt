@@ -290,8 +290,6 @@ class GameEngine(
         events.removeAll(workEvents)
         workEvents.clear()
 
-        inputManager.record()
-
         with(scripts[current]) {
             if (this == null) return
 
@@ -319,6 +317,7 @@ class GameEngine(
             // Fixed step simulation
             accumulator += delta
             if (accumulator >= REFRESH_LIMIT) {
+                inputManager.record()
                 inError = try {
                     scripts[current]?.advance()
                     false
@@ -343,19 +342,19 @@ class GameEngine(
                 }
                 engineGameScript?.advance()
                 accumulator -= REFRESH_LIMIT
+
+                // The user hit Ctrl + R(ecord)
+                if (inputHandler.isCombinationPressed(Key.CTRL, Key.R)) {
+                    popup("recording GIF", "#00FF00")
+                    platform.record()
+                    // The user hit Ctrl + S(creenshot)
+                } else if (inputHandler.isCombinationPressed(Key.CTRL, Key.S)) {
+                    popup("screenshot PNG", "#00FF00")
+                    platform.screenshot()
+                }
+                inputManager.reset()
             }
         }
-
-        // The user hit Ctrl + R(ecord)
-        if (inputHandler.isCombinationPressed(Key.CTRL, Key.R)) {
-            popup("recording GIF", "#00FF00")
-            platform.record()
-            // The user hit Ctrl + S(creenshot)
-        } else if (inputHandler.isCombinationPressed(Key.CTRL, Key.S)) {
-            popup("screenshot PNG", "#00FF00")
-            platform.screenshot()
-        }
-        inputManager.reset()
     }
 
     private suspend fun popup(message: String, color: String, forever: Boolean = false) {

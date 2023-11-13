@@ -185,16 +185,22 @@ class TouchManager(lastKeyCode: KeyCode) {
         val keycode = event.keycode!!
         when (event.way) {
             InternalTouchEventWay.DOWN -> {
-                keyPressed[keycode] = true
-                justKeyPressed[keycode] = true
-                justPressedKeyCode.add(keycode)
-                isAnyKeyJustPressed = true
-                numberOfKeyPressed++
+                // Set the key pressed only if the key is not ALREADY pressed
+                // (Secure the state of the keys as in JS, the key signal is sent again when the key is not released)
+                if (!keyPressed[keycode]) {
+                    keyPressed[keycode] = true
+                    justKeyPressed[keycode] = true
+                    justPressedKeyCode.add(keycode)
+                    isAnyKeyJustPressed = true
+                    numberOfKeyPressed++
+                }
             }
+
             InternalTouchEventWay.UP -> {
                 keyPressed[keycode] = false
                 numberOfKeyPressed--
             }
+
             InternalTouchEventWay.MOVE -> throw IllegalArgumentException("${event.keycode} is not supposed to move.")
         }
     }
@@ -206,6 +212,7 @@ class TouchManager(lastKeyCode: KeyCode) {
                 touch[event.touchSignal.ordinal] = event.position
                 lastTouch.set(event.position)
             }
+
             InternalTouchEventWay.MOVE -> {
                 touch[event.touchSignal.ordinal]?.run {
                     x = event.position.x
@@ -213,6 +220,7 @@ class TouchManager(lastKeyCode: KeyCode) {
                 }
                 lastTouch.set(event.position)
             }
+
             InternalTouchEventWay.UP -> {
                 touch[event.touchSignal.ordinal] = null
             }
