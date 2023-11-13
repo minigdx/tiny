@@ -42,7 +42,7 @@ class GameExporter {
         val configFile = gameDirectory.resolve("_tiny.json")
         val gameParameters = JSON.decodeFromStream<GameParameters>(FileInputStream(configFile))
 
-        val exportedGame = ZipOutputStream(FileOutputStream(archive))
+        val exportedGame = ZipOutputStream(FileOutputStream(gameDirectory.resolve(archive)))
 
         // Add all engine files into the zip
         ENGINE_FILES.forEach { name ->
