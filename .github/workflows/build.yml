@@ -36,7 +36,7 @@ jobs:
         run: |
           unzip tiny-cli/build/distributions/tiny-cli-${{github.ref_name}}.zip
           tiny-cli-${{github.ref_name}}/bin/tiny-cli export tiny-sample
-          unzip -o -d tiny-doc/src/docs/asciidoc/sample tiny-export.zip
+          unzip -o -d tiny-doc/src/docs/asciidoc/sample tiny-sample/tiny-export.zip
       - name: Build examples and generate Asciidoctor HTML pages
         run: ./gradlew asciidoctor -Pversion="${{github.ref_name}}"
       - name: Copy generated content into gh-pages.
