@@ -1230,6 +1230,17 @@ Projects need to be exported using <a href="https://ldtk.io/docs/game-dev/super-
 </table>
 </div>
 <div class="sect3">
+<h4 id="_map_level">map.level()</h4>
+<div class="paragraph">
+<p>Set the current level to use.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">map.level(level) -- Set the current level to use. The level can be an index or the id defined by LDTK. Return the previous index level.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_map_layer">map.layer()</h4>
 <div class="paragraph">
 <p>Set the current layer to draw.</p>
@@ -1242,13 +1253,38 @@ map.layer() -- Reset the current layer to draw to the first available layer (ind
 </div>
 </div>
 <div class="sect3">
+<h4 id="_map_from">map.from()</h4>
+<div class="paragraph">
+<p>Convert cell coordinates cx, cy into map screen coordinates x, y.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">map.from(arg1, arg2) -- Convert the cell coordinates into coordinates as a table [x,y].
+map.from(arg) -- Convert the cell coordinates from a table [cx,cy] into screen coordinates as a table [x,y].</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_map_to">map.to()</h4>
+<div class="paragraph">
+<p>Convert screen coordinates x, y into map cell coordinates cx, cy.
+For example, coordinates of the player can be converted to cell coordinates to access the flag of the tile matching the player coordinates.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">map.to(x, y) -- Convert the coordinates into cell coordinates as a table [cx,cy].
+map.to(arg) -- Convert the coordinates from a table [x,y] into cell coordinates as a table [cx,cy].</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_map_flag">map.flag()</h4>
 <div class="paragraph">
 <p>Get the flag from a tile.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">map.flag(x, y) -- Get the flag from the tile at the coordinate x,y.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">map.flag(cx, cy) -- Get the flag from the tile at the coordinate cx,cy.</code></pre>
 </div>
 </div>
 </div>
@@ -1256,6 +1292,15 @@ map.layer() -- Reset the current layer to draw to the first available layer (ind
 <h4 id="_map_entities">map.entities()</h4>
 <div class="paragraph">
 <p>Table with all entities by type (ie: <code>map.entities["player"]</code>).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>local players = map.entities["player"]
+local entity = players[1] -- get the first player
+shape.rectf(entity.x, entity.y, entity.width, entity.height, 8) -- display an entity using a rectangle
+[...]
+entity.customFields -- access custom field of the entity</code></pre>
+</div>
 </div>
 </div>
 <div class="sect3">
@@ -1858,7 +1903,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version main<br>
-Last updated 2023-11-13 22:59:50 UTC
+Last updated 2023-11-15 19:32:48 UTC
 </div>
 </div>
 </body>
