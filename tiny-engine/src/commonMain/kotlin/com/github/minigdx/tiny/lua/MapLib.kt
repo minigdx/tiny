@@ -5,6 +5,7 @@ import com.github.mingdx.tiny.doc.TinyArgs
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
+import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.resources.LdtkEntity
 import kotlinx.serialization.json.JsonArray
@@ -21,6 +22,7 @@ import org.luaj.vm2.Varargs
 import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
+import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
 
@@ -31,7 +33,7 @@ import kotlin.math.min
         "WARNING: Projects need to be exported using " +
         "https://ldtk.io/docs/game-dev/super-simple-export/['Super simple export']",
 )
-class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() {
+class MapLib(private val resourceAccess: GameResourceAccess, private val spriteSize: Pair<Pixel, Pixel>) : TwoArgFunction() {
 
     private var currentLevel: Int = 0
 
@@ -44,9 +46,47 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         map["entities"] = entities()
         map["flag"] = flag()
         map["from"] = from()
+        map["to"] = to()
+        map["level"] = level()
         arg2["map"] = map
         arg2["package"]["loaded"]["map"] = map
         return map
+    }
+
+    @TinyFunction("Set the current level to use.")
+    inner class level : OneArgFunction() {
+        @TinyCall(
+            "Set the current level to use. " +
+                "The level can be an index or the id defined by LDTK. " +
+                "Return the previous index level.",
+        )
+        override fun call(@TinyArg("level") arg: LuaValue): LuaValue {
+            val prec = currentLevel
+            currentLevel = if (arg.isstring()) {
+                var index = 0
+                var found = false
+                var level = resourceAccess.level(index)
+                val levelId = arg.checkjstring()
+                while (level != null && !found) {
+                    if (level.ldktLevel.uniqueIdentifer == levelId) {
+                        found = true
+                    } else {
+                        level = resourceAccess.level(++index)
+                    }
+                }
+                if (!found) {
+                    // Level not found by its identifier
+                    // Return the actual level and ignore the modification
+                    prec
+                } else {
+                    index
+                }
+            } else {
+                arg.checkint()
+            }
+
+            return valueOf(prec)
+        }
     }
 
     @TinyFunction("Set the current layer to draw.")
@@ -68,18 +108,55 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         override fun call(): LuaValue = super.call()
     }
 
-    // convert screen coordinate into map coordinate
+    @TinyFunction("Convert cell coordinates cx, cy into map screen coordinates x, y.")
     inner class from : TwoArgFunction() {
+        @TinyCall("Convert the cell coordinates into coordinates as a table [x,y].")
         override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
-            TODO()
+            val (cx, cy) = if (arg1.istable()) {
+                arg1["cx"].toint() to arg1["cy"].toint()
+            } else {
+                arg1.checkint() to arg2.checkint()
+            }
+
+            return LuaTable().apply {
+                set("x", valueOf(cx * spriteSize.first.toDouble()))
+                set("y", valueOf(cy * spriteSize.second.toDouble()))
+            }
         }
+
+        @TinyCall("Convert the cell coordinates from a table [cx,cy] into screen coordinates as a table [x,y].")
+        override fun call(arg: LuaValue): LuaValue = super.call(arg)
+    }
+
+    @TinyFunction(
+        "Convert screen coordinates x, y into map cell coordinates cx, cy.\n" +
+            "For example, coordinates of the player can be converted to cell coordinates to access the flag " +
+            "of the tile matching the player coordinates.",
+    )
+    inner class to : TwoArgFunction() {
+        @TinyCall("Convert the coordinates into cell coordinates as a table [cx,cy].")
+        override fun call(@TinyArg("x") arg1: LuaValue, @TinyArg("y") arg2: LuaValue): LuaValue {
+            val (x, y) = if (arg1.istable()) {
+                arg1["x"].toint() to arg1["y"].toint()
+            } else {
+                arg1.checkint() to arg2.checkint()
+            }
+
+            return LuaTable().apply {
+                set("cx", valueOf(floor(x / spriteSize.first.toDouble())))
+                set("cy", valueOf(floor(y / spriteSize.second.toDouble())))
+            }
+        }
+
+        @TinyCall("Convert the coordinates from a table [x,y] into cell coordinates as a table [cx,cy].")
+        override fun call(arg: LuaValue) = super.call(arg)
     }
 
     @TinyFunction("Get the flag from a tile.")
     inner class flag : LibFunction() {
 
-        @TinyCall("Get the flag from the tile at the coordinate x,y.")
-        override fun call(@TinyArg("x") a: LuaValue, @TinyArg("y") b: LuaValue): LuaValue {
+        @TinyCall("Get the flag from the tile at the coordinate cx,cy.")
+        override fun call(@TinyArg("cx") a: LuaValue, @TinyArg("cy") b: LuaValue): LuaValue {
             val tileX = a.checkint()
             val tileY = b.checkint()
 
@@ -93,7 +170,18 @@ class MapLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         }
     }
 
-    @TinyFunction("Table with all entities by type (ie: `map.entities[\"player\"]`).")
+    @TinyFunction(
+        """Table with all entities by type (ie: `map.entities["player"]`).
+            
+```
+local players = map.entities["player"]
+local entity = players[1] -- get the first player
+shape.rectf(entity.x, entity.y, entity.width, entity.height, 8) -- display an entity using a rectangle
+[...]
+entity.customFields -- access custom field of the entity
+```
+        """,
+    )
     inner class entities : LuaTable() {
 
         private val cachedEntities: MutableMap<Int, LuaValue> = mutableMapOf()

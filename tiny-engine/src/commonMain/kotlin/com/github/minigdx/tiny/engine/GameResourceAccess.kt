@@ -22,21 +22,21 @@ interface GameResourceAccess {
     val frameBuffer: FrameBuffer
 
     /**
-     * Acces a sprite sheet by it's index.
+     * Access a sprite sheet by its index.
      */
     fun spritesheet(index: Int): SpriteSheet?
 
     fun spritesheet(sheet: SpriteSheet)
 
     /**
-     * Access a level by it's index.
+     * Access a level by its index.
      */
     fun level(index: Int): GameLevel?
 
     fun sound(index: Int): Sound?
 
     /**
-     * Find a script by it's name.
+     * Find a script by its name.
      */
     fun script(name: String): GameScript?
 }
