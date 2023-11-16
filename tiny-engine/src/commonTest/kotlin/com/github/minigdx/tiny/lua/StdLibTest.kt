@@ -23,6 +23,7 @@ class StdLibTest {
     private val mockResources = object : GameResourceAccess {
         override val bootSpritesheet: SpriteSheet = SpriteSheet(
             0,
+            0,
             "boot",
             ResourceType.BOOT_SPRITESHEET,
             PixelArray(1, 1, PixelFormat.INDEX),

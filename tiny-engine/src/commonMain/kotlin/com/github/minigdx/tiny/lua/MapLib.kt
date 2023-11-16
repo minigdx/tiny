@@ -7,6 +7,7 @@ import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameResourceAccess
+import com.github.minigdx.tiny.resources.GameLevel
 import com.github.minigdx.tiny.resources.LdtkEntity
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
@@ -33,7 +34,8 @@ import kotlin.math.min
         "WARNING: Projects need to be exported using " +
         "https://ldtk.io/docs/game-dev/super-simple-export/['Super simple export']",
 )
-class MapLib(private val resourceAccess: GameResourceAccess, private val spriteSize: Pair<Pixel, Pixel>) : TwoArgFunction() {
+class MapLib(private val resourceAccess: GameResourceAccess, private val spriteSize: Pair<Pixel, Pixel>) :
+    TwoArgFunction() {
 
     private var currentLevel: Int = 0
 
@@ -186,15 +188,22 @@ entity.customFields -- access custom field of the entity
 
         private val cachedEntities: MutableMap<Int, LuaValue> = mutableMapOf()
 
+        private var currentLevelVersion = currentLevel to -1
+
         private val entities: LuaValue
             get() {
-                return cachedEntities[currentLevel] ?: cacheMe(resourceAccess.level(currentLevel)?.entities)
+                // When the level is update, clear the cache.
+                val version = resourceAccess.level(currentLevel)?.version
+                if (currentLevel to version != currentLevelVersion) {
+                    cachedEntities.clear()
+                }
+                return cachedEntities[currentLevel] ?: cacheMe(resourceAccess.level(currentLevel))
             }
 
-        private fun cacheMe(entities: Map<String, List<LdtkEntity>>?): LuaValue {
+        private fun cacheMe(level: GameLevel?): LuaValue {
             // Transform the list of entities into a table in Lua.
             val toCache = LuaTable()
-            entities?.forEach { (key, v) ->
+            level?.entities?.forEach { (key, v) ->
                 val entitiesOfType = LuaTable()
                 v.forEach {
                     entitiesOfType[it.iid] = it.toLuaTable()
@@ -203,6 +212,7 @@ entity.customFields -- access custom field of the entity
             }
 
             cachedEntities[currentLevel] = toCache
+            currentLevelVersion = currentLevel to (level?.version ?: -1)
             return toCache
         }
 

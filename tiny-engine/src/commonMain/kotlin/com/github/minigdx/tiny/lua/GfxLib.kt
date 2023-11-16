@@ -89,6 +89,7 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
                 copyFrom(frameBuffer.colorIndexBuffer) { index, _, _ -> index }
             }
             val sheet = SpriteSheet(
+                0,
                 arg.checkint(),
                 "frame_buffer",
                 ResourceType.GAME_SPRITESHEET,

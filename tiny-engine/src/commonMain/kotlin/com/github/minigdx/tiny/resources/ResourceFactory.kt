@@ -16,15 +16,11 @@ import com.github.minigdx.tiny.resources.ResourceType.GAME_GAMESCRIPT
 import com.github.minigdx.tiny.resources.ResourceType.GAME_LEVEL
 import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
 class LdKtIntLayer(
@@ -47,7 +43,7 @@ class LdKtImageLayer(
     var pixels: PixelArray = PixelArray(width, height),
 )
 
-@OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class ResourceFactory(
     private val vfs: VirtualFileSystem,
     private val platform: Platform,
@@ -58,8 +54,9 @@ class ResourceFactory(
     private val json = Json { ignoreUnknownKeys = true }
 
     fun soundEffect(index: Int, name: String): Flow<Sound> {
+        var version = 0
         return vfs.watch(platform.createSoundStream(name))
-            .map { soundData -> Sound(index, name, soundData) }
+            .map { soundData -> Sound(version++, index, name, soundData) }
             .onEach {
                 logger.debug("RESOURCE_FACTORY") {
                     "Loading sound '$name'"
@@ -68,6 +65,7 @@ class ResourceFactory(
     }
 
     fun gameLevel(index: Int, name: String): Flow<GameLevel> {
+        var version = 0
         return flowOf("$name/data.json")
             .map { platform.createByteArrayStream(it) }
             .flatMapMerge { filestream -> vfs.watch(filestream) }
@@ -78,8 +76,7 @@ class ResourceFactory(
                 logger.debug("RESOURCE_FACTORY") {
                     "Loading level " + level.uniqueIdentifer + " with layers " + level.layers.joinToString(", ")
                 }
-            }.flatMapMerge { level ->
-
+            }.map { level ->
                 val layers = listOf("$name/_composite.png") + level.layers.map { layer -> "$name/$layer" }
                 val pngLayers = layers
                     .mapIndexed { index, layer ->
@@ -91,29 +88,29 @@ class ResourceFactory(
                             width = level.width,
                             height = level.height,
                         )
-                    }.asFlow()
-                    .flatMapMerge { layer ->
-                        vfs.watch(platform.createImageStream(layer.name)).map { imageData ->
-                            convertToColorIndex(imageData.data, level.width, level.height)
-                        }.map { texture ->
+                    }.mapNotNull { layer ->
+                        val stream = platform.createImageStream(layer.name)
+                        if (stream.exists()) {
+                            val imageData = stream.read()
+                            val texture = convertToColorIndex(imageData.data, level.width, level.height)
                             layer.apply {
                                 pixels = texture
                             }
+                        } else {
+                            null
                         }
                     }
 
                 val intLayers = layers
                     .map { layer -> layer.replace(".png", ".csv") }
-                    .mapIndexed { index, layer ->
-                        layer to index
-                    }.asFlow()
-                    .flatMapMerge { (layer, index) ->
-                        vfs.watch(platform.createByteArrayStream(layer)).map { data ->
-                            data.decodeToString()
+                    .mapIndexedNotNull { index, layer ->
+                        val stream = platform.createByteArrayStream(layer)
+                        if (stream.exists()) {
+                            val data = stream.read()
+                            val lines = data.decodeToString()
                                 .lines()
                                 .map { l -> l.split(",").filter { it.isNotBlank() } }
                                 .filterNot { it.isEmpty() }
-                        }.map { lines ->
                             val l = LdKtIntLayer(
                                 name = layer,
                                 index = index,
@@ -129,21 +126,19 @@ class ResourceFactory(
                                 }
                             }
                             l
+                        } else {
+                            null
                         }
                     }
 
-                flowOf(GameLevel(index, GAME_LEVEL, name, level.layers.size + 1, level))
-                    .combine(pngLayers) { l, layer ->
-                        l.apply {
-                            imageLayers[layer.index] = layer
-                        }
-                    }.combine(intLayers) { l, layer ->
-                        l.apply {
-                            this.intLayers[layer.index] = layer
-                        }
-                    }.map {
-                        it.copy()
+                GameLevel(version++, index, GAME_LEVEL, name, level.layers.size + 1, level).apply {
+                    pngLayers.forEach { layer ->
+                        imageLayers[layer.index] = layer
                     }
+                    intLayers.forEach { layer ->
+                        this.intLayers[layer.index] = layer
+                    }
+                }.copy()
             }
     }
 
@@ -163,8 +158,9 @@ class ResourceFactory(
         gameOptions: GameOptions,
         resourceType: ResourceType,
     ): Flow<GameScript> {
+        var version = 0
         return vfs.watch(platform.createByteArrayStream(name)).map { content ->
-            GameScript(index, name, gameOptions, inputHandler, resourceType).apply {
+            GameScript(version++, index, name, gameOptions, inputHandler, resourceType).apply {
                 this.content = content
             }
         }.onEach {
@@ -183,9 +179,10 @@ class ResourceFactory(
     }
 
     private fun spritesheet(index: Int, name: String, resourceType: ResourceType): Flow<SpriteSheet> {
+        var version = 0
         return vfs.watch(platform.createImageStream(name)).map { imageData ->
             val sheet = convertToColorIndex(imageData.data, imageData.width, imageData.height)
-            SpriteSheet(index, name, resourceType, sheet, imageData.width, imageData.height)
+            SpriteSheet(version++, index, name, resourceType, sheet, imageData.width, imageData.height)
         }.onEach {
             logger.debug("RESOURCE_FACTORY") {
                 "Loading spritesheet '$name' ($resourceType)"

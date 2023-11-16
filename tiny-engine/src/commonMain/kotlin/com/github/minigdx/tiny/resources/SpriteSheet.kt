@@ -4,6 +4,7 @@ import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.graphic.PixelArray
 
 class SpriteSheet(
+    override val version: Int,
     override val index: Int,
     override val name: String,
     override val type: ResourceType,

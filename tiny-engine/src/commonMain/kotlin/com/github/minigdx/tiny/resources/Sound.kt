@@ -3,6 +3,7 @@ package com.github.minigdx.tiny.resources
 import com.github.minigdx.tiny.platform.SoundData
 
 data class Sound(
+    override val version: Int,
     override val index: Int,
     override val name: String,
     val data: SoundData,

@@ -173,7 +173,7 @@ class GameEngine(
         workEvents.forEach { resource ->
             // The resource is loading
             if (!resource.reload) {
-                logger.info("GAME_ENGINE") { "Loaded ${resource.name} ${resource.type}" }
+                logger.info("GAME_ENGINE") { "Loaded ${resource.name} ${resource.type} (version: ${resource.version})" }
                 when (resource.type) {
                     BOOT_GAMESCRIPT -> {
                         // Always put the boot script at the top of the stack
@@ -221,7 +221,7 @@ class GameEngine(
                     scripts[0]!!.resourcesLoaded()
                 }
             } else {
-                logger.info("GAME_ENGINE") { "Reload ${resource.name} ${resource.type}" }
+                logger.info("GAME_ENGINE") { "Reload ${resource.name} ${resource.type} (version: ${resource.version})" }
                 // The resource already has been loaded.
                 when (resource.type) {
                     BOOT_GAMESCRIPT -> {
@@ -279,6 +279,8 @@ class GameEngine(
 
                     GAME_LEVEL -> {
                         levels[resource.index] = resource as GameLevel
+                        // Force the reloading of the script as level init might occur in the _init block.
+                        scripts[current]?.reload = true
                     }
 
                     GAME_SOUND -> {

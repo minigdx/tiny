@@ -47,8 +47,8 @@ class KeysLib : TwoArgFunction() {
         keys["space"] = LuaInteger.valueOf(Key.SPACE.ordinal)
         keys["enter"] = LuaInteger.valueOf(Key.ENTER.ordinal)
 
-        arg2.set("keys", keys)
-        arg2.get("package").get("loaded").set("keys", keys)
+        arg2["keys"] = keys
+        arg2["package"]["loaded"]["keys"] = keys
         return keys
     }
 }

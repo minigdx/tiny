@@ -29,6 +29,7 @@ import org.luaj.vm2.lib.StringLib
 import org.luaj.vm2.lib.TableLib
 
 class GameScript(
+    override val version: Int,
     /**
      * Index of game script
      */
