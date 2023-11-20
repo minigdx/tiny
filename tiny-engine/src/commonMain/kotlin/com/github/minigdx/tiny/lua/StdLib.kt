@@ -164,6 +164,7 @@ class StdLib(
 
             val space = 4
             var currentX = x
+            var currentY = y
             str.forEach { char ->
 
                 val coord = if (char.isLetter()) {
@@ -190,6 +191,10 @@ class StdLib(
                 } else if (char in ':'..'@') {
                     val index = char.lowercaseChar() - ':'
                     index to 5
+                } else if (char == '\n') {
+                    currentY += 6
+                    currentX = x - space // compensate the next space
+                    null
                 } else {
                     // Maybe it's an emoji: try EMOJI MAP conversion
                     EMOJI_MAP[char]
@@ -199,7 +204,7 @@ class StdLib(
                     resourceAccess.frameBuffer.copyFrom(
                         spritesheet.pixels,
                         currentX,
-                        y,
+                        currentY,
                         indexX * 4,
                         indexY * 4,
                         4,

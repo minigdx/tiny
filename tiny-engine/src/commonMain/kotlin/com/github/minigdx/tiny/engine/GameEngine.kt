@@ -239,21 +239,7 @@ class GameEngine(
                             resource.isValid()
                             true
                         } catch (ex: LuaError) {
-                            val errorLine = ex.errorLine()
-                            logger.warn(
-                                "TINY",
-                            ) {
-                                val error =
-                                    errorLine?.let { (l, line) -> "line $l:$line <-- the \uD83D\uDC1E is around here (${ex.getLuaMessage()})" }
-                                "The line ${ex.level} trigger an execution error (${ex.getLuaMessage()}). Please fix your script!\n" + error
-                            }
-
-                            val msg = errorLine?.let { (l, line) ->
-                                "error line $l:$line (${ex.getLuaMessage()})"
-                            } ?: "Error: ${ex.getLuaMessage()}"
-
-                            popup(msg, "#FF0000", true)
-
+                            popupError(ex)
                             false
                         }
                         if (isValid) {
@@ -298,22 +284,30 @@ class GameEngine(
             if (exited >= 0) {
                 // next script
                 current = min(exited + 1, scripts.size - 1)
-                val state = getState()
+                try {
+                    val state = getState()
 
-                logger.debug("GAME_ENGINE") {
-                    "Stop $name to switch the next game script ${scripts[current]?.name}"
+                    logger.debug("GAME_ENGINE") {
+                        "Stop $name to switch the next game script ${scripts[current]?.name}"
+                    }
+                    // Reevaluate the game to flush the previous state.
+                    scripts[current]?.evaluate()
+                    scripts[current]?.setState(state)
+                } catch (ex: LuaError) {
+                    popupError(ex)
                 }
-                // Reevaluate the game to flush the previous state.
-                scripts[current]?.evaluate()
-                scripts[current]?.setState(state)
             } else if (reload) {
                 clear()
                 // Stop all sounds to avoid annoying sound loop
                 sounds.forEach { s -> s?.stop() }
-                val state = getState()
-                evaluate()
-                setState(state)
-                inError = false
+                try {
+                    val state = getState()
+                    evaluate()
+                    setState(state)
+                    inError = false
+                } catch (ex: LuaError) {
+                    popupError(ex)
+                }
             }
 
             // Fixed step simulation
@@ -325,20 +319,7 @@ class GameEngine(
                     false
                 } catch (ex: LuaError) {
                     if (!inError) { // display the log only once.
-                        val errorLine = ex.errorLine()
-                        logger.warn(
-                            "TINY",
-                        ) {
-                            val error =
-                                errorLine?.let { (l, line) -> "line $l:$line <-- the \uD83D\uDC1E is around here (${ex.getLuaMessage()})" }
-                            "The line ${ex.level} trigger an execution error (${ex.getLuaMessage()}). Please fix your script!\n" + error
-                        }
-
-                        val msg = errorLine?.let { (l, line) ->
-                            "error line $l:$line (${ex.getLuaMessage()})"
-                        } ?: "Error: ${ex.getLuaMessage()}"
-
-                        popup(msg, "#FF0000", true)
+                        popupError(ex)
                     }
                     true
                 }
@@ -357,6 +338,23 @@ class GameEngine(
                 inputManager.reset()
             }
         }
+    }
+
+    private suspend fun GameEngine.popupError(ex: LuaError) {
+        val errorLine = ex.errorLine()
+        logger.warn(
+            "TINY",
+        ) {
+            val error =
+                errorLine?.let { (l, line) -> "line $l:$line <-- the \uD83D\uDC1E is around here (${ex.getLuaMessage()})" }
+            "The line ${ex.level} trigger an execution error (${ex.getLuaMessage()}). Please fix your script!\n" + error
+        }
+
+        val msg = errorLine?.let { (l, line) ->
+            "error line $l:$line (${ex.getLuaMessage()})"
+        } ?: "Error: ${ex.getLuaMessage()}"
+
+        popup(msg, "#FF0000", true)
     }
 
     private suspend fun popup(message: String, color: String, forever: Boolean = false) {
