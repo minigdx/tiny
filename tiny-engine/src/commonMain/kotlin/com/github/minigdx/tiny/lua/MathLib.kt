@@ -31,6 +31,7 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
         math["dst"] = dst()
         math["dst2"] = dst2()
         math["sign"] = sign()
+        math["roverlap"] = roverlap()
         math["perlin"] = perlin(Random.nextLong())
         return math
     }
@@ -143,6 +144,27 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
                 return call(arg1)
             }
             return valueOf(Random.nextInt(arg1.toint(), arg2.toint()))
+        }
+    }
+
+    @TinyFunction("Check if two (r)ectangles overlaps.")
+    inner class roverlap() : TwoArgFunction() {
+        @TinyCall("Check if the rectangle rect1 overlaps with the rectangle rect2.")
+        override fun call(
+            @TinyArg("rect1", "Rectangle as a table {x, y, with, height}.") arg1: LuaValue,
+            @TinyArg("rect2", "Rectangle as a table {x, y, with, height}.") arg2: LuaValue,
+        ): LuaValue {
+            val ax = arg1["x"].toint()
+            val ay = arg1["y"].toint()
+            val awidth = arg1["width"].toint()
+            val aheight = arg1["height"].toint()
+
+            val bx = arg2["x"].toint()
+            val by = arg2["y"].toint()
+            val bwidth = arg2["width"].toint()
+            val bheight = arg2["height"].toint()
+
+            return valueOf(ax < bx + bwidth && ax + awidth > bx && ay < by + bheight && ay + aheight > by)
         }
     }
 

@@ -127,7 +127,7 @@ class MapLib(private val resourceAccess: GameResourceAccess, private val spriteS
         }
 
         @TinyCall("Convert the cell coordinates from a table [cx,cy] into screen coordinates as a table [x,y].")
-        override fun call(arg: LuaValue): LuaValue = super.call(arg)
+        override fun call(@TinyArg("cell") arg: LuaValue): LuaValue = super.call(arg)
     }
 
     @TinyFunction(
@@ -151,25 +151,31 @@ class MapLib(private val resourceAccess: GameResourceAccess, private val spriteS
         }
 
         @TinyCall("Convert the coordinates from a table [x,y] into cell coordinates as a table [cx,cy].")
-        override fun call(arg: LuaValue) = super.call(arg)
+        override fun call(@TinyArg("coordinates") arg: LuaValue) = super.call(arg)
     }
 
     @TinyFunction("Get the flag from a tile.")
-    inner class flag : LibFunction() {
+    inner class flag : TwoArgFunction() {
 
         @TinyCall("Get the flag from the tile at the coordinate cx,cy.")
-        override fun call(@TinyArg("cx") a: LuaValue, @TinyArg("cy") b: LuaValue): LuaValue {
-            val tileX = a.checkint()
-            val tileY = b.checkint()
+        override fun call(@TinyArg("cx") arg1: LuaValue, @TinyArg("cy") arg2: LuaValue): LuaValue {
+            val (tileX, tileY) = if (arg1.istable()) {
+                arg1["cx"].toint() to arg1["cy"].toint()
+            } else {
+                arg1.checkint() to arg2.checkint()
+            }
 
-            val layer = resourceAccess.level(currentLevel)?.intLayers?.first { l -> l != null } ?: return NONE
+            val layer = resourceAccess.level(currentLevel)?.intLayers?.first { l -> l != null } ?: return NIL
 
             return if (tileX in 0 until layer.width && tileY in 0 until layer.height) {
                 valueOf(layer.ints.getOne(tileX, tileY))
             } else {
-                NONE
+                NIL
             }
         }
+
+        @TinyCall("Get the flag from the tile at the coordinate table [cx,cy].")
+        override fun call(@TinyArg("cell") arg: LuaValue): LuaValue = super.call(arg)
     }
 
     @TinyFunction(
