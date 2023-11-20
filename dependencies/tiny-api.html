@@ -1260,7 +1260,7 @@ map.layer() -- Reset the current layer to draw to the first available layer (ind
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-lua" data-lang="lua">map.from(arg1, arg2) -- Convert the cell coordinates into coordinates as a table [x,y].
-map.from(arg) -- Convert the cell coordinates from a table [cx,cy] into screen coordinates as a table [x,y].</code></pre>
+map.from(cell) -- Convert the cell coordinates from a table [cx,cy] into screen coordinates as a table [x,y].</code></pre>
 </div>
 </div>
 </div>
@@ -1273,7 +1273,7 @@ For example, coordinates of the player can be converted to cell coordinates to a
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-lua" data-lang="lua">map.to(x, y) -- Convert the coordinates into cell coordinates as a table [cx,cy].
-map.to(arg) -- Convert the coordinates from a table [x,y] into cell coordinates as a table [cx,cy].</code></pre>
+map.to(coordinates) -- Convert the coordinates from a table [x,y] into cell coordinates as a table [cx,cy].</code></pre>
 </div>
 </div>
 </div>
@@ -1284,7 +1284,8 @@ map.to(arg) -- Convert the coordinates from a table [x,y] into cell coordinates 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">map.flag(cx, cy) -- Get the flag from the tile at the coordinate cx,cy.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">map.flag(cx, cy) -- Get the flag from the tile at the coordinate cx,cy.
+map.flag(cell) -- Get the flag from the tile at the coordinate table [cx,cy].</code></pre>
 </div>
 </div>
 </div>
@@ -1401,6 +1402,17 @@ end
 <pre class="highlight"><code class="language-lua" data-lang="lua">math.rnd() -- Generate a random int (negative or positive value)
 math.rnd(until) -- Generate a random value between 1 until the argument. If a table is passed, it'll return a random element of the table.
 math.rnd(a, b) -- Generate a random value between a and b.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_math_roverlap">math.roverlap()</h4>
+<div class="paragraph">
+<p>Check if two (r)ectangles overlaps.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">math.roverlap(rect1, rect2) -- Check if the rectangle rect1 overlaps with the rectangle rect2.</code></pre>
 </div>
 </div>
 </div>
@@ -1903,7 +1915,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version main<br>
-Last updated 2023-11-16 13:19:01 UTC
+Last updated 2023-11-20 11:07:34 UTC
 </div>
 </div>
 </body>

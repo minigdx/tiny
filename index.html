@@ -852,6 +852,7 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <li><a href="#_math_dst">math.dst()</a></li>
 <li><a href="#_math_dst2">math.dst2()</a></li>
 <li><a href="#_math_rnd">math.rnd()</a></li>
+<li><a href="#_math_roverlap">math.roverlap()</a></li>
 <li><a href="#_math_perlin">math.perlin()</a></li>
 </ul>
 </li>
@@ -2419,7 +2420,7 @@ Projects need to be exported using <a href="https://ldtk.io/docs/game-dev/super-
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">map</span><span class="p">.</span><span class="n">from</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">)</span> <span class="c1">-- Convert the cell coordinates into coordinates as a table [x,y].</span>
-<span class="n">map</span><span class="p">.</span><span class="n">from</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="c1">-- Convert the cell coordinates from a table [cx,cy] into screen coordinates as a table [x,y].</span></code></pre>
+<span class="n">map</span><span class="p">.</span><span class="n">from</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span> <span class="c1">-- Convert the cell coordinates from a table [cx,cy] into screen coordinates as a table [x,y].</span></code></pre>
 </div>
 </div>
 </div>
@@ -2432,7 +2433,7 @@ For example, coordinates of the player can be converted to cell coordinates to a
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">map</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- Convert the coordinates into cell coordinates as a table [cx,cy].</span>
-<span class="n">map</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="c1">-- Convert the coordinates from a table [x,y] into cell coordinates as a table [cx,cy].</span></code></pre>
+<span class="n">map</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span> <span class="c1">-- Convert the coordinates from a table [x,y] into cell coordinates as a table [cx,cy].</span></code></pre>
 </div>
 </div>
 </div>
@@ -2443,7 +2444,8 @@ For example, coordinates of the player can be converted to cell coordinates to a
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">map</span><span class="p">.</span><span class="n">flag</span><span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">)</span> <span class="c1">-- Get the flag from the tile at the coordinate cx,cy.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">map</span><span class="p">.</span><span class="n">flag</span><span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">)</span> <span class="c1">-- Get the flag from the tile at the coordinate cx,cy.</span>
+<span class="n">map</span><span class="p">.</span><span class="n">flag</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span> <span class="c1">-- Get the flag from the tile at the coordinate table [cx,cy].</span></code></pre>
 </div>
 </div>
 </div>
@@ -2560,6 +2562,17 @@ end
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">math</span><span class="p">.</span><span class="n">rnd</span><span class="p">()</span> <span class="c1">-- Generate a random int (negative or positive value)</span>
 <span class="n">math</span><span class="p">.</span><span class="n">rnd</span><span class="p">(</span><span class="k">until</span><span class="p">)</span> <span class="c1">-- Generate a random value between 1 until the argument. If a table is passed, it'll return a random element of the table.</span>
 <span class="n">math</span><span class="p">.</span><span class="n">rnd</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="c1">-- Generate a random value between a and b.</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_math_roverlap">math.roverlap()</h4>
+<div class="paragraph">
+<p>Check if two (r)ectangles overlaps.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">math</span><span class="p">.</span><span class="n">roverlap</span><span class="p">(</span><span class="n">rect1</span><span class="p">,</span> <span class="n">rect2</span><span class="p">)</span> <span class="c1">-- Check if the rectangle rect1 overlaps with the rectangle rect2.</span></code></pre>
 </div>
 </div>
 </div>
@@ -3077,7 +3090,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version main<br>
-Last updated 2023-11-16 13:16:45 UTC
+Last updated 2023-11-20 11:05:15 UTC
 </div>
 </div>
 <style>
