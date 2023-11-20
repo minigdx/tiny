@@ -57,14 +57,21 @@ class MapLib(private val resourceAccess: GameResourceAccess, private val spriteS
 
     @TinyFunction("Set the current level to use.")
     inner class level : OneArgFunction() {
+        @TinyCall("Return the index of the current level.")
+        override fun call(): LuaValue {
+            return super.call()
+        }
+
         @TinyCall(
             "Set the current level to use. " +
                 "The level can be an index or the id defined by LDTK. " +
                 "Return the previous index level.",
         )
         override fun call(@TinyArg("level") arg: LuaValue): LuaValue {
+            if (arg.isnil()) return valueOf(currentLevel)
+
             val prec = currentLevel
-            currentLevel = if (arg.isstring()) {
+            currentLevel = if (!arg.isnumber()) {
                 var index = 0
                 var found = false
                 var level = resourceAccess.level(index)
