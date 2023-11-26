@@ -22,6 +22,11 @@ function popup(logo, text, color, keep)
     forever = keep
 end
 
+function printDebug(index, text, color)
+    shape.rectf(0, index * 6, #text * 6 + 6, 6, color)
+    print(text, 6, index * 6 + 1, "#FFFFFF")
+end
+
 function clear()
     dt = 0
     forever = false

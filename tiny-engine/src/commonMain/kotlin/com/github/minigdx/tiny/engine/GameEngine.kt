@@ -88,6 +88,8 @@ class GameEngine(
 
     private var numberOfResources: Int = 0
 
+    private val debugMessages = mutableListOf<DebugMessage>()
+
     private lateinit var scripts: Array<GameScript?>
     private lateinit var spriteSheets: Array<SpriteSheet?>
     private lateinit var levels: Array<GameLevel?>
@@ -335,9 +337,24 @@ class GameEngine(
                     popup("screenshot PNG", "#00FF00")
                     platform.screenshot()
                 }
+
+                debugMessages.forEachIndexed { index, debugMessage ->
+                    val (msg, color) = debugMessage
+                    engineGameScript?.invoke(
+                        "printDebug",
+                        valueOf(index),
+                        valueOf(msg),
+                        valueOf(color),
+                    )
+                }
+                debugMessages.clear()
                 inputManager.reset()
             }
         }
+    }
+
+    override fun debug(str: DebugMessage) {
+        debugMessages.add(str)
     }
 
     private suspend fun GameEngine.popupError(ex: LuaError) {

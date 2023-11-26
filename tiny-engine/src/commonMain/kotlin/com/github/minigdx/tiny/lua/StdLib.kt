@@ -5,13 +5,13 @@ import com.github.mingdx.tiny.doc.TinyArgs
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
+import com.github.minigdx.tiny.engine.DebugMessage
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
 import org.luaj.vm2.lib.LibFunction
-import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.VarArgFunction
 
@@ -120,13 +120,17 @@ class StdLib(
     }
 
     @TinyFunction("Print in the console a value to help debugging")
-    internal inner class debug : OneArgFunction() {
+    internal inner class debug : TwoArgFunction() {
+
+        override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
+            val message = arg1.optjstring("")!!
+            val color = arg2.optjstring("#32CD32")!!
+            resourceAccess.debug(DebugMessage(message, color))
+            return NIL
+        }
 
         @TinyCall("Print in the console a value")
-        override fun call(arg: LuaValue): LuaValue {
-            println("🐞 -> $arg")
-            return NONE
-        }
+        override fun call(arg: LuaValue): LuaValue = super.call(arg)
     }
 
     @TinyFunction("Print on the screen a string.", example = STD_PRINT_EXAMPLE)

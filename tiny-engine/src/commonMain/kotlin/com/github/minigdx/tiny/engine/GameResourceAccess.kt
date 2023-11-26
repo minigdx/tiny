@@ -6,6 +6,8 @@ import com.github.minigdx.tiny.resources.GameScript
 import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.resources.SpriteSheet
 
+data class DebugMessage(val mesage: String, val color: String)
+
 /**
  * Descriptor to access the game resource
  */
@@ -39,4 +41,10 @@ interface GameResourceAccess {
      * Find a script by its name.
      */
     fun script(name: String): GameScript?
+
+    /**
+     * Print a message over the current screen,
+     * after the game rendered.
+     */
+    fun debug(str: DebugMessage) = Unit
 }
