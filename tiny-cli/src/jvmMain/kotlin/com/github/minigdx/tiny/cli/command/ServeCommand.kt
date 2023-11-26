@@ -9,6 +9,7 @@ import com.github.ajalt.clikt.parameters.types.int
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
+import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
@@ -17,6 +18,7 @@ import io.ktor.server.response.respondBytes
 import io.ktor.server.routing.get
 import io.ktor.server.routing.head
 import io.ktor.server.routing.routing
+import io.ktor.util.pipeline.PipelineContext
 import java.io.FileInputStream
 import java.util.zip.ZipInputStream
 
@@ -57,18 +59,14 @@ class ServeCommand : CliktCommand(name = "serve", help = "Run your game as a web
         val method = fun Application.() {
             routing {
                 head("/{...}") {
-                    call.respond(HttpStatusCode.OK)
+                    if (resources.containsKey(resourceKey())) {
+                        call.respond(HttpStatusCode.OK)
+                    } else {
+                        call.respond(HttpStatusCode.NotFound)
+                    }
                 }
                 get("/{...}") {
-                    val key = call.request.local.uri.let { k ->
-                        // Small hack as the engine add a /.
-                        // Need to fix it...
-                        if (k.startsWith("/")) {
-                            k.drop(1)
-                        } else {
-                            k
-                        }
-                    }
+                    val key = resourceKey()
                     if (resources.containsKey(key)) {
                         val value = resources[key]
                         if (value != null) {
@@ -112,5 +110,18 @@ class ServeCommand : CliktCommand(name = "serve", help = "Run your game as a web
         server.start(wait = true)
         // start a browser to the address
         // route to files from the zip.
+    }
+
+    private fun PipelineContext<Unit, ApplicationCall>.resourceKey(): String {
+        val key = call.request.local.uri.let { k ->
+            // Small hack as the engine add a /.
+            // Need to fix it...
+            if (k.startsWith("/")) {
+                k.drop(1)
+            } else {
+                k
+            }
+        }
+        return key
     }
 }
