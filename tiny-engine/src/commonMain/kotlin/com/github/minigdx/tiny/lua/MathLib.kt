@@ -127,8 +127,12 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
             if (arg.isnil()) return call()
             return if (arg.istable()) {
                 val table = arg.checktable()!!
-                val index = Random.nextInt(1, table.length() + 1)
-                table[index]
+                if (table.length() > 0) {
+                    val index = Random.nextInt(1, table.length() + 1)
+                    table[index]
+                } else {
+                    NIL
+                }
             } else {
                 if (arg.isint()) {
                     valueOf(Random.nextInt(abs(arg.toint())))
