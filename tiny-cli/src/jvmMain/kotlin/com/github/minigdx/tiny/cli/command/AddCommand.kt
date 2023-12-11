@@ -32,23 +32,36 @@ class AddCommand : CliktCommand(name = "add", help = "Add a resource to your gam
 
         // regarding the input, add it into the right resource
         resources.forEach { r ->
-            if (r.endsWith("png")) {
+            val type = if (r.endsWith("png")) {
                 // Add spritesheet
                 gameParameters = gameParameters.addSpritesheet(r)
+                "spritesheet"
             } else if (r.endsWith("lua")) {
                 // Add script
                 gameParameters = gameParameters.addScript(r)
+                "script"
             } else if (r.endsWith("mid") || r.endsWith("midi")) {
                 // Add midi
                 gameParameters = gameParameters.addSound(r)
+                "sound"
             } else {
                 val file = File(r)
                 if (file.isDirectory && file.resolve("data.json").isFile) {
                     // Add level
                     gameParameters = gameParameters.addLevel(r)
+                    "level"
+                } else {
+                    null
                 }
             }
-            echo("➕$r added into your game!")
+            if (type != null) {
+                echo("➕ $r added into your game as $type!")
+            } else {
+                echo(
+                    "❌ $r NOT added as the type of the resource is unknown. " +
+                        "Please check the path of the resource and if it's supported by tiny.",
+                )
+            }
         }
 
         // Save the updated _tiny.json
