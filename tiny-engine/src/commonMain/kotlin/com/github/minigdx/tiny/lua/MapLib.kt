@@ -338,8 +338,8 @@ entity.customFields -- access custom field of the entity
         override fun call(
             @TinyArg("x", "x screen coordinate") a: LuaValue,
             @TinyArg("y", "y screen coordinate") b: LuaValue,
-            @TinyArg("sx", "x map coordinate") c: LuaValue,
-            @TinyArg("sy", "y map coordinate") d: LuaValue,
+            @TinyArg("mx", "x map coordinate") c: LuaValue,
+            @TinyArg("my", "y map coordinate") d: LuaValue,
         ): LuaValue {
             val layer = resourceAccess.level(currentLevel)?.imageLayers?.get(currentLayer)
             if (layer != null) {
@@ -358,7 +358,7 @@ entity.customFields -- access custom field of the entity
 
         override fun invoke(
             @TinyArgs(
-                names = ["x", "y", "sx", "sy", "width", "height"],
+                names = ["x", "y", "mx", "my", "width", "height"],
             ) args: Varargs,
         ): Varargs {
             if (args.narg() < 6) return super.invoke(args)

@@ -152,7 +152,7 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         }
 
         @TinyCall("Apply dithering pattern. The previous dithering pattern is returned.")
-        override fun call(@TinyArg("pattern") a: LuaValue): LuaValue {
+        override fun call(@TinyArg("pattern", "Dither pattern. For example: 0xA5A5 or 0x3030") a: LuaValue): LuaValue {
             return valueOf(resourceAccess.frameBuffer.blender.dither(a.checkint()))
         }
     }

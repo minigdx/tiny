@@ -76,7 +76,13 @@ class JuiceLib : TwoArgFunction() {
         override fun call(
             @TinyArg("start") a: LuaValue,
             @TinyArg("end") b: LuaValue,
-            @TinyArg("progress") c: LuaValue,
+            @TinyArg(
+                "progress",
+                "Progress value. " +
+                    "Needs to be between 0 (start of the interpolation) " +
+                    "and 1 (end of the interpolation)",
+            )
+            c: LuaValue,
         ): LuaValue {
             return valueOf(
                 interpolation.interpolate(

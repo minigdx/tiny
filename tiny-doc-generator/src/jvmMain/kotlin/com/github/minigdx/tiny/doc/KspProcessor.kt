@@ -20,6 +20,9 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSNode
 import com.google.devtools.ksp.visitor.KSDefaultVisitor
 
+typealias ArgName = String
+typealias ArgDescription = String
+
 @DslMarker
 annotation class AsciidocDslMarker
 
@@ -70,7 +73,7 @@ class AsciidocSection(val title: String?, val description: String?) {
                 appendLine()
             }
 
-            if (description != null && description.isNotBlank()) {
+            if (!description.isNullOrBlank()) {
                 appendLine(description)
                 appendLine()
             }
@@ -97,6 +100,23 @@ class AsciidocLibSection(val title: String?) {
                 >$code
                 >```
                """.trimMargin(">"),
+        )
+    }
+
+    // List<Name
+    fun tableArgs(args: List<Pair<ArgName, ArgDescription>>) {
+        val rows = args.map {
+            "|${it.first} |${it.second}"
+        }.joinToString("\n")
+        paragraph(
+            """
+        >[cols="1,1"]
+        >|===
+        >|Argument name |Argument description
+        >
+        >$rows      
+        >|===
+        """.trimMargin(">"),
         )
     }
 
@@ -133,7 +153,7 @@ fun asciidoc(block: AsciidocDocument.() -> Unit): AsciidocDocument {
     return doc
 }
 
-class TinyArgDescriptor(var name: String)
+class TinyArgDescriptor(var name: String, var description: String = "")
 class TinyCallDescriptor(
     var description: String = "",
     var args: List<TinyArgDescriptor> = emptyList(),
@@ -216,8 +236,12 @@ class KspProcessor(
      *     }
      * ```
      */
-    inner class FunctionVisitor : KSDefaultVisitor<MutableList<TinyFunctionDescriptor>, MutableList<TinyFunctionDescriptor>>() {
-        override fun defaultHandler(node: KSNode, data: MutableList<TinyFunctionDescriptor>): MutableList<TinyFunctionDescriptor> = data
+    inner class FunctionVisitor :
+        KSDefaultVisitor<MutableList<TinyFunctionDescriptor>, MutableList<TinyFunctionDescriptor>>() {
+        override fun defaultHandler(
+            node: KSNode,
+            data: MutableList<TinyFunctionDescriptor>,
+        ): MutableList<TinyFunctionDescriptor> = data
 
         override fun visitClassDeclaration(
             classDeclaration: KSClassDeclaration,
@@ -267,10 +291,15 @@ class KspProcessor(
                             val multiArg = multiArgs.firstOrNull()
                             if (multiArg != null) {
                                 call.args += multiArg.names.map { n -> TinyArgDescriptor(n) }
+                                    .zip(multiArg.documentations) { ano, doc ->
+                                        ano.apply {
+                                            ano.description = doc
+                                        }
+                                    }
                             } else {
                                 val args = p.getAnnotationsByType(TinyArg::class)
                                 val arg = args.firstOrNull()?.name ?: p.name?.asString() ?: ""
-                                call.args += TinyArgDescriptor(arg)
+                                call.args += TinyArgDescriptor(arg, args.firstOrNull()?.description ?: "")
                             }
                         }
                         calls.add(call)
@@ -345,6 +374,18 @@ class KspProcessor(
                                         "-- ${call.description}"
                                 }.joinToString("\n")
                                 code(result)
+                            }
+
+                            val args = func.calls.flatMap { it.args }
+                                .filter { it.description.isNotBlank() }
+                                .sortedBy { it.name }
+
+                            if (args.isNotEmpty()) {
+                                tableArgs(
+                                    args.map {
+                                        it.name to it.description
+                                    },
+                                )
                             }
 
                             example(func.example)
