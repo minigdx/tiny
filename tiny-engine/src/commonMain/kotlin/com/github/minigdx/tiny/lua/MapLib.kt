@@ -32,7 +32,8 @@ import kotlin.math.min
     "Map API to accessing maps data configured in a game. " +
         "Map can be created using LDTk ( https://ldtk.io/ ). \n\n" +
         "WARNING: Projects need to be exported using " +
-        "https://ldtk.io/docs/game-dev/super-simple-export/['Super simple export']",
+        "https://ldtk.io/docs/game-dev/super-simple-export/['Super simple export']. " +
+        "Also, Int layers _need_ to have an Auto Layer tileset otherwise, they will not be known by the engine.",
 )
 class MapLib(private val resourceAccess: GameResourceAccess, private val spriteSize: Pair<Pixel, Pixel>) :
     TwoArgFunction() {
@@ -172,7 +173,7 @@ class MapLib(private val resourceAccess: GameResourceAccess, private val spriteS
                 arg1.checkint() to arg2.checkint()
             }
 
-            val layer = resourceAccess.level(currentLevel)?.intLayers?.first { l -> l != null } ?: return NIL
+            val layer = resourceAccess.level(currentLevel)?.intLayers?.firstOrNull { l -> l != null } ?: return NIL
 
             return if (tileX in 0 until layer.width && tileY in 0 until layer.height) {
                 valueOf(layer.ints.getOne(tileX, tileY))
