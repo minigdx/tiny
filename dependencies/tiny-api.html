@@ -2195,9 +2195,33 @@ sfx.stop(sound) -- Stop the sound by it's index.</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">shape.rect() -- Draw a rectangle.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">shape.rect() -- Draw a rectangle.
+shape.rect(rect) -- Draw a rectangle.
+shape.rect(rect, color) -- Draw a rectangle using a rectangle and a color.</code></pre>
 </div>
 </div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">rect</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A rectangle {x, y, width, height, color}</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">rect</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A rectangle {x, y, width, height}</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="sect3">
 <h4 id="_shape_oval">shape.oval()</h4>
@@ -2230,9 +2254,33 @@ shape.ovalf() -- Draw a filled oval using the specified color.</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">shape.rectf() -- Draw a filled rectangle.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">shape.rectf() -- Draw a filled rectangle.
+shape.rectf(rect) -- Draw a filled rectangle.
+shape.rectf(rect, color) -- Draw a filled rectangle using a rectangle and a color.</code></pre>
 </div>
 </div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">rect</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A rectangle {x, y, width, height, color}</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">rect</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A rectangle {x, y, width, height}</p></td>
+</tr>
+</tbody>
+</table>
 <tiny-editor style="display: none;">
 
 function _draw()
@@ -2629,7 +2677,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version main<br>
-Last updated 2023-12-12 22:07:48 UTC
+Last updated 2023-12-13 21:54:18 UTC
 </div>
 </div>
 </body>

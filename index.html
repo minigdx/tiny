@@ -3355,9 +3355,33 @@ end
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">rect</span><span class="p">()</span> <span class="c1">-- Draw a rectangle.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">rect</span><span class="p">()</span> <span class="c1">-- Draw a rectangle.</span>
+<span class="n">shape</span><span class="p">.</span><span class="n">rect</span><span class="p">(</span><span class="n">rect</span><span class="p">)</span> <span class="c1">-- Draw a rectangle.</span>
+<span class="n">shape</span><span class="p">.</span><span class="n">rect</span><span class="p">(</span><span class="n">rect</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a rectangle using a rectangle and a color.</span></code></pre>
 </div>
 </div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">rect</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A rectangle {x, y, width, height, color}</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">rect</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A rectangle {x, y, width, height}</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="sect3">
 <h4 id="_shape_oval">shape.oval()</h4>
@@ -3390,9 +3414,33 @@ end
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">rectf</span><span class="p">()</span> <span class="c1">-- Draw a filled rectangle.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">rectf</span><span class="p">()</span> <span class="c1">-- Draw a filled rectangle.</span>
+<span class="n">shape</span><span class="p">.</span><span class="n">rectf</span><span class="p">(</span><span class="n">rect</span><span class="p">)</span> <span class="c1">-- Draw a filled rectangle.</span>
+<span class="n">shape</span><span class="p">.</span><span class="n">rectf</span><span class="p">(</span><span class="n">rect</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a filled rectangle using a rectangle and a color.</span></code></pre>
 </div>
 </div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">rect</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A rectangle {x, y, width, height, color}</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">rect</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A rectangle {x, y, width, height}</p></td>
+</tr>
+</tbody>
+</table>
 <tiny-editor style="display: none;">
 
 function _draw()
@@ -3804,7 +3852,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version main<br>
-Last updated 2023-12-12 22:05:46 UTC
+Last updated 2023-12-13 21:52:10 UTC
 </div>
 </div>
 <style>
