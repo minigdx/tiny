@@ -69,6 +69,7 @@ class DebugLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
         tiny["enabled"] = enabled()
         tiny["log"] = log()
         tiny["rect"] = rect()
+        tiny["table"] = table()
 
         arg2["debug"] = tiny
         arg2["package"]["loaded"]["debug"] = tiny
@@ -82,6 +83,26 @@ class DebugLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
         override fun call(@TinyArg("enabled") arg: LuaValue): LuaValue {
             val enabled = arg.optboolean(true)
             resourceAccess.debug(DebugEnabled(enabled))
+            return NIL
+        }
+    }
+
+    @TinyFunction("Display a table.")
+    internal inner class table : OneArgFunction() {
+        @TinyCall("Display a table.")
+        override fun call(@TinyArg("table") arg: LuaValue): LuaValue {
+            val luaTable = arg.opttable(null) ?: return NIL
+            val keys = luaTable.keys()
+            val str = keys.joinToString("") { k ->
+                val value = luaTable[k]
+                val v = if (value.isnumber() || value.isstring()) {
+                    value.optjstring("nil")
+                } else {
+                    "nil"
+                }
+                "[$k:$v]"
+            }
+            resourceAccess.debug(DebugMessage(str, "#32CD32"))
             return NIL
         }
     }
