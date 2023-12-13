@@ -781,6 +781,13 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <li><a href="#_ctrl_touching">ctrl.touching()</a></li>
 </ul>
 </li>
+<li><a href="#_debug">debug</a>
+<ul class="sectlevel3">
+<li><a href="#_debug_enabled">debug.enabled()</a></li>
+<li><a href="#_debug_log">debug.log()</a></li>
+<li><a href="#_debug_rect">debug.rect()</a></li>
+</ul>
+</li>
 <li><a href="#_gfx">gfx</a>
 <ul class="sectlevel3">
 <li><a href="#_gfx_cls">gfx.cls()</a></li>
@@ -891,7 +898,6 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <li><a href="#_new">new()</a></li>
 <li><a href="#_all">all()</a></li>
 <li><a href="#_rpairs">rpairs()</a></li>
-<li><a href="#_debug">debug()</a></li>
 <li><a href="#_print">print()</a></li>
 </ul>
 </li>
@@ -1778,6 +1784,70 @@ function _draw()
 end
 
 </tiny-editor>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_debug">debug</h3>
+<div class="paragraph">
+<p>Helpers to debug your game by drawing or printing information on screen.</p>
+</div>
+<div class="sect3">
+<h4 id="_debug_enabled">debug.enabled()</h4>
+<div class="paragraph">
+<p>Enable or disable debug feature.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">debug</span><span class="p">.</span><span class="n">enabled</span><span class="p">(</span><span class="n">enabled</span><span class="p">)</span> <span class="c1">-- Enable or disable debug by passing true to enable, false to disable.</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_debug_log">debug.log()</h4>
+<div class="paragraph">
+<p>Log a message on the screen.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">debug</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Log a message on the screen.</span>
+<span class="n">debug</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="n">str</span><span class="p">)</span> <span class="c1">-- Log a message on the screen.</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_debug_rect">debug.rect()</h4>
+<div class="paragraph">
+<p>Draw a rectangle on the screen</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">debug</span><span class="p">.</span><span class="n">rect</span><span class="p">()</span> <span class="c1">-- Draw a debug rectangle.</span>
+<span class="n">debug</span><span class="p">.</span><span class="n">rect</span><span class="p">(</span><span class="n">rect</span><span class="p">)</span> <span class="c1">-- Draw a debug rectangle.</span>
+<span class="n">debug</span><span class="p">.</span><span class="n">rect</span><span class="p">(</span><span class="n">rect</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a debug rectangle using a rectangle and a color.</span></code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">rect</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A rectangle {x, y, width, height, color}</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">rect</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A rectangle {x, y, width, height}</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 <div class="sect2">
@@ -3740,17 +3810,6 @@ end
 </tiny-editor>
 </div>
 <div class="sect3">
-<h4 id="_debug">debug()</h4>
-<div class="paragraph">
-<p>Print in the console a value to help debugging</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">debug</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="c1">-- Print in the console a value</span></code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
 <h4 id="_print">print()</h4>
 <div class="paragraph">
 <p>Print on the screen a string.</p>
@@ -3852,7 +3911,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version main<br>
-Last updated 2023-12-13 21:52:10 UTC
+Last updated 2023-12-13 23:00:25 UTC
 </div>
 </div>
 <style>
