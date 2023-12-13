@@ -16,6 +16,57 @@ import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import kotlin.math.abs
 
+private class Shape(private val resourceAccess: GameResourceAccess) {
+
+    fun rectArgs(args: Varargs): List<Int>? {
+        when (args.narg()) {
+            // rect including color
+            in 1..1 -> {
+                val table = args.arg1().opttable(null) ?: return null
+                return listOf(
+                    table["x"].checkint(),
+                    table["y"].checkint(),
+                    table["width"].checkint(),
+                    table["height"].checkint(),
+                    table["color"].checkColorIndex(),
+                )
+            }
+            // rect with color
+            in 2..2 -> {
+                val table = args.arg1().opttable(null) ?: return null
+                return listOf(
+                    table["x"].checkint(),
+                    table["y"].checkint(),
+                    table["width"].checkint(),
+                    table["height"].checkint(),
+                    args.arg(2).checkColorIndex(),
+                )
+            }
+            // not supported
+            in 3..4 -> {
+                return null
+            }
+            // every args
+            else -> {
+                val x = args.arg(1).checkint()
+                val y = args.arg(2).checkint()
+                val width = args.arg(3).checkint()
+                val height = args.arg(4).checkint()
+                val color = args.arg(5).checkColorIndex()
+                return listOf(x, y, width, height, color)
+            }
+        }
+    }
+
+    private fun LuaValue.checkColorIndex(): Int {
+        return if (this.isnumber()) {
+            this.checkint()
+        } else {
+            resourceAccess.frameBuffer.gamePalette.getColorIndex(this.checkjstring()!!)
+        }
+    }
+}
+
 @TinyLib(
     "shape",
     "Shape API to draw...shapes. " +
@@ -23,6 +74,9 @@ import kotlin.math.abs
         "All shapes can be draw filed or not filed.",
 )
 class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() {
+
+    private val shape = Shape(resourceAccess)
+
     override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
         val shp = LuaTable()
         shp["line"] = line()
@@ -45,12 +99,8 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
     internal inner class rect : LibFunction() {
         @TinyCall("Draw a rectangle.")
         override fun invoke(@TinyArgs(["x", "y", "width", "height", "color"]) args: Varargs): Varargs {
-            if (args.narg() < 5) return NONE
-            val x = args.arg(1).checkint()
-            val y = args.arg(2).checkint()
-            val width = args.arg(3).checkint()
-            val height = args.arg(4).checkint()
-            val color = args.arg(5).checkColorIndex()
+            val (x, y, width, height, color) = shape.rectArgs(args) ?: return NIL
+
             for (i in x until x + width) {
                 resourceAccess.frameBuffer.pixel(i, y, color)
                 resourceAccess.frameBuffer.pixel(i, y + height - 1, color)
@@ -59,8 +109,19 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
                 resourceAccess.frameBuffer.pixel(x, i, color)
                 resourceAccess.frameBuffer.pixel(x + width - 1, i, color)
             }
-            return NONE
+            return NIL
         }
+
+        @TinyCall("Draw a rectangle.")
+        override fun call(@TinyArg("rect", "A rectangle {x, y, width, height, color}") a: LuaValue): LuaValue {
+            return super.call(a)
+        }
+
+        @TinyCall("Draw a rectangle using a rectangle and a color.")
+        override fun call(
+            @TinyArg("rect", "A rectangle {x, y, width, height}") a: LuaValue,
+            @TinyArg("color") b: LuaValue,
+        ): LuaValue = super.call(a, b)
     }
 
     @TinyFunction("Draw an oval.")
@@ -214,18 +275,24 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
         // cornerX: Int, cornerY: Int, width: Int, height: Int, color: Int
         @TinyCall("Draw a filled rectangle.")
         override fun invoke(@TinyArgs(["x", "y", "width", "height", "color"]) args: Varargs): Varargs {
-            if (args.narg() < 5) return NONE
-            val x = args.arg(1).checkint()
-            val y = args.arg(2).checkint()
-            val width = args.arg(3).checkint()
-            val height = args.arg(4).checkint()
-            val color = args.arg(5).checkColorIndex()
+            val (x, y, width, height, color) = shape.rectArgs(args) ?: return NIL
 
             for (j in y until y + height) {
                 resourceAccess.frameBuffer.fill(x, x + width, j, color)
             }
-            return NONE
+            return NIL
         }
+
+        @TinyCall("Draw a filled rectangle.")
+        override fun call(@TinyArg("rect", "A rectangle {x, y, width, height, color}") a: LuaValue): LuaValue {
+            return super.call(a)
+        }
+
+        @TinyCall("Draw a filled rectangle using a rectangle and a color.")
+        override fun call(
+            @TinyArg("rect", "A rectangle {x, y, width, height}") a: LuaValue,
+            @TinyArg("color") b: LuaValue,
+        ): LuaValue = super.call(a, b)
     }
 
     private fun LuaValue.checkColorIndex(): Int {
