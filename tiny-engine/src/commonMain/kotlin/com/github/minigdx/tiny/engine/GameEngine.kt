@@ -88,7 +88,8 @@ class GameEngine(
 
     private var numberOfResources: Int = 0
 
-    private val debugMessages = mutableListOf<DebugMessage>()
+    private var debugEnabled: Boolean = true
+    private val debugActions = mutableListOf<DebugAction>()
 
     private lateinit var scripts: Array<GameScript?>
     private lateinit var spriteSheets: Array<SpriteSheet?>
@@ -338,23 +339,49 @@ class GameEngine(
                     platform.screenshot()
                 }
 
-                debugMessages.forEachIndexed { index, debugMessage ->
-                    val (msg, color) = debugMessage
-                    engineGameScript?.invoke(
-                        "printDebug",
-                        valueOf(index),
-                        valueOf(msg),
-                        valueOf(color),
-                    )
+                var msgIndex = 0
+                if (!debugEnabled) {
+                    debugActions.clear()
                 }
-                debugMessages.clear()
+                debugActions.forEach { debugAction ->
+                    when (debugAction) {
+                        is DebugMessage -> {
+                            val (msg, color) = debugAction
+                            engineGameScript?.invoke(
+                                "printDebug",
+                                valueOf(msgIndex++),
+                                valueOf(msg),
+                                valueOf(color),
+                            )
+                        }
+
+                        is DebugRect -> {
+                            val (x, y, width, height, color) = debugAction
+                            engineGameScript?.invoke(
+                                "shape.rect",
+                                valueOf(x),
+                                valueOf(y),
+                                valueOf(width),
+                                valueOf(height),
+                                valueOf(color),
+                            )
+                        }
+                        is DebugEnabled -> Unit // NOP
+                    }
+                }
+                debugActions.clear()
                 inputManager.reset()
             }
         }
     }
 
-    override fun debug(str: DebugMessage) {
-        debugMessages.add(str)
+    override fun debug(action: DebugAction) {
+        when (action) {
+            is DebugEnabled -> {
+                debugEnabled = action.enabled
+            }
+            else -> debugActions.add(action)
+        }
     }
 
     private suspend fun GameEngine.popupError(ex: LuaError) {

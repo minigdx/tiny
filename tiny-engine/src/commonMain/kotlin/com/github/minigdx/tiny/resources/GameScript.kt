@@ -5,6 +5,7 @@ import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.lua.CtrlLib
+import com.github.minigdx.tiny.lua.DebugLib
 import com.github.minigdx.tiny.lua.GfxLib
 import com.github.minigdx.tiny.lua.JuiceLib
 import com.github.minigdx.tiny.lua.KeysLib
@@ -79,6 +80,7 @@ class GameScript(
         load(CtrlLib(inputHandler, sprLib))
         load(SfxLib(this@GameScript.resourceAccess, playSound = !forValidation))
         load(ShapeLib(this@GameScript.resourceAccess))
+        load(DebugLib(this@GameScript.resourceAccess))
         load(KeysLib())
         load(MathLib())
         load(tinyLib)
@@ -124,8 +126,17 @@ class GameScript(
     }
 
     internal suspend fun invoke(name: String, vararg args: LuaValue) {
+        val path = name.split(".")
+        val head = path.first()
+        val tail = path.drop(1)
+
+        var function = globals?.get(head)
+        tail.forEach {
+            function = function?.get(it)
+        }
+
         @Suppress("UNCHECKED_CAST")
-        globals?.get(name)?.nullIfNil()?.invokeSuspend(args as Array<LuaValue>)
+        function?.nullIfNil()?.invokeSuspend(args as Array<LuaValue>)
     }
 
     suspend fun getState(): State? {

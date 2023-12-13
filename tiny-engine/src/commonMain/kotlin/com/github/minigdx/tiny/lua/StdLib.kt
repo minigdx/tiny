@@ -5,7 +5,6 @@ import com.github.mingdx.tiny.doc.TinyArgs
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
-import com.github.minigdx.tiny.engine.DebugMessage
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import org.luaj.vm2.LuaTable
@@ -26,7 +25,6 @@ class StdLib(
         arg2["all"] = all()
         arg2["rpairs"] = rpairs()
         arg2["print"] = print()
-        arg2["debug"] = debug()
         arg2["new"] = new()
         return tiny
     }
@@ -117,20 +115,6 @@ class StdLib(
             // iterator, object to iterate, seed value.
             return varargsOf(iterator, table, valueOf(table.length() + 1))
         }
-    }
-
-    @TinyFunction("Print in the console a value to help debugging")
-    internal inner class debug : TwoArgFunction() {
-
-        override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
-            val message = arg1.optjstring("")!!
-            val color = arg2.optjstring("#32CD32")!!
-            resourceAccess.debug(DebugMessage(message, color))
-            return NIL
-        }
-
-        @TinyCall("Print in the console a value")
-        override fun call(arg: LuaValue): LuaValue = super.call(arg)
     }
 
     @TinyFunction("Print on the screen a string.", example = STD_PRINT_EXAMPLE)
