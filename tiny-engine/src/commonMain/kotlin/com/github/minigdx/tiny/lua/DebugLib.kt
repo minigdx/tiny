@@ -77,7 +77,7 @@ class DebugLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
         return tiny
     }
 
-    @TinyFunction("Enable or disable debug feature.")
+    @TinyFunction("Enable or disable debug feature.", example = DEBUG_ENABLED_EXAMPLE)
     internal inner class enabled : OneArgFunction() {
         @TinyCall("Enable or disable debug by passing true to enable, false to disable.")
         override fun call(@TinyArg("enabled") arg: LuaValue): LuaValue {
@@ -87,7 +87,7 @@ class DebugLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
         }
     }
 
-    @TinyFunction("Display a table.")
+    @TinyFunction("Display a table.", example = DEBUG_EXAMPLE)
     internal inner class table : OneArgFunction() {
         @TinyCall("Display a table.")
         override fun call(@TinyArg("table") arg: LuaValue): LuaValue {
@@ -107,7 +107,7 @@ class DebugLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
         }
     }
 
-    @TinyFunction("Log a message on the screen.")
+    @TinyFunction("Log a message on the screen.", example = DEBUG_EXAMPLE)
     internal inner class log : TwoArgFunction() {
 
         @TinyCall("Log a message on the screen.")
@@ -122,7 +122,7 @@ class DebugLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
         override fun call(@TinyArg("str") arg: LuaValue): LuaValue = super.call(arg)
     }
 
-    @TinyFunction("Draw a rectangle on the screen")
+    @TinyFunction("Draw a rectangle on the screen", example = DEBUG_ENABLED_EXAMPLE)
     internal inner class rect : LibFunction() {
 
         @TinyCall("Draw a debug rectangle.")
