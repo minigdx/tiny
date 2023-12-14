@@ -635,6 +635,42 @@ end
 <pre class="highlight"><code class="language-lua" data-lang="lua">debug.enabled(enabled) -- Enable or disable debug by passing true to enable, false to disable.</code></pre>
 </div>
 </div>
+<tiny-editor style="display: none;">
+
+function _init()
+   switch = true
+end
+
+function _update()
+    local pos = ctrl.touch()
+
+    debug.rect(pos.x, pos.y, 16, 16)
+
+    if ctrl.touched(0) then
+       switch = not switch
+
+       debug.enabled(switch)
+    end
+
+    debug.log("debug ".. tostring(switch))
+end
+
+function _draw()
+    gfx.cls()
+    -- draw the mouse position.
+    local pos = ctrl.touch()
+
+    shape.line(pos.x - 2, pos.y, pos.x + 2, pos.y, 3)
+    shape.line(pos.x, pos.y - 2, pos.x, pos.y + 2, 3)
+
+    if switch then
+      print("debug enabled", 10, 40)
+    else
+     print("debug disabled", 10, 40)
+    end
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_debug_table">debug.table()</h4>
@@ -646,6 +682,25 @@ end
 <pre class="highlight"><code class="language-lua" data-lang="lua">debug.table(table) -- Display a table.</code></pre>
 </div>
 </div>
+<tiny-editor style="display: none;">
+
+function _update()
+    local pos = ctrl.touch()
+
+    debug.table(pos)
+    debug.log("frame "..tiny.frame)
+end
+
+function _draw()
+    gfx.cls()
+    -- draw the mouse position.
+    local pos = ctrl.touch()
+
+    shape.line(pos.x - 2, pos.y, pos.x + 2, pos.y, 3)
+    shape.line(pos.x, pos.y - 2, pos.x, pos.y + 2, 3)
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_debug_log">debug.log()</h4>
@@ -658,6 +713,25 @@ end
 debug.log(str) -- Log a message on the screen.</code></pre>
 </div>
 </div>
+<tiny-editor style="display: none;">
+
+function _update()
+    local pos = ctrl.touch()
+
+    debug.table(pos)
+    debug.log("frame "..tiny.frame)
+end
+
+function _draw()
+    gfx.cls()
+    -- draw the mouse position.
+    local pos = ctrl.touch()
+
+    shape.line(pos.x - 2, pos.y, pos.x + 2, pos.y, 3)
+    shape.line(pos.x, pos.y - 2, pos.x, pos.y + 2, 3)
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_debug_rect">debug.rect()</h4>
@@ -693,6 +767,42 @@ debug.rect(rect, color) -- Draw a debug rectangle using a rectangle and a color.
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;">
+
+function _init()
+   switch = true
+end
+
+function _update()
+    local pos = ctrl.touch()
+
+    debug.rect(pos.x, pos.y, 16, 16)
+
+    if ctrl.touched(0) then
+       switch = not switch
+
+       debug.enabled(switch)
+    end
+
+    debug.log("debug ".. tostring(switch))
+end
+
+function _draw()
+    gfx.cls()
+    -- draw the mouse position.
+    local pos = ctrl.touch()
+
+    shape.line(pos.x - 2, pos.y, pos.x + 2, pos.y, 3)
+    shape.line(pos.x, pos.y - 2, pos.x, pos.y + 2, 3)
+
+    if switch then
+      print("debug enabled", 10, 40)
+    else
+     print("debug disabled", 10, 40)
+    end
+end
+
+</tiny-editor>
 </div>
 </div>
 <div class="sect2">
@@ -2741,7 +2851,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version main<br>
-Last updated 2023-12-13 23:14:53 UTC
+Last updated 2023-12-14 09:20:37 UTC
 </div>
 </div>
 </body>
