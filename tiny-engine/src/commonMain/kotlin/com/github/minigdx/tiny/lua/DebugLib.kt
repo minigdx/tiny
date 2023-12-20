@@ -79,12 +79,23 @@ class DebugLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
 
     @TinyFunction("Enable or disable debug feature.", example = DEBUG_ENABLED_EXAMPLE)
     internal inner class enabled : OneArgFunction() {
+
+        private var status = false
+
         @TinyCall("Enable or disable debug by passing true to enable, false to disable.")
         override fun call(@TinyArg("enabled") arg: LuaValue): LuaValue {
+            if (arg.isnil()) {
+                return valueOf(status)
+            }
+
             val enabled = arg.optboolean(true)
+            status = enabled
             resourceAccess.debug(DebugEnabled(enabled))
-            return NIL
+            return valueOf(status)
         }
+
+        @TinyCall("Return true if debug is enabled. False otherwise.")
+        override fun call(): LuaValue = super.call()
     }
 
     @TinyFunction("Display a table.", example = DEBUG_EXAMPLE)
