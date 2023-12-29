@@ -17,6 +17,7 @@ import com.github.minigdx.tiny.lua.SprLib
 import com.github.minigdx.tiny.lua.StdLib
 import com.github.minigdx.tiny.lua.TinyBaseLib
 import com.github.minigdx.tiny.lua.TinyLib
+import com.github.minigdx.tiny.lua.Vec2Lib
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LoadState
 import org.luaj.vm2.LuaError
@@ -83,6 +84,7 @@ class GameScript(
         load(DebugLib(this@GameScript.resourceAccess))
         load(KeysLib())
         load(MathLib())
+        load(Vec2Lib())
         load(tinyLib)
         load(sprLib)
         load(JuiceLib())
