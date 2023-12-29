@@ -2854,7 +2854,13 @@ end
 <div class="sect3">
 <h4 id="_vec2_create">vec2.create()</h4>
 <div class="paragraph">
-<p>Create a vector 2 as a table { x, y }</p>
+<p>Create a vector 2 as a table { x, y }.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">vec2.create(x, y) -- Create a vector 2 as a table { x, y }.
+vec2.create(vec2) -- Create a vector 2 as a table { x, y } using another vector 2.</code></pre>
+</div>
 </div>
 </div>
 <div class="sect3">
@@ -2862,6 +2868,34 @@ end
 <div class="paragraph">
 <p>Add vector2 to another vector2</p>
 </div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">vec2.add(v1, v2) -- Add a vector 2 {x, y} to another vector 2 {x, y}
+vec2.add(x1, y1, x2, y2) -- Add a destructured vector 2 to another destructured vector 2</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+</tbody>
+</table>
 <tiny-editor style="display: none;">
 
 function _init()
@@ -2891,6 +2925,34 @@ end
 <div class="paragraph">
 <p>Subtract another vector to a vector</p>
 </div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">vec2.sub(v1, v2) -- Subtract a vector 2 {x, y} from another vector 2 {x, y}
+vec2.sub(x1, y1, x2, y2) -- Subtract a destructured vector 2 from another destructured vector 2</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+</tbody>
+</table>
 <tiny-editor style="display: none;">
 
 function _init()
@@ -2920,30 +2982,207 @@ end
 <div class="paragraph">
 <p>Dot product between two vectors</p>
 </div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">vec2.dot(v1, v2) -- Dot product between a vector 2 {x, y} and another vector 2 {x, y}
+vec2.dot(x1, y1, x2, y2) -- Dot product between a destructured vector 2 and another destructured vector 2</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+</tbody>
+</table>
+<tiny-editor style="display: none;">
+
+function _init()
+    angle = 0
+end
+function _update()
+
+    if ctrl.pressing(keys.space) then
+        angle = angle + 0.1
+    end
+
+    gfx.camera(-128, -128)
+
+    local v1 = vec2.create(1, 0)
+    local v2 = vec2.create(math.cos(angle), math.sin(angle))
+    local dot = vec2.dot(v1, v2)
+
+    local scl = vec2.scl(v1, dot)
+
+    gfx.cls()
+
+    local scaledv1 = vec2.scl(v1, 64)
+    local scaledv2 = vec2.scl(v2, 64)
+    local scaledv3 = vec2.scl(scl, 64)
+
+    print("v1", 18, 5, 10)
+    shape.line(0, 0, scaledv1.x, scaledv1.y, 10)
+    print("v2", scaledv2.x + 5, scaledv2.y + 5, 11)
+    shape.line(0, 0, scaledv2.x, scaledv2.y, 11)
+
+    print("dot", scaledv3.x, 5, 9)
+    shape.line(0, 0, scaledv3.x, scaledv3.y, 9)
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_vec2_mag">vec2.mag()</h4>
 <div class="paragraph">
 <p>Calculate the magnitude (length) of a vector</p>
 </div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">vec2.mag(x, y) -- Calculate the magnitude (length) of a vector 2 {x, y}
+vec2.mag(v1) -- Calculate the magnitude (length) of a vector 2 {x, y}</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="sect3">
 <h4 id="_vec2_nor">vec2.nor()</h4>
 <div class="paragraph">
 <p>Normalize a vector</p>
 </div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">vec2.nor(x, y) -- Normalize a vector 2 {x, y}
+vec2.nor(v1) -- Normalize a vector 2 {x, y}</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+</tbody>
+</table>
+<tiny-editor style="display: none;">
+
+function _update()
+    gfx.cls()
+
+    local v0 = vec2.create(43, 64)
+    local v1 = vec2.nor(v0)
+
+
+    print("vector     x: " .. v0.x .. " y: " .. v0.y)
+    print("normalized x: " .. v1.x .. " y: " .. v1.y, 0, 8)
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_vec2_crs">vec2.crs()</h4>
 <div class="paragraph">
 <p>Cross product</p>
 </div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">vec2.crs(v1, v2) -- Cross product between a vector 2 {x, y} and another vector 2 {x, y}
+vec2.crs(x1, y1, x2, y2) -- Cross product between a destructured vector 2 and another destructured vector 2</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="sect3">
 <h4 id="_vec2_scl">vec2.scl()</h4>
 <div class="paragraph">
 <p>Scale a vector</p>
 </div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">vec2.scl(x, y, scl) -- Scale a vector 2 {x, y} using the factor scl
+vec2.scl(v1, scl) -- Scale a vector 2 {x, y} using the factor scl</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+</tbody>
+</table>
 <tiny-editor style="display: none;">
 
 function _init()
@@ -2970,7 +3209,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version main<br>
-Last updated 2023-12-29 12:25:30 UTC
+Last updated 2023-12-29 20:14:21 UTC
 </div>
 </div>
 </body>
