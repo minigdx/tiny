@@ -2846,13 +2846,131 @@ end
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_vec2">vec2</h3>
+<div class="paragraph">
+<p>Vector2 manipulation library.</p>
+</div>
+<div class="sect3">
+<h4 id="_vec2_create">vec2.create()</h4>
+<div class="paragraph">
+<p>Create a vector 2 as a table { x, y }</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_vec2_add">vec2.add()</h4>
+<div class="paragraph">
+<p>Add vector2 to another vector2</p>
+</div>
+<tiny-editor style="display: none;">
+
+function _init()
+    gfx.camera(-128, -128)
+
+    local v1 = vec2.create(32, 38)
+    local v2 = vec2.create(20, 2)
+
+    gfx.cls()
+    print("v1", 2, 15, 10)
+    shape.line(0, 0, v1.x, v1.y, 10)
+    print("v2", 23, 3, 9)
+    shape.line(0, 0, v2.x, v2.y, 9)
+
+    local v3 = vec2.add(v1, v2)
+
+    print("v1 + v2", 30, 15, 11)
+    gfx.dither(0xAAAA)
+    shape.line(0, 0, v3.x, v3.y, 11)
+    gfx.dither()
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_vec2_sub">vec2.sub()</h4>
+<div class="paragraph">
+<p>Subtract another vector to a vector</p>
+</div>
+<tiny-editor style="display: none;">
+
+function _init()
+    gfx.camera(-128, -128)
+
+    local v1 = vec2.create(32, 38)
+    local v2 = vec2.create(20, 2)
+
+    gfx.cls()
+    print("v1", 18, 15, 10)
+    shape.line(0, 0, v1.x, v1.y, 10)
+    print("v2", 23, 3, 9)
+    shape.line(0, 0, v2.x, v2.y, 9)
+
+    local v3 = vec2.sub(v1, v2)
+
+    print("v1 - v2", 0, 40, 11)
+    gfx.dither(0xAAAA)
+    shape.line(0, 0, v3.x, v3.y, 11)
+    gfx.dither()
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_vec2_dot">vec2.dot()</h4>
+<div class="paragraph">
+<p>Dot product between two vectors</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_vec2_mag">vec2.mag()</h4>
+<div class="paragraph">
+<p>Calculate the magnitude (length) of a vector</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_vec2_nor">vec2.nor()</h4>
+<div class="paragraph">
+<p>Normalize a vector</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_vec2_crs">vec2.crs()</h4>
+<div class="paragraph">
+<p>Cross product</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_vec2_scl">vec2.scl()</h4>
+<div class="paragraph">
+<p>Scale a vector</p>
+</div>
+<tiny-editor style="display: none;">
+
+function _init()
+    gfx.camera(-128, -128)
+
+    local v1 = vec2.create(32, 38)
+    local v2 = vec2.scl(v1, 2)
+
+    gfx.cls()
+    print("v1 scaled", 8, 60, 11)
+    gfx.dither(0xAAAA)
+    shape.line(0, 0, v2.x, v2.y, 11)
+    gfx.dither()
+    print("v1", 18, 15, 10)
+    shape.line(0, 0, v1.x, v1.y, 10)
+end
+
+</tiny-editor>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
 Version main<br>
-Last updated 2023-12-20 22:45:19 UTC
+Last updated 2023-12-29 12:25:30 UTC
 </div>
 </div>
 </body>
