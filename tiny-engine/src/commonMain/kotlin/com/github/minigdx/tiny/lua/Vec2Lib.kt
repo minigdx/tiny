@@ -201,7 +201,7 @@ class Vec2Lib : TwoArgFunction() {
     companion object {
         fun extract(arg1: LuaValue, arg2: LuaValue): List<LuaValue> {
             return if (arg1.istable()) {
-                listOf(arg1.get("x"), arg2.get("y"))
+                listOf(arg1.get("x"), arg1.get("y"))
             } else {
                 listOf(arg1, arg2)
             }

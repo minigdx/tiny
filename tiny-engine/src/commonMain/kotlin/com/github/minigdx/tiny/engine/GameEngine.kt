@@ -367,6 +367,27 @@ class GameEngine(
                             )
                         }
                         is DebugEnabled -> Unit // NOP
+                        is DebugLine -> {
+                            val (x1, y1, x2, y2, color) = debugAction
+                            engineGameScript?.invoke(
+                                "shape.line",
+                                valueOf(x1),
+                                valueOf(y1),
+                                valueOf(x2),
+                                valueOf(y2),
+                                valueOf(color),
+                            )
+                        }
+                        is DebugPoint -> {
+                            val (x, y, color) = debugAction
+                            engineGameScript?.invoke(
+                                "shape.circlef",
+                                valueOf(x),
+                                valueOf(y),
+                                valueOf(2),
+                                valueOf(color),
+                            )
+                        }
                     }
                 }
                 debugActions.clear()
