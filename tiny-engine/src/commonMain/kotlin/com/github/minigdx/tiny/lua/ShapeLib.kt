@@ -95,7 +95,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
         return shp
     }
 
-    @TinyFunction("Draw a rectangle.")
+    @TinyFunction("Draw a rectangle.", example = SHAPE_RECTF_EXAMPLE)
     internal inner class rect : LibFunction() {
         @TinyCall("Draw a rectangle.")
         override fun invoke(@TinyArgs(["x", "y", "width", "height", "color"]) args: Varargs): Varargs {
@@ -124,7 +124,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
         ): LuaValue = super.call(a, b)
     }
 
-    @TinyFunction("Draw an oval.")
+    @TinyFunction("Draw an oval.", example = SHAPE_OVALF_EXAMPLE)
     internal inner class oval : LibFunction() {
         @TinyCall("Draw an oval using the default color.")
         override fun call(
@@ -198,7 +198,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
         }
     }
 
-    @TinyFunction("Draw an oval filled.")
+    @TinyFunction("Draw an oval filled.", example = SHAPE_OVALF_EXAMPLE)
     internal inner class ovalf : LibFunction() {
         @TinyCall("Draw a filled oval using the default color.")
         override fun call(
@@ -266,7 +266,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
                     p += 2 * radiusY * radiusY * x - 2 * radiusX * radiusX * y + radiusX * radiusX
                 }
             }
-            return NONE
+            return NIL
         }
     }
 
@@ -346,11 +346,11 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
                 }
                 x++
             }
-            return NONE
+            return NIL
         }
     }
 
-    @TinyFunction("Draw a line.")
+    @TinyFunction("Draw a line.", example = SHAPE_LINE_EXAMPLE)
     internal inner class line : LibFunction() {
 
         @TinyCall("Draw a line.")
@@ -414,7 +414,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
         }
     }
 
-    @TinyFunction("Draw a circle.")
+    @TinyFunction("Draw a circle.", example = SHAPE_CIRCLEF_EXAMPLE)
     internal inner class circle : LibFunction() {
 
         @TinyCall("Draw a circle with the default color.")
@@ -460,7 +460,10 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
         }
     }
 
-    @TinyFunction("Draw a filled triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3) and color.")
+    @TinyFunction(
+        "Draw a filled triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3) and color.",
+        example = SHAPE_TRIANGLEF_EXAMPLE,
+    )
     inner class trianglef : LibFunction() {
 
         @TinyCall("Draw a filled triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).")
@@ -513,7 +516,10 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
         }
     }
 
-    @TinyFunction("Draw a triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3) and color.")
+    @TinyFunction(
+        "Draw a triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3) and color.",
+        example = SHAPE_TRIANGLEF_EXAMPLE,
+    )
     inner class triangle : LibFunction() {
 
         private val line = line()

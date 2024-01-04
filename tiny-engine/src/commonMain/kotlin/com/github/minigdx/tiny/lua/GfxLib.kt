@@ -36,7 +36,7 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         return func
     }
 
-    @TinyFunction("clear the screen")
+    @TinyFunction("clear the screen", example = GFX_CLS_EXAMPLE)
     internal inner class cls : OneArgFunction() {
         @TinyCall("Clear the screen with a default color.")
         override fun call(): LuaValue = super.call()
@@ -53,7 +53,7 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         }
     }
 
-    @TinyFunction("Set the color index at the coordinate (x,y).")
+    @TinyFunction("Set the color index at the coordinate (x,y).", example = GFX_PSET_EXAMPLE)
     internal inner class pset : ThreeArgFunction() {
         @TinyCall("set the color index at the coordinate (x,y).")
         override fun call(@TinyArg("x")arg1: LuaValue, @TinyArg("y")arg2: LuaValue, @TinyArg("color")arg3: LuaValue): LuaValue {
@@ -62,7 +62,7 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         }
     }
 
-    @TinyFunction("Get the color index at the coordinate (x,y).")
+    @TinyFunction("Get the color index at the coordinate (x,y).", example = GFX_PGET_EXAMPLE)
     internal inner class pget : TwoArgFunction() {
         @TinyCall("get the color index at the coordinate (x,y).")
         override fun call(@TinyArg("x")arg1: LuaValue, @TinyArg("y")arg2: LuaValue): LuaValue {

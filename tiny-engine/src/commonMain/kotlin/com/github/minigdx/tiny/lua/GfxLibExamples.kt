@@ -66,3 +66,48 @@ function _draw()
     spr.sheet(0)
     spr.sdraw()
 end"""
+
+//language=Lua
+const val GFX_PSET_EXAMPLE = """
+function _draw()
+   local pos = ctrl.touching(0)
+   if pos ~= nil then
+      -- set the pixel with the color 9 when the mouse is pressed
+      gfx.pset(pos.x, pos.y, 9)
+   end
+end"""
+
+//language=Lua
+const val GFX_PGET_EXAMPLE = """
+function _draw()
+   gfx.cls()
+   local index = 0
+   for x=0, 240, 16 do
+     for y=0, 240, 16 do
+        shape.rectf(x, y, 16, 16, index)
+        index = index + 1
+     end
+   end
+
+   local pos = ctrl.touch()
+   local color = gfx.pget(pos.x, pos.y)
+   if color ~= nil then 
+     shape.rectf(0, 0, 80, 6, 13)
+     print("color index: "..color)
+   end
+
+
+   shape.circlef(pos.x - 2, pos.y - 2, 4, 0)
+end"""
+
+//language=Lua
+const val GFX_CLS_EXAMPLE = """
+function _draw()
+    if ctrl.pressed(keys.space) then
+       gfx.cls()
+    end
+
+    print("Press space to clear the screen") 
+    local pos = ctrl.touch()
+    shape.circlef(pos.x, pos.y, 4, math.rnd())
+end"""
