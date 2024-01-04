@@ -900,6 +900,18 @@ debug.line(v1, v2, color) -- Draw a debug line.</code></pre>
 gfx.cls(color) -- Clear the screen with a color.</code></pre>
 </div>
 </div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    if ctrl.pressed(keys.space) then
+       gfx.cls()
+    end
+
+    print("Press space to clear the screen")
+    local pos = ctrl.touch()
+    shape.circlef(pos.x, pos.y, 4, math.rnd())
+end
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_gfx_pset">gfx.pset()</h4>
@@ -911,6 +923,16 @@ gfx.cls(color) -- Clear the screen with a color.</code></pre>
 <pre class="highlight"><code class="language-lua" data-lang="lua">gfx.pset(x, y, color) -- set the color index at the coordinate (x,y).</code></pre>
 </div>
 </div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+   local pos = ctrl.touching(0)
+   if pos ~= nil then
+      -- set the pixel with the color 9 when the mouse is pressed
+      gfx.pset(pos.x, pos.y, 9)
+   end
+end
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_gfx_pget">gfx.pget()</h4>
@@ -922,6 +944,29 @@ gfx.cls(color) -- Clear the screen with a color.</code></pre>
 <pre class="highlight"><code class="language-lua" data-lang="lua">gfx.pget(x, y) -- get the color index at the coordinate (x,y).</code></pre>
 </div>
 </div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+   gfx.cls()
+   local index = 0
+   for x=0, 240, 16 do
+     for y=0, 240, 16 do
+        shape.rectf(x, y, 16, 16, index)
+        index = index + 1
+     end
+   end
+
+   local pos = ctrl.touch()
+   local color = gfx.pget(pos.x, pos.y)
+   if color ~= nil then
+     shape.rectf(0, 0, 80, 6, 13)
+     print("color index: "..color)
+   end
+
+
+   shape.circlef(pos.x - 2, pos.y - 2, 4, 0)
+end
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_gfx_to_sheet">gfx.to_sheet()</h4>
@@ -2486,6 +2531,31 @@ shape.rect(rect, color) -- Draw a rectangle using a rectangle and a color.</code
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+  gfx.cls()
+
+  -- filled rectangle
+  print("filled rectangle", 20, 10)
+  shape.rectf(20, 20, 20, 20, 4)
+  shape.rectf(30, 30, 20, 20, 5)
+  shape.rectf(40, 40, 20, 20, 6)
+
+  print("non filled rectangle", 20, 65)
+  -- non filled rectangle
+  shape.rect(50, 70, 20, 20, 7)
+  shape.rect(60, 80, 20, 20, 8)
+  shape.rect(70, 90, 20, 20, 9)
+
+  print("rectangle with different width", 20, 115)
+  shape.rect(20, 120, 30, 20, 10)
+  shape.rect(20, 140, 40, 20, 12)
+  shape.rect(20, 160, 60, 20, 13)
+
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_shape_oval">shape.oval()</h4>
@@ -2498,6 +2568,23 @@ shape.rect(rect, color) -- Draw a rectangle using a rectangle and a color.</code
 shape.oval() -- Draw an oval using the specified color.</code></pre>
 </div>
 </div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+
+    local pos = ctrl.touch()
+    local w = math.max(0, pos.x)
+    local h = math.max(0, pos.y)
+
+    shape.ovalf(w, h, w, h, 5)
+    shape.oval(256 - w, 256 - h, w, h, 1)
+
+
+    print("size w: "..w.." h: "..h)
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_shape_ovalf">shape.ovalf()</h4>
@@ -2510,6 +2597,23 @@ shape.oval() -- Draw an oval using the specified color.</code></pre>
 shape.ovalf() -- Draw a filled oval using the specified color.</code></pre>
 </div>
 </div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+
+    local pos = ctrl.touch()
+    local w = math.max(0, pos.x)
+    local h = math.max(0, pos.y)
+
+    shape.ovalf(w, h, w, h, 5)
+    shape.oval(256 - w, 256 - h, w, h, 1)
+
+
+    print("size w: "..w.." h: "..h)
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_shape_rectf">shape.rectf()</h4>
@@ -2618,6 +2722,21 @@ end
 shape.line(x0, y0, x1, y1) -- Draw a line with a default color.</code></pre>
 </div>
 </div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+  gfx.cls()
+
+  local i =0
+  for x =16, 240, 16 do
+    for y =16, 240, 16 do
+      shape.line(x, y, 256 - x, 256 - y, i)
+      i = i + 1
+    end
+  end
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_shape_circle">shape.circle()</h4>
@@ -2630,6 +2749,31 @@ shape.line(x0, y0, x1, y1) -- Draw a line with a default color.</code></pre>
 shape.circle(centerX, centerY, radius, color) -- Draw a circle.</code></pre>
 </div>
 </div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+
+    -- filled circle
+    shape.circlef(20, 20, 20, 4)
+    shape.circlef(30, 30, 20, 5)
+    shape.circlef(40, 40, 20, 6)
+    print("filled circle", 20, 10)
+
+    -- non filled circle
+    shape.circle(50, 70, 10, 7)
+    shape.circle(60, 80, 10, 8)
+    shape.circle(70, 90, 10, 9)
+    print("non filled circle", 20, 65)
+
+    shape.circle(80, 120, 15, 10)
+    shape.circle(80, 140, 20, 16)
+    shape.circle(80, 160, 30, 14)
+    print("circle with different radius", 20, 115)
+
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_shape_trianglef">shape.trianglef()</h4>
@@ -2641,6 +2785,34 @@ shape.circle(centerX, centerY, radius, color) -- Draw a circle.</code></pre>
 <pre class="highlight"><code class="language-lua" data-lang="lua">shape.trianglef() -- Draw a filled triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).</code></pre>
 </div>
 </div>
+<tiny-editor style="display: none;"  >
+
+function tri(f, fill)
+  local x1 = 128 + math.cos(f) * 64
+  local y1 = 128 + math.sin(f) * 64
+
+  local x2 = 128 + math.cos(f + math.pi * 1/3) * 64
+  local y2 = 128 + math.sin(f + math.pi * 1/3) * 64
+
+  local x3 = 128 + math.cos(f+ math.pi * 2/3) * 64
+  local y3 = 128 + math.sin(f +math.pi * 2/3) * 64
+
+  if fill then
+    shape.trianglef(x3, y3, x2, y2, x1, y1, 8)
+  else
+    shape.triangle(x1, y1, x2, y2, x3, y3, 8)
+  end
+end
+
+function _draw()
+  gfx.cls()
+  local f = tiny.frame * 0.01
+
+  tri(f, false)
+  tri(f*2, true)
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_shape_triangle">shape.triangle()</h4>
@@ -2652,6 +2824,34 @@ shape.circle(centerX, centerY, radius, color) -- Draw a circle.</code></pre>
 <pre class="highlight"><code class="language-lua" data-lang="lua">shape.triangle() -- Draw a triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).</code></pre>
 </div>
 </div>
+<tiny-editor style="display: none;"  >
+
+function tri(f, fill)
+  local x1 = 128 + math.cos(f) * 64
+  local y1 = 128 + math.sin(f) * 64
+
+  local x2 = 128 + math.cos(f + math.pi * 1/3) * 64
+  local y2 = 128 + math.sin(f + math.pi * 1/3) * 64
+
+  local x3 = 128 + math.cos(f+ math.pi * 2/3) * 64
+  local y3 = 128 + math.sin(f +math.pi * 2/3) * 64
+
+  if fill then
+    shape.trianglef(x3, y3, x2, y2, x1, y1, 8)
+  else
+    shape.triangle(x1, y1, x2, y2, x3, y3, 8)
+  end
+end
+
+function _draw()
+  gfx.cls()
+  local f = tiny.frame * 0.01
+
+  tri(f, false)
+  tri(f*2, true)
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_shape_gradient">shape.gradient()</h4>
@@ -3365,7 +3565,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version main<br>
-Last updated 2024-01-04 12:10:44 UTC
+Last updated 2024-01-04 14:02:58 UTC
 </div>
 </div>
 </body>
