@@ -1640,7 +1640,7 @@ This <span class="nb">command </span>will download the particles library from th
 <span class="n">ctrl</span><span class="p">.</span><span class="n">touch</span><span class="p">(</span><span class="n">sprN</span><span class="p">)</span> <span class="c1">-- Get the mouse coordinate and draw a sprite on those coordinates.</span></code></pre>
 </div>
 </div>
-<tiny-editor style="display: none;">
+<tiny-editor style="display: none;"  >
 
 function _draw()
   gfx.cls(2)
@@ -1672,7 +1672,7 @@ end
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">ctrl</span><span class="p">.</span><span class="n">pressing</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="c1">-- Is the key is still pressed?</span></code></pre>
 </div>
 </div>
-<tiny-editor style="display: none;">
+<tiny-editor style="display: none;"  >
 
 function _init()
     circle = {
@@ -1765,7 +1765,7 @@ The touch can be :</p>
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">ctrl</span><span class="p">.</span><span class="n">touching</span><span class="p">(</span><span class="n">touch</span><span class="p">)</span> <span class="c1">-- Is the screen is still touched or mouse button is still pressed?</span></code></pre>
 </div>
 </div>
-<tiny-editor style="display: none;">
+<tiny-editor style="display: none;"  >
 
 function _init()
    t = {}
@@ -1817,7 +1817,7 @@ end
 <span class="n">debug</span><span class="p">.</span><span class="n">enabled</span><span class="p">()</span> <span class="c1">-- Return true if debug is enabled. False otherwise.</span></code></pre>
 </div>
 </div>
-<tiny-editor style="display: none;">
+<tiny-editor style="display: none;"  >
 
 function _init()
    switch = true
@@ -1864,7 +1864,7 @@ end
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">debug</span><span class="p">.</span><span class="n">table</span><span class="p">(</span><span class="n">table</span><span class="p">)</span> <span class="c1">-- Display a table.</span></code></pre>
 </div>
 </div>
-<tiny-editor style="display: none;">
+<tiny-editor style="display: none;"  >
 
 function _update()
     local pos = ctrl.touch()
@@ -1895,7 +1895,7 @@ end
 <span class="n">debug</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="n">str</span><span class="p">)</span> <span class="c1">-- Log a message on the screen.</span></code></pre>
 </div>
 </div>
-<tiny-editor style="display: none;">
+<tiny-editor style="display: none;"  >
 
 function _update()
     local pos = ctrl.touch()
@@ -1949,7 +1949,7 @@ end
 </tr>
 </tbody>
 </table>
-<tiny-editor style="display: none;">
+<tiny-editor style="display: none;"  >
 
 function _init()
    switch = true
@@ -2127,7 +2127,7 @@ end
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">to_sheet</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span> <span class="c1">-- Copy the current frame buffer to an new or existing sheet index.</span></code></pre>
 </div>
 </div>
-<tiny-editor style="display: none;">
+<tiny-editor style="display: none;"  >
 
 function _draw()
     gfx.cls(1)
@@ -2161,7 +2161,7 @@ end
 <span class="n">gfx</span><span class="p">.</span><span class="n">pal</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="c1">-- Replace the color a for the color b.</span></code></pre>
 </div>
 </div>
-<tiny-editor style="display: none;">
+<tiny-editor style="display: none;"  >
 
 function _draw()
     gfx.cls()
@@ -2215,7 +2215,7 @@ end
 </tr>
 </tbody>
 </table>
-<tiny-editor style="display: none;">
+<tiny-editor style="display: none;"  >
 
 function _draw()
     gfx.cls()
@@ -2240,7 +2240,7 @@ end
 <span class="n">gfx</span><span class="p">.</span><span class="n">clip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span> <span class="c1">-- Clip and limit the drawing area.</span></code></pre>
 </div>
 </div>
-<tiny-editor style="display: none;">
+<tiny-editor style="display: none;"  >
 
 function _init()
   c = {}
@@ -2331,7 +2331,7 @@ All interpolations available:</p>
 </tr>
 </tbody>
 </table>
-<tiny-editor style="display: none;">
+<tiny-editor style="display: none;"  >
 
 function _init()
   t = 0
@@ -3439,7 +3439,7 @@ entity.customFields -- access custom field of the entity</code></pre>
 <div class="paragraph">
 <p>value of pi (~3.14)</p>
 </div>
-<tiny-editor style="display: none;">
+<tiny-editor style="display: none;"  >
 function _update()
     gfx.cls()
     print(math.pi, 10, 10) -- value of pi (~3.14)
@@ -3451,7 +3451,7 @@ end
 <div class="paragraph">
 <p>positive infinity value.</p>
 </div>
-<tiny-editor style="display: none;">
+<tiny-editor style="display: none;"  >
 function _update()
     gfx.cls()
     print(math.huge, 10, 10) -- positive infinity value.
@@ -3726,7 +3726,7 @@ end
 </tr>
 </tbody>
 </table>
-<tiny-editor style="display: none;">
+<tiny-editor style="display: none;"  >
 
 function _draw()
   gfx.cls()
@@ -3762,7 +3762,7 @@ end
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">circlef</span><span class="p">(</span><span class="n">centerX</span><span class="p">,</span> <span class="n">centerY</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a circle at the coordinate (centerX, centerY) with the radius and the color.</span></code></pre>
 </div>
 </div>
-<tiny-editor style="display: none;">
+<tiny-editor style="display: none;"  >
 
 function _draw()
     gfx.cls()
@@ -3844,7 +3844,7 @@ end
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">gradient</span><span class="p">()</span> <span class="c1">-- Draw a gradient using dithering, only from color c1 to color c2.</span></code></pre>
 </div>
 </div>
-<tiny-editor style="display: none;">
+<tiny-editor style="display: none;"  >
 
 function _draw()
 
@@ -3877,6 +3877,24 @@ end
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">spr</span><span class="p">.</span><span class="n">pget</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- get the color index at the coordinate (x,y) from the current spritesheet.</span></code></pre>
 </div>
 </div>
+<tiny-editor style="display: none;" sprite="resources/tiny-town.png" >
+
+function _draw()
+    local pos = ctrl.touch()
+
+    gfx.cls()
+
+    spr.sdraw()
+    shape.circlef(pos.x - 4, pos.y - 4, 8, 3)
+    local color = spr.pget(pos.x, pos.y)
+    if(color ~= nil) then
+        print("index color: "..color, 7, 0)
+        shape.rectf(0, 0, 6, 6, color)
+        shape.circlef(pos.x - 4, pos.y - 4, 6, color)
+    end
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_spr_pset">spr.pset()</h4>
@@ -3888,6 +3906,28 @@ end
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">spr</span><span class="p">.</span><span class="n">pset</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Set the color index at the coordinate (x,y) in the current spritesheet.</span></code></pre>
 </div>
 </div>
+<tiny-editor style="display: none;" sprite="resources/tiny-dungeon.png" >
+
+function _draw()
+    local pos = ctrl.touch()
+
+    local touching = ctrl.touching(0)
+    gfx.cls()
+
+   spr.sdraw()
+
+   if touching ~= nil then
+      spr.pset(touching.x, touching.y, 9)
+   end
+   print("click to alter", 45, 96)
+   shape.circle(64 + 8, 128 + 8, 32, 1)
+   shape.circlef(128 + 8, 128 + 8, 32, 1)
+   spr.draw(100, 128, 128)
+
+   shape.circlef(pos.x, pos.y, 2, 3)
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_spr_sheet">spr.sheet()</h4>
@@ -3914,6 +3954,24 @@ end
 <span class="n">spr</span><span class="p">.</span><span class="n">sdraw</span><span class="p">()</span> <span class="c1">-- Draw a fragment from the spritesheet.</span></code></pre>
 </div>
 </div>
+<tiny-editor style="display: none;" sprite="resources/tiny-town.png" >
+
+function _draw()
+    local pos = ctrl.touch()
+
+    gfx.cls()
+
+    spr.sdraw()
+    shape.circlef(pos.x - 4, pos.y - 4, 8, 3)
+    local color = spr.pget(pos.x, pos.y)
+    if(color ~= nil) then
+        print("index color: "..color, 7, 0)
+        shape.rectf(0, 0, 6, 6, color)
+        shape.circlef(pos.x - 4, pos.y - 4, 6, color)
+    end
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_spr_draw">spr.draw()</h4>
@@ -3922,10 +3980,30 @@ end
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">spr</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="n">sprN</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- Draw a sprite.</span>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">spr</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="n">sprN</span><span class="p">)</span> <span class="c1">-- Draw a sprite at the default coordinate (0, 0).</span>
+<span class="n">spr</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="n">sprN</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- Draw a sprite.</span>
 <span class="n">spr</span><span class="p">.</span><span class="n">draw</span><span class="p">()</span> <span class="c1">-- Draw a sprite and allow flip on x or y axis.</span></code></pre>
 </div>
 </div>
+<tiny-editor style="display: none;" sprite="resources/tiny-town.png" >
+
+function _init()
+  id = 1
+end
+
+function _draw()
+    if ctrl.pressed(keys.left) then
+      id = id - 1
+    elseif ctrl.pressed(keys.right) then
+      id = id + 1
+    end
+
+    gfx.cls()
+    print("sprite index "..id.. " (press left or right to change)", 50, 112)
+    spr.draw(id, 120, 120)
+end
+
+</tiny-editor>
 </div>
 </div>
 <div class="sect2">
@@ -3944,7 +4022,7 @@ end
 <span class="n">new</span><span class="p">(</span><span class="n">class</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span> <span class="c1">-- Create new instance of class using default values.</span></code></pre>
 </div>
 </div>
-<tiny-editor style="display: none;">
+<tiny-editor style="display: none;"  >
 
 local Player = {
     x = 128,
@@ -4005,7 +4083,7 @@ end
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">rpairs</span><span class="p">()</span> <span class="c1">-- Iterate over the values of the table</span></code></pre>
 </div>
 </div>
-<tiny-editor style="display: none;">
+<tiny-editor style="display: none;"  >
 
 function _draw()
     gfx.cls()
@@ -4036,7 +4114,7 @@ end
 <span class="nb">print</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- print on the screen a string with a specific color.</span></code></pre>
 </div>
 </div>
-<tiny-editor style="display: none;">
+<tiny-editor style="display: none;"  >
 
 function _draw()
     gfx.cls()
@@ -4062,7 +4140,7 @@ end
 <div class="paragraph">
 <p>Delta time between two frame. As Tiny is a fixed frame engine, it&#8217;s always equal to 1/60</p>
 </div>
-<tiny-editor style="display: none;">
+<tiny-editor style="display: none;"  >
 function _update()
     gfx.cls()
     print(tiny.dt, 10, 10) -- Delta time between two frame. As Tiny is a fixed frame engine, it's always equal to 1/60
@@ -4074,7 +4152,7 @@ end
 <div class="paragraph">
 <p>Time elapsed since the start of the game.</p>
 </div>
-<tiny-editor style="display: none;">
+<tiny-editor style="display: none;"  >
 function _update()
     gfx.cls()
     print(tiny.t, 10, 10) -- Time elapsed since the start of the game.
@@ -4086,7 +4164,7 @@ end
 <div class="paragraph">
 <p>Number of frames elapsed since the start of the game.</p>
 </div>
-<tiny-editor style="display: none;">
+<tiny-editor style="display: none;"  >
 function _update()
     gfx.cls()
     print(tiny.frame, 10, 10) -- Number of frames elapsed since the start of the game.
@@ -4155,7 +4233,7 @@ end
 </tr>
 </tbody>
 </table>
-<tiny-editor style="display: none;">
+<tiny-editor style="display: none;"  >
 
 function _init()
     gfx.camera(-128, -128)
@@ -4212,7 +4290,7 @@ end
 </tr>
 </tbody>
 </table>
-<tiny-editor style="display: none;">
+<tiny-editor style="display: none;"  >
 
 function _init()
     gfx.camera(-128, -128)
@@ -4269,7 +4347,7 @@ end
 </tr>
 </tbody>
 </table>
-<tiny-editor style="display: none;">
+<tiny-editor style="display: none;"  >
 
 function _init()
     angle = 0
@@ -4364,7 +4442,7 @@ end
 </tr>
 </tbody>
 </table>
-<tiny-editor style="display: none;">
+<tiny-editor style="display: none;"  >
 
 function _update()
     gfx.cls()
@@ -4442,7 +4520,7 @@ end
 </tr>
 </tbody>
 </table>
-<tiny-editor style="display: none;">
+<tiny-editor style="display: none;"  >
 
 function _init()
     gfx.camera(-128, -128)
@@ -4483,7 +4561,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version main<br>
-Last updated 2023-12-30 15:11:49 UTC
+Last updated 2024-01-04 11:31:29 UTC
 </div>
 </div>
 <style>
