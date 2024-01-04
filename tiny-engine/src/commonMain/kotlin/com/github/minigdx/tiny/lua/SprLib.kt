@@ -32,17 +32,35 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
         return sprTable
     }
 
-    @TinyFunction("Get the color index at the coordinate (x,y) from the current spritesheet.")
+    @TinyFunction(
+        "Get the color index at the coordinate (x,y) from the current spritesheet.",
+        example = SPR_PGET_EXAMPLE,
+        spritePath = "resources/tiny-town.png",
+    )
     private inner class pget : TwoArgFunction() {
         @TinyCall("get the color index at the coordinate (x,y) from the current spritesheet.")
         override fun call(@TinyArg("x") arg1: LuaValue, @TinyArg("y") arg2: LuaValue): LuaValue {
-            val index = resourceAccess.spritesheet(currentSpritesheet)?.pixels?.get(arg1.checkint(), arg2.checkint())
-            val colorIndex = index?.get(0) ?: 0
-            return valueOf(colorIndex)
+            val pixelArray = resourceAccess.spritesheet(currentSpritesheet)?.pixels ?: return NIL
+
+            val x = arg1.checkint()
+            val y = arg2.checkint()
+
+            if (x in 0 until pixelArray.width && y in 0 until pixelArray.height) {
+                val index = pixelArray.get(x, y)
+
+                val colorIndex = index.get(0)
+                return valueOf(colorIndex)
+            } else {
+                return NIL
+            }
         }
     }
 
-    @TinyFunction("Set the color index at the coordinate (x,y) in the current spritesheet.")
+    @TinyFunction(
+        "Set the color index at the coordinate (x,y) in the current spritesheet.",
+        example = SPR_PSET_EXAMPLE,
+        spritePath = "resources/tiny-dungeon.png",
+    )
     private inner class pset : ThreeArgFunction() {
         @TinyCall("Set the color index at the coordinate (x,y) in the current spritesheet.")
         override fun call(
@@ -80,7 +98,11 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
         }
     }
 
-    @TinyFunction("S(uper) Draw a fragment from the spritesheet.")
+    @TinyFunction(
+        "S(uper) Draw a fragment from the spritesheet.",
+        example = SPR_PGET_EXAMPLE,
+        spritePath = "resources/tiny-town.png",
+    )
     internal inner class sdraw : LibFunction() {
         @TinyCall("Draw the full spritesheet at default coordinate (0, 0)")
         override fun call(): LuaValue {
@@ -141,24 +163,27 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
         }
     }
 
-    @TinyFunction("Draw a sprite.")
+    @TinyFunction("Draw a sprite.", example = SPR_DRAW_EXAMPLE, spritePath = "resources/tiny-town.png")
     internal inner class draw : LibFunction() {
-        // sprn, x, y, flip x, flip y
+
+        @TinyCall("Draw a sprite at the default coordinate (0, 0).")
+        override fun call(
+            @TinyArg("sprN") a: LuaValue,
+        ): LuaValue = super.call(a)
+
         @TinyCall("Draw a sprite.")
         override fun call(
             @TinyArg("sprN") a: LuaValue,
             @TinyArg("x") b: LuaValue,
             @TinyArg("y") c: LuaValue,
-        ): LuaValue {
-            return invoke(arrayOf(a, b, c, valueOf(false), valueOf(false))).arg1()
-        }
+        ): LuaValue = super.call(a, b, c)
 
         @TinyCall("Draw a sprite and allow flip on x or y axis.")
         override fun invoke(@TinyArgs(["sprN", "x", "y", "flipX", "flipY"]) args: Varargs): Varargs {
-            if (args.narg() < 3) return NONE
+            if (args.narg() < 1) return NIL
             val sprN = args.arg(1).checkint()
-            val x = args.arg(2).checkint()
-            val y = args.arg(3).checkint()
+            val x = args.arg(2).optint(0)
+            val y = args.arg(3).optint(0)
             val flipX = args.arg(4).optboolean(false)
             val flipY = args.arg(5).optboolean(false)
 
@@ -181,7 +206,7 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
                 reverseY = flipY,
             )
 
-            return NONE
+            return NIL
         }
     }
 }

@@ -41,6 +41,8 @@ fun main() {
 
     elts.forEachIndexed { index, game ->
         val code = game.textContent ?: ""
+        val spritePath = game.getAttribute("sprite")
+        val levelPath = game.getAttribute("level")
 
         val link = document.createElement("a") {
             setAttribute("id", "link-editor-$index")
@@ -60,7 +62,7 @@ fun main() {
         link.textContent = "\uD83D\uDC7E ▶ Run and tweak an example"
         link.onclick = { _ ->
             if (!clicked) {
-                createGame(playLink, index, codeToUse, rootPath)
+                createGame(playLink, index, codeToUse, spritePath, levelPath, rootPath)
                 clicked = true
             }
             true
@@ -68,7 +70,7 @@ fun main() {
 
         // There is a user code. Let's unfold the game.
         if (savedCode != null) {
-            createGame(playLink, index, codeToUse, rootPath)
+            createGame(playLink, index, codeToUse, spritePath, levelPath, rootPath)
         }
     }
 }
@@ -77,6 +79,8 @@ private fun createGame(
     container: Element,
     index: Int,
     code: String,
+    spritePath: String?,
+    levelPath: String?,
     rootPath: String,
 ) {
     val canvas = document.createElement("canvas").apply {
@@ -130,8 +134,8 @@ private fun createGame(
             "#CC1424",
         ),
         gameScripts = listOf("#editor-$index"),
-        spriteSheets = emptyList(),
-        gameLevels = emptyList(),
+        spriteSheets = spritePath?.let { listOf(it) } ?: emptyList(),
+        gameLevels = levelPath?.let { listOf(it) } ?: emptyList(),
         zoom = 2,
         gutter = 0 to 0,
         spriteSize = 16 to 16,

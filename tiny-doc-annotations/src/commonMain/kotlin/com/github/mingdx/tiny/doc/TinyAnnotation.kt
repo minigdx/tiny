@@ -32,6 +32,16 @@ annotation class TinyFunction(
      * This code will be injected in the web documentation.
      */
     val example: String = "",
+
+    /**
+     * Expected sprite path associated to the example.
+     */
+    val spritePath: String = "",
+
+    /**
+     * Expected level path associated to the example.
+     */
+    val levelPath: String = "",
 )
 
 @Target(AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.FUNCTION)
@@ -39,11 +49,11 @@ annotation class TinyFunction(
 @Repeatable
 annotation class TinyArg(
     /**
-     * Name of the argument
+     * Name of the argument.
      */
     val name: String,
     /**
-     * Description of the argument
+     * Description of the argument.
      */
     val description: String = "",
 )
@@ -56,6 +66,9 @@ annotation class TinyArgs(
      * Name of the arguments, in order.
      */
     val names: Array<String>,
+    /**
+     * Documentations associated to arguments, in order.
+     */
     val documentations: Array<String> = [],
 )
 

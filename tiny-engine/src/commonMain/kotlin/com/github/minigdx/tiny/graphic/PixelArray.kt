@@ -38,8 +38,8 @@ class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = Pix
     }
 
     fun set(x: Pixel, y: Pixel, vararg pixel: Int) {
-        assert(x in 0 until width) { "x ($x) has to be between 0 and $width " }
-        assert(y in 0 until height) { "y ($y) has to be between 0 and $height " }
+        assert(x in 0 until width) { "x ($x) has to be between 0 and $width (excluded)" }
+        assert(y in 0 until height) { "y ($y) has to be between 0 and $height (excluded)" }
         assert(pixel.size == pixelFormat) { "the assigned pixel needs to conform the pixel format ($pixelFormat)" }
 
         val correctedX = min(max(0, x), width - 1)
@@ -52,8 +52,8 @@ class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = Pix
     }
 
     fun get(x: Pixel, y: Pixel): Array<Int> {
-        assert(x in 0 until width) { "x ($x) has to be between 0 and $width " }
-        assert(y in 0 until height) { "y ($y) has to be between 0 and $height " }
+        assert(x in 0 until width) { "x ($x) has to be between 0 and $width (excluded)" }
+        assert(y in 0 until height) { "y ($y) has to be between 0 and $height (excluded)" }
         val position = (x + y * width) * pixelFormat
         tmp.forEachIndexed { index, _ ->
             tmp[index] = pixels[position + index]

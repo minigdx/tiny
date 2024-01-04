@@ -58,8 +58,13 @@ val copySample = tasks.create("copy-sample", Copy::class) {
     into(project.buildDir.resolve("docs/asciidoc/sample"))
 }
 
+val copyResources = tasks.create("copy-resources", Copy::class) {
+    from(project.projectDir.resolve("src/docs/asciidoc/resources"))
+    into(project.buildDir.resolve("docs/asciidoc/resources"))
+}
+
 tasks.withType(AsciidoctorTask::class.java).configureEach {
     this.baseDirFollowsSourceDir()
 
-    this.dependsOn(unzipAsciidoctorResources, copyAsciidoctorDependencies, copySample)
+    this.dependsOn(unzipAsciidoctorResources, copyAsciidoctorDependencies, copySample, copyResources)
 }

@@ -120,12 +120,14 @@ class AsciidocLibSection(val title: String?) {
         )
     }
 
-    fun example(lua: String?) {
+    fun example(lua: String?, spritePath: String? = null, levelPath: String? = null) {
         if (lua == null) return
+        val spr = spritePath?.let { """sprite="$it"""" } ?: ""
+        val lvl = levelPath?.let { """level="$it"""" } ?: ""
         paragraph(
             """
                 >++++
-                ><tiny-editor style="display: none;">
+                ><tiny-editor style="display: none;" $spr $lvl>
                 >$lua
                 ></tiny-editor>
                 >++++
@@ -164,6 +166,8 @@ data class TinyFunctionDescriptor(
     var description: String = "",
     var calls: List<TinyCallDescriptor> = emptyList(),
     var example: String? = null,
+    var spritePath: String? = null,
+    var levelPath: String? = null,
 )
 
 class TinyLibDescriptor(
@@ -306,10 +310,14 @@ class KspProcessor(
                     }
 
                 val example = function.example.ifBlank { null }
+                val levelPath = function.levelPath.ifBlank { null }
+                val spritePath = function.spritePath.ifBlank { null }
                 TinyFunctionDescriptor(
                     example = example,
                     name = name.ifBlank { defaultName },
                     description = function.description,
+                    levelPath = levelPath,
+                    spritePath = spritePath,
                     calls = calls,
                 )
             }
@@ -388,7 +396,7 @@ class KspProcessor(
                                 )
                             }
 
-                            example(func.example)
+                            example(func.example, func.spritePath, func.levelPath)
                         }
                     }
                 }
