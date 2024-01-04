@@ -51,3 +51,5 @@ include::dependencies/tiny-api.adoc[]
 
 - https://tomhalligan.substack.com/p/tinkering-with-tiny[Tinkering with Tiny]
 - https://tomhalligan.substack.com/p/tiny-gardening[Tiny Gardening]
+
+include::licences.adoc[]

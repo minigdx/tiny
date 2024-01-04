@@ -1,0 +1,18 @@
+== Licences
+
+This documentation is using assets from https://www.kenney.nl.
+Please find below the licences regarding those assets.
+
+- https://www.kenney.nl/assets/tiny-town[Tiny Town (1.0)]
+- https://www.kenney.nl/assets/tiny-battle[Tiny Battle (1.0)]
+- https://www.kenney.nl/assets/tiny-dungeon[Tiny Dungeon (1.0)]
+- https://www.kenney.nl/assets/pixel-platformer[Pixel Platformer (1.2)]
+
+------------------------------
+License: (Creative Commons Zero, CC0)
+http://creativecommons.org/publicdomain/zero/1.0/
+
+This content is free to use in personal, educational and commercial projects.
+
+Support us by crediting Kenney or www.kenney.nl (this is not mandatory)
+------------------------------
