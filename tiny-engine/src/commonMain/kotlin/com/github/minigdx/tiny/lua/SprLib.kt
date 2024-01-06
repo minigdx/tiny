@@ -7,6 +7,7 @@ import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
+import com.github.minigdx.tiny.graphic.PixelArray
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
@@ -45,15 +46,18 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
             val x = arg1.checkint()
             val y = arg2.checkint()
 
-            if (x in 0 until pixelArray.width && y in 0 until pixelArray.height) {
+            if (isInPixelArray(pixelArray, x, y)) {
                 val index = pixelArray.get(x, y)
-
                 val colorIndex = index.get(0)
                 return valueOf(colorIndex)
             } else {
                 return NIL
             }
         }
+    }
+
+    private fun isInPixelArray(pixelArray: PixelArray, x: Int, y: Int): Boolean {
+        return x in 0 until pixelArray.width && y in 0 until pixelArray.height
     }
 
     @TinyFunction(
@@ -68,12 +72,15 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
             @TinyArg("y") arg2: LuaValue,
             @TinyArg("color") arg3: LuaValue,
         ): LuaValue {
-            resourceAccess.spritesheet(currentSpritesheet)?.pixels?.set(
-                arg1.checkint(),
-                arg2.checkint(),
-                arg3.checkint(),
-            )
-            return arg3
+            val x = arg1.checkint()
+            val y = arg2.checkint()
+            val pixels = resourceAccess.spritesheet(currentSpritesheet)?.pixels ?: return NIL
+            return if (isInPixelArray(pixels, x, y)) {
+                pixels.set(x, y, arg3.checkint())
+                arg3
+            } else {
+                NIL
+            }
         }
     }
 

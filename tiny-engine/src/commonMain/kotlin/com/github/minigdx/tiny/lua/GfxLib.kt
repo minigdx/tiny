@@ -49,7 +49,7 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
                 arg.checkColorIndex()
             }
             resourceAccess.frameBuffer.clear(color)
-            return NONE
+            return NIL
         }
     }
 
@@ -58,7 +58,7 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         @TinyCall("set the color index at the coordinate (x,y).")
         override fun call(@TinyArg("x")arg1: LuaValue, @TinyArg("y")arg2: LuaValue, @TinyArg("color")arg3: LuaValue): LuaValue {
             resourceAccess.frameBuffer.pixel(arg1.checkint(), arg2.checkint(), arg3.checkint())
-            return NONE
+            return NIL
         }
     }
 
