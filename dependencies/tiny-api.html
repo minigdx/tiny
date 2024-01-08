@@ -2253,7 +2253,8 @@ entity.customFields -- access custom field of the entity</code></pre>
 <div class="content">
 <pre class="highlight"><code class="language-lua" data-lang="lua">map.draw() -- Draw the default layer on the screen.
 map.draw(x, y) -- Draw the default layer on the screen at the x/y coordinates.
-map.draw(x, y, mx, my) -- Draw the default layer on the screen at the x/y coordinates.
+map.draw(x, y, mx, my) -- Draw the default layer on the screen at the x/y coordinates starting the mx/my coordinates from the map.
+map.draw() -- Draw the default layer on the screen at the x/y coordinates starting the mx/my coordinates from the map using the size width/height.
 map.draw(layer) -- Draw the layer on the screen by it's index.</code></pre>
 </div>
 </div>
@@ -3565,7 +3566,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version main<br>
-Last updated 2024-01-06 17:09:54 UTC
+Last updated 2024-01-08 21:23:50 UTC
 </div>
 </div>
 </body>
