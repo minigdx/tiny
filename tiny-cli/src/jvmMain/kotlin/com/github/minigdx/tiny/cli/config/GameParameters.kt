@@ -87,6 +87,12 @@ data class GameParametersV1(
      * The libraries will be added at the end of the scripts lists.
      */
     val libraries: List<String> = emptyList(),
+    /**
+     * Is the default mouse cursor should be hidden?
+     * If true, the mouse cursor will not be displayed.
+     * The game have to display it by itself if the mouse is required.
+     */
+    val hideMouseCursor: Boolean = false,
 ) : GameParameters() {
     override fun toGameOptions(): GameOptions {
         return GameOptions(
@@ -99,6 +105,7 @@ data class GameParametersV1(
             gameLevels = levels,
             zoom = zoom,
             sounds = sounds,
+            hideMouseCursor = hideMouseCursor,
         )
     }
 

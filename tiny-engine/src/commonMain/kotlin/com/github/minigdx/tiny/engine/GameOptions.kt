@@ -18,6 +18,7 @@ class GameOptions(
     val record: Seconds = 8f,
     val gutter: Pair<Pixel, Pixel> = 10 to 10,
     val spriteSize: Pair<Pixel, Pixel> = 8 to 8,
+    val hideMouseCursor: Boolean = false,
 ) : MouseProject {
 
     init {

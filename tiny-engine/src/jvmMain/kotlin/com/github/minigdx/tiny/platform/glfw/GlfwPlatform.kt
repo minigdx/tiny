@@ -31,6 +31,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.lwjgl.glfw.GLFW
+import org.lwjgl.glfw.GLFW.GLFW_CURSOR
+import org.lwjgl.glfw.GLFW.GLFW_CURSOR_HIDDEN
 import org.lwjgl.opengl.GL
 import org.lwjgl.system.MemoryUtil
 import java.awt.image.BufferedImage
@@ -121,6 +123,11 @@ class GlfwPlatform(
             (vidmode.width() - windowWidth) / 2,
             (vidmode.height() - windowHeight) / 2,
         )
+
+        // Hide the mouse cursor if configured like so in the game.
+        if (gameOptions.hideMouseCursor) {
+            GLFW.glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN)
+        }
 
         // Make the OpenGL context current
         GLFW.glfwMakeContextCurrent(window)
