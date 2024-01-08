@@ -334,7 +334,8 @@ entity.customFields -- access custom field of the entity
         }
 
         @TinyCall(
-            description = "Draw the default layer on the screen at the x/y coordinates.",
+            description = "Draw the default layer on the screen at the x/y coordinates " +
+                "starting the mx/my coordinates from the map.",
         )
         override fun call(
             @TinyArg("x", "x screen coordinate") a: LuaValue,
@@ -357,6 +358,10 @@ entity.customFields -- access custom field of the entity
             return NONE
         }
 
+        @TinyCall(
+            description = "Draw the default layer on the screen at the x/y coordinates " +
+                "starting the mx/my coordinates from the map using the size width/height.",
+        )
         override fun invoke(
             @TinyArgs(
                 names = ["x", "y", "mx", "my", "width", "height"],
