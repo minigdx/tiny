@@ -3070,6 +3070,50 @@ end
 </tiny-editor>
 </div>
 <div class="sect3">
+<h4 id="_merge">merge()</h4>
+<div class="paragraph">
+<p>Add <strong>all key/value</strong> from the table <code>source</code> to the table <code>dest</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">merge(source, dest) -- Merge source into dest.</code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+    local src = {x = 1, y = 2, z = 3}
+    local dst = {a = 4, b = 5}
+    local result = merge(src, dst)
+    debug.table(result)
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_append">append()</h4>
+<div class="paragraph">
+<p>Append <strong>all values</strong> from the table <code>source</code> to the table <code>dest</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">append(source, dest) -- Copy source into dest.</code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+    local src = {1, 2, 3}
+    local dst = {4, 5}
+    local result = append(src, dst)
+    debug.table(result)
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
 <h4 id="_all">all()</h4>
 <div class="paragraph">
 <p>Iterate over values of a table.</p>
@@ -3566,7 +3610,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version main<br>
-Last updated 2024-01-08 21:23:50 UTC
+Last updated 2024-01-10 08:45:32 UTC
 </div>
 </div>
 </body>
