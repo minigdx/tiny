@@ -25,6 +25,8 @@ class StdLib(
         arg2["all"] = all()
         arg2["rpairs"] = rpairs()
         arg2["print"] = print()
+        arg2["merge"] = merge()
+        arg2["append"] = append()
         arg2["new"] = new()
         return tiny
     }
@@ -51,6 +53,53 @@ class StdLib(
             default.setmetatable(arg1)
             arg1.rawset("__index", arg1)
             return default
+        }
+    }
+
+    @TinyFunction(
+        "Add *all key/value* from the table `source` to the table `dest`.",
+        example = STD_MERGE_EXAMPLE,
+    )
+    inner class merge : TwoArgFunction() {
+
+        @TinyCall("Merge source into dest.")
+        override fun call(@TinyArg("source") arg1: LuaValue, @TinyArg("dest") arg2: LuaValue): LuaValue {
+            return if (arg1.istable() and arg2.istable()) {
+                arg1 as LuaTable
+                arg2 as LuaTable
+
+                val keys = arg1.keys()
+                keys.forEach { k ->
+                    val value = arg1.get(k)
+                    arg2[k] = value
+                }
+                return arg2
+            } else {
+                NIL
+            }
+        }
+    }
+
+    @TinyFunction(
+        "Append *all values* from the table `source` to the table `dest`.",
+        example = STD_APPEND_EXAMPLE,
+    )
+    inner class append : TwoArgFunction() {
+
+        @TinyCall("Copy source into dest.")
+        override fun call(@TinyArg("source") arg1: LuaValue, @TinyArg("dest") arg2: LuaValue): LuaValue {
+            return if (arg1.istable() and arg2.istable()) {
+                arg1 as LuaTable
+                arg2 as LuaTable
+
+                arg1.keys().forEach { key ->
+                    val value = arg1[key]
+                    arg2.insert(0, value)
+                }
+                arg2
+            } else {
+                NIL
+            }
         }
     }
 
