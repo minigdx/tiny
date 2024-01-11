@@ -7,6 +7,7 @@ function _update()
 
     debug.table(pos)
     debug.log("frame "..tiny.frame)
+    debug.console("hello from the console")
 end
   
 function _draw()

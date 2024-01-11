@@ -132,6 +132,7 @@ class DebugLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
         val tiny = LuaTable()
         tiny["enabled"] = enabled()
         tiny["log"] = log()
+        tiny["console"] = console()
         tiny["rect"] = rect()
         tiny["point"] = point()
         tiny["line"] = line()
@@ -197,6 +198,15 @@ class DebugLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
 
         @TinyCall("Log a message on the screen.")
         override fun call(@TinyArg("str") arg: LuaValue): LuaValue = super.call(arg)
+    }
+
+    @TinyFunction("Log a message into the console.", example = DEBUG_EXAMPLE)
+    internal inner class console : OneArgFunction() {
+        @TinyCall("Log a message into the console.")
+        override fun call(@TinyArg("str") arg: LuaValue): LuaValue {
+            println(arg)
+            return NIL
+        }
     }
 
     @TinyFunction("Draw a rectangle on the screen", example = DEBUG_ENABLED_EXAMPLE)
