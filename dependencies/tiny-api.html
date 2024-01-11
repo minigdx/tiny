@@ -690,6 +690,7 @@ function _update()
 
     debug.table(pos)
     debug.log("frame "..tiny.frame)
+    debug.console("hello from the console")
 end
 
 function _draw()
@@ -721,6 +722,38 @@ function _update()
 
     debug.table(pos)
     debug.log("frame "..tiny.frame)
+    debug.console("hello from the console")
+end
+
+function _draw()
+    gfx.cls()
+    -- draw the mouse position.
+    local pos = ctrl.touch()
+
+    shape.line(pos.x - 2, pos.y, pos.x + 2, pos.y, 3)
+    shape.line(pos.x, pos.y - 2, pos.x, pos.y + 2, 3)
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_debug_console">debug.console()</h4>
+<div class="paragraph">
+<p>Log a message into the console.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">debug.console(str) -- Log a message into the console.</code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+function _update()
+    local pos = ctrl.touch()
+
+    debug.table(pos)
+    debug.log("frame "..tiny.frame)
+    debug.console("hello from the console")
 end
 
 function _draw()
@@ -3610,7 +3643,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version main<br>
-Last updated 2024-01-11 09:03:38 UTC
+Last updated 2024-01-11 17:08:28 UTC
 </div>
 </div>
 </body>

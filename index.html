@@ -786,6 +786,7 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <li><a href="#_debug_enabled">debug.enabled()</a></li>
 <li><a href="#_debug_table">debug.table()</a></li>
 <li><a href="#_debug_log">debug.log()</a></li>
+<li><a href="#_debug_console">debug.console()</a></li>
 <li><a href="#_debug_rect">debug.rect()</a></li>
 <li><a href="#_debug_point">debug.point()</a></li>
 <li><a href="#_debug_line">debug.line()</a></li>
@@ -1874,6 +1875,7 @@ function _update()
 
     debug.table(pos)
     debug.log("frame "..tiny.frame)
+    debug.console("hello from the console")
 end
 
 function _draw()
@@ -1905,6 +1907,38 @@ function _update()
 
     debug.table(pos)
     debug.log("frame "..tiny.frame)
+    debug.console("hello from the console")
+end
+
+function _draw()
+    gfx.cls()
+    -- draw the mouse position.
+    local pos = ctrl.touch()
+
+    shape.line(pos.x - 2, pos.y, pos.x + 2, pos.y, 3)
+    shape.line(pos.x, pos.y - 2, pos.x, pos.y + 2, 3)
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_debug_console">debug.console()</h4>
+<div class="paragraph">
+<p>Log a message into the console.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">debug</span><span class="p">.</span><span class="n">console</span><span class="p">(</span><span class="n">str</span><span class="p">)</span> <span class="c1">-- Log a message into the console.</span></code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+function _update()
+    local pos = ctrl.touch()
+
+    debug.table(pos)
+    debug.log("frame "..tiny.frame)
+    debug.console("hello from the console")
 end
 
 function _draw()
@@ -4844,7 +4878,7 @@ Support us by crediting Kenney or www.kenney.nl (this is not mandatory)</pre>
 <div id="footer">
 <div id="footer-text">
 Version main<br>
-Last updated 2024-01-11 09:01:26 UTC
+Last updated 2024-01-11 17:06:10 UTC
 </div>
 </div>
 <style>
