@@ -67,6 +67,7 @@ fun setupGames(rootPath: String, tinyGameTag: HTMLCollection) {
         val gameWidth = game.getAttribute("width")?.toInt() ?: 128
         val gameHeight = game.getAttribute("height")?.toInt() ?: 128
         val gameZoom = game.getAttribute("zoom")?.toInt() ?: 1
+        val hideMouse = game.getAttribute("mouse")?.toBoolean() ?: false
 
         val sprWidth = game.getAttribute("spritew")?.toInt() ?: 16
         val sprHeight = game.getAttribute("spriteh")?.toInt() ?: 16
@@ -93,6 +94,9 @@ fun setupGames(rootPath: String, tinyGameTag: HTMLCollection) {
         canvas.setAttribute("width", (gameWidth * gameZoom).toString())
         canvas.setAttribute("height", (gameHeight * gameZoom).toString())
         canvas.setAttribute("tabindex", "1")
+        if (hideMouse) {
+            canvas.setAttribute("style", "cursor: none;")
+        }
         game.appendChild(canvas)
 
         val gameOptions = GameOptions(
@@ -106,6 +110,7 @@ fun setupGames(rootPath: String, tinyGameTag: HTMLCollection) {
             zoom = gameZoom,
             gutter = 0 to 0,
             spriteSize = sprWidth to sprHeight,
+            hideMouseCursor = hideMouse,
         )
 
         val logger = StdOutLogger("game-$index")

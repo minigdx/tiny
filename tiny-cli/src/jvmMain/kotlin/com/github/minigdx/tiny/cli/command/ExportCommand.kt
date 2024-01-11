@@ -95,6 +95,7 @@ class GameExporter {
                 template = template.replace("{GAME_ZOOM}", gameParameters.zoom.toString())
                 template = template.replace("{GAME_SPRW}", gameParameters.sprites.width.toString())
                 template = template.replace("{GAME_SPRH}", gameParameters.sprites.height.toString())
+                template = template.replace("{GAME_HIDE_MOUSE}", gameParameters.hideMouseCursor.toString())
 
                 template = replaceList(template, (gameParameters.scripts + gameParameters.libraries.map { "$it.lua" }), "{GAME_SCRIPT}", "GAME_SCRIPT")
                 template = replaceList(template, gameParameters.spritesheets, "{GAME_SPRITESHEET}", "GAME_SPRITESHEET")
