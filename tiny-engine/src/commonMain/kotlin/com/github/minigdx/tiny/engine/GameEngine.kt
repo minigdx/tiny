@@ -247,6 +247,9 @@ class GameEngine(
                         }
                         if (isValid) {
                             scripts[resource.index] = resource
+                            // Force the reloading of the script, as the script update might be used as resource of
+                            // the current game script.
+                            scripts[current]?.reload = true
                             clear()
                         }
                     }
