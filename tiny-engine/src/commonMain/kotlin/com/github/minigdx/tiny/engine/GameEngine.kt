@@ -161,7 +161,7 @@ class GameEngine(
 
         resourcesScope.launch {
             resources.asFlow()
-                .flatMapMerge { resource -> resource }
+                .flatMapMerge(concurrency = 128) { resource -> resource }
                 .collect(ScriptsCollector(events))
         }
 
