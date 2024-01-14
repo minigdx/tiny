@@ -55,7 +55,7 @@ class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = Pix
         assert(x in 0 until width) { "x ($x) has to be between 0 and $width (excluded)" }
         assert(y in 0 until height) { "y ($y) has to be between 0 and $height (excluded)" }
         val position = (x + y * width) * pixelFormat
-        tmp.forEachIndexed { index, _ ->
+        (0 until pixelFormat).forEach { index ->
             tmp[index] = pixels[position + index]
         }
         return tmp

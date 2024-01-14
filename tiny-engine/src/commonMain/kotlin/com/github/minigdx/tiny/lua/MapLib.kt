@@ -128,7 +128,7 @@ class MapLib(private val resourceAccess: GameResourceAccess, private val spriteS
                 arg1.checkint() to arg2.checkint()
             }
 
-            return LuaTable().apply {
+            return LuaTable(2, 2).apply {
                 set("x", valueOf(cx * spriteSize.first.toDouble()))
                 set("y", valueOf(cy * spriteSize.second.toDouble()))
             }
@@ -152,7 +152,7 @@ class MapLib(private val resourceAccess: GameResourceAccess, private val spriteS
                 arg1.checkint() to arg2.checkint()
             }
 
-            return LuaTable().apply {
+            return LuaTable(2, 2).apply {
                 set("cx", valueOf(floor(x / spriteSize.first.toDouble())))
                 set("cy", valueOf(floor(y / spriteSize.second.toDouble())))
             }

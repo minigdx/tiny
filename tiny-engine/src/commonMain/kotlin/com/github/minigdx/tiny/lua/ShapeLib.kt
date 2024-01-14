@@ -658,7 +658,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
             }
             dither.call(previous)
 
-            return NONE
+            return NIL
         }
     }
 }
