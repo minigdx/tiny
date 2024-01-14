@@ -52,11 +52,26 @@ class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = Pix
     }
 
     fun get(x: Pixel, y: Pixel): Array<Int> {
-        assert(x in 0 until width) { "x ($x) has to be between 0 and $width (excluded)" }
-        assert(y in 0 until height) { "y ($y) has to be between 0 and $height (excluded)" }
+        assert(x >= 0 && x < width) { "x ($x) has to be between 0 and $width (excluded)" }
+        assert(y >= 0 && x < height) { "y ($y) has to be between 0 and $height (excluded)" }
         val position = (x + y * width) * pixelFormat
-        (0 until pixelFormat).forEach { index ->
-            tmp[index] = pixels[position + index]
+        when (pixelFormat) {
+            PixelFormat.RGBA -> {
+                tmp[0] = pixels[position]
+                tmp[1] = pixels[position + 1]
+                tmp[2] = pixels[position + 2]
+                tmp[3] = pixels[position + 3]
+            }
+
+            PixelFormat.RGB -> {
+                tmp[0] = pixels[position]
+                tmp[1] = pixels[position + 1]
+                tmp[2] = pixels[position + 2]
+            }
+
+            PixelFormat.INDEX -> {
+                tmp[0] = pixels[position]
+            }
         }
         return tmp
     }
