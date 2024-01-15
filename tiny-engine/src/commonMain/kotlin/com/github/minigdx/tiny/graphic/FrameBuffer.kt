@@ -80,8 +80,6 @@ class FrameBuffer(
 
     internal var buffer: ByteArray = ByteArray(height * width * PixelFormat.RGBA)
 
-    internal var gifBuffer: IntArray = IntArray(0)
-
     internal val clipper: Clipper = Clipper(width, height)
 
     internal val blender = Blender(gamePalette)

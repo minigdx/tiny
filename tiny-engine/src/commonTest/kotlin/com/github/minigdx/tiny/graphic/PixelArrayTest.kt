@@ -9,7 +9,7 @@ import kotlin.test.assertTrue
 
 class PixelArrayTest {
 
-    private val blender: (Array<Int>, Pixel, Pixel) -> Array<Int> = { c, _, _ ->
+    private val blender: (ByteArray, Pixel, Pixel) -> ByteArray = { c, _, _ ->
         c
     }
 
@@ -70,7 +70,7 @@ class PixelArrayTest {
         source.set(0, 0, 9)
         val result = source.get(0, 0)
         assertTrue(result.size == 1)
-        assertTrue(result[0] == 9)
+        assertTrue(result[0] == 9.toByte())
     }
 
     @Test
@@ -79,10 +79,10 @@ class PixelArrayTest {
         source.set(0, 0, 1, 2, 3, 4)
         val result = source.get(0, 0)
         assertTrue(result.size == 4)
-        assertTrue(result[0] == 1)
-        assertTrue(result[1] == 2)
-        assertTrue(result[2] == 3)
-        assertTrue(result[3] == 4)
+        assertTrue(result[0] == 1.toByte())
+        assertTrue(result[1] == 2.toByte())
+        assertTrue(result[2] == 3.toByte())
+        assertTrue(result[3] == 4.toByte())
     }
 
     @Test

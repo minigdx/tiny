@@ -12,6 +12,16 @@ actual fun toGif(name: String, animation: List<FrameBuffer>) {
     }
     FileOutputStream("build/test-results/jvmTest/$name.gif").use { out ->
         val reference = animation.first()
+
+        fun convert(data: ByteArray): IntArray {
+            val result = IntArray(data.size)
+            val colorPalette = reference.gamePalette
+            data.forEachIndexed { index, byte ->
+                result[index] = colorPalette.getRGAasInt(byte.toInt())
+            }
+            return result
+        }
+
         val encoder = FastGifEncoder(
             out,
             reference.width,
@@ -21,7 +31,7 @@ actual fun toGif(name: String, animation: List<FrameBuffer>) {
         )
 
         animation.forEach { img ->
-            encoder.addImage(img.gifBuffer, reference.width, options)
+            encoder.addImage(convert(img.generateBuffer()), reference.width, options)
         }
         encoder.finishEncoding()
     }
