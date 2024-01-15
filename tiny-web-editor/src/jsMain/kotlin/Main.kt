@@ -25,7 +25,10 @@ import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.HTMLTextAreaElement
 import org.w3c.dom.url.URLSearchParams
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
+@OptIn(ExperimentalEncodingApi::class)
 fun main() {
     val rootPath = getRootPath()
 
@@ -34,7 +37,7 @@ fun main() {
     val url = URLSearchParams(window.location.search)
     val savedCode = url.get("game")
     val decodedCode = if (savedCode?.isNotBlank() == true) {
-        window.atob(savedCode)
+        Base64.decode(savedCode.encodeToByteArray()).decodeToString()
     } else {
         null
     }
@@ -75,6 +78,7 @@ fun main() {
     }
 }
 
+@OptIn(ExperimentalEncodingApi::class)
 private fun createGame(
     container: Element,
     index: Int,
@@ -101,7 +105,7 @@ private fun createGame(
     container.appendChild(textarea)
 
     val link = (document.createElement("a") as HTMLAnchorElement).apply {
-        val b64 = window.btoa(code)
+        val b64 = Base64.encode(code.encodeToByteArray())
         id = "share-$index"
         href = "sandbox.html?game=$b64"
         textContent = "\uD83D\uDD17 Share this game!"

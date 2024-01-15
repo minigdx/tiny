@@ -4,6 +4,8 @@ Here are a fews examples of game created using `🧸 Tiny`.
 
 image:sample/camping.gif[link=https://dwursteisen.itch.io/trijam-camping]
 image:sample/level-up.gif[link=https://dwursteisen.itch.io/trijam-220-type-it]
+image:sample/memory.gif[link=https://dwursteisen.itch.io/memory-pong-trijam-251]
+image:sample/connect_me.gif[link=https://dwursteisen.itch.io/connect-me]
 
 
 TIP: Want your game to appear here? Create a post about it in https://github.com/minigdx/tiny/discussions/categories/show-and-tell[the Show and tell board] and share all information about it.
