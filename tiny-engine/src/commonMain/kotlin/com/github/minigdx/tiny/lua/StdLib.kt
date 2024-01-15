@@ -246,11 +246,11 @@ class StdLib(
                         indexY * 4,
                         4,
                         4,
-                    ) { pixel: Array<Int>, _, _ ->
-                        if (pixel[0] == 0) {
+                    ) { pixel: ByteArray, _, _ ->
+                        if (pixel[0].toInt() == 0) {
                             pixel
                         } else {
-                            pixel[0] = color
+                            pixel[0] = color.toByte()
                             pixel
                         }
                     }

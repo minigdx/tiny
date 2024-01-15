@@ -8,7 +8,7 @@ import kotlin.math.abs
 /**
  * Color palette used by the game.
  *
- * Every colors from every resources will be aligned to use this color palette.
+ * Every color from every resource will be aligned to use this color palette.
  * It means that if a color from a resource is not part of this color palette,
  * this color will be replaced will the closed color from the palette.
  *

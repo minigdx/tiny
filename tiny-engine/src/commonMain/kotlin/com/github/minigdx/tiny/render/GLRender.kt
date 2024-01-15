@@ -11,9 +11,13 @@ import com.danielgergely.kgl.GL_FLOAT
 import com.danielgergely.kgl.GL_FRAGMENT_SHADER
 import com.danielgergely.kgl.GL_LINK_STATUS
 import com.danielgergely.kgl.GL_NEAREST
+import com.danielgergely.kgl.GL_R8
+import com.danielgergely.kgl.GL_RED
 import com.danielgergely.kgl.GL_REPEAT
 import com.danielgergely.kgl.GL_RGBA
 import com.danielgergely.kgl.GL_STATIC_DRAW
+import com.danielgergely.kgl.GL_TEXTURE0
+import com.danielgergely.kgl.GL_TEXTURE1
 import com.danielgergely.kgl.GL_TEXTURE_2D
 import com.danielgergely.kgl.GL_TEXTURE_MAG_FILTER
 import com.danielgergely.kgl.GL_TEXTURE_MIN_FILTER
@@ -26,6 +30,7 @@ import com.danielgergely.kgl.Kgl
 import com.danielgergely.kgl.Shader
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameOptions
+import com.github.minigdx.tiny.graphic.PixelFormat
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.RenderContext
 import com.github.minigdx.tiny.platform.WindowManager
@@ -36,14 +41,16 @@ class GLRender(
     private val gameOptions: GameOptions,
 ) : Render {
 
+    private var buffer = ByteArray(0)
+
     private val uvsData = FloatBuffer(
         floatArrayOf(
             2f,
-            0f,
-            0f,
             2f,
             0f,
             0f,
+            0f,
+            2f,
         ),
     )
 
@@ -73,9 +80,13 @@ class GLRender(
         varying vec2 texture;
         
         uniform sampler2D image;
+        uniform sampler2D colors;
         
         void main() {
-            gl_FragColor = texture2D(image, texture);
+            vec4 point = texture2D(image, texture);
+            vec4 color = texture2D(colors, vec2(point.r, 1.0));
+            
+            gl_FragColor = color;
         }
         """.trimIndent()
 
@@ -110,12 +121,12 @@ class GLRender(
         gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
 
         val vertexData = floatArrayOf(
-            -1f,
-            -3f,
             3f,
-            1f,
             -1f,
-            1f,
+            -1f,
+            3f,
+            -1f,
+            -1f,
         )
 
         val positionBuffer = gl.createBuffer()
@@ -154,10 +165,47 @@ class GLRender(
         )
         gl.enableVertexAttribArray(uvs)
 
+        val colors = gameOptions.colors()
+        // texture of one pixel height and 256 pixel width.
+        // one pixel of the texture = one index.
+        buffer = ByteArray(256 * 256 * PixelFormat.RGBA)
+        var pos = 0
+        for (y in 0 until 256) {
+            for (index in 0 until 256) {
+                val color = colors.getRGBA(index)
+
+                buffer[pos++] = color[0]
+                buffer[pos++] = color[1]
+                buffer[pos++] = color[2]
+                buffer[pos++] = color[3]
+            }
+        }
+        val index = gl.createTexture()
+        gl.bindTexture(GL_TEXTURE_2D, index)
+
+        gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+        gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
+
+        gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+        gl.texImage2D(
+            GL_TEXTURE_2D,
+            0,
+            GL_RGBA,
+            256,
+            256,
+            0,
+            GL_RGBA,
+            GL_UNSIGNED_BYTE,
+            ByteBuffer(buffer),
+        )
+        gl.uniform1i(gl.getUniformLocation(shaderProgram, "colors")!!, 1)
+
         return GLRenderContext(
             windowManager = windowManager,
             program = shaderProgram,
             texture = gameTexture,
+            colors = index,
         )
     }
 
@@ -188,23 +236,25 @@ class GLRender(
             gameOptions.height * gameOptions.zoom * context.windowManager.ratioHeight,
         )
 
+        // -- game screen -- //
+        gl.activeTexture(GL_TEXTURE0)
         gl.bindTexture(GL_TEXTURE_2D, context.texture)
 
         gl.texImage2D(
             GL_TEXTURE_2D,
             0,
-            GL_RGBA,
-            // I think that the texture format is not in the format OpenGL expect it (column first or line first)
-            // So I swap the height and the width so it's working even with non square game resolution.
-            height,
+            GL_R8,
             width,
+            height,
             0,
-            GL_RGBA,
+            GL_RED,
             GL_UNSIGNED_BYTE,
             ByteBuffer(image),
         )
-
         gl.uniform1i(gl.getUniformLocation(context.program, "image")!!, 0)
+
+        gl.activeTexture(GL_TEXTURE1)
+        gl.bindTexture(GL_TEXTURE_2D, context.colors)
 
         gl.clear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 

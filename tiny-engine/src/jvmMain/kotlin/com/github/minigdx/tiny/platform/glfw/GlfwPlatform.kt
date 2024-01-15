@@ -56,7 +56,8 @@ class GlfwPlatform(
     private var lastFrame: Long = getTime()
 
     // Keep 30 seconds at 60 frames per seconds
-    private val gifBufferCache: MutableFixedSizeList<IntArray> = MutableFixedSizeList(gameOptions.record.toInt() * FPS)
+    private val gifFrameCache: MutableFixedSizeList<IntArray> = MutableFixedSizeList(gameOptions.record.toInt() * FPS)
+
     private var lastBuffer: FrameBuffer? = null
 
     private val lwjglInputHandler = LwjglInput(gameOptions)
@@ -187,10 +188,22 @@ class GlfwPlatform(
         GLFW.glfwTerminate()
     }
 
+    private fun convert(data: ByteArray): IntArray {
+        val result = IntArray(data.size)
+        val colorPalette = gameOptions.colors()
+        data.forEachIndexed { index, byte ->
+            result[index] = colorPalette.getRGAasInt(byte.toInt())
+        }
+        return result
+    }
+
     override fun draw(context: RenderContext, frameBuffer: FrameBuffer) {
         val image = frameBuffer.generateBuffer()
         render.draw(context, image, frameBuffer.width, frameBuffer.height)
-        gifBufferCache.add(frameBuffer.gifBuffer)
+        val imageCopy = image.copyOf()
+        recordScope.launch {
+            gifFrameCache.add(convert(imageCopy))
+        }
         lastBuffer = frameBuffer
     }
 
@@ -201,7 +214,7 @@ class GlfwPlatform(
 
         logger.info("GLWF") { "Starting to generate GIF in '${origin.absolutePath}' (Wait for it...)" }
         val buffer = mutableListOf<IntArray>().apply {
-            addAll(gifBufferCache)
+            addAll(gifFrameCache)
         }
 
         recordScope.launch {

@@ -49,7 +49,7 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
             if (isInPixelArray(pixelArray, x, y)) {
                 val index = pixelArray.get(x, y)
                 val colorIndex = index.get(0)
-                return valueOf(colorIndex)
+                return valueOf(colorIndex.toInt())
             } else {
                 return NIL
             }

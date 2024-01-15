@@ -30,7 +30,7 @@ class Blender(private val gamePalette: ColorPalette) {
         switch[gamePalette.check(source)] = gamePalette.check(target)
     }
 
-    fun mix(colors: Array<ColorIndex>, x: Pixel, y: Pixel, transparency: Array<Int>?): Array<ColorIndex>? {
+    fun mix(colors: ByteArray, x: Pixel, y: Pixel, transparency: Array<Int>?): ByteArray? {
         fun dither(pattern: Int): Boolean {
             val a = x % 4
             val b = (y % 4) * 4
@@ -38,10 +38,10 @@ class Blender(private val gamePalette: ColorPalette) {
             return (pattern shr (15 - (a + b))) and 0x01 == 0x01
         }
 
-        val color = gamePalette.check(colors[0])
-        colors[0] = switch[gamePalette.check(color)]
+        val color = gamePalette.check(colors[0].toInt())
+        colors[0] = switch[color].toByte()
         // Return null if transparent
-        if (transparency == null && gamePalette.isTransparent(colors[0])) return null
+        if (transparency == null && gamePalette.isTransparent(colors[0].toInt())) return null
         return if (!dither(dithering)) {
             null
         } else {
@@ -88,7 +88,7 @@ class FrameBuffer(
 
     internal val camera = Camera()
 
-    private var tmp = Array(1) { 0 }
+    private var tmp = ByteArray(1) { 0 }
 
     private val transparency = arrayOf(0)
 
@@ -103,9 +103,9 @@ class FrameBuffer(
         val cy = camera.cy(y)
         if (!clipper.isIn(cx, cy)) return
 
-        tmp[0] = gamePalette.check(colorIndex)
+        tmp[0] = gamePalette.check(colorIndex).toByte()
         val index = blender.mix(tmp, cx, cy, transparency) ?: return
-        colorIndexBuffer.set(cx, cy, index[0])
+        colorIndexBuffer.set(cx, cy, index[0].toInt())
     }
 
     fun fill(startX: Pixel, endX: Pixel, y: Pixel, colorIndex: ColorIndex) {
@@ -129,7 +129,7 @@ class FrameBuffer(
                 pixel(x, y, colorIndex)
             }
         } else {
-            tmp[0] = color
+            tmp[0] = color.toByte()
             val targetColor = blender.mix(tmp, 0, 0, transparency) ?: return
             colorIndexBuffer.fill(left, right, cy, targetColor[0])
         }
@@ -180,7 +180,7 @@ class FrameBuffer(
         /**
          * Blend function
          */
-        blender: (Array<Int>, Pixel, Pixel) -> Array<Int> = { colors, _, _ -> colors },
+        blender: (ByteArray, Pixel, Pixel) -> ByteArray = { colors, _, _ -> colors },
     ) {
         val cx = camera.cx(dstX)
         val cy = camera.cy(dstY)
@@ -209,23 +209,6 @@ class FrameBuffer(
      * Create a buffer using the colorIndexBuffer as reference.
      */
     fun generateBuffer(): ByteArray {
-        // Reset the old buffer
-        gifBuffer = IntArray(height * width)
-
-        var pos = 0
-        for (x in 0 until width) {
-            for (y in 0 until height) {
-                val index = colorIndexBuffer.getOne(x, y)
-                val color = gamePalette.getRGBA(index)
-
-                buffer[pos++] = color[0]
-                buffer[pos++] = color[1]
-                buffer[pos++] = color[2]
-                buffer[pos++] = color[3]
-
-                gifBuffer[x + y * width] = gamePalette.getRGAasInt(index)
-            }
-        }
-        return buffer
+        return this.colorIndexBuffer.pixels
     }
 }
