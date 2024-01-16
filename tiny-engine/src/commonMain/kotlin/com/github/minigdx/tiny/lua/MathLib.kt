@@ -36,7 +36,7 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
         return math
     }
 
-    @TinyFunction("Return the sign of the number: -1 if negative. 1 otherwise.")
+    @TinyFunction("Return the sign of the number: -1 if negative. 1 otherwise.", example = MATH_SIGN_EXAMPLE)
     internal inner class sign : OneArgFunction() {
 
         @TinyCall("Return the sign of the number.")
@@ -112,7 +112,7 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
         }
     }
 
-    @TinyFunction("Generate random values")
+    @TinyFunction("Generate random values", example = MATH_RND_EXAMPLE)
     internal inner class rnd : TwoArgFunction() {
         @TinyCall("Generate a random int (negative or positive value)")
         override fun call(): LuaValue {
@@ -172,7 +172,7 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
         }
     }
 
-    @TinyFunction("Perlin noise. The random generated value is between 0 and 1.")
+    @TinyFunction("Perlin noise. The random generated value is between 0.0 and 1.0.", example = MATH_PERLIN_EXAMPLE)
     inner class perlin(seed: Long) : ThreeArgFunction() {
 
         private val permutation: MutableList<Int>
@@ -240,9 +240,9 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
 
         @TinyCall("Generate a random value regarding the parameters x,y and z.")
         override fun call(
-            @TinyArg("x") arg1: LuaValue,
-            @TinyArg("y") arg2: LuaValue,
-            @TinyArg("z") arg3: LuaValue,
+            @TinyArg("x", description = "A value between 0.0 and 1.0.") arg1: LuaValue,
+            @TinyArg("y", description = "A value between 0.0 and 1.0.") arg2: LuaValue,
+            @TinyArg("z", description = "A value between 0.0 and 1.0.") arg3: LuaValue,
         ): LuaValue {
             return valueOf(noise(arg1.todouble(), arg2.todouble(), arg3.todouble()))
         }
