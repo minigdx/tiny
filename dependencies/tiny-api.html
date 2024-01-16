@@ -2366,6 +2366,18 @@ end
 <pre class="highlight"><code class="language-lua" data-lang="lua">math.sign(number) -- Return the sign of the number.</code></pre>
 </div>
 </div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+    local cos = math.cos(tiny.t)
+    print("cos: "..cos)
+    print("sign: "..math.sign(cos), 0, 8)
+
+    shape.line(128, 128, 128 + cos * 128, 128, 9)
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_math_clamp">math.clamp()</h4>
@@ -2438,6 +2450,27 @@ math.rnd(until) -- Generate a random value between 1 until the argument. If a ta
 math.rnd(a, b) -- Generate a random value between a and b.</code></pre>
 </div>
 </div>
+<tiny-editor style="display: none;"  >
+
+local value = {}
+function _update()
+    table.insert(value, math.rnd(126))
+
+    if(#value > 50) then
+        table.remove(value, #value)
+    end
+end
+
+function _draw()
+    gfx.cls()
+    local y = 0
+    for v in all(value) do
+        print("rnd: "..v, 4, y)
+        y = y + 6
+    end
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_math_roverlap">math.roverlap()</h4>
@@ -2475,13 +2508,51 @@ math.rnd(a, b) -- Generate a random value between a and b.</code></pre>
 <div class="sect3">
 <h4 id="_math_perlin">math.perlin()</h4>
 <div class="paragraph">
-<p>Perlin noise. The random generated value is between 0 and 1.</p>
+<p>Perlin noise. The random generated value is between 0.0 and 1.0.</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-lua" data-lang="lua">math.perlin(x, y, z) -- Generate a random value regarding the parameters x,y and z.</code></pre>
 </div>
 </div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A value between 0.0 and 1.0.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">y</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A value between 0.0 and 1.0.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">z</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A value between 0.0 and 1.0.</p></td>
+</tr>
+</tbody>
+</table>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls(8)
+
+    gfx.dither(0x0001)
+    local x = math.perlin(0.1, 0.2, tiny.frame / 100)
+    local y = math.perlin(0.4, 0.5, tiny.frame / 100)
+    shape.circlef(x * 256, y * 256, 64, 7)
+end
+
+</tiny-editor>
 </div>
 </div>
 <div class="sect2">
@@ -3642,8 +3713,8 @@ end
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 1.1.0<br>
-Last updated 2024-01-16 18:59:11 UTC
+Version main<br>
+Last updated 2024-01-16 22:54:03 UTC
 </div>
 </div>
 </body>

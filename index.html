@@ -705,7 +705,7 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <div id="header">
 <h1>Tiny 🧸</h1>
 <div class="details">
-<span id="revnumber">version 1.1.0</span>
+<span id="revnumber">version main</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -3553,6 +3553,18 @@ end
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">math</span><span class="p">.</span><span class="n">sign</span><span class="p">(</span><span class="n">number</span><span class="p">)</span> <span class="c1">-- Return the sign of the number.</span></code></pre>
 </div>
 </div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+    local cos = math.cos(tiny.t)
+    print("cos: "..cos)
+    print("sign: "..math.sign(cos), 0, 8)
+
+    shape.line(128, 128, 128 + cos * 128, 128, 9)
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_math_clamp">math.clamp()</h4>
@@ -3625,6 +3637,27 @@ end
 <span class="n">math</span><span class="p">.</span><span class="n">rnd</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="c1">-- Generate a random value between a and b.</span></code></pre>
 </div>
 </div>
+<tiny-editor style="display: none;"  >
+
+local value = {}
+function _update()
+    table.insert(value, math.rnd(126))
+
+    if(#value > 50) then
+        table.remove(value, #value)
+    end
+end
+
+function _draw()
+    gfx.cls()
+    local y = 0
+    for v in all(value) do
+        print("rnd: "..v, 4, y)
+        y = y + 6
+    end
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_math_roverlap">math.roverlap()</h4>
@@ -3662,13 +3695,51 @@ end
 <div class="sect3">
 <h4 id="_math_perlin">math.perlin()</h4>
 <div class="paragraph">
-<p>Perlin noise. The random generated value is between 0 and 1.</p>
+<p>Perlin noise. The random generated value is between 0.0 and 1.0.</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">math</span><span class="p">.</span><span class="n">perlin</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="c1">-- Generate a random value regarding the parameters x,y and z.</span></code></pre>
 </div>
 </div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A value between 0.0 and 1.0.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">y</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A value between 0.0 and 1.0.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">z</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A value between 0.0 and 1.0.</p></td>
+</tr>
+</tbody>
+</table>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls(8)
+
+    gfx.dither(0x0001)
+    local x = math.perlin(0.1, 0.2, tiny.frame / 100)
+    local y = math.perlin(0.4, 0.5, tiny.frame / 100)
+    shape.circlef(x * 256, y * 256, 64, 7)
+end
+
+</tiny-editor>
 </div>
 </div>
 <div class="sect2">
@@ -4879,8 +4950,8 @@ Support us by crediting Kenney or www.kenney.nl (this is not mandatory)</pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 1.1.0<br>
-Last updated 2024-01-16 18:56:52 UTC
+Version main<br>
+Last updated 2024-01-16 22:50:12 UTC
 </div>
 </div>
 <style>
