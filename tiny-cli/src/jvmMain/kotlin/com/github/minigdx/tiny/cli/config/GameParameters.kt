@@ -29,6 +29,8 @@ sealed class GameParameters() {
 
     abstract fun addSound(sound: String): GameParameters
 
+    abstract fun setPalette(colors: List<String>): GameParameters
+
     /**
      * Return the list of the user Lua script to load.
      */
@@ -142,5 +144,9 @@ data class GameParametersV1(
 
     override fun addLibrary(lib: String): GameParameters {
         return copy(libraries = libraries + lib)
+    }
+
+    override fun setPalette(colors: List<String>): GameParameters {
+        return copy(colors = colors)
     }
 }

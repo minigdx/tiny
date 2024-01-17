@@ -121,6 +121,38 @@ Alternatively, you can also manually add resources to your game by editing the `
 
 With the `tiny-cli add` command, you can easily add new resources to your game and customize its functionality and appearance. Whether you are adding new spritesheets, sounds, or fonts, this command makes it easy to create the game of your dreams with the tiny game engine.
 
+=== the `tiny-cli palette` command
+
+The tiny-cli lib command is used extract a color palette from an image to use it in your `🧸 Tiny` game. This command provides an easy way to use colors from an image as your game's palette color.
+
+==== Usage
+
+To use the `tiny-cli palette` command, follow the syntax:
+
+[source,shell]
+tiny-cli palette <image_name>
+
+For example:
+
+[source,shell]
+tiny-cli palette my_palette.png
+
+This command will replace your game palette with the palette extract from the file.
+
+You might want to check before which palette will be extract from the image using the flag `--print`:
+
+[source,shell]
+tiny-cli palette --print my_palette.png
+
+If, instead to replace your game's color palette,
+the flag `--append` can help you to append colors in your game's palette
+instead of replacing it:
+
+[source,shell]
+tiny-cli palette --append my_palette.png
+
+NOTE: Only colors that are not already in your game's palette will be appended, to not mess with colors index.
+
 === The `tiny-cli export` command
 
 The `tiny-cli export` command is a tool for exporting your tiny game to a zip file, which includes all the assets needed to run the game in a browser. This command makes it easy to distribute your game and share it with others.
@@ -176,7 +208,7 @@ Where:
 
 `--port [port number]`: Allows you to specify a custom port number to run the server on. The default port number is 8080.
 
-==== Example Usage
+==== Usage
 
 To run the tiny serve command, you can use the following examples:
 
@@ -206,12 +238,14 @@ To use the `tiny-cli lib` command, follow the syntax:
 
 [source,shell]
 tiny-cli lib <library_name>
+
 Replace <library_name> with the name of the library you want to download and add to your game.
 
 For example, to download and add the particles library to your game, you would run the following command:
 
 [source,shell]
 tiny-cli lib particles
+
 This command will download the particles library and add it to your game.
 
 ==== Library Repository
@@ -229,4 +263,5 @@ Here are a few examples to illustrate how to use the `tiny-cli lib` command:
 Download and add the particles library to your game:
 [source,shell]
 tiny-cli lib particles
+
 This command will download the particles library from the repository and add it to your game.
