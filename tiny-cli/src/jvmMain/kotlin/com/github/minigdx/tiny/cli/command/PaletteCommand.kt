@@ -9,6 +9,7 @@ import com.github.ajalt.clikt.parameters.types.file
 import com.github.minigdx.tiny.cli.config.GameParameters
 import com.github.minigdx.tiny.cli.exception.MissingTinyConfigurationException
 import com.github.minigdx.tiny.file.CommonVirtualFileSystem
+import com.github.minigdx.tiny.graphic.PixelFormat
 import com.github.minigdx.tiny.log.StdOutLogger
 import com.github.minigdx.tiny.platform.glfw.GlfwPlatform
 import kotlinx.coroutines.runBlocking
@@ -52,7 +53,7 @@ class PaletteCommand : CliktCommand(name = "palette", help = "Extract the color 
         }
         var extractedColors = emptyList<String>()
 
-        for (index in 0..(imageData.height * imageData.width) step 4) {
+        for (index in 0 until (imageData.height * imageData.width * PixelFormat.RGBA) step 4) {
             val r = imageData.data[index].toInt() and 0xFF
             val g = imageData.data[index + 1].toInt() and 0xFF
             val b = imageData.data[index + 2].toInt() and 0xFF
