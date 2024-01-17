@@ -2030,7 +2030,7 @@ end
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">debug</span><span class="p">.</span><span class="n">rect</span><span class="p">()</span> <span class="c1">-- Draw a debug rectangle.</span>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">debug</span><span class="p">.</span><span class="n">rect</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a debug rectangle.</span>
 <span class="n">debug</span><span class="p">.</span><span class="n">rect</span><span class="p">(</span><span class="n">rect</span><span class="p">)</span> <span class="c1">-- Draw a debug rectangle.</span>
 <span class="n">debug</span><span class="p">.</span><span class="n">rect</span><span class="p">(</span><span class="n">rect</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a debug rectangle using a rectangle and a color.</span></code></pre>
 </div>
@@ -2101,7 +2101,7 @@ end
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">debug</span><span class="p">.</span><span class="n">point</span><span class="p">()</span> <span class="c1">-- Draw a debug point.</span>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">debug</span><span class="p">.</span><span class="n">point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a debug point.</span>
 <span class="n">debug</span><span class="p">.</span><span class="n">point</span><span class="p">(</span><span class="n">point</span><span class="p">)</span> <span class="c1">-- Draw a debug point.</span>
 <span class="n">debug</span><span class="p">.</span><span class="n">point</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a debug point.</span></code></pre>
 </div>
@@ -2136,7 +2136,7 @@ end
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">debug</span><span class="p">.</span><span class="n">line</span><span class="p">()</span> <span class="c1">-- Draw a debug line.</span>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">debug</span><span class="p">.</span><span class="n">line</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a debug line.</span>
 <span class="n">debug</span><span class="p">.</span><span class="n">line</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span> <span class="c1">-- Draw a debug line.</span>
 <span class="n">debug</span><span class="p">.</span><span class="n">line</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a debug line.</span></code></pre>
 </div>
@@ -3543,7 +3543,7 @@ entity.customFields -- access custom field of the entity</code></pre>
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">map</span><span class="p">.</span><span class="n">draw</span><span class="p">()</span> <span class="c1">-- Draw the default layer on the screen.</span>
 <span class="n">map</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- Draw the default layer on the screen at the x/y coordinates.</span>
 <span class="n">map</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">mx</span><span class="p">,</span> <span class="n">my</span><span class="p">)</span> <span class="c1">-- Draw the default layer on the screen at the x/y coordinates starting the mx/my coordinates from the map.</span>
-<span class="n">map</span><span class="p">.</span><span class="n">draw</span><span class="p">()</span> <span class="c1">-- Draw the default layer on the screen at the x/y coordinates starting the mx/my coordinates from the map using the size width/height.</span>
+<span class="n">map</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">mx</span><span class="p">,</span> <span class="n">my</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span> <span class="c1">-- Draw the default layer on the screen at the x/y coordinates starting the mx/my coordinates from the map using the size width/height.</span>
 <span class="n">map</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span> <span class="c1">-- Draw the layer on the screen by it's index.</span></code></pre>
 </div>
 </div>
@@ -3865,7 +3865,7 @@ end
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">rect</span><span class="p">()</span> <span class="c1">-- Draw a rectangle.</span>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">rect</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a rectangle.</span>
 <span class="n">shape</span><span class="p">.</span><span class="n">rect</span><span class="p">(</span><span class="n">rect</span><span class="p">)</span> <span class="c1">-- Draw a rectangle.</span>
 <span class="n">shape</span><span class="p">.</span><span class="n">rect</span><span class="p">(</span><span class="n">rect</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a rectangle using a rectangle and a color.</span></code></pre>
 </div>
@@ -3926,7 +3926,7 @@ end
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">oval</span><span class="p">(</span><span class="n">centerX</span><span class="p">,</span> <span class="n">centerY</span><span class="p">,</span> <span class="n">radiusX</span><span class="p">,</span> <span class="n">radiusY</span><span class="p">)</span> <span class="c1">-- Draw an oval using the default color.</span>
-<span class="n">shape</span><span class="p">.</span><span class="n">oval</span><span class="p">()</span> <span class="c1">-- Draw an oval using the specified color.</span></code></pre>
+<span class="n">shape</span><span class="p">.</span><span class="n">oval</span><span class="p">(</span><span class="n">centerX</span><span class="p">,</span> <span class="n">centerY</span><span class="p">,</span> <span class="n">radiusX</span><span class="p">,</span> <span class="n">radiusY</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw an oval using the specified color.</span></code></pre>
 </div>
 </div>
 <tiny-editor style="display: none;"  >
@@ -3955,7 +3955,7 @@ end
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">ovalf</span><span class="p">(</span><span class="n">centerX</span><span class="p">,</span> <span class="n">centerY</span><span class="p">,</span> <span class="n">radiusX</span><span class="p">,</span> <span class="n">radiusY</span><span class="p">)</span> <span class="c1">-- Draw a filled oval using the default color.</span>
-<span class="n">shape</span><span class="p">.</span><span class="n">ovalf</span><span class="p">()</span> <span class="c1">-- Draw a filled oval using the specified color.</span></code></pre>
+<span class="n">shape</span><span class="p">.</span><span class="n">ovalf</span><span class="p">(</span><span class="n">centerX</span><span class="p">,</span> <span class="n">centerY</span><span class="p">,</span> <span class="n">radiusX</span><span class="p">,</span> <span class="n">radiusY</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a filled oval using the specified color.</span></code></pre>
 </div>
 </div>
 <tiny-editor style="display: none;"  >
@@ -3983,7 +3983,7 @@ end
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">rectf</span><span class="p">()</span> <span class="c1">-- Draw a filled rectangle.</span>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">rectf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a filled rectangle.</span>
 <span class="n">shape</span><span class="p">.</span><span class="n">rectf</span><span class="p">(</span><span class="n">rect</span><span class="p">)</span> <span class="c1">-- Draw a filled rectangle.</span>
 <span class="n">shape</span><span class="p">.</span><span class="n">rectf</span><span class="p">(</span><span class="n">rect</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a filled rectangle using a rectangle and a color.</span></code></pre>
 </div>
@@ -4079,7 +4079,7 @@ end
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">line</span><span class="p">()</span> <span class="c1">-- Draw a line.</span>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">line</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a line.</span>
 <span class="n">shape</span><span class="p">.</span><span class="n">line</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">)</span> <span class="c1">-- Draw a line with a default color.</span></code></pre>
 </div>
 </div>
@@ -4143,7 +4143,7 @@ end
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">trianglef</span><span class="p">()</span> <span class="c1">-- Draw a filled triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">trianglef</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">x3</span><span class="p">,</span> <span class="n">y3</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a filled triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).</span></code></pre>
 </div>
 </div>
 <tiny-editor style="display: none;"  >
@@ -4182,7 +4182,7 @@ end
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">triangle</span><span class="p">()</span> <span class="c1">-- Draw a triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">triangle</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">x3</span><span class="p">,</span> <span class="n">y3</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).</span></code></pre>
 </div>
 </div>
 <tiny-editor style="display: none;"  >
@@ -4221,7 +4221,7 @@ end
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">gradient</span><span class="p">()</span> <span class="c1">-- Draw a gradient using dithering, only from color c1 to color c2.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">color1</span><span class="p">,</span> <span class="n">color2</span><span class="p">,</span> <span class="n">is_horizontal</span><span class="p">)</span> <span class="c1">-- Draw a gradient using dithering, only from color c1 to color c2.</span></code></pre>
 </div>
 </div>
 <tiny-editor style="display: none;"  >
@@ -4329,11 +4329,57 @@ end
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">spr</span><span class="p">.</span><span class="n">sdraw</span><span class="p">()</span> <span class="c1">-- Draw the full spritesheet at default coordinate (0, 0)</span>
-<span class="n">spr</span><span class="p">.</span><span class="n">sdraw</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- Draw the full spritesheet at default coordinate (x, y)</span>
-<span class="n">spr</span><span class="p">.</span><span class="n">sdraw</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sprX</span><span class="p">,</span> <span class="n">sprY</span><span class="p">)</span> <span class="c1">-- Draw the full spritesheet at default coordinate (x, y) from the sprite (sprX, sprY)</span>
-<span class="n">spr</span><span class="p">.</span><span class="n">sdraw</span><span class="p">()</span> <span class="c1">-- Draw a fragment from the spritesheet.</span></code></pre>
+<span class="n">spr</span><span class="p">.</span><span class="n">sdraw</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- Draw the full spritesheet at coordinate (x, y)</span>
+<span class="n">spr</span><span class="p">.</span><span class="n">sdraw</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sprX</span><span class="p">,</span> <span class="n">sprY</span><span class="p">)</span> <span class="c1">-- Draw the full spritesheet at coordinate (x, y) from the sprite (sprX, sprY)</span>
+<span class="n">spr</span><span class="p">.</span><span class="n">sdraw</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sprX</span><span class="p">,</span> <span class="n">sprY</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">flipX</span><span class="p">,</span> <span class="n">flipY</span><span class="p">)</span> <span class="c1">-- Draw a fragment from the spritesheet at the coordinate (x, y) from the sprite (sprX, sprY) with the width and height.</span></code></pre>
 </div>
 </div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">flipX</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">flip on the x axis (default: false)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">flipY</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">flip on the y axis (default: false)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">height</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">height of the spritesheet to copy (default height of the spritesheet)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">sprX</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x coordinate from the spritesheet (default 0)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">sprY</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">y coordinate from the spritesheet (default 0)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">width</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">width of the spritesheet to copy (default width of the spritesheet)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">screen x coordinate to draw the sprite (default 0)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">y</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">screen y coordinate to draw the sprite (default 0)</p></td>
+</tr>
+</tbody>
+</table>
 <tiny-editor style="display: none;" sprite="resources/tiny-town.png" >
 
 function _draw()
@@ -4362,7 +4408,7 @@ end
 <div class="content">
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">spr</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="n">sprN</span><span class="p">)</span> <span class="c1">-- Draw a sprite at the default coordinate (0, 0).</span>
 <span class="n">spr</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="n">sprN</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- Draw a sprite.</span>
-<span class="n">spr</span><span class="p">.</span><span class="n">draw</span><span class="p">()</span> <span class="c1">-- Draw a sprite and allow flip on x or y axis.</span></code></pre>
+<span class="n">spr</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="n">sprN</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">flipX</span><span class="p">,</span> <span class="n">flipY</span><span class="p">)</span> <span class="c1">-- Draw a sprite and allow flip on x or y axis.</span></code></pre>
 </div>
 </div>
 <tiny-editor style="display: none;" sprite="resources/tiny-town.png" >
@@ -4481,19 +4527,19 @@ end
 <div class="ulist">
 <ul>
 <li>
-<p>If you want to iterate over keys, use pairs(table).</p>
+<p>If you want to iterate over keys, use <code>pairs(table)</code>.</p>
 </li>
 <li>
-<p>If you want to iterate over index, use ipairs(table).</p>
+<p>If you want to iterate over index, use <code>ipairs(table)</code>.</p>
 </li>
 <li>
-<p>If you want to iterate in reverse, use rpairs(table).</p>
+<p>If you want to iterate in reverse, use <code>rpairs(table)</code>.</p>
 </li>
 </ul>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">all</span><span class="p">()</span> <span class="c1">-- Iterate over the values of the table</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">all</span><span class="p">(</span><span class="n">table</span><span class="p">)</span> <span class="c1">-- Iterate over the values of the table</span></code></pre>
 </div>
 </div>
 </div>
@@ -4504,7 +4550,7 @@ end
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">rpairs</span><span class="p">()</span> <span class="c1">-- Iterate over the values of the table</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">rpairs</span><span class="p">(</span><span class="n">table</span><span class="p">)</span> <span class="c1">-- Iterate over the values of the table</span></code></pre>
 </div>
 </div>
 <tiny-editor style="display: none;"  >
@@ -5020,7 +5066,7 @@ Support us by crediting Kenney or www.kenney.nl (this is not mandatory)</pre>
 <div id="footer">
 <div id="footer-text">
 Version main<br>
-Last updated 2024-01-17 08:43:55 UTC
+Last updated 2024-01-17 13:57:53 UTC
 </div>
 </div>
 <style>
