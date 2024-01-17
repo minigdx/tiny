@@ -116,12 +116,12 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
             return invoke(varargsOf(arrayOf(NIL, NIL, NIL, NIL, NIL, NIL, NIL, NIL))).arg1()
         }
 
-        @TinyCall("Draw the full spritesheet at default coordinate (x, y)")
+        @TinyCall("Draw the full spritesheet at coordinate (x, y)")
         override fun call(@TinyArg("x") a: LuaValue, @TinyArg("y") b: LuaValue): LuaValue {
             return invoke(varargsOf(arrayOf(a, b, NIL, NIL, NIL, NIL, NIL, NIL))).arg1()
         }
 
-        @TinyCall("Draw the full spritesheet at default coordinate (x, y) from the sprite (sprX, sprY)")
+        @TinyCall("Draw the full spritesheet at coordinate (x, y) from the sprite (sprX, sprY)")
         override fun call(
             @TinyArg("x") a: LuaValue,
             @TinyArg("y") b: LuaValue,
@@ -131,7 +131,7 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
             return invoke(varargsOf(arrayOf(a, b, c, d, NIL, NIL, NIL, NIL))).arg1()
         }
 
-        @TinyCall("Draw a fragment from the spritesheet.")
+        @TinyCall("Draw a fragment from the spritesheet at the coordinate (x, y) from the sprite (sprX, sprY) with the width and height.")
         override fun invoke(
             @TinyArgs(
                 arrayOf(
@@ -143,6 +143,16 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
                     "height",
                     "flipX",
                     "flipY",
+                ),
+                documentations = arrayOf(
+                    "screen x coordinate to draw the sprite (default 0)",
+                    "screen y coordinate to draw the sprite (default 0)",
+                    "x coordinate from the spritesheet (default 0)",
+                    "y coordinate from the spritesheet (default 0)",
+                    "width of the spritesheet to copy (default width of the spritesheet)",
+                    "height of the spritesheet to copy (default height of the spritesheet)",
+                    "flip on the x axis (default: false)",
+                    "flip on the y axis (default: false)",
                 ),
             ) args: Varargs,
         ): Varargs {

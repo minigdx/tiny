@@ -294,8 +294,15 @@ class KspProcessor(
                             val multiArgs = p.getAnnotationsByType(TinyArgs::class)
                             val multiArg = multiArgs.firstOrNull()
                             if (multiArg != null) {
+                                val documentation = multiArg.documentations
+                                val docs = if (documentation.size < multiArg.names.size) {
+                                    documentation + (0 until multiArg.names.size - documentation.size).map { "" }.toTypedArray()
+                                } else {
+                                    documentation
+                                }
+
                                 call.args += multiArg.names.map { n -> TinyArgDescriptor(n) }
-                                    .zip(multiArg.documentations) { ano, doc ->
+                                    .zip(docs) { ano, doc ->
                                         ano.apply {
                                             ano.description = doc
                                         }

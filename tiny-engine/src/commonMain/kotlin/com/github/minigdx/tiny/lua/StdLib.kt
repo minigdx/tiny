@@ -105,9 +105,9 @@ class StdLib(
 
     @TinyFunction(
         "Iterate over values of a table.\n\n" +
-            "- If you want to iterate over keys, use pairs(table).\n " +
-            "- If you want to iterate over index, use ipairs(table).\n " +
-            "- If you want to iterate in reverse, use rpairs(table).\n",
+            "- If you want to iterate over keys, use `pairs(table)`.\n " +
+            "- If you want to iterate over index, use `ipairs(table)`.\n " +
+            "- If you want to iterate in reverse, use `rpairs(table)`.\n",
     )
     internal inner class all : VarArgFunction() {
 
