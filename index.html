@@ -745,9 +745,14 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <li><a href="#_editing_the_tiny_json_file">Editing the <code>_tiny.json</code> File</a></li>
 </ul>
 </li>
-<li><a href="#_the_tiny_cli_export_command">The <code>tiny-cli export</code> command</a>
+<li><a href="#_the_tiny_cli_palette_command">the <code>tiny-cli palette</code> command</a>
 <ul class="sectlevel3">
 <li><a href="#_usage_4">Usage</a></li>
+</ul>
+</li>
+<li><a href="#_the_tiny_cli_export_command">The <code>tiny-cli export</code> command</a>
+<ul class="sectlevel3">
+<li><a href="#_usage_5">Usage</a></li>
 <li><a href="#_exporting_a_game">Exporting a Game</a></li>
 </ul>
 </li>
@@ -758,12 +763,12 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <li><a href="#_options">Options</a></li>
 </ul>
 </li>
-<li><a href="#_example_usage">Example Usage</a></li>
+<li><a href="#_usage_6">Usage</a></li>
 </ul>
 </li>
 <li><a href="#_the_tiny_cli_lib_command">the <code>tiny-cli lib</code> command</a>
 <ul class="sectlevel3">
-<li><a href="#_usage_5">Usage</a></li>
+<li><a href="#_usage_7">Usage</a></li>
 <li><a href="#_library_repository">Library Repository</a></li>
 <li><a href="#_examples">Examples</a></li>
 </ul>
@@ -1451,12 +1456,70 @@ Note that the added resource is not automatically copied to your game&#8217;s fo
 </div>
 </div>
 <div class="sect2">
+<h3 id="_the_tiny_cli_palette_command">the <code>tiny-cli palette</code> command</h3>
+<div class="paragraph">
+<p>The tiny-cli lib command is used extract a color palette from an image to use it in your <code>🧸 Tiny</code> game. This command provides an easy way to use colors from an image as your game&#8217;s palette color.</p>
+</div>
+<div class="sect3">
+<h4 id="_usage_4">Usage</h4>
+<div class="paragraph">
+<p>To use the <code>tiny-cli palette</code> command, follow the syntax:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="shell">tiny-cli palette &lt;image_name&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="shell">tiny-cli palette my_palette.png</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This command will replace your game palette with the palette extract from the file.</p>
+</div>
+<div class="paragraph">
+<p>You might want to check before which palette will be extract from the image using the flag <code>--print</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="shell">tiny-cli palette <span class="nt">--print</span> my_palette.png</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If, instead to replace your game&#8217;s color palette,
+the flag <code>--append</code> can help you to append colors in your game&#8217;s palette
+instead of replacing it:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="shell">tiny-cli palette <span class="nt">--append</span> my_palette.png</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Only colors that are not already in your game&#8217;s palette will be appended, to not mess with colors index.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
 <h3 id="_the_tiny_cli_export_command">The <code>tiny-cli export</code> command</h3>
 <div class="paragraph">
 <p>The <code>tiny-cli export</code> command is a tool for exporting your tiny game to a zip file, which includes all the assets needed to run the game in a browser. This command makes it easy to distribute your game and share it with others.</p>
 </div>
 <div class="sect3">
-<h4 id="_usage_4">Usage</h4>
+<h4 id="_usage_5">Usage</h4>
 <div class="paragraph">
 <p>To use the <code>tiny-cli export</code> command, simply open your terminal and type the following command:</p>
 </div>
@@ -1534,7 +1597,7 @@ Note that the added resource is not automatically copied to your game&#8217;s fo
 </div>
 </div>
 <div class="sect3">
-<h4 id="_example_usage">Example Usage</h4>
+<h4 id="_usage_6">Usage</h4>
 <div class="paragraph">
 <p>To run the tiny serve command, you can use the following examples:</p>
 </div>
@@ -1577,24 +1640,28 @@ The tiny serve command is intended for local testing only and should not be used
 <p>The tiny-cli lib command is used to download and add Lua libraries to your <code>🧸 Tiny</code> game. This command provides an easy way to enhance the functionality of your game by incorporating libraries.</p>
 </div>
 <div class="sect3">
-<h4 id="_usage_5">Usage</h4>
+<h4 id="_usage_7">Usage</h4>
 <div class="paragraph">
 <p>To use the <code>tiny-cli lib</code> command, follow the syntax:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="shell">tiny-cli lib &lt;library_name&gt;
-Replace &lt;library_name&gt; with the name of the library you want to download and add to your game.</code></pre>
+<pre class="rouge highlight"><code data-lang="shell">tiny-cli lib &lt;library_name&gt;</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>Replace &lt;library_name&gt; with the name of the library you want to download and add to your game.</p>
 </div>
 <div class="paragraph">
 <p>For example, to download and add the particles library to your game, you would run the following command:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="shell">tiny-cli lib particles
-This <span class="nb">command </span>will download the particles library and add it to your game.</code></pre>
+<pre class="rouge highlight"><code data-lang="shell">tiny-cli lib particles</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>This command will download the particles library and add it to your game.</p>
 </div>
 </div>
 <div class="sect3">
@@ -1619,9 +1686,11 @@ This <span class="nb">command </span>will download the particles library and add
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="shell">tiny-cli lib particles
-This <span class="nb">command </span>will download the particles library from the repository and add it to your game.</code></pre>
+<pre class="rouge highlight"><code data-lang="shell">tiny-cli lib particles</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>This command will download the particles library from the repository and add it to your game.</p>
 </div>
 </div>
 </div>
@@ -4951,7 +5020,7 @@ Support us by crediting Kenney or www.kenney.nl (this is not mandatory)</pre>
 <div id="footer">
 <div id="footer-text">
 Version main<br>
-Last updated 2024-01-16 22:50:12 UTC
+Last updated 2024-01-17 08:43:55 UTC
 </div>
 </div>
 <style>
