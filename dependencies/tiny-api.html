@@ -2415,6 +2415,25 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+
+    local pos = ctrl.touch()
+
+    local x = math.clamp(60, pos.x, 256 - 60)
+
+    gfx.dither(0xA5A5)
+    shape.line(64, 129, 256 - 60, 129, 9)
+    gfx.dither()
+    shape.rect(60, 128, 4, 4, 9)
+    shape.rect(256 - 60, 128, 4, 4, 9)
+    shape.circlef(pos.x, pos.y, 2, 9)
+    shape.circle(x, 129, 2, 8)
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_math_dst">math.dst()</h4>
@@ -2426,6 +2445,26 @@ end
 <pre class="highlight"><code class="language-lua" data-lang="lua">math.dst(x1, y1, x2, y2) -- Distance between (x1, y1) and (x2, y2).</code></pre>
 </div>
 </div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+
+    local pos = ctrl.touch()
+    shape.line(pos.x, pos.y, 128, 128, 3)
+    shape.circlef(128, 128, 2, 9)
+    shape.circlef(pos.x, pos.y, 2, 9)
+
+    -- midle of the line
+    local x = (pos.x - 128) * 0.5
+    local y = (pos.y - 128) * 0.5
+
+    -- display dst
+    local dst = math.dst(128, 128, pos.x, pos.y)
+    print("dst: "..dst, 128 + x, 128 + y)
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_math_dst2">math.dst2()</h4>
@@ -2437,6 +2476,36 @@ end
 <pre class="highlight"><code class="language-lua" data-lang="lua">math.dst2(x1, y1, x2, y2) -- Distance not squared between (x1, y1) and (x2, y2).</code></pre>
 </div>
 </div>
+<tiny-editor style="display: none;"  >
+
+local a = {
+    x = 10 + math.rnd(236),
+    y = 10 + math.rnd(236)
+}
+
+local b = {
+    x = 10 + math.rnd(236),
+    y = 10 + math.rnd(236)
+}
+
+function _draw()
+    gfx.cls()
+
+    local pos = ctrl.touch()
+
+    if math.dst2(pos.x, pos.y, a.x, a.y) > math.dst2(pos.x, pos.y, b.x, b.y) then
+        -- b is closer
+        shape.line(pos.x, pos.y, b.x, b.y, 3)
+    else
+        -- a is closer
+        shape.line(pos.x, pos.y, a.x, a.y, 3)
+    end
+    shape.circlef(a.x, a.y, 2, 9)
+    shape.circlef(b.x, b.y, 2, 9)
+    shape.circlef(pos.x, pos.y, 2, 9)
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_math_rnd">math.rnd()</h4>
@@ -3760,7 +3829,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version main<br>
-Last updated 2024-01-17 19:00:30 UTC
+Last updated 2024-01-18 13:34:56 UTC
 </div>
 </div>
 </body>
