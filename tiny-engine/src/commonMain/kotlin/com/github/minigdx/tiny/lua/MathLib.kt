@@ -49,7 +49,7 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
         }
     }
 
-    @TinyFunction("Clamp the value between 2 values.")
+    @TinyFunction("Clamp the value between 2 values.", example = MATH_CLAMP_EXAMPLE)
     internal inner class clamp : ThreeArgFunction() {
 
         @TinyCall("Clamp the value between a and b. If a is greater than b, then b will be returned.")
@@ -72,7 +72,7 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
         }
     }
 
-    @TinyFunction("Compute the distance between two points.")
+    @TinyFunction("Compute the distance between two points.", example = MATH_DST_EXAMPLE)
     internal inner class dst : LibFunction() {
 
         private val dst2 = dst2()
@@ -94,6 +94,7 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
     @TinyFunction(
         "Compute the distance between two points not squared. " +
             "Use this method to know if an coordinate is closer than another.",
+        example = MATH_DST2_EXAMPLE,
     )
     internal inner class dst2 : LibFunction() {
 
