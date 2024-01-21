@@ -5,6 +5,7 @@ import com.github.minigdx.tiny.resources.GameLevel
 import com.github.minigdx.tiny.resources.GameScript
 import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.resources.SpriteSheet
+import com.github.minigdx.tiny.sound.WaveGenerator
 
 sealed interface DebugAction
 data class DebugMessage(val mesage: String, val color: String) : DebugAction
@@ -41,7 +42,12 @@ interface GameResourceAccess {
      */
     fun level(index: Int): GameLevel?
 
+    /**
+     * Access sound by its index
+     */
     fun sound(index: Int): Sound?
+
+    fun note(wave: WaveGenerator)
 
     /**
      * Find a script by its name.

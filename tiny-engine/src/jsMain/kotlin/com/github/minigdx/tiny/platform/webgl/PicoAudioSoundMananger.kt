@@ -1,6 +1,8 @@
 package com.github.minigdx.tiny.platform.webgl
 
+import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.input.InputHandler
+import com.github.minigdx.tiny.lua.Note
 import com.github.minigdx.tiny.sound.MidiSound
 import com.github.minigdx.tiny.sound.SoundManager
 
@@ -30,5 +32,9 @@ class PicoAudioSoundMananger : SoundManager {
         val audio = js("var PicoAudio = require('picoaudio'); new PicoAudio.default()")
         val smf = audio.parseSMF(data)
         return PicoAudioSound(audio, smf)
+    }
+
+    override fun playNotes(notes: List<Pair<Note, Seconds>>) {
+        TODO("Not yet implemented")
     }
 }

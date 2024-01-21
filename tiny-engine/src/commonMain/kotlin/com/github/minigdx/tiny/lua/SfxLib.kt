@@ -4,8 +4,14 @@ import com.github.mingdx.tiny.doc.TinyArg
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
+import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.resources.Sound
+import com.github.minigdx.tiny.sound.SawTooth
+import com.github.minigdx.tiny.sound.SineWave
+import com.github.minigdx.tiny.sound.SquareWave
+import com.github.minigdx.tiny.sound.TriangleWave
+import com.github.minigdx.tiny.sound.WaveGenerator
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.OneArgFunction
@@ -22,9 +28,47 @@ class SfxLib(
         ctrl.set("play", play())
         ctrl.set("loop", loop())
         ctrl.set("stop", stop())
+        ctrl.set("sine", sine())
+        ctrl.set("square", square())
+        ctrl.set("triangle", triangle())
+        ctrl.set("saw", sawtooth())
         arg2.set("sfx", ctrl)
         arg2.get("package").get("loaded").set("sfx", ctrl)
         return ctrl
+    }
+
+    abstract inner class WaveFunction : TwoArgFunction() {
+        private val notes = Note.values()
+
+        override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
+            val note = if (arg1.isint()) {
+                notes[arg1.checkint()]
+            } else {
+                return NIL
+            }
+
+            val duration = arg2.optdouble(0.1)
+            resourceAccess.note(wave(note, duration.toFloat()))
+            return NIL
+        }
+
+        abstract fun wave(note: Note, duration: Seconds): WaveGenerator
+    }
+
+    inner class sine : WaveFunction() {
+        override fun wave(note: Note, duration: Seconds) = SineWave(note, duration)
+    }
+
+    inner class sawtooth : WaveFunction() {
+        override fun wave(note: Note, duration: Seconds) = SawTooth(note, duration)
+    }
+
+    inner class square : WaveFunction() {
+        override fun wave(note: Note, duration: Seconds) = SquareWave(note, duration)
+    }
+
+    inner class triangle : WaveFunction() {
+        override fun wave(note: Note, duration: Seconds) = TriangleWave(note, duration)
     }
 
     @TinyFunction(

@@ -1,11 +1,13 @@
 package com.github.minigdx.tiny.platform.test
 
+import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
+import com.github.minigdx.tiny.lua.Note
 import com.github.minigdx.tiny.platform.ImageData
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.RenderContext
@@ -84,6 +86,10 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
 
                     override fun stop() = Unit
                 }
+            }
+
+            override fun playNotes(notes: List<Pair<Note, Seconds>>, longuestDuration: Seconds) {
+                TODO("Not yet implemented")
             }
         }
     }

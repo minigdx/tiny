@@ -24,6 +24,8 @@ import com.github.minigdx.tiny.resources.ResourceType.GAME_SOUND
 import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
 import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.resources.SpriteSheet
+import com.github.minigdx.tiny.sound.SoundManager
+import com.github.minigdx.tiny.sound.WaveGenerator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -91,6 +93,9 @@ class GameEngine(
     private var debugEnabled: Boolean = true
     private val debugActions = mutableListOf<DebugAction>()
 
+    private val notes = mutableListOf<WaveGenerator>()
+    private var longuestDuration: Seconds = 0f
+
     private lateinit var scripts: Array<GameScript?>
     private lateinit var spriteSheets: Array<SpriteSheet?>
     private lateinit var levels: Array<GameLevel?>
@@ -115,6 +120,7 @@ class GameEngine(
     private lateinit var renderContext: RenderContext
     private lateinit var inputHandler: InputHandler
     private lateinit var inputManager: InputManager
+    private lateinit var soundManager: SoundManager
 
     private lateinit var resourceFactory: ResourceFactory
 
@@ -123,7 +129,7 @@ class GameEngine(
 
         inputHandler = platform.initInputHandler()
         inputManager = platform.initInputManager()
-        platform.initSoundManager(inputHandler)
+        soundManager = platform.initSoundManager(inputHandler)
 
         resourceFactory = ResourceFactory(vfs, platform, logger, gameOptions.colors())
 
@@ -316,6 +322,10 @@ class GameEngine(
                 }
             }
 
+            soundManager.playNotes(notes, longuestDuration)
+            notes.clear()
+            longuestDuration = 0f
+
             // Fixed step simulation
             accumulator += delta
             if (accumulator >= REFRESH_LIMIT) {
@@ -463,6 +473,11 @@ class GameEngine(
         val protected = max(0, min(index, sounds.size - 1))
         if (protected >= sounds.size) return null
         return sounds[protected]
+    }
+
+    override fun note(wave: WaveGenerator) {
+        longuestDuration = max(longuestDuration, wave.duration)
+        notes.add(wave)
     }
 
     override fun script(name: String): GameScript? {
