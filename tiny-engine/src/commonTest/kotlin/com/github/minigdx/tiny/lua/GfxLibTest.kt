@@ -7,6 +7,7 @@ import com.github.minigdx.tiny.resources.GameLevel
 import com.github.minigdx.tiny.resources.GameScript
 import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.resources.SpriteSheet
+import com.github.minigdx.tiny.sound.WaveGenerator
 import org.luaj.vm2.LuaValue.Companion.valueOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -21,6 +22,7 @@ class GfxLibTest {
         override fun level(index: Int): GameLevel? = null
         override fun sound(index: Int): Sound? = null
         override fun script(name: String): GameScript? = null
+        override fun note(wave: WaveGenerator) = Unit
     }
 
     @Test

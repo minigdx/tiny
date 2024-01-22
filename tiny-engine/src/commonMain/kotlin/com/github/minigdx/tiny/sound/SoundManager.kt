@@ -17,7 +17,7 @@ interface SoundManager {
 
     suspend fun createSound(data: ByteArray): MidiSound
 
-    fun playNotes(notes: List<WaveGenerator>, longuestDuration: Seconds)
+    fun playNotes(notes: List<WaveGenerator>, longestDuration: Seconds)
 
     fun mix(sample: Int, notes: List<WaveGenerator>): Float {
         var result = 0f

@@ -41,8 +41,8 @@ class PicoAudioSoundMananger : SoundManager {
         return PicoAudioSound(audio, smf)
     }
 
-    private fun toAudioBuffer(notes: List<WaveGenerator>, longuestDuration: Seconds): AudioBuffer {
-        val numSamples = (longuestDuration * SAMPLE_RATE).toInt()
+    private fun toAudioBuffer(notes: List<WaveGenerator>, longestDuration: Seconds): AudioBuffer {
+        val numSamples = (longestDuration * SAMPLE_RATE).toInt()
 
         val audioBuffer = audioContext.createBuffer(
             1,
@@ -51,7 +51,7 @@ class PicoAudioSoundMananger : SoundManager {
         )
         val channel = audioBuffer.getChannelData(0)
 
-        val result = Float32Array((SAMPLE_RATE * longuestDuration).toInt())
+        val result = Float32Array((SAMPLE_RATE * longestDuration).toInt())
         (0 until numSamples).forEach { index ->
             val signal = mix(index, notes)
             result[index] = signal
@@ -60,11 +60,11 @@ class PicoAudioSoundMananger : SoundManager {
         return audioBuffer
     }
 
-    override fun playNotes(notes: List<WaveGenerator>, longuestDuration: Seconds) {
+    override fun playNotes(notes: List<WaveGenerator>, longestDuration: Seconds) {
         if (notes.isEmpty()) return
 
         val source = audioContext.createBufferSource()
-        source.buffer = toAudioBuffer(notes, longuestDuration)
+        source.buffer = toAudioBuffer(notes, longestDuration)
         source.connect(audioContext.destination)
         source.start()
     }

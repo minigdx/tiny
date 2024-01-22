@@ -88,7 +88,7 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
                 }
             }
 
-            override fun playNotes(notes: List<WaveGenerator>, longuestDuration: Seconds) = Unit
+            override fun playNotes(notes: List<WaveGenerator>, longestDuration: Seconds) = Unit
         }
     }
 

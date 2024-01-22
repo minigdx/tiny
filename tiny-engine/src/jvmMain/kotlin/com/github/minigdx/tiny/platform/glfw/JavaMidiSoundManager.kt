@@ -80,11 +80,11 @@ class JavaMidiSoundManager : SoundManager {
         return JavaMidiSound(data)
     }
 
-    override fun playNotes(notes: List<WaveGenerator>, longuestDuration: Seconds) {
+    override fun playNotes(notes: List<WaveGenerator>, longestDuration: Seconds) {
         if (notes.isEmpty()) return
 
-        buffer = ByteArray((longuestDuration * SAMPLE_RATE).toInt() * 2)
-        val numSamples: Int = (SAMPLE_RATE * longuestDuration).toInt()
+        buffer = ByteArray((longestDuration * SAMPLE_RATE).toInt() * 2)
+        val numSamples: Int = (SAMPLE_RATE * longestDuration).toInt()
         for (i in 0 until numSamples) {
             val sample = mix(i, notes)
 
