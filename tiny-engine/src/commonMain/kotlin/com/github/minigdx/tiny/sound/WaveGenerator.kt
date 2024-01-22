@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.sound
 
+import com.github.minigdx.tiny.Percent
 import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.lua.Note
 import com.github.minigdx.tiny.sound.SoundManager.Companion.SAMPLE_RATE
@@ -7,7 +8,7 @@ import kotlin.math.abs
 import kotlin.math.sin
 import kotlin.random.Random
 
-sealed class WaveGenerator(note: Note, val duration: Seconds) {
+sealed class WaveGenerator(note: Note, val duration: Seconds, val volume: Percent) {
 
     val period = SAMPLE_RATE.toFloat() / note.frequency
 
@@ -35,19 +36,19 @@ sealed class WaveGenerator(note: Note, val duration: Seconds) {
     }
 }
 
-class SawTooth(note: Note, duration: Seconds) : WaveGenerator(note, duration) {
+class SawTooth(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGenerator(note, duration, volume) {
     override fun generate(sample: Int): Float {
         return (2 * (angle(sample) / TWO_PI))
     }
 }
 
-class SineWave(note: Note, duration: Seconds) : WaveGenerator(note, duration) {
+class SineWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGenerator(note, duration, volume) {
     override fun generate(sample: Int): Float {
         return sin(angle(sample))
     }
 }
 
-class SquareWave(note: Note, duration: Seconds) : WaveGenerator(note, duration) {
+class SquareWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGenerator(note, duration, volume) {
     override fun generate(sample: Int): Float {
         val value = sin(angle(sample))
         return if (value > 0f) {
@@ -58,7 +59,7 @@ class SquareWave(note: Note, duration: Seconds) : WaveGenerator(note, duration) 
     }
 }
 
-class TriangleWave(note: Note, duration: Seconds) : WaveGenerator(note, duration) {
+class TriangleWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGenerator(note, duration, volume) {
     override fun generate(sample: Int): Float {
         val angle = angle(sample)
         return if (angle < PI) {
@@ -69,7 +70,7 @@ class TriangleWave(note: Note, duration: Seconds) : WaveGenerator(note, duration
     }
 }
 
-class NoiseWave(note: Note, duration: Seconds) : WaveGenerator(note, duration) {
+class NoiseWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGenerator(note, duration, volume) {
 
     private var lastNoise = 0.0f
     override fun generate(sample: Int): Float {
@@ -80,7 +81,7 @@ class NoiseWave(note: Note, duration: Seconds) : WaveGenerator(note, duration) {
     }
 }
 
-class PulseWave(note: Note, duration: Seconds) : WaveGenerator(note, duration) {
+class PulseWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGenerator(note, duration, volume) {
     override fun generate(sample: Int): Float {
         val angle = angle(sample)
 

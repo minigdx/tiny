@@ -23,7 +23,8 @@ interface SoundManager {
         var result = 0f
         notes.forEach {
             if (it.accept(sample)) {
-                result = result.toRawBits().or(it.generate(sample).toRawBits()).toFloat()
+                val sampleValue = it.generate(sample) * it.volume
+                result += sampleValue
             }
         }
         return result
