@@ -6,6 +6,8 @@ import com.github.minigdx.tiny.sound.MidiSound
 import com.github.minigdx.tiny.sound.SoundManager
 import com.github.minigdx.tiny.sound.SoundManager.Companion.SAMPLE_RATE
 import com.github.minigdx.tiny.sound.WaveGenerator
+import org.khronos.webgl.Float32Array
+import org.khronos.webgl.set
 
 class PicoAudioSound(val audio: dynamic, val smf: dynamic) : MidiSound {
     override fun play() {
@@ -39,27 +41,30 @@ class PicoAudioSoundMananger : SoundManager {
         return PicoAudioSound(audio, smf)
     }
 
-    private fun toAudioBuffer(wave: WaveGenerator): AudioBuffer {
+    private fun toAudioBuffer(notes: List<WaveGenerator>, longuestDuration: Seconds): AudioBuffer {
+        val numSamples = (longuestDuration * SAMPLE_RATE).toInt()
+
         val audioBuffer = audioContext.createBuffer(
             1,
-            (wave.duration * SAMPLE_RATE).toInt(),
+            numSamples,
             SAMPLE_RATE,
         )
         val channel = audioBuffer.getChannelData(0)
 
-        val numSamples: Int = (SAMPLE_RATE * wave.duration).toInt()
-
-        val values = (0 until numSamples).map { index ->
-            wave.generate(index)
+        val result = Float32Array((SAMPLE_RATE * longuestDuration).toInt())
+        (0 until numSamples).forEach { index ->
+            val signal = mix(index, notes)
+            result[index] = signal
         }
-        channel.set(values.toTypedArray())
+        channel.set(result)
         return audioBuffer
     }
+
     override fun playNotes(notes: List<WaveGenerator>, longuestDuration: Seconds) {
-        // FIXME: how to merge waves??
-        val firstWave = notes.firstOrNull() ?: return
+        if (notes.isEmpty()) return
+
         val source = audioContext.createBufferSource()
-        source.buffer = toAudioBuffer(firstWave)
+        source.buffer = toAudioBuffer(notes, longuestDuration)
         source.connect(audioContext.destination)
         source.start()
     }

@@ -7,14 +7,23 @@ import kotlin.math.abs
 import kotlin.math.sin
 import kotlin.random.Random
 
-sealed class WaveGenerator(val note: Note, val duration: Seconds) {
+sealed class WaveGenerator(note: Note, val duration: Seconds) {
 
     val period = SAMPLE_RATE.toFloat() / note.frequency
+
+    val numberOfSample = SAMPLE_RATE * duration
 
     /**
      * Return a value between -1.0 and 1.0
      */
     abstract fun generate(sample: Int): Float
+
+    /**
+     * Is a wave can be generated for this sample?
+     */
+    internal fun accept(sample: Int): Boolean {
+        return sample < numberOfSample
+    }
 
     internal fun angle(sample: Int): Float {
         return (TWO_PI * sample) / period

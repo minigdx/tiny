@@ -14,7 +14,6 @@ import javax.sound.sampled.AudioFormat
 import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.SourceDataLine
 import kotlin.experimental.and
-import kotlin.experimental.or
 
 class JavaMidiSound(private val data: ByteArray) : MidiSound {
 
@@ -84,28 +83,17 @@ class JavaMidiSoundManager : SoundManager {
     override fun playNotes(notes: List<WaveGenerator>, longuestDuration: Seconds) {
         if (notes.isEmpty()) return
 
-        // TODO: boucle sur les notes.
-        //   regarder dans le buffer et faire un + entre note et buffer
-        //   write le tout et let's go
-        //   mettre a jour la List : LiveNote(note, duration, type)
         buffer = ByteArray((longuestDuration * SAMPLE_RATE).toInt() * 2)
-        notes.forEach { wave ->
-            val numSamples: Int = (SAMPLE_RATE * wave.duration).toInt()
+        val numSamples: Int = (SAMPLE_RATE * longuestDuration).toInt()
+        for (i in 0 until numSamples) {
+            val sample = mix(i, notes)
 
-            for (i in 0 until numSamples) {
-                val byteA = buffer[2 * i] and 0xFF.toByte()
-                val byteB = (buffer[2 * i + 1]).toInt().shl(8).toByte()
+            val sampleValue: Float = (sample * Short.MAX_VALUE)
+            val clippedValue = sampleValue.coerceIn(Short.MIN_VALUE.toFloat(), Short.MAX_VALUE.toFloat())
+            val result = clippedValue.toInt().toShort()
 
-                // TODO: le mix de note n'est pas bon.
-                // TODO: la fin du son n'est pas ouf.
-                val actualBuffer = byteA.or(byteB).toShort()
-
-                val sample = wave.generate(i)
-                val sampleValue = (Short.MAX_VALUE * sample).toInt().toShort() + actualBuffer
-
-                buffer[2 * i] = (sampleValue and 0xFF).toByte()
-                buffer[2 * i + 1] = ((sampleValue shr 8) and 0xFF).toByte()
-            }
+            buffer[2 * i] = (result and 0xFF).toByte()
+            buffer[2 * i + 1] = (result.toInt().shr(8) and 0xFF).toByte()
         }
 
         // generate the byte array

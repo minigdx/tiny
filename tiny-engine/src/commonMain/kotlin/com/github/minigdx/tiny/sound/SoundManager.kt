@@ -19,6 +19,16 @@ interface SoundManager {
 
     fun playNotes(notes: List<WaveGenerator>, longuestDuration: Seconds)
 
+    fun mix(sample: Int, notes: List<WaveGenerator>): Float {
+        var result = 0f
+        notes.forEach {
+            if (it.accept(sample)) {
+                result = result.toRawBits().or(it.generate(sample).toRawBits()).toFloat()
+            }
+        }
+        return result
+    }
+
     companion object {
 
         const val SAMPLE_RATE = 44100
