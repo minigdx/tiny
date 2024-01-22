@@ -40,7 +40,10 @@ class SfxLib(
     abstract inner class WaveFunction : TwoArgFunction() {
         private val notes = Note.values()
 
-        override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("note", description = "Note from c0 to b8. Please check `note` for more information.") arg1: LuaValue,
+            @TinyArg("duration", description = "Duration in the note in seconds (default 0.1 second)") arg2: LuaValue,
+        ): LuaValue {
             val note = if (arg1.isint()) {
                 notes[arg1.checkint()]
             } else {
@@ -55,18 +58,22 @@ class SfxLib(
         abstract fun wave(note: Note, duration: Seconds): WaveGenerator
     }
 
+    @TinyFunction("Generate and play a sine wave sound.")
     inner class sine : WaveFunction() {
         override fun wave(note: Note, duration: Seconds) = SineWave(note, duration)
     }
 
+    @TinyFunction("Generate and play a sawtooth wave sound.")
     inner class sawtooth : WaveFunction() {
         override fun wave(note: Note, duration: Seconds) = SawTooth(note, duration)
     }
 
+    @TinyFunction("Generate and play a square wave sound.")
     inner class square : WaveFunction() {
         override fun wave(note: Note, duration: Seconds) = SquareWave(note, duration)
     }
 
+    @TinyFunction("Generate and play a triangle wave sound.")
     inner class triangle : WaveFunction() {
         override fun wave(note: Note, duration: Seconds) = TriangleWave(note, duration)
     }
