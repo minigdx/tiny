@@ -84,15 +84,13 @@ class JavaMidiSoundManager : SoundManager {
     override fun playNotes(notes: List<WaveGenerator>, longuestDuration: Seconds) {
         if (notes.isEmpty()) return
 
-        val sampleRate = SAMPLE_RATE
-
         // TODO: boucle sur les notes.
         //   regarder dans le buffer et faire un + entre note et buffer
         //   write le tout et let's go
         //   mettre a jour la List : LiveNote(note, duration, type)
-        buffer = ByteArray((longuestDuration * sampleRate).toInt() * 2)
+        buffer = ByteArray((longuestDuration * SAMPLE_RATE).toInt() * 2)
         notes.forEach { wave ->
-            val numSamples: Int = (sampleRate * wave.duration).toInt()
+            val numSamples: Int = (SAMPLE_RATE * wave.duration).toInt()
 
             for (i in 0 until numSamples) {
                 val byteA = buffer[2 * i] and 0xFF.toByte()

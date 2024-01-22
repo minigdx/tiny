@@ -7,7 +7,6 @@ import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
-import com.github.minigdx.tiny.lua.Note
 import com.github.minigdx.tiny.platform.ImageData
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.RenderContext
@@ -15,6 +14,7 @@ import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.sound.MidiSound
 import com.github.minigdx.tiny.sound.SoundManager
+import com.github.minigdx.tiny.sound.WaveGenerator
 import com.github.minigdx.tiny.util.MutableFixedSizeList
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -88,9 +88,7 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
                 }
             }
 
-            override fun playNotes(notes: List<Pair<Note, Seconds>>, longuestDuration: Seconds) {
-                TODO("Not yet implemented")
-            }
+            override fun playNotes(notes: List<WaveGenerator>, longuestDuration: Seconds) = Unit
         }
     }
 

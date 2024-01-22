@@ -7,6 +7,8 @@ import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.resources.Sound
+import com.github.minigdx.tiny.sound.NoiseWave
+import com.github.minigdx.tiny.sound.PulseWave
 import com.github.minigdx.tiny.sound.SawTooth
 import com.github.minigdx.tiny.sound.SineWave
 import com.github.minigdx.tiny.sound.SquareWave
@@ -31,6 +33,8 @@ class SfxLib(
         ctrl.set("sine", sine())
         ctrl.set("square", square())
         ctrl.set("triangle", triangle())
+        ctrl.set("noise", noise())
+        ctrl.set("pulse", pulse())
         ctrl.set("saw", sawtooth())
         arg2.set("sfx", ctrl)
         arg2.get("package").get("loaded").set("sfx", ctrl)
@@ -76,6 +80,16 @@ class SfxLib(
     @TinyFunction("Generate and play a triangle wave sound.")
     inner class triangle : WaveFunction() {
         override fun wave(note: Note, duration: Seconds) = TriangleWave(note, duration)
+    }
+
+    @TinyFunction("Generate and play a noise wave sound.")
+    inner class noise : WaveFunction() {
+        override fun wave(note: Note, duration: Seconds) = NoiseWave(note, duration)
+    }
+
+    @TinyFunction("Generate and play a pulse wave sound.")
+    inner class pulse : WaveFunction() {
+        override fun wave(note: Note, duration: Seconds) = PulseWave(note, duration)
     }
 
     @TinyFunction(

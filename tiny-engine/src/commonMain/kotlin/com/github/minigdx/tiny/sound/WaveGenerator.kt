@@ -3,7 +3,9 @@ package com.github.minigdx.tiny.sound
 import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.lua.Note
 import com.github.minigdx.tiny.sound.SoundManager.Companion.SAMPLE_RATE
+import kotlin.math.abs
 import kotlin.math.sin
+import kotlin.random.Random
 
 sealed class WaveGenerator(val note: Note, val duration: Seconds) {
 
@@ -29,6 +31,7 @@ class SawTooth(note: Note, duration: Seconds) : WaveGenerator(note, duration) {
         return (2 * (angle(sample) / TWO_PI))
     }
 }
+
 class SineWave(note: Note, duration: Seconds) : WaveGenerator(note, duration) {
     override fun generate(sample: Int): Float {
         return sin(angle(sample))
@@ -54,5 +57,28 @@ class TriangleWave(note: Note, duration: Seconds) : WaveGenerator(note, duration
         } else {
             2 * (PI - angle) / PI + 1
         }
+    }
+}
+
+class NoiseWave(note: Note, duration: Seconds) : WaveGenerator(note, duration) {
+
+    private var lastNoise = 0.0f
+    override fun generate(sample: Int): Float {
+        val white = Random.nextFloat() * 2 - 1
+        val brown = (lastNoise + (0.02f * white)) / 1.02f
+        lastNoise = brown
+        return brown * 3.5f
+    }
+}
+
+class PulseWave(note: Note, duration: Seconds) : WaveGenerator(note, duration) {
+    override fun generate(sample: Int): Float {
+        val angle = angle(sample)
+
+        val t = angle % 1
+        val k = abs(2.0 * ((angle / 128.0) % 1.0) - 1.0)
+        val u = (t + 0.5 * k) % 1.0
+        val ret = abs(4.0 * u - 2.0) - abs(8.0 * t - 4.0)
+        return (ret / 6.0).toFloat()
     }
 }
