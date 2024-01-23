@@ -43,6 +43,7 @@ class PicoAudioSoundMananger : SoundManager {
 
     private fun toAudioBuffer(notes: List<WaveGenerator>, longestDuration: Seconds): AudioBuffer {
         val numSamples = (longestDuration * SAMPLE_RATE).toInt()
+        val fadeOutIndex = getFadeOutIndex(longestDuration)
 
         val audioBuffer = audioContext.createBuffer(
             1,
@@ -51,9 +52,9 @@ class PicoAudioSoundMananger : SoundManager {
         )
         val channel = audioBuffer.getChannelData(0)
 
-        val result = Float32Array((SAMPLE_RATE * longestDuration).toInt())
+        val result = Float32Array(numSamples)
         (0 until numSamples).forEach { index ->
-            val signal = mix(index, notes)
+            val signal = fadeOut(mix(index, notes), index, fadeOutIndex, numSamples)
             result[index] = signal
         }
         channel.set(result)

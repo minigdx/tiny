@@ -30,8 +30,21 @@ interface SoundManager {
         return result
     }
 
+    fun getFadeOutIndex(longestDuration: Seconds): Int {
+        return ((longestDuration - FADE_OUT_DURATION) * SAMPLE_RATE).toInt()
+    }
+
+    fun fadeOut(sample: Float, index: Int, fadeOutIndex: Int, endIndex: Int): Float {
+        return if (index < fadeOutIndex) {
+            sample
+        } else {
+            sample * (endIndex - index) / (endIndex - fadeOutIndex).toFloat()
+        }
+    }
+
     companion object {
 
         const val SAMPLE_RATE = 44100
+        private const val FADE_OUT_DURATION: Seconds = 0.5f
     }
 }

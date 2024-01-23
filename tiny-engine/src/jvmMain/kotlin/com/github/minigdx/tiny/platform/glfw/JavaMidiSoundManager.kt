@@ -7,12 +7,13 @@ import com.github.minigdx.tiny.sound.SoundManager
 import com.github.minigdx.tiny.sound.SoundManager.Companion.SAMPLE_RATE
 import com.github.minigdx.tiny.sound.WaveGenerator
 import java.io.ByteArrayInputStream
+import java.util.concurrent.ArrayBlockingQueue
+import java.util.concurrent.BlockingQueue
 import javax.sound.midi.MidiSystem
 import javax.sound.midi.Sequencer
 import javax.sound.midi.Sequencer.LOOP_CONTINUOUSLY
 import javax.sound.sampled.AudioFormat
 import javax.sound.sampled.AudioSystem
-import javax.sound.sampled.SourceDataLine
 import kotlin.experimental.and
 
 class JavaMidiSound(private val data: ByteArray) : MidiSound {
@@ -55,25 +56,38 @@ class JavaMidiSound(private val data: ByteArray) : MidiSound {
 
 class JavaMidiSoundManager : SoundManager {
 
-    private lateinit var notesLine: SourceDataLine
+    // When closing the application, switch isActive to false to stop the background thread.
+    private var isActive = true
 
-    private var buffer = ByteArray(0)
+    private val bufferQueue: BlockingQueue<ByteArray> = ArrayBlockingQueue(10)
+
+    private val backgroundAudio = object : Thread() {
+        override fun run() {
+            val notesLine = AudioSystem.getSourceDataLine(
+                AudioFormat(
+                    AudioFormat.Encoding.PCM_SIGNED,
+                    SoundManager.SAMPLE_RATE.toFloat(),
+                    16,
+                    1, // TODO: set 2 to get Stereo
+                    2,
+                    SoundManager.SAMPLE_RATE.toFloat(),
+                    false,
+                ),
+            )
+
+            notesLine.open()
+            notesLine.start()
+
+            while (isActive) {
+                val nextBuffer = bufferQueue.take()
+                notesLine.write(nextBuffer, 0, nextBuffer.size)
+            }
+            notesLine.close()
+        }
+    }
 
     override fun initSoundManager(inputHandler: InputHandler) {
-        notesLine = AudioSystem.getSourceDataLine(
-            AudioFormat(
-                AudioFormat.Encoding.PCM_SIGNED,
-                SoundManager.SAMPLE_RATE.toFloat(),
-                16,
-                1, // TODO: set 2 to get Stereo
-                2,
-                SoundManager.SAMPLE_RATE.toFloat(),
-                false,
-            ),
-        )
-
-        notesLine.open()
-        notesLine.start()
+        backgroundAudio.start()
     }
 
     override suspend fun createSound(data: ByteArray): MidiSound {
@@ -83,10 +97,12 @@ class JavaMidiSoundManager : SoundManager {
     override fun playNotes(notes: List<WaveGenerator>, longestDuration: Seconds) {
         if (notes.isEmpty()) return
 
-        buffer = ByteArray((longestDuration * SAMPLE_RATE).toInt() * 2)
         val numSamples: Int = (SAMPLE_RATE * longestDuration).toInt()
+        val buffer = ByteArray(numSamples * 2)
+        val fadeOutIndex = getFadeOutIndex(longestDuration)
+
         for (i in 0 until numSamples) {
-            val sample = mix(i, notes)
+            val sample = fadeOut(mix(i, notes), i, fadeOutIndex, numSamples)
 
             val sampleValue: Float = (sample * Short.MAX_VALUE)
             val clippedValue = sampleValue.coerceIn(Short.MIN_VALUE.toFloat(), Short.MAX_VALUE.toFloat())
@@ -96,7 +112,6 @@ class JavaMidiSoundManager : SoundManager {
             buffer[2 * i + 1] = (result.toInt().shr(8) and 0xFF).toByte()
         }
 
-        // generate the byte array
-        notesLine.write(buffer, 0, buffer.size)
+        bufferQueue.offer(buffer)
     }
 }
