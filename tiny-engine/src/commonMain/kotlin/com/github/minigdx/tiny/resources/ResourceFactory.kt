@@ -151,6 +151,8 @@ class ResourceFactory(
     fun bootscript(name: String, inputHandler: InputHandler, gameOptions: GameOptions) =
         script(0, name, inputHandler, gameOptions, BOOT_GAMESCRIPT)
 
+    private val protectedResources = setOf(BOOT_GAMESCRIPT, ENGINE_GAMESCRIPT, BOOT_SPRITESHEET)
+
     private fun script(
         index: Int,
         name: String,
@@ -159,7 +161,12 @@ class ResourceFactory(
         resourceType: ResourceType,
     ): Flow<GameScript> {
         var version = 0
-        return vfs.watch(platform.createByteArrayStream(name)).map { content ->
+        return vfs.watch(
+            platform.createByteArrayStream(
+                name = name,
+                canUseJarPrefix = !protectedResources.contains(resourceType),
+            ),
+        ).map { content ->
             GameScript(version++, index, name, gameOptions, inputHandler, resourceType).apply {
                 this.content = content
             }
@@ -180,7 +187,12 @@ class ResourceFactory(
 
     private fun spritesheet(index: Int, name: String, resourceType: ResourceType): Flow<SpriteSheet> {
         var version = 0
-        return vfs.watch(platform.createImageStream(name)).map { imageData ->
+        return vfs.watch(
+            platform.createImageStream(
+                name = name,
+                canUseJarPrefix = !protectedResources.contains(resourceType),
+            ),
+        ).map { imageData ->
             val sheet = convertToColorIndex(imageData.data, imageData.width, imageData.height)
             SpriteSheet(version++, index, name, resourceType, sheet, imageData.width, imageData.height)
         }.onEach {

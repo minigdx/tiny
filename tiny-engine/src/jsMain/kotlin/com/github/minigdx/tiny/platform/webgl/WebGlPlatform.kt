@@ -91,11 +91,11 @@ class WebGlPlatform(
         return Dispatchers.Default
     }
 
-    override fun createByteArrayStream(name: String): SourceStream<ByteArray> {
+    override fun createByteArrayStream(name: String, canUseJarPrefix: Boolean): SourceStream<ByteArray> {
         return AjaxStream("$rootUrl/$name")
     }
 
-    override fun createImageStream(name: String): SourceStream<ImageData> {
+    override fun createImageStream(name: String, canUseJarPrefix: Boolean): SourceStream<ImageData> {
         return ImageDataStream("$rootUrl/$name")
     }
 

@@ -67,7 +67,7 @@ class GameScript(
 
     class State(val args: LuaValue)
 
-    private fun createLuaGlobals(forValidation: Boolean = false): Globals = Globals().apply {
+    private fun createLuaGlobals(customizeLuaGlobal: GameResourceAccess.(Globals) -> Unit, forValidation: Boolean = false): Globals = Globals().apply {
         val sprLib = SprLib(this@GameScript.gameOptions, this@GameScript.resourceAccess)
 
         load(TinyBaseLib(this@GameScript.resourceAccess))
@@ -90,20 +90,23 @@ class GameScript(
         load(sprLib)
         load(JuiceLib())
         load(NotesLib())
+
+        this@GameScript.resourceAccess.customizeLuaGlobal(this)
+
         LoadState.install(this)
         LuaC.install(this)
     }
 
-    suspend fun isValid(): Boolean {
-        with(createLuaGlobals(forValidation = true)) {
+    suspend fun isValid(customizeLuaGlobal: GameResourceAccess.(Globals) -> Unit): Boolean {
+        with(createLuaGlobals(customizeLuaGlobal, forValidation = true)) {
             load(content.decodeToString()).call()
             get("_init").nullIfNil()?.callSuspend(valueOf(gameOptions.width), valueOf(gameOptions.height))
         }
         return true
     }
 
-    suspend fun evaluate() {
-        globals = createLuaGlobals()
+    suspend fun evaluate(customizeLuaGlobal: GameResourceAccess.(Globals) -> Unit) {
+        globals = createLuaGlobals(customizeLuaGlobal)
 
         evaluated = true
         exited = -1

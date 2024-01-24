@@ -97,6 +97,15 @@ class JavaMidiSoundManager : SoundManager {
     override fun playNotes(notes: List<WaveGenerator>, longestDuration: Seconds) {
         if (notes.isEmpty()) return
 
+        val buffer = generateAudioBuffer(longestDuration, notes)
+
+        bufferQueue.offer(buffer)
+    }
+
+    private fun generateAudioBuffer(
+        longestDuration: Seconds,
+        notes: List<WaveGenerator>,
+    ): ByteArray {
         val numSamples: Int = (SAMPLE_RATE * longestDuration).toInt()
         val buffer = ByteArray(numSamples * 2)
         val fadeOutIndex = getFadeOutIndex(longestDuration)
@@ -111,7 +120,21 @@ class JavaMidiSoundManager : SoundManager {
             buffer[2 * i] = (result and 0xFF).toByte()
             buffer[2 * i + 1] = (result.toInt().shr(8) and 0xFF).toByte()
         }
+        return buffer
+    }
 
-        bufferQueue.offer(buffer)
+    override fun playSfx(notes: List<WaveGenerator>) {
+        if (notes.isEmpty()) return
+
+        val numSamples: Int = (SAMPLE_RATE * notes.first().duration * notes.size).toInt()
+        val sfxBuffer = ByteArray(numSamples * 2)
+        var currentIndex = 0
+        notes.forEach {
+            val buffer = generateAudioBuffer(it.duration, listOf(it))
+            buffer.copyInto(sfxBuffer, destinationOffset = currentIndex)
+            currentIndex += buffer.size
+        }
+
+        bufferQueue.offer(sfxBuffer)
     }
 }

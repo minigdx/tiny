@@ -19,6 +19,8 @@ interface SoundManager {
 
     fun playNotes(notes: List<WaveGenerator>, longestDuration: Seconds)
 
+    fun playSfx(notes: List<WaveGenerator>)
+
     fun mix(sample: Int, notes: List<WaveGenerator>): Float {
         var result = 0f
         notes.forEach {

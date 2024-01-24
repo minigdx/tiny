@@ -49,6 +49,7 @@ class GlfwPlatform(
     private val vfs: VirtualFileSystem,
     private val workdirectory: File,
     private val render: Render = GLRender(KglLwjgl, logger, gameOptions),
+    private val jarResourcePrefix: String = "",
 ) : Platform {
 
     private var window: Long = 0
@@ -308,8 +309,14 @@ class GlfwPlatform(
         return ImageData(result, width, height)
     }
 
-    override fun createByteArrayStream(name: String): SourceStream<ByteArray> {
-        val fromJar = GlfwPlatform::class.java.getResourceAsStream("/$name")
+    override fun createByteArrayStream(name: String, canUseJarPrefix: Boolean): SourceStream<ByteArray> {
+        val resourceName = if (canUseJarPrefix) {
+            "$jarResourcePrefix/$name"
+        } else {
+            "/$name"
+        }
+
+        val fromJar = GlfwPlatform::class.java.getResourceAsStream(resourceName)
         return if (fromJar != null) {
             InputStreamStream(fromJar)
         } else {
@@ -317,10 +324,10 @@ class GlfwPlatform(
         }
     }
 
-    override fun createImageStream(name: String): SourceStream<ImageData> {
+    override fun createImageStream(name: String, canUseJarPrefix: Boolean): SourceStream<ImageData> {
         return object : SourceStream<ImageData> {
 
-            private val delegate = createByteArrayStream(name)
+            private val delegate = createByteArrayStream(name, canUseJarPrefix)
 
             override suspend fun exists(): Boolean = delegate.exists()
 

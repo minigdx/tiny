@@ -89,6 +89,7 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
             }
 
             override fun playNotes(notes: List<WaveGenerator>, longestDuration: Seconds) = Unit
+            override fun playSfx(notes: List<WaveGenerator>) = Unit
         }
     }
 
@@ -96,13 +97,13 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
         return Dispatchers.Unconfined
     }
 
-    override fun createByteArrayStream(name: String): SourceStream<ByteArray> {
+    override fun createByteArrayStream(name: String, canUseJarPrefix: Boolean): SourceStream<ByteArray> {
         val data = (resources[name] as? String?)?.encodeToByteArray() ?: resources[name] as? ByteArray
             ?: throw IllegalStateException("$name is not a valid ByteArray.")
         return ObjectStream(data)
     }
 
-    override fun createImageStream(name: String): SourceStream<ImageData> {
+    override fun createImageStream(name: String, canUseJarPrefix: Boolean): SourceStream<ImageData> {
         val data = resources[name] as? ImageData ?: throw IllegalStateException("$name is not a valid ImageData.")
         return ObjectStream(data)
     }

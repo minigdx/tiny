@@ -47,6 +47,12 @@ interface GameResourceAccess {
      */
     fun sound(index: Int): Sound?
 
+    /**
+     * Play a note represented by a wave.
+     *
+     * All notes added in the same update loop will be played at the same time
+     * at the end of the update loop.
+     */
     fun note(wave: WaveGenerator)
 
     /**

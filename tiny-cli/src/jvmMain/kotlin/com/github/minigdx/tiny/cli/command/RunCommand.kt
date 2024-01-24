@@ -18,8 +18,8 @@ import java.io.File
 class RunCommand : CliktCommand(name = "run", help = "Run your game.") {
 
     val gameDirectory by argument(help = "The directory containing all game information")
-        .file(mustExist = true, canBeDir = true, canBeFile = false)
-        .default(File("."))
+            .file(mustExist = true, canBeDir = true, canBeFile = false)
+            .default(File("."))
 
     fun isOracleOrOpenJDK(): Boolean {
         val vendor = System.getProperty("java.vendor")?.lowercase()

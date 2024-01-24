@@ -46,7 +46,7 @@ class SfxLib(
     }
 
     abstract inner class WaveFunction : ThreeArgFunction() {
-        private val notes = Note.values()
+        private val notes = Note.values().associateBy { it.index }
 
         override fun call(
             @TinyArg(
@@ -57,7 +57,7 @@ class SfxLib(
             @TinyArg("volume", description = "Volume express in percentage (between 0.0 and 1.0)") arg3: LuaValue,
         ): LuaValue {
             val note = if (arg1.isint()) {
-                notes[arg1.checkint()]
+                notes[arg1.checkint()] ?: return NIL
             } else {
                 return NIL
             }

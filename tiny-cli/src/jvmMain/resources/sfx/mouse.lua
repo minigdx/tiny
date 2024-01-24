@@ -13,9 +13,9 @@ mouse._update = function(on_click)
     mouse.x = pos.x
     mouse.y = pos.y
 
-    local clicked = ctrl.touched(0)
+    local clicked = ctrl.touching(0)
     if clicked then
-        on_click(clicked.x, clicked.y)
+        on_click(pos.x, pos.y)
     end
 end
 

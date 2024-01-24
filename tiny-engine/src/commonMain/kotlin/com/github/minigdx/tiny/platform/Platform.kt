@@ -83,12 +83,12 @@ interface Platform {
      * Create a SourceStream from the name of the resource.
      * Regarding the platform, the name can be adjusted.
      */
-    fun createByteArrayStream(name: String): SourceStream<ByteArray>
+    fun createByteArrayStream(name: String, canUseJarPrefix: Boolean = true): SourceStream<ByteArray>
 
     /**
      * Create a SourceStream from an image from uncompressed data.
      */
-    fun createImageStream(name: String): SourceStream<ImageData>
+    fun createImageStream(name: String, canUseJarPrefix: Boolean = true): SourceStream<ImageData>
 
     /**
      * Create a SourceStream from a midi file.

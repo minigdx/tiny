@@ -174,7 +174,7 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
 
     override fun io(): CoroutineDispatcher = delegate.io()
 
-    override fun createByteArrayStream(name: String): SourceStream<ByteArray> {
+    override fun createByteArrayStream(name: String, canUseJarPrefix: Boolean): SourceStream<ByteArray> {
         return if (name.startsWith("#")) {
             EditorStream(name)
         } else {
@@ -182,6 +182,8 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
         }
     }
 
-    override fun createImageStream(name: String): SourceStream<ImageData> = delegate.createImageStream(name)
+    override fun createImageStream(name: String, canUseJarPrefix: Boolean): SourceStream<ImageData> = delegate.createImageStream(
+        name,
+    )
     override fun createSoundStream(name: String): SourceStream<SoundData> = delegate.createSoundStream(name)
 }

@@ -14,6 +14,7 @@ class MainCommand : CliktCommand(invokeWithoutSubcommand = true) {
             ServeCommand(),
             LibCommand(),
             PaletteCommand(),
+            SfxCommand(),
         )
     }
 

@@ -92,3 +92,9 @@ class PulseWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGen
         return (ret / 6.0).toFloat()
     }
 }
+
+class SilenceWave(duration: Seconds) : WaveGenerator(Note.C0, duration, 1.0f) {
+    override fun generate(sample: Int): Float {
+        return 0f
+    }
+}
