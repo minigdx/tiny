@@ -62,7 +62,31 @@ class PicoAudioSoundMananger : SoundManager {
     }
 
     override fun playSfx(notes: List<WaveGenerator>) {
-        TODO("Not yet implemented")
+        if (notes.isEmpty()) return
+
+        val numSamples: Int = (SAMPLE_RATE * notes.first().duration * notes.size).toInt()
+        val sfxBuffer = audioContext.createBuffer(
+            1,
+            numSamples,
+            SAMPLE_RATE,
+        )
+
+        var currentIndex = 0
+        val result = Float32Array(numSamples)
+        val channel = sfxBuffer.getChannelData(0)
+
+        notes.forEach {
+            val buffer = toAudioBuffer(listOf(it), it.duration)
+            result.set(buffer.getChannelData(0), currentIndex)
+            currentIndex += buffer.getChannelData(0).length
+        }
+
+        channel.set(result)
+
+        val source = audioContext.createBufferSource()
+        source.buffer = sfxBuffer
+        source.connect(audioContext.destination)
+        source.start()
     }
 
     override fun playNotes(notes: List<WaveGenerator>, longestDuration: Seconds) {
