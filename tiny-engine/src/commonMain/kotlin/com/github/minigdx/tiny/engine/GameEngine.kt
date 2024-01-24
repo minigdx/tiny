@@ -95,6 +95,7 @@ class GameEngine(
     private val debugActions = mutableListOf<DebugAction>()
 
     private val notes = mutableListOf<WaveGenerator>()
+    private var sfx: List<WaveGenerator>? = null
     private var longuestDuration: Seconds = 0f
 
     private lateinit var scripts: Array<GameScript?>
@@ -327,6 +328,9 @@ class GameEngine(
             notes.clear()
             longuestDuration = 0f
 
+            sfx?.run { soundManager.playSfx(this) }
+            sfx = null
+
             // Fixed step simulation
             accumulator += delta
             if (accumulator >= REFRESH_LIMIT) {
@@ -482,6 +486,10 @@ class GameEngine(
     override fun note(wave: WaveGenerator) {
         longuestDuration = max(longuestDuration, wave.duration)
         notes.add(wave)
+    }
+
+    override fun sfx(waves: List<WaveGenerator>) {
+        sfx = waves
     }
 
     override fun script(name: String): GameScript? {

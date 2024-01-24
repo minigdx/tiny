@@ -11,6 +11,7 @@ import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.sound.NoiseWave
 import com.github.minigdx.tiny.sound.PulseWave
 import com.github.minigdx.tiny.sound.SawTooth
+import com.github.minigdx.tiny.sound.SilenceWave
 import com.github.minigdx.tiny.sound.SineWave
 import com.github.minigdx.tiny.sound.SquareWave
 import com.github.minigdx.tiny.sound.TriangleWave
@@ -40,6 +41,7 @@ class SfxLib(
         ctrl.set("noise", noise())
         ctrl.set("pulse", pulse())
         ctrl.set("saw", sawtooth())
+        ctrl.set("sfx", sfx())
         arg2.set("sfx", ctrl)
         arg2.get("package").get("loaded").set("sfx", ctrl)
         return ctrl
@@ -155,6 +157,52 @@ class SfxLib(
                 0
             }
             canPlay(resourceAccess.sound(index))?.stop()
+            return NIL
+        }
+    }
+
+    private fun extractNote(str: String): Note {
+        val note = str.substringAfter("(").substringBefore(")")
+        return Note.valueOf(note)
+    }
+
+    inner class sfx : TwoArgFunction() {
+
+        private val acceptedTypes = setOf("sine", "noise", "pulse", "triangle")
+        private fun extractWaveType(str: String): String? {
+            if (str == "*") return str
+
+            val type = str.substringBefore("(")
+            return if (acceptedTypes.contains(type)) {
+                type
+            } else {
+                null
+            }
+        }
+
+        private fun trim(str: String): String {
+            val lastIndex = str.lastIndexOf(')')
+            if (lastIndex < 0) return str
+            return str.substring(0, lastIndex + 2)
+        }
+
+        override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
+            val bpm = arg2.optint(120)
+            val duration = 60 / bpm.toFloat() / 4
+            val score = arg1.optjstring("")!!
+            val parts = trim(score).split("-")
+            val waves = parts.mapNotNull {
+                val wave = extractWaveType(it)
+                when (wave) {
+                    "*" -> SilenceWave(duration)
+                    "sine" -> SineWave(extractNote(it), duration)
+                    "triangle" -> TriangleWave(extractNote(it), duration)
+                    "noise" -> NoiseWave(extractNote(it), duration)
+                    "pulse" -> PulseWave(extractNote(it), duration)
+                    else -> null
+                }
+            }
+            resourceAccess.sfx(waves)
             return NIL
         }
     }

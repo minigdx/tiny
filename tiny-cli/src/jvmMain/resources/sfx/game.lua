@@ -74,7 +74,7 @@ function _update()
                 score = score .. "*-"
             end
         end
-        music.play(score, 220)
+        sfx.sfx(score, 220)
     end
 
     local new_wave = current_wave

@@ -56,6 +56,11 @@ interface GameResourceAccess {
     fun note(wave: WaveGenerator)
 
     /**
+     * Play the sfx represented by this list of waves.
+     */
+    fun sfx(waves: List<WaveGenerator>)
+
+    /**
      * Find a script by its name.
      */
     fun script(name: String): GameScript?
