@@ -108,7 +108,9 @@ class JavaMidiSoundManager : SoundManager {
 
             while (isActive) {
                 val nextBuffer = bufferQueue.take()
-                notesLine.write(nextBuffer, 0, nextBuffer.size)
+                if (isActive) {
+                    notesLine.write(nextBuffer, 0, nextBuffer.size)
+                }
             }
             notesLine.close()
         }
@@ -178,5 +180,10 @@ class JavaMidiSoundManager : SoundManager {
             currentIndex += buffer.size
         }
         return sfxBuffer
+    }
+
+    override fun destroy() {
+        isActive = false
+        bufferQueue.offer(ByteArray(0)) // unlock the thread to quit
     }
 }

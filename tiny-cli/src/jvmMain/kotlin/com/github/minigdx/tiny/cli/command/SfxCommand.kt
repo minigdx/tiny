@@ -44,7 +44,7 @@ class SfxCommand : CliktCommand(name = "sfx", help = "Start the SFX Editor") {
             val logger = StdOutLogger("tiny-cli")
             val vfs = CommonVirtualFileSystem()
             val gameOption = gameParameters.toGameOptions()
-            GameEngine(
+            val gameEngine = GameEngine(
                 gameOptions = gameOption,
                 platform = GlfwPlatform(
                     gameOption,
@@ -56,7 +56,14 @@ class SfxCommand : CliktCommand(name = "sfx", help = "Start the SFX Editor") {
                 ),
                 vfs = vfs,
                 logger = logger,
-            ).main()
+            )
+            Runtime.getRuntime().addShutdownHook(
+                Thread {
+                    gameEngine.end()
+                    echo("\uD83D\uDC4B See you soon!")
+                },
+            )
+            gameEngine.main()
         } catch (ex: Exception) {
             echo(
                 "\uD83E\uDDE8 An unexpected exception occurred. " +

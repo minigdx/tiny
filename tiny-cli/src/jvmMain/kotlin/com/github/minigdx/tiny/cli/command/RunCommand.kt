@@ -48,12 +48,19 @@ class RunCommand : CliktCommand(name = "run", help = "Run your game.") {
             val logger = StdOutLogger("tiny-cli")
             val vfs = CommonVirtualFileSystem()
             val gameOption = gameParameters.toGameOptions()
-            GameEngine(
+            val gameEngine = GameEngine(
                 gameOptions = gameOption,
                 platform = GlfwPlatform(gameOption, logger, vfs, gameDirectory, LwjglGLRender(logger, gameOption)),
                 vfs = vfs,
                 logger = logger,
-            ).main()
+            )
+            Runtime.getRuntime().addShutdownHook(
+                Thread {
+                    gameEngine.end()
+                    echo("\uD83D\uDC4B See you soon!")
+                },
+            )
+            gameEngine.main()
         } catch (ex: Exception) {
             echo("\uD83E\uDDE8 An unexpected exception occurred. The application will stop. It might be a bug in Tiny. If so, please report it.")
             when (ex) {

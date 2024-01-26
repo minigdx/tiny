@@ -15,6 +15,8 @@ interface SoundManager {
 
     fun initSoundManager(inputHandler: InputHandler)
 
+    fun destroy() = Unit
+
     suspend fun createSfxSound(bytes: ByteArray): Sound
 
     suspend fun createMidiSound(data: ByteArray): Sound

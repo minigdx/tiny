@@ -106,6 +106,13 @@ class ServeCommand : CliktCommand(name = "serve", help = "Run your game as a web
         val server = embeddedServer(Netty, port = port, module = method)
 
         echo("\uD83D\uDE80 Try your game on http://localhost:$port with your browser.")
+
+        Runtime.getRuntime().addShutdownHook(
+            Thread {
+                server.stop()
+                echo("\uD83D\uDC4B See you soon!")
+            },
+        )
         // Starts the server and waits for the engine to stop and exits.
         server.start(wait = true)
         // start a browser to the address

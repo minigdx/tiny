@@ -504,6 +504,7 @@ class GameEngine(
 
     override fun end() {
         sounds.forEach { it?.stop() }
+        soundManager.destroy()
     }
 
     companion object {
