@@ -38,6 +38,7 @@ class StdLibTest {
         override fun sound(index: Int): Sound? = null
         override fun script(name: String): GameScript? = null
         override fun note(wave: WaveGenerator) = Unit
+        override fun sfx(waves: List<WaveGenerator>) = Unit
     }
 
     private val gameOptions = GameOptions(

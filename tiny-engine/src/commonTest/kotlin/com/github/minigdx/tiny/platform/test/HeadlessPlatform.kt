@@ -77,6 +77,15 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
     override fun initSoundManager(inputHandler: InputHandler): SoundManager {
         return object : SoundManager {
             override fun initSoundManager(inputHandler: InputHandler) = Unit
+            override suspend fun createSfxSound(bytes: ByteArray): Sound {
+                return object : Sound {
+                    override fun play() = Unit
+
+                    override fun loop() = Unit
+
+                    override fun stop() = Unit
+                }
+            }
 
             override suspend fun createMidiSound(data: ByteArray): Sound {
                 return object : Sound {
