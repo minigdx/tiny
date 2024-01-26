@@ -2,14 +2,14 @@ package com.github.minigdx.tiny.platform.webgl
 
 import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.input.InputHandler
-import com.github.minigdx.tiny.sound.MidiSound
+import com.github.minigdx.tiny.sound.Sound
 import com.github.minigdx.tiny.sound.SoundManager
 import com.github.minigdx.tiny.sound.SoundManager.Companion.SAMPLE_RATE
 import com.github.minigdx.tiny.sound.WaveGenerator
 import org.khronos.webgl.Float32Array
 import org.khronos.webgl.set
 
-class PicoAudioSound(val audio: dynamic, val smf: dynamic) : MidiSound {
+class PicoAudioSound(val audio: dynamic, val smf: dynamic) : Sound {
     override fun play() {
         audio.init()
         audio.setData(smf)
@@ -35,7 +35,7 @@ class PicoAudioSoundMananger : SoundManager {
         audioContext = AudioContext()
     }
 
-    override suspend fun createSound(data: ByteArray): MidiSound {
+    override suspend fun createMidiSound(data: ByteArray): Sound {
         val audio = js("var PicoAudio = require('picoaudio'); new PicoAudio.default()")
         val smf = audio.parseSMF(data)
         return PicoAudioSound(audio, smf)

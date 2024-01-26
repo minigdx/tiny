@@ -14,7 +14,11 @@ class SoundDataSourceStream(
     override suspend fun read(): SoundData {
         val bytes = delegate.read()
 
-        val sound = soundManager.createSound(bytes)
+        val sound = if (name.endsWith(".sfx")) {
+            soundManager.createSfxSound(bytes)
+        } else {
+            soundManager.createMidiSound(bytes)
+        }
         return SoundData(name, sound)
     }
 

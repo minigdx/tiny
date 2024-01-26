@@ -40,7 +40,7 @@ class AddCommand : CliktCommand(name = "add", help = "Add a resource to your gam
                 // Add script
                 gameParameters = gameParameters.addScript(r)
                 "script"
-            } else if (r.endsWith("mid") || r.endsWith("midi")) {
+            } else if (r.endsWith("mid") || r.endsWith("midi") || r.endsWith("sfx")) {
                 // Add midi
                 gameParameters = gameParameters.addSound(r)
                 "sound"

@@ -3,7 +3,7 @@ package com.github.minigdx.tiny.sound
 import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.input.InputHandler
 
-interface MidiSound {
+interface Sound {
     fun play()
 
     fun loop()
@@ -15,7 +15,9 @@ interface SoundManager {
 
     fun initSoundManager(inputHandler: InputHandler)
 
-    suspend fun createSound(data: ByteArray): MidiSound
+    suspend fun createSfxSound(bytes: ByteArray): Sound
+
+    suspend fun createMidiSound(data: ByteArray): Sound
 
     fun playNotes(notes: List<WaveGenerator>, longestDuration: Seconds)
 

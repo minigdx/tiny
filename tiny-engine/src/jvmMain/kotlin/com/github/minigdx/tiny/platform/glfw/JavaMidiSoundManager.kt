@@ -2,7 +2,8 @@ package com.github.minigdx.tiny.platform.glfw
 
 import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.input.InputHandler
-import com.github.minigdx.tiny.sound.MidiSound
+import com.github.minigdx.tiny.lua.SfxLib
+import com.github.minigdx.tiny.sound.Sound
 import com.github.minigdx.tiny.sound.SoundManager
 import com.github.minigdx.tiny.sound.SoundManager.Companion.SAMPLE_RATE
 import com.github.minigdx.tiny.sound.WaveGenerator
@@ -13,10 +14,37 @@ import javax.sound.midi.MidiSystem
 import javax.sound.midi.Sequencer
 import javax.sound.midi.Sequencer.LOOP_CONTINUOUSLY
 import javax.sound.sampled.AudioFormat
+import javax.sound.sampled.AudioInputStream
 import javax.sound.sampled.AudioSystem
+import javax.sound.sampled.Clip
 import kotlin.experimental.and
 
-class JavaMidiSound(private val data: ByteArray) : MidiSound {
+class SfxSound(byteArray: ByteArray) : Sound {
+
+    private val clip: Clip
+
+    init {
+        val audioFormat = AudioFormat(SAMPLE_RATE.toFloat(), 16, 1, true, false)
+        val audioStream = AudioInputStream(ByteArrayInputStream(byteArray), audioFormat, byteArray.size.toLong())
+        clip = AudioSystem.getClip()
+        clip.open(audioStream)
+        //  audioStream.close()
+    }
+    override fun play() {
+        stop()
+        clip.start()
+    }
+
+    override fun loop() {
+        clip.loop(LOOP_CONTINUOUSLY)
+    }
+
+    override fun stop() {
+        clip.stop()
+        clip.framePosition = 0
+    }
+}
+class JavaMidiSound(private val data: ByteArray) : Sound {
 
     private var sequencer: Sequencer? = null
 
@@ -66,11 +94,11 @@ class JavaMidiSoundManager : SoundManager {
             val notesLine = AudioSystem.getSourceDataLine(
                 AudioFormat(
                     AudioFormat.Encoding.PCM_SIGNED,
-                    SoundManager.SAMPLE_RATE.toFloat(),
+                    SAMPLE_RATE.toFloat(),
                     16,
                     1, // TODO: set 2 to get Stereo
                     2,
-                    SoundManager.SAMPLE_RATE.toFloat(),
+                    SAMPLE_RATE.toFloat(),
                     false,
                 ),
             )
@@ -90,8 +118,17 @@ class JavaMidiSoundManager : SoundManager {
         backgroundAudio.start()
     }
 
-    override suspend fun createSound(data: ByteArray): MidiSound {
+    override suspend fun createMidiSound(data: ByteArray): Sound {
         return JavaMidiSound(data)
+    }
+
+    override suspend fun createSfxSound(bytes: ByteArray): Sound {
+        val score = bytes.decodeToString()
+        val duration = 60f / 120f / 4.0f
+        val waves = SfxLib.convertScoreToWaves(score, duration)
+
+        val buffer = generateScoreBuffer(waves)
+        return SfxSound(buffer)
     }
 
     override fun playNotes(notes: List<WaveGenerator>, longestDuration: Seconds) {
@@ -126,6 +163,12 @@ class JavaMidiSoundManager : SoundManager {
     override fun playSfx(notes: List<WaveGenerator>) {
         if (notes.isEmpty()) return
 
+        val sfxBuffer = generateScoreBuffer(notes)
+
+        bufferQueue.offer(sfxBuffer)
+    }
+
+    private fun generateScoreBuffer(notes: List<WaveGenerator>): ByteArray {
         val numSamples: Int = (SAMPLE_RATE * notes.first().duration * notes.size).toInt()
         val sfxBuffer = ByteArray(numSamples * 2)
         var currentIndex = 0
@@ -134,7 +177,6 @@ class JavaMidiSoundManager : SoundManager {
             buffer.copyInto(sfxBuffer, destinationOffset = currentIndex)
             currentIndex += buffer.size
         }
-
-        bufferQueue.offer(sfxBuffer)
+        return sfxBuffer
     }
 }

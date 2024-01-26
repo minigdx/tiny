@@ -12,7 +12,7 @@ import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.RenderContext
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
-import com.github.minigdx.tiny.sound.MidiSound
+import com.github.minigdx.tiny.sound.Sound
 import com.github.minigdx.tiny.sound.SoundManager
 import com.github.minigdx.tiny.sound.WaveGenerator
 import com.github.minigdx.tiny.util.MutableFixedSizeList
@@ -78,8 +78,8 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
         return object : SoundManager {
             override fun initSoundManager(inputHandler: InputHandler) = Unit
 
-            override suspend fun createSound(data: ByteArray): MidiSound {
-                return object : MidiSound {
+            override suspend fun createMidiSound(data: ByteArray): Sound {
+                return object : Sound {
                     override fun play() = Unit
 
                     override fun loop() = Unit

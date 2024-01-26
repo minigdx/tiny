@@ -97,6 +97,7 @@ function _update()
                 score = score .. "*-"
             end
         end
+        debug.console(score)
         sfx.sfx(score, 220)
     end
 

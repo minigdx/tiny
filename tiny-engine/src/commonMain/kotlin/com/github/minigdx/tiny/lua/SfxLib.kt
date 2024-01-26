@@ -161,14 +161,30 @@ class SfxLib(
         }
     }
 
-    private fun extractNote(str: String): Note {
-        val note = str.substringAfter("(").substringBefore(")")
-        return Note.valueOf(note)
-    }
-
     inner class sfx : TwoArgFunction() {
 
+        override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
+            val bpm = arg2.optint(120)
+            val duration = 60 / bpm.toFloat() / 4
+            val score = arg1.optjstring("")!!
+            val waves = convertScoreToWaves(score, duration)
+            resourceAccess.sfx(waves)
+            return NIL
+        }
+    }
+
+    private fun canPlay(sound: Sound?): Sound? {
+        return if (playSound) {
+            sound
+        } else {
+            null
+        }
+    }
+
+    companion object {
+
         private val acceptedTypes = setOf("sine", "noise", "pulse", "triangle")
+
         private fun extractWaveType(str: String): String? {
             if (str == "*") return str
 
@@ -180,16 +196,18 @@ class SfxLib(
             }
         }
 
+        private fun extractNote(str: String): Note {
+            val note = str.substringAfter("(").substringBefore(")")
+            return Note.valueOf(note)
+        }
+
         private fun trim(str: String): String {
             val lastIndex = str.lastIndexOf(')')
             if (lastIndex < 0) return str
             return str.substring(0, lastIndex + 2)
         }
 
-        override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
-            val bpm = arg2.optint(120)
-            val duration = 60 / bpm.toFloat() / 4
-            val score = arg1.optjstring("")!!
+        fun convertScoreToWaves(score: String, duration: Seconds): List<WaveGenerator> {
             val parts = trim(score).split("-")
             val waves = parts.mapNotNull {
                 val wave = extractWaveType(it)
@@ -202,16 +220,8 @@ class SfxLib(
                     else -> null
                 }
             }
-            resourceAccess.sfx(waves)
-            return NIL
-        }
-    }
 
-    private fun canPlay(sound: Sound?): Sound? {
-        return if (playSound) {
-            sound
-        } else {
-            null
+            return waves
         }
     }
 }

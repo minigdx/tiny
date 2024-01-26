@@ -7,7 +7,7 @@ import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
-import com.github.minigdx.tiny.sound.MidiSound
+import com.github.minigdx.tiny.sound.Sound
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.coroutines.CoroutineDispatcher
 
@@ -19,7 +19,7 @@ class ImageData(
     // Height of the Image
     val height: Pixel,
 )
-class SoundData(val name: String, val sound: MidiSound)
+class SoundData(val name: String, val sound: Sound)
 
 interface Platform {
     /**
