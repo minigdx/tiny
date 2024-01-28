@@ -10,7 +10,7 @@ import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.sound.NoiseWave
 import com.github.minigdx.tiny.sound.PulseWave
-import com.github.minigdx.tiny.sound.SawTooth
+import com.github.minigdx.tiny.sound.SawToothWave
 import com.github.minigdx.tiny.sound.SilenceWave
 import com.github.minigdx.tiny.sound.SineWave
 import com.github.minigdx.tiny.sound.SquareWave
@@ -80,7 +80,7 @@ class SfxLib(
 
     @TinyFunction("Generate and play a sawtooth wave sound.")
     inner class sawtooth : WaveFunction() {
-        override fun wave(note: Note, duration: Seconds, volume: Percent) = SawTooth(note, duration, volume)
+        override fun wave(note: Note, duration: Seconds, volume: Percent) = SawToothWave(note, duration, volume)
     }
 
     @TinyFunction("Generate and play a square wave sound.")
@@ -183,7 +183,7 @@ class SfxLib(
 
     companion object {
 
-        private val acceptedTypes = setOf("sine", "noise", "pulse", "triangle")
+        private val acceptedTypes = setOf("sine", "noise", "pulse", "triangle", "saw", "square")
 
         private fun extractWaveType(str: String): String? {
             if (str == "*") return str
@@ -215,6 +215,8 @@ class SfxLib(
                     "*" -> SilenceWave(duration)
                     "sine" -> SineWave(extractNote(it), duration)
                     "triangle" -> TriangleWave(extractNote(it), duration)
+                    "square" -> SquareWave(extractNote(it), duration)
+                    "saw" -> SawToothWave(extractNote(it), duration)
                     "noise" -> NoiseWave(extractNote(it), duration)
                     "pulse" -> PulseWave(extractNote(it), duration)
                     else -> null

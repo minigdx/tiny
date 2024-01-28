@@ -11,7 +11,7 @@ local labels = {"C0", "Db0", "D0", "Eb0", "E0", "F0", "Gb0", "G0", "Ab0", "A0", 
 
 local waves = {{
     type = "sine",
-    color = 9,
+    color = 9
 }, {
     type = "noise",
     color = 4
@@ -21,15 +21,24 @@ local waves = {{
 }, {
     type = "triangle",
     color = 13
+}, {
+    type = "saw",
+    color = 11
+}, {
+    type = "square",
+    color = 15
 }}
 
+local faders = {}
 local current_wave = waves[1]
 
 function on_fader_update(fader, value)
     fader.value = math.ceil(value)
     fader.data = {
         note = labels[fader.value],
-        wave = current_wave.type
+        wave = current_wave.type,
+        value = fader.value,
+        color = current_wave.color
     }
     fader.label = labels[fader.value]
     fader.tip_color = current_wave.color
@@ -39,7 +48,44 @@ function on_active_button(current, prec)
     current_wave = current.data.wave
 end
 
-local faders = {}
+function on_active_tab(current, prec)
+    local data = {}
+    -- save the current score
+    for f in all(faders) do
+        table.insert(data, {
+            wave = f.data.wave,
+            note = f.data.note,
+            value = f.value,
+            color = f.tip_color    
+        })
+    end
+    prec.data = data
+
+    -- restore the previous score
+    if current.data ~= nil then
+        local data = current.data
+        for k,f in ipairs(faders) do
+            f.data = data[k]
+            f.value = data[k].value
+            f.label = labels[f.value]
+            f.tip_color = data[k].color
+        end
+    else
+        -- no data, reset to 0
+        for k,f in ipairs(faders) do
+            f.value = 0
+            f.label = ""
+            f.data = {
+                wave = "",
+                note = 0,
+                value = 0,
+                color = 0
+            }
+            -- f.tip_color = data[k].color
+        end
+    end
+end
+
 
 local window = {
     width = 0,
@@ -50,10 +96,11 @@ function _init(w, h)
     window.width = w
     window.height = h
 
+    -- faders
     for i = 1, 32 do
         local f = widgets.createFader({
             x = 10 + 16 + i * 12,
-            y = 16 + 10 + 2,
+            y = 16 + 16 + 2,
             height = 256 - 18,
             label = labels[0],
             value = 0,
@@ -66,10 +113,11 @@ function _init(w, h)
         table.insert(faders, f)
     end
 
+    -- buttons
     for i = 0, #waves - 1 do
         local w = widgets.createButton({
             x = 10,
-            y = 10 + i * 16,
+            y = 16 + i * 16,
             overlay = 16 + i,
             data = {
                 wave = waves[i + 1]
@@ -81,22 +129,45 @@ function _init(w, h)
             w.status = 2
         end
     end
+
+    -- tabs
+    local tab = widgets.createTab({
+        x = 0,
+        width = 2 * 16 + 8,
+        status = 1,
+        label = "hello",
+        on_active_tab = on_active_tab
+    })
+
+    widgets.createTab({
+        x = tab.width,
+        width = 24,
+        status = 0,
+        on_active_tab = on_active_tab,
+        new_tab = true
+    })
+end
+
+function generate_score()
+    local score = ""
+
+    for f in all(faders) do
+        if f.data ~= nil and f.data.note ~= nil then
+            score = score .. f.data.wave .. "(" .. f.data.note .. ")-"
+        else
+            score = score .. "*-"
+        end
+    end
+    return score
 end
 
 function _update()
-    mouse._update(widgets.on_update, widgets.on_click)
+    mouse._update(widgets.on_update, widgets.on_click, widgets.on_clicked)
     widgets._update()
 
     if ctrl.pressed(keys.space) then
-        local score = ""
 
-        for f in all(faders) do
-            if f.data ~= nil and f.data.note ~= nil then
-                score = score .. f.data.wave .. "(" .. f.data.note .. ")-"
-            else
-                score = score .. "*-"
-            end
-        end
+        local score = generate_score()
         debug.console(score)
         sfx.sfx(score, 220)
     end
@@ -112,13 +183,11 @@ function _update()
         current_wave = new_wave
     end
 end
-
+--
 function _draw()
-    gfx.cls()
-
-    shape.gradient(0, 0, window.width, window.height, 2, 3)
+    gfx.cls(2)
+    -- background for tabs
+    shape.rectf(0, 0, window.width, 8, 1)
     widgets._draw()
     mouse._draw(current_wave.color)
-
-    print(current_wave.type, 10, 2)
 end

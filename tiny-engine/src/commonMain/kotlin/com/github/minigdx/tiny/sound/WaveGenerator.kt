@@ -36,7 +36,7 @@ sealed class WaveGenerator(note: Note, val duration: Seconds, val volume: Percen
     }
 }
 
-class SawTooth(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGenerator(note, duration, volume) {
+class SawToothWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGenerator(note, duration, volume) {
     override fun generate(sample: Int): Float {
         return (2 * (angle(sample) / TWO_PI))
     }

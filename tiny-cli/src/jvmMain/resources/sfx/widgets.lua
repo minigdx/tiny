@@ -26,11 +26,29 @@ local Button = {
     end
 }
 
+local Tab = {
+    x = 0,
+    y = 0,
+    width = 0,
+    height = 8,
+    label = "+",
+    status = 0, -- 0 : inactive ; 1 : active
+    new_tab = false
+}
+
 local buttons = {}
+local tabs = {}
 local faders = {}
 local widgets = {}
 
 local factory = {}
+
+factory.createTab = function(value)
+    local result = new(Tab, value)
+    table.insert(widgets, result)
+    table.insert(tabs, result)
+    return result
+end
 
 factory.createButton = function(value)
     local result = new(Button, value)
@@ -48,7 +66,7 @@ factory.createFader = function(value)
 end
 
 function inside_widget(w, x, y)
-    return w.x <= x and w.x + w.width >= x and w.y <= y and w.y + w.height + 12 >= y
+    return w.x <= x and x <= w.x + w.width and w.y <= y and y <= w.y + w.height
 end
 
 factory.on_update = function(x, y)
@@ -62,7 +80,9 @@ factory.on_update = function(x, y)
         end
     end
 end
+
 factory.on_click = function(x, y)
+    -- on click faders
     for f in all(faders) do
         if inside_widget(f, x, y) then
             local percent = math.max(0.0, 1.0 - ((y - f.y) / f.height))
@@ -70,7 +90,11 @@ factory.on_click = function(x, y)
             f.on_value_update(f, value)
         end
     end
+end
 
+
+factory.on_clicked = function(x, y)
+    -- on click buttons
     local prec = nil
     local current = nil
     for f in all(buttons) do
@@ -88,9 +112,84 @@ factory.on_click = function(x, y)
         current.status = 2
         current.on_active_button(current, prec)
     end
+
+    -- on click tab
+    local new_active = nil
+    local current_active = nil
+    for t in all(tabs) do
+        if t.status == 1 then
+            current_active = t
+        elseif inside_widget(t, x, y) and t.status == 0 then
+            new_active = t
+        end
+
+    end
+
+    if new_active ~= nil then
+        if new_active.new_tab then
+            new_active.width = 2 * 16 + 8
+            new_active.label = "new_sfx"
+            new_active.new_tab = false
+            
+            if #tabs < 12 then
+                factory.createTab({
+                    width = 24,
+                    new_tab = true,
+                    x = new_active.x + new_active.width,
+                    on_active_tab = new_active.on_active_tab
+                })
+                table.insert(tabs, t)
+            end
+
+        end
+        current_active.status = 0
+        new_active.status = 1
+        new_active.on_active_tab(new_active, current_active)
+    end
 end
 
 factory._update = function(mouse)
+    
+end
+
+function draw_tabs()
+    local active_tab = tabs[1]
+    for index = #tabs, 1, -1 do
+        local v = tabs[index]
+        if v.status == 0 then
+            draw_tab(v)
+        else
+            active_tab = v
+        end
+    end
+
+    draw_tab(active_tab)
+end
+
+function draw_tab(tab)
+    local offset = tab.status * 8
+
+    -- body
+    local time = math.floor(tab.width / 16)
+    local rest = tab.width % 16
+    for i = 0, time - 1 do
+        spr.sdraw(tab.x + (i) * 16, 0, 80, offset, 16, 8)
+
+    end
+
+    spr.sdraw(tab.x + (time) * 16, 0, 80, offset, rest, 8)
+
+    -- right
+    spr.sdraw(tab.x + tab.width, 0, 96, offset, 8, 8)
+
+    local center = tab.width * 0.5 - #tab.label * 0.5 * 4
+
+    print(tab.label, tab.x + center, tab.y + 2)
+
+    -- left
+    if tab.status == 1 then
+        spr.sdraw(tab.x - 8, 0, 64, 8, 8, 8)
+    end
 
 end
 
@@ -124,7 +223,6 @@ function draw_button(button)
     spr.draw(background, button.x, button.y)
 
     if button.overlay ~= nil then
-
         spr.draw(button.overlay, button.x, button.y)
     end
 end
@@ -136,6 +234,8 @@ factory._draw = function()
     for b in all(buttons) do
         draw_button(b)
     end
+
+    draw_tabs()
 end
 
 return factory
