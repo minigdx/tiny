@@ -266,17 +266,16 @@ class GlfwPlatform(
             val width = buffer.width
             val height = buffer.height
             val image = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
-            val colorData = buffer.buffer
 
             for (y in 0 until height) {
                 for (x in 0 until width) {
-                    val i = y * width + x
-                    val r = colorData[i * 4 + 0].toInt() and 0xff
-                    val g = colorData[i * 4 + 1].toInt() and 0xff
-                    val b = colorData[i * 4 + 2].toInt() and 0xff
-                    val a = colorData[i * 4 + 3].toInt() and 0xff
+                    val colorData = buffer.gamePalette.getRGBA(buffer.pixel(x, y))
+                    val r = colorData[0].toInt() and 0xff
+                    val g = colorData[1].toInt() and 0xff
+                    val b = colorData[2].toInt() and 0xff
+                    val a = colorData[3].toInt() and 0xff
                     val color = (a shl 24) or (r shl 16) or (g shl 8) or b
-                    image.setRGB(y, x, color)
+                    image.setRGB(x, y, color)
                 }
             }
 
