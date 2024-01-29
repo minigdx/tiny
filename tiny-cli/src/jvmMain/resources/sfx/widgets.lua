@@ -84,7 +84,13 @@ end
 factory.on_click = function(x, y)
     -- on click faders
     for f in all(faders) do
-        if inside_widget(f, x, y) then
+        local box = { 
+            x = f.x,
+            y = f.y,
+            width = f.width,
+            height = f.height + 12
+        }
+        if inside_widget(box, x, y) then
             local percent = math.max(0.0, 1.0 - ((y - f.y) / f.height))
             local value = percent * (f.max_value - f.min_value) + f.min_value
             f.on_value_update(f, value)
