@@ -44,7 +44,9 @@ sealed class WaveGenerator(val note: Note, val duration: Seconds, val volume: Pe
 
 class SawToothWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGenerator(note, duration, volume) {
     override fun generate(sample: Int): Float {
-        return (2 * (angle(sample) / TWO_PI))
+        val angle: Float = (angle(sample) / TWO_PI) % period
+        val phase = (angle * 2f) - 1f
+        return phase
     }
 }
 
@@ -67,11 +69,12 @@ class SquareWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGe
 
 class TriangleWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGenerator(note, duration, volume) {
     override fun generate(sample: Int): Float {
-        val angle = angle(sample)
-        return if (angle < PI) {
-            2 * angle / PI
+        val angle: Float = (angle(sample) / TWO_PI) % period
+        val phase = (angle * 2f) - 1f
+        return if (phase < 0) {
+            phase + 1f
         } else {
-            2 * (PI - angle) / PI + 1
+            1f - phase
         }
     }
 }
