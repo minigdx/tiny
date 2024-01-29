@@ -42,7 +42,6 @@ abstract class SoundManager {
     ): FloatArray {
         val numSamples: Int = (SAMPLE_RATE * longestDuration).toInt()
         val fadeOutIndex = getFadeOutIndex(longestDuration)
-        val offsetSample = 0
         val result = FloatArray(numSamples)
         for (i in 0 until numSamples) {
             val sampleMixed = mix(i, notes)
@@ -53,8 +52,6 @@ abstract class SoundManager {
     }
 
     protected fun createScoreBuffer(notes: List<WaveGenerator>): FloatArray {
-        val duration = notes.first().duration
-        var offsetSample = 0
         var currentIndex = 0
 
         fun merge(head: WaveGenerator, tail: List<WaveGenerator>): List<WaveGenerator> {
@@ -75,7 +72,7 @@ abstract class SoundManager {
         var prec: WaveGenerator? = null
         var lastSample = 0
         val result = FloatArray((mergedNotes.sumOf { it.duration.toDouble() } * SAMPLE_RATE).toInt())
-        mergedNotes.forEachIndexed { index, note ->
+        mergedNotes.forEach { note ->
             val crossover = (0.05f * SAMPLE_RATE).toInt()
             val mixedNotes = listOf(note)
             val noteSamples = (SAMPLE_RATE * note.duration).toInt()
