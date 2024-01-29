@@ -45,7 +45,7 @@ abstract class SoundManager {
         val offsetSample = 0
         val result = FloatArray(numSamples)
         for (i in 0 until numSamples) {
-            val sampleMixed = mix(i, notes, offsetSample)
+            val sampleMixed = mix(i, notes)
             val sample = fadeOut(sampleMixed, i, fadeOutIndex, numSamples)
             result[i] = sample
         }
@@ -54,31 +54,43 @@ abstract class SoundManager {
 
     protected fun createScoreBuffer(notes: List<WaveGenerator>): FloatArray {
         val duration = notes.first().duration
-        val noteSamples = (SAMPLE_RATE * duration).toInt()
-        val noteFadeOutIndex = getFadeOutIndex(duration) // fade out index within the note.
-        val numSamples: Int = (noteSamples * notes.size)
         var offsetSample = 0
         var currentIndex = 0
-        val result = FloatArray(numSamples)
 
-        notes.forEachIndexed { index, note ->
+        fun merge(head: WaveGenerator, tail: List<WaveGenerator>): List<WaveGenerator> {
+            if (tail.isEmpty()) {
+                return listOf(head)
+            }
+
+            val next = tail.first()
+            return if (next.isSame(head)) {
+                merge(head.copy(head.duration + next.duration, head.volume), tail.drop(1))
+            } else {
+                listOf(head) + merge(next, tail.drop(1))
+            }
+        }
+
+        val mergedNotes = merge(notes.first(), notes.drop(1)) + SilenceWave(0.1f)
+
+        var prec: WaveGenerator? = null
+        var lastSample = 0
+        val result = FloatArray((mergedNotes.sumOf { it.duration.toDouble() } * SAMPLE_RATE).toInt())
+        mergedNotes.forEachIndexed { index, note ->
+            val crossover = (0.05f * SAMPLE_RATE).toInt()
             val mixedNotes = listOf(note)
-            val nextNoteIsDifferent = index == notes.size - 1 || notes[index + 1].isSame(note)
-
+            val noteSamples = (SAMPLE_RATE * note.duration).toInt()
             for (i in 0 until noteSamples) {
-                val sampleMixed = mix(i, mixedNotes, offsetSample)
-                // Last note or different kind of note after
-                val sample = if (nextNoteIsDifferent || notes[index + 1].isSilence) {
-                    fadeOut(sampleMixed, i, noteFadeOutIndex, numSamples)
-                } else {
-                    sampleMixed
+                var sampleMixed = mix(i, mixedNotes)
+
+                // crossover
+                if (prec != null && i <= crossover) {
+                    sampleMixed = (sampleMixed + fadeOut(prec!!.generate(lastSample + i), lastSample + i, lastSample, lastSample + crossover))
                 }
-                result[currentIndex++] = sample
-                offsetSample++
+                result[currentIndex++] = sampleMixed
             }
-            if (nextNoteIsDifferent) {
-                offsetSample = 0
-            }
+
+            prec = note
+            lastSample = noteSamples
         }
         return result
     }
@@ -88,11 +100,11 @@ abstract class SoundManager {
      */
     abstract fun playBuffer(buffer: FloatArray)
 
-    private fun mix(sample: Int, notes: List<WaveGenerator>, offsetSample: Int = 0): Float {
+    private fun mix(sample: Int, notes: List<WaveGenerator>): Float {
         var result = 0f
         notes.forEach {
             if (it.accept(sample)) {
-                val sampleValue = it.generate(sample + offsetSample) * it.volume
+                val sampleValue = it.generate(sample) * it.volume
                 result += sampleValue
             }
         }

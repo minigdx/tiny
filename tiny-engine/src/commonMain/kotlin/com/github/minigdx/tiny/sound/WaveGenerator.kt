@@ -14,6 +14,8 @@ sealed class WaveGenerator(val note: Note, val duration: Seconds, val volume: Pe
 
     val numberOfSample = SAMPLE_RATE * duration
 
+    open val isSilence: Boolean = false
+
     /**
      * Return a value between -1.0 and 1.0
      */
@@ -34,7 +36,7 @@ sealed class WaveGenerator(val note: Note, val duration: Seconds, val volume: Pe
         return (other.note == this.note && this::class == other::class)
     }
 
-    open val isSilence: Boolean = false
+    abstract fun copy(duration: Seconds, volume: Percent): WaveGenerator
 
     companion object {
         internal const val PI = kotlin.math.PI.toFloat()
@@ -48,12 +50,16 @@ class SawToothWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : Wave
         val phase = (angle * 2f) - 1f
         return phase
     }
+
+    override fun copy(duration: Seconds, volume: Percent): WaveGenerator = SawToothWave(note, duration, volume)
 }
 
 class SineWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGenerator(note, duration, volume) {
     override fun generate(sample: Int): Float {
         return sin(angle(sample))
     }
+
+    override fun copy(duration: Seconds, volume: Percent): WaveGenerator = SineWave(note, duration, volume)
 }
 
 class SquareWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGenerator(note, duration, volume) {
@@ -65,6 +71,8 @@ class SquareWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGe
             -1f
         }
     }
+
+    override fun copy(duration: Seconds, volume: Percent): WaveGenerator = SquareWave(note, duration, volume)
 }
 
 class TriangleWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGenerator(note, duration, volume) {
@@ -77,6 +85,8 @@ class TriangleWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : Wave
             1f - phase
         }
     }
+
+    override fun copy(duration: Seconds, volume: Percent): WaveGenerator = TriangleWave(note, duration, volume)
 }
 
 class NoiseWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGenerator(note, duration, volume) {
@@ -88,6 +98,8 @@ class NoiseWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGen
         lastNoise = brown
         return brown * 3.5f * note.index / Note.B8.index
     }
+
+    override fun copy(duration: Seconds, volume: Percent): WaveGenerator = NoiseWave(note, duration, volume)
 }
 
 class PulseWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGenerator(note, duration, volume) {
@@ -100,12 +112,16 @@ class PulseWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGen
         val ret = abs(4.0 * u - 2.0) - abs(8.0 * t - 4.0)
         return (ret / 6.0).toFloat()
     }
+
+    override fun copy(duration: Seconds, volume: Percent): WaveGenerator = PulseWave(note, duration, volume)
 }
 
 class SilenceWave(duration: Seconds) : WaveGenerator(Note.C0, duration, 1.0f) {
+
+    override val isSilence: Boolean = true
     override fun generate(sample: Int): Float {
         return 0f
     }
 
-    override val isSilence: Boolean = true
+    override fun copy(duration: Seconds, volume: Percent): WaveGenerator = SilenceWave(duration)
 }
