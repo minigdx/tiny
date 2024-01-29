@@ -70,14 +70,14 @@ class TriangleWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : Wave
     }
 }
 
-class NoiseWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGenerator(note, duration, volume) {
+class NoiseWave(private val note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGenerator(note, duration, volume) {
 
     private var lastNoise = 0.0f
     override fun generate(sample: Int): Float {
         val white = Random.nextFloat() * 2 - 1
         val brown = (lastNoise + (0.02f * white)) / 1.02f
         lastNoise = brown
-        return brown * 3.5f
+        return brown * 3.5f * note.index / Note.B8.index
     }
 }
 
