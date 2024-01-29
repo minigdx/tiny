@@ -8,7 +8,7 @@ import kotlin.math.abs
 import kotlin.math.sin
 import kotlin.random.Random
 
-sealed class WaveGenerator(note: Note, val duration: Seconds, val volume: Percent) {
+sealed class WaveGenerator(val note: Note, val duration: Seconds, val volume: Percent) {
 
     val period = SAMPLE_RATE.toFloat() / note.frequency
 
@@ -29,6 +29,12 @@ sealed class WaveGenerator(note: Note, val duration: Seconds, val volume: Percen
     internal fun angle(sample: Int): Float {
         return (TWO_PI * sample) / period
     }
+
+    fun isSame(other: WaveGenerator): Boolean {
+        return (other.note == this.note && this::class == other::class)
+    }
+
+    open val isSilence: Boolean = false
 
     companion object {
         internal const val PI = kotlin.math.PI.toFloat()
@@ -70,7 +76,7 @@ class TriangleWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : Wave
     }
 }
 
-class NoiseWave(private val note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGenerator(note, duration, volume) {
+class NoiseWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGenerator(note, duration, volume) {
 
     private var lastNoise = 0.0f
     override fun generate(sample: Int): Float {
@@ -97,4 +103,6 @@ class SilenceWave(duration: Seconds) : WaveGenerator(Note.C0, duration, 1.0f) {
     override fun generate(sample: Int): Float {
         return 0f
     }
+
+    override val isSilence: Boolean = true
 }

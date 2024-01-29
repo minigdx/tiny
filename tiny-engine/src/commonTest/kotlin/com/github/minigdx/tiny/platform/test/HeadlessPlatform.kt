@@ -1,6 +1,5 @@
 package com.github.minigdx.tiny.platform.test
 
-import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.file.SourceStream
@@ -14,7 +13,6 @@ import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.sound.Sound
 import com.github.minigdx.tiny.sound.SoundManager
-import com.github.minigdx.tiny.sound.WaveGenerator
 import com.github.minigdx.tiny.util.MutableFixedSizeList
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -75,7 +73,7 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
     override fun initInputManager(): InputManager = input
 
     override fun initSoundManager(inputHandler: InputHandler): SoundManager {
-        return object : SoundManager {
+        return object : SoundManager() {
             override fun initSoundManager(inputHandler: InputHandler) = Unit
             override suspend fun createSfxSound(bytes: ByteArray): Sound {
                 return object : Sound {
@@ -97,8 +95,7 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
                 }
             }
 
-            override fun playNotes(notes: List<WaveGenerator>, longestDuration: Seconds) = Unit
-            override fun playSfx(notes: List<WaveGenerator>) = Unit
+            override fun playBuffer(buffer: FloatArray) = Unit
         }
     }
 
