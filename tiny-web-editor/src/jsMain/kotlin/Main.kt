@@ -2,6 +2,7 @@ import com.github.minigdx.tiny.engine.GameEngine
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.file.CommonVirtualFileSystem
+import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.forEachIndexed
 import com.github.minigdx.tiny.getRootPath
@@ -186,4 +187,5 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
         name,
     )
     override fun createSoundStream(name: String): SourceStream<SoundData> = delegate.createSoundStream(name)
+    override fun createLocalFile(name: String): LocalFile = delegate.createLocalFile(name)
 }

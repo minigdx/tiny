@@ -20,6 +20,7 @@ local Button = {
     y = 0,
     width = 16,
     height = 16,
+    grouped = true,
     status = 0, -- 0 : idle ; 1 : over ; 2 : active
     overlay = 0, -- sprite index,
     on_active_button = function(current, prec)
@@ -84,7 +85,7 @@ end
 factory.on_click = function(x, y)
     -- on click faders
     for f in all(faders) do
-        local box = { 
+        local box = {
             x = f.x,
             y = f.y,
             width = f.width,
@@ -98,7 +99,6 @@ factory.on_click = function(x, y)
     end
 end
 
-
 factory.on_clicked = function(x, y)
     -- on click buttons
     local prec = nil
@@ -111,11 +111,14 @@ factory.on_clicked = function(x, y)
         end
     end
     -- active the current button and deactive the previous activated
-    if current ~= nil then
+    if current ~= nil and current.grouped then
         if prec ~= nil then
             prec.status = 0
         end
         current.status = 2
+    end
+
+    if current ~= nil then
         current.on_active_button(current, prec)
     end
 
@@ -134,9 +137,9 @@ factory.on_clicked = function(x, y)
     if new_active ~= nil then
         if new_active.new_tab then
             new_active.width = 2 * 16 + 8
-            new_active.label = "new_sfx"
+            new_active.label = ""
             new_active.new_tab = false
-            
+
             if #tabs < 12 then
                 factory.createTab({
                     width = 24,
@@ -144,9 +147,10 @@ factory.on_clicked = function(x, y)
                     x = new_active.x + new_active.width,
                     on_active_tab = new_active.on_active_tab
                 })
-                table.insert(tabs, t)
+
             end
 
+            factory.on_new_tab(new_active)
         end
         current_active.status = 0
         new_active.status = 1
@@ -155,7 +159,7 @@ factory.on_clicked = function(x, y)
 end
 
 factory._update = function(mouse)
-    
+
 end
 
 function draw_tabs()
@@ -189,7 +193,7 @@ function draw_tab(tab)
     spr.sdraw(tab.x + tab.width, 0, 96, offset, 8, 8)
 
     local center = tab.width * 0.5 - #tab.label * 0.5 * 4
-
+    
     print(tab.label, tab.x + center, tab.y + 2)
 
     -- left

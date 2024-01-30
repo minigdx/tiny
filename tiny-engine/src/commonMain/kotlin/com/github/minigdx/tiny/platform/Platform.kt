@@ -3,6 +3,7 @@ package com.github.minigdx.tiny.platform
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
+import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.input.InputHandler
@@ -94,4 +95,6 @@ interface Platform {
      * Create a SourceStream from a midi file.
      */
     fun createSoundStream(name: String): SourceStream<SoundData>
+
+    fun createLocalFile(name: String): LocalFile
 }

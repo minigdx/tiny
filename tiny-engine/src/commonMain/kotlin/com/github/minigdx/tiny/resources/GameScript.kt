@@ -19,6 +19,8 @@ import com.github.minigdx.tiny.lua.StdLib
 import com.github.minigdx.tiny.lua.TinyBaseLib
 import com.github.minigdx.tiny.lua.TinyLib
 import com.github.minigdx.tiny.lua.Vec2Lib
+import com.github.minigdx.tiny.lua.WorkspaceLib
+import com.github.minigdx.tiny.platform.Platform
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LoadState
 import org.luaj.vm2.LuaError
@@ -43,6 +45,7 @@ class GameScript(
     override val name: String,
     val gameOptions: GameOptions,
     val inputHandler: InputHandler,
+    val platform: Platform,
     override val type: ResourceType,
 ) : GameResource {
 
@@ -90,6 +93,7 @@ class GameScript(
         load(sprLib)
         load(JuiceLib())
         load(NotesLib())
+        load(WorkspaceLib(platform = platform))
 
         this@GameScript.resourceAccess.customizeLuaGlobal(this)
 

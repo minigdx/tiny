@@ -2,6 +2,7 @@ package com.github.minigdx.tiny.platform.test
 
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
+import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.input.InputHandler
@@ -117,6 +118,15 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
     override fun createSoundStream(name: String): SourceStream<SoundData> {
         val data = resources[name] as? SoundData ?: throw IllegalStateException("$name is not a valid SoundData.")
         return ObjectStream(data)
+    }
+
+    override fun createLocalFile(name: String): LocalFile = object : LocalFile {
+        override val name: String = "name"
+        override val extension: String = ""
+
+        override fun readAll(): ByteArray = ByteArray(0)
+
+        override fun save(content: ByteArray) = Unit
     }
 
     fun saveAnimation(name: String) = toGif(name, frames)

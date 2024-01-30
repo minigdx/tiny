@@ -6,6 +6,8 @@ import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.file.FileStream
 import com.github.minigdx.tiny.file.InputStreamStream
+import com.github.minigdx.tiny.file.JvmLocalFile
+import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SoundDataSourceStream
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.file.VirtualFileSystem
@@ -351,6 +353,8 @@ class GlfwPlatform(
             it.initSoundManager(inputHandler)
         }
     }
+
+    override fun createLocalFile(name: String): LocalFile = JvmLocalFile(name, workdirectory)
 
     companion object {
         private const val FPS = 60

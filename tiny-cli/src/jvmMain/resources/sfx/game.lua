@@ -48,6 +48,8 @@ function on_active_button(current, prec)
     current_wave = current.data.wave
 end
 
+local active_tab = nil
+
 function on_active_tab(current, prec)
     local data = {}
     -- save the current score
@@ -56,7 +58,7 @@ function on_active_tab(current, prec)
             wave = f.data.wave,
             note = f.data.note,
             value = f.value,
-            color = f.tip_color    
+            color = f.tip_color
         })
     end
     prec.data = data
@@ -64,7 +66,7 @@ function on_active_tab(current, prec)
     -- restore the previous score
     if current.data ~= nil then
         local data = current.data
-        for k,f in ipairs(faders) do
+        for k, f in ipairs(faders) do
             f.data = data[k]
             f.value = data[k].value
             f.label = labels[f.value]
@@ -72,7 +74,7 @@ function on_active_tab(current, prec)
         end
     else
         -- no data, reset to 0
-        for k,f in ipairs(faders) do
+        for k, f in ipairs(faders) do
             f.value = 0
             f.label = ""
             f.data = {
@@ -81,20 +83,57 @@ function on_active_tab(current, prec)
                 value = 0,
                 color = 0
             }
-            -- f.tip_color = data[k].color
         end
     end
-end
 
+    active_tab = current
+    debug.console(active_tab.label)
+end
 
 local window = {
     width = 0,
     height = 0
 }
+
+function on_new_tab(tab)
+    local filename = ws.create("sfx", "sfx")
+    tab.label = filename
+end
+
+function on_play_button()
+    local score = generate_score()
+    sfx.sfx(score, 220)
+end
+
+function on_save_button()
+    local score = generate_score()
+    ws.save(active_tab.label, score)
+end
+
 function _init(w, h)
 
+    widgets.on_new_tab = on_new_tab
     window.width = w
     window.height = h
+
+    widgets.createButton({
+        x = 10,
+        y = 16,
+        overlay = 22,
+        grouped = false,
+        on_active_button = on_play_button
+    })
+
+    widgets.createButton({
+        x = 10,
+        y = 16 + 2 + 16,
+        overlay = 23,
+        data = {
+            save = true
+        },
+        grouped = false,
+        on_active_button = on_save_button
+    })
 
     -- faders
     for i = 1, 32 do
@@ -114,10 +153,10 @@ function _init(w, h)
     end
 
     -- buttons
-    for i = 0, #waves - 1 do
+    for i = #waves - 1, 0, -1 do
         local w = widgets.createButton({
             x = 10,
-            y = 16 + i * 16,
+            y = 250 - i * 16,
             overlay = 16 + i,
             data = {
                 wave = waves[i + 1]
@@ -131,16 +170,42 @@ function _init(w, h)
     end
 
     -- tabs
-    local tab = widgets.createTab({
-        x = 0,
-        width = 2 * 16 + 8,
-        status = 1,
-        label = "hello",
-        on_active_tab = on_active_tab
-    })
+
+    local files = ws.list()
+
+    local tabs = {}
+    local new_tab_x = 0
+    if #files > 0 then
+        for w in all(files) do
+            local tab = widgets.createTab({
+                x = 0,
+                width = 2 * 16 + 8,
+                status = 0,
+                label = w,
+                on_active_tab = on_active_tab
+            })
+            table.insert(tabs, tab)
+            new_tab_x = new_tab_x + tab.width
+        end
+    else
+        local file = ws.create("sfx", "sfx")
+        local tab = widgets.createTab({
+            x = 0,
+            width = 2 * 16 + 8,
+            status = 0,
+            label = file,
+            on_active_tab = on_active_tab
+        })
+        
+        table.insert(tabs, tab)
+        new_tab_x = new_tab_x + tab.width
+    end
+
+    tabs[1].status = 1
+    active_tab = tabs[1]
 
     widgets.createTab({
-        x = tab.width,
+        x = new_tab_x,
         width = 24,
         status = 0,
         on_active_tab = on_active_tab,
@@ -173,21 +238,23 @@ function _update()
     end
 
     local new_wave = current_wave
-    if ctrl.pressed(keys.up) then
-        for i = 1, #waves do
-            if waves[i].type == current_wave.type then
-                local next_index = (i % #waves) + 1
-                new_wave = waves[next_index]
-            end
-        end
-        current_wave = new_wave
-    end
 end
 --
 function _draw()
     gfx.cls(2)
     -- background for tabs
     shape.rectf(0, 0, window.width, 8, 1)
+    -- octave limits
+    local per_octave = math.floor((256 - 18) / 9) -- height / nb octaves
+    for octave = 9, 0, -1 do
+        local y = 34 + (256 - 18) - octave * per_octave
+        gfx.dither(0x1010)
+        shape.line(36, y - 2, 36 + 32 * 12, y - 2, 3)
+        gfx.dither()
+        print("<C" .. octave, 40 + 32 * 12, y - 4, 3)
+    end
+    gfx.dither()
+
     widgets._draw()
     mouse._draw(current_wave.color)
 end
