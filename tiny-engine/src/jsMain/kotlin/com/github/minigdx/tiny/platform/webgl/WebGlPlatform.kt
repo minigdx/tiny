@@ -114,14 +114,6 @@ class WebGlPlatform(
     }
 
     override fun createLocalFile(name: String): LocalFile {
-        val (file, ext) = if (name.contains(".")) {
-            name.split(".")
-        } else {
-            listOf(name, "")
-        }
-        return JsLocalFile(
-            file,
-            ext,
-        )
+        return JsLocalFile(name)
     }
 }

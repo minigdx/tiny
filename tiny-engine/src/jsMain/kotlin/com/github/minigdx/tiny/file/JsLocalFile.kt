@@ -3,24 +3,24 @@ package com.github.minigdx.tiny.file
 import kotlinx.browser.localStorage
 
 class JsLocalFile(
-    override val name: String,
-    override val extension: String,
+    val filename: String,
 ) : LocalFile {
 
-    private fun computeFilename(): String {
-        return if (extension.isBlank()) {
-            name
-        } else {
-            "$name.$extension"
-        }
+    override val name: String
+    override val extension: String
+
+    init {
+        val (name, ext) = ("$filename.").split(".")
+        this.name = name
+        this.extension = ext
     }
 
     override fun readAll(): ByteArray {
-        val item = localStorage.getItem(computeFilename())
+        val item = localStorage.getItem(filename)
         return item?.encodeToByteArray() ?: ByteArray(0)
     }
 
     override fun save(content: ByteArray) {
-        localStorage.setItem(computeFilename(), content.decodeToString())
+        localStorage.setItem(filename, content.decodeToString())
     }
 }

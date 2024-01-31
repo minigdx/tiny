@@ -3,9 +3,12 @@ package com.github.minigdx.tiny
 import com.github.minigdx.tiny.engine.GameEngine
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.file.CommonVirtualFileSystem
+import com.github.minigdx.tiny.file.JsLocalFile
 import com.github.minigdx.tiny.log.StdOutLogger
+import com.github.minigdx.tiny.lua.WorkspaceLib
 import com.github.minigdx.tiny.platform.webgl.WebGlPlatform
 import kotlinx.browser.document
+import kotlinx.browser.localStorage
 import kotlinx.browser.window
 import kotlinx.dom.appendText
 import org.w3c.dom.Element
@@ -98,6 +101,15 @@ fun setupGames(rootPath: String, tinyGameTag: HTMLCollection) {
             canvas.setAttribute("style", "cursor: none;")
         }
         game.appendChild(canvas)
+
+        WorkspaceLib.DEFAULT = (0 until localStorage.length).mapNotNull { index ->
+            val key = localStorage.key(index)
+            if (key != null) {
+                JsLocalFile(key)
+            } else {
+                null
+            }
+        }
 
         val gameOptions = GameOptions(
             width = gameWidth,
