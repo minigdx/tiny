@@ -61,7 +61,9 @@ function on_active_tab(current, prec)
             color = f.tip_color
         })
     end
-    prec.data = data
+    if prec ~= nil then
+        prec.data = data
+    end
 
     -- restore the previous score
     if current.data ~= nil then
@@ -87,7 +89,6 @@ function on_active_tab(current, prec)
     end
 
     active_tab = current
-    debug.console(active_tab.label)
 end
 
 local window = {
@@ -178,7 +179,7 @@ function _init(w, h)
     if #files > 0 then
         for w in all(files) do
             local tab = widgets.createTab({
-                x = 0,
+                x = new_tab_x,
                 width = 2 * 16 + 8,
                 status = 0,
                 label = w,
@@ -196,7 +197,6 @@ function _init(w, h)
             label = file,
             on_active_tab = on_active_tab
         })
-        
         table.insert(tabs, tab)
         new_tab_x = new_tab_x + tab.width
     end
@@ -211,6 +211,68 @@ function _init(w, h)
         on_active_tab = on_active_tab,
         new_tab = true
     })
+    --
+    init_faders(tabs)
+end
+
+function extract(inputString)
+    local pattern = "([a-zA-Z]+)%(([^%)]+)%)"
+    local wave, note = inputString:match(pattern)
+    return wave, note
+end
+
+function split(inputString)
+    local result = {}
+    for token in string.gmatch(inputString, "[^%-]+") do
+        table.insert(result, token)
+    end
+    return result
+end
+
+function init_faders(tabs)
+    local index = 1
+
+    local notes = {}
+    for k, v in pairs(labels) do
+        notes[v] = k
+    end
+
+    local colors = {}
+    for v in all(waves) do
+        colors[v.type] = v.color
+    end
+
+    for t in all(tabs) do
+        local f = t.label
+        local content = ws.load(f)
+        local saved = split(content)
+        local result = {}
+        for index, f in ipairs(faders) do
+            local s = saved[index]
+
+            local data = {
+                wave = "",
+                note = 0,
+                value = 0,
+                color = 0
+            }
+
+            if s ~= "(0)" and s ~= "*" then
+                local wave, note = extract(s)
+                data = {
+                    wave = wave,
+                    note = note,
+                    value = notes[note],
+                    color = colors[wave],
+                }
+            end
+
+            table.insert(result, data)
+        end
+        t.data = result
+    end
+    on_active_tab(tabs[1])
+
 end
 
 function generate_score()
@@ -231,9 +293,7 @@ function _update()
     widgets._update()
 
     if ctrl.pressed(keys.space) then
-
         local score = generate_score()
-        debug.console(score)
         sfx.sfx(score, 220)
     end
 
