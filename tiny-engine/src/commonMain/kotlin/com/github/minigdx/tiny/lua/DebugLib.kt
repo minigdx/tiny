@@ -88,6 +88,7 @@ private class DebugShape {
                 val color = args.arg(3)
                 return listOf(a.get("x"), a.get("y"), b.get("x"), b.get("y"), color)
             }
+
             else -> {
                 null
             }
@@ -103,6 +104,7 @@ private class DebugShape {
                 val color = args.arg(3)
                 return listOf(a, b, color)
             }
+
             2 -> {
                 val a = args.arg(1)
                 val b = args.arg(2)
@@ -112,10 +114,12 @@ private class DebugShape {
                     listOf(a, b, LuaValue.NIL)
                 }
             }
+
             1 -> {
                 val a = args.arg(1)
                 return listOf(a.get("x"), a.get("y"), LuaValue.NIL)
             }
+
             else -> {
                 null
             }
@@ -204,8 +208,19 @@ class DebugLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
     internal inner class console : OneArgFunction() {
         @TinyCall("Log a message into the console.")
         override fun call(@TinyArg("str") arg: LuaValue): LuaValue {
-            println(arg)
+            val str = formatValue(arg)
+            println(str)
             return NIL
+        }
+
+        private fun formatValue(arg: LuaValue): String = if (arg.istable()) {
+            val table = arg as LuaTable
+            val keys = table.keys()
+            val str = keys.map { it.optjstring("nil") + ":" + formatValue(table.get(it)) }
+                .joinToString(" ")
+            "table[$str]"
+        } else {
+            arg.toString()
         }
     }
 
