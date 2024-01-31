@@ -1,6 +1,8 @@
 package com.github.minigdx.tiny.lua
 
 import com.github.mingdx.tiny.doc.TinyArg
+import com.github.mingdx.tiny.doc.TinyCall
+import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.platform.Platform
@@ -26,9 +28,14 @@ class WorkspaceLib(
         return ws
     }
 
+    @TinyFunction(
+        "Save the content into a local file, " +
+            "on desktop or in the local storage on the web platform.",
+    )
     internal inner class save : TwoArgFunction() {
 
-        override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
+        @TinyCall("Save the content into the file name.")
+        override fun call(@TinyArg("name") arg1: LuaValue, @TinyArg("content") arg2: LuaValue): LuaValue {
             val file = findFile(arg1) ?: return NIL
             file.save(arg2.checkjstring()?.encodeToByteArray() ?: ByteArray(0))
             return NIL
@@ -40,24 +47,34 @@ class WorkspaceLib(
         return resources.firstOrNull { it.name == filename }
     }
 
+    @TinyFunction("Load and get the content of the file name")
     internal inner class load : OneArgFunction() {
-        override fun call(arg: LuaValue): LuaValue {
+
+        @TinyCall("Load and get the content of the file name")
+        override fun call(@TinyArg("name") arg: LuaValue): LuaValue {
             val file = findFile(arg) ?: return NIL
             val content = file.readAll().decodeToString()
             return valueOf(content)
         }
     }
 
+    @TinyFunction("Create a local file. The name is generated so the name is unique.")
     internal inner class create : TwoArgFunction() {
 
+        @TinyCall("Create a local file with the prefix and the extension. The name of the file created.")
         override fun call(@TinyArg("prefix") arg1: LuaValue, @TinyArg("extension") arg2: LuaValue): LuaValue {
             val prefix = arg1.optjstring("new")!!
             val ext = arg2.optjstring("")!!
 
+            val (filename, filenameWithExt) = findAvailableName(prefix, ext)
+
+            resources = resources + platform.createLocalFile(filenameWithExt)
+            return valueOf(filename)
+        }
+
+        private fun findAvailableName(prefix: String, ext: String): Pair<String, String> {
             var nameAvailable = false
-
             var index = 0
-
             var filename = ""
 
             while (!nameAvailable) {
@@ -74,15 +91,17 @@ class WorkspaceLib(
             } else {
                 "$filename.$ext"
             }
-            resources = resources + platform.createLocalFile(fileneameWithExt)
-            return valueOf(filename)
+            return Pair(filename, fileneameWithExt)
         }
     }
 
+    @TinyFunction("List all files available in the workspace.")
     internal inner class list : OneArgFunction() {
 
+        @TinyCall("List all files available in the workspace.")
         override fun call(): LuaValue = super.call()
 
+        @TinyCall("List all files available in the workspace and filter by the file extension.")
         override fun call(@TinyArg("extension") arg: LuaValue): LuaValue {
             val ext = arg.optjstring(null).let { it?.lowercase() }
             val result = LuaTable()

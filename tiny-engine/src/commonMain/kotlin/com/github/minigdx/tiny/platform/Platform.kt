@@ -96,5 +96,10 @@ interface Platform {
      */
     fun createSoundStream(name: String): SourceStream<SoundData>
 
+    /**
+     * Create a file using the name.
+     *
+     * @param: name of the file, with the extension, if any.
+     */
     fun createLocalFile(name: String): LocalFile
 }

@@ -7,7 +7,13 @@ class JsLocalFile(
     override val extension: String,
 ) : LocalFile {
 
-    private fun computeFilename() = "$name.$extension"
+    private fun computeFilename(): String {
+        return if (extension.isBlank()) {
+            name
+        } else {
+            "$name.$extension"
+        }
+    }
 
     override fun readAll(): ByteArray {
         val item = localStorage.getItem(computeFilename())
