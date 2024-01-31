@@ -3870,6 +3870,51 @@ end
 <div class="paragraph">
 <p>Workspace manipulation library. It allows you to save/load/download files</p>
 </div>
+<div class="sect3">
+<h4 id="_ws_save">ws.save()</h4>
+<div class="paragraph">
+<p>Save the content into a local file, on desktop or in the local storage on the web platform.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">ws.save(name, content) -- Save the content into the file name.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_ws_load">ws.load()</h4>
+<div class="paragraph">
+<p>Load and get the content of the file name</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">ws.load(name) -- Load and get the content of the file name</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_ws_create">ws.create()</h4>
+<div class="paragraph">
+<p>Create a local file. The name is generated so the name is unique.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">ws.create(prefix, extension) -- Create a local file with the prefix and the extension. The name of the file created.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_ws_list">ws.list()</h4>
+<div class="paragraph">
+<p>List all files available in the workspace.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">ws.list() -- List all files available in the workspace.
+ws.list(extension) -- List all files available in the workspace and filter by the file extension.</code></pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -3877,7 +3922,7 @@ end
 <div id="footer">
 <div id="footer-text">
 Version custom-sound<br>
-Last updated 2024-01-30 20:58:50 UTC
+Last updated 2024-01-31 23:13:56 UTC
 </div>
 </div>
 </body>

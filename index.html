@@ -939,7 +939,14 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <li><a href="#_vec2_scl">vec2.scl()</a></li>
 </ul>
 </li>
-<li><a href="#_ws">ws</a></li>
+<li><a href="#_ws">ws</a>
+<ul class="sectlevel3">
+<li><a href="#_ws_save">ws.save()</a></li>
+<li><a href="#_ws_load">ws.load()</a></li>
+<li><a href="#_ws_create">ws.create()</a></li>
+<li><a href="#_ws_list">ws.list()</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#_links">Links</a></li>
@@ -5134,6 +5141,51 @@ end
 <div class="paragraph">
 <p>Workspace manipulation library. It allows you to save/load/download files</p>
 </div>
+<div class="sect3">
+<h4 id="_ws_save">ws.save()</h4>
+<div class="paragraph">
+<p>Save the content into a local file, on desktop or in the local storage on the web platform.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">ws</span><span class="p">.</span><span class="n">save</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span> <span class="c1">-- Save the content into the file name.</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_ws_load">ws.load()</h4>
+<div class="paragraph">
+<p>Load and get the content of the file name</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">ws</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="c1">-- Load and get the content of the file name</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_ws_create">ws.create()</h4>
+<div class="paragraph">
+<p>Create a local file. The name is generated so the name is unique.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">ws</span><span class="p">.</span><span class="n">create</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">extension</span><span class="p">)</span> <span class="c1">-- Create a local file with the prefix and the extension. The name of the file created.</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_ws_list">ws.list()</h4>
+<div class="paragraph">
+<p>List all files available in the workspace.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">ws</span><span class="p">.</span><span class="n">list</span><span class="p">()</span> <span class="c1">-- List all files available in the workspace.</span>
+<span class="n">ws</span><span class="p">.</span><span class="n">list</span><span class="p">(</span><span class="n">extension</span><span class="p">)</span> <span class="c1">-- List all files available in the workspace and filter by the file extension.</span></code></pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -5191,7 +5243,7 @@ Support us by crediting Kenney or www.kenney.nl (this is not mandatory)</pre>
 <div id="footer">
 <div id="footer-text">
 Version custom-sound<br>
-Last updated 2024-01-30 20:56:33 UTC
+Last updated 2024-01-31 23:11:26 UTC
 </div>
 </div>
 <style>
