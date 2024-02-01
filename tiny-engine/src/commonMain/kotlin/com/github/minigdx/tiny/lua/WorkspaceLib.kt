@@ -53,7 +53,7 @@ class WorkspaceLib(
         @TinyCall("Load and get the content of the file name")
         override fun call(@TinyArg("name") arg: LuaValue): LuaValue {
             val file = findFile(arg) ?: return NIL
-            val content = file.readAll().decodeToString()
+            val content = file.readAll()?.decodeToString() ?: return NIL
             return valueOf(content)
         }
     }

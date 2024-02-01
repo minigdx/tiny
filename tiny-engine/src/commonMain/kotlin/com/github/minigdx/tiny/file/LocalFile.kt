@@ -15,7 +15,7 @@ interface LocalFile {
     /**
      * Read the content of the file
      */
-    fun readAll(): ByteArray
+    fun readAll(): ByteArray?
 
     /**
      * Save the content of the file

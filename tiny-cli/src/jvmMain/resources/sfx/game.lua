@@ -183,6 +183,7 @@ function _init(w, h)
                 width = 2 * 16 + 8,
                 status = 0,
                 label = w,
+                content = ws.load(w),
                 on_active_tab = on_active_tab
             })
             table.insert(tabs, tab)
@@ -243,33 +244,34 @@ function init_faders(tabs)
     end
 
     for t in all(tabs) do
-        local f = t.label
-        local content = ws.load(f)
-        local saved = split(content)
-        local result = {}
-        for index, f in ipairs(faders) do
-            local s = saved[index]
+        local content = t.content
+        if content then
+            local saved = split(content)
+            local result = {}
+            for index, f in ipairs(faders) do
+                local s = saved[index]
 
-            local data = {
-                wave = "",
-                note = 0,
-                value = 0,
-                color = 0
-            }
-
-            if s ~= "(0)" and s ~= "*" then
-                local wave, note = extract(s)
-                data = {
-                    wave = wave,
-                    note = note,
-                    value = notes[note],
-                    color = colors[wave],
+                local data = {
+                    wave = "",
+                    note = 0,
+                    value = 0,
+                    color = 0
                 }
-            end
 
-            table.insert(result, data)
+                if s ~= "(0)" and s ~= "*" then
+                    local wave, note = extract(s)
+                    data = {
+                        wave = wave,
+                        note = note,
+                        value = notes[note],
+                        color = colors[wave]
+                    }
+                end
+
+                table.insert(result, data)
+            end
+            t.data = result
         end
-        t.data = result
     end
     on_active_tab(tabs[1])
 

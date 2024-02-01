@@ -12,8 +12,13 @@ class JvmLocalFile(
     override val name: String = file.nameWithoutExtension
 
     override val extension: String = file.extension
-    override fun readAll(): ByteArray {
-        return workingDirectory.resolve(file).readBytes()
+    override fun readAll(): ByteArray? {
+        val resolved = workingDirectory.resolve(file)
+        return if (resolved.exists() && resolved.isFile) {
+            resolved.readBytes()
+        } else {
+            null
+        }
     }
 
     override fun save(content: ByteArray) {

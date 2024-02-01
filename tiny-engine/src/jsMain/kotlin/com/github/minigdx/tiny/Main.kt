@@ -104,8 +104,8 @@ fun setupGames(rootPath: String, tinyGameTag: HTMLCollection) {
 
         WorkspaceLib.DEFAULT = (0 until localStorage.length).mapNotNull { index ->
             val key = localStorage.key(index)
-            if (key != null) {
-                JsLocalFile(key)
+            if (key != null && key.startsWith("tiny")) {
+                JsLocalFile(key.replaceFirst("tiny-", ""))
             } else {
                 null
             }
