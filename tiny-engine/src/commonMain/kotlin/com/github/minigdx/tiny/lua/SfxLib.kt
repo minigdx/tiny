@@ -44,6 +44,7 @@ class SfxLib(
         ctrl.set("noise", noise())
         ctrl.set("pulse", pulse())
         ctrl.set("saw", sawtooth())
+        ctrl.set("to_table", toTable())
         ctrl.set("sfx", sfx())
         arg2.set("sfx", ctrl)
         arg2.get("package").get("loaded").set("sfx", ctrl)
@@ -161,6 +162,36 @@ class SfxLib(
             }
             canPlay(resourceAccess.sound(index))?.stop()
             return NIL
+        }
+    }
+
+    inner class toTable : OneArgFunction() {
+
+        private fun Beat.toLuaTable(): LuaTable {
+            val beat = LuaTable()
+            notes.forEach { wave ->
+                beat.set("type", wave.name)
+                beat.set("note", wave.note.index)
+            }
+            return beat
+        }
+
+        override fun call(arg: LuaValue): LuaValue {
+            val score = arg.optjstring(null) ?: return NIL
+            val song = convertScoreToSong(score)
+
+            val patterns = LuaTable()
+            song.patterns.forEach { (index, pattern) ->
+                val beats = LuaTable()
+                pattern.beats.forEach { beat ->
+                    beats.insert(beat.index, beat.toLuaTable())
+                }
+                patterns.insert(index, beats)
+            }
+            val result = LuaTable()
+            result["bpm"] = valueOf(song.bpm)
+            result["patterns"] = patterns
+            return result
         }
     }
 
