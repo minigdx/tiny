@@ -44,16 +44,6 @@ sealed class WaveGenerator(val note: Note, val duration: Seconds, val volume: Pe
     }
 }
 
-class SawToothWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGenerator(note, duration, volume) {
-    override fun generate(sample: Int): Float {
-        val angle: Float = sin(angle(sample))
-        val phase = (angle * 2f) - 1f
-        return phase
-    }
-
-    override fun copy(duration: Seconds, volume: Percent): WaveGenerator = SawToothWave(note, duration, volume)
-}
-
 class SineWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGenerator(note, duration, volume) {
     override fun generate(sample: Int): Float {
         return sin(angle(sample))
@@ -110,6 +100,16 @@ class PulseWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGen
     }
 
     override fun copy(duration: Seconds, volume: Percent): WaveGenerator = PulseWave(note, duration, volume)
+}
+
+class SawToothWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGenerator(note, duration, volume) {
+    override fun generate(sample: Int): Float {
+        val angle: Float = sin(angle(sample))
+        val phase = (angle * 2f) - 1f
+        return phase
+    }
+
+    override fun copy(duration: Seconds, volume: Percent): WaveGenerator = SawToothWave(note, duration, volume)
 }
 
 class SilenceWave(duration: Seconds) : WaveGenerator(Note.C0, duration, 1.0f) {

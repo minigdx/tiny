@@ -177,6 +177,15 @@ enum class Note(val frequency: Float, val index: Int) {
     As8(7458.62f, OCTAVE_8 + 11),
     Bb8(7458.62f, OCTAVE_8 + 11),
     B8(7902.13f, OCTAVE_8 + 12),
+    ;
+
+    companion object {
+        private val notesPerIndex = Note.values().distinctBy { it.index }.sortedBy { it.index }.toTypedArray()
+
+        fun fromIndex(noteIndex: Int): Note {
+            return notesPerIndex[noteIndex - 1]
+        }
+    }
 }
 
 @TinyLib(
