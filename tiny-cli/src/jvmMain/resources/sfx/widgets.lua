@@ -37,12 +37,35 @@ local Tab = {
     new_tab = false
 }
 
+local Counter = {
+    label = "",
+    value = 0,
+    x = 0,
+    y = 0,
+    width = 16,
+    height = 16,
+    status = 0, -- 0 : iddle ; 1 : over left ; 2 : over right
+    on_left = function(counter)
+    end,
+    on_right = function(counter)
+    end,
+    spr = 32
+}
+
 local buttons = {}
 local tabs = {}
 local faders = {}
 local widgets = {}
+local counters = {}
 
 local factory = {}
+
+factory.createCounter = function(value)
+    local result = new(Counter, value)
+    table.insert(widgets, result)
+    table.insert(counters, result)
+    return result
+end
 
 factory.createTab = function(value)
     local result = new(Tab, value)
@@ -78,6 +101,30 @@ factory.on_update = function(x, y)
 
         if f.status == 0 and inside_widget(f, x, y) then
             f.status = 1
+        end
+    end
+
+    for c in all(counters) do
+        -- inside the widgets
+        local left = {
+            width = 8,
+            height = 8,
+            x = c.x,
+            y = c.y + 8
+        }
+
+        local right = {
+            width = 8,
+            height = 8,
+            x = c.x + 8,
+            y = c.y + 8
+        }
+        if inside_widget(left, x, y) then
+            c.status = 1
+        elseif inside_widget(right, x, y) then
+            c.status = 2
+        else
+            c.status = 0
         end
     end
 end
@@ -156,6 +203,14 @@ factory.on_clicked = function(x, y)
         new_active.status = 1
         new_active.on_active_tab(new_active, current_active)
     end
+
+    for c in all(counters) do
+        if c.status == 1 then
+            c.on_left(c)
+        elseif c.status == 2 then
+            c.on_right(c)
+        end
+    end
 end
 
 factory._update = function(mouse)
@@ -193,7 +248,7 @@ function draw_tab(tab)
     spr.sdraw(tab.x + tab.width, 0, 96, offset, 8, 8)
 
     local center = tab.width * 0.5 - #tab.label * 0.5 * 4
-    
+
     print(tab.label, tab.x + center, tab.y + 2)
 
     -- left
@@ -236,7 +291,20 @@ function draw_button(button)
         spr.draw(button.overlay, button.x, button.y)
     end
 end
+
+function draw_counter(counter)
+
+    spr.draw(counter.spr + counter.status, counter.x, counter.y)
+
+    print(counter.label, counter.x + 1, counter.y - 4)
+    print(string.sub(counter.value, 1, 4), counter.x + 3, counter.y + 2)
+end
+
 factory._draw = function()
+    for c in all(counters) do
+        draw_counter(c)
+    end
+
     for f in all(faders) do
         draw_fader(f)
     end

@@ -111,12 +111,21 @@ function on_save_button()
     ws.save(active_tab.label, score)
 end
 
+function on_decrease_bpm(counter)
+    counter.value = math.max(10, counter.value - 5)
+end
+
+function on_increase_bpm(counter)
+    counter.value = math.min(220, counter.value + 5)
+end
+
 function _init(w, h)
 
     widgets.on_new_tab = on_new_tab
     window.width = w
     window.height = h
 
+    -- buttons
     widgets.createButton({
         x = 10,
         y = 16,
@@ -134,6 +143,33 @@ function _init(w, h)
         },
         grouped = false,
         on_active_button = on_save_button
+    })
+
+    widgets.createButton({
+        x = 10,
+        y = 16 + 2 + 16 + 2 + 16,
+        overlay = 24,
+        grouped = false,
+        on_active_button = on_play_button
+    })
+
+
+    widgets.createCounter({
+        x = 10,
+        y = 112,
+        value = 1,
+        label = "pattern",
+        -- on_left = on_decrease_bpm,
+        -- on_right = on_increase_bpm,
+    })
+
+    widgets.createCounter({
+        x = 10,
+        y = 112 + 24,
+        value = 120,
+        label = "bpm",
+        on_left = on_decrease_bpm,
+        on_right = on_increase_bpm,
     })
 
     -- faders
