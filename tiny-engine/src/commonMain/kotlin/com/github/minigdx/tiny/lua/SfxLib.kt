@@ -170,8 +170,10 @@ class SfxLib(
         private fun Beat.toLuaTable(): LuaTable {
             val beat = LuaTable()
             notes.forEach { wave ->
-                beat.set("type", wave.name)
-                beat.set("note", wave.note.index)
+                val note = LuaTable()
+                note.set("type", wave.name)
+                note.set("note", wave.note.index)
+                beat.insert(0, note)
             }
             return beat
         }
@@ -190,6 +192,7 @@ class SfxLib(
             }
             val result = LuaTable()
             result["bpm"] = valueOf(song.bpm)
+            result["volume"] = valueOf(song.volume.toDouble())
             result["patterns"] = patterns
             return result
         }
@@ -198,10 +201,8 @@ class SfxLib(
     inner class sfx : TwoArgFunction() {
 
         override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
-            val bpm = arg2.optint(120)
-            val duration = 60 / bpm.toFloat() / 4
             val score = arg1.optjstring("")!!
-            val waves = convertScoreToWaves(score, duration)
+            val waves = convertScoreToSong(score)
             resourceAccess.sfx(waves)
             return NIL
         }
@@ -293,13 +294,13 @@ class SfxLib(
                 )
             }
 
-            val (_, nbPattern, bpm) = header.split(" ")
+            val (_, nbPattern, bpm, volume) = header.split(" ")
 
             val duration = 60f / bpm.toFloat() / 4f
 
             // Map<Index, Pattern>
             val patterns = lines.drop(1).take(nbPattern.toInt()).mapIndexed { indexPattern, pattern ->
-                val beatsStr = pattern.split(" ")
+                val beatsStr = pattern.trim().split(" ")
                 val beats = convertToBeats(beatsStr, duration)
                 Pattern(indexPattern + 1, beats)
             }.associateBy { it.index }
@@ -313,7 +314,7 @@ class SfxLib(
 
             val patternsOrdered = orders.map { patterns[it]!! }
 
-            return Song(bpm.toInt(), patterns, patternsOrdered)
+            return Song(bpm.toInt(), volume.toInt() / 255f, patterns, patternsOrdered)
         }
 
         private fun convertToBeats(beatsStr: List<String>, duration: Seconds): List<Beat> {

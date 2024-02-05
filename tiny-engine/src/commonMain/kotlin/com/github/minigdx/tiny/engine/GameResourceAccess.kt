@@ -56,12 +56,6 @@ interface GameResourceAccess {
      */
     fun note(wave: WaveGenerator)
 
-    /**
-     * Play the sfx represented by this list of waves.
-     */
-    @Deprecated("use sfx(song) instead")
-    fun sfx(waves: List<WaveGenerator>)
-
     fun sfx(song: Song)
 
     /**

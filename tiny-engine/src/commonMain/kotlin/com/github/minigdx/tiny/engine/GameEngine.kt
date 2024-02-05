@@ -97,8 +97,6 @@ class GameEngine(
 
     private val notes = mutableListOf<WaveGenerator>()
 
-    @Deprecated("use [song] instead")
-    private var sfx: List<WaveGenerator>? = null
     private var song: Song? = null
     private var longuestDuration: Seconds = 0f
 
@@ -332,9 +330,6 @@ class GameEngine(
             notes.clear()
             longuestDuration = 0f
 
-            sfx?.run { soundManager.playSfx(this) }
-            sfx = null
-
             song?.run { soundManager.playSong(this) }
             song = null
 
@@ -493,11 +488,6 @@ class GameEngine(
     override fun note(wave: WaveGenerator) {
         longuestDuration = max(longuestDuration, wave.duration)
         notes.add(wave)
-    }
-
-    @Deprecated("use sfx(song) instead")
-    override fun sfx(waves: List<WaveGenerator>) {
-        sfx = waves
     }
 
     override fun sfx(song: Song) {

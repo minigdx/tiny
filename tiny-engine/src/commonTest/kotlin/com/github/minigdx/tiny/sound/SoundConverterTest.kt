@@ -10,7 +10,7 @@ class SoundConverterTest {
     fun createStrip() {
         val result = SoundConverter().createStrip(
             5,
-            arrayListOf(
+            arrayOf(
                 PulseWave(Note.A4, 0.1f),
                 PulseWave(Note.A4, 0.1f),
                 SilenceWave(0.1f),
@@ -25,7 +25,7 @@ class SoundConverterTest {
         val sine = SineWave(Note.C0, 0.1f)
         val pulse = PulseWave(Note.C0, 0.1f)
         val pattern = Pattern(1, listOf(Beat(1, listOf(sine, pulse))))
-        val song = Song(120, mapOf(pattern.index to pattern), listOf(pattern, pattern))
+        val song = Song(120, 1f, mapOf(pattern.index to pattern), listOf(pattern, pattern))
 
         val result = SoundConverter().prepateStrip(song)
 

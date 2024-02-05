@@ -193,7 +193,7 @@ class SoundConverter {
             val volume = firstBeat.volume
             val value = firstBeat.generate(cursor.current)
             val sampled = value * volume
-            result[cursor.absolute] = sampled
+            result[sample] = sampled
             cursor.advance()
         }
 
@@ -206,7 +206,7 @@ class SoundConverter {
 
             (0 until numberOfSamplesPerBeat).forEach { sample ->
                 val sampled = fader.fadeWith(cursor.previous, a, cursor.current, b)
-                result[cursor.absolute] = sampled
+                result[sample] = sampled
                 cursor.advance()
             }
         }
