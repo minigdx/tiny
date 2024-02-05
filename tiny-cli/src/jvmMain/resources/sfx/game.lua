@@ -11,37 +11,42 @@ local labels = {"C0", "Db0", "D0", "Eb0", "E0", "F0", "Gb0", "G0", "Ab0", "A0", 
 
 local waves = {{
     type = "sine",
-    color = 9
+    color = 9,
+    index = 1
 }, {
     type = "noise",
-    color = 4
+    color = 4,
+    index = 2
 }, {
     type = "pulse",
-    color = 10
+    color = 10,
+    index = 3
 }, {
     type = "triangle",
-    color = 13
+    color = 13,
+    index = 4
 }, {
     type = "saw",
-    color = 11
+    color = 11,
+    index = 5
 }, {
     type = "square",
-    color = 15
+    color = 15,
+    index = 6
 }}
 
+local bpm = nil
+local patterns = nil
 local faders = {}
 local current_wave = waves[1]
 
 function on_fader_update(fader, value)
-    fader.value = math.ceil(value)
-    fader.data = {
-        note = labels[fader.value],
-        wave = current_wave.type,
-        value = fader.value,
-        color = current_wave.color
-    }
-    fader.label = labels[fader.value]
-    fader.tip_color = current_wave.color
+    widgets.setFaderValue(
+        fader, 
+        current_wave.index,
+        math.ceil(value),
+        current_wave.color
+    )
 end
 
 function on_active_button(current, prec)
@@ -153,23 +158,22 @@ function _init(w, h)
         on_active_button = on_play_button
     })
 
-
-    widgets.createCounter({
+    patterns = widgets.createCounter({
         x = 10,
         y = 112,
         value = 1,
-        label = "pattern",
+        label = "pattern"
         -- on_left = on_decrease_bpm,
         -- on_right = on_increase_bpm,
     })
 
-    widgets.createCounter({
+    bpm = widgets.createCounter({
         x = 10,
         y = 112 + 24,
         value = 120,
         label = "bpm",
         on_left = on_decrease_bpm,
-        on_right = on_increase_bpm,
+        on_right = on_increase_bpm
     })
 
     -- faders
@@ -219,7 +223,7 @@ function _init(w, h)
                 width = 2 * 16 + 8,
                 status = 0,
                 label = w,
-                content = ws.load(w),
+                content = sfx.to_table(ws.load(w)),
                 on_active_tab = on_active_tab
             })
             table.insert(tabs, tab)
@@ -252,20 +256,6 @@ function _init(w, h)
     init_faders(tabs)
 end
 
-function extract(inputString)
-    local pattern = "([a-zA-Z]+)%(([^%)]+)%)"
-    local wave, note = inputString:match(pattern)
-    return wave, note
-end
-
-function split(inputString)
-    local result = {}
-    for token in string.gmatch(inputString, "[^%-]+") do
-        table.insert(result, token)
-    end
-    return result
-end
-
 function init_faders(tabs)
     local index = 1
 
@@ -280,33 +270,9 @@ function init_faders(tabs)
     end
 
     for t in all(tabs) do
-        local content = t.content
-        if content then
-            local saved = split(content)
-            local result = {}
-            for index, f in ipairs(faders) do
-                local s = saved[index]
-
-                local data = {
-                    wave = "",
-                    note = 0,
-                    value = 0,
-                    color = 0
-                }
-
-                if s ~= "(0)" and s ~= "*" then
-                    local wave, note = extract(s)
-                    data = {
-                        wave = wave,
-                        note = note,
-                        value = notes[note],
-                        color = colors[wave]
-                    }
-                end
-
-                table.insert(result, data)
-            end
-            t.data = result
+        local song = t.content
+        if song then
+            t.data = song
         end
     end
     on_active_tab(tabs[1])

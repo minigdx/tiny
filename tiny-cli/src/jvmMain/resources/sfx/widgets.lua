@@ -6,6 +6,7 @@ local Fader = {
     min_value = 0,
     max_value = 10,
     value = nil,
+    values = nil,
     tip_color = 9,
     disabled_color = 7,
     label = "",
@@ -13,6 +14,11 @@ local Fader = {
     data = nil,
     on_value_update = function(fader, value)
     end
+}
+
+local FaderValue = {
+    value = 0,
+    color = 0
 }
 
 local Button = {
@@ -81,8 +87,17 @@ factory.createButton = function(value)
     return result
 end
 
-factory.createFader = function(value)
+factory.setFaderValue = function(fader, index, value, color)
+    if fader.values == nil then
+        fader.values = {}
+    end
+    fader.values[index] = {
+        value = value,
+        color = color
+    }
+end
 
+factory.createFader = function(value)
     local result = new(Fader, value)
     table.insert(widgets, result)
     table.insert(faders, result)
@@ -259,20 +274,15 @@ function draw_tab(tab)
 end
 
 function draw_fader(f)
-    local y = f.height - 4
-
-    if f.value then
-        y = f.height - ((f.value - f.min_value) / (f.max_value - f.min_value) * f.height)
-    end
-    local tipy = f.y + y
-
-    if f.value > f.min_value then
-        local linex = f.x + f.width * 0.5
-        gfx.dither(0xA5A5)
-        shape.line(linex, tipy, linex, f.y + f.height, 7)
-        gfx.dither()
-        shape.rectf(f.x, tipy, f.width, 4, f.tip_color)
+    if f.values ~= nil and next(f.values) then
+        for v in all(f.values) do
+            local y = f.height - ((v.value - f.min_value) / (f.max_value - f.min_value) * f.height)
+            local tipy = f.y + y
+            shape.rectf(f.x, tipy, f.width, 4, v.color)
+        end
     else
+        local y = f.height - (0 / (f.max_value - f.min_value) * f.height)
+        local tipy = f.y + y
         shape.rectf(f.x, tipy, f.width, 4, f.disabled_color)
     end
 
