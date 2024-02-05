@@ -123,10 +123,9 @@ class JavaMidiSoundManager : SoundManager() {
 
     override suspend fun createSfxSound(bytes: ByteArray): Sound {
         val score = bytes.decodeToString()
-        val duration = 60f / 120f / 4.0f
-        val waves = SfxLib.convertScoreToWaves(score, duration)
+        val waves = SfxLib.convertScoreToSong(score)
 
-        val buffer = convertBuffer(createScoreBuffer(waves))
+        val buffer = convertBuffer(createBufferFromSong(waves))
         return SfxSound(buffer)
     }
 

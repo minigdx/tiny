@@ -215,75 +215,6 @@ class SfxLib(
         }
     }
 
-    fun convertToWave(note: String, duration: Seconds): WaveGenerator {
-        val wave = note.substring(0, 2).toInt(16)
-        val noteIndex = note.substring(2, 4).toInt(16)
-        val volume = note.substring(4, 6).toInt(16) / 255f
-
-        return when (wave) {
-            1 -> SineWave(Note.fromIndex(noteIndex), duration, volume)
-            2 -> SquareWave(Note.fromIndex(noteIndex), duration, volume)
-            3 -> TriangleWave(Note.fromIndex(noteIndex), duration, volume)
-            4 -> NoiseWave(Note.fromIndex(noteIndex), duration, volume)
-            5 -> PulseWave(Note.fromIndex(noteIndex), duration, volume)
-            6 -> SawToothWave(Note.fromIndex(noteIndex), duration, volume)
-            else -> SilenceWave(duration)
-        }
-    }
-
-    fun convertScoreToSong(score: String): Song {
-        val lines = score.lines()
-        if (lines.isEmpty()) {
-            throw IllegalArgumentException(
-                "The content of the score is empty. Can't convert it into a song. " +
-                    "Check if the score is not empty or correctly loaded!",
-            )
-        }
-
-        val header = lines.first()
-        if (!header.startsWith(TINY_SFX_HEADER)) {
-            throw IllegalArgumentException(
-                "The '$TINY_SFX_HEADER' is missing from the fist line of the score. " +
-                    "Is the score a valid score?",
-            )
-        }
-
-        val (_, nbPattern, bpm) = header.split(" ")
-
-        val duration = 60f / bpm.toFloat() / 4f
-
-        // Map<Index, Pattern>
-        val patterns = lines.drop(1).take(nbPattern.toInt()).mapIndexed { indexPattern, pattern ->
-            val beatsStr = pattern.split(" ")
-            val beats = convertToBeats(beatsStr, duration)
-            Pattern(indexPattern + 1, beats)
-        }.associateBy { it.index }
-
-        val patternOrder = lines.drop(nbPattern.toInt() + 1).firstOrNull()
-        val orders = if (patternOrder.isNullOrBlank()) {
-            listOf(1)
-        } else {
-            patternOrder.split(" ").map { it.toInt() }
-        }
-
-        val patternsOrdered = orders.map { patterns[it]!! }
-
-        return Song(bpm.toInt(), patterns, patternsOrdered)
-    }
-
-    private fun convertToBeats(beatsStr: List<String>, duration: Seconds): List<Beat> {
-        val beats = beatsStr
-            .asSequence()
-            .mapIndexed { index, beat ->
-                val notes = beat.split(":")
-                    .asSequence()
-                    .filter { it.isNotBlank() }
-                    .map { note -> convertToWave(note, duration) }
-                Beat(index + 1, notes.toList())
-            }
-        return beats.toList()
-    }
-
     companion object {
 
         private val acceptedTypes = setOf("sine", "noise", "pulse", "triangle", "saw", "square")
@@ -327,6 +258,75 @@ class SfxLib(
             }
 
             return waves
+        }
+
+        fun convertToWave(note: String, duration: Seconds): WaveGenerator {
+            val wave = note.substring(0, 2).toInt(16)
+            val noteIndex = note.substring(2, 4).toInt(16)
+            val volume = note.substring(4, 6).toInt(16) / 255f
+
+            return when (wave) {
+                1 -> SineWave(Note.fromIndex(noteIndex), duration, volume)
+                2 -> SquareWave(Note.fromIndex(noteIndex), duration, volume)
+                3 -> TriangleWave(Note.fromIndex(noteIndex), duration, volume)
+                4 -> NoiseWave(Note.fromIndex(noteIndex), duration, volume)
+                5 -> PulseWave(Note.fromIndex(noteIndex), duration, volume)
+                6 -> SawToothWave(Note.fromIndex(noteIndex), duration, volume)
+                else -> SilenceWave(duration)
+            }
+        }
+
+        fun convertScoreToSong(score: String): Song {
+            val lines = score.lines()
+            if (lines.isEmpty()) {
+                throw IllegalArgumentException(
+                    "The content of the score is empty. Can't convert it into a song. " +
+                        "Check if the score is not empty or correctly loaded!",
+                )
+            }
+
+            val header = lines.first()
+            if (!header.startsWith(TINY_SFX_HEADER)) {
+                throw IllegalArgumentException(
+                    "The '$TINY_SFX_HEADER' is missing from the fist line of the score. " +
+                        "Is the score a valid score?",
+                )
+            }
+
+            val (_, nbPattern, bpm) = header.split(" ")
+
+            val duration = 60f / bpm.toFloat() / 4f
+
+            // Map<Index, Pattern>
+            val patterns = lines.drop(1).take(nbPattern.toInt()).mapIndexed { indexPattern, pattern ->
+                val beatsStr = pattern.split(" ")
+                val beats = convertToBeats(beatsStr, duration)
+                Pattern(indexPattern + 1, beats)
+            }.associateBy { it.index }
+
+            val patternOrder = lines.drop(nbPattern.toInt() + 1).firstOrNull()
+            val orders = if (patternOrder.isNullOrBlank()) {
+                listOf(1)
+            } else {
+                patternOrder.split(" ").map { it.toInt() }
+            }
+
+            val patternsOrdered = orders.map { patterns[it]!! }
+
+            return Song(bpm.toInt(), patterns, patternsOrdered)
+        }
+
+        private fun convertToBeats(beatsStr: List<String>, duration: Seconds): List<Beat> {
+            val beats = beatsStr
+                .asSequence()
+                .mapIndexed { index, beat ->
+                    val notes = beat.split(":")
+                        .asSequence()
+                        .filter { it.isNotBlank() }
+                        .map { note -> convertToWave(note, duration) }
+                    Beat(index + 1, notes.toList())
+                }
+            return beats.toList()
         }
 
         private const val TINY_SFX_HEADER = "tiny-sfx"

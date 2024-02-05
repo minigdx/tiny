@@ -5,6 +5,7 @@ import com.github.minigdx.tiny.resources.GameLevel
 import com.github.minigdx.tiny.resources.GameScript
 import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.resources.SpriteSheet
+import com.github.minigdx.tiny.sound.Song
 import com.github.minigdx.tiny.sound.WaveGenerator
 
 sealed interface DebugAction
@@ -58,7 +59,10 @@ interface GameResourceAccess {
     /**
      * Play the sfx represented by this list of waves.
      */
+    @Deprecated("use sfx(song) instead")
     fun sfx(waves: List<WaveGenerator>)
+
+    fun sfx(song: Song)
 
     /**
      * Find a script by its name.

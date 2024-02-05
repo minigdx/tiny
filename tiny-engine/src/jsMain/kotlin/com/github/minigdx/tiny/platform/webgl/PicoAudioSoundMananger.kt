@@ -4,7 +4,6 @@ import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.lua.SfxLib
 import com.github.minigdx.tiny.sound.Sound
 import com.github.minigdx.tiny.sound.SoundManager
-import com.github.minigdx.tiny.sound.SoundManager.Companion.SAMPLE_RATE
 import org.khronos.webgl.Float32Array
 import org.khronos.webgl.set
 
@@ -57,9 +56,8 @@ class PicoAudioSoundMananger : SoundManager() {
 
     override suspend fun createSfxSound(bytes: ByteArray): Sound {
         val score = bytes.decodeToString()
-        val duration = 60f / 120f / 4.0f
-        val waves = SfxLib.convertScoreToWaves(score, duration)
-        val buffer = convertBuffer(createScoreBuffer(waves))
+        val song = SfxLib.convertScoreToSong(score)
+        val buffer = convertBuffer(createBufferFromSong(song))
         return SfxSound(buffer, this)
     }
 

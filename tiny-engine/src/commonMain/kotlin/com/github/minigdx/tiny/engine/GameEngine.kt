@@ -24,6 +24,7 @@ import com.github.minigdx.tiny.resources.ResourceType.GAME_SOUND
 import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
 import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.resources.SpriteSheet
+import com.github.minigdx.tiny.sound.Song
 import com.github.minigdx.tiny.sound.SoundManager
 import com.github.minigdx.tiny.sound.WaveGenerator
 import kotlinx.coroutines.CoroutineScope
@@ -95,7 +96,10 @@ class GameEngine(
     private val debugActions = mutableListOf<DebugAction>()
 
     private val notes = mutableListOf<WaveGenerator>()
+
+    @Deprecated("use [song] instead")
     private var sfx: List<WaveGenerator>? = null
+    private var song: Song? = null
     private var longuestDuration: Seconds = 0f
 
     private lateinit var scripts: Array<GameScript?>
@@ -331,6 +335,9 @@ class GameEngine(
             sfx?.run { soundManager.playSfx(this) }
             sfx = null
 
+            song?.run { soundManager.playSong(this) }
+            song = null
+
             // Fixed step simulation
             accumulator += delta
             if (accumulator >= REFRESH_LIMIT) {
@@ -488,8 +495,13 @@ class GameEngine(
         notes.add(wave)
     }
 
+    @Deprecated("use sfx(song) instead")
     override fun sfx(waves: List<WaveGenerator>) {
         sfx = waves
+    }
+
+    override fun sfx(song: Song) {
+        this.song = song
     }
 
     override fun script(name: String): GameScript? {

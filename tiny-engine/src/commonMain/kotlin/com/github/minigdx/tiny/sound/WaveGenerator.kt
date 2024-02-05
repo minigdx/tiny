@@ -8,7 +8,11 @@ import kotlin.math.abs
 import kotlin.math.sin
 import kotlin.random.Random
 
-sealed class WaveGenerator(val note: Note, val duration: Seconds, val volume: Percent) {
+sealed class WaveGenerator(
+    val note: Note,
+    val duration: Seconds,
+    val volume: Percent,
+) {
 
     val period = SAMPLE_RATE.toFloat() / note.frequency
 
