@@ -18,7 +18,7 @@ data class Pattern(val index: Int, val beats: List<Beat>)
  */
 data class Song(val bpm: Int, val volume: Float, val patterns: Map<Int, Pattern>, val music: List<Pattern>) {
 
-    val durationOfBeat: Seconds = (bpm / 60f / 4f)
+    val durationOfBeat: Seconds = (60f / bpm / 8f)
 
     val numberOfBeats = music.count() * 32
 }

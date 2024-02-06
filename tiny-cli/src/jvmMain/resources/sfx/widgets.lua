@@ -91,10 +91,15 @@ factory.setFaderValue = function(fader, index, value, color)
     if fader.values == nil then
         fader.values = {}
     end
-    fader.values[index] = {
-        value = value,
-        color = color
-    }
+
+    if value <= 0 then
+        fader.values[index] = nil
+    else
+        fader.values[index] = {
+            value = value,
+            color = color
+        }
+    end
 end
 
 factory.createFader = function(value)

@@ -27,8 +27,32 @@ class SoundConverterTest {
         val pattern = Pattern(1, listOf(Beat(1, listOf(sine, pulse))))
         val song = Song(120, 1f, mapOf(pattern.index to pattern), listOf(pattern, pattern))
 
-        val result = SoundConverter().prepateStrip(song)
+        val (lastBeat, result) = SoundConverter().prepareStrip(song)
 
+        assertEquals(1, lastBeat)
+        assertEquals(2, result.size)
+        assertEquals(65, result[sine.name]!!.size)
+        assertEquals(65, result[pulse.name]!!.size)
+    }
+
+    @Test
+    fun prepareStripWithSilence() {
+        val sine = SineWave(Note.C0, 0.1f)
+        val silence = SilenceWave(0.1f)
+        val pulse = PulseWave(Note.C0, 0.1f)
+        val pattern = Pattern(
+            1,
+            listOf(
+                Beat(1, listOf(sine)),
+                Beat(2, listOf(silence)),
+                Beat(3, listOf(pulse)),
+            ),
+        )
+        val song = Song(120, 1f, mapOf(pattern.index to pattern), listOf(pattern, pattern))
+
+        val (lastBeat, result) = SoundConverter().prepareStrip(song)
+
+        assertEquals(6, lastBeat)
         assertEquals(2, result.size)
         assertEquals(65, result[sine.name]!!.size)
         assertEquals(65, result[pulse.name]!!.size)

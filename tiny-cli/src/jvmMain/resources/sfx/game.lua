@@ -41,12 +41,7 @@ local faders = {}
 local current_wave = waves[1]
 
 function on_fader_update(fader, value)
-    widgets.setFaderValue(
-        fader, 
-        current_wave.index,
-        math.ceil(value),
-        current_wave.color
-    )
+    widgets.setFaderValue(fader, current_wave.index, math.ceil(value), current_wave.color)
 end
 
 function on_active_button(current, prec)
@@ -108,7 +103,8 @@ end
 
 function on_play_button()
     local score = generate_score()
-    sfx.sfx(score, 220)
+    debug.console(score)
+    sfx.sfx(score)
 end
 
 function on_save_button()
@@ -279,16 +275,45 @@ function init_faders(tabs)
 
 end
 
-function generate_score()
-    local score = ""
+function to_hex(number)
+    local hexString = string.format("%X", number)
 
-    for f in all(faders) do
-        if f.data ~= nil and f.data.note ~= nil then
-            score = score .. f.data.wave .. "(" .. f.data.note .. ")-"
-        else
-            score = score .. "*-"
-        end
+    -- Add a leading zero if the number is below 16
+    if number < 16 then
+        hexString = "0" .. hexString
     end
+
+    return hexString
+end
+
+function generate_score()
+    local score = "tiny-sfx 1 " .. bpm.value .. " 255\n"
+
+    -- write patterns
+
+    local strip = ""
+    for f in all(faders) do
+        local beat = ""
+        if f.values ~= nil and next(f.values) then
+            debug.console(f.values)
+            for k, v in pairs(f.values) do
+                debug.console("key "..k)
+                debug.console(v)
+                if #beat > 0 then
+                    beat = beat .. ":"
+                end
+                beat = beat .. to_hex(k) .. to_hex(v.value) .. to_hex(255)
+            end
+        else
+           beat = "0000FF" 
+        end
+
+        strip = strip .. beat .. " "
+    end
+
+    score = score .. strip .. "\n"
+    -- write patterns order
+    score = score .. "1"
     return score
 end
 
@@ -298,7 +323,7 @@ function _update()
 
     if ctrl.pressed(keys.space) then
         local score = generate_score()
-        sfx.sfx(score, 220)
+        sfx.sfx(score)
     end
 
     local new_wave = current_wave

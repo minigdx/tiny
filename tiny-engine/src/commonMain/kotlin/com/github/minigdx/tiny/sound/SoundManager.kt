@@ -27,15 +27,7 @@ abstract class SoundManager {
         if (notes.isEmpty()) return
 
         val result = createNotesBuffer(longestDuration, notes)
-        playBuffer(result)
-    }
-
-    fun playSfx(notes: List<WaveGenerator>) {
-        if (notes.isEmpty()) return
-
-        val result = createScoreBuffer(notes)
-
-        playBuffer(result)
+        playBuffer(result, result.size)
     }
 
     protected fun createNotesBuffer(
@@ -53,58 +45,10 @@ abstract class SoundManager {
         return result
     }
 
-    protected fun createScoreBuffer(notes: List<WaveGenerator>): FloatArray {
-        var currentIndex = 0
-
-        fun merge(head: WaveGenerator, tail: List<WaveGenerator>): List<WaveGenerator> {
-            if (tail.isEmpty()) {
-                return listOf(head)
-            }
-
-            val next = tail.first()
-            return if (next.isSame(head)) {
-                merge(head.copy(head.duration + next.duration, head.volume), tail.drop(1))
-            } else {
-                listOf(head) + merge(next, tail.drop(1))
-            }
-        }
-
-        val mergedNotes = merge(notes.first(), notes.drop(1)) + SilenceWave(0.1f)
-
-        var prec: WaveGenerator? = null
-        var lastSample = 0
-        val result = FloatArray((mergedNotes.sumOf { it.duration.toDouble() } * SAMPLE_RATE).toInt())
-        mergedNotes.forEach { note ->
-            val crossover = (0.05f * SAMPLE_RATE).toInt()
-            val mixedNotes = listOf(note)
-            val noteSamples = (SAMPLE_RATE * note.duration).toInt()
-            for (i in 0 until noteSamples) {
-                var sampleMixed = mix(i, mixedNotes)
-
-                // crossover
-                if (prec != null && i <= crossover) {
-                    sampleMixed = (
-                        sampleMixed + fadeOut(
-                            prec!!.generate(lastSample + i),
-                            lastSample + i,
-                            lastSample,
-                            lastSample + crossover,
-                        )
-                        )
-                }
-                result[currentIndex++] = sampleMixed
-            }
-
-            prec = note
-            lastSample = noteSamples
-        }
-        return result
-    }
-
     /**
      * @param buffer byte array representing the sound. Each sample is represented with a float from -1.0f to 1.0f
      */
-    abstract fun playBuffer(buffer: FloatArray)
+    abstract fun playBuffer(buffer: FloatArray, numberOfSamples: Int)
 
     private fun mix(sample: Int, notes: List<WaveGenerator>): Float {
         var result = 0f
@@ -130,16 +74,16 @@ abstract class SoundManager {
     }
 
     fun playSong(song: Song) {
-        val mix = createBufferFromSong(song)
+        val (mix, numberOfSamples) = createBufferFromSong(song)
 
-        playBuffer(mix)
+        playBuffer(mix, numberOfSamples)
     }
 
     private val converter = SoundConverter()
 
-    fun createBufferFromSong(song: Song): FloatArray {
+    fun createBufferFromSong(song: Song): Pair<FloatArray, Int> {
         val numberOfSamplesPerBeat = (song.durationOfBeat * SAMPLE_RATE).toInt()
-        val strips = converter.prepateStrip(song)
+        val (lastBeat, strips) = converter.prepareStrip(song)
         val buffers = strips.map { (kind, strip) ->
             kind to converter.createStrip(numberOfSamplesPerBeat, strip)
         }.toMap()
@@ -154,7 +98,7 @@ abstract class SoundManager {
             }
             mix[sample] = result / buffers.size.toFloat()
         }
-        return mix
+        return mix to lastBeat * numberOfSamplesPerBeat
     }
 
     companion object {
@@ -166,18 +110,24 @@ abstract class SoundManager {
 
 class SoundConverter {
 
-    internal fun prepateStrip(song: Song): Map<String, Array<WaveGenerator>> {
+    internal fun prepareStrip(song: Song): Pair<Int, Map<String, Array<WaveGenerator>>> {
         // Create a line per WaveGenerator kind.
         val musicPerType: MutableMap<String, Array<WaveGenerator>> = mutableMapOf()
+        // All beats of this music.
         val beats = song.music.flatMap { pattern -> pattern.beats }
         val silence = SilenceWave(song.durationOfBeat)
+        var lastBeat = 0
         beats.forEachIndexed { index, beat ->
-            beat.notes.forEach {
+            val validNotes = beat.notes.filterNot { it.isSilence }
+            validNotes.forEach {
                 val waves = musicPerType.getOrPut(it.name) { Array(song.numberOfBeats + 1) { silence } }
                 waves[index] = it
             }
+            if (validNotes.isNotEmpty()) {
+                lastBeat = index + 1
+            }
         }
-        return musicPerType
+        return lastBeat to musicPerType
     }
 
     internal fun createStrip(numberOfSamplesPerBeat: Int, waves: Array<WaveGenerator>): FloatArray {
@@ -189,11 +139,11 @@ class SoundConverter {
 
         // Create the first wave.
         val firstBeat = waves.first()
-        (0 until numberOfSamplesPerBeat).forEach { sample ->
+        (0 until numberOfSamplesPerBeat).forEach { _ ->
             val volume = firstBeat.volume
             val value = firstBeat.generate(cursor.current)
             val sampled = value * volume
-            result[sample] = sampled
+            result[cursor.absolute] = sampled
             cursor.advance()
         }
 
@@ -204,9 +154,9 @@ class SoundConverter {
 
             cursor.next()
 
-            (0 until numberOfSamplesPerBeat).forEach { sample ->
+            (0 until numberOfSamplesPerBeat).forEach { _ ->
                 val sampled = fader.fadeWith(cursor.previous, a, cursor.current, b)
-                result[sample] = sampled
+                result[cursor.absolute] = sampled
                 cursor.advance()
             }
         }

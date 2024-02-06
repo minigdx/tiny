@@ -218,49 +218,6 @@ class SfxLib(
 
     companion object {
 
-        private val acceptedTypes = setOf("sine", "noise", "pulse", "triangle", "saw", "square")
-
-        private fun extractWaveType(str: String): String? {
-            if (str == "*") return str
-
-            val type = str.substringBefore("(")
-            return if (acceptedTypes.contains(type)) {
-                type
-            } else {
-                null
-            }
-        }
-
-        private fun extractNote(str: String): Note {
-            val note = str.substringAfter("(").substringBefore(")")
-            return Note.valueOf(note)
-        }
-
-        private fun trim(str: String): String {
-            val lastIndex = str.lastIndexOf(')')
-            if (lastIndex < 0) return str
-            return str.substring(0, lastIndex + 2)
-        }
-
-        fun convertScoreToWaves(score: String, duration: Seconds): List<WaveGenerator> {
-            val parts = trim(score).split("-")
-            val waves = parts.mapNotNull {
-                val wave = extractWaveType(it)
-                when (wave) {
-                    "*" -> SilenceWave(duration)
-                    "sine" -> SineWave(extractNote(it), duration)
-                    "triangle" -> TriangleWave(extractNote(it), duration)
-                    "square" -> SquareWave(extractNote(it), duration)
-                    "saw" -> SawToothWave(extractNote(it), duration)
-                    "noise" -> NoiseWave(extractNote(it), duration)
-                    "pulse" -> PulseWave(extractNote(it), duration)
-                    else -> null
-                }
-            }
-
-            return waves
-        }
-
         fun convertToWave(note: String, duration: Seconds): WaveGenerator {
             val wave = note.substring(0, 2).toInt(16)
             val noteIndex = note.substring(2, 4).toInt(16)
@@ -268,11 +225,11 @@ class SfxLib(
 
             return when (wave) {
                 1 -> SineWave(Note.fromIndex(noteIndex), duration, volume)
-                2 -> SquareWave(Note.fromIndex(noteIndex), duration, volume)
-                3 -> TriangleWave(Note.fromIndex(noteIndex), duration, volume)
-                4 -> NoiseWave(Note.fromIndex(noteIndex), duration, volume)
-                5 -> PulseWave(Note.fromIndex(noteIndex), duration, volume)
-                6 -> SawToothWave(Note.fromIndex(noteIndex), duration, volume)
+                2 -> NoiseWave(Note.fromIndex(noteIndex), duration, volume)
+                3 -> PulseWave(Note.fromIndex(noteIndex), duration, volume)
+                4 -> TriangleWave(Note.fromIndex(noteIndex), duration, volume)
+                5 -> SawToothWave(Note.fromIndex(noteIndex), duration, volume)
+                6 -> SquareWave(Note.fromIndex(noteIndex), duration, volume)
                 else -> SilenceWave(duration)
             }
         }
@@ -296,7 +253,7 @@ class SfxLib(
 
             val (_, nbPattern, bpm, volume) = header.split(" ")
 
-            val duration = 60f / bpm.toFloat() / 4f
+            val duration = 60f / bpm.toFloat() / 8f
 
             // Map<Index, Pattern>
             val patterns = lines.drop(1).take(nbPattern.toInt()).mapIndexed { indexPattern, pattern ->
