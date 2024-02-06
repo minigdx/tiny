@@ -39,6 +39,7 @@ local Tab = {
     width = 0,
     height = 8,
     label = "+",
+    content = nil,
     status = 0, -- 0 : inactive ; 1 : active
     new_tab = false
 }
@@ -100,6 +101,10 @@ factory.setFaderValue = function(fader, index, value, color)
             color = color
         }
     end
+end
+
+factory.resetFaderValue = function(fader)
+    fader.values = {}
 end
 
 factory.createFader = function(value)

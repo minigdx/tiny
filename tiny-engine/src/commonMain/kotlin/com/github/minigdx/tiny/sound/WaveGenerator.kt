@@ -44,6 +44,8 @@ sealed class WaveGenerator(
 
     abstract val name: String
 
+    abstract val index: Int
+
     companion object {
         internal const val PI = kotlin.math.PI.toFloat()
         internal const val TWO_PI = 2.0f * PI
@@ -58,6 +60,8 @@ class SineWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGene
     override fun copy(duration: Seconds, volume: Percent): WaveGenerator = SineWave(note, duration, volume)
 
     override val name: String = "sine"
+
+    override val index: Int = 1
 }
 
 class SquareWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGenerator(note, duration, volume) {
@@ -73,6 +77,8 @@ class SquareWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGe
     override fun copy(duration: Seconds, volume: Percent): WaveGenerator = SquareWave(note, duration, volume)
 
     override val name: String = "square"
+
+    override val index: Int = 2
 }
 
 class TriangleWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGenerator(note, duration, volume) {
@@ -85,6 +91,8 @@ class TriangleWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : Wave
     override fun copy(duration: Seconds, volume: Percent): WaveGenerator = TriangleWave(note, duration, volume)
 
     override val name: String = "triangle"
+
+    override val index: Int = 3
 }
 
 class NoiseWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGenerator(note, duration, volume) {
@@ -100,6 +108,8 @@ class NoiseWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGen
     override fun copy(duration: Seconds, volume: Percent): WaveGenerator = NoiseWave(note, duration, volume)
 
     override val name: String = "noise"
+
+    override val index: Int = 4
 }
 
 class PulseWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGenerator(note, duration, volume) {
@@ -116,6 +126,8 @@ class PulseWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGen
     override fun copy(duration: Seconds, volume: Percent): WaveGenerator = PulseWave(note, duration, volume)
 
     override val name: String = "pulse"
+
+    override val index: Int = 5
 }
 
 class SawToothWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGenerator(note, duration, volume) {
@@ -128,6 +140,8 @@ class SawToothWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : Wave
     override fun copy(duration: Seconds, volume: Percent): WaveGenerator = SawToothWave(note, duration, volume)
 
     override val name: String = "sawtooth"
+
+    override val index: Int = 6
 }
 
 class SilenceWave(duration: Seconds) : WaveGenerator(Note.C0, duration, 1.0f) {
@@ -140,4 +154,6 @@ class SilenceWave(duration: Seconds) : WaveGenerator(Note.C0, duration, 1.0f) {
     override fun copy(duration: Seconds, volume: Percent): WaveGenerator = SilenceWave(duration)
 
     override val name: String = " "
+
+    override val index: Int = 0
 }

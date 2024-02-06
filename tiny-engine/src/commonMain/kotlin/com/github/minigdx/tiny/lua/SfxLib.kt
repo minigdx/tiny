@@ -172,6 +172,7 @@ class SfxLib(
             notes.forEach { wave ->
                 val note = LuaTable()
                 note.set("type", wave.name)
+                note.set("index", wave.index)
                 note.set("note", wave.note.index)
                 beat.insert(0, note)
             }
@@ -225,11 +226,11 @@ class SfxLib(
 
             return when (wave) {
                 1 -> SineWave(Note.fromIndex(noteIndex), duration, volume)
-                2 -> NoiseWave(Note.fromIndex(noteIndex), duration, volume)
-                3 -> PulseWave(Note.fromIndex(noteIndex), duration, volume)
-                4 -> TriangleWave(Note.fromIndex(noteIndex), duration, volume)
-                5 -> SawToothWave(Note.fromIndex(noteIndex), duration, volume)
-                6 -> SquareWave(Note.fromIndex(noteIndex), duration, volume)
+                2 -> SquareWave(Note.fromIndex(noteIndex), duration, volume)
+                3 -> TriangleWave(Note.fromIndex(noteIndex), duration, volume)
+                4 -> NoiseWave(Note.fromIndex(noteIndex), duration, volume)
+                5 -> PulseWave(Note.fromIndex(noteIndex), duration, volume)
+                6 -> SawToothWave(Note.fromIndex(noteIndex), duration, volume)
                 else -> SilenceWave(duration)
             }
         }

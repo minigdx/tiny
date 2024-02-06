@@ -12,28 +12,34 @@ local labels = {"C0", "Db0", "D0", "Eb0", "E0", "F0", "Gb0", "G0", "Ab0", "A0", 
 local waves = {{
     type = "sine",
     color = 9,
-    index = 1
-}, {
-    type = "noise",
-    color = 4,
-    index = 2
-}, {
-    type = "pulse",
-    color = 10,
-    index = 3
+    index = 1,
+    overlay = 16
+},  {
+    type = "square",
+    color = 15,
+    index = 2,
+    overlay = 21,
 }, {
     type = "triangle",
     color = 13,
-    index = 4
+    index = 3,
+    overlay = 19
+}, {
+    type = "noise",
+    color = 4,
+    index = 4,
+    overlay = 17
+}, {
+    type = "pulse",
+    color = 10,
+    index = 5,
+    overlay = 18
 }, {
     type = "saw",
     color = 11,
-    index = 5
-}, {
-    type = "square",
-    color = 15,
+    overlay = 20,
     index = 6
-}}
+},}
 
 local bpm = nil
 local patterns = nil
@@ -51,40 +57,39 @@ end
 local active_tab = nil
 
 function on_active_tab(current, prec)
-    local data = {}
-    -- save the current score
-    for f in all(faders) do
-        table.insert(data, {
-            wave = f.data.wave,
-            note = f.data.note,
-            value = f.value,
-            color = f.tip_color
-        })
-    end
     if prec ~= nil then
-        prec.data = data
+        local score = generate_score()
+        prec.content = sfx.to_table(score)
     end
 
-    -- restore the previous score
-    if current.data ~= nil then
-        local data = current.data
+    -- restore the previous score of the current tab
+    if current.content ~= nil then
+        local data = current.content
+        bpm.value = data["bpm"]
+        -- always get the first pattern
+        local beats = data["patterns"][1]
         for k, f in ipairs(faders) do
-            f.data = data[k]
-            f.value = data[k].value
-            f.label = labels[f.value]
-            f.tip_color = data[k].color
+            widgets.resetFaderValue(f)
+            if beats[k] ~= nil then
+                for b in all(beats[k]) do
+                    if b.index > 0 then
+                        local w = waves[b.index]
+                        widgets.setFaderValue(f, b.index, b.note, w.color)
+                    else
+                        -- set silence value
+                        widgets.resetFaderValue(f)
+                    end
+                end
+            else
+                -- set silence value
+                widgets.resetFaderValue(f)
+            end
         end
     else
+        bpm.value = 120
         -- no data, reset to 0
         for k, f in ipairs(faders) do
-            f.value = 0
-            f.label = ""
-            f.data = {
-                wave = "",
-                note = 0,
-                value = 0,
-                color = 0
-            }
+            widgets.resetFaderValue(f)
         end
     end
 
@@ -103,7 +108,6 @@ end
 
 function on_play_button()
     local score = generate_score()
-    debug.console(score)
     sfx.sfx(score)
 end
 
@@ -189,12 +193,13 @@ function _init(w, h)
         table.insert(faders, f)
     end
 
+    
     -- buttons
     for i = #waves - 1, 0, -1 do
         local w = widgets.createButton({
             x = 10,
             y = 250 - i * 16,
-            overlay = 16 + i,
+            overlay = waves[i + 1].overlay,
             data = {
                 wave = waves[i + 1]
             },
@@ -265,14 +270,7 @@ function init_faders(tabs)
         colors[v.type] = v.color
     end
 
-    for t in all(tabs) do
-        local song = t.content
-        if song then
-            t.data = song
-        end
-    end
     on_active_tab(tabs[1])
-
 end
 
 function to_hex(number)
@@ -295,17 +293,14 @@ function generate_score()
     for f in all(faders) do
         local beat = ""
         if f.values ~= nil and next(f.values) then
-            debug.console(f.values)
             for k, v in pairs(f.values) do
-                debug.console("key "..k)
-                debug.console(v)
                 if #beat > 0 then
                     beat = beat .. ":"
                 end
                 beat = beat .. to_hex(k) .. to_hex(v.value) .. to_hex(255)
             end
         else
-           beat = "0000FF" 
+            beat = "0000FF"
         end
 
         strip = strip .. beat .. " "
