@@ -96,7 +96,7 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
                 }
             }
 
-            override fun playBuffer(buffer: FloatArray) = Unit
+            override fun playBuffer(buffer: FloatArray, numberOfSamples: Int) = Unit
         }
     }
 

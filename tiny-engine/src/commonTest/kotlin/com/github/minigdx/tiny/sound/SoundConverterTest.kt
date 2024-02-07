@@ -29,7 +29,7 @@ class SoundConverterTest {
 
         val (lastBeat, result) = SoundConverter().prepareStrip(song)
 
-        assertEquals(1, lastBeat)
+        assertEquals(2, lastBeat)
         assertEquals(2, result.size)
         assertEquals(65, result[sine.name]!!.size)
         assertEquals(65, result[pulse.name]!!.size)
