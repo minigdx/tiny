@@ -12,6 +12,7 @@ local Fader = {
     label = "",
     type = "fader",
     data = nil,
+    index = 0,
     on_value_update = function(fader, value)
     end
 }
@@ -111,6 +112,9 @@ factory.createFader = function(value)
     local result = new(Fader, value)
     table.insert(widgets, result)
     table.insert(faders, result)
+
+    result.index = #faders
+    
     return result
 end
 

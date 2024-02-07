@@ -14,11 +14,11 @@ local waves = {{
     color = 9,
     index = 1,
     overlay = 16
-},  {
+}, {
     type = "square",
     color = 15,
     index = 2,
-    overlay = 21,
+    overlay = 21
 }, {
     type = "triangle",
     color = 13,
@@ -39,22 +39,76 @@ local waves = {{
     color = 11,
     overlay = 20,
     index = 6
-},}
+}}
 
 local bpm = nil
 local patterns = nil
 local faders = {}
 local current_wave = waves[1]
 
+local active_tab = nil
+
 function on_fader_update(fader, value)
     widgets.setFaderValue(fader, current_wave.index, math.ceil(value), current_wave.color)
+
+    local actual_pattern = active_tab.content["patterns"][patterns.value]
+
+    if actual_pattern == nil then
+        actual_pattern = {}
+        active_tab.content["patterns"][patterns.value] = actual_pattern
+    end
+    local beat = actual_pattern[fader.index]
+
+    if beat == nil then
+        beat = {}
+        actual_pattern[fader.index] = beat
+
+    end
+
+    local note = beat[current_wave.index]
+    if note == nil then
+        local n = {
+            note = 0,
+            index = current_wave.index,
+            type = 0
+        }
+        beat[current_wave.index] = n
+    end
+
+    beat[current_wave.index].index = current_wave.index
+    beat[current_wave.index].note = math.ceil(value)
+
 end
 
 function on_active_button(current, prec)
     current_wave = current.data.wave
 end
 
-local active_tab = nil
+function active_pattern(index, data)
+    local beats = data["patterns"][index]
+    if beats == nil then
+        beats = {}
+        data["patterns"][index] = beats
+    end
+
+    for k, f in ipairs(faders) do
+        widgets.resetFaderValue(f)
+        if beats[k] ~= nil then
+            for b in all(beats[k]) do
+                if b.index > 0 then
+                    local w = waves[b.index]
+                    widgets.setFaderValue(f, b.index, b.note, w.color)
+                else
+                    -- set silence value
+                    widgets.resetFaderValue(f)
+                end
+            end
+        else
+            -- set silence value
+            widgets.resetFaderValue(f)
+        end
+    end
+end
 
 function on_active_tab(current, prec)
     if prec ~= nil then
@@ -67,30 +121,15 @@ function on_active_tab(current, prec)
         local data = current.content
         bpm.value = data["bpm"]
         -- always get the first pattern
-        local beats = data["patterns"][1]
-        for k, f in ipairs(faders) do
-            widgets.resetFaderValue(f)
-            if beats[k] ~= nil then
-                for b in all(beats[k]) do
-                    if b.index > 0 then
-                        local w = waves[b.index]
-                        widgets.setFaderValue(f, b.index, b.note, w.color)
-                    else
-                        -- set silence value
-                        widgets.resetFaderValue(f)
-                    end
-                end
-            else
-                -- set silence value
-                widgets.resetFaderValue(f)
-            end
-        end
+        active_pattern(1, data)
     else
         bpm.value = 120
+        patterns.value = 1
         -- no data, reset to 0
         for k, f in ipairs(faders) do
             widgets.resetFaderValue(f)
         end
+        current.content = sfx.to_table(generate_score())
     end
 
     active_tab = current
@@ -107,7 +146,7 @@ function on_new_tab(tab)
 end
 
 function on_play_button()
-    local score = generate_score()
+    local score = generate_score(patterns.value)
     sfx.sfx(score)
 end
 
@@ -122,6 +161,16 @@ end
 
 function on_increase_bpm(counter)
     counter.value = math.min(220, counter.value + 5)
+end
+
+function on_previous_patterns(counter)
+    counter.value = math.max(counter.value - 1, 1)
+    active_pattern(counter.value, active_tab.content)
+end
+
+function on_next_patterns(counter)
+    counter.value = math.min(counter.value + 1, 10)
+    active_pattern(counter.value, active_tab.content)
 end
 
 function _init(w, h)
@@ -162,9 +211,9 @@ function _init(w, h)
         x = 10,
         y = 112,
         value = 1,
-        label = "pattern"
-        -- on_left = on_decrease_bpm,
-        -- on_right = on_increase_bpm,
+        label = "pattern",
+        on_left = on_previous_patterns,
+        on_right = on_next_patterns
     })
 
     bpm = widgets.createCounter({
@@ -193,7 +242,6 @@ function _init(w, h)
         table.insert(faders, f)
     end
 
-    
     -- buttons
     for i = #waves - 1, 0, -1 do
         local w = widgets.createButton({
@@ -284,31 +332,56 @@ function to_hex(number)
     return hexString
 end
 
-function generate_score()
-    local score = "tiny-sfx 1 " .. bpm.value .. " 255\n"
+function generate_score(played_pattern)
 
-    -- write patterns
+    -- new file. So there is not content yet.
+    if active_tab.content == nil then
+        local new_pattern = {}
 
-    local strip = ""
-    for f in all(faders) do
-        local beat = ""
-        if f.values ~= nil and next(f.values) then
-            for k, v in pairs(f.values) do
-                if #beat > 0 then
-                    beat = beat .. ":"
-                end
-                beat = beat .. to_hex(k) .. to_hex(v.value) .. to_hex(255)
-            end
-        else
-            beat = "0000FF"
+        for index = 1, 32 do
+            local beat = {}
+            beat[1] = {
+                type = 0,
+                index = 0,
+                note = 1
+            }
+
+            new_pattern[index] = beat
         end
 
-        strip = strip .. beat .. " "
+        active_tab.content = {}
+        active_tab.content.patterns = {}
+        active_tab.content.patterns[1] = new_pattern
+    end
+    local p = active_tab.content["patterns"]
+    local score = "tiny-sfx " .. #p .. " " .. bpm.value .. " 255\n"
+    -- write patterns
+    for patterns in all(active_tab.content["patterns"]) do
+        local strip = ""
+        for index = 1, 32 do
+            local beatStr = ""
+            local beat = patterns[index]
+            if beat == nil then
+                beatStr = beatStr .. "0000FF"
+            else
+                for note in all(beat) do
+                    beatStr = beatStr .. to_hex(note.index) .. to_hex(note.note) .. to_hex(255) .. ":"
+                end
+                beatStr = beatStr:sub(1, -2)
+            end
+            strip = strip .. beatStr .. " "
+        end
+        --
+        score = score .. strip .. "\n"
     end
 
-    score = score .. strip .. "\n"
     -- write patterns order
-    score = score .. "1"
+    if played_pattern == nil then
+        -- TODO: in music mode, generate patterns
+        played_pattern = 1
+    end
+    score = score .. played_pattern
+
     return score
 end
 
