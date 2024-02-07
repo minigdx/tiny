@@ -267,7 +267,7 @@ class SfxLib(
             val orders = if (patternOrder.isNullOrBlank()) {
                 listOf(1)
             } else {
-                patternOrder.split(" ").map { it.toInt() }
+                patternOrder.trim().split(" ").map { it.toInt() }
             }
 
             val patternsOrdered = orders.map { patterns[it]!! }

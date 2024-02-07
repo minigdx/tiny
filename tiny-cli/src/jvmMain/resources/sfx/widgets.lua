@@ -3,6 +3,7 @@ local Fader = {
     y = 0,
     width = 11,
     height = 80,
+    enabled = true,
     min_value = 0,
     max_value = 10,
     value = nil,
@@ -27,6 +28,7 @@ local Button = {
     y = 0,
     width = 16,
     height = 16,
+    enabled = true,
     grouped = true,
     status = 0, -- 0 : idle ; 1 : over ; 2 : active
     overlay = 0, -- sprite index,
@@ -39,6 +41,7 @@ local Tab = {
     y = 0,
     width = 0,
     height = 8,
+    enabled = true,
     label = "+",
     content = nil,
     status = 0, -- 0 : inactive ; 1 : active
@@ -52,6 +55,7 @@ local Counter = {
     y = 0,
     width = 16,
     height = 16,
+    enabled = true,
     status = 0, -- 0 : iddle ; 1 : over left ; 2 : over right
     on_left = function(counter)
     end,
@@ -114,7 +118,7 @@ factory.createFader = function(value)
     table.insert(faders, result)
 
     result.index = #faders
-    
+
     return result
 end
 
@@ -167,7 +171,7 @@ factory.on_click = function(x, y)
             width = f.width,
             height = f.height + 12
         }
-        if inside_widget(box, x, y) then
+        if f.enabled and inside_widget(box, x, y) then
             local percent = math.max(0.0, 1.0 - ((y - f.y) / f.height))
             local value = percent * (f.max_value - f.min_value) + f.min_value
             f.on_value_update(f, value)
@@ -187,14 +191,14 @@ factory.on_clicked = function(x, y)
         end
     end
     -- active the current button and deactive the previous activated
-    if current ~= nil and current.grouped then
+    if current ~= nil and current.enabled and current.grouped then
         if prec ~= nil then
             prec.status = 0
         end
         current.status = 2
     end
 
-    if current ~= nil then
+    if current ~= nil and current.enabled then
         current.on_active_button(current, prec)
     end
 
@@ -234,9 +238,9 @@ factory.on_clicked = function(x, y)
     end
 
     for c in all(counters) do
-        if c.status == 1 then
+        if c.enabled and c.status == 1 then
             c.on_left(c)
-        elseif c.status == 2 then
+        elseif c.enabled and c.status == 2 then
             c.on_right(c)
         end
     end
@@ -326,15 +330,21 @@ end
 
 factory._draw = function()
     for c in all(counters) do
-        draw_counter(c)
+        if c.enabled then
+            draw_counter(c)
+        end
     end
 
     for f in all(faders) do
-        draw_fader(f)
+        if f.enabled then
+            draw_fader(f)
+        end
     end
 
     for b in all(buttons) do
-        draw_button(b)
+        if b.enabled then
+            draw_button(b)
+        end
     end
 
     draw_tabs()
