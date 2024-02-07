@@ -48,6 +48,12 @@ local current_wave = waves[1]
 
 local active_tab = nil
 
+local fader_mode = true
+local switch_mode = nil
+
+local fader_widgets = {}
+local music_widgets = {}
+
 function on_fader_update(fader, value)
     widgets.setFaderValue(fader, current_wave.index, math.ceil(value), current_wave.color)
 
@@ -111,6 +117,10 @@ function active_pattern(index, data)
 end
 
 function on_active_tab(current, prec)
+
+    fader_mode = false
+    on_switch_mode()
+    
     if prec ~= nil then
         local score = generate_score()
         prec.content = sfx.to_table(score)
@@ -140,11 +150,7 @@ local window = {
     height = 0
 }
 
-local fader_mode = true
-local switch_mode = nil
 
-local fader_widgets = {}
-local music_widgets = {}
 
 function on_new_tab(tab)
     local filename = ws.create("sfx", "sfx")
