@@ -705,7 +705,7 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <div id="header">
 <h1>Tiny 🧸</h1>
 <div class="details">
-<span id="revnumber">version custom-sound</span>
+<span id="revnumber">version 1.2.0</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -766,9 +766,14 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <li><a href="#_usage_6">Usage</a></li>
 </ul>
 </li>
-<li><a href="#_the_tiny_cli_lib_command">the <code>tiny-cli lib</code> command</a>
+<li><a href="#_the_tiny_cli_sfx_command">the <code>tiny-cli sfx</code> command</a>
 <ul class="sectlevel3">
 <li><a href="#_usage_7">Usage</a></li>
+</ul>
+</li>
+<li><a href="#_the_tiny_cli_lib_command">the <code>tiny-cli lib</code> command</a>
+<ul class="sectlevel3">
+<li><a href="#_usage_8">Usage</a></li>
 <li><a href="#_library_repository">Library Repository</a></li>
 <li><a href="#_examples">Examples</a></li>
 </ul>
@@ -1650,12 +1655,40 @@ The tiny serve command is intended for local testing only and should not be used
 </div>
 </div>
 <div class="sect2">
+<h3 id="_the_tiny_cli_sfx_command">the <code>tiny-cli sfx</code> command</h3>
+<div class="paragraph">
+<p>The tiny-cli sfx command is used to start a SFX edtor to generate sound to use in your <code>🧸 Tiny</code> game.</p>
+</div>
+<div class="sect3">
+<h4 id="_usage_7">Usage</h4>
+<div class="paragraph">
+<p>To use the <code>tiny-cli sfx</code> command, follow the syntax:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="shell">tiny-cli sfx</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The command can be used to edit sounds used by your <code>🧸 Tiny</code> game.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="shell">tiny-cli sfx &lt;game&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The editor will be run with all SFX sounds from your game loaded.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
 <h3 id="_the_tiny_cli_lib_command">the <code>tiny-cli lib</code> command</h3>
 <div class="paragraph">
 <p>The tiny-cli lib command is used to download and add Lua libraries to your <code>🧸 Tiny</code> game. This command provides an easy way to enhance the functionality of your game by incorporating libraries.</p>
 </div>
 <div class="sect3">
-<h4 id="_usage_7">Usage</h4>
+<h4 id="_usage_8">Usage</h4>
 <div class="paragraph">
 <p>To use the <code>tiny-cli lib</code> command, follow the syntax:</p>
 </div>
@@ -3904,43 +3937,337 @@ end
 <div class="sect2">
 <h3 id="_sfx">sfx</h3>
 <div class="paragraph">
-<p>Sound API to play/loop/stop a sound.</p>
+<p>Sound API to play/loop/stop a sound.
+A sound can be an SFX sound, generated using the tiny-cli sfx command or a MIDI file.
+Please note that a SFX sound will produce the same sound whatever platform and whatever computer
+as the sound is generated.</p>
+</div>
+<div class="paragraph">
+<p>A MIDI sound will depend of the MIDI synthesizer available on the machine.</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+Because of browser behaviour, a sound can <strong>only</strong> be played only after the first
+user interaction.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Avoid to start a music or a sound at the beginning of the game.
+Before it, force the player to hit a key or click by adding an interactive menu
+or by starting the sound as soon as the player is moving.</p>
 </div>
 <div class="sect3">
 <h4 id="_sfx_sine">sfx.sine()</h4>
 <div class="paragraph">
 <p>Generate and play a sine wave sound.</p>
 </div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">sfx</span><span class="p">.</span><span class="n">sine</span><span class="p">(</span><span class="n">note</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">volume</span><span class="p">)</span> <span class="c1">-- Generate and play a sound using one note.</span></code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+local waves = {
+    { name = "sine", fun = sfx.sine, note = notes.C6 },
+    { name = "pulse", fun = sfx.pulse, note = notes.C6 },
+    { name = "triangle", fun = sfx.triangle, note = notes.C6 },
+    { name = "noise", fun = sfx.noise, note = notes.C8 },
+    { name = "sawtooth", fun = sfx.sawtooth, note = notes.C6 },
+    { name = "square", fun = sfx.square, note = notes.C6 },
+}
+
+local index = 1
+
+function new_index(index, tableSize)
+     return ((index - 1) % tableSize) + 1
+end
+
+function _update()
+    if ctrl.pressed(keys.left) then
+        index =new_index(index - 1, #waves)
+    elseif ctrl.pressed(keys.right) then
+        index = new_index(index + 1, #waves)
+    end
+
+    if ctrl.pressed(keys.space) then
+        waves[index].fun( waves[index].note)
+    end
+end
+
+function _draw()
+    gfx.cls()
+    local str = "<<-- "..waves[index].name .. " -->>"
+    print(str, 128 - math.floor(#str * 4 * 0.5), 128 )
+
+
+    local space = "(hit space to play a note)"
+    print(space, 128 - math.floor(#space * 4 * 0.5), 142)
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_sfx_sawtooth">sfx.sawtooth()</h4>
 <div class="paragraph">
 <p>Generate and play a sawtooth wave sound.</p>
 </div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">sfx</span><span class="p">.</span><span class="n">sawtooth</span><span class="p">(</span><span class="n">note</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">volume</span><span class="p">)</span> <span class="c1">-- Generate and play a sound using one note.</span></code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+local waves = {
+    { name = "sine", fun = sfx.sine, note = notes.C6 },
+    { name = "pulse", fun = sfx.pulse, note = notes.C6 },
+    { name = "triangle", fun = sfx.triangle, note = notes.C6 },
+    { name = "noise", fun = sfx.noise, note = notes.C8 },
+    { name = "sawtooth", fun = sfx.sawtooth, note = notes.C6 },
+    { name = "square", fun = sfx.square, note = notes.C6 },
+}
+
+local index = 1
+
+function new_index(index, tableSize)
+     return ((index - 1) % tableSize) + 1
+end
+
+function _update()
+    if ctrl.pressed(keys.left) then
+        index =new_index(index - 1, #waves)
+    elseif ctrl.pressed(keys.right) then
+        index = new_index(index + 1, #waves)
+    end
+
+    if ctrl.pressed(keys.space) then
+        waves[index].fun( waves[index].note)
+    end
+end
+
+function _draw()
+    gfx.cls()
+    local str = "<<-- "..waves[index].name .. " -->>"
+    print(str, 128 - math.floor(#str * 4 * 0.5), 128 )
+
+
+    local space = "(hit space to play a note)"
+    print(space, 128 - math.floor(#space * 4 * 0.5), 142)
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_sfx_square">sfx.square()</h4>
 <div class="paragraph">
 <p>Generate and play a square wave sound.</p>
 </div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">sfx</span><span class="p">.</span><span class="n">square</span><span class="p">(</span><span class="n">note</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">volume</span><span class="p">)</span> <span class="c1">-- Generate and play a sound using one note.</span></code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+local waves = {
+    { name = "sine", fun = sfx.sine, note = notes.C6 },
+    { name = "pulse", fun = sfx.pulse, note = notes.C6 },
+    { name = "triangle", fun = sfx.triangle, note = notes.C6 },
+    { name = "noise", fun = sfx.noise, note = notes.C8 },
+    { name = "sawtooth", fun = sfx.sawtooth, note = notes.C6 },
+    { name = "square", fun = sfx.square, note = notes.C6 },
+}
+
+local index = 1
+
+function new_index(index, tableSize)
+     return ((index - 1) % tableSize) + 1
+end
+
+function _update()
+    if ctrl.pressed(keys.left) then
+        index =new_index(index - 1, #waves)
+    elseif ctrl.pressed(keys.right) then
+        index = new_index(index + 1, #waves)
+    end
+
+    if ctrl.pressed(keys.space) then
+        waves[index].fun( waves[index].note)
+    end
+end
+
+function _draw()
+    gfx.cls()
+    local str = "<<-- "..waves[index].name .. " -->>"
+    print(str, 128 - math.floor(#str * 4 * 0.5), 128 )
+
+
+    local space = "(hit space to play a note)"
+    print(space, 128 - math.floor(#space * 4 * 0.5), 142)
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_sfx_triangle">sfx.triangle()</h4>
 <div class="paragraph">
 <p>Generate and play a triangle wave sound.</p>
 </div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">sfx</span><span class="p">.</span><span class="n">triangle</span><span class="p">(</span><span class="n">note</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">volume</span><span class="p">)</span> <span class="c1">-- Generate and play a sound using one note.</span></code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+local waves = {
+    { name = "sine", fun = sfx.sine, note = notes.C6 },
+    { name = "pulse", fun = sfx.pulse, note = notes.C6 },
+    { name = "triangle", fun = sfx.triangle, note = notes.C6 },
+    { name = "noise", fun = sfx.noise, note = notes.C8 },
+    { name = "sawtooth", fun = sfx.sawtooth, note = notes.C6 },
+    { name = "square", fun = sfx.square, note = notes.C6 },
+}
+
+local index = 1
+
+function new_index(index, tableSize)
+     return ((index - 1) % tableSize) + 1
+end
+
+function _update()
+    if ctrl.pressed(keys.left) then
+        index =new_index(index - 1, #waves)
+    elseif ctrl.pressed(keys.right) then
+        index = new_index(index + 1, #waves)
+    end
+
+    if ctrl.pressed(keys.space) then
+        waves[index].fun( waves[index].note)
+    end
+end
+
+function _draw()
+    gfx.cls()
+    local str = "<<-- "..waves[index].name .. " -->>"
+    print(str, 128 - math.floor(#str * 4 * 0.5), 128 )
+
+
+    local space = "(hit space to play a note)"
+    print(space, 128 - math.floor(#space * 4 * 0.5), 142)
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_sfx_noise">sfx.noise()</h4>
 <div class="paragraph">
 <p>Generate and play a noise wave sound.</p>
 </div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">sfx</span><span class="p">.</span><span class="n">noise</span><span class="p">(</span><span class="n">note</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">volume</span><span class="p">)</span> <span class="c1">-- Generate and play a sound using one note.</span></code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+local waves = {
+    { name = "sine", fun = sfx.sine, note = notes.C6 },
+    { name = "pulse", fun = sfx.pulse, note = notes.C6 },
+    { name = "triangle", fun = sfx.triangle, note = notes.C6 },
+    { name = "noise", fun = sfx.noise, note = notes.C8 },
+    { name = "sawtooth", fun = sfx.sawtooth, note = notes.C6 },
+    { name = "square", fun = sfx.square, note = notes.C6 },
+}
+
+local index = 1
+
+function new_index(index, tableSize)
+     return ((index - 1) % tableSize) + 1
+end
+
+function _update()
+    if ctrl.pressed(keys.left) then
+        index =new_index(index - 1, #waves)
+    elseif ctrl.pressed(keys.right) then
+        index = new_index(index + 1, #waves)
+    end
+
+    if ctrl.pressed(keys.space) then
+        waves[index].fun( waves[index].note)
+    end
+end
+
+function _draw()
+    gfx.cls()
+    local str = "<<-- "..waves[index].name .. " -->>"
+    print(str, 128 - math.floor(#str * 4 * 0.5), 128 )
+
+
+    local space = "(hit space to play a note)"
+    print(space, 128 - math.floor(#space * 4 * 0.5), 142)
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_sfx_pulse">sfx.pulse()</h4>
 <div class="paragraph">
 <p>Generate and play a pulse wave sound.</p>
 </div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">sfx</span><span class="p">.</span><span class="n">pulse</span><span class="p">(</span><span class="n">note</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">volume</span><span class="p">)</span> <span class="c1">-- Generate and play a sound using one note.</span></code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+local waves = {
+    { name = "sine", fun = sfx.sine, note = notes.C6 },
+    { name = "pulse", fun = sfx.pulse, note = notes.C6 },
+    { name = "triangle", fun = sfx.triangle, note = notes.C6 },
+    { name = "noise", fun = sfx.noise, note = notes.C8 },
+    { name = "sawtooth", fun = sfx.sawtooth, note = notes.C6 },
+    { name = "square", fun = sfx.square, note = notes.C6 },
+}
+
+local index = 1
+
+function new_index(index, tableSize)
+     return ((index - 1) % tableSize) + 1
+end
+
+function _update()
+    if ctrl.pressed(keys.left) then
+        index =new_index(index - 1, #waves)
+    elseif ctrl.pressed(keys.right) then
+        index = new_index(index + 1, #waves)
+    end
+
+    if ctrl.pressed(keys.space) then
+        waves[index].fun( waves[index].note)
+    end
+end
+
+function _draw()
+    gfx.cls()
+    local str = "<<-- "..waves[index].name .. " -->>"
+    print(str, 128 - math.floor(#str * 4 * 0.5), 128 )
+
+
+    local space = "(hit space to play a note)"
+    print(space, 128 - math.floor(#space * 4 * 0.5), 142)
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_sfx_play">sfx.play()</h4>
@@ -5242,8 +5569,8 @@ Support us by crediting Kenney or www.kenney.nl (this is not mandatory)</pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version custom-sound<br>
-Last updated 2024-02-01 09:27:41 UTC
+Version 1.2.0<br>
+Last updated 2024-02-08 21:10:09 UTC
 </div>
 </div>
 <style>
