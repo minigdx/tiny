@@ -78,8 +78,6 @@ class FrameBuffer(
 
     internal val colorIndexBuffer: PixelArray = PixelArray(width, height, PixelFormat.INDEX)
 
-    internal var buffer: ByteArray = ByteArray(height * width * PixelFormat.RGBA)
-
     internal val clipper: Clipper = Clipper(width, height)
 
     internal val blender = Blender(gamePalette)

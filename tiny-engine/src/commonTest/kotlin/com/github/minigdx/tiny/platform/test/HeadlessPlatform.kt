@@ -2,6 +2,7 @@ package com.github.minigdx.tiny.platform.test
 
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
+import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.input.InputHandler
@@ -11,7 +12,7 @@ import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.RenderContext
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
-import com.github.minigdx.tiny.sound.MidiSound
+import com.github.minigdx.tiny.sound.Sound
 import com.github.minigdx.tiny.sound.SoundManager
 import com.github.minigdx.tiny.util.MutableFixedSizeList
 import kotlinx.coroutines.CoroutineDispatcher
@@ -73,11 +74,10 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
     override fun initInputManager(): InputManager = input
 
     override fun initSoundManager(inputHandler: InputHandler): SoundManager {
-        return object : SoundManager {
+        return object : SoundManager() {
             override fun initSoundManager(inputHandler: InputHandler) = Unit
-
-            override suspend fun createSound(data: ByteArray): MidiSound {
-                return object : MidiSound {
+            override suspend fun createSfxSound(bytes: ByteArray): Sound {
+                return object : Sound {
                     override fun play() = Unit
 
                     override fun loop() = Unit
@@ -85,6 +85,18 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
                     override fun stop() = Unit
                 }
             }
+
+            override suspend fun createMidiSound(data: ByteArray): Sound {
+                return object : Sound {
+                    override fun play() = Unit
+
+                    override fun loop() = Unit
+
+                    override fun stop() = Unit
+                }
+            }
+
+            override fun playBuffer(buffer: FloatArray, numberOfSamples: Int) = Unit
         }
     }
 
@@ -92,13 +104,13 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
         return Dispatchers.Unconfined
     }
 
-    override fun createByteArrayStream(name: String): SourceStream<ByteArray> {
+    override fun createByteArrayStream(name: String, canUseJarPrefix: Boolean): SourceStream<ByteArray> {
         val data = (resources[name] as? String?)?.encodeToByteArray() ?: resources[name] as? ByteArray
             ?: throw IllegalStateException("$name is not a valid ByteArray.")
         return ObjectStream(data)
     }
 
-    override fun createImageStream(name: String): SourceStream<ImageData> {
+    override fun createImageStream(name: String, canUseJarPrefix: Boolean): SourceStream<ImageData> {
         val data = resources[name] as? ImageData ?: throw IllegalStateException("$name is not a valid ImageData.")
         return ObjectStream(data)
     }
@@ -106,6 +118,15 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
     override fun createSoundStream(name: String): SourceStream<SoundData> {
         val data = resources[name] as? SoundData ?: throw IllegalStateException("$name is not a valid SoundData.")
         return ObjectStream(data)
+    }
+
+    override fun createLocalFile(name: String): LocalFile = object : LocalFile {
+        override val name: String = "name"
+        override val extension: String = ""
+
+        override fun readAll(): ByteArray = ByteArray(0)
+
+        override fun save(content: ByteArray) = Unit
     }
 
     fun saveAnimation(name: String) = toGif(name, frames)

@@ -3,11 +3,12 @@ package com.github.minigdx.tiny.platform
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
+import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
-import com.github.minigdx.tiny.sound.MidiSound
+import com.github.minigdx.tiny.sound.Sound
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.coroutines.CoroutineDispatcher
 
@@ -19,7 +20,7 @@ class ImageData(
     // Height of the Image
     val height: Pixel,
 )
-class SoundData(val name: String, val sound: MidiSound)
+class SoundData(val name: String, val sound: Sound)
 
 interface Platform {
     /**
@@ -83,15 +84,22 @@ interface Platform {
      * Create a SourceStream from the name of the resource.
      * Regarding the platform, the name can be adjusted.
      */
-    fun createByteArrayStream(name: String): SourceStream<ByteArray>
+    fun createByteArrayStream(name: String, canUseJarPrefix: Boolean = true): SourceStream<ByteArray>
 
     /**
      * Create a SourceStream from an image from uncompressed data.
      */
-    fun createImageStream(name: String): SourceStream<ImageData>
+    fun createImageStream(name: String, canUseJarPrefix: Boolean = true): SourceStream<ImageData>
 
     /**
      * Create a SourceStream from a midi file.
      */
     fun createSoundStream(name: String): SourceStream<SoundData>
+
+    /**
+     * Create a file using the name.
+     *
+     * @param: name of the file, with the extension, if any.
+     */
+    fun createLocalFile(name: String): LocalFile
 }

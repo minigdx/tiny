@@ -228,6 +228,24 @@ Once the server is running, you can access the game in your web browser by navig
 
 NOTE: The tiny serve command is intended for local testing only and should not be used to serve your game online. When you are ready to publish your game, you should upload the exported game files to a web server and serve them from there.
 
+=== the `tiny-cli sfx` command
+
+The tiny-cli sfx command is used to start a SFX edtor to generate sound to use in your `🧸 Tiny` game.
+
+==== Usage
+
+To use the `tiny-cli sfx` command, follow the syntax:
+
+[source,shell]
+tiny-cli sfx
+
+The command can be used to edit sounds used by your `🧸 Tiny` game.
+
+[source,shell]
+tiny-cli sfx <game>
+
+The editor will be run with all SFX sounds from your game loaded.
+
 === the `tiny-cli lib` command
 
 The tiny-cli lib command is used to download and add Lua libraries to your `🧸 Tiny` game. This command provides an easy way to enhance the functionality of your game by incorporating libraries.

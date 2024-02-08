@@ -5,6 +5,8 @@ import com.github.minigdx.tiny.resources.GameLevel
 import com.github.minigdx.tiny.resources.GameScript
 import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.resources.SpriteSheet
+import com.github.minigdx.tiny.sound.Song
+import com.github.minigdx.tiny.sound.WaveGenerator
 
 sealed interface DebugAction
 data class DebugMessage(val mesage: String, val color: String) : DebugAction
@@ -41,7 +43,20 @@ interface GameResourceAccess {
      */
     fun level(index: Int): GameLevel?
 
+    /**
+     * Access sound by its index
+     */
     fun sound(index: Int): Sound?
+
+    /**
+     * Play a note represented by a wave.
+     *
+     * All notes added in the same update loop will be played at the same time
+     * at the end of the update loop.
+     */
+    fun note(wave: WaveGenerator)
+
+    fun sfx(song: Song)
 
     /**
      * Find a script by its name.

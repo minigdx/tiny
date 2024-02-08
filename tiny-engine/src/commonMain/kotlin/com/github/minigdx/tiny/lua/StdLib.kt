@@ -119,18 +119,18 @@ class StdLib(
 
                 override fun invoke(args: Varargs): Varargs {
                     val table = args.checktable(1)!!
-                    index += 1
+                    val keys = table.keys()
+                    if (index >= keys.size) return NONE
 
-                    val luaValue = table[index]
-                    if (luaValue.isnil()) return NONE
+                    val key = keys[index++]
+                    val result = table.get(key)
 
-                    // Return only the value.
-                    return varargsOf(arrayOf(luaValue))
+                    return result
                 }
             }
             val table = args.checktable(1)!!
             // iterator, object to iterate, seed value.
-            return varargsOf(iterator, table, valueOf(0))
+            return varargsOf(iterator, table)
         }
     }
 

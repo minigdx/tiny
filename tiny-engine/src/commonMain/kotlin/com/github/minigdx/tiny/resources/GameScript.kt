@@ -11,6 +11,7 @@ import com.github.minigdx.tiny.lua.JuiceLib
 import com.github.minigdx.tiny.lua.KeysLib
 import com.github.minigdx.tiny.lua.MapLib
 import com.github.minigdx.tiny.lua.MathLib
+import com.github.minigdx.tiny.lua.NotesLib
 import com.github.minigdx.tiny.lua.SfxLib
 import com.github.minigdx.tiny.lua.ShapeLib
 import com.github.minigdx.tiny.lua.SprLib
@@ -18,6 +19,8 @@ import com.github.minigdx.tiny.lua.StdLib
 import com.github.minigdx.tiny.lua.TinyBaseLib
 import com.github.minigdx.tiny.lua.TinyLib
 import com.github.minigdx.tiny.lua.Vec2Lib
+import com.github.minigdx.tiny.lua.WorkspaceLib
+import com.github.minigdx.tiny.platform.Platform
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LoadState
 import org.luaj.vm2.LuaError
@@ -42,6 +45,7 @@ class GameScript(
     override val name: String,
     val gameOptions: GameOptions,
     val inputHandler: InputHandler,
+    val platform: Platform,
     override val type: ResourceType,
 ) : GameResource {
 
@@ -66,7 +70,7 @@ class GameScript(
 
     class State(val args: LuaValue)
 
-    private fun createLuaGlobals(forValidation: Boolean = false): Globals = Globals().apply {
+    private fun createLuaGlobals(customizeLuaGlobal: GameResourceAccess.(Globals) -> Unit, forValidation: Boolean = false): Globals = Globals().apply {
         val sprLib = SprLib(this@GameScript.gameOptions, this@GameScript.resourceAccess)
 
         load(TinyBaseLib(this@GameScript.resourceAccess))
@@ -88,20 +92,25 @@ class GameScript(
         load(tinyLib)
         load(sprLib)
         load(JuiceLib())
+        load(NotesLib())
+        load(WorkspaceLib(platform = platform))
+
+        this@GameScript.resourceAccess.customizeLuaGlobal(this)
+
         LoadState.install(this)
         LuaC.install(this)
     }
 
-    suspend fun isValid(): Boolean {
-        with(createLuaGlobals(forValidation = true)) {
+    suspend fun isValid(customizeLuaGlobal: GameResourceAccess.(Globals) -> Unit): Boolean {
+        with(createLuaGlobals(customizeLuaGlobal, forValidation = true)) {
             load(content.decodeToString()).call()
             get("_init").nullIfNil()?.callSuspend(valueOf(gameOptions.width), valueOf(gameOptions.height))
         }
         return true
     }
 
-    suspend fun evaluate() {
-        globals = createLuaGlobals()
+    suspend fun evaluate(customizeLuaGlobal: GameResourceAccess.(Globals) -> Unit) {
+        globals = createLuaGlobals(customizeLuaGlobal)
 
         evaluated = true
         exited = -1

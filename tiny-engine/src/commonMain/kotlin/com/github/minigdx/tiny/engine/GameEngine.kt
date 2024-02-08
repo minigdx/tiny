@@ -24,13 +24,16 @@ import com.github.minigdx.tiny.resources.ResourceType.GAME_SOUND
 import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
 import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.resources.SpriteSheet
+import com.github.minigdx.tiny.sound.Song
+import com.github.minigdx.tiny.sound.SoundManager
+import com.github.minigdx.tiny.sound.WaveGenerator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.launch
+import org.luaj.vm2.Globals
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaValue.Companion.valueOf
 import kotlin.math.max
@@ -75,12 +78,13 @@ class ScriptsCollector(private val events: MutableList<GameResource>) : FlowColl
     }
 }
 
-@OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class GameEngine(
     val gameOptions: GameOptions,
     val platform: Platform,
     val vfs: VirtualFileSystem,
     val logger: Logger,
+    val customizeLuaGlobal: GameResourceAccess.(Globals) -> Unit = {},
 ) : GameLoop, GameResourceAccess {
 
     private val events: MutableList<GameResource> = mutableListOf()
@@ -90,6 +94,11 @@ class GameEngine(
 
     private var debugEnabled: Boolean = true
     private val debugActions = mutableListOf<DebugAction>()
+
+    private val notes = mutableListOf<WaveGenerator>()
+
+    private var song: Song? = null
+    private var longuestDuration: Seconds = 0f
 
     private lateinit var scripts: Array<GameScript?>
     private lateinit var spriteSheets: Array<SpriteSheet?>
@@ -112,9 +121,10 @@ class GameEngine(
 
     private var accumulator: Seconds = 0f
 
-    private lateinit var renderContext: RenderContext
-    private lateinit var inputHandler: InputHandler
-    private lateinit var inputManager: InputManager
+    lateinit var renderContext: RenderContext
+    lateinit var inputHandler: InputHandler
+    lateinit var inputManager: InputManager
+    lateinit var soundManager: SoundManager
 
     private lateinit var resourceFactory: ResourceFactory
 
@@ -123,7 +133,7 @@ class GameEngine(
 
         inputHandler = platform.initInputHandler()
         inputManager = platform.initInputManager()
-        platform.initSoundManager(inputHandler)
+        soundManager = platform.initSoundManager(inputHandler)
 
         resourceFactory = ResourceFactory(vfs, platform, logger, gameOptions.colors())
 
@@ -182,7 +192,7 @@ class GameEngine(
                         // Always put the boot script at the top of the stack
                         val bootScript = resource as GameScript
                         bootScript.resourceAccess = this
-                        bootScript.evaluate()
+                        bootScript.evaluate(customizeLuaGlobal)
                         scripts[0] = bootScript
                     }
 
@@ -197,7 +207,7 @@ class GameEngine(
                         // Don't put the engine script in the stack
                         engineGameScript = resource as GameScript
                         engineGameScript?.resourceAccess = this
-                        engineGameScript?.evaluate()
+                        engineGameScript?.evaluate(customizeLuaGlobal)
                     }
 
                     BOOT_SPRITESHEET -> {
@@ -231,7 +241,7 @@ class GameEngine(
                         // Always put the boot script at the top of the stack
                         val bootScript = resource as GameScript
                         bootScript.resourceAccess = this
-                        bootScript.evaluate()
+                        bootScript.evaluate(customizeLuaGlobal)
                         scripts[0] = bootScript
                     }
 
@@ -239,7 +249,7 @@ class GameEngine(
                         resource as GameScript
                         resource.resourceAccess = this
                         val isValid = try {
-                            resource.isValid()
+                            resource.isValid(customizeLuaGlobal)
                             true
                         } catch (ex: LuaError) {
                             popupError(ex)
@@ -258,7 +268,7 @@ class GameEngine(
                         // Don't put the engine script in the stack
                         engineGameScript = resource as GameScript
                         engineGameScript?.resourceAccess = this
-                        engineGameScript?.evaluate()
+                        engineGameScript?.evaluate(customizeLuaGlobal)
                     }
 
                     BOOT_SPRITESHEET -> {
@@ -297,7 +307,7 @@ class GameEngine(
                         "Stop $name to switch the next game script ${scripts[current]?.name}"
                     }
                     // Reevaluate the game to flush the previous state.
-                    scripts[current]?.evaluate()
+                    scripts[current]?.evaluate(customizeLuaGlobal)
                     scripts[current]?.setState(state)
                 } catch (ex: LuaError) {
                     popupError(ex)
@@ -308,13 +318,20 @@ class GameEngine(
                 sounds.forEach { s -> s?.stop() }
                 try {
                     val state = getState()
-                    evaluate()
+                    evaluate(customizeLuaGlobal)
                     setState(state)
                     inError = false
                 } catch (ex: LuaError) {
                     popupError(ex)
                 }
             }
+
+            soundManager.playNotes(notes, longuestDuration)
+            notes.clear()
+            longuestDuration = 0f
+
+            song?.run { soundManager.playSong(this) }
+            song = null
 
             // Fixed step simulation
             accumulator += delta
@@ -369,6 +386,7 @@ class GameEngine(
                                 valueOf(color),
                             )
                         }
+
                         is DebugEnabled -> Unit // NOP
                         is DebugLine -> {
                             val (x1, y1, x2, y2, color) = debugAction
@@ -381,6 +399,7 @@ class GameEngine(
                                 valueOf(color),
                             )
                         }
+
                         is DebugPoint -> {
                             val (x, y, color) = debugAction
                             engineGameScript?.invoke(
@@ -404,6 +423,7 @@ class GameEngine(
             is DebugEnabled -> {
                 debugEnabled = action.enabled
             }
+
             else -> debugActions.add(action)
         }
     }
@@ -465,6 +485,15 @@ class GameEngine(
         return sounds[protected]
     }
 
+    override fun note(wave: WaveGenerator) {
+        longuestDuration = max(longuestDuration, wave.duration)
+        notes.add(wave)
+    }
+
+    override fun sfx(song: Song) {
+        this.song = song
+    }
+
     override fun script(name: String): GameScript? {
         return scripts
             .drop(1) // drop the _boot.lua
@@ -477,6 +506,7 @@ class GameEngine(
 
     override fun end() {
         sounds.forEach { it?.stop() }
+        soundManager.destroy()
     }
 
     companion object {

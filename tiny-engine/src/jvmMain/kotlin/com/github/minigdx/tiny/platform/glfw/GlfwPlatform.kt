@@ -6,6 +6,8 @@ import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.file.FileStream
 import com.github.minigdx.tiny.file.InputStreamStream
+import com.github.minigdx.tiny.file.JvmLocalFile
+import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SoundDataSourceStream
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.file.VirtualFileSystem
@@ -49,6 +51,7 @@ class GlfwPlatform(
     private val vfs: VirtualFileSystem,
     private val workdirectory: File,
     private val render: Render = GLRender(KglLwjgl, logger, gameOptions),
+    private val jarResourcePrefix: String = "",
 ) : Platform {
 
     private var window: Long = 0
@@ -265,17 +268,16 @@ class GlfwPlatform(
             val width = buffer.width
             val height = buffer.height
             val image = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
-            val colorData = buffer.buffer
 
             for (y in 0 until height) {
                 for (x in 0 until width) {
-                    val i = y * width + x
-                    val r = colorData[i * 4 + 0].toInt() and 0xff
-                    val g = colorData[i * 4 + 1].toInt() and 0xff
-                    val b = colorData[i * 4 + 2].toInt() and 0xff
-                    val a = colorData[i * 4 + 3].toInt() and 0xff
+                    val colorData = buffer.gamePalette.getRGBA(buffer.pixel(x, y))
+                    val r = colorData[0].toInt() and 0xff
+                    val g = colorData[1].toInt() and 0xff
+                    val b = colorData[2].toInt() and 0xff
+                    val a = colorData[3].toInt() and 0xff
                     val color = (a shl 24) or (r shl 16) or (g shl 8) or b
-                    image.setRGB(y, x, color)
+                    image.setRGB(x, y, color)
                 }
             }
 
@@ -308,8 +310,14 @@ class GlfwPlatform(
         return ImageData(result, width, height)
     }
 
-    override fun createByteArrayStream(name: String): SourceStream<ByteArray> {
-        val fromJar = GlfwPlatform::class.java.getResourceAsStream("/$name")
+    override fun createByteArrayStream(name: String, canUseJarPrefix: Boolean): SourceStream<ByteArray> {
+        val resourceName = if (canUseJarPrefix) {
+            "$jarResourcePrefix/$name"
+        } else {
+            "/$name"
+        }
+
+        val fromJar = GlfwPlatform::class.java.getResourceAsStream(resourceName)
         return if (fromJar != null) {
             InputStreamStream(fromJar)
         } else {
@@ -317,10 +325,10 @@ class GlfwPlatform(
         }
     }
 
-    override fun createImageStream(name: String): SourceStream<ImageData> {
+    override fun createImageStream(name: String, canUseJarPrefix: Boolean): SourceStream<ImageData> {
         return object : SourceStream<ImageData> {
 
-            private val delegate = createByteArrayStream(name)
+            private val delegate = createByteArrayStream(name, canUseJarPrefix)
 
             override suspend fun exists(): Boolean = delegate.exists()
 
@@ -345,6 +353,8 @@ class GlfwPlatform(
             it.initSoundManager(inputHandler)
         }
     }
+
+    override fun createLocalFile(name: String): LocalFile = JvmLocalFile(name, workdirectory)
 
     companion object {
         private const val FPS = 60

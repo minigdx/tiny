@@ -6,6 +6,8 @@ import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.file.AjaxStream
 import com.github.minigdx.tiny.file.ImageDataStream
+import com.github.minigdx.tiny.file.JsLocalFile
+import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SoundDataSourceStream
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.graphic.FrameBuffer
@@ -91,11 +93,11 @@ class WebGlPlatform(
         return Dispatchers.Default
     }
 
-    override fun createByteArrayStream(name: String): SourceStream<ByteArray> {
+    override fun createByteArrayStream(name: String, canUseJarPrefix: Boolean): SourceStream<ByteArray> {
         return AjaxStream("$rootUrl/$name")
     }
 
-    override fun createImageStream(name: String): SourceStream<ImageData> {
+    override fun createImageStream(name: String, canUseJarPrefix: Boolean): SourceStream<ImageData> {
         return ImageDataStream("$rootUrl/$name")
     }
 
@@ -109,5 +111,9 @@ class WebGlPlatform(
 
     override fun createSoundStream(name: String): SourceStream<SoundData> {
         return SoundDataSourceStream(name, soundManager, createByteArrayStream(name))
+    }
+
+    override fun createLocalFile(name: String): LocalFile {
+        return JsLocalFile(name)
     }
 }
