@@ -27,7 +27,23 @@ import org.luaj.vm2.lib.TwoArgFunction
 import kotlin.math.max
 import kotlin.math.min
 
-@TinyLib("sfx", "Sound API to play/loop/stop a sound.")
+@TinyLib(
+    "sfx",
+    """Sound API to play/loop/stop a sound.
+A sound can be an SFX sound, generated using the tiny-cli sfx command or a MIDI file.
+Please note that a SFX sound will produce the same sound whatever platform and whatever computer
+as the sound is generated. 
+
+A MIDI sound will depend of the MIDI synthesizer available on the machine.
+  
+WARNING: Because of browser behaviour, a sound can *only* be played only after the first 
+user interaction. 
+
+Avoid to start a music or a sound at the beginning of the game.
+Before it, force the player to hit a key or click by adding an interactive menu 
+or by starting the sound as soon as the player is moving.
+""",
+)
 class SfxLib(
     private val resourceAccess: GameResourceAccess,
     // When validating the script, don't play sound
@@ -79,31 +95,37 @@ class SfxLib(
 
     @TinyFunction("Generate and play a sine wave sound.", example = SFX_WAVE_EXAMPLE)
     inner class sine : WaveFunction() {
+        @TinyCall("Generate and play a sound using one note.")
         override fun wave(note: Note, duration: Seconds, volume: Percent) = SineWave(note, duration, volume)
     }
 
     @TinyFunction("Generate and play a sawtooth wave sound.", example = SFX_WAVE_EXAMPLE)
     inner class sawtooth : WaveFunction() {
+        @TinyCall("Generate and play a sound using one note.")
         override fun wave(note: Note, duration: Seconds, volume: Percent) = SawToothWave(note, duration, volume)
     }
 
     @TinyFunction("Generate and play a square wave sound.", example = SFX_WAVE_EXAMPLE)
     inner class square : WaveFunction() {
+        @TinyCall("Generate and play a sound using one note.")
         override fun wave(note: Note, duration: Seconds, volume: Percent) = SquareWave(note, duration, volume)
     }
 
     @TinyFunction("Generate and play a triangle wave sound.", example = SFX_WAVE_EXAMPLE)
     inner class triangle : WaveFunction() {
+        @TinyCall("Generate and play a sound using one note.")
         override fun wave(note: Note, duration: Seconds, volume: Percent) = TriangleWave(note, duration, volume)
     }
 
     @TinyFunction("Generate and play a noise wave sound.", example = SFX_WAVE_EXAMPLE)
     inner class noise : WaveFunction() {
+        @TinyCall("Generate and play a sound using one note.")
         override fun wave(note: Note, duration: Seconds, volume: Percent) = NoiseWave(note, duration, volume)
     }
 
     @TinyFunction("Generate and play a pulse wave sound.", example = SFX_WAVE_EXAMPLE)
     inner class pulse : WaveFunction() {
+        @TinyCall("Generate and play a sound using one note.")
         override fun wave(note: Note, duration: Seconds, volume: Percent) = PulseWave(note, duration, volume)
     }
 
