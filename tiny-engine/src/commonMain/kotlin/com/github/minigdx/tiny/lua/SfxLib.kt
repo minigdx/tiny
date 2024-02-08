@@ -43,7 +43,7 @@ class SfxLib(
         ctrl.set("triangle", triangle())
         ctrl.set("noise", noise())
         ctrl.set("pulse", pulse())
-        ctrl.set("saw", sawtooth())
+        ctrl.set("sawtooth", sawtooth())
         ctrl.set("to_table", toTable())
         ctrl.set("sfx", sfx())
         arg2.set("sfx", ctrl)
@@ -77,32 +77,32 @@ class SfxLib(
         abstract fun wave(note: Note, duration: Seconds, volume: Percent): WaveGenerator
     }
 
-    @TinyFunction("Generate and play a sine wave sound.")
+    @TinyFunction("Generate and play a sine wave sound.", example = SFX_WAVE_EXAMPLE)
     inner class sine : WaveFunction() {
         override fun wave(note: Note, duration: Seconds, volume: Percent) = SineWave(note, duration, volume)
     }
 
-    @TinyFunction("Generate and play a sawtooth wave sound.")
+    @TinyFunction("Generate and play a sawtooth wave sound.", example = SFX_WAVE_EXAMPLE)
     inner class sawtooth : WaveFunction() {
         override fun wave(note: Note, duration: Seconds, volume: Percent) = SawToothWave(note, duration, volume)
     }
 
-    @TinyFunction("Generate and play a square wave sound.")
+    @TinyFunction("Generate and play a square wave sound.", example = SFX_WAVE_EXAMPLE)
     inner class square : WaveFunction() {
         override fun wave(note: Note, duration: Seconds, volume: Percent) = SquareWave(note, duration, volume)
     }
 
-    @TinyFunction("Generate and play a triangle wave sound.")
+    @TinyFunction("Generate and play a triangle wave sound.", example = SFX_WAVE_EXAMPLE)
     inner class triangle : WaveFunction() {
         override fun wave(note: Note, duration: Seconds, volume: Percent) = TriangleWave(note, duration, volume)
     }
 
-    @TinyFunction("Generate and play a noise wave sound.")
+    @TinyFunction("Generate and play a noise wave sound.", example = SFX_WAVE_EXAMPLE)
     inner class noise : WaveFunction() {
         override fun wave(note: Note, duration: Seconds, volume: Percent) = NoiseWave(note, duration, volume)
     }
 
-    @TinyFunction("Generate and play a pulse wave sound.")
+    @TinyFunction("Generate and play a pulse wave sound.", example = SFX_WAVE_EXAMPLE)
     inner class pulse : WaveFunction() {
         override fun wave(note: Note, duration: Seconds, volume: Percent) = PulseWave(note, duration, volume)
     }
