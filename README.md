@@ -18,6 +18,15 @@ Tiny is a lightweight, multiplatform game engine that allows developers to creat
 
 The Tiny game engine comes with extensive documentation that covers everything from installing the engine to creating games. The documentation is available on the [GitHub website](https://minigdx.github.io/tiny/).
 
+## Games
+
+Want to build a game like those? Read the documentation above ⬆️ and start to build your own!
+
+[![Camping](./tiny-doc/src/docs/asciidoc/sample/camping.gif)](https://dwursteisen.itch.io/trijam-camping)
+[![Type It](./tiny-doc/src/docs/asciidoc/sample/level-up.gif)](https://dwursteisen.itch.io/trijam-220-type-it)
+[![Memory Pong](./tiny-doc/src/docs/asciidoc/sample/memory.gif)](https://dwursteisen.itch.io/memory-pong-trijam-251)
+[![Connect Me](./tiny-doc/src/docs/asciidoc/sample/connect_me.gif)](https://dwursteisen.itch.io/connect-me)
+
 ## Community
 
 Tiny has a growing community of developers who use the engine to create games. You can join the community on social media platforms like Twitter, itch.io and Reddit.
