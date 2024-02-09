@@ -475,8 +475,7 @@ function _update()
     widgets._update()
 
     if ctrl.pressed(keys.space) then
-        local score = generate_score()
-        sfx.sfx(score)
+        on_play_button()
     end
 
     local new_wave = current_wave
