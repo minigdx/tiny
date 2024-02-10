@@ -442,7 +442,11 @@ function generate_score(played_pattern)
                 beatStr = beatStr .. "0000FF"
             else
                 for note in all(beat) do
-                    beatStr = beatStr .. to_hex(note.index) .. to_hex(note.note) .. to_hex(255) .. ":"
+                    if note.note == 0 then
+                        beatStr = beatStr .. "0000FF:"
+                    else
+                        beatStr = beatStr .. to_hex(note.index) .. to_hex(note.note) .. to_hex(255) .. ":"
+                    end
                 end
                 beatStr = beatStr:sub(1, -2)
             end
