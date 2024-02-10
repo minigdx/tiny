@@ -232,6 +232,13 @@ NOTE: The tiny serve command is intended for local testing only and should not b
 
 The tiny-cli sfx command is used to start a SFX edtor to generate sound to use in your `🧸 Tiny` game.
 
+https://dwursteisen.itch.io/tiny-sfx-editor[This SFX editor can be tried online] on itch.io.
+
+image:sample/tiny-cli-sfx1.png[]
+
+image:sample/tiny-cli-sfx0.png[]
+
+
 ==== Usage
 
 To use the `tiny-cli sfx` command, follow the syntax:

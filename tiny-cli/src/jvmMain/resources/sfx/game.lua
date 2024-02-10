@@ -43,6 +43,8 @@ local waves = {{
 
 local bpm = nil
 local patterns = nil
+local volume = nil
+
 local faders = {}
 local current_wave = waves[1]
 
@@ -117,28 +119,36 @@ function active_pattern(index, data)
 end
 
 function on_active_tab(current, prec)
-
     fader_mode = false
     on_switch_mode()
-    
+
     if prec ~= nil then
         local score = generate_score()
         prec.content = sfx.to_table(score)
+        debug.console(generate_score())
     end
 
     -- restore the previous score of the current tab
     if current.content ~= nil then
+
         local data = current.content
         bpm.value = data["bpm"]
+        volume.value = (data["volume"] / 255) * 10
+        debug.console("stuff")
+        debug.console(data["volume"])
         -- always get the first pattern
         active_pattern(1, data)
+
+        debug.console(generate_score())
     else
         bpm.value = 120
         patterns.value = 1
+        volume.value = 10
         -- no data, reset to 0
-        for k, f in ipairs(faders) do
+        for k, f in pairs(faders) do
             widgets.resetFaderValue(f)
         end
+        active_tab = { }
         current.content = sfx.to_table(generate_score())
     end
 
@@ -150,15 +160,13 @@ local window = {
     height = 0
 }
 
-
-
 function on_new_tab(tab)
     local filename = ws.create("sfx", "sfx")
     tab.label = filename
 end
 
 function on_play_button()
-    local score = nil 
+    local score = nil
     if fader_mode then
         score = generate_score(patterns.value)
     else
@@ -198,7 +206,13 @@ function on_increase_pattern(counter)
     counter.value = math.min(counter.value + 1, #active_tab.content["patterns"])
 end
 
+function on_decrease_volume(counter)
+    counter.value = math.max(counter.value - 1, 1)
+end
 
+function on_increase_volume(counter)
+    counter.value = math.min(counter.value + 1, 10)
+end
 
 function on_switch_mode()
     fader_mode = not fader_mode
@@ -237,7 +251,6 @@ function _init(w, h)
         on_active_button = on_play_button
     })
 
-    
     widgets.createButton({
         x = 10,
         y = 16 + 2 + 16,
@@ -259,7 +272,7 @@ function _init(w, h)
 
     patterns = widgets.createCounter({
         x = 10,
-        y = 112,
+        y = 90,
         value = 1,
         label = "pattern",
         on_left = on_previous_patterns,
@@ -267,10 +280,10 @@ function _init(w, h)
     })
 
     table.insert(fader_widgets, patterns)
-    
+
     bpm = widgets.createCounter({
         x = 10,
-        y = 112 + 24,
+        y = 90 + 24,
         value = 120,
         label = "bpm",
         on_left = on_decrease_bpm,
@@ -278,7 +291,18 @@ function _init(w, h)
     })
 
     table.insert(fader_widgets, bpm)
-    
+
+    volume = widgets.createCounter({
+        x = 10,
+        y = 90 + 24 + 24,
+        value = 10,
+        label = "volume",
+        on_left = on_decrease_volume,
+        on_right = on_increase_volume
+    })
+
+    table.insert(fader_widgets, bpm)
+
     -- faders
     for i = 1, 32 do
         local f = widgets.createFader({
@@ -296,7 +320,7 @@ function _init(w, h)
         table.insert(faders, f)
         table.insert(fader_widgets, f)
     end
-    
+
     -- buttons
     for i = #waves - 1, 0, -1 do
         local w = widgets.createButton({
@@ -308,7 +332,7 @@ function _init(w, h)
             },
             on_active_button = on_active_button
         })
-        
+
         table.insert(fader_widgets, w)
 
         if i == 0 then
@@ -317,14 +341,14 @@ function _init(w, h)
     end
 
     -- music buttons
-    for x=1,8 do
-        for y=1,8 do
+    for x = 1, 8 do
+        for y = 1, 8 do
             local w = widgets.createCounter({
                 x = 28 + x * 48,
                 y = y * 32,
                 value = nil,
                 enabled = false,
-                index = x + (y -1) * 8,
+                index = x + (y - 1) * 8,
                 label = "pattern",
                 on_left = on_decrease_pattern,
                 on_right = on_increase_pattern
@@ -333,7 +357,7 @@ function _init(w, h)
             if x == 1 and y == 1 then
                 w.value = 1
             end
-            music_widgets[x + (y-1) * 8] = w
+            music_widgets[x + (y - 1) * 8] = w
         end
     end
     -- tabs
@@ -431,7 +455,17 @@ function generate_score(played_pattern)
         active_tab.content.patterns[1] = new_pattern
     end
     local p = active_tab.content["patterns"]
-    local score = "tiny-sfx " .. #p .. " " .. bpm.value .. " 255\n"
+    local v = math.floor((volume.value * 25.5))
+
+    debug.console("volume value")
+    debug.console(volume.value)
+    debug.console("computed volume")
+    debug.console(v)
+    local score = "tiny-sfx " .. #p .. " " .. bpm.value .. " "..v.."\n"
+
+    debug.console("SCORE ???")
+    debug.console(score)
+    debug.console(volume.value)
     -- write patterns
     for patterns in all(active_tab.content["patterns"]) do
         local strip = ""
@@ -442,7 +476,11 @@ function generate_score(played_pattern)
                 beatStr = beatStr .. "0000FF"
             else
                 for note in all(beat) do
-                    beatStr = beatStr .. to_hex(note.index) .. to_hex(note.note) .. to_hex(255) .. ":"
+                    if note.note == 0 then
+                        beatStr = beatStr .. "0000FF:"
+                    else
+                        beatStr = beatStr .. to_hex(note.index) .. to_hex(note.note) .. to_hex(255) .. ":"
+                    end
                 end
                 beatStr = beatStr:sub(1, -2)
             end
@@ -460,8 +498,8 @@ function generate_score(played_pattern)
             if w.value == 0 then
                 stop = true
             end
-            if(not stop) then
-                played_pattern = played_pattern..w.value.." "
+            if (not stop) then
+                played_pattern = played_pattern .. w.value .. " "
             end
         end
     end
@@ -475,8 +513,7 @@ function _update()
     widgets._update()
 
     if ctrl.pressed(keys.space) then
-        local score = generate_score()
-        sfx.sfx(score)
+        on_play_button()
     end
 
     local new_wave = current_wave

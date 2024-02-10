@@ -24,6 +24,7 @@ import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.ThreeArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
+import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
 
@@ -215,7 +216,7 @@ class SfxLib(
             }
             val result = LuaTable()
             result["bpm"] = valueOf(song.bpm)
-            result["volume"] = valueOf(song.volume.toDouble())
+            result["volume"] = valueOf(floor(song.volume.toDouble() * 255))
             result["patterns"] = patterns
             return result
         }
