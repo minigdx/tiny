@@ -117,10 +117,9 @@ function active_pattern(index, data)
 end
 
 function on_active_tab(current, prec)
-
     fader_mode = false
     on_switch_mode()
-    
+
     if prec ~= nil then
         local score = generate_score()
         prec.content = sfx.to_table(score)
@@ -136,9 +135,10 @@ function on_active_tab(current, prec)
         bpm.value = 120
         patterns.value = 1
         -- no data, reset to 0
-        for k, f in ipairs(faders) do
+        for k, f in pairs(faders) do
             widgets.resetFaderValue(f)
         end
+        active_tab = { }
         current.content = sfx.to_table(generate_score())
     end
 
@@ -150,15 +150,13 @@ local window = {
     height = 0
 }
 
-
-
 function on_new_tab(tab)
     local filename = ws.create("sfx", "sfx")
     tab.label = filename
 end
 
 function on_play_button()
-    local score = nil 
+    local score = nil
     if fader_mode then
         score = generate_score(patterns.value)
     else
@@ -198,8 +196,6 @@ function on_increase_pattern(counter)
     counter.value = math.min(counter.value + 1, #active_tab.content["patterns"])
 end
 
-
-
 function on_switch_mode()
     fader_mode = not fader_mode
     if fader_mode then
@@ -237,7 +233,6 @@ function _init(w, h)
         on_active_button = on_play_button
     })
 
-    
     widgets.createButton({
         x = 10,
         y = 16 + 2 + 16,
@@ -267,7 +262,7 @@ function _init(w, h)
     })
 
     table.insert(fader_widgets, patterns)
-    
+
     bpm = widgets.createCounter({
         x = 10,
         y = 112 + 24,
@@ -278,7 +273,7 @@ function _init(w, h)
     })
 
     table.insert(fader_widgets, bpm)
-    
+
     -- faders
     for i = 1, 32 do
         local f = widgets.createFader({
@@ -296,7 +291,7 @@ function _init(w, h)
         table.insert(faders, f)
         table.insert(fader_widgets, f)
     end
-    
+
     -- buttons
     for i = #waves - 1, 0, -1 do
         local w = widgets.createButton({
@@ -308,7 +303,7 @@ function _init(w, h)
             },
             on_active_button = on_active_button
         })
-        
+
         table.insert(fader_widgets, w)
 
         if i == 0 then
@@ -317,14 +312,14 @@ function _init(w, h)
     end
 
     -- music buttons
-    for x=1,8 do
-        for y=1,8 do
+    for x = 1, 8 do
+        for y = 1, 8 do
             local w = widgets.createCounter({
                 x = 28 + x * 48,
                 y = y * 32,
                 value = nil,
                 enabled = false,
-                index = x + (y -1) * 8,
+                index = x + (y - 1) * 8,
                 label = "pattern",
                 on_left = on_decrease_pattern,
                 on_right = on_increase_pattern
@@ -333,7 +328,7 @@ function _init(w, h)
             if x == 1 and y == 1 then
                 w.value = 1
             end
-            music_widgets[x + (y-1) * 8] = w
+            music_widgets[x + (y - 1) * 8] = w
         end
     end
     -- tabs
@@ -464,8 +459,8 @@ function generate_score(played_pattern)
             if w.value == 0 then
                 stop = true
             end
-            if(not stop) then
-                played_pattern = played_pattern..w.value.." "
+            if (not stop) then
+                played_pattern = played_pattern .. w.value .. " "
             end
         end
     end
