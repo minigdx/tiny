@@ -43,6 +43,8 @@ local waves = {{
 
 local bpm = nil
 local patterns = nil
+local volume = nil
+
 local faders = {}
 local current_wave = waves[1]
 
@@ -123,17 +125,25 @@ function on_active_tab(current, prec)
     if prec ~= nil then
         local score = generate_score()
         prec.content = sfx.to_table(score)
+        debug.console(generate_score())
     end
 
     -- restore the previous score of the current tab
     if current.content ~= nil then
+
         local data = current.content
         bpm.value = data["bpm"]
+        volume.value = (data["volume"] / 255) * 10
+        debug.console("stuff")
+        debug.console(data["volume"])
         -- always get the first pattern
         active_pattern(1, data)
+
+        debug.console(generate_score())
     else
         bpm.value = 120
         patterns.value = 1
+        volume.value = 10
         -- no data, reset to 0
         for k, f in pairs(faders) do
             widgets.resetFaderValue(f)
@@ -196,6 +206,14 @@ function on_increase_pattern(counter)
     counter.value = math.min(counter.value + 1, #active_tab.content["patterns"])
 end
 
+function on_decrease_volume(counter)
+    counter.value = math.max(counter.value - 1, 1)
+end
+
+function on_increase_volume(counter)
+    counter.value = math.min(counter.value + 1, 10)
+end
+
 function on_switch_mode()
     fader_mode = not fader_mode
     if fader_mode then
@@ -254,7 +272,7 @@ function _init(w, h)
 
     patterns = widgets.createCounter({
         x = 10,
-        y = 112,
+        y = 90,
         value = 1,
         label = "pattern",
         on_left = on_previous_patterns,
@@ -265,11 +283,22 @@ function _init(w, h)
 
     bpm = widgets.createCounter({
         x = 10,
-        y = 112 + 24,
+        y = 90 + 24,
         value = 120,
         label = "bpm",
         on_left = on_decrease_bpm,
         on_right = on_increase_bpm
+    })
+
+    table.insert(fader_widgets, bpm)
+
+    volume = widgets.createCounter({
+        x = 10,
+        y = 90 + 24 + 24,
+        value = 10,
+        label = "volume",
+        on_left = on_decrease_volume,
+        on_right = on_increase_volume
     })
 
     table.insert(fader_widgets, bpm)
@@ -426,7 +455,17 @@ function generate_score(played_pattern)
         active_tab.content.patterns[1] = new_pattern
     end
     local p = active_tab.content["patterns"]
-    local score = "tiny-sfx " .. #p .. " " .. bpm.value .. " 255\n"
+    local v = math.floor((volume.value * 25.5))
+
+    debug.console("volume value")
+    debug.console(volume.value)
+    debug.console("computed volume")
+    debug.console(v)
+    local score = "tiny-sfx " .. #p .. " " .. bpm.value .. " "..v.."\n"
+
+    debug.console("SCORE ???")
+    debug.console(score)
+    debug.console(volume.value)
     -- write patterns
     for patterns in all(active_tab.content["patterns"]) do
         local strip = ""

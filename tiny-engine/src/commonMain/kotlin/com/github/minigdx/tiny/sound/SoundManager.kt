@@ -96,7 +96,7 @@ abstract class SoundManager {
             buffers.forEach { (_, line) ->
                 result += line[sample]
             }
-            mix[sample] = result / buffers.size.toFloat()
+            mix[sample] = (result / buffers.size.toFloat()) * song.volume
         }
         return mix to lastBeat * numberOfSamplesPerBeat
     }
