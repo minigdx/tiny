@@ -354,7 +354,7 @@ class GlfwPlatform(
         }
     }
 
-    override fun createLocalFile(name: String): LocalFile = JvmLocalFile(name, workdirectory)
+    override fun createLocalFile(name: String): LocalFile = JvmLocalFile(name, workdirectory.resolve("data"))
 
     companion object {
         private const val FPS = 60
