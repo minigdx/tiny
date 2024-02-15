@@ -128,7 +128,12 @@ class StdLib(
                     return result
                 }
             }
-            val table = args.checktable(1)!!
+            // If the expected table is nil, don't iterate.
+            val table = if (args.isnil(1)) {
+                LuaTable()
+            } else {
+                args.checktable(1)!!
+            }
             // iterator, object to iterate, seed value.
             return varargsOf(iterator, table)
         }
