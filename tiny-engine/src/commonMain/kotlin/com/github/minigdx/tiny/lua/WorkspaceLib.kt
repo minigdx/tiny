@@ -69,6 +69,7 @@ class WorkspaceLib(
             val (filename, filenameWithExt) = findAvailableName(prefix, ext)
 
             resources = resources + platform.createLocalFile(filenameWithExt)
+            DEFAULT = resources
             return valueOf(filename)
         }
 
