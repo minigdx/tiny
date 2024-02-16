@@ -209,9 +209,6 @@ class DebugLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
 
         private val recursiveSecurity = mutableSetOf<Int>()
 
-
-
-
         @TinyCall("Log a message into the console.")
         override fun call(@TinyArg("str") arg: LuaValue): LuaValue {
             val str = formatValue(arg)
@@ -222,8 +219,8 @@ class DebugLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
 
         private fun formatValue(arg: LuaValue): String = if (arg.istable()) {
             val table = arg as LuaTable
-            if(recursiveSecurity.contains(table.hashCode())) {
-                 "table[<${table.hashCode()}>]"
+            if (recursiveSecurity.contains(table.hashCode())) {
+                "table[<${table.hashCode()}>]"
             } else {
                 recursiveSecurity.add(table.hashCode())
                 val keys = table.keys()

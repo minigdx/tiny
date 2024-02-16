@@ -22,7 +22,7 @@ class JvmLocalFile(
     }
 
     override fun save(content: ByteArray) {
-        if(!workingDirectory.exists()) {
+        if (!workingDirectory.exists()) {
             workingDirectory.mkdirs()
         }
         workingDirectory.resolve(file).writeBytes(content)

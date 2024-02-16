@@ -64,7 +64,7 @@ class RunCommand : CliktCommand(name = "run", help = "Run your game.") {
             )
 
             val data = File("data")
-            if(data.exists() && data.isDirectory) {
+            if (data.exists() && data.isDirectory) {
                 WorkspaceLib.DEFAULT = data.listFiles().map { JvmLocalFile(it.name, data) }
             }
             gameEngine.main()
