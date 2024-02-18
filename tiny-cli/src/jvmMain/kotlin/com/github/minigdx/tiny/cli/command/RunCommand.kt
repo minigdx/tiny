@@ -8,7 +8,9 @@ import com.github.ajalt.clikt.parameters.types.file
 import com.github.minigdx.tiny.cli.config.GameParameters
 import com.github.minigdx.tiny.engine.GameEngine
 import com.github.minigdx.tiny.file.CommonVirtualFileSystem
+import com.github.minigdx.tiny.file.JvmLocalFile
 import com.github.minigdx.tiny.log.StdOutLogger
+import com.github.minigdx.tiny.lua.WorkspaceLib
 import com.github.minigdx.tiny.lua.errorLine
 import com.github.minigdx.tiny.platform.glfw.GlfwPlatform
 import com.github.minigdx.tiny.render.LwjglGLRender
@@ -60,6 +62,11 @@ class RunCommand : CliktCommand(name = "run", help = "Run your game.") {
                     echo("\uD83D\uDC4B See you soon!")
                 },
             )
+
+            val data = File("data")
+            if (data.exists() && data.isDirectory) {
+                WorkspaceLib.DEFAULT = data.listFiles().map { JvmLocalFile(it.name, data) }
+            }
             gameEngine.main()
         } catch (ex: Exception) {
             echo("\uD83E\uDDE8 An unexpected exception occurred. The application will stop. It might be a bug in Tiny. If so, please report it.")

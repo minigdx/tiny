@@ -134,8 +134,6 @@ function on_active_tab(current, prec)
         local data = current.content
         bpm.value = data["bpm"]
         volume.value = (data["volume"] / 255) * 10
-        debug.console("stuff")
-        debug.console(data["volume"])
         -- always get the first pattern
         active_pattern(1, data)
 
@@ -148,7 +146,7 @@ function on_active_tab(current, prec)
         for k, f in pairs(faders) do
             widgets.resetFaderValue(f)
         end
-        active_tab = { }
+        active_tab = {}
         current.content = sfx.to_table(generate_score())
     end
 
@@ -457,15 +455,8 @@ function generate_score(played_pattern)
     local p = active_tab.content["patterns"]
     local v = math.floor((volume.value * 25.5))
 
-    debug.console("volume value")
-    debug.console(volume.value)
-    debug.console("computed volume")
-    debug.console(v)
-    local score = "tiny-sfx " .. #p .. " " .. bpm.value .. " "..v.."\n"
+    local score = "tiny-sfx " .. #p .. " " .. bpm.value .. " " .. v .. "\n"
 
-    debug.console("SCORE ???")
-    debug.console(score)
-    debug.console(volume.value)
     -- write patterns
     for patterns in all(active_tab.content["patterns"]) do
         local strip = ""

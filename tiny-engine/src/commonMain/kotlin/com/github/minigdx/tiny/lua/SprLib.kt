@@ -87,7 +87,7 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
     @TinyFunction(
         "Switch to another spritesheet. " +
             "The index of the spritesheet is given by it's position in the spritesheets field from the `_tiny.json` file." +
-            "The first spritesheet is at the index 0.",
+            "The first spritesheet is at the index 0. It retuns the previous spritesheet.",
     )
     internal inner class sheet : OneArgFunction() {
 
@@ -96,12 +96,13 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
 
         @TinyCall("Switch to the N spritesheet")
         override fun call(@TinyArg("spritesheetN") arg: LuaValue): LuaValue {
+            val previousSpriteSheet = currentSpritesheet
             currentSpritesheet = if (arg.isnil()) {
                 0
             } else {
                 arg.checkint()
             }
-            return NONE
+            return valueOf(previousSpriteSheet)
         }
     }
 
