@@ -7,6 +7,7 @@ image:sample/level-up.gif[link=https://dwursteisen.itch.io/trijam-220-type-it]
 image:sample/memory.gif[link=https://dwursteisen.itch.io/memory-pong-trijam-251]
 image:sample/connect_me.gif[link=https://dwursteisen.itch.io/connect-me]
 image:sample/only_three_seconds.gif[link=https://dwursteisen.itch.io/one-light-for-three-seconds]
+image:sample/meiro_de_maigo2.gif[link=https://dwursteisen.itch.io/meiro-de]
 
 
 TIP: Want your game to appear here? Create a post about it in https://github.com/minigdx/tiny/discussions/categories/show-and-tell[the Show and tell board] and share all information about it.
