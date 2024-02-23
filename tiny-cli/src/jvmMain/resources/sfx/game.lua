@@ -56,10 +56,6 @@ local switch_mode = nil
 local fader_widgets = {}
 local music_widgets = {}
 
-function on_active_button(current, prec)
-    current_wave = current.data.wave
-end
-
 local window = {
     width = 0,
     height = 0
@@ -80,38 +76,12 @@ function on_save_button()
     ws.save(active_tab.label, score)
 end
 
-function on_previous_patterns(counter)
-    counter.value = math.max(counter.value - 1, 1)
-    active_pattern(counter.value, active_tab.content)
-end
-
-function on_next_patterns(counter)
-    counter.value = math.min(counter.value + 1, 10)
-    active_pattern(counter.value, active_tab.content)
-end
-
 function on_decrease_pattern(counter)
     counter.value = math.max(counter.value - 1, 1)
 end
 
 function on_increase_pattern(counter)
     counter.value = math.min(counter.value + 1, #active_tab.content["patterns"])
-end
-
-function init_faders(tabs)
-    local index = 1
-
-    local notes = {}
-    for k, v in pairs(labels) do
-        notes[v] = k
-    end
-
-    local colors = {}
-    for v in all(waves) do
-        colors[v.type] = v.color
-    end
-
-    on_active_tab(tabs[1])
 end
 
 function to_hex(number)
@@ -163,6 +133,11 @@ end
 
 editor.activate_pattern = function(index, data)
     local beats = data["patterns"][index]
+
+    if beats == nil then
+        beats = {}
+        data["patterns"][index] = beats
+    end
 
     for k, f in ipairs(editor.fader_widgets) do
         local beat = beats[k]
@@ -286,6 +261,16 @@ editor.create_widgets = function()
         end
     })
 
+    local on_previous_patterns = function(counter)
+        counter.value = math.max(counter.value - 1, 1)
+        editor.activate_pattern(counter.value, editor.active_tab.content)
+    end
+    
+    local on_next_patterns = function(counter)
+        counter.value = math.min(counter.value + 1, 10)
+        editor.activate_pattern(counter.value, editor.active_tab.content)
+    end
+
     editor.pattern_counter = widgets.createCounter({
         x = 10,
         y = 90,
@@ -367,6 +352,10 @@ editor.create_widgets = function()
     end
 
     -- buttons
+    local on_active_button = function(current, prec)
+        current_wave = current.data.wave
+    end
+
     for i = #waves - 1, 0, -1 do
         local w = widgets.createButton({
             x = 10,
