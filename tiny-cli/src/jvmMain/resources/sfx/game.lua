@@ -56,11 +56,9 @@ local switch_mode = nil
 local fader_widgets = {}
 local music_widgets = {}
 
-
 function on_active_button(current, prec)
     current_wave = current.data.wave
 end
-
 
 local window = {
     width = 0,
@@ -82,14 +80,6 @@ function on_save_button()
     ws.save(active_tab.label, score)
 end
 
-function on_decrease_bpm(counter)
-    counter.value = math.max(10, counter.value - 5)
-end
-
-function on_increase_bpm(counter)
-    counter.value = math.min(220, counter.value + 5)
-end
-
 function on_previous_patterns(counter)
     counter.value = math.max(counter.value - 1, 1)
     active_pattern(counter.value, active_tab.content)
@@ -107,15 +97,6 @@ end
 function on_increase_pattern(counter)
     counter.value = math.min(counter.value + 1, #active_tab.content["patterns"])
 end
-
-function on_decrease_volume(counter)
-    counter.value = math.max(counter.value - 1, 1)
-end
-
-function on_increase_volume(counter)
-    counter.value = math.min(counter.value + 1, 10)
-end
-
 
 function init_faders(tabs)
     local index = 1
@@ -163,7 +144,7 @@ local editor = {
 --[[
     enable widgets regarding the mode selected.
 ]]
-editor.switch_to_mode = function(mode) 
+editor.switch_to_mode = function(mode)
     editor.mode = mode
 
     local enabled_sound_widgets = mode == 0
@@ -176,11 +157,13 @@ editor.switch_to_mode = function(mode)
     for w in all(editor.patterns_editor_widgets) do
         w.enabled = enabled_patterns_widgets
     end
+
+    editor.switch_button.overlay = 24 + mode
 end
 
 editor.activate_pattern = function(index, data)
     local beats = data["patterns"][index]
-    
+
     for k, f in ipairs(editor.fader_widgets) do
         local beat = beats[k]
         if beat ~= nil and beat.index > 0 then
@@ -272,7 +255,7 @@ editor.on_active_tab = function(current, prev)
 end
 
 editor.create_widgets = function()
-    
+
     -- buttons
     editor.play_button = widgets.createButton({
         x = 10,
@@ -298,7 +281,9 @@ editor.create_widgets = function()
         y = 16 + 2 + 16 + 2 + 16,
         overlay = 24,
         grouped = false,
-        on_active_button = on_switch_mode
+        on_active_button = function()
+            editor.switch_to_mode((editor.mode + 1) % 2)
+        end
     })
 
     editor.pattern_counter = widgets.createCounter({
@@ -312,6 +297,14 @@ editor.create_widgets = function()
 
     table.insert(editor.sound_editor_widgets, editor.pattern_counter)
 
+    local on_decrease_bpm = function(counter)
+        counter.value = math.max(10, counter.value - 5)
+    end
+
+    local on_increase_bpm = function(counter)
+        counter.value = math.min(220, counter.value + 5)
+    end
+
     editor.bpm_counter = widgets.createCounter({
         x = 10,
         y = 90 + 24,
@@ -322,6 +315,14 @@ editor.create_widgets = function()
     })
 
     table.insert(editor.sound_editor_widgets, editor.bpm_counter)
+
+    local on_decrease_volume = function(counter)
+        counter.value = math.max(counter.value - 1, 1)
+    end
+
+    local on_increase_volume = function(counter)
+        counter.value = math.min(counter.value + 1, 10)
+    end
 
     editor.volume_counter = widgets.createCounter({
         x = 10,
@@ -344,7 +345,7 @@ editor.create_widgets = function()
             volume = 1.0,
             index = current_wave.index,
             note = fader.value
-        } 
+        }
     end
 
     -- faders
@@ -479,7 +480,7 @@ function _draw()
     -- background for tabs
     shape.rectf(0, 0, window.width, 8, 1)
 
-    if fader_mode then
+    if editor.mode == 0 then
         -- octave limits
         local per_octave = math.floor((256 - 18) / 9) -- height / nb octaves
         for octave = 9, 0, -1 do
