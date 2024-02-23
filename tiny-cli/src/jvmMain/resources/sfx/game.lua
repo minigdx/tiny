@@ -183,10 +183,14 @@ editor.activate_pattern = function(index, data)
     
     for k, f in ipairs(editor.fader_widgets) do
         local beat = beats[k]
-        if beats[k] ~= nil then
+        if beat ~= nil and beat.index > 0 then
             -- set fader value
+            f.value = beat.note
+            f.tip_color = waves[beat.index].color
         else
             -- set fader value to 0
+            f.value = 0
+            f.tip_color = 0
         end
     end
 end
@@ -265,40 +269,6 @@ editor.on_active_tab = function(current, prev)
     editor.activate_pattern(1, data)
     -- set faders value regarding the first patterns
     editor.active_tab = current
-
-    -- TODO: configure widgets regarding the current tab.
---[[
-
-    if prev ~= nil then
-        local score = generate_score()
-        prev.content = sfx.to_table(score)
-        debug.console(generate_score())
-    end
-    
-    -- restore the previous score of the current tab
-    if current.content ~= nil then
-        
-        local data = current.content
-        bpm.value = data["bpm"]
-        volume.value = (data["volume"] / 255) * 10
-        -- always get the first pattern
-        active_pattern(1, data)
-        
-        debug.console(generate_score())
-    else
-        bpm.value = 120
-        patterns.value = 1
-        volume.value = 10
-        -- no data, reset to 0
-        for k, f in pairs(faders) do
-            widgets.resetFaderValue(f)
-        end
-        active_tab = {}
-        current.content = sfx.to_table(generate_score())
-    end
-    
-    active_tab = current
-    ]]
 end
 
 editor.create_widgets = function()
@@ -367,6 +337,14 @@ editor.create_widgets = function()
     local on_fader_update = function(fader, value)
         fader.value = math.ceil(value)
         fader.tip_color = current_wave.color
+        local current_pattern = editor.active_tab.content["patterns"][editor.pattern_counter.value]
+
+        current_pattern[fader.index] = {
+            type = current_wave.type,
+            volume = 1.0,
+            index = current_wave.index,
+            note = fader.value
+        } 
     end
 
     -- faders
