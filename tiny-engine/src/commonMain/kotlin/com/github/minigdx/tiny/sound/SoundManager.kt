@@ -27,7 +27,7 @@ abstract class SoundManager {
         if (notes.isEmpty()) return
 
         val result = createNotesBuffer(longestDuration, notes)
-        playBuffer(result, result.size)
+        playBuffer(result, result.size.toLong())
     }
 
     protected fun createNotesBuffer(
@@ -48,7 +48,7 @@ abstract class SoundManager {
     /**
      * @param buffer byte array representing the sound. Each sample is represented with a float from -1.0f to 1.0f
      */
-    abstract fun playBuffer(buffer: FloatArray, numberOfSamples: Int)
+    abstract fun playBuffer(buffer: FloatArray, numberOfSamples: Long)
 
     private fun mix(sample: Int, notes: List<WaveGenerator>): Float {
         var result = 0f
@@ -81,24 +81,16 @@ abstract class SoundManager {
 
     private val converter = SoundConverter()
 
-    fun createBufferFromSong(song: Song): Pair<FloatArray, Int> {
+    fun createBufferFromSong(song: Song): SoundBuffer {
         val numberOfSamplesPerBeat = (song.durationOfBeat * SAMPLE_RATE).toInt()
-        val (lastBeat, strips) = converter.prepareStrip(song)
-        val buffers = strips.map { (kind, strip) ->
-            kind to converter.createStrip(numberOfSamplesPerBeat, strip)
-        }.toMap()
 
-        val numberOfTotalSamples = numberOfSamplesPerBeat * (song.numberOfBeats + 1)
+        val result = converter.createStrip(
+            song.volume,
+            numberOfSamplesPerBeat,
+            song.music.flatMap { p -> p.notes }.toTypedArray(),
+        )
 
-        val mix = FloatArray(numberOfTotalSamples)
-        (0 until numberOfTotalSamples).forEach { sample ->
-            var result = 0f
-            buffers.forEach { (_, line) ->
-                result += line[sample]
-            }
-            mix[sample] = (result / buffers.size.toFloat()) * song.volume
-        }
-        return mix to lastBeat * numberOfSamplesPerBeat
+        return result
     }
 
     companion object {
@@ -108,29 +100,11 @@ abstract class SoundManager {
     }
 }
 
+data class SoundBuffer(val samples: FloatArray, val numberOfSamples: Long)
+
 class SoundConverter {
 
-    internal fun prepareStrip(song: Song): Pair<Int, Map<String, Array<WaveGenerator>>> {
-        // Create a line per WaveGenerator kind.
-        val musicPerType: MutableMap<String, Array<WaveGenerator>> = mutableMapOf()
-        // All beats of this music.
-        val beats = song.music.flatMap { pattern -> pattern.beats }
-        val silence = SilenceWave(song.durationOfBeat)
-        var lastBeat = 0
-        beats.forEachIndexed { index, beat ->
-            val validNotes = beat.notes.filterNot { it.isSilence }
-            validNotes.forEach {
-                val waves = musicPerType.getOrPut(it.name) { Array(song.numberOfBeats + 1) { silence } }
-                waves[index] = it
-            }
-            if (validNotes.isNotEmpty()) {
-                lastBeat = index + 1
-            }
-        }
-        return lastBeat to musicPerType
-    }
-
-    internal fun createStrip(numberOfSamplesPerBeat: Int, waves: Array<WaveGenerator>): FloatArray {
+    internal fun createStrip(songVolume: Float, numberOfSamplesPerBeat: Int, waves: Array<WaveGenerator>): SoundBuffer {
         // 1/4 of a beat is used to fade
         val fader = Fader(0.25f * numberOfSamplesPerBeat / SAMPLE_RATE.toFloat())
 
@@ -143,7 +117,7 @@ class SoundConverter {
             val volume = firstBeat.volume
             val value = firstBeat.generate(cursor.current)
             val sampled = value * volume
-            result[cursor.absolute] = sampled
+            result[cursor.absolute] = sampled * songVolume
             cursor.advance()
         }
 
@@ -156,12 +130,12 @@ class SoundConverter {
 
             (0 until numberOfSamplesPerBeat).forEach { _ ->
                 val sampled = fader.fadeWith(cursor.previous, a, cursor.current, b)
-                result[cursor.absolute] = sampled
+                result[cursor.absolute] = sampled * songVolume
                 cursor.advance()
             }
         }
 
-        return result
+        return SoundBuffer(result, cursor.absolute.toLong())
     }
 }
 

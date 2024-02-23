@@ -92,76 +92,11 @@ function on_active_button(current, prec)
     current_wave = current.data.wave
 end
 
-function active_pattern(index, data)
-    local beats = data["patterns"][index]
-    if beats == nil then
-        beats = {}
-        data["patterns"][index] = beats
-    end
-
-    for k, f in ipairs(faders) do
-        widgets.resetFaderValue(f)
-        if beats[k] ~= nil then
-            for b in all(beats[k]) do
-                if b.index > 0 then
-                    local w = waves[b.index]
-                    widgets.setFaderValue(f, b.index, b.note, w.color)
-                else
-                    -- set silence value
-                    widgets.resetFaderValue(f)
-                end
-            end
-        else
-            -- set silence value
-            widgets.resetFaderValue(f)
-        end
-    end
-end
-
-function on_active_tab(current, prec)
-    fader_mode = false
-    on_switch_mode()
-
-    if prec ~= nil then
-        local score = generate_score()
-        prec.content = sfx.to_table(score)
-        debug.console(generate_score())
-    end
-
-    -- restore the previous score of the current tab
-    if current.content ~= nil then
-
-        local data = current.content
-        bpm.value = data["bpm"]
-        volume.value = (data["volume"] / 255) * 10
-        -- always get the first pattern
-        active_pattern(1, data)
-
-        debug.console(generate_score())
-    else
-        bpm.value = 120
-        patterns.value = 1
-        volume.value = 10
-        -- no data, reset to 0
-        for k, f in pairs(faders) do
-            widgets.resetFaderValue(f)
-        end
-        active_tab = {}
-        current.content = sfx.to_table(generate_score())
-    end
-
-    active_tab = current
-end
 
 local window = {
     width = 0,
     height = 0
 }
-
-function on_new_tab(tab)
-    local filename = ws.create("sfx", "sfx")
-    tab.label = filename
-end
 
 function on_play_button()
     local score = nil
@@ -212,197 +147,6 @@ function on_increase_volume(counter)
     counter.value = math.min(counter.value + 1, 10)
 end
 
-function on_switch_mode()
-    fader_mode = not fader_mode
-    if fader_mode then
-        switch_mode.overlay = 24
-        for w in all(fader_widgets) do
-            w.enabled = true
-        end
-        for w in all(music_widgets) do
-            w.enabled = false
-        end
-    else
-        switch_mode.overlay = 25
-        for w in all(fader_widgets) do
-            w.enabled = false
-        end
-        for w in all(music_widgets) do
-            w.enabled = true
-        end
-    end
-
-end
-
-function _init(w, h)
-
-    widgets.on_new_tab = on_new_tab
-    window.width = w
-    window.height = h
-
-    -- buttons
-    widgets.createButton({
-        x = 10,
-        y = 16,
-        overlay = 22,
-        grouped = false,
-        on_active_button = on_play_button
-    })
-
-    widgets.createButton({
-        x = 10,
-        y = 16 + 2 + 16,
-        overlay = 23,
-        data = {
-            save = true
-        },
-        grouped = false,
-        on_active_button = on_save_button
-    })
-
-    switch_mode = widgets.createButton({
-        x = 10,
-        y = 16 + 2 + 16 + 2 + 16,
-        overlay = 24,
-        grouped = false,
-        on_active_button = on_switch_mode
-    })
-
-    patterns = widgets.createCounter({
-        x = 10,
-        y = 90,
-        value = 1,
-        label = "pattern",
-        on_left = on_previous_patterns,
-        on_right = on_next_patterns
-    })
-
-    table.insert(fader_widgets, patterns)
-
-    bpm = widgets.createCounter({
-        x = 10,
-        y = 90 + 24,
-        value = 120,
-        label = "bpm",
-        on_left = on_decrease_bpm,
-        on_right = on_increase_bpm
-    })
-
-    table.insert(fader_widgets, bpm)
-
-    volume = widgets.createCounter({
-        x = 10,
-        y = 90 + 24 + 24,
-        value = 10,
-        label = "volume",
-        on_left = on_decrease_volume,
-        on_right = on_increase_volume
-    })
-
-    table.insert(fader_widgets, bpm)
-
-    -- faders
-    for i = 1, 32 do
-        local f = widgets.createFader({
-            x = 10 + 16 + i * 12,
-            y = 16 + 16 + 2,
-            height = 256 - 18,
-            label = labels[0],
-            value = 0,
-            max_value = #labels,
-            data = {
-                note = labels[0]
-            },
-            on_value_update = on_fader_update
-        })
-        table.insert(faders, f)
-        table.insert(fader_widgets, f)
-    end
-
-    -- buttons
-    for i = #waves - 1, 0, -1 do
-        local w = widgets.createButton({
-            x = 10,
-            y = 250 - i * 16,
-            overlay = waves[i + 1].overlay,
-            data = {
-                wave = waves[i + 1]
-            },
-            on_active_button = on_active_button
-        })
-
-        table.insert(fader_widgets, w)
-
-        if i == 0 then
-            w.status = 2
-        end
-    end
-
-    -- music buttons
-    for x = 1, 8 do
-        for y = 1, 8 do
-            local w = widgets.createCounter({
-                x = 28 + x * 48,
-                y = y * 32,
-                value = nil,
-                enabled = false,
-                index = x + (y - 1) * 8,
-                label = "pattern",
-                on_left = on_decrease_pattern,
-                on_right = on_increase_pattern
-            })
-
-            if x == 1 and y == 1 then
-                w.value = 1
-            end
-            music_widgets[x + (y - 1) * 8] = w
-        end
-    end
-    -- tabs
-
-    local files = ws.list()
-
-    local tabs = {}
-    local new_tab_x = 0
-    if #files > 0 then
-        for w in all(files) do
-            local tab = widgets.createTab({
-                x = new_tab_x,
-                width = 2 * 16 + 8,
-                status = 0,
-                label = w,
-                content = sfx.to_table(ws.load(w)),
-                on_active_tab = on_active_tab
-            })
-            table.insert(tabs, tab)
-            new_tab_x = new_tab_x + tab.width
-        end
-    else
-        local file = ws.create("sfx", "sfx")
-        local tab = widgets.createTab({
-            x = 0,
-            width = 2 * 16 + 8,
-            status = 0,
-            label = file,
-            on_active_tab = on_active_tab
-        })
-        table.insert(tabs, tab)
-        new_tab_x = new_tab_x + tab.width
-    end
-
-    tabs[1].status = 1
-    active_tab = tabs[1]
-
-    widgets.createTab({
-        x = new_tab_x,
-        width = 24,
-        status = 0,
-        on_active_tab = on_active_tab,
-        new_tab = true
-    })
-    --
-    init_faders(tabs)
-end
 
 function init_faders(tabs)
     local index = 1
@@ -431,34 +175,62 @@ function to_hex(number)
     return hexString
 end
 
-function generate_score(played_pattern)
+local editor = {
+    mode = 0, -- 0 -> sound editor ; 1 -> pattern editor ; 2 -> music editor
+    play_button = nil,
+    save_button = nil,
+    switch_button = nil,
+    pattern_counter = nil,
+    bpm_counter = nil,
+    volume_counter = nil,
+    active_tab = nil, -- current active (displayed) tab.
+    sound_editor_widgets = {}, -- all widgets used only in the sound editor mode
+    patterns_editor_widgets = {}, -- all widgets used only in the patterns editor mode
+    fader_widgets = {}, -- all faders (used only in the sound editor mode)
+    wave_widgets = {}, -- all waves button (used only in the sound editor mode)
+    tabs_widgets = {} -- all the tabs
+}
 
-    -- new file. So there is not content yet.
-    if active_tab.content == nil then
-        local new_pattern = {}
+--[[
+    enable widgets regarding the mode selected.
+]]
+editor.switch_to_mode = function(mode) 
+    editor.mode = mode
 
-        for index = 1, 32 do
-            local beat = {}
-            beat[1] = {
-                type = 0,
-                index = 0,
-                note = 1
-            }
+    local enabled_sound_widgets = mode == 0
+    local enabled_patterns_widgets = mode == 1
 
-            new_pattern[index] = beat
-        end
-
-        active_tab.content = {}
-        active_tab.content.patterns = {}
-        active_tab.content.patterns[1] = new_pattern
+    for w in all(editor.sound_editor_widgets) do
+        w.enabled = enabled_sound_widgets
     end
-    local p = active_tab.content["patterns"]
-    local v = math.floor((volume.value * 25.5))
 
-    local score = "tiny-sfx " .. #p .. " " .. bpm.value .. " " .. v .. "\n"
+    for w in all(editor.patterns_editor_widgets) do
+        w.enabled = enabled_patterns_widgets
+    end
+end
+
+editor.activate_pattern = function(index, data)
+    local beats = data["patterns"][index]
+    
+    for k, f in ipairs(editor.fader_widgets) do
+        local beat = beats[k]
+        if beats[k] ~= nil then
+            -- set fader value
+        else
+            -- set fader value to 0
+        end
+    end
+end
+
+editor.generate_score = function(content, pattern_selector)
+    local p = content["patterns"]
+    local v = math.floor((editor.volume_counter.value * 25.5))
+    local bpm = editor.bpm_counter.value
+
+    local score = "tiny-sfx " .. #p .. " " .. bpm .. " " .. v .. "\n"
 
     -- write patterns
-    for patterns in all(active_tab.content["patterns"]) do
+    for patterns in all(content["patterns"]) do
         local strip = ""
         for index = 1, 32 do
             local beatStr = ""
@@ -466,14 +238,7 @@ function generate_score(played_pattern)
             if beat == nil then
                 beatStr = beatStr .. "0000FF"
             else
-                for note in all(beat) do
-                    if note.note == 0 then
-                        beatStr = beatStr .. "0000FF:"
-                    else
-                        beatStr = beatStr .. to_hex(note.index) .. to_hex(note.note) .. to_hex(255) .. ":"
-                    end
-                end
-                beatStr = beatStr:sub(1, -2)
+                beatStr = beatStr .. to_hex(beat.index) .. to_hex(beat.note) .. to_hex(beat.volume)
             end
             strip = strip .. beatStr .. " "
         end
@@ -482,21 +247,268 @@ function generate_score(played_pattern)
     end
 
     -- write patterns order
-    if played_pattern == nil then
-        played_pattern = ""
+    if pattern_selector == nil then
+        pattern_selector = ""
         local stop = false
         for w in all(music_widgets) do
             if w.value == 0 then
                 stop = true
             end
             if (not stop) then
-                played_pattern = played_pattern .. w.value .. " "
+                pattern_selector = pattern_selector .. w.value .. " "
             end
         end
     end
-    score = score .. played_pattern
+    score = score .. pattern_selector
 
     return score
+end
+
+--[[
+    Callback when a new tab is created.
+]]
+editor.on_new_tab = function(tab)
+    -- create a new file and assign the name to the new tab.
+    local filename = ws.create("sfx", "sfx")
+    tab.label = filename
+    tab.content = sfx.to_table(sfx.empty_score())
+    table.insert(editor.tabs_widgets, tab)
+end
+
+--[[
+    Callback when a new tab is active. 
+]]
+editor.on_active_tab = function(current, prev)
+    editor.switch_to_mode(0)
+
+    if prev ~= nil then
+        -- update the model of the previous tab before switching.
+        local score = editor.generate_score(prev.content)
+        prev.content = sfx.to_table(score)
+    end
+
+    local data = current.content
+
+    editor.bpm_counter.value = data["bpm"]
+    editor.volume_counter.value = math.floor((data["volume"] / 255) * 10)
+
+    -- always get the first pattern
+    editor.activate_pattern(1, data)
+    -- set faders value regarding the first patterns
+    editor.active_tab = current
+
+    -- TODO: configure widgets regarding the current tab.
+--[[
+
+    if prev ~= nil then
+        local score = generate_score()
+        prev.content = sfx.to_table(score)
+        debug.console(generate_score())
+    end
+    
+    -- restore the previous score of the current tab
+    if current.content ~= nil then
+        
+        local data = current.content
+        bpm.value = data["bpm"]
+        volume.value = (data["volume"] / 255) * 10
+        -- always get the first pattern
+        active_pattern(1, data)
+        
+        debug.console(generate_score())
+    else
+        bpm.value = 120
+        patterns.value = 1
+        volume.value = 10
+        -- no data, reset to 0
+        for k, f in pairs(faders) do
+            widgets.resetFaderValue(f)
+        end
+        active_tab = {}
+        current.content = sfx.to_table(generate_score())
+    end
+    
+    active_tab = current
+    ]]
+end
+
+editor.create_widgets = function()
+    
+    -- buttons
+    editor.play_button = widgets.createButton({
+        x = 10,
+        y = 16,
+        overlay = 22,
+        grouped = false,
+        on_active_button = on_play_button
+    })
+
+    editor.save_button = widgets.createButton({
+        x = 10,
+        y = 16 + 2 + 16,
+        overlay = 23,
+        data = {
+            save = true
+        },
+        grouped = false,
+        on_active_button = on_save_button
+    })
+
+    editor.switch_button = widgets.createButton({
+        x = 10,
+        y = 16 + 2 + 16 + 2 + 16,
+        overlay = 24,
+        grouped = false,
+        on_active_button = on_switch_mode
+    })
+
+    editor.pattern_counter = widgets.createCounter({
+        x = 10,
+        y = 90,
+        value = 1,
+        label = "pattern",
+        on_left = on_previous_patterns,
+        on_right = on_next_patterns
+    })
+
+    table.insert(editor.sound_editor_widgets, editor.pattern_counter)
+
+    editor.bpm_counter = widgets.createCounter({
+        x = 10,
+        y = 90 + 24,
+        value = 120,
+        label = "bpm",
+        on_left = on_decrease_bpm,
+        on_right = on_increase_bpm
+    })
+
+    table.insert(editor.sound_editor_widgets, editor.bpm_counter)
+
+    editor.volume_counter = widgets.createCounter({
+        x = 10,
+        y = 90 + 24 + 24,
+        value = 10,
+        label = "volume",
+        on_left = on_decrease_volume,
+        on_right = on_increase_volume
+    })
+
+    table.insert(editor.sound_editor_widgets, editor.volume_counter)
+
+    -- faders
+    for i = 1, 32 do
+        local fader = widgets.createFader({
+            x = 10 + 16 + i * 12,
+            y = 16 + 16 + 2,
+            height = 256 - 18,
+            label = labels[0],
+            value = 0,
+            max_value = #labels,
+            data = {
+                note = labels[0]
+            },
+            on_value_update = on_fader_update
+        })
+        table.insert(editor.fader_widgets, fader)
+        table.insert(editor.sound_editor_widgets, fader)
+    end
+
+    -- buttons
+    for i = #waves - 1, 0, -1 do
+        local w = widgets.createButton({
+            x = 10,
+            y = 250 - i * 16,
+            overlay = waves[i + 1].overlay,
+            data = {
+                wave = waves[i + 1]
+            },
+            on_active_button = on_active_button
+        })
+
+        table.insert(editor.sound_editor_widgets, w)
+        table.insert(editor.wave_widgets, w)
+
+        -- activate the first button
+        if i == 0 then
+            w.status = 2
+        end
+    end
+
+    -- music buttons
+    for x = 1, 8 do
+        for y = 1, 8 do
+            local w = widgets.createCounter({
+                x = 28 + x * 48,
+                y = y * 32,
+                value = nil,
+                enabled = false,
+                index = x + (y - 1) * 8,
+                label = "pattern",
+                on_left = on_decrease_pattern,
+                on_right = on_increase_pattern
+            })
+
+            editor.patterns_editor_widgets[x + (y - 1) * 8] = w
+
+            if x == 1 and y == 1 then
+                w.value = 1
+            end
+        end
+    end
+
+    -- tabs
+    local files = ws.list()
+
+    local new_tab_x = 0
+    if #files > 0 then
+        for w in all(files) do
+            local tab = widgets.createTab({
+                x = new_tab_x,
+                width = 2 * 16 + 8,
+                status = 0,
+                label = w,
+                content = sfx.to_table(ws.load(w)),
+                on_active_tab = editor.on_active_tab,
+                on_new_tab = editor.on_new_tab
+            })
+            table.insert(editor.tabs_widgets, tab)
+            new_tab_x = new_tab_x + tab.width
+        end
+    else
+        local file = ws.create("sfx", "sfx")
+        local tab = widgets.createTab({
+            x = 0,
+            width = 2 * 16 + 8,
+            status = 0,
+            label = file,
+            content = sfx.to_table(sfx.empty_score()),
+            on_active_tab = editor.on_active_tab,
+            on_new_tab = editor.on_new_tab
+        })
+        table.insert(editor.tabs_widgets, tab)
+        new_tab_x = new_tab_x + tab.width
+    end
+
+    -- activate the first tab
+    editor.tabs_widgets[1].status = 1
+    editor.active_tab = editor.tabs_widgets[1]
+
+    local w = widgets.createTab({
+        x = new_tab_x,
+        width = 24,
+        status = 0,
+        on_active_tab = editor.on_active_tab,
+        on_new_tab = editor.on_new_tab,
+        new_tab = true
+    })
+end
+
+function _init(w, h)
+    window.width = w
+    window.height = h
+
+    --
+    editor.create_widgets()
 end
 
 function _update()

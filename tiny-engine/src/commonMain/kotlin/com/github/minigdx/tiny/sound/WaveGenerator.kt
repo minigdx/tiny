@@ -153,7 +153,7 @@ class SilenceWave(duration: Seconds) : WaveGenerator(Note.C0, duration, 1.0f) {
 
     override fun copy(duration: Seconds, volume: Percent): WaveGenerator = SilenceWave(duration)
 
-    override val name: String = " "
+    override val name: String = "silence"
 
     override val index: Int = 0
 }

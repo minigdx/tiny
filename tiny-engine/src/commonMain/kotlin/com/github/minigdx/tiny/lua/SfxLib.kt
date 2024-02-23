@@ -8,7 +8,6 @@ import com.github.minigdx.tiny.Percent
 import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.resources.Sound
-import com.github.minigdx.tiny.sound.Beat
 import com.github.minigdx.tiny.sound.NoiseWave
 import com.github.minigdx.tiny.sound.Pattern
 import com.github.minigdx.tiny.sound.PulseWave
@@ -24,6 +23,7 @@ import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.ThreeArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
+import org.luaj.vm2.lib.ZeroArgFunction
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
@@ -62,6 +62,7 @@ class SfxLib(
         ctrl.set("pulse", pulse())
         ctrl.set("sawtooth", sawtooth())
         ctrl.set("to_table", toTable())
+        ctrl.set("empty_score", emptyScore())
         ctrl.set("sfx", sfx())
         arg2.set("sfx", ctrl)
         arg2.get("package").get("loaded").set("sfx", ctrl)
@@ -190,16 +191,13 @@ class SfxLib(
 
     inner class toTable : OneArgFunction() {
 
-        private fun Beat.toLuaTable(): LuaTable {
-            val beat = LuaTable()
-            notes.forEach { wave ->
-                val note = LuaTable()
-                note.set("type", wave.name)
-                note.set("index", wave.index)
-                note.set("note", wave.note.index)
-                beat.insert(0, note)
-            }
-            return beat
+        private fun WaveGenerator.toLuaTable(): LuaTable {
+            val note = LuaTable()
+            note.set("type", this.name)
+            note.set("index", this.index)
+            note.set("note", this.note.index)
+            note.set("volume", (this.volume * 255).toInt())
+            return note
         }
 
         override fun call(arg: LuaValue): LuaValue {
@@ -208,11 +206,11 @@ class SfxLib(
 
             val patterns = LuaTable()
             song.patterns.forEach { (index, pattern) ->
-                val beats = LuaTable()
-                pattern.beats.forEach { beat ->
-                    beats.insert(beat.index, beat.toLuaTable())
+                val notes = LuaTable()
+                pattern.notes.forEach { note ->
+                    notes.insert(0, note.toLuaTable())
                 }
-                patterns.insert(index, beats)
+                patterns.insert(index, notes)
             }
             val result = LuaTable()
             result["bpm"] = valueOf(song.bpm)
@@ -220,6 +218,15 @@ class SfxLib(
             result["patterns"] = patterns
             return result
         }
+    }
+
+    inner class emptyScore : ZeroArgFunction() {
+        override fun call(): LuaValue {
+            val pattern = Pattern(1, emptyList())
+            val song = Song(120, 0.5f, mapOf(1 to pattern), listOf(pattern))
+            return valueOf(song.toString())
+        }
+
     }
 
     inner class sfx : TwoArgFunction() {
@@ -282,7 +289,7 @@ class SfxLib(
             // Map<Index, Pattern>
             val patterns = lines.drop(1).take(nbPattern.toInt()).mapIndexed { indexPattern, pattern ->
                 val beatsStr = pattern.trim().split(" ")
-                val beats = convertToBeats(beatsStr, duration)
+                val beats = convertToWaves(beatsStr, duration)
                 Pattern(indexPattern + 1, beats)
             }.associateBy { it.index }
 
@@ -298,16 +305,11 @@ class SfxLib(
             return Song(bpm.toInt(), volume.toInt() / 255f, patterns, patternsOrdered)
         }
 
-        private fun convertToBeats(beatsStr: List<String>, duration: Seconds): List<Beat> {
+        private fun convertToWaves(beatsStr: List<String>, duration: Seconds): List<WaveGenerator> {
             val beats = beatsStr
                 .asSequence()
-                .mapIndexed { index, beat ->
-                    val notes = beat.split(":")
-                        .asSequence()
-                        .filter { it.isNotBlank() }
-                        .map { note -> convertToWave(note, duration) }
-                    Beat(index + 1, notes.toList())
-                }
+                .filter { it.isNotBlank() }
+                .map { beat -> convertToWave(beat, duration) }
             return beats.toList()
         }
 

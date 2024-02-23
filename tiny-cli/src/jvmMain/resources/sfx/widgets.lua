@@ -45,7 +45,9 @@ local Tab = {
     label = "+",
     content = nil,
     status = 0, -- 0 : inactive ; 1 : active
-    new_tab = false
+    new_tab = false,
+    on_active_tab = nil,
+    on_new_tab = nil,
 }
 
 local Counter = {
@@ -215,6 +217,7 @@ factory.on_clicked = function(x, y)
     end
 
     if new_active ~= nil then
+        -- create a new tab.
         if new_active.new_tab then
             new_active.width = 2 * 16 + 8
             new_active.label = ""
@@ -225,16 +228,18 @@ factory.on_clicked = function(x, y)
                     width = 24,
                     new_tab = true,
                     x = new_active.x + new_active.width,
-                    on_active_tab = new_active.on_active_tab
+                    on_active_tab = new_active.on_active_tab,
+                    on_new_tab = new_active.on_new_tab,
                 })
-
             end
 
-            factory.on_new_tab(new_active)
+            new_active.on_new_tab(new_active)
         end
         current_active.status = 0
         new_active.status = 1
-        new_active.on_active_tab(new_active, current_active)
+        if new_active.on_active_tab ~= nil then
+            new_active.on_active_tab(new_active, current_active)
+        end
     end
 
     for c in all(counters) do
@@ -265,6 +270,9 @@ function draw_tabs()
 end
 
 function draw_tab(tab)
+    if tab == nil then
+        return
+    end
     local offset = tab.status * 8
 
     -- body

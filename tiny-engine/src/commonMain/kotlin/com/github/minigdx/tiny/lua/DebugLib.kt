@@ -228,6 +228,8 @@ class DebugLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
                     .joinToString(" ")
                 "table[$str]"
             }
+        } else if (arg.isfunction()) {
+            "function(" + (0 until arg.narg()).map { "arg" }.joinToString(", ") + ")"
         } else {
             arg.toString()
         }
