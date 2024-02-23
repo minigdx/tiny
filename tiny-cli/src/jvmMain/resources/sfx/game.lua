@@ -56,37 +56,6 @@ local switch_mode = nil
 local fader_widgets = {}
 local music_widgets = {}
 
-function on_fader_update(fader, value)
-    widgets.setFaderValue(fader, current_wave.index, math.ceil(value), current_wave.color)
-
-    local actual_pattern = active_tab.content["patterns"][patterns.value]
-
-    if actual_pattern == nil then
-        actual_pattern = {}
-        active_tab.content["patterns"][patterns.value] = actual_pattern
-    end
-    local beat = actual_pattern[fader.index]
-
-    if beat == nil then
-        beat = {}
-        actual_pattern[fader.index] = beat
-
-    end
-
-    local note = beat[current_wave.index]
-    if note == nil then
-        local n = {
-            note = 0,
-            index = current_wave.index,
-            type = 0
-        }
-        beat[current_wave.index] = n
-    end
-
-    beat[current_wave.index].index = current_wave.index
-    beat[current_wave.index].note = math.ceil(value)
-
-end
 
 function on_active_button(current, prec)
     current_wave = current.data.wave
@@ -394,6 +363,11 @@ editor.create_widgets = function()
     })
 
     table.insert(editor.sound_editor_widgets, editor.volume_counter)
+
+    local on_fader_update = function(fader, value)
+        fader.value = math.ceil(value)
+        fader.tip_color = current_wave.color
+    end
 
     -- faders
     for i = 1, 32 do

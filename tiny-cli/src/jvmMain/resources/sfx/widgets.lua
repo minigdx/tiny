@@ -7,7 +7,6 @@ local Fader = {
     min_value = 0,
     max_value = 10,
     value = nil,
-    values = nil,
     tip_color = 9,
     disabled_color = 7,
     label = "",
@@ -16,11 +15,6 @@ local Fader = {
     index = 0,
     on_value_update = function(fader, value)
     end
-}
-
-local FaderValue = {
-    value = 0,
-    color = 0
 }
 
 local Button = {
@@ -47,7 +41,7 @@ local Tab = {
     status = 0, -- 0 : inactive ; 1 : active
     new_tab = false,
     on_active_tab = nil,
-    on_new_tab = nil,
+    on_new_tab = nil
 }
 
 local Counter = {
@@ -93,25 +87,6 @@ factory.createButton = function(value)
     table.insert(widgets, result)
     table.insert(buttons, result)
     return result
-end
-
-factory.setFaderValue = function(fader, index, value, color)
-    if fader.values == nil then
-        fader.values = {}
-    end
-
-    if value <= 0 then
-        fader.values[index] = nil
-    else
-        fader.values[index] = {
-            value = value,
-            color = color
-        }
-    end
-end
-
-factory.resetFaderValue = function(fader)
-    fader.values = {}
 end
 
 factory.createFader = function(value)
@@ -229,7 +204,7 @@ factory.on_clicked = function(x, y)
                     new_tab = true,
                     x = new_active.x + new_active.width,
                     on_active_tab = new_active.on_active_tab,
-                    on_new_tab = new_active.on_new_tab,
+                    on_new_tab = new_active.on_new_tab
                 })
             end
 
@@ -300,13 +275,12 @@ function draw_tab(tab)
 end
 
 function draw_fader(f)
-    if f.values ~= nil and next(f.values) then
-        for v in all(f.values) do
-            local y = f.height - ((v.value - f.min_value) / (f.max_value - f.min_value) * f.height)
-            local tipy = f.y + y
-            shape.rectf(f.x, tipy, f.width, 4, v.color)
-        end
+    if f.value ~= nil and f.value > 0 then
+        local y = f.height - ((f.value - f.min_value) / (f.max_value - f.min_value) * f.height)
+        local tipy = f.y + y
+        shape.rectf(f.x, tipy, f.width, 4, f.tip_color)
     else
+        -- fader value = 0
         local y = f.height - (0 / (f.max_value - f.min_value) * f.height)
         local tipy = f.y + y
         shape.rectf(f.x, tipy, f.width, 4, f.disabled_color)
