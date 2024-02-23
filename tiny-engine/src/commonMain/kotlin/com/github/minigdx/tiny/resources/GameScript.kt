@@ -4,6 +4,7 @@ import com.github.minigdx.tiny.engine.Exit
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.input.InputHandler
+import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.lua.CtrlLib
 import com.github.minigdx.tiny.lua.DebugLib
 import com.github.minigdx.tiny.lua.GfxLib
@@ -16,6 +17,8 @@ import com.github.minigdx.tiny.lua.SfxLib
 import com.github.minigdx.tiny.lua.ShapeLib
 import com.github.minigdx.tiny.lua.SprLib
 import com.github.minigdx.tiny.lua.StdLib
+import com.github.minigdx.tiny.lua.TestLib
+import com.github.minigdx.tiny.lua.TestResult
 import com.github.minigdx.tiny.lua.TinyBaseLib
 import com.github.minigdx.tiny.lua.TinyLib
 import com.github.minigdx.tiny.lua.Vec2Lib
@@ -46,6 +49,7 @@ class GameScript(
     val gameOptions: GameOptions,
     val inputHandler: InputHandler,
     val platform: Platform,
+    val logger: Logger,
     override val type: ResourceType,
 ) : GameResource {
 
@@ -67,6 +71,8 @@ class GameScript(
     private var globals: Globals? = null
 
     private val tinyLib: TinyLib = TinyLib()
+
+    internal val testResults = mutableListOf<TestResult>()
 
     class State(val args: LuaValue)
 
@@ -94,6 +100,7 @@ class GameScript(
         load(JuiceLib())
         load(NotesLib())
         load(WorkspaceLib(platform = platform))
+        load(TestLib(this@GameScript))
 
         this@GameScript.resourceAccess.customizeLuaGlobal(this)
 
@@ -105,6 +112,30 @@ class GameScript(
         with(createLuaGlobals(customizeLuaGlobal, forValidation = true)) {
             load(content.decodeToString()).call()
             get("_init").nullIfNil()?.callSuspend(valueOf(gameOptions.width), valueOf(gameOptions.height))
+            if (gameOptions.runTests) {
+                gameOptions.gameScripts.map { name ->
+                    // use the new content for the game script evaluated
+                    if (name == this@GameScript.name) {
+                        content.decodeToString()
+                    } else {
+                        // use the cached content for the script not updated.
+                        resourceAccess.script(name)?.content!!.decodeToString()
+                    }
+                }.forEach { scriptContent ->
+                    val globalForTest = createLuaGlobals(customizeLuaGlobal, forValidation = true)
+                    println(scriptContent)
+                    globalForTest.load(scriptContent).call()
+                    globalForTest.get("_test").callSuspend()
+                }
+                logger.info("TEST") { "⚙\uFE0F === Ran ${testResults.size} tests ===" }
+                testResults.forEach {
+                    if (it.passed) {
+                        logger.info("TEST") { "✅ ${it.script} - ${it.test}" }
+                    } else {
+                        logger.info("TEST") { "\uD83D\uDD34 ${it.script} - ${it.test}: ${it.reason}" }
+                    }
+                }
+            }
         }
         return true
     }

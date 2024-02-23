@@ -4,6 +4,8 @@ import com.github.ajalt.clikt.core.Abort
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.default
+import com.github.ajalt.clikt.parameters.options.flag
+import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.minigdx.tiny.cli.config.GameParameters
 import com.github.minigdx.tiny.engine.GameEngine
@@ -19,9 +21,12 @@ import java.io.File
 
 class RunCommand : CliktCommand(name = "run", help = "Run your game.") {
 
-    val gameDirectory by argument(help = "The directory containing all game information")
+    val gameDirectory by argument(help = "The directory containing all game information.")
         .file(mustExist = true, canBeDir = true, canBeFile = false)
         .default(File("."))
+
+    val test by option(help = "Run tests before running the game.")
+        .flag()
 
     fun isOracleOrOpenJDK(): Boolean {
         val vendor = System.getProperty("java.vendor")?.lowercase()
@@ -50,6 +55,7 @@ class RunCommand : CliktCommand(name = "run", help = "Run your game.") {
             val logger = StdOutLogger("tiny-cli")
             val vfs = CommonVirtualFileSystem()
             val gameOption = gameParameters.toGameOptions()
+                .copy(runTests = test)
             val gameEngine = GameEngine(
                 gameOptions = gameOption,
                 platform = GlfwPlatform(gameOption, logger, vfs, gameDirectory, LwjglGLRender(logger, gameOption)),
@@ -65,7 +71,7 @@ class RunCommand : CliktCommand(name = "run", help = "Run your game.") {
 
             val data = File("data")
             if (data.exists() && data.isDirectory) {
-                WorkspaceLib.DEFAULT = data.listFiles().map { JvmLocalFile(it.name, data) }
+                WorkspaceLib.DEFAULT = data.listFiles()?.map { JvmLocalFile(it.name, data) } ?: emptyList()
             }
             gameEngine.main()
         } catch (ex: Exception) {

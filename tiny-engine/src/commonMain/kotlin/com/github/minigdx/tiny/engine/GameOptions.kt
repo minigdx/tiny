@@ -6,7 +6,7 @@ import com.github.minigdx.tiny.graphic.ColorPalette
 import com.github.minigdx.tiny.input.MouseProject
 import com.github.minigdx.tiny.input.Vector2
 
-class GameOptions(
+data class GameOptions(
     val width: Pixel,
     val height: Pixel,
     val palette: List<String>,
@@ -19,6 +19,7 @@ class GameOptions(
     val gutter: Pair<Pixel, Pixel> = 10 to 10,
     val spriteSize: Pair<Pixel, Pixel> = 8 to 8,
     val hideMouseCursor: Boolean = false,
+    val runTests: Boolean = false,
 ) : MouseProject {
 
     init {

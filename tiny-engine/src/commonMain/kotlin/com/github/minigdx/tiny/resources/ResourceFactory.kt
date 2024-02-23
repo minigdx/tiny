@@ -167,7 +167,7 @@ class ResourceFactory(
                 canUseJarPrefix = !protectedResources.contains(resourceType),
             ),
         ).map { content ->
-            GameScript(version++, index, name, gameOptions, inputHandler, platform, resourceType).apply {
+            GameScript(version++, index, name, gameOptions, inputHandler, platform, logger, resourceType).apply {
                 this.content = content
             }
         }.onEach {

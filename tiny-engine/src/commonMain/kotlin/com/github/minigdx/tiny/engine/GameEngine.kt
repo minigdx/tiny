@@ -201,6 +201,7 @@ class GameEngine(
                         resource.resourceAccess = this
                         // Game script will be evaluated when the boot script will exit
                         scripts[resource.index] = resource
+                        resource.isValid(customizeLuaGlobal)
                     }
 
                     ENGINE_GAMESCRIPT -> {
