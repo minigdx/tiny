@@ -212,10 +212,17 @@ class SfxLib(
                 }
                 patterns.insert(index, notes)
             }
+
+            val music = LuaTable()
+            song.music.map { it.index }.forEach {
+                music.insert(0, valueOf(it))
+            }
+
             val result = LuaTable()
             result["bpm"] = valueOf(song.bpm)
             result["volume"] = valueOf(floor(song.volume.toDouble() * 255))
             result["patterns"] = patterns
+            result["music"] = music
             return result
         }
     }

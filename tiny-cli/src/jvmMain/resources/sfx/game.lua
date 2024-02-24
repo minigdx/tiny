@@ -49,15 +49,6 @@ local window = {
 }
 
 
-
-function on_decrease_pattern(counter)
-    counter.value = math.max(counter.value - 1, 1)
-end
-
-function on_increase_pattern(counter)
-    counter.value = math.min(counter.value + 1, #active_tab.content["patterns"])
-end
-
 function to_hex(number)
     local hexString = string.format("%X", number)
 
@@ -151,20 +142,24 @@ editor.generate_score = function(content, pattern_selector)
         score = score .. strip .. "\n"
     end
 
+    local music = "not-set"
     -- write patterns order
     if pattern_selector == nil then
-        pattern_selector = ""
         local stop = false
-        for w in all(music_widgets) do
+        music = ""
+        for w in all(editor.patterns_editor_widgets) do
             if w.value == 0 then
                 stop = true
             end
             if (not stop) then
-                pattern_selector = pattern_selector .. w.value .. " "
+                music = music .. w.value .. " "
             end
         end
+    else
+        music = pattern_selector
     end
-    score = score .. pattern_selector
+    
+    score = score .. music
 
     return score
 end
@@ -367,6 +362,16 @@ editor.create_widgets = function()
     end
 
     -- music buttons
+    local on_decrease_pattern = function(counter)
+        counter.value = math.max(counter.value - 1, 1)
+        editor.active_tab.content["music"][counter.index] = counter.value
+    end
+    
+    local on_increase_pattern = function(counter)
+        counter.value = math.min(counter.value + 1, #editor.active_tab.content["patterns"])
+        editor.active_tab.content["music"][counter.index] = counter.value
+    end
+
     for x = 1, 8 do
         for y = 1, 8 do
             local w = widgets.createCounter({
