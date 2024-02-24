@@ -48,15 +48,7 @@ local window = {
     height = 0
 }
 
-function on_play_button()
-    local score = nil
-    if fader_mode then
-        score = generate_score(patterns.value)
-    else
-        score = generate_score()
-    end
-    sfx.sfx(score)
-end
+
 
 function on_decrease_pattern(counter)
     counter.value = math.max(counter.value - 1, 1)
@@ -214,6 +206,17 @@ end
 editor.create_widgets = function()
 
     -- buttons
+
+    local on_play_button = function()
+        local score = nil
+        if editor.mode == 0 then
+            score = editor.generate_score(editor.active_tab.content, editor.pattern_counter.value)
+        else
+            score = editor.generate_score(editor.active_tab.content)
+        end
+        sfx.sfx(score)
+    end
+
     editor.play_button = widgets.createButton({
         x = 10,
         y = 16,
@@ -314,7 +317,7 @@ editor.create_widgets = function()
 
         current_pattern[fader.index] = {
             type = current_wave.type,
-            volume = 1.0,
+            volume = 255,
             index = current_wave.index,
             note = fader.value
         }
