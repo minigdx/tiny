@@ -41,20 +41,7 @@ local waves = {{
     index = 6
 }}
 
-local bpm = nil
-local patterns = nil
-local volume = nil
-
-local faders = {}
 local current_wave = waves[1]
-
-local active_tab = nil
-
-local fader_mode = true
-local switch_mode = nil
-
-local fader_widgets = {}
-local music_widgets = {}
 
 local window = {
     width = 0,
@@ -69,11 +56,6 @@ function on_play_button()
         score = generate_score()
     end
     sfx.sfx(score)
-end
-
-function on_save_button()
-    local score = generate_score()
-    ws.save(active_tab.label, score)
 end
 
 function on_decrease_pattern(counter)
@@ -240,6 +222,11 @@ editor.create_widgets = function()
         on_active_button = on_play_button
     })
 
+    local on_save_button = function()
+        local score = editor.generate_score(editor.active_tab.content)
+        ws.save(editor.active_tab.label, score)
+    end
+
     editor.save_button = widgets.createButton({
         x = 10,
         y = 16 + 2 + 16,
@@ -265,7 +252,7 @@ editor.create_widgets = function()
         counter.value = math.max(counter.value - 1, 1)
         editor.activate_pattern(counter.value, editor.active_tab.content)
     end
-    
+
     local on_next_patterns = function(counter)
         counter.value = math.min(counter.value + 1, 10)
         editor.activate_pattern(counter.value, editor.active_tab.content)
