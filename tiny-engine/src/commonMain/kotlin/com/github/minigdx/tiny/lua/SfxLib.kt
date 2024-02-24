@@ -226,7 +226,6 @@ class SfxLib(
             val song = Song(120, 0.5f, mapOf(1 to pattern), listOf(pattern))
             return valueOf(song.toString())
         }
-
     }
 
     inner class sfx : TwoArgFunction() {
