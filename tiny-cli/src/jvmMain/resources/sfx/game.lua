@@ -117,6 +117,12 @@ editor.activate_pattern = function(index, data)
         end
     end
 
+    for k, f in ipairs(editor.patterns_editor_widgets) do
+        local pattern_id = data["music"][k]
+        if pattern_id ~= nil then
+            f.value = pattern_id
+        end
+    end
     -- TODO: set the pattenrs editor values.
 end
 
