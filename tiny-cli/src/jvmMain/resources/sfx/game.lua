@@ -116,6 +116,8 @@ editor.activate_pattern = function(index, data)
             f.tip_color = 0
         end
     end
+
+    -- TODO: set the pattenrs editor values.
 end
 
 editor.generate_score = function(content, pattern_selector)
@@ -310,12 +312,21 @@ editor.create_widgets = function()
         fader.tip_color = current_wave.color
         local current_pattern = editor.active_tab.content["patterns"][editor.pattern_counter.value]
 
-        current_pattern[fader.index] = {
-            type = current_wave.type,
-            volume = 255,
-            index = current_wave.index,
-            note = fader.value
-        }
+        if fader.value == 0 then
+            current_pattern[fader.index] = {
+                type = 0,
+                volume = 255,
+                index = 0,
+                note = 0
+            }
+        else
+            current_pattern[fader.index] = {
+                type = current_wave.type,
+                volume = 255,
+                index = current_wave.index,
+                note = fader.value
+            }
+        end
     end
 
     -- faders
