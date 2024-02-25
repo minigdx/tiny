@@ -60,11 +60,33 @@ local Counter = {
     spr = 32
 }
 
+local Envelop = {
+    label = "",
+    value = 0,
+    x = 0,
+    y = 0,
+    width = 128,
+    height = 64,
+    enabled = true,
+    attack = 0,
+    decay = 0.2,
+    sustain = 0.5,
+    release = 0,
+
+    attack_end_x = 0,
+    attack_end_y = 0,
+    decay_end_x = 0,
+    decay_end_y = 0,
+    release_start_x = 0,
+    release_start_y = 0
+}
+
 local buttons = {}
 local tabs = {}
 local faders = {}
 local widgets = {}
 local counters = {}
+local envelops = {}
 
 local factory = {}
 
@@ -96,6 +118,16 @@ factory.createFader = function(value)
 
     result.index = #faders
 
+    return result
+end
+
+factory.createEnvelop = function(value)
+    local result = new(Envelop, value)
+    result.attack_start_x = result.x
+    result.attack_start_y = result.y + result.height
+
+    table.insert(widgets, result)
+    table.insert(envelops, result)
     return result
 end
 
@@ -137,6 +169,29 @@ factory.on_update = function(x, y)
             c.status = 0
         end
     end
+
+    for e in all(envelops) do
+        if e.enabled then
+            e.attack_end_x = e.attack_start_x + e.width * e.attack
+            e.attack_end_y = e.attack_start_y - e.height
+
+            e.is_over_attack = math.dst2(x, y, e.attack_end_x, e.attack_end_y) <= 4 * 4
+
+            e.decay_end_x = e.attack_end_x + e.width * e.decay
+            e.decay_end_y = e.y + (1 - e.sustain) * e.height
+
+            e.is_over_decay = math.dst2(x, y, e.decay_end_x, e.decay_end_y) <= 4 * 4
+
+            e.release_start_x = e.x + e.width - e.width * e.release
+            e.release_start_y = e.y + (1 - e.sustain) * e.height
+            e.is_over_release = math.dst2(x, y, e.release_start_x, e.release_start_y) <= 4 * 4
+
+            local sx = e.decay_end_x + (e.release_start_x - e.decay_end_x) * 0.5
+            local sy = e.y + (1 - e.sustain) * e.height
+
+            e.is_over_sustain = math.dst2(x, y, sx, sy) <= 4 * 4
+        end
+    end
 end
 
 factory.on_click = function(x, y)
@@ -152,6 +207,34 @@ factory.on_click = function(x, y)
             local percent = math.max(0.0, 1.0 - ((y - f.y) / f.height))
             local value = percent * (f.max_value - f.min_value) + f.min_value
             f.on_value_update(f, value)
+        end
+    end
+
+    for e in all(envelops) do
+        if e.enabled then
+            if e.is_over_attack then
+                local dst = math.min(math.max(0, x - e.x), e.width)
+                local attack = dst / e.width
+
+                debug.log("attack")
+                e.attack = attack
+            elseif e.is_over_decay then
+                local dst = math.min(math.max(0, x - e.attack_end_x), e.width)
+                local decay = dst / e.width
+                
+                debug.log("decay "..decay)
+                e.decay = decay
+            elseif e.is_over_sustain then
+                local dst = math.min(math.max(0, y - e.y), e.height)
+                local sustain = 1 - dst / e.height
+
+                e.sustain = sustain
+            elseif e.is_over_release then
+                local dst = math.min(math.max(0, e.x + e.width - x), e.width)
+                local release = dst / e.width
+
+                e.release = release
+            end
         end
     end
 end
@@ -310,6 +393,48 @@ function draw_counter(counter)
     print(string.sub(counter.value, 1, 4), counter.x + 3, counter.y + 2)
 end
 
+function draw_envelop(envelop)
+
+    shape.rect(envelop.x, envelop.y, envelop.width, envelop.height, 9)
+
+    -- attack
+    print("attack", envelop.attack_end_x, envelop.attack_end_y - 8)
+    shape.line(envelop.x, envelop.y + envelop.height, envelop.attack_end_x, envelop.attack_end_y, 9)
+    if envelop.is_over_attack then
+        shape.circlef(envelop.attack_end_x, envelop.attack_end_y, 2, 9)
+    else
+        shape.circle(envelop.attack_end_x, envelop.attack_end_y, 2, 9)
+    end
+
+    print("decay", envelop.decay_end_x, envelop.decay_end_y - 8)
+    shape.line(envelop.attack_end_x, envelop.attack_end_y, envelop.decay_end_x, envelop.decay_end_y, 9)
+    if envelop.is_over_decay then
+        shape.circlef(envelop.decay_end_x, envelop.decay_end_y, 2, 9)
+    else
+        shape.circle(envelop.decay_end_x, envelop.decay_end_y, 2, 9)
+    end
+
+    print("release", envelop.release_start_x, envelop.release_start_y - 8)
+    shape.line(envelop.release_start_x, envelop.release_start_y, envelop.x + envelop.width, envelop.y + envelop.height,
+        9)
+    if envelop.is_over_release then
+        shape.circlef(envelop.release_start_x, envelop.release_start_y, 2, 9)
+    else
+        shape.circle(envelop.release_start_x, envelop.release_start_y, 2, 9)
+    end
+
+    shape.line(envelop.decay_end_x, envelop.decay_end_y, envelop.release_start_x, envelop.release_start_y, 9)
+    local width = 8
+    local height = 4
+    if envelop.is_over_sustain then
+        shape.rectf(envelop.decay_end_x + (envelop.release_start_x - envelop.decay_end_x - width) * 0.5,
+            envelop.y + (1 - envelop.sustain) * envelop.height - height * 0.5, width, height, 8)
+    else
+        shape.rect(envelop.decay_end_x + (envelop.release_start_x - envelop.decay_end_x - width) * 0.5,
+            envelop.y + (1 - envelop.sustain) * envelop.height - height * 0.5, width, height, 8)
+    end
+end
+
 factory._draw = function()
     for c in all(counters) do
         if c.enabled then
@@ -326,6 +451,15 @@ factory._draw = function()
     for b in all(buttons) do
         if b.enabled then
             draw_button(b)
+        end
+    end
+
+    for e in all(envelops) do
+        if e.is_over_attack then
+            debug.log("is over")
+        end
+        if e.enabled then
+            draw_envelop(e)
         end
     end
 

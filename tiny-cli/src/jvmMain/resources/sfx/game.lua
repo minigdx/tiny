@@ -71,6 +71,7 @@ local editor = {
     active_tab = nil, -- current active (displayed) tab.
     sound_editor_widgets = {}, -- all widgets used only in the sound editor mode
     patterns_editor_widgets = {}, -- all widgets used only in the patterns editor mode
+    patterns_fx_widgets = {}, -- all wdgets used for the fx editor
     fader_widgets = {}, -- all faders (used only in the sound editor mode)
     wave_widgets = {}, -- all waves button (used only in the sound editor mode)
     tabs_widgets = {} -- all the tabs
@@ -84,6 +85,8 @@ editor.switch_to_mode = function(mode)
 
     local enabled_sound_widgets = mode == 0
     local enabled_patterns_widgets = mode == 1
+    local enabled_music_widgets = mode == 2
+    local enabled_fx_widgets = mode == 3
 
     for w in all(editor.sound_editor_widgets) do
         w.enabled = enabled_sound_widgets
@@ -91,6 +94,10 @@ editor.switch_to_mode = function(mode)
 
     for w in all(editor.patterns_editor_widgets) do
         w.enabled = enabled_patterns_widgets
+    end
+
+    for w in all(editor.patterns_fx_widgets) do
+        w.enabled = enabled_fx_widgets
     end
 
     editor.switch_button.overlay = 24 + mode
@@ -250,7 +257,7 @@ editor.create_widgets = function()
         overlay = 24,
         grouped = false,
         on_active_button = function()
-            editor.switch_to_mode((editor.mode + 1) % 2)
+            editor.switch_to_mode((editor.mode + 1) % 4)
         end
     })
 
@@ -410,6 +417,16 @@ editor.create_widgets = function()
         end
     end
 
+    -- fx
+    local on_envelop_update = function(env, attack, decay, sustain, release)
+    end
+    local env = widgets.createEnvelop({
+        x = 60,
+        y = 30,
+        on_update = on_envelop_update
+    })
+    table.insert(editor.patterns_fx_widgets, env)
+
     -- tabs
     local files = ws.list()
 
@@ -472,7 +489,7 @@ function _update()
     widgets._update()
 
     if ctrl.pressed(keys.space) then
-        on_play_button()
+        editor.play_button.on_active_button()
     end
 
     local new_wave = current_wave
