@@ -14,7 +14,10 @@ sealed class WaveGenerator(
     val volume: Percent,
 ) {
 
-    val period = SAMPLE_RATE.toFloat() / note.frequency
+    var frequency: Float = note.frequency
+
+    val period: Float
+        get() = SAMPLE_RATE.toFloat() / frequency
 
     val numberOfSample = SAMPLE_RATE * duration
 
