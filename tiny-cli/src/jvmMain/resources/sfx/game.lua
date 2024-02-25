@@ -440,6 +440,8 @@ editor.create_widgets = function()
     -- activate the first tab
     editor.tabs_widgets[1].status = 1
     editor.active_tab = editor.tabs_widgets[1]
+    -- force the switch to the first tab on startup
+    editor.on_active_tab(editor.active_tab, nil)
 
     local w = widgets.createTab({
         x = new_tab_x,
