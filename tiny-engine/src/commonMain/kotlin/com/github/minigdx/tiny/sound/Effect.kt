@@ -5,18 +5,11 @@ import com.github.minigdx.tiny.Percent
 import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.sound.SoundManager.Companion.SAMPLE_RATE
 import com.github.minigdx.tiny.sound.WaveGenerator.Companion.TWO_PI
+import kotlin.math.abs
 import kotlin.math.sin
+import kotlin.random.Random
 
-interface Effect {
-    /**
-     * Set the sample at the [index] in the [buffer].
-     *
-     */
-    fun apply(index: Int, buffer: FloatArray)
-}
-
-// update frequencies
-interface WaveEffect {
+interface Modulation {
 
     fun apply(index: Int, frequency: Float): Float
 }
@@ -27,7 +20,7 @@ interface WaveEffect {
  */
 class Sweep(
     val sweep: Frequency,
-) : WaveEffect {
+) : Modulation {
     override fun apply(index: Int, frequency: Float): Float {
         return frequency + index * sweep / SAMPLE_RATE.toFloat()
     }
@@ -36,7 +29,7 @@ class Sweep(
 class Vibrato(
     val vibratoFrequency: Float,
     val depth: Percent
-) : WaveEffect {
+) : Modulation {
     override fun apply(index: Int, frequency: Float): Float {
         val t = index / SAMPLE_RATE.toFloat()
         val vibrato = sin(TWO_PI * vibratoFrequency * t) * depth
@@ -45,32 +38,109 @@ class Vibrato(
 
 }
 
-sealed interface Wave : Effect {
+sealed interface SoundGenerator {
 
-    val waveEffets: Array<WaveEffect>
+    val modulation: Modulation?
+
+    val envelope: Envelope?
 
     val frequency: Float
 
     fun angle(index: Int): Float {
         val t = index / SAMPLE_RATE.toFloat()
 
-        var f = frequency
-        waveEffets.forEach {
-            f = it.apply(index, f)
-        }
-
-        val angle = TWO_PI * f * t
+        val apply = modulation?.apply(index, frequency) ?: frequency
+        val angle = TWO_PI * apply * t
         return angle
+    }
+
+    fun apply(index: Int): Float
+
+    fun generate(index: Int, buffer: FloatArray) {
+        val sample = apply(index)
+        buffer[index] = envelope?.apply(sample, index, buffer) ?: sample
     }
 }
 
-class SineWave2(
+class Sine2(
     override var frequency: Float,
-    override val waveEffets: Array<WaveEffect> = emptyArray(),
-) : Wave {
-    override fun apply(index: Int, buffer: FloatArray) {
-        buffer[index] = sin(angle(index)) * 0.7f
+    override val modulation: Modulation? = null,
+    override val envelope: Envelope? = null,
+) : SoundGenerator {
+    override fun apply(index: Int): Float {
+        return sin(angle(index)) * 0.7f
     }
+}
+
+class Square2(
+    override val frequency: Float,
+    override val modulation: Modulation?,
+    override val envelope: Envelope?,
+) : SoundGenerator {
+    override fun apply(index: Int): Float {
+        val value = sin(angle(index))
+        return if (value > 0f) {
+            0.7f
+        } else {
+            -0.7f
+        }
+    }
+}
+
+class Triangle2(
+    override val frequency: Float,
+    override val modulation: Modulation?,
+    override val envelope: Envelope?,
+): SoundGenerator {
+    override fun apply(index: Int): Float {
+        val angle: Float = sin(angle(index))
+        val phase = (angle + 1.0) % 1.0 // Normalize sinValue to the range [0, 1]
+        return (if (phase < 0.5) 4.0 * phase - 1.0 else 3.0 - 4.0 * phase).toFloat()
+    }
+
+}
+
+class Pulse2(
+    override val frequency: Float,
+    override val modulation: Modulation?,
+    override val envelope: Envelope?,
+): SoundGenerator {
+    override fun apply(index: Int): Float {
+        val angle = angle(index)
+
+        val t = angle % 1
+        val k = abs(2.0 * ((angle / 128.0) % 1.0) - 1.0)
+        val u = (t + 0.5 * k) % 1.0
+        val ret = abs(4.0 * u - 2.0) - abs(8.0 * t - 4.0)
+        return (ret / 6.0).toFloat()
+    }
+}
+
+class SawTooth2(
+    override val frequency: Float,
+    override val modulation: Modulation?,
+    override val envelope: Envelope?,
+) : SoundGenerator {
+    override fun apply(index: Int): Float {
+        val angle: Float = sin(angle(index))
+        val phase = (angle * 2f) - 1f
+        return phase
+    }
+}
+
+class Noise2(
+    override val frequency: Float,
+    override val modulation: Modulation?,
+    override val envelope: Envelope?,
+) : SoundGenerator {
+    override fun apply(index: Int): Float {
+        val white = Random.nextFloat() * 2 - 1
+        val brown = (lastNoise + (0.02f * white)) / 1.02f
+        lastNoise = brown
+        return brown * 3.5f
+    }
+
+    private var lastNoise = 0.0f
 }
 
 
@@ -94,7 +164,7 @@ class Envelope(
      * Time to reach the volume 0
      */
     val release: Seconds,
-) : Effect {
+)  {
 
     private val endOfAttackIndex = (attack * SAMPLE_RATE).toInt()
 
@@ -104,19 +174,19 @@ class Envelope(
 
     private val releaseDuration = (release * SAMPLE_RATE).toInt()
 
-    override fun apply(index: Int, buffer: FloatArray) {
+    fun apply(sample: Float, index: Int, buffer: FloatArray): Float {
         // attack phase
         if (index <= endOfAttackIndex) {
             val percentAttack = index / endOfAttackIndex.toFloat()
-            buffer[index] *= percentAttack
+            return sample * percentAttack
         } else if (index > endOfAttackIndex && index <= endOfDecay) { // decay phase
             val percentDecay = (index - endOfAttackIndex) / decayDuration.toFloat()
-            buffer[index] *= 1f - (1f - sustain) * percentDecay
+            return sample * (1f - (1f - sustain) * percentDecay)
         } else if (index > endOfDecay && index <= buffer.size - releaseDuration) { // sustain phase
-            buffer[index] *= sustain
+            return sample * sustain
         } else { // release phase
             val percentRelease = (index - (buffer.size - releaseDuration)) / releaseDuration.toFloat()
-            buffer[index] *= sustain * (1f - percentRelease)
+            return sample * (sustain * (1f - percentRelease))
         }
     }
 }
