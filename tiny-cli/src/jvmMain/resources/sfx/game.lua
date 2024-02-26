@@ -421,11 +421,18 @@ editor.create_widgets = function()
     local on_envelop_update = function(env, attack, decay, sustain, release)
     end
     local env = widgets.createEnvelop({
-        x = 60,
+        x = 100,
         y = 30,
         on_update = on_envelop_update
     })
     table.insert(editor.patterns_fx_widgets, env)
+
+    local c_env = widgets.createCheckbox({
+        x = 40,
+        y = 30,
+        label = "enable"
+    })
+    table.insert(editor.patterns_fx_widgets, c_env)
 
     -- tabs
     local files = ws.list()

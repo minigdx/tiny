@@ -81,12 +81,23 @@ local Envelop = {
     release_start_y = 0
 }
 
+local Checkbox = {
+    label = "",
+    value = false,
+    x = 0,
+    y = 0,
+    width = 8,
+    height = 8,
+    enabled = true,
+}
+
 local buttons = {}
 local tabs = {}
 local faders = {}
 local widgets = {}
 local counters = {}
 local envelops = {}
+local checkboxes = {}
 
 local factory = {}
 
@@ -128,6 +139,14 @@ factory.createEnvelop = function(value)
 
     table.insert(widgets, result)
     table.insert(envelops, result)
+    return result
+end
+
+factory.createCheckbox = function(value)
+    local result = new(Checkbox, value)
+    
+    table.insert(widgets, result)
+    table.insert(checkboxes, result)
     return result
 end
 
@@ -216,13 +235,11 @@ factory.on_click = function(x, y)
                 local dst = math.min(math.max(0, x - e.x), e.width)
                 local attack = dst / e.width
 
-                debug.log("attack")
                 e.attack = attack
             elseif e.is_over_decay then
                 local dst = math.min(math.max(0, x - e.attack_end_x), e.width)
                 local decay = dst / e.width
                 
-                debug.log("decay "..decay)
                 e.decay = decay
             elseif e.is_over_sustain then
                 local dst = math.min(math.max(0, y - e.y), e.height)
@@ -234,6 +251,12 @@ factory.on_click = function(x, y)
                 local release = dst / e.width
 
                 e.release = release
+            end
+
+            if e.is_over_attack or e.is_over_decay or e.is_over_sustain or e.is_over_release then
+                if e.on_update ~= nil then
+                    e.on_update(e, e.attack, e.decay, e.sustain, e.release)
+                end
             end
         end
     end
@@ -305,6 +328,15 @@ factory.on_clicked = function(x, y)
             c.on_left(c)
         elseif c.enabled and c.status == 2 then
             c.on_right(c)
+        end
+    end
+
+    for c in all(checkboxes) do
+        if c.enabled and inside_widget(c, x, y) then
+            c.value = not c.value
+            if c.on_update ~= nil then
+                c.on_update(c)
+            end
         end
     end
 end
@@ -435,6 +467,14 @@ function draw_envelop(envelop)
     end
 end
 
+function draw_checkbox(c)
+    if c.value then
+        spr.sdraw(c.x, c.y, 8, 48, 8, 8)
+    else
+        spr.sdraw(c.x, c.y, 0, 48, 8, 8)
+    end
+    print(c.label, c.x + 10, c.y + 2)
+end
 factory._draw = function()
     for c in all(counters) do
         if c.enabled then
@@ -460,6 +500,12 @@ factory._draw = function()
         end
         if e.enabled then
             draw_envelop(e)
+        end
+    end
+
+    for c in all(checkboxes) do
+        if c.enabled then
+            draw_checkbox(c)
         end
     end
 
