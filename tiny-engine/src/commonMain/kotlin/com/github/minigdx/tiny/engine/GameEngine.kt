@@ -24,7 +24,7 @@ import com.github.minigdx.tiny.resources.ResourceType.GAME_SOUND
 import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
 import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.resources.SpriteSheet
-import com.github.minigdx.tiny.sound.Song
+import com.github.minigdx.tiny.sound.Song2
 import com.github.minigdx.tiny.sound.SoundManager
 import com.github.minigdx.tiny.sound.WaveGenerator
 import kotlinx.coroutines.CoroutineScope
@@ -97,7 +97,7 @@ class GameEngine(
 
     private val notes = mutableListOf<WaveGenerator>()
 
-    private var song: Song? = null
+    private var song: Song2? = null
     private var longuestDuration: Seconds = 0f
 
     private lateinit var scripts: Array<GameScript?>
@@ -490,7 +490,7 @@ class GameEngine(
         notes.add(wave)
     }
 
-    override fun sfx(song: Song) {
+    override fun sfx(song: Song2) {
         this.song = song
     }
 

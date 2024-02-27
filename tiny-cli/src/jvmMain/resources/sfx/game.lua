@@ -48,7 +48,6 @@ local window = {
     height = 0
 }
 
-
 function to_hex(number)
     local hexString = string.format("%X", number)
 
@@ -74,7 +73,7 @@ local editor = {
     patterns_fx_widgets = {}, -- all wdgets used for the fx editor
     fader_widgets = {}, -- all faders (used only in the sound editor mode)
     wave_widgets = {}, -- all waves button (used only in the sound editor mode)
-    tabs_widgets = {} -- all the tabs
+    tabs_widgets = {}, -- all the tab
 }
 
 --[[
@@ -104,11 +103,11 @@ editor.switch_to_mode = function(mode)
 end
 
 editor.activate_pattern = function(index, data)
-    local beats = data["patterns"][index]
+    local beats = data["tracks"][1]["patterns"][index]
 
     if beats == nil then
         beats = {}
-        data["patterns"][index] = beats
+        data["tracks"][1]["patterns"][index] = beats
     end
 
     for k, f in ipairs(editor.fader_widgets) do
@@ -125,7 +124,7 @@ editor.activate_pattern = function(index, data)
     end
 
     for k, f in ipairs(editor.patterns_editor_widgets) do
-        local pattern_id = data["music"][k]
+        local pattern_id = data["tracks"][1]["music"][k]
         if pattern_id ~= nil then
             f.value = pattern_id
         end
@@ -134,47 +133,54 @@ editor.activate_pattern = function(index, data)
 end
 
 editor.generate_score = function(content, pattern_selector)
-    local p = content["patterns"]
     local v = math.floor((editor.volume_counter.value * 25.5))
     local bpm = editor.bpm_counter.value
 
-    local score = "tiny-sfx " .. #p .. " " .. bpm .. " " .. v .. "\n"
+    local score = "tiny-sfx " .. bpm .. " " .. v .. "\n"
 
-    -- write patterns
-    for patterns in all(content["patterns"]) do
-        local strip = ""
-        for index = 1, 32 do
-            local beatStr = ""
-            local beat = patterns[index]
-            if beat == nil then
-                beatStr = beatStr .. "0000FF"
+    local tracks = content["tracks"]
+    for t in all(tracks) do
+        local p = t["patterns"]
+        local track = "" .. #p .. " 01 " .. to_hex(t["env"]["attack"]) .. " " .. to_hex(t["env"]["decay"]) .. " " ..
+                          to_hex(t["env"]["sustain"]) .. " " .. to_hex(t["env"]["release"]) .. " 00 00 00 00 00\n"
+
+        -- write patterns
+        for pattern in all(p) do
+            local strip = ""
+            for index = 1, 32 do
+                local beatStr = ""
+                local beat = pattern[index]
+                if beat == nil then
+                    beatStr = beatStr .. "0000FF"
+                else
+                    beatStr = beatStr .. to_hex(beat.index) .. to_hex(beat.note) .. to_hex(beat.volume)
+                end
+                strip = strip .. beatStr .. " "
+            end
+            --
+            track = track .. strip .. "\n"
+
+            local music = "not-set"
+            -- write patterns order
+            if pattern_selector == nil then
+                local stop = false
+                music = ""
+                for w in all(editor.patterns_editor_widgets) do
+                    if w.value == 0 then
+                        stop = true
+                    end
+                    if (not stop) then
+                        music = music .. w.value .. " "
+                    end
+                end
             else
-                beatStr = beatStr .. to_hex(beat.index) .. to_hex(beat.note) .. to_hex(beat.volume)
+                music = pattern_selector
             end
-            strip = strip .. beatStr .. " "
-        end
-        --
-        score = score .. strip .. "\n"
-    end
 
-    local music = "not-set"
-    -- write patterns order
-    if pattern_selector == nil then
-        local stop = false
-        music = ""
-        for w in all(editor.patterns_editor_widgets) do
-            if w.value == 0 then
-                stop = true
-            end
-            if (not stop) then
-                music = music .. w.value .. " "
-            end
+            track = track .. music .. "\n"
         end
-    else
-        music = pattern_selector
+        score = score .. track
     end
-    
-    score = score .. music
 
     return score
 end
@@ -323,7 +329,7 @@ editor.create_widgets = function()
     local on_fader_update = function(fader, value)
         fader.value = math.ceil(value)
         fader.tip_color = current_wave.color
-        local current_pattern = editor.active_tab.content["patterns"][editor.pattern_counter.value]
+        local current_pattern = editor.active_tab.content["tracks"][1]["patterns"][editor.pattern_counter.value]
 
         if fader.value == 0 then
             current_pattern[fader.index] = {
@@ -388,12 +394,12 @@ editor.create_widgets = function()
     -- music buttons
     local on_decrease_pattern = function(counter)
         counter.value = math.max(counter.value - 1, 1)
-        editor.active_tab.content["music"][counter.index] = counter.value
+        editor.active_tab.content["tracks"][1]["music"][counter.index] = counter.value
     end
-    
+
     local on_increase_pattern = function(counter)
-        counter.value = math.min(counter.value + 1, #editor.active_tab.content["patterns"])
-        editor.active_tab.content["music"][counter.index] = counter.value
+        counter.value = math.min(counter.value + 1, #editor.active_tab.content["tracks"][1]["patterns"])
+        editor.active_tab.content["tracks"][1]["music"][counter.index] = counter.value
     end
 
     for x = 1, 8 do
@@ -419,16 +425,23 @@ editor.create_widgets = function()
 
     -- fx
     local on_envelop_update = function(env, attack, decay, sustain, release)
+        editor.active_tab.content["tracks"][env.index]["env"].attack = attack * 255
+        editor.active_tab.content["tracks"][env.index]["env"].decay = decay * 255
+        editor.active_tab.content["tracks"][env.index]["env"].sustain = sustain * 255
+        editor.active_tab.content["tracks"][env.index]["env"].release = release * 255
     end
+
     local env = widgets.createEnvelop({
         x = 100,
         y = 30,
+        index = 1,
         on_update = on_envelop_update
     })
     table.insert(editor.patterns_fx_widgets, env)
-    
+
     local on_update_attack = function(knob)
         env.attack = knob.value
+        on_envelop_update(env, env.attack, env.decay, env.sustain, env.release)
     end
 
     local attack = widgets.createKnob({
@@ -442,8 +455,9 @@ editor.create_widgets = function()
 
     local on_update_decay = function(knob)
         env.decay = knob.value
+        on_envelop_update(env, env.attack, env.decay, env.sustain, env.release)
     end
-    
+
     local decay = widgets.createKnob({
         x = env.x + (16 + 16),
         y = env.y + env.height + 4,
@@ -455,8 +469,9 @@ editor.create_widgets = function()
 
     local on_update_sustain = function(knob)
         env.sustain = knob.value
+        on_envelop_update(env, env.attack, env.decay, env.sustain, env.release)
     end
-    
+
     local sustain = widgets.createKnob({
         x = env.x + (16 + 16) * 2,
         y = env.y + env.height + 4,
@@ -468,8 +483,9 @@ editor.create_widgets = function()
 
     local on_update_release = function(knob)
         env.release = knob.value
+        on_envelop_update(env, env.attack, env.decay, env.sustain, env.release)
     end
-    
+
     local on_update_release = widgets.createKnob({
         x = env.x + (16 + 16) * 3,
         y = env.y + env.height + 4,
@@ -478,7 +494,6 @@ editor.create_widgets = function()
         value = env.release
     })
     table.insert(editor.patterns_fx_widgets, on_update_release)
-
 
     local c_env = widgets.createCheckbox({
         x = 40,

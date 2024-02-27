@@ -5,7 +5,7 @@ import com.github.minigdx.tiny.resources.GameLevel
 import com.github.minigdx.tiny.resources.GameScript
 import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.resources.SpriteSheet
-import com.github.minigdx.tiny.sound.Song
+import com.github.minigdx.tiny.sound.Song2
 import com.github.minigdx.tiny.sound.WaveGenerator
 
 sealed interface DebugAction
@@ -56,7 +56,7 @@ interface GameResourceAccess {
      */
     fun note(wave: WaveGenerator)
 
-    fun sfx(song: Song)
+    fun sfx(song: Song2)
 
     /**
      * Find a script by its name.

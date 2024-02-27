@@ -56,7 +56,7 @@ class PicoAudioSoundMananger : SoundManager() {
 
     override suspend fun createSfxSound(bytes: ByteArray): Sound {
         val score = bytes.decodeToString()
-        val song = SfxLib.convertScoreToSong(score)
+        val song = SfxLib.convertScoreToSong2(score)
         val (buf, length) = createBufferFromSong(song)
         val buffer = convertBuffer(buf, length)
         return SfxSound(buffer, this)

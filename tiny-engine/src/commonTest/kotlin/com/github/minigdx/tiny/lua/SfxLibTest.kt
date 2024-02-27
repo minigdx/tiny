@@ -12,7 +12,7 @@ import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.resources.SpriteSheet
 import com.github.minigdx.tiny.sound.SilenceWave
 import com.github.minigdx.tiny.sound.SineWave
-import com.github.minigdx.tiny.sound.Song
+import com.github.minigdx.tiny.sound.Song2
 import com.github.minigdx.tiny.sound.WaveGenerator
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -37,7 +37,7 @@ class SfxLibTest {
         override fun sound(index: Int): Sound? = null
         override fun script(name: String): GameScript? = null
         override fun note(wave: WaveGenerator) = Unit
-        override fun sfx(song: Song) = Unit
+        override fun sfx(song: Song2) = Unit
     }
 
     @Test

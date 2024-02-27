@@ -216,21 +216,11 @@ factory.on_update = function(x, y)
             e.attack_end_x = e.attack_start_x + e.width * e.attack
             e.attack_end_y = e.attack_start_y - e.height
 
-            e.is_over_attack = math.dst2(x, y, e.attack_end_x, e.attack_end_y) <= 4 * 4
-
             e.decay_end_x = e.attack_end_x + e.width * e.decay
             e.decay_end_y = e.y + (1 - e.sustain) * e.height
 
-            e.is_over_decay = math.dst2(x, y, e.decay_end_x, e.decay_end_y) <= 4 * 4
-
             e.release_start_x = e.x + e.width - e.width * e.release
             e.release_start_y = e.y + (1 - e.sustain) * e.height
-            e.is_over_release = math.dst2(x, y, e.release_start_x, e.release_start_y) <= 4 * 4
-
-            local sx = e.decay_end_x + (e.release_start_x - e.decay_end_x) * 0.5
-            local sy = e.y + (1 - e.sustain) * e.height
-
-            e.is_over_sustain = math.dst2(x, y, sx, sy) <= 4 * 4
         end
     end
 
@@ -256,38 +246,6 @@ factory.on_click = function(x, y)
             local percent = math.max(0.0, 1.0 - ((y - f.y) / f.height))
             local value = percent * (f.max_value - f.min_value) + f.min_value
             f.on_value_update(f, value)
-        end
-    end
-
-    for e in all(envelops) do
-        if e.enabled then
-            if e.is_over_attack then
-                local dst = math.min(math.max(0, x - e.x), e.width)
-                local attack = dst / e.width
-
-                e.attack = attack
-            elseif e.is_over_decay then
-                local dst = math.min(math.max(0, x - e.attack_end_x), e.width)
-                local decay = dst / e.width
-
-                e.decay = decay
-            elseif e.is_over_sustain then
-                local dst = math.min(math.max(0, y - e.y), e.height)
-                local sustain = 1 - dst / e.height
-
-                e.sustain = sustain
-            elseif e.is_over_release then
-                local dst = math.min(math.max(0, e.x + e.width - x), e.width)
-                local release = dst / e.width
-
-                e.release = release
-            end
-
-            if e.is_over_attack or e.is_over_decay or e.is_over_sustain or e.is_over_release then
-                if e.on_update ~= nil then
-                    e.on_update(e, e.attack, e.decay, e.sustain, e.release)
-                end
-            end
         end
     end
 

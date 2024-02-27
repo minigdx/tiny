@@ -215,37 +215,79 @@ class SfxLib(
             return note
         }
 
+        private fun SoundGenerator.toLuaTable(): LuaTable {
+            val note = LuaTable()
+            note.set("type", this.name)
+            note.set("index", this.index)
+            note.set("note", this.note.index)
+            note.set("volume", (this.volume * 255).toInt())
+            return note
+        }
+
         override fun call(arg: LuaValue): LuaValue {
             val score = arg.optjstring(null) ?: return NIL
-            val song = convertScoreToSong(score)
+            val song = convertScoreToSong2(score)
 
-            val patterns = LuaTable()
-            song.patterns.forEach { (index, pattern) ->
-                val notes = LuaTable()
-                pattern.notes.forEach { note ->
-                    notes.insert(0, note.toLuaTable())
+            val tracks = LuaTable()
+            song.tracks.forEach { t ->
+                val track = LuaTable()
+
+                val env = LuaTable()
+                env["attack"] = valueOf(((t.envelope?.attack ?: 0f) * 255).toInt())
+                env["decay"] = valueOf(((t.envelope?.decay ?: 0f) * 255).toInt())
+                env["sustain"] = valueOf(((t.envelope?.sustain ?: 0f) * 255).toInt())
+                env["release"] = valueOf(((t.envelope?.release ?: 0f) * 255).toInt())
+
+                track["env"] = env
+
+                // TODO: put the modulation parameters
+
+                val patterns = LuaTable()
+                t.patterns.forEach { (index, pattern) ->
+                    val notes = LuaTable()
+                    pattern.notes.forEach { note ->
+                        notes.insert(0, note.toLuaTable())
+                    }
+                    patterns.insert(index, notes)
                 }
-                patterns.insert(index, notes)
-            }
+                track["patterns"] = patterns
 
-            val music = LuaTable()
-            song.music.map { it.index }.forEach {
-                music.insert(0, valueOf(it))
+                val music = LuaTable()
+                t.music.map { it.index }.forEach {
+                    music.insert(0, valueOf(it))
+                }
+                track["music"] = music
+
+                tracks.insert(0, track)
             }
 
             val result = LuaTable()
             result["bpm"] = valueOf(song.bpm)
             result["volume"] = valueOf(floor(song.volume.toDouble() * 255))
-            result["patterns"] = patterns
-            result["music"] = music
+            result["tracks"] = tracks
+
             return result
         }
     }
 
     inner class emptyScore : ZeroArgFunction() {
         override fun call(): LuaValue {
-            val pattern = Pattern(1, emptyList())
-            val song = Song(120, 0.5f, mapOf(1 to pattern), listOf(pattern))
+            val pattern = Pattern2(1, emptyList())
+            val track = Track(
+                mapOf(1 to pattern),
+                listOf(pattern),
+                (60f / 120 / 8f),
+                Envelope(0.1f, 0f, 1f, 0.1f),
+                null,
+            )
+            val emptyTrack = Track(
+                emptyMap(),
+                emptyList(),
+                (60f / 120 / 8f),
+                Envelope(0.1f, 0f, 1f, 0.1f),
+                null,
+            )
+            val song = Song2(120, 0.5f, arrayOf(track, emptyTrack, emptyTrack, emptyTrack))
             return valueOf(song.toString())
         }
     }
@@ -254,7 +296,7 @@ class SfxLib(
 
         override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
             val score = arg1.optjstring("")!!
-            val waves = convertScoreToSong(score)
+            val waves = convertScoreToSong2(score)
             resourceAccess.sfx(waves)
             return NIL
         }
@@ -292,13 +334,13 @@ class SfxLib(
             val volume = note.substring(4, 6).toInt(16) / 255f
 
             return when (wave) {
-                1 -> Sine2(Note.fromIndex(noteIndex).frequency, mod, env)
-                2 -> Square2(Note.fromIndex(noteIndex).frequency, mod, env)
-                3 -> Triangle2(Note.fromIndex(noteIndex).frequency, mod, env)
-                4 -> Noise2(Note.fromIndex(noteIndex).frequency, mod, env)
-                5 -> Pulse2(Note.fromIndex(noteIndex).frequency, mod, env)
-                6 -> SawTooth2(Note.fromIndex(noteIndex).frequency, mod, env)
-                else -> Silence2(0f, null, null)
+                1 -> Sine2(Note.fromIndex(noteIndex), mod, env, volume)
+                2 -> Square2(Note.fromIndex(noteIndex), mod, env, volume)
+                3 -> Triangle2(Note.fromIndex(noteIndex), mod, env, volume)
+                4 -> Noise2(Note.fromIndex(noteIndex), mod, env, volume)
+                5 -> Pulse2(Note.fromIndex(noteIndex), mod, env, volume)
+                6 -> SawTooth2(Note.fromIndex(noteIndex), mod, env, volume)
+                else -> Silence2(Note.C0, null, null, volume)
             }
         }
 
@@ -339,8 +381,8 @@ class SfxLib(
                 val track = tail.first()
                 val configuration = track.split(" ").map { it.toInt(16) }
                 val nbPattern = configuration.first()
-                val (mod, modA, modB, _, _) = configuration.drop(1)
-                val (env, envA, envB, envC, envD) = configuration.drop(6)
+                val (env, envA, envB, envC, envD) = configuration.drop(1)
+                val (mod, modA, modB, _, _) = configuration.drop(6)
 
                 val modulation = if (mod > 0) {
                     if (mod == 1) {
@@ -353,7 +395,12 @@ class SfxLib(
                 }
 
                 val envelope = if (env > 0) {
-                    Envelope(envA / 255f, envB / 255f, envC / 255f, envD / 255f)
+                    Envelope(
+                        attack = (envA / 255f) * duration,
+                        decay = (envB / 255f) * duration,
+                        sustain = envC / 255f,
+                        release = (envD / 255f) * duration,
+                    )
                 } else {
                     null
                 }

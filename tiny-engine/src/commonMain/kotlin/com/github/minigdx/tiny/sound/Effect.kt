@@ -3,6 +3,7 @@ package com.github.minigdx.tiny.sound
 import com.github.minigdx.tiny.Frequency
 import com.github.minigdx.tiny.Percent
 import com.github.minigdx.tiny.Seconds
+import com.github.minigdx.tiny.lua.Note
 import com.github.minigdx.tiny.sound.SoundManager.Companion.SAMPLE_RATE
 import com.github.minigdx.tiny.sound.WaveGenerator.Companion.TWO_PI
 import kotlin.math.abs
@@ -45,6 +46,14 @@ sealed interface SoundGenerator {
 
     val frequency: Float
 
+    val note: Note
+
+    val index: Int
+
+    val volume: Float
+
+    val name: String
+
     fun angle(index: Int): Float {
         val t = index / SAMPLE_RATE.toFloat()
 
@@ -62,20 +71,32 @@ sealed interface SoundGenerator {
 }
 
 class Sine2(
-    override var frequency: Float,
+    override val note: Note,
     override val modulation: Modulation? = null,
     override val envelope: Envelope? = null,
+    override val volume: Float,
 ) : SoundGenerator {
+
+    override val index: Int = 1
+    override val name: String = "sine"
+    override val frequency: Float = note.frequency
+
     override fun apply(index: Int): Float {
-        return sin(angle(index)) * 0.7f
+        return sin(angle(index)) * 0.7f * volume
     }
 }
 
 class Square2(
-    override val frequency: Float,
+    override val note: Note,
     override val modulation: Modulation?,
     override val envelope: Envelope?,
+    override val volume: Float,
 ) : SoundGenerator {
+
+    override val index: Int = 2
+    override val name: String = "square"
+    override val frequency: Float = note.frequency
+
     override fun apply(index: Int): Float {
         val value = sin(angle(index))
         return if (value > 0f) {
@@ -87,10 +108,16 @@ class Square2(
 }
 
 class Triangle2(
-    override val frequency: Float,
+    override val note: Note,
     override val modulation: Modulation?,
     override val envelope: Envelope?,
+    override val volume: Float,
 ) : SoundGenerator {
+
+    override val index: Int = 3
+    override val name: String = "triangle"
+    override val frequency: Float = note.frequency
+
     override fun apply(index: Int): Float {
         val angle: Float = sin(angle(index))
         val phase = (angle + 1.0) % 1.0 // Normalize sinValue to the range [0, 1]
@@ -99,10 +126,16 @@ class Triangle2(
 }
 
 class Pulse2(
-    override val frequency: Float,
+    override val note: Note,
     override val modulation: Modulation?,
     override val envelope: Envelope?,
+    override val volume: Float,
 ) : SoundGenerator {
+
+    override val index: Int = 5
+    override val name: String = "pulse"
+    override val frequency: Float = note.frequency
+
     override fun apply(index: Int): Float {
         val angle = angle(index)
 
@@ -115,10 +148,16 @@ class Pulse2(
 }
 
 class SawTooth2(
-    override val frequency: Float,
+    override val note: Note,
     override val modulation: Modulation?,
     override val envelope: Envelope?,
+    override val volume: Float,
 ) : SoundGenerator {
+
+    override val index: Int = 6
+    override val name: String = "sawtooth"
+    override val frequency: Float = note.frequency
+
     override fun apply(index: Int): Float {
         val angle: Float = sin(angle(index))
         val phase = (angle * 2f) - 1f
@@ -127,18 +166,30 @@ class SawTooth2(
 }
 
 class Silence2(
-    override val frequency: Float,
+    override val note: Note,
     override val modulation: Modulation?,
     override val envelope: Envelope?,
+    override val volume: Float,
 ) : SoundGenerator {
+
+    override val index: Int = 0
+    override val name: String = "silence"
+    override val frequency: Float = note.frequency
+
     override fun apply(index: Int): Float = 0f
 }
 
 class Noise2(
-    override val frequency: Float,
+    override val note: Note,
     override val modulation: Modulation?,
     override val envelope: Envelope?,
+    override val volume: Float,
 ) : SoundGenerator {
+
+    override val index: Int = 4
+    override val name: String = "noise"
+    override val frequency: Float = note.frequency
+
     override fun apply(index: Int): Float {
         val white = Random.nextFloat() * 2 - 1
         val brown = (lastNoise + (0.02f * white)) / 1.02f

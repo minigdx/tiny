@@ -82,4 +82,46 @@ class Song2(
     val numberOfBeats = tracks.maxOf { it.music.size } * 32
 
     val numberOfTotalSample = (durationOfBeat * SAMPLE_RATE * numberOfBeats).toLong()
+
+    private fun Float.toHex(): String {
+        val r = (this * 255).toInt().toString(16)
+        return if (r.length == 1) {
+            "0$r"
+        } else {
+            r
+        }.uppercase()
+    }
+
+    override fun toString(): String {
+        val header = "tiny-sfx $bpm ${(volume * 255).toInt()}\n"
+
+        val tracks = tracks.map { track ->
+
+            var trackHeader = "${track.patterns.size} "
+            trackHeader += if (track.envelope == null) {
+                "00 00 00 00 00"
+            } else {
+                "01 " +
+                    "${track.envelope.attack.toHex()} " +
+                    "${track.envelope.decay.toHex()} " +
+                    "${track.envelope.sustain.toHex()} " +
+                    "${track.envelope.release.toHex()} "
+            }
+            // TODO: support modulation
+            trackHeader += "00 00 00 00 00"
+
+            val patternsInOrder = track.patterns.map { it }.sortedBy { it.key }.map { it.value }
+            val patternsStr = patternsInOrder.joinToString("\n") { pattern ->
+                pattern.notes.joinToString(" ") { wave ->
+                    wave.index.toString(16) +
+                        wave.note.index.toString(16) +
+                        (wave.volume * 255).toInt().toString(16)
+                }
+            }
+
+            val patternOrder = track.music.map { it.index }.joinToString(" ")
+            trackHeader + ("\n" + patternsStr + "\n" + patternOrder).ifBlank { "" }
+        }.joinToString("\n")
+        return header + tracks
+    }
 }
