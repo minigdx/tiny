@@ -28,14 +28,13 @@ class Sweep(
 
 class Vibrato(
     val vibratoFrequency: Float,
-    val depth: Percent
+    val depth: Percent,
 ) : Modulation {
     override fun apply(index: Int, frequency: Float): Float {
         val t = index / SAMPLE_RATE.toFloat()
         val vibrato = sin(TWO_PI * vibratoFrequency * t) * depth
         return frequency + vibrato
     }
-
 }
 
 sealed interface SoundGenerator {
@@ -91,20 +90,19 @@ class Triangle2(
     override val frequency: Float,
     override val modulation: Modulation?,
     override val envelope: Envelope?,
-): SoundGenerator {
+) : SoundGenerator {
     override fun apply(index: Int): Float {
         val angle: Float = sin(angle(index))
         val phase = (angle + 1.0) % 1.0 // Normalize sinValue to the range [0, 1]
         return (if (phase < 0.5) 4.0 * phase - 1.0 else 3.0 - 4.0 * phase).toFloat()
     }
-
 }
 
 class Pulse2(
     override val frequency: Float,
     override val modulation: Modulation?,
     override val envelope: Envelope?,
-): SoundGenerator {
+) : SoundGenerator {
     override fun apply(index: Int): Float {
         val angle = angle(index)
 
@@ -143,7 +141,6 @@ class Noise2(
     private var lastNoise = 0.0f
 }
 
-
 /**
  * Volume envelope. It changes the volume level over time.
  */
@@ -164,7 +161,7 @@ class Envelope(
      * Time to reach the volume 0
      */
     val release: Seconds,
-)  {
+) {
 
     private val endOfAttackIndex = (attack * SAMPLE_RATE).toInt()
 

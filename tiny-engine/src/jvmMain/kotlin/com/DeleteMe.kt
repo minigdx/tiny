@@ -35,7 +35,6 @@ fun main() {
     playSound(buffer, sampleRate)
 }
 
-
 fun playSound(buffer: FloatArray, sampleRate: Float) {
     val format = AudioFormat(sampleRate, 16, 1, true, false)
     val line = AudioSystem.getSourceDataLine(format)

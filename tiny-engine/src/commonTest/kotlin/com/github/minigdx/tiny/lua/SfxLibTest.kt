@@ -61,6 +61,30 @@ class SfxLibTest {
     }
 
     @Test
+    fun scoreToSong2() {
+        val score = """tiny-sfx 120 255
+            |02 00 00 00 00 00 00 00 00 00 00
+    |0101FF 0101FF 
+    |0101FF 0101FF
+    |1 2 1
+    |00 00 00 00 00 00 00 00 00 00 00
+    |00 00 00 00 00 00 00 00 00 00 00
+    |00 00 00 00 00 00 00 00 00 00 00
+        """.trimMargin()
+
+        val song = SfxLib.convertScoreToSong2(score)
+
+        assertEquals(120, song.bpm)
+        assertEquals(1f, song.volume)
+        assertEquals(4, song.tracks.size)
+        assertEquals(2, song.tracks[0].patterns.size)
+        // patterns by index
+        assertEquals(2, song.tracks[0].patterns[1]!!.notes.size)
+        // patterns ordered by usage
+        assertEquals(3, song.tracks[0].music.size)
+    }
+
+    @Test
     fun convertToNote() {
         val wave = SfxLib.convertToWave("0101FF", 0.1f)
         assertTrue(wave::class == SineWave::class)

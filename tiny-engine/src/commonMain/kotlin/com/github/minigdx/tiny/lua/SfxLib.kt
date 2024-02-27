@@ -8,6 +8,7 @@ import com.github.minigdx.tiny.Percent
 import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.resources.Sound
+import com.github.minigdx.tiny.sound.Envelope
 import com.github.minigdx.tiny.sound.NoiseWave
 import com.github.minigdx.tiny.sound.Pattern
 import com.github.minigdx.tiny.sound.PulseWave
@@ -15,8 +16,12 @@ import com.github.minigdx.tiny.sound.SawToothWave
 import com.github.minigdx.tiny.sound.SilenceWave
 import com.github.minigdx.tiny.sound.SineWave
 import com.github.minigdx.tiny.sound.Song
+import com.github.minigdx.tiny.sound.Song2
 import com.github.minigdx.tiny.sound.SquareWave
+import com.github.minigdx.tiny.sound.Sweep
+import com.github.minigdx.tiny.sound.Track
 import com.github.minigdx.tiny.sound.TriangleWave
+import com.github.minigdx.tiny.sound.Vibrato
 import com.github.minigdx.tiny.sound.WaveGenerator
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
@@ -269,6 +274,90 @@ class SfxLib(
                 6 -> SawToothWave(Note.fromIndex(noteIndex), duration, volume)
                 else -> SilenceWave(duration)
             }
+        }
+
+        /**
+         * tiny-sfx <bpm> <volume>
+         * <nb pattern track> <mod active> <mod param1> <mod param2> <mod param3> <mod param4> <env active> <env param1> <env param2> <env param3> <env param4>
+         * <wave type><note><volume> ...
+         * ...nb pattern...
+         * <pattern index order>
+         */
+        fun convertScoreToSong2(score: String): Song2 {
+            val lines = score.lines()
+            if (lines.isEmpty()) {
+                throw IllegalArgumentException(
+                    "The content of the score is empty. Can't convert it into a song. " +
+                        "Check if the score is not empty or correctly loaded!",
+                )
+            }
+
+            val header = lines.first()
+            if (!header.startsWith(TINY_SFX_HEADER)) {
+                throw IllegalArgumentException(
+                    "The '$TINY_SFX_HEADER' is missing from the fist line of the score. " +
+                        "Is the score a valid score?",
+                )
+            }
+
+            val (_, bpm, volume) = header.split(" ")
+
+            val duration = 60f / bpm.toFloat() / 8f
+
+            var tail = lines.drop(1)
+
+            var remainingTrack = 4
+
+            val tracks = mutableListOf<Track>()
+            do {
+                val track = tail.first()
+                val configuration = track.split(" ").map { it.toInt(16) }
+                val nbPattern = configuration.first()
+                val (mod, modA, modB, _, _) = configuration.drop(1)
+                val (env, envA, envB, envC, envD) = configuration.drop(5)
+
+                val modulation = if (mod > 0) {
+                    if (mod == 1) {
+                        Sweep(modA)
+                    } else {
+                        Vibrato(modA / 255f, modB / 255f)
+                    }
+                } else {
+                    null
+                }
+
+                val envelope = if (env > 0) {
+                    Envelope(envA / 255f, envB / 255f, envC / 255f, envD / 255f)
+                } else {
+                    null
+                }
+                val (patterns, patternsOrdered) = if (nbPattern > 0) {
+                    val patternsStr = tail.drop(1)
+
+                    // Map<Index, Pattern>
+                    val patterns = patternsStr.take(nbPattern).mapIndexed { indexPattern, pattern ->
+                        val beatsStr = pattern.trim().split(" ")
+                        val beats = convertToWaves(beatsStr, duration)
+                        Pattern(indexPattern + 1, beats)
+                    }.associateBy { it.index }
+
+                    val patternOrder = patternsStr.drop(nbPattern).first()
+                    val orders = patternOrder.trim().split(" ").map { it.toInt() }
+
+                    val patternsOrdered = orders.map { patterns[it]!! }
+                    tail = tail.drop(nbPattern + 2) // drop patterns + configuration + patterns order
+                    patterns to patternsOrdered
+                } else {
+                    tail = tail.drop(1) // drop  configuration
+                    emptyMap<Int, Pattern>() to emptyList()
+                }
+
+                tracks.add(Track(patterns, patternsOrdered, envelope = envelope, modulation = modulation))
+
+                remainingTrack--
+            } while (remainingTrack > 0)
+
+            return Song2(bpm.toInt(), volume.toInt() / 255f, tracks.toTypedArray())
         }
 
         fun convertScoreToSong(score: String): Song {

@@ -30,3 +30,15 @@ data class Song(val bpm: Int, val volume: Float, val patterns: Map<Int, Pattern>
         return header + patternsStr + patternOrder
     }
 }
+
+data class Track(
+    val patterns: Map<Int, Pattern>,
+    val music: List<Pattern>,
+    val envelope: Envelope? = null,
+    val modulation: Modulation? = null,
+)
+class Song2(
+    val bpm: Int,
+    val volume: Float,
+    val tracks: Array<Track>,
+)
