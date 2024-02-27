@@ -55,9 +55,9 @@ sealed interface SoundGenerator {
 
     fun apply(index: Int): Float
 
-    fun generate(index: Int, buffer: FloatArray) {
+    fun generate(index: Int, beatDuration: Int): Float {
         val sample = apply(index)
-        buffer[index] = envelope?.apply(sample, index, buffer) ?: sample
+        return envelope?.apply(sample, index, beatDuration) ?: sample
     }
 }
 
@@ -126,6 +126,14 @@ class SawTooth2(
     }
 }
 
+class Silence2(
+    override val frequency: Float,
+    override val modulation: Modulation?,
+    override val envelope: Envelope?,
+) : SoundGenerator {
+    override fun apply(index: Int): Float = 0f
+}
+
 class Noise2(
     override val frequency: Float,
     override val modulation: Modulation?,
@@ -171,7 +179,7 @@ class Envelope(
 
     private val releaseDuration = (release * SAMPLE_RATE).toInt()
 
-    fun apply(sample: Float, index: Int, buffer: FloatArray): Float {
+    fun apply(sample: Float, index: Int, nbSample: Int): Float {
         // attack phase
         if (index <= endOfAttackIndex) {
             val percentAttack = index / endOfAttackIndex.toFloat()
@@ -179,10 +187,10 @@ class Envelope(
         } else if (index > endOfAttackIndex && index <= endOfDecay) { // decay phase
             val percentDecay = (index - endOfAttackIndex) / decayDuration.toFloat()
             return sample * (1f - (1f - sustain) * percentDecay)
-        } else if (index > endOfDecay && index <= buffer.size - releaseDuration) { // sustain phase
+        } else if (index > endOfDecay && index <= nbSample - releaseDuration) { // sustain phase
             return sample * sustain
         } else { // release phase
-            val percentRelease = (index - (buffer.size - releaseDuration)) / releaseDuration.toFloat()
+            val percentRelease = (index - (nbSample - releaseDuration)) / releaseDuration.toFloat()
             return sample * (sustain * (1f - percentRelease))
         }
     }

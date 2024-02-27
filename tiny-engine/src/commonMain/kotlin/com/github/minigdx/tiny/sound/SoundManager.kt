@@ -79,6 +79,11 @@ abstract class SoundManager {
         playBuffer(mix, numberOfSamples)
     }
 
+    fun playSong(song: Song2) {
+        val (mix, numberOfSamples) = createBufferFromSong(song)
+        playBuffer(mix, numberOfSamples)
+    }
+
     private val converter = SoundConverter()
 
     fun createBufferFromSong(song: Song): SoundBuffer {
@@ -91,6 +96,23 @@ abstract class SoundManager {
         )
 
         return result
+    }
+
+    fun createBufferFromSong(song: Song2): SoundBuffer {
+        val numberOfSample = song.numberOfTotalSample
+
+        val result = FloatArray(numberOfSample.toInt())
+
+        val divider = song.tracks.size.toFloat()
+        (0 until numberOfSample.toInt()).forEach { index ->
+            song.tracks.forEach { track: Track ->
+                val sample = track.getSample(index) * divider
+                result[index] += sample
+            }
+
+            result[index] = result[index] / divider
+        }
+        return SoundBuffer(result, numberOfSample)
     }
 
     companion object {

@@ -9,17 +9,27 @@ import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.sound.Envelope
+import com.github.minigdx.tiny.sound.Modulation
+import com.github.minigdx.tiny.sound.Noise2
 import com.github.minigdx.tiny.sound.NoiseWave
 import com.github.minigdx.tiny.sound.Pattern
+import com.github.minigdx.tiny.sound.Pattern2
+import com.github.minigdx.tiny.sound.Pulse2
 import com.github.minigdx.tiny.sound.PulseWave
+import com.github.minigdx.tiny.sound.SawTooth2
 import com.github.minigdx.tiny.sound.SawToothWave
+import com.github.minigdx.tiny.sound.Silence2
 import com.github.minigdx.tiny.sound.SilenceWave
+import com.github.minigdx.tiny.sound.Sine2
 import com.github.minigdx.tiny.sound.SineWave
 import com.github.minigdx.tiny.sound.Song
 import com.github.minigdx.tiny.sound.Song2
+import com.github.minigdx.tiny.sound.SoundGenerator
+import com.github.minigdx.tiny.sound.Square2
 import com.github.minigdx.tiny.sound.SquareWave
 import com.github.minigdx.tiny.sound.Sweep
 import com.github.minigdx.tiny.sound.Track
+import com.github.minigdx.tiny.sound.Triangle2
 import com.github.minigdx.tiny.sound.TriangleWave
 import com.github.minigdx.tiny.sound.Vibrato
 import com.github.minigdx.tiny.sound.WaveGenerator
@@ -276,6 +286,22 @@ class SfxLib(
             }
         }
 
+        fun convertToSound(note: String, mod: Modulation?, env: Envelope?): SoundGenerator {
+            val wave = note.substring(0, 2).toInt(16)
+            val noteIndex = note.substring(2, 4).toInt(16)
+            val volume = note.substring(4, 6).toInt(16) / 255f
+
+            return when (wave) {
+                1 -> Sine2(Note.fromIndex(noteIndex).frequency, mod, env)
+                2 -> Square2(Note.fromIndex(noteIndex).frequency, mod, env)
+                3 -> Triangle2(Note.fromIndex(noteIndex).frequency, mod, env)
+                4 -> Noise2(Note.fromIndex(noteIndex).frequency, mod, env)
+                5 -> Pulse2(Note.fromIndex(noteIndex).frequency, mod, env)
+                6 -> SawTooth2(Note.fromIndex(noteIndex).frequency, mod, env)
+                else -> Silence2(0f, null, null)
+            }
+        }
+
         /**
          * tiny-sfx <bpm> <volume>
          * <nb pattern track> <mod active> <mod param1> <mod param2> <mod param3> <mod param4> <env active> <env param1> <env param2> <env param3> <env param4>
@@ -314,7 +340,7 @@ class SfxLib(
                 val configuration = track.split(" ").map { it.toInt(16) }
                 val nbPattern = configuration.first()
                 val (mod, modA, modB, _, _) = configuration.drop(1)
-                val (env, envA, envB, envC, envD) = configuration.drop(5)
+                val (env, envA, envB, envC, envD) = configuration.drop(6)
 
                 val modulation = if (mod > 0) {
                     if (mod == 1) {
@@ -337,8 +363,8 @@ class SfxLib(
                     // Map<Index, Pattern>
                     val patterns = patternsStr.take(nbPattern).mapIndexed { indexPattern, pattern ->
                         val beatsStr = pattern.trim().split(" ")
-                        val beats = convertToWaves(beatsStr, duration)
-                        Pattern(indexPattern + 1, beats)
+                        val beats = convertToSound(beatsStr, modulation, envelope)
+                        Pattern2(indexPattern + 1, beats)
                     }.associateBy { it.index }
 
                     val patternOrder = patternsStr.drop(nbPattern).first()
@@ -349,10 +375,10 @@ class SfxLib(
                     patterns to patternsOrdered
                 } else {
                     tail = tail.drop(1) // drop  configuration
-                    emptyMap<Int, Pattern>() to emptyList()
+                    emptyMap<Int, Pattern2>() to emptyList()
                 }
 
-                tracks.add(Track(patterns, patternsOrdered, envelope = envelope, modulation = modulation))
+                tracks.add(Track(patterns, patternsOrdered, duration, envelope = envelope, modulation = modulation))
 
                 remainingTrack--
             } while (remainingTrack > 0)
@@ -405,6 +431,14 @@ class SfxLib(
                 .asSequence()
                 .filter { it.isNotBlank() }
                 .map { beat -> convertToWave(beat, duration) }
+            return beats.toList()
+        }
+
+        private fun convertToSound(beatsStr: List<String>, mod: Modulation?, env: Envelope?): List<SoundGenerator> {
+            val beats = beatsStr
+                .asSequence()
+                .filter { it.isNotBlank() }
+                .map { beat -> convertToSound(beat, mod, env) }
             return beats.toList()
         }
 
