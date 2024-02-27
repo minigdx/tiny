@@ -6,9 +6,6 @@ import com.github.minigdx.tiny.lua.SfxLib
 import com.github.minigdx.tiny.platform.glfw.JavaMidiSoundManager
 
 fun main() {
-    val sampleRate = 44100f // Fréquence d'échantillonnage en Hz
-    val duration = 0.2 // Durée en secondes
-
     val score = """tiny-sfx 80 255
             |02 00 00 00 00 00 01 01 00 FF 01
     |011FFF 011FFF 011FFF 011FFF 011FFF 011FFF

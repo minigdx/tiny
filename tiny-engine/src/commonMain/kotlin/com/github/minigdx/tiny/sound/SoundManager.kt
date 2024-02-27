@@ -73,12 +73,6 @@ abstract class SoundManager {
         }
     }
 
-    fun playSong(song: Song) {
-        val (mix, numberOfSamples) = createBufferFromSong(song)
-
-        playBuffer(mix, numberOfSamples)
-    }
-
     fun playSong(song: Song2) {
         val (mix, numberOfSamples) = createBufferFromSong(song)
         playBuffer(mix, numberOfSamples)

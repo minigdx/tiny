@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.sound
 
+import com.github.minigdx.tiny.lua.Note
 import com.github.minigdx.tiny.sound.SoundManager.Companion.SAMPLE_RATE
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -10,7 +11,7 @@ class SongTest {
 
     @Test
     fun getPosition() {
-        val pattern = Pattern2(1, listOf(Sine2(0f, null, null)))
+        val pattern = Pattern2(1, listOf(Sine2(Note.C0, null, null, 1f)))
         val track = Track(mapOf(1 to pattern), listOf(pattern, pattern, pattern), 1f, null, null)
 
         val position = track.getPosition(0)
@@ -23,7 +24,7 @@ class SongTest {
 
     @Test
     fun getPositionOutOfTrack() {
-        val pattern = Pattern2(1, listOf(Sine2(0f, null, null)))
+        val pattern = Pattern2(1, listOf(Sine2(Note.C0, null, null, 1f)))
         val track = Track(mapOf(1 to pattern), listOf(pattern, pattern, pattern), 1f, null, null)
 
         val position = track.getPosition(Int.MAX_VALUE)
@@ -32,7 +33,7 @@ class SongTest {
 
     @Test
     fun getPositionInSecondPattern() {
-        val pattern = Pattern2(1, listOf(Sine2(0f, null, null), Sine2(0f, null, null)))
+        val pattern = Pattern2(1, listOf(Sine2(Note.C0, null, null, 1f), Sine2(Note.C0, null, null, 1f)))
         val track = Track(mapOf(1 to pattern), listOf(pattern, pattern, pattern), 1f, null, null)
 
         // 1 beats on the seconds pattern.

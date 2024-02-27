@@ -105,8 +105,13 @@ class JavaMidiSoundManager : SoundManager() {
 
             while (isActive) {
                 val nextBuffer = bufferQueue.take()
+                if (notesLine.isActive) {
+                    notesLine.close()
+                    notesLine.open()
+                    notesLine.start()
+                }
                 if (isActive) {
-                    notesLine.write(nextBuffer, 0, nextBuffer.size)
+                    Thread { notesLine.write(nextBuffer, 0, nextBuffer.size) }.start()
                 }
             }
             notesLine.close()
