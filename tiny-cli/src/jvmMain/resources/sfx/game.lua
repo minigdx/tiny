@@ -426,6 +426,59 @@ editor.create_widgets = function()
         on_update = on_envelop_update
     })
     table.insert(editor.patterns_fx_widgets, env)
+    
+    local on_update_attack = function(knob)
+        env.attack = knob.value
+    end
+
+    local attack = widgets.createKnob({
+        x = env.x,
+        y = env.y + env.height + 4,
+        label = "attack",
+        on_update = on_update_attack,
+        value = env.attack
+    })
+    table.insert(editor.patterns_fx_widgets, attack)
+
+    local on_update_decay = function(knob)
+        env.decay = knob.value
+    end
+    
+    local decay = widgets.createKnob({
+        x = env.x + (16 + 16),
+        y = env.y + env.height + 4,
+        label = "decay",
+        on_update = on_update_decay,
+        value = env.decay
+    })
+    table.insert(editor.patterns_fx_widgets, decay)
+
+    local on_update_sustain = function(knob)
+        env.sustain = knob.value
+    end
+    
+    local sustain = widgets.createKnob({
+        x = env.x + (16 + 16) * 2,
+        y = env.y + env.height + 4,
+        label = "sustain",
+        on_update = on_update_sustain,
+        value = env.sustain
+    })
+    table.insert(editor.patterns_fx_widgets, sustain)
+
+    local on_update_release = function(knob)
+        env.release = knob.value
+    end
+    
+    local on_update_release = widgets.createKnob({
+        x = env.x + (16 + 16) * 3,
+        y = env.y + env.height + 4,
+        label = "release",
+        on_update = on_update_release,
+        value = env.release
+    })
+    table.insert(editor.patterns_fx_widgets, on_update_release)
+
 
     local c_env = widgets.createCheckbox({
         x = 40,

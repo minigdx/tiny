@@ -88,7 +88,18 @@ local Checkbox = {
     y = 0,
     width = 8,
     height = 8,
+    enabled = true
+}
+
+local Knob = {
+    label = "",
+    value = 0,
+    x = 0,
+    y = 0,
+    width = 16,
+    height = 16,
     enabled = true,
+    on_update = nil
 }
 
 local buttons = {}
@@ -98,6 +109,7 @@ local widgets = {}
 local counters = {}
 local envelops = {}
 local checkboxes = {}
+local knobs = {}
 
 local factory = {}
 
@@ -139,15 +151,25 @@ factory.createEnvelop = function(value)
 
     table.insert(widgets, result)
     table.insert(envelops, result)
+
     return result
 end
 
 factory.createCheckbox = function(value)
     local result = new(Checkbox, value)
-    
+
     table.insert(widgets, result)
     table.insert(checkboxes, result)
     return result
+end
+
+factory.createKnob = function(value)
+    local result = new(Knob, value)
+
+    table.insert(widgets, result)
+    table.insert(knobs, result)
+    return result
+
 end
 
 function inside_widget(w, x, y)
@@ -211,6 +233,14 @@ factory.on_update = function(x, y)
             e.is_over_sustain = math.dst2(x, y, sx, sy) <= 4 * 4
         end
     end
+
+
+    if ctrl.touching(0) == nil then
+        for k in all(knobs) do
+            k.update_in_progress = false
+        end
+    end
+
 end
 
 factory.on_click = function(x, y)
@@ -239,7 +269,7 @@ factory.on_click = function(x, y)
             elseif e.is_over_decay then
                 local dst = math.min(math.max(0, x - e.attack_end_x), e.width)
                 local decay = dst / e.width
-                
+
                 e.decay = decay
             elseif e.is_over_sustain then
                 local dst = math.min(math.max(0, y - e.y), e.height)
@@ -257,6 +287,18 @@ factory.on_click = function(x, y)
                 if e.on_update ~= nil then
                     e.on_update(e, e.attack, e.decay, e.sustain, e.release)
                 end
+            end
+        end
+    end
+
+    for k in all(knobs) do
+        if inside_widget(k, x, y) or k.update_in_progress then
+            local dst = k.y + 8 - y
+            local percent = math.max(math.min(1, dst / 32), 0)
+            k.value = percent
+            k.update_in_progress = true
+            if k.on_update ~= nil then
+                k.on_update(k)
             end
         end
     end
@@ -475,6 +517,17 @@ function draw_checkbox(c)
     end
     print(c.label, c.x + 10, c.y + 2)
 end
+
+function draw_knob(k)
+    local angle = (1.8 * math.pi) * k.value + math.pi * 0.6
+
+    local target_x = math.cos(angle) * 6 + k.x + 8
+    local target_y = math.sin(angle) * 6 + k.y + 8
+
+    spr.sdraw(k.x, k.y, 0, 64, 16, 16)
+    shape.line(k.x + 8, k.y + 8, target_x, target_y, 9)
+    print(k.label, k.x, k.y + 18)
+end
 factory._draw = function()
     for c in all(counters) do
         if c.enabled then
@@ -496,7 +549,7 @@ factory._draw = function()
 
     for e in all(envelops) do
         if e.is_over_attack then
-            debug.log("is over")
+           
         end
         if e.enabled then
             draw_envelop(e)
@@ -506,6 +559,12 @@ factory._draw = function()
     for c in all(checkboxes) do
         if c.enabled then
             draw_checkbox(c)
+        end
+    end
+
+    for k in all(knobs) do
+        if k.enabled then
+            draw_knob(k)
         end
     end
 
