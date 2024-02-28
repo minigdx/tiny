@@ -146,12 +146,12 @@ editor.generate_score = function(content, pattern_selector)
                           to_hex(t["env"]["sustain"]) .. " " .. to_hex(t["env"]["release"])
 
         if t["mod"]["type"] == 1 then
-            track = track .. " 01 "..to_hex(t["mod"]["a"]).." 00 00 00\n"
+            track = track .. " 01 " .. to_hex(t["mod"]["a"]) .. " 00 00 00\n"
         elseif t["mod"]["type"] == 2 then
-            track = track .. " 02 "..to_hex(t["mod"]["a"]).." "..to_hex(t["mod"]["b"]).." 00 00\n"
+            track = track .. " 02 " .. to_hex(t["mod"]["a"]) .. " " .. to_hex(t["mod"]["b"]) .. " 00 00\n"
         else
             track = track .. " 00 00 00 00 00\n"
-        end                  
+        end
 
         -- write patterns
         for pattern in all(p) do
@@ -232,7 +232,22 @@ editor.on_active_tab = function(current, prev)
     editor.env.release = data["tracks"][editor.env.index]["env"].release / 255
     editor.release_knob.value = editor.env.release
 
-    -- TODO: set back the knob values for mod
+    editor.vibrato_knob.value = 0
+    editor.depth_knob.value = 0
+    editor.sweep_knob.value = 0
+    editor.c_sweep.value = false
+    editor.c_vibrato.value = false
+    local type = data["tracks"][editor.env.index]["mod"].type
+    if type == 1 then
+        editor.c_sweep.value = true
+        editor.sweep_knob.value = data["tracks"][editor.env.index]["mod"].a / 255
+        
+    elseif type == 2 then
+        editor.c_vibrato.value = true
+        editor.vibrato_knob.value = data["tracks"][editor.env.index]["mod"].a / 255
+        editor.depth_knob.value = data["tracks"][editor.env.index]["mod"].b / 255
+
+    end
 
     -- always get the first pattern
     editor.activate_pattern(1, data)
@@ -559,7 +574,7 @@ editor.create_widgets = function()
         end
         editor.active_tab.content["tracks"][env.index]["mod"]["a"] = knob.value * 255
     end
-    
+
     local vibrato = widgets.createKnob({
         x = env.x,
         y = env.y + env.height + 4 + 64,
@@ -569,14 +584,14 @@ editor.create_widgets = function()
     })
     table.insert(editor.patterns_fx_widgets, vibrato)
     editor.vibrato_knob = vibrato
-    
+
     local on_update_depth = function(knob)
         if editor.active_tab.content["tracks"][env.index]["mod"]["type"] ~= 2 then
             return
         end
         editor.active_tab.content["tracks"][env.index]["mod"]["b"] = knob.value * 255
     end
-    
+
     local depth = widgets.createKnob({
         x = env.x + 32,
         y = env.y + env.height + 4 + 64,
@@ -594,14 +609,14 @@ editor.create_widgets = function()
     })
     table.insert(editor.patterns_fx_widgets, c_vibrato)
     editor.c_vibrato = c_vibrato
-    
+
     c_vibrato.on_update = function()
         c_sweep.value = false
         editor.active_tab.content["tracks"][env.index]["mod"]["type"] = 2
         editor.active_tab.content["tracks"][env.index]["mod"]["a"] = editor.vibrato_knob.value * 255
         editor.active_tab.content["tracks"][env.index]["mod"]["b"] = editor.depth_knob.value * 255
     end
-    
+
     c_sweep.on_update = function()
         c_vibrato.value = false
         editor.active_tab.content["tracks"][env.index]["mod"]["type"] = 1
