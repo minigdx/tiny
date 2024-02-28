@@ -241,7 +241,35 @@ class SfxLib(
 
                 track["env"] = env
 
-                // TODO: put the modulation parameters
+                val modulation = t.modulation
+
+                val mod = LuaTable()
+                when (modulation) {
+                    is Sweep -> {
+                        mod["type"] = 1
+                        mod["a"] = Note.fromFrequency(modulation.sweep).index
+                        mod["b"] = 0
+                        mod["c"] = 0
+                        mod["d"] = 0
+                    }
+
+                    is Vibrato -> {
+                        mod["type"] = 2
+                        mod["a"] = Note.fromFrequency(modulation.vibratoFrequency).index
+                        mod["b"] = valueOf((modulation.depth.toDouble() * 255).toInt())
+                        mod["c"] = 0
+                        mod["d"] = 0
+                    }
+
+                    null -> {
+                        mod["type"] = 0
+                        mod["a"] = 0
+                        mod["b"] = 0
+                        mod["c"] = 0
+                        mod["d"] = 0
+                    }
+                }
+                track["mod"] = mod
 
                 val patterns = LuaTable()
                 t.patterns.forEach { (index, pattern) ->
@@ -387,9 +415,9 @@ class SfxLib(
 
                 val modulation = if (mod > 0) {
                     if (mod == 1) {
-                        Sweep(modA)
+                        Sweep(Note.fromIndex(modA).frequency.toInt())
                     } else {
-                        Vibrato(modA / 255f, modB / 255f)
+                        Vibrato(Note.fromIndex(modA).frequency, modB / 255f)
                     }
                 } else {
                     null
