@@ -486,14 +486,14 @@ editor.create_widgets = function()
         on_envelop_update(env, env.attack, env.decay, env.sustain, env.release)
     end
 
-    local on_update_release = widgets.createKnob({
+    local release = widgets.createKnob({
         x = env.x + (16 + 16) * 3,
         y = env.y + env.height + 4,
         label = "release",
         on_update = on_update_release,
         value = env.release
     })
-    table.insert(editor.patterns_fx_widgets, on_update_release)
+    table.insert(editor.patterns_fx_widgets, release)
 
     local c_env = widgets.createCheckbox({
         x = 40,
@@ -501,6 +501,61 @@ editor.create_widgets = function()
         label = "enable"
     })
     table.insert(editor.patterns_fx_widgets, c_env)
+
+
+    local on_update_sweep = function(knob)
+        
+    end
+
+    local sweep = widgets.createKnob({
+        x = env.x,
+        y = env.y + env.height + 4 + 32,
+        label = "sweep",
+        on_update = on_update_sweep,
+        value = env.release
+    })
+    table.insert(editor.patterns_fx_widgets, sweep)
+
+    local c_sweep = widgets.createCheckbox({
+        x = 40,
+        y = env.y + env.height + 4 + 32,
+        label = "enable"
+    })
+    table.insert(editor.patterns_fx_widgets, c_sweep)
+
+    local on_update_vibrato = function(knob)
+        
+    end
+
+    local vibrato = widgets.createKnob({
+        x = env.x,
+        y = env.y + env.height + 4 + 64,
+        label = "vibrato",
+        on_update = on_update_vibrato,
+        value = env.release
+    })
+    table.insert(editor.patterns_fx_widgets, vibrato)
+
+    local on_update_depth = function(knob)
+        
+    end
+
+
+    local depth = widgets.createKnob({
+        x = env.x + 32,
+        y = env.y + env.height + 4 + 64,
+        label = "depth",
+        on_update = on_update_depth,
+        value = env.release
+    })
+    table.insert(editor.patterns_fx_widgets, depth)
+
+    local c_vibrato = widgets.createCheckbox({
+        x = 40,
+        y = env.y + env.height + 4 + 64,
+        label = "enable"
+    })
+    table.insert(editor.patterns_fx_widgets, c_vibrato)
 
     -- tabs
     local files = ws.list()

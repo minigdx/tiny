@@ -157,7 +157,7 @@ end
 
 factory.createCheckbox = function(value)
     local result = new(Checkbox, value)
-
+    result.width = 12 + #result.label * 4
     table.insert(widgets, result)
     table.insert(checkboxes, result)
     return result
