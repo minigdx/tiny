@@ -415,9 +415,9 @@ class SfxLib(
 
                 val modulation = if (mod > 0) {
                     if (mod == 1) {
-                        Sweep(Note.fromIndex(modA).frequency.toInt())
+                        Sweep(Note.fromIndex(1 + modA * Note.B8.index / 255).frequency.toInt())
                     } else {
-                        Vibrato(Note.fromIndex(modA).frequency, modB / 255f)
+                        Vibrato(Note.fromIndex(1 + modA * Note.B8.index / 255).frequency, modB / 255f)
                     }
                 } else {
                     null
