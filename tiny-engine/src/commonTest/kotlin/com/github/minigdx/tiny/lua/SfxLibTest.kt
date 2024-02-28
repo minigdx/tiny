@@ -103,15 +103,19 @@ class SfxLibTest {
     fun toTable() {
         val lib = SfxLib(mockResources, false)
         val table = lib.toTable().call(lib.emptyScore().call())
-        val r = table["patterns"][1].checktable()!!.keys()
+        val r = table["tracks"][1]["patterns"][1].checktable()!!.keys()
         assertTrue(r.isEmpty())
     }
 
     @Test
     fun createEmptyScore() {
-        val expectedScore = """tiny-sfx 1 120 127
+        val expectedScore = """tiny-sfx 120 127
+            |1 01 19 00 FF 19 00 00 00 00 00
     |
     |1
+    |0 01 19 00 FF 19 00 00 00 00 00
+    |0 01 19 00 FF 19 00 00 00 00 00
+    |0 01 19 00 FF 19 00 00 00 00 00
         """.trimMargin()
 
         val score = SfxLib(mockResources, false).emptyScore().call()
