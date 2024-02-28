@@ -231,12 +231,13 @@ class SfxLib(
             val tracks = LuaTable()
             song.tracks.forEach { t ->
                 val track = LuaTable()
+                val inv = 1 / t.beatDuration
 
                 val env = LuaTable()
-                env["attack"] = valueOf(((t.envelope?.attack ?: 0f) * 255).toInt())
-                env["decay"] = valueOf(((t.envelope?.decay ?: 0f) * 255).toInt())
+                env["attack"] = valueOf(((t.envelope?.attack ?: 0f) * 255 * inv).toInt())
+                env["decay"] = valueOf(((t.envelope?.decay ?: 0f) * 255 * inv).toInt())
                 env["sustain"] = valueOf(((t.envelope?.sustain ?: 0f) * 255).toInt())
-                env["release"] = valueOf(((t.envelope?.release ?: 0f) * 255).toInt())
+                env["release"] = valueOf(((t.envelope?.release ?: 0f) * 255 * inv).toInt())
 
                 track["env"] = env
 

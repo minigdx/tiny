@@ -67,13 +67,14 @@ local editor = {
     pattern_counter = nil,
     bpm_counter = nil,
     volume_counter = nil,
+    env = nil,
     active_tab = nil, -- current active (displayed) tab.
     sound_editor_widgets = {}, -- all widgets used only in the sound editor mode
     patterns_editor_widgets = {}, -- all widgets used only in the patterns editor mode
     patterns_fx_widgets = {}, -- all wdgets used for the fx editor
     fader_widgets = {}, -- all faders (used only in the sound editor mode)
     wave_widgets = {}, -- all waves button (used only in the sound editor mode)
-    tabs_widgets = {}, -- all the tab
+    tabs_widgets = {} -- all the tab
 }
 
 --[[
@@ -212,6 +213,15 @@ editor.on_active_tab = function(current, prev)
 
     editor.bpm_counter.value = data["bpm"]
     editor.volume_counter.value = math.floor((data["volume"] / 255) * 10)
+
+    editor.env.attack = data["tracks"][editor.env.index]["env"].attack / 255
+    editor.attack_knob.value = editor.env.attack
+    editor.env.decay = data["tracks"][editor.env.index]["env"].decay / 255
+    editor.decay_knob.value = editor.env.decay
+    editor.env.sustain = data["tracks"][editor.env.index]["env"].sustain / 255
+    editor.sustain_knob.value = editor.env.sustain
+    editor.env.release = data["tracks"][editor.env.index]["env"].release / 255
+    editor.release_knob.value = editor.env.release
 
     -- always get the first pattern
     editor.activate_pattern(1, data)
@@ -438,6 +448,7 @@ editor.create_widgets = function()
         on_update = on_envelop_update
     })
     table.insert(editor.patterns_fx_widgets, env)
+    editor.env = env
 
     local on_update_attack = function(knob)
         env.attack = knob.value
@@ -452,6 +463,7 @@ editor.create_widgets = function()
         value = env.attack
     })
     table.insert(editor.patterns_fx_widgets, attack)
+    editor.attack_knob = attack
 
     local on_update_decay = function(knob)
         env.decay = knob.value
@@ -466,6 +478,7 @@ editor.create_widgets = function()
         value = env.decay
     })
     table.insert(editor.patterns_fx_widgets, decay)
+    editor.decay_knob = decay
 
     local on_update_sustain = function(knob)
         env.sustain = knob.value
@@ -480,6 +493,7 @@ editor.create_widgets = function()
         value = env.sustain
     })
     table.insert(editor.patterns_fx_widgets, sustain)
+    editor.sustain_knob = sustain
 
     local on_update_release = function(knob)
         env.release = knob.value
@@ -494,6 +508,7 @@ editor.create_widgets = function()
         value = env.release
     })
     table.insert(editor.patterns_fx_widgets, release)
+    editor.release_knob = release
 
     local c_env = widgets.createCheckbox({
         x = 40,
@@ -502,9 +517,8 @@ editor.create_widgets = function()
     })
     table.insert(editor.patterns_fx_widgets, c_env)
 
-
     local on_update_sweep = function(knob)
-        
+
     end
 
     local sweep = widgets.createKnob({
@@ -524,7 +538,7 @@ editor.create_widgets = function()
     table.insert(editor.patterns_fx_widgets, c_sweep)
 
     local on_update_vibrato = function(knob)
-        
+
     end
 
     local vibrato = widgets.createKnob({
@@ -537,9 +551,8 @@ editor.create_widgets = function()
     table.insert(editor.patterns_fx_widgets, vibrato)
 
     local on_update_depth = function(knob)
-        
-    end
 
+    end
 
     local depth = widgets.createKnob({
         x = env.x + 32,
