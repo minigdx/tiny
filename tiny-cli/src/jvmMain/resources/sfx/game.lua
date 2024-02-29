@@ -146,7 +146,7 @@ editor.generate_score = function(content, pattern_selector)
                           to_hex(t["env"]["sustain"]) .. " " .. to_hex(t["env"]["release"])
 
         if t["mod"]["type"] == 1 then
-            track = track .. " 01 " .. to_hex(t["mod"]["a"]) .. " 00 00 00\n"
+            track = track .. " 01 " .. to_hex(t["mod"]["a"]) .. " ".. to_hex(t["mod"]["b"] * 255) .. " 00 00\n"
         elseif t["mod"]["type"] == 2 then
             track = track .. " 02 " .. to_hex(t["mod"]["a"]) .. " " .. to_hex(t["mod"]["b"]) .. " 00 00\n"
         else
@@ -235,12 +235,14 @@ editor.on_active_tab = function(current, prev)
     editor.vibrato_knob.value = 0
     editor.depth_knob.value = 0
     editor.sweep_knob.value = 0
+    editor.acceleration_knob.value = 0
     editor.c_sweep.value = false
     editor.c_vibrato.value = false
     local type = data["tracks"][editor.env.index]["mod"].type
     if type == 1 then
         editor.c_sweep.value = true
         editor.sweep_knob.value = data["tracks"][editor.env.index]["mod"].a / 255
+        editor.acceleration_knob.value = data["tracks"][editor.env.index]["mod"].b
         
     elseif type == 2 then
         editor.c_vibrato.value = true
@@ -555,10 +557,25 @@ editor.create_widgets = function()
         y = env.y + env.height + 4 + 32,
         label = "sweep",
         on_update = on_update_sweep,
-        value = env.release
     })
     table.insert(editor.patterns_fx_widgets, sweep)
     editor.sweep_knob = sweep
+
+    local on_update_acceleration = function(knob)
+        if editor.active_tab.content["tracks"][env.index]["mod"]["type"] ~= 1 then
+            return
+        end
+        editor.active_tab.content["tracks"][env.index]["mod"]["b"] = knob.value
+    end
+
+    local acceleration = widgets.createKnob({
+        x = env.x + 32,
+        y = env.y + env.height + 4 + 32,
+        label = "acceleration",
+        on_update = on_update_acceleration,
+    })
+    table.insert(editor.patterns_fx_widgets, acceleration)
+    editor.acceleration_knob = acceleration
 
     local c_sweep = widgets.createCheckbox({
         x = 40,
@@ -621,6 +638,7 @@ editor.create_widgets = function()
         c_vibrato.value = false
         editor.active_tab.content["tracks"][env.index]["mod"]["type"] = 1
         editor.active_tab.content["tracks"][env.index]["mod"]["a"] = editor.sweep_knob.value * 255
+        editor.active_tab.content["tracks"][env.index]["mod"]["b"] = editor.acceleration_knob.value
     end
 
     -- tabs

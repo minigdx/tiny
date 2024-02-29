@@ -12,7 +12,6 @@ import com.github.minigdx.tiny.sound.Envelope
 import com.github.minigdx.tiny.sound.Modulation
 import com.github.minigdx.tiny.sound.Noise2
 import com.github.minigdx.tiny.sound.NoiseWave
-import com.github.minigdx.tiny.sound.Pattern
 import com.github.minigdx.tiny.sound.Pattern2
 import com.github.minigdx.tiny.sound.Pulse2
 import com.github.minigdx.tiny.sound.PulseWave
@@ -22,7 +21,6 @@ import com.github.minigdx.tiny.sound.Silence2
 import com.github.minigdx.tiny.sound.SilenceWave
 import com.github.minigdx.tiny.sound.Sine2
 import com.github.minigdx.tiny.sound.SineWave
-import com.github.minigdx.tiny.sound.Song
 import com.github.minigdx.tiny.sound.Song2
 import com.github.minigdx.tiny.sound.SoundGenerator
 import com.github.minigdx.tiny.sound.Square2
@@ -248,7 +246,7 @@ class SfxLib(
                     is Sweep -> {
                         mod["type"] = 1
                         mod["a"] = Note.fromFrequency(modulation.sweep).index
-                        mod["b"] = 0
+                        mod["b"] = if (modulation.acceleration) 1 else 0
                         mod["c"] = 0
                         mod["d"] = 0
                     }
@@ -415,7 +413,7 @@ class SfxLib(
 
                 val modulation = if (mod > 0) {
                     if (mod == 1) {
-                        Sweep(Note.fromIndex(1 + modA * Note.B8.index / 255).frequency.toInt())
+                        Sweep(Note.fromIndex(1 + modA * Note.B8.index / 255).frequency.toInt(), modB / 255f > 0.5f)
                     } else {
                         Vibrato(Note.fromIndex(1 + modA * Note.B8.index / 255).frequency, modB / 255f)
                     }
@@ -460,54 +458,6 @@ class SfxLib(
             } while (remainingTrack > 0)
 
             return Song2(bpm.toInt(), volume.toInt() / 255f, tracks.toTypedArray())
-        }
-
-        fun convertScoreToSong(score: String): Song {
-            val lines = score.lines()
-            if (lines.isEmpty()) {
-                throw IllegalArgumentException(
-                    "The content of the score is empty. Can't convert it into a song. " +
-                        "Check if the score is not empty or correctly loaded!",
-                )
-            }
-
-            val header = lines.first()
-            if (!header.startsWith(TINY_SFX_HEADER)) {
-                throw IllegalArgumentException(
-                    "The '$TINY_SFX_HEADER' is missing from the fist line of the score. " +
-                        "Is the score a valid score?",
-                )
-            }
-
-            val (_, nbPattern, bpm, volume) = header.split(" ")
-
-            val duration = 60f / bpm.toFloat() / 8f
-
-            // Map<Index, Pattern>
-            val patterns = lines.drop(1).take(nbPattern.toInt()).mapIndexed { indexPattern, pattern ->
-                val beatsStr = pattern.trim().split(" ")
-                val beats = convertToWaves(beatsStr, duration)
-                Pattern(indexPattern + 1, beats)
-            }.associateBy { it.index }
-
-            val patternOrder = lines.drop(nbPattern.toInt() + 1).firstOrNull()
-            val orders = if (patternOrder.isNullOrBlank()) {
-                listOf(1)
-            } else {
-                patternOrder.trim().split(" ").map { it.toInt() }
-            }
-
-            val patternsOrdered = orders.map { patterns[it]!! }
-
-            return Song(bpm.toInt(), volume.toInt() / 255f, patterns, patternsOrdered)
-        }
-
-        private fun convertToWaves(beatsStr: List<String>, duration: Seconds): List<WaveGenerator> {
-            val beats = beatsStr
-                .asSequence()
-                .filter { it.isNotBlank() }
-                .map { beat -> convertToWave(beat, duration) }
-            return beats.toList()
         }
 
         private fun convertToSound(beatsStr: List<String>, mod: Modulation?, env: Envelope?): List<SoundGenerator> {

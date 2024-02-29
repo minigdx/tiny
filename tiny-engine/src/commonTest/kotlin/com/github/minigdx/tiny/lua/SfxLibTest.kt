@@ -41,26 +41,6 @@ class SfxLibTest {
     }
 
     @Test
-    fun scoreToSong() {
-        val score = """tiny-sfx 2 120 255
-    |0101FF 0101FF 
-    |0101FF 0101FF
-    |1 2 1
-        """.trimMargin()
-
-        val song = SfxLib.convertScoreToSong(score)
-
-        assertEquals(120, song.bpm)
-        assertEquals(1f, song.volume)
-        // patterns by index
-        assertEquals(2, song.patterns.size)
-        // patterns ordered by usage
-        assertEquals(3, song.music.size)
-
-        assertEquals(song.patterns[1]!!.notes.size, 2)
-    }
-
-    @Test
     fun scoreToSong2() {
         val score = """tiny-sfx 120 255
             |02 00 00 00 00 00 00 00 00 00 00

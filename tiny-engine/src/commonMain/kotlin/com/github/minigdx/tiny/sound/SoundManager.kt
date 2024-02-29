@@ -104,7 +104,7 @@ abstract class SoundManager {
                 result[index] += sample
             }
 
-            result[index] = result[index] / divider
+            result[index] = (result[index] / divider) * song.volume
         }
         return SoundBuffer(result, numberOfSample)
     }

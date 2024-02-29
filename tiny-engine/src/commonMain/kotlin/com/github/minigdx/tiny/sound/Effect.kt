@@ -21,9 +21,17 @@ interface Modulation {
  */
 class Sweep(
     val sweep: Frequency,
+    val acceleration: Boolean,
 ) : Modulation {
+
+    private val way = if (acceleration) {
+        1
+    } else {
+        -1
+    }
+
     override fun apply(index: Int, frequency: Float): Float {
-        return frequency + index * sweep / SAMPLE_RATE.toFloat()
+        return frequency + index * (sweep * way) / SAMPLE_RATE.toFloat()
     }
 }
 
