@@ -43,7 +43,7 @@ data class LdtkLevel(
     val width: Int,
     val height: Int,
     val bgColor: String,
-    val customFields: Map<String, String>,
+    val customFields: JsonElement,
     val layers: List<String>,
     val entities: Map<String, List<LdtkEntity>>,
 )
