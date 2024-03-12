@@ -44,6 +44,12 @@ local Tab = {
     on_new_tab = nil
 }
 
+local TabManager = {
+    on_new_tab = nil,
+    tags = {},
+    active_tab = 0
+}
+
 local Counter = {
     label = "",
     value = 0,
@@ -113,6 +119,10 @@ local knobs = {}
 
 local factory = {}
 
+function inside_widget(w, x, y)
+    return w.x <= x and x <= w.x + w.width and w.y <= y and y <= w.y + w.height
+end
+
 factory.createCounter = function(value)
     local result = new(Counter, value)
     table.insert(widgets, result)
@@ -127,11 +137,54 @@ factory.createTab = function(value)
     return result
 end
 
+TabManager._update = function(self)
+    
+end
+
+TabManager._draw = function(self)
+    
+end
+
+
 factory.createButton = function(value)
     local result = new(Button, value)
     table.insert(widgets, result)
     table.insert(buttons, result)
     return result
+end
+
+Button._update = function(self)
+    if self.status == 2 then
+        return
+    end
+    
+    local pos = ctrl.touch()
+    if inside_widget(self, pos.x, pos.y) then
+        self.status = 1
+    else
+        self.status = 0
+    end
+
+end
+
+Button._draw = function(self)
+    local background = 0
+    if self.status > 0 then
+        background = 1
+    end
+
+    spr.draw(background, self.x, self.y)
+
+    if self.overlay ~= nil then
+        spr.draw(self.overlay, self.x, self.y)
+    end
+end
+
+--[[
+    @deprecated
+]]
+function draw_button(button)
+    button:_draw()
 end
 
 factory.createFader = function(value)
@@ -172,19 +225,37 @@ factory.createKnob = function(value)
 
 end
 
-function inside_widget(w, x, y)
-    return w.x <= x and x <= w.x + w.width and w.y <= y and y <= w.y + w.height
+Knob._draw = function(self)
+    local angle = (1.8 * math.pi) * self.value + math.pi * 0.6
+
+    local target_x = math.cos(angle) * 6 + self.x + 8
+    local target_y = math.sin(angle) * 6 + self.y + 8
+
+    spr.sdraw(self.x, self.y, 0, 64, 16, 16)
+    shape.line(self.x + 8, self.y + 8, target_x, target_y, 9)
+    print(self.label, self.x, self.y + 18)
+end
+
+Knob._update = function(self)
+
+    local touching = ctrl.touching(0)
+
+    -- the click started in the widget?
+    if touching ~= nil and inside_widget(self, touching.x, touching.y) then
+        local touch = ctrl.touch()
+
+        local dst = self.y + 8 - touch.y
+        local percent = math.max(math.min(1, dst / 32), 0)
+        self.value = percent
+        if self.on_update ~= nil then
+            self.on_update(self)
+        end
+    end
 end
 
 factory.on_update = function(x, y)
     for f in all(buttons) do
-        if f.status == 1 then
-            f.status = 0
-        end
-
-        if f.status == 0 and inside_widget(f, x, y) then
-            f.status = 1
-        end
+        f:_update()
     end
 
     for c in all(counters) do
@@ -224,11 +295,8 @@ factory.on_update = function(x, y)
         end
     end
 
-
-    if ctrl.touching(0) == nil then
-        for k in all(knobs) do
-            k.update_in_progress = false
-        end
+    for k in all(knobs) do
+        k:_update()
     end
 
 end
@@ -246,18 +314,6 @@ factory.on_click = function(x, y)
             local percent = math.max(0.0, 1.0 - ((y - f.y) / f.height))
             local value = percent * (f.max_value - f.min_value) + f.min_value
             f.on_value_update(f, value)
-        end
-    end
-
-    for k in all(knobs) do
-        if inside_widget(k, x, y) or k.update_in_progress then
-            local dst = k.y + 8 - y
-            local percent = math.max(math.min(1, dst / 32), 0)
-            k.value = percent
-            k.update_in_progress = true
-            if k.on_update ~= nil then
-                k.on_update(k)
-            end
         end
     end
 end
@@ -404,19 +460,6 @@ function draw_fader(f)
     print(f.label, f.x, f.y + f.height + 5)
 end
 
-function draw_button(button)
-    local background = 0
-    if button.status > 0 then
-        background = 1
-    end
-
-    spr.draw(background, button.x, button.y)
-
-    if button.overlay ~= nil then
-        spr.draw(button.overlay, button.x, button.y)
-    end
-end
-
 function draw_counter(counter)
 
     spr.draw(counter.spr + counter.status, counter.x, counter.y)
@@ -476,16 +519,13 @@ function draw_checkbox(c)
     print(c.label, c.x + 10, c.y + 2)
 end
 
+--[[
+    @deprecated
+]]
 function draw_knob(k)
-    local angle = (1.8 * math.pi) * k.value + math.pi * 0.6
-
-    local target_x = math.cos(angle) * 6 + k.x + 8
-    local target_y = math.sin(angle) * 6 + k.y + 8
-
-    spr.sdraw(k.x, k.y, 0, 64, 16, 16)
-    shape.line(k.x + 8, k.y + 8, target_x, target_y, 9)
-    print(k.label, k.x, k.y + 18)
+    k:_draw()
 end
+
 factory._draw = function()
     for c in all(counters) do
         if c.enabled then
@@ -507,7 +547,7 @@ factory._draw = function()
 
     for e in all(envelops) do
         if e.is_over_attack then
-           
+
         end
         if e.enabled then
             draw_envelop(e)
