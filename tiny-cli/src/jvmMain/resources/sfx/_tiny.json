@@ -2,14 +2,14 @@
   "version": "V1",
   "name": "Tiny SFX Sequencer",
   "resolution": {
-    "width": 512,
-    "height": 288
+    "width": 192,
+    "height": 128
   },
   "sprites": {
-    "width": 16,
-    "height": 16
+    "width": 8,
+    "height": 8
   },
-  "zoom": 2,
+  "zoom": 4,
   "colors": [
     "#000000",
     "#1D2B53",
@@ -29,12 +29,18 @@
     "#FFCCAA"
   ],
   "scripts": [
+    "test-game.lua",
     "game.lua",
     "mouse.lua",
     "widgets.lua"
   ],
   "spritesheets": [
     "sfx.png"
+  ],
+  "levels": [
+    "editor/simplified/Level_0",
+    "editor/simplified/Score",
+    "editor/simplified/Fx"
   ],
   "hideMouseCursor": true
 }

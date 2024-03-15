@@ -36,6 +36,13 @@ interface GameResourceAccess {
      */
     fun spritesheet(index: Int): SpriteSheet?
 
+    /**
+     * Find a sprite sheet by its name
+     */
+    fun spritesheet(name: String): Int?
+
+    fun newSpritesheetIndex(): Int
+
     fun spritesheet(sheet: SpriteSheet)
 
     /**

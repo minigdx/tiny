@@ -88,10 +88,18 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
             val copy = PixelArray(frameBuffer.width, frameBuffer.height).apply {
                 copyFrom(frameBuffer.colorIndexBuffer) { index, _, _ -> index }
             }
+
+            val (index, name) = if (arg.isstring()) {
+                val index = resourceAccess.spritesheet(arg.tojstring()) ?: resourceAccess.newSpritesheetIndex()
+                index to arg.tojstring()
+            } else {
+                val spriteSheet = resourceAccess.spritesheet(arg.checkint())
+                arg.toint() to (spriteSheet?.name ?: "frame_buffer_${arg.toint()}")
+            }
             val sheet = SpriteSheet(
                 0,
-                arg.checkint(),
-                "frame_buffer",
+                index,
+                name,
                 ResourceType.GAME_SPRITESHEET,
                 copy,
                 copy.width,

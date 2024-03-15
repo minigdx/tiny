@@ -99,6 +99,8 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
             val previousSpriteSheet = currentSpritesheet
             currentSpritesheet = if (arg.isnil()) {
                 0
+            } else if (arg.isstring()) {
+                resourceAccess.spritesheet(arg.tojstring()) ?: 0
             } else {
                 arg.checkint()
             }

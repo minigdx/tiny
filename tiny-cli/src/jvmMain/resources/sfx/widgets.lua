@@ -6,7 +6,7 @@ local Fader = {
     enabled = true,
     min_value = 0,
     max_value = 10,
-    value = nil,
+    value = 0,
     tip_color = 9,
     disabled_color = 7,
     label = "",
@@ -45,9 +45,13 @@ local Tab = {
 }
 
 local TabManager = {
+    x = 0,
+    y = 0,
+    width = 0,
+    height = 0,
     on_new_tab = nil,
-    tags = {},
-    active_tab = 0
+    tabs = {},
+    active_tab = nil
 }
 
 local Counter = {
@@ -117,7 +121,10 @@ local envelops = {}
 local checkboxes = {}
 local knobs = {}
 
-local factory = {}
+local factory = {
+    tabs = {},
+    widgets = {}
+}
 
 function inside_widget(w, x, y)
     return w.x <= x and x <= w.x + w.width and w.y <= y and y <= w.y + w.height
@@ -137,19 +144,98 @@ factory.createTab = function(value)
     return result
 end
 
+Tab._init = function(self)
+    self.index = #self.parent.tabs
+    self.x = self.parent.x + self.index * 32
+    self.y = self.parent.y
+    self.width = #self.label * 4 + 12
+
+    if self.index > 1 then
+        local prev = self.parent.tabs[self.index - 1]
+        self.x = prev.x + prev.width
+    else
+        self.x = 0
+    end
+end
+
+--[[
+    Draw tab header
+]]
+Tab._draw_header = function(self)
+    local offset = self.status * 8
+
+    -- body
+    -- number of body repetition
+    local time = math.floor(self.width / 16)
+    local rest = self.width % 16
+    for i = 0, time - 1 do
+        spr.sdraw(self.x + (i) * 16, 0, 80, offset, 16, 8)
+    end
+
+    spr.sdraw(self.x + (time) * 16, 0, 80, offset, rest, 8)
+
+    -- right
+    spr.sdraw(self.x + self.width, 0, 96, offset, 8, 8)
+
+    local center = self.width * 0.5 - #self.label * 0.5 * 4
+
+    print(self.label, self.x + center, self.y + 2)
+
+    -- left
+    if self.status == 1 then
+        spr.sdraw(self.x - 8, 0, 64, 8, 8, 8)
+    end
+end
+
+--[[
+    Draw tab content
+]]
+Tab._draw = function(self)
+
+end
+
+TabManager._init = function(self)
+    self.new_tab = new(Tab, {
+        label = "+"
+    })
+    self.new_tab.parent = self
+    self.new_tab.index = 0
+    self.new_tab:_init()
+end
+
 TabManager._update = function(self)
-    
+
 end
 
 TabManager._draw = function(self)
-    
+    -- draw new tab header
+    self.new_tab:_draw_header()
+
+    -- draw tab headers
+    for i, tab in rpairs(self.tabs) do
+        tab:_draw_header()
+    end
+    -- draw current header
+    if self.active_tab ~= nil then
+        self.active_tab:_draw_header()
+        -- draw current tab content
+        self.active_tab:_draw()
+    end
 end
 
+TabManager.create_tab = function(self, data)
+    local new_tab = new(Tab, data)
+    table.insert(self.tabs, new_tab)
+    new_tab.parent = self
+    new_tab:_init()
 
-factory.createButton = function(value)
+    self.new_tab.x = new_tab.x + new_tab.width
+    return new_tab
+end
+
+factory.create_button = function(self, value)
     local result = new(Button, value)
-    table.insert(widgets, result)
-    table.insert(buttons, result)
+    result.help = result.customFields.Help
     return result
 end
 
@@ -157,10 +243,18 @@ Button._update = function(self)
     if self.status == 2 then
         return
     end
-    
+
     local pos = ctrl.touch()
+    
     if inside_widget(self, pos.x, pos.y) then
         self.status = 1
+        if self.on_hover ~= nil then
+            self:on_hover()
+        end
+        local touched = ctrl.touched(0)
+        if touched and self.on_changed ~= nil then
+            self:on_changed()
+        end
     else
         self.status = 0
     end
@@ -173,37 +267,24 @@ Button._draw = function(self)
         background = 1
     end
 
-    spr.draw(background, self.x, self.y)
+    spr.draw(28 + background, self.x, self.y)
 
     if self.overlay ~= nil then
         spr.draw(self.overlay, self.x, self.y)
     end
 end
 
---[[
-    @deprecated
-]]
-function draw_button(button)
-    button:_draw()
-end
-
-factory.createFader = function(value)
+factory.create_fader = function(self, value)
     local result = new(Fader, value)
-    table.insert(widgets, result)
-    table.insert(faders, result)
-
-    result.index = #faders
-
+    result.help = result.customFields.Help
+    result.label = result.customFields.Label
     return result
 end
 
-factory.createEnvelop = function(value)
-    local result = new(Envelop, value)
+factory.create_envelop = function(self, data)
+    local result = new(Envelop, data)
     result.attack_start_x = result.x
     result.attack_start_y = result.y + result.height
-
-    table.insert(widgets, result)
-    table.insert(envelops, result)
 
     return result
 end
@@ -216,24 +297,30 @@ factory.createCheckbox = function(value)
     return result
 end
 
-factory.createKnob = function(value)
+factory.create_knob = function(self, value)
     local result = new(Knob, value)
-
-    table.insert(widgets, result)
-    table.insert(knobs, result)
+    result.label = result.customFields.Label
+    result.help = result.customFields.Help
     return result
+end
 
+factory.create_tabs = function(self)
+    local tabs = new(TabManager)
+    tabs:_init()
+    table.insert(self.tabs, tabs)
+    table.insert(self.widgets, tabs)
+    return tabs
 end
 
 Knob._draw = function(self)
     local angle = (1.8 * math.pi) * self.value + math.pi * 0.6
 
-    local target_x = math.cos(angle) * 6 + self.x + 8
-    local target_y = math.sin(angle) * 6 + self.y + 8
+    local target_x = math.cos(angle) * 3 + self.x + 4
+    local target_y = math.sin(angle) * 3 + self.y + 3
 
-    spr.sdraw(self.x, self.y, 0, 64, 16, 16)
-    shape.line(self.x + 8, self.y + 8, target_x, target_y, 9)
-    print(self.label, self.x, self.y + 18)
+    spr.draw(30, self.x, self.y)
+    shape.line(self.x + 4, self.y + 3, target_x, target_y, 9)
+    print(self.label, self.x - 1, self.y + 10)
 end
 
 Knob._update = function(self)
@@ -244,329 +331,247 @@ Knob._update = function(self)
     if touching ~= nil and inside_widget(self, touching.x, touching.y) then
         local touch = ctrl.touch()
 
-        local dst = self.y + 8 - touch.y
+        local dst = self.y + 4 - touch.y
         local percent = math.max(math.min(1, dst / 32), 0)
         self.value = percent
         if self.on_update ~= nil then
-            self.on_update(self)
+            self:on_update(self.value)
+        end
+    end
+
+    local pos = ctrl.touch()
+    if inside_widget(self, pos.x, pos.y) then
+        if self.on_hover ~= nil then
+            self:on_hover()
         end
     end
 end
 
-factory.on_update = function(x, y)
-    for f in all(buttons) do
-        f:_update()
-    end
 
-    for c in all(counters) do
-        -- inside the widgets
-        local left = {
-            width = 8,
-            height = 8,
-            x = c.x,
-            y = c.y + 8
-        }
+factory._init = function(self)
 
-        local right = {
-            width = 8,
-            height = 8,
-            x = c.x + 8,
-            y = c.y + 8
-        }
-        if inside_widget(left, x, y) then
-            c.status = 1
-        elseif inside_widget(right, x, y) then
-            c.status = 2
-        else
-            c.status = 0
-        end
-    end
-
-    for e in all(envelops) do
-        if e.enabled then
-            e.attack_end_x = e.attack_start_x + e.width * e.attack
-            e.attack_end_y = e.attack_start_y - e.height
-
-            e.decay_end_x = e.attack_end_x + e.width * e.decay
-            e.decay_end_y = e.y + (1 - e.sustain) * e.height
-
-            e.release_start_x = e.x + e.width - e.width * e.release
-            e.release_start_y = e.y + (1 - e.sustain) * e.height
-        end
-    end
-
-    for k in all(knobs) do
-        k:_update()
-    end
-
-end
-
-factory.on_click = function(x, y)
-    -- on click faders
-    for f in all(faders) do
-        local box = {
-            x = f.x,
-            y = f.y,
-            width = f.width,
-            height = f.height + 12
-        }
-        if f.enabled and inside_widget(box, x, y) then
-            local percent = math.max(0.0, 1.0 - ((y - f.y) / f.height))
-            local value = percent * (f.max_value - f.min_value) + f.min_value
-            f.on_value_update(f, value)
-        end
-    end
-end
-
-factory.on_clicked = function(x, y)
-    -- on click buttons
-    local prec = nil
-    local current = nil
-    for f in all(buttons) do
-        if f.status == 2 then
-            prec = f
-        elseif f.status == 1 and inside_widget(f, x, y) then
-            current = f
-        end
-    end
-    -- active the current button and deactive the previous activated
-    if current ~= nil and current.enabled and current.grouped then
-        if prec ~= nil then
-            prec.status = 0
-        end
-        current.status = 2
-    end
-
-    if current ~= nil and current.enabled then
-        current.on_active_button(current, prec)
-    end
-
-    -- on click tab
-    local new_active = nil
-    local current_active = nil
-    for t in all(tabs) do
-        if t.status == 1 then
-            current_active = t
-        elseif inside_widget(t, x, y) and t.status == 0 then
-            new_active = t
-        end
-
-    end
-
-    if new_active ~= nil then
-        -- create a new tab.
-        if new_active.new_tab then
-            new_active.width = 2 * 16 + 8
-            new_active.label = ""
-            new_active.new_tab = false
-
-            if #tabs < 12 then
-                factory.createTab({
-                    width = 24,
-                    new_tab = true,
-                    x = new_active.x + new_active.width,
-                    on_active_tab = new_active.on_active_tab,
-                    on_new_tab = new_active.on_new_tab
-                })
-            end
-
-            new_active.on_new_tab(new_active)
-        end
-        current_active.status = 0
-        new_active.status = 1
-        if new_active.on_active_tab ~= nil then
-            new_active.on_active_tab(new_active, current_active)
-        end
-    end
-
-    for c in all(counters) do
-        if c.enabled and c.status == 1 then
-            c.on_left(c)
-        elseif c.enabled and c.status == 2 then
-            c.on_right(c)
-        end
-    end
-
-    for c in all(checkboxes) do
-        if c.enabled and inside_widget(c, x, y) then
-            c.value = not c.value
-            if c.on_update ~= nil then
-                c.on_update(c)
-            end
-        end
-    end
 end
 
 factory._update = function(mouse)
 
 end
 
-function draw_tabs()
-    local active_tab = tabs[1]
-    for index = #tabs, 1, -1 do
-        local v = tabs[index]
-        if v.status == 0 then
-            draw_tab(v)
-        else
-            active_tab = v
+Fader._update = function(self)
+    local pos = ctrl.touch()
+    if inside_widget(self, pos.x, pos.y) then
+        if self.on_hover ~= nil then
+            self:on_hover()
+        end
+
+        if ctrl.touching(0) then
+            local percent = math.max(0.0, 1.0 - ((pos.y - self.y) / self.height))
+            self.value = percent
+
+            if self.on_value_update then
+                self:on_value_update(self.value)
+            end
         end
     end
-
-    draw_tab(active_tab)
 end
 
-function draw_tab(tab)
-    if tab == nil then
-        return
+Fader._draw = function(self)
+    local color = self.disabled_color
+
+    if self.value ~= nil and self.value > 0 then
+        color = self.tip_color
     end
-    local offset = tab.status * 8
-
-    -- body
-    local time = math.floor(tab.width / 16)
-    local rest = tab.width % 16
-    for i = 0, time - 1 do
-        spr.sdraw(tab.x + (i) * 16, 0, 80, offset, 16, 8)
-
-    end
-
-    spr.sdraw(tab.x + (time) * 16, 0, 80, offset, rest, 8)
-
-    -- right
-    spr.sdraw(tab.x + tab.width, 0, 96, offset, 8, 8)
-
-    local center = tab.width * 0.5 - #tab.label * 0.5 * 4
-
-    print(tab.label, tab.x + center, tab.y + 2)
-
-    -- left
-    if tab.status == 1 then
-        spr.sdraw(tab.x - 8, 0, 64, 8, 8, 8)
-    end
-
-end
-
-function draw_fader(f)
-    if f.value ~= nil and f.value > 0 then
-        local y = f.height - ((f.value - f.min_value) / (f.max_value - f.min_value) * f.height)
-        local tipy = f.y + y
-        shape.rectf(f.x, tipy, f.width, 4, f.tip_color)
-    else
-        -- fader value = 0
-        local y = f.height - (0 / (f.max_value - f.min_value) * f.height)
-        local tipy = f.y + y
-        shape.rectf(f.x, tipy, f.width, 4, f.disabled_color)
-    end
-
-    print(f.label, f.x, f.y + f.height + 5)
+    local y = self.height - self.value * self.height
+    local tipy = self.y + y
+    shape.rectf(self.x + 1, tipy, self.width - 2, 2, self.tip_color)
 end
 
 function draw_counter(counter)
-
     spr.draw(counter.spr + counter.status, counter.x, counter.y)
 
     print(counter.label, counter.x + 1, counter.y - 4)
     print(string.sub(counter.value, 1, 4), counter.x + 3, counter.y + 2)
 end
 
-function draw_envelop(envelop)
+Envelop._update = function(self)
 
-    shape.rect(envelop.x, envelop.y, envelop.width, envelop.height, 9)
+    self.decay = math.min(self.decay, 1 - self.attack)
+    self.release = math.min(self.release, 1 - (self.decay + self.attack))
+
+    self.attack_end_x = self.x + self.attack * self.width 
+    self.attack_end_y = self.y
+
+    self.decay_end_x = self.attack_end_x + self.decay * self.width 
+    self.decay_end_y = self.y + self.height * (1 - self.sustain)
+
+    self.release_start_x = self.x + self.width - self.release * self.width 
+    self.release_start_y = self.y + self.height * (1 - self.sustain)
+
+    self.attack_fader.value = self.attack
+    self.decay_fader.value = self.decay
+    self.release_fader.value = self.release
+end
+
+Envelop._draw = function(self)
+    shape.rect(self.x, self.y, self.width + 1, self.height + 1, 9)
 
     -- attack
-    print("attack", envelop.attack_end_x, envelop.attack_end_y - 8)
-    shape.line(envelop.x, envelop.y + envelop.height, envelop.attack_end_x, envelop.attack_end_y, 9)
-    if envelop.is_over_attack then
-        shape.circlef(envelop.attack_end_x, envelop.attack_end_y, 2, 9)
-    else
-        shape.circle(envelop.attack_end_x, envelop.attack_end_y, 2, 9)
-    end
+    shape.line(self.x, self.y + self.height, self.attack_end_x, self.attack_end_y, 8)
+    shape.circle(self.attack_end_x, self.attack_end_y, 2, 8)
 
-    print("decay", envelop.decay_end_x, envelop.decay_end_y - 8)
-    shape.line(envelop.attack_end_x, envelop.attack_end_y, envelop.decay_end_x, envelop.decay_end_y, 9)
-    if envelop.is_over_decay then
-        shape.circlef(envelop.decay_end_x, envelop.decay_end_y, 2, 9)
-    else
-        shape.circle(envelop.decay_end_x, envelop.decay_end_y, 2, 9)
-    end
+    -- decay
+    shape.line(self.attack_end_x, self.attack_end_y, self.decay_end_x, self.decay_end_y, 10)
+    shape.circle(self.decay_end_x, self.decay_end_y, 2, 10)
 
-    print("release", envelop.release_start_x, envelop.release_start_y - 8)
-    shape.line(envelop.release_start_x, envelop.release_start_y, envelop.x + envelop.width, envelop.y + envelop.height,
-        9)
-    if envelop.is_over_release then
-        shape.circlef(envelop.release_start_x, envelop.release_start_y, 2, 9)
-    else
-        shape.circle(envelop.release_start_x, envelop.release_start_y, 2, 9)
-    end
+    -- release
+    shape.line(self.release_start_x, self.release_start_y, self.x + self.width, self.y + self.height, 9)
+    shape.circle(self.release_start_x, self.release_start_y, 2, 9)
 
-    shape.line(envelop.decay_end_x, envelop.decay_end_y, envelop.release_start_x, envelop.release_start_y, 9)
+    shape.line(self.decay_end_x, self.decay_end_y, self.release_start_x, self.release_start_y, 9)
+
+    -- sustain
     local width = 8
     local height = 4
-    if envelop.is_over_sustain then
-        shape.rectf(envelop.decay_end_x + (envelop.release_start_x - envelop.decay_end_x - width) * 0.5,
-            envelop.y + (1 - envelop.sustain) * envelop.height - height * 0.5, width, height, 8)
+    shape.rect(self.decay_end_x + (self.release_start_x - self.decay_end_x - width) * 0.5, self.y + (1 - self.sustain) * self.height - height * 0.5, width, height, 8)
+end
+
+factory.create_checkbox = function(self, data)
+    local result = new(Checkbox, data)
+    result.help = result.customFields.Help
+    result.label = result.customFields.Label
+    return result
+end
+
+Checkbox._update = function(self)
+    local pos = ctrl.touched(0)
+    if pos ~= nil then
+        local w = {
+            x = self.x,
+            y = self.y,
+            height = self.height,
+            width = self.width + #self.label * 4
+        }
+        if inside_widget(w, pos.x, pos.y) then
+            self.value = not self.value
+            if self.on_change then
+                self:on_changed(self.value)
+            end
+        end
+    end
+
+    pos = ctrl.touch()
+    if self.on_hover and inside_widget(self, pos.x, pos.y) then
+        self:on_hover()
+    end
+end
+
+Checkbox._draw = function(self)
+    if self.value then
+        spr.sdraw(self.x, self.y, 8, 48, 8, 8)
     else
-        shape.rect(envelop.decay_end_x + (envelop.release_start_x - envelop.decay_end_x - width) * 0.5,
-            envelop.y + (1 - envelop.sustain) * envelop.height - height * 0.5, width, height, 8)
+        spr.sdraw(self.x, self.y, 0, 48, 8, 8)
     end
+    print(self.label, self.x + 10, self.y + 2)
 end
 
-function draw_checkbox(c)
-    if c.value then
-        spr.sdraw(c.x, c.y, 8, 48, 8, 8)
+local Help = {
+    _type = "Help",
+    label = ""
+}
+
+Help._update = function(self)
+
+end
+
+Help._draw = function(self)
+    print(self.label, self.x, self.y + 2)
+    shape.rect(self.x, self.y, self.width, self.height)
+end
+
+factory.create_help = function(self, data)
+    local help = new(Help, data)
+    return help
+end
+
+local MenuItem = {
+    _type = "MenuItem",
+    spr = nil,
+    hold = false,
+    status = 0,
+    active = 0,
+    help = "",
+    on_click = function()
+    end,
+    on_hover = function()
+    end
+}
+
+local menuItems = {}
+
+MenuItem._update = function(self)
+    local pos = ctrl.touch()
+    if not self.hold then
+        self.active = 0
+    end
+
+    if inside_widget(self, pos.x, pos.y) then
+        if self.active == 0 then
+            self.status = 1
+        end
+        if ctrl.touched(0) then
+            self:on_click()
+            if self.hold then
+                for i in all(menuItems) do
+                    i.active = 0
+                end
+            end
+            self.active = 1
+            self.status = 0
+        end
+        self:on_hover()
     else
-        spr.sdraw(c.x, c.y, 0, 48, 8, 8)
+        self.status = 0
     end
-    print(c.label, c.x + 10, c.y + 2)
+
 end
 
---[[
-    @deprecated
-]]
-function draw_knob(k)
-    k:_draw()
+MenuItem._draw = function(self)
+    if self.spr ~= nil then
+        spr.draw(self.spr + self.status * 128 + self.active * (128 + 32), self.x, self.y)
+    end
 end
 
-factory._draw = function()
-    for c in all(counters) do
-        if c.enabled then
-            draw_counter(c)
-        end
+factory.create_menu_item = function(self, data)
+    local menu = new(MenuItem, data)
+
+    local item = data.customFields.Item
+    -- todo: move outside the widgets factory this configuration
+    if item == "Wave" then
+        menu.spr = 14
+        menu.hold = true
+    elseif item == "Fx" then
+        menu.spr = 15
+        menu.hold = true
+    elseif item == "Music" then
+        menu.spr = 16
+        menu.hold = true
+    elseif item == "Save" then
+        menu.spr = 17
+    elseif item == "Prev" then
+        menu.spr = 21
+    elseif item == "Next" then
+        menu.spr = 22
     end
+    menu.item = item
+    menu.help = data.customFields.Help
 
-    for f in all(faders) do
-        if f.enabled then
-            draw_fader(f)
-        end
+    table.insert(menuItems, menu)
+    return menu
+end
+
+factory._draw = function(self)
+    for w in all(self.widgets) do
+        w:_draw()
     end
-
-    for b in all(buttons) do
-        if b.enabled then
-            draw_button(b)
-        end
-    end
-
-    for e in all(envelops) do
-        if e.is_over_attack then
-
-        end
-        if e.enabled then
-            draw_envelop(e)
-        end
-    end
-
-    for c in all(checkboxes) do
-        if c.enabled then
-            draw_checkbox(c)
-        end
-    end
-
-    for k in all(knobs) do
-        if k.enabled then
-            draw_knob(k)
-        end
-    end
-
-    draw_tabs()
 end
 
 return factory
