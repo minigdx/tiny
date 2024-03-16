@@ -130,109 +130,6 @@ function inside_widget(w, x, y)
     return w.x <= x and x <= w.x + w.width and w.y <= y and y <= w.y + w.height
 end
 
-factory.createCounter = function(value)
-    local result = new(Counter, value)
-    table.insert(widgets, result)
-    table.insert(counters, result)
-    return result
-end
-
-factory.createTab = function(value)
-    local result = new(Tab, value)
-    table.insert(widgets, result)
-    table.insert(tabs, result)
-    return result
-end
-
-Tab._init = function(self)
-    self.index = #self.parent.tabs
-    self.x = self.parent.x + self.index * 32
-    self.y = self.parent.y
-    self.width = #self.label * 4 + 12
-
-    if self.index > 1 then
-        local prev = self.parent.tabs[self.index - 1]
-        self.x = prev.x + prev.width
-    else
-        self.x = 0
-    end
-end
-
---[[
-    Draw tab header
-]]
-Tab._draw_header = function(self)
-    local offset = self.status * 8
-
-    -- body
-    -- number of body repetition
-    local time = math.floor(self.width / 16)
-    local rest = self.width % 16
-    for i = 0, time - 1 do
-        spr.sdraw(self.x + (i) * 16, 0, 80, offset, 16, 8)
-    end
-
-    spr.sdraw(self.x + (time) * 16, 0, 80, offset, rest, 8)
-
-    -- right
-    spr.sdraw(self.x + self.width, 0, 96, offset, 8, 8)
-
-    local center = self.width * 0.5 - #self.label * 0.5 * 4
-
-    print(self.label, self.x + center, self.y + 2)
-
-    -- left
-    if self.status == 1 then
-        spr.sdraw(self.x - 8, 0, 64, 8, 8, 8)
-    end
-end
-
---[[
-    Draw tab content
-]]
-Tab._draw = function(self)
-
-end
-
-TabManager._init = function(self)
-    self.new_tab = new(Tab, {
-        label = "+"
-    })
-    self.new_tab.parent = self
-    self.new_tab.index = 0
-    self.new_tab:_init()
-end
-
-TabManager._update = function(self)
-
-end
-
-TabManager._draw = function(self)
-    -- draw new tab header
-    self.new_tab:_draw_header()
-
-    -- draw tab headers
-    for i, tab in rpairs(self.tabs) do
-        tab:_draw_header()
-    end
-    -- draw current header
-    if self.active_tab ~= nil then
-        self.active_tab:_draw_header()
-        -- draw current tab content
-        self.active_tab:_draw()
-    end
-end
-
-TabManager.create_tab = function(self, data)
-    local new_tab = new(Tab, data)
-    table.insert(self.tabs, new_tab)
-    new_tab.parent = self
-    new_tab:_init()
-
-    self.new_tab.x = new_tab.x + new_tab.width
-    return new_tab
-end
-
 factory.create_button = function(self, value)
     local result = new(Button, value)
     result.help = result.customFields.Help
@@ -286,14 +183,6 @@ factory.create_envelop = function(self, data)
     result.attack_start_x = result.x
     result.attack_start_y = result.y + result.height
 
-    return result
-end
-
-factory.createCheckbox = function(value)
-    local result = new(Checkbox, value)
-    result.width = 12 + #result.label * 4
-    table.insert(widgets, result)
-    table.insert(checkboxes, result)
     return result
 end
 
@@ -537,6 +426,10 @@ end
 MenuItem._draw = function(self)
     if self.spr ~= nil then
         spr.draw(self.spr + self.status * 128 + self.active * (128 + 32), self.x, self.y)
+    end
+    
+    if self.label ~= nil then
+        print(self.label, self.x + 5, self.y + 2)
     end
 end
 

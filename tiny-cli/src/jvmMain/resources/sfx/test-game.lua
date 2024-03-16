@@ -13,6 +13,10 @@ local mode = {
     fx = {
         id = 2,
         widgets = {}
+    },
+    music = {
+        id = 3,
+        widgets = {}
     }
 }
 
@@ -23,7 +27,7 @@ local button_type = {
     },
     Noise = {
         spr = 61,
-        color = 4,
+        color = 4
     },
     Triangle = {
         spr = 63,
@@ -50,24 +54,28 @@ function switch_to(new_mode)
     -- configure every buttons?
 end
 
+local find_widget = function(widgets, ref)
+    for w in all(widgets) do
+        if w.iid == ref.entityIid then
+            return w
+        end
+    end
+end
+
 function _init()
     widgets:_init()
     help = nil
     menu = {}
 
     local on_click = {
-        Prev = function(self)
-            debug.console("previous")
-        end,
-        Next = function(self)
-            debug.console("next")
-        end,
         Wave = function(self)
             switch_to(mode.score)
         end,
         Fx = function(self)
             switch_to(mode.fx)
-            debug.console("FX")
+        end,
+        Music = function(self)
+            switch_to(mode.music)
         end
     }
 
@@ -88,6 +96,35 @@ function _init()
         table.insert(menu, w)
         w.on_hover = on_menu_item_hover
         w.on_click = on_click[i.customFields.Item]
+        if i.customFields.Item == "Wave" then
+            w.active = 1
+        end
+    end
+
+    local FileSelector = {
+        current_file = 1,
+        files = {},
+        screen = nil
+    }
+    local file_selector = nil
+   
+    for i in all(map.entities["FilesSelector"]) do
+        file_selector = new(FileSelector, i)
+        file_selector.files = ws.list()
+        file_selector.next = find_widget(menu, file_selector.customFields.Next)
+        file_selector.previous = find_widget(menu, file_selector.customFields.Previous)
+        file_selector.screen = find_widget(menu, file_selector.customFields.Screen)
+        file_selector.next.on_click = function(self)
+            file_selector.current_file = math.min(#file_selector.files, file_selector.current_file + 1)
+            file_selector.screen.label = file_selector.files[file_selector.current_file]
+            
+        end
+
+        file_selector.previous.on_click = function(self)
+            file_selector.current_file = math.max(1, file_selector.current_file - 1)
+            file_selector.screen.label = file_selector.files[file_selector.current_file]
+        end
+        file_selector.previous:on_click()
     end
 
     -- preload mode
@@ -113,7 +150,7 @@ function _init()
             knob.on_hover = on_menu_item_hover
             knob.id = k.customFields.Id
             knob.type = k.customFields.Type
-        -- knob.on_value_update
+            -- knob.on_value_update
             table.insert(m.widgets, knob)
         end
 
@@ -121,14 +158,6 @@ function _init()
             local knob = widgets:create_checkbox(k)
             knob.on_hover = on_menu_item_hover
             table.insert(m.widgets, knob)
-        end
-
-        local find_widget = function(widgets, ref)
-            for w in all(widgets) do
-                if w.iid == ref.entityIid then
-                    return w
-                end
-            end
         end
 
         for k in all(map.entities["Envelop"]) do
@@ -169,8 +198,6 @@ function _init()
                 _update = function(self)
                 end,
                 _draw = function(self)
-                    debug.log("v " .. self.vibrato)
-                    debug.log("d " .. self.depth)
                 end
             }
             local knob = new(Vibrato, k)
@@ -199,8 +226,6 @@ function _init()
                 _update = function(self)
                 end,
                 _draw = function(self)
-                    debug.log("s " .. self.sweep)
-                    debug.log("a " .. self.acceleration)
                 end
             }
             local knob = new(Sweep, k)
@@ -263,18 +288,18 @@ function _init()
         for k in all(map.entities["Sound"]) do
             local Sound = {
                 volumes = {},
-                notes = {},
+                notes = {}
             }
             local s = new(Sound, k)
             local selector = find_widget(m.widgets, k.customFields.WaveSelector)
-            for key,v in ipairs(k.customFields.Volumes) do
+            for key, v in ipairs(k.customFields.Volumes) do
                 local f = find_widget(m.widgets, v)
                 f.on_value_update = function(self, value)
                     s.volumes[key] = value
                 end
             end
 
-            for key,v in ipairs(k.customFields.Notes) do
+            for key, v in ipairs(k.customFields.Notes) do
                 local f = find_widget(m.widgets, v)
                 f.on_value_update = function(self, value)
                     s.notes[key] = value

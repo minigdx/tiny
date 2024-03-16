@@ -125,6 +125,38 @@
 					"Help": ""
 				}
 			}
+		],
+		"FilesSelector": [
+			{
+				"id": "FilesSelector",
+				"iid": "34029630-d7b0-11ee-9c45-c74f5e3eabe3",
+				"layer": "Entities",
+				"x": 64,
+				"y": 16,
+				"width": 8,
+				"height": 8,
+				"color": 39387,
+				"customFields": {
+					"Previous": {
+						"entityIid": "fce7b3d0-d7b0-11ee-9c45-9dddf90ef7e1",
+						"layerIid": "8a2f1940-d7b0-11ee-9c45-cd8bc568018a",
+						"levelIid": "d319e5a0-d7b0-11ee-9c45-898e2a016ceb",
+						"worldIid": "d3199781-d7b0-11ee-9c45-11db300be03a"
+					},
+					"Next": {
+						"entityIid": "04f9be10-d7b0-11ee-9c45-5153c382042a",
+						"layerIid": "8a2f1940-d7b0-11ee-9c45-cd8bc568018a",
+						"levelIid": "d319e5a0-d7b0-11ee-9c45-898e2a016ceb",
+						"worldIid": "d3199781-d7b0-11ee-9c45-11db300be03a"
+					},
+					"Screen": {
+						"entityIid": "f0987fa0-d7b0-11ee-9c45-4bfc6d23b807",
+						"layerIid": "8a2f1940-d7b0-11ee-9c45-cd8bc568018a",
+						"levelIid": "d319e5a0-d7b0-11ee-9c45-898e2a016ceb",
+						"worldIid": "d3199781-d7b0-11ee-9c45-11db300be03a"
+					}
+				}
+			}
 		]
 	}
 }
