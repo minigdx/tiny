@@ -6,32 +6,7 @@ import com.github.minigdx.tiny.sound.SoundManager.Companion.SAMPLE_RATE
 /**
  * A pattern is a part of a song. A song is composed of multiple pattern played in a specific order.
  */
-data class Pattern(val index: Int, val notes: List<WaveGenerator>)
 data class Pattern2(val index: Int, val notes: List<SoundGenerator>)
-
-/**
- * A song is a group of pattern.
- */
-data class Song(val bpm: Int, val volume: Float, val patterns: Map<Int, Pattern>, val music: List<Pattern>) {
-
-    val durationOfBeat: Seconds = (60f / bpm / 8f)
-
-    val numberOfBeats = music.count() * 32
-
-    override fun toString(): String {
-        val header = "tiny-sfx ${patterns.size} $bpm ${(volume * 255).toInt()}\n"
-        val patternsInOrder = patterns.map { it }.sortedBy { it.key }.map { it.value }
-        val patternsStr = patternsInOrder.joinToString("\n") { pattern ->
-            pattern.notes.joinToString(" ") { wave ->
-                wave.index.toString(16) +
-                    wave.note.index.toString(16) +
-                    (wave.volume * 255).toInt().toString(16)
-            }
-        }.ifBlank { "\n" }
-        val patternOrder = music.map { it.index }.joinToString(" ")
-        return header + patternsStr + patternOrder
-    }
-}
 
 data class Track(
     val patterns: Map<Int, Pattern2>,
@@ -92,6 +67,15 @@ class Song2(
         }.uppercase()
     }
 
+    private fun Int.toHex(): String {
+        val r = toString(16)
+        return if (r.length == 1) {
+            "0$r"
+        } else {
+            r
+        }.uppercase()
+    }
+
     override fun toString(): String {
         val header = "tiny-sfx $bpm ${(volume * 255).toInt()}\n"
 
@@ -102,10 +86,10 @@ class Song2(
                 "00 00 00 00 00"
             } else {
                 "01 " +
-                    "${track.envelope.attack.toHex()} " +
-                    "${track.envelope.decay.toHex()} " +
-                    "${track.envelope.sustain.toHex()} " +
-                    "${track.envelope.release.toHex()} "
+                        "${track.envelope.attack.toHex()} " +
+                        "${track.envelope.decay.toHex()} " +
+                        "${track.envelope.sustain.toHex()} " +
+                        "${track.envelope.release.toHex()} "
             }
             // TODO: support modulation
             trackHeader += "00 00 00 00 00"
@@ -113,9 +97,9 @@ class Song2(
             val patternsInOrder = track.patterns.map { it }.sortedBy { it.key }.map { it.value }
             val patternsStr = patternsInOrder.joinToString("\n") { pattern ->
                 pattern.notes.joinToString(" ") { wave ->
-                    wave.index.toString(16) +
-                        wave.note.index.toString(16) +
-                        (wave.volume * 255).toInt().toString(16)
+                    wave.index.toHex() +
+                            wave.note.index.toHex() +
+                            wave.volume.toHex()
                 }
             }
 

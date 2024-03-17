@@ -86,7 +86,7 @@ class Sine2(
 ) : SoundGenerator {
 
     override val index: Int = 1
-    override val name: String = "sine"
+    override val name: String = "Sine"
     override val frequency: Float = note.frequency
 
     override fun apply(index: Int): Float {
@@ -102,7 +102,7 @@ class Square2(
 ) : SoundGenerator {
 
     override val index: Int = 2
-    override val name: String = "square"
+    override val name: String = "Square"
     override val frequency: Float = note.frequency
 
     override fun apply(index: Int): Float {
@@ -123,7 +123,7 @@ class Triangle2(
 ) : SoundGenerator {
 
     override val index: Int = 3
-    override val name: String = "triangle"
+    override val name: String = "Triangle"
     override val frequency: Float = note.frequency
 
     override fun apply(index: Int): Float {
@@ -141,7 +141,7 @@ class Pulse2(
 ) : SoundGenerator {
 
     override val index: Int = 5
-    override val name: String = "pulse"
+    override val name: String = "Pulse"
     override val frequency: Float = note.frequency
 
     override fun apply(index: Int): Float {
@@ -163,7 +163,7 @@ class SawTooth2(
 ) : SoundGenerator {
 
     override val index: Int = 6
-    override val name: String = "sawtooth"
+    override val name: String = "Sawtooth"
     override val frequency: Float = note.frequency
 
     override fun apply(index: Int): Float {
@@ -181,7 +181,7 @@ class Silence2(
 ) : SoundGenerator {
 
     override val index: Int = 0
-    override val name: String = "silence"
+    override val name: String = "Silence"
     override val frequency: Float = note.frequency
 
     override fun apply(index: Int): Float = 0f
@@ -195,7 +195,7 @@ class Noise2(
 ) : SoundGenerator {
 
     override val index: Int = 4
-    override val name: String = "noise"
+    override val name: String = "Noise"
     override val frequency: Float = note.frequency
 
     override fun apply(index: Int): Float {

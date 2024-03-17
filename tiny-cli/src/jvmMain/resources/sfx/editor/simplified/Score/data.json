@@ -906,6 +906,18 @@
 						"layerIid": "4a687451-d7b0-11ee-9c45-f9fbfe85abb1",
 						"levelIid": "4a687450-d7b0-11ee-9c45-2f52ca2677e5",
 						"worldIid": "d3199781-d7b0-11ee-9c45-11db300be03a"
+					},
+					"Volume": {
+						"entityIid": "8269eaf0-d7b0-11ee-9c45-f7dd92d8e86a",
+						"layerIid": "4a687451-d7b0-11ee-9c45-f9fbfe85abb1",
+						"levelIid": "4a687450-d7b0-11ee-9c45-2f52ca2677e5",
+						"worldIid": "d3199781-d7b0-11ee-9c45-11db300be03a"
+					},
+					"BPM": {
+						"entityIid": "81bb5b70-d7b0-11ee-9c45-1393fc15fd52",
+						"layerIid": "4a687451-d7b0-11ee-9c45-f9fbfe85abb1",
+						"levelIid": "4a687450-d7b0-11ee-9c45-2f52ca2677e5",
+						"worldIid": "d3199781-d7b0-11ee-9c45-11db300be03a"
 					}
 				}
 			}

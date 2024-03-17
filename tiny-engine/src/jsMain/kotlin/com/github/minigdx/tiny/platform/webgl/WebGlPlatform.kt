@@ -57,8 +57,8 @@ class WebGlPlatform(
         val context = canvas.getContext("webgl2") as? WebGL2RenderingContext
             ?: throw IllegalStateException(
                 "The canvas context is expected to be a webgl2 context. " +
-                        "WebGL2 doesn't seems to be supported by your browser. " +
-                        "Please update to a compatible browser to run the game in WebGL2.",
+                    "WebGL2 doesn't seems to be supported by your browser. " +
+                    "Please update to a compatible browser to run the game in WebGL2.",
             )
         render = GLRender(KglJs(context), logger, gameOptions)
         return render.init(windowManager)

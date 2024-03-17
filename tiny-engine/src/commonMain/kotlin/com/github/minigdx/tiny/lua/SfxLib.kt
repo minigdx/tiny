@@ -18,7 +18,6 @@ import com.github.minigdx.tiny.sound.PulseWave
 import com.github.minigdx.tiny.sound.SawTooth2
 import com.github.minigdx.tiny.sound.SawToothWave
 import com.github.minigdx.tiny.sound.Silence2
-import com.github.minigdx.tiny.sound.SilenceWave
 import com.github.minigdx.tiny.sound.Sine2
 import com.github.minigdx.tiny.sound.SineWave
 import com.github.minigdx.tiny.sound.Song2
@@ -75,6 +74,7 @@ class SfxLib(
         ctrl.set("pulse", pulse())
         ctrl.set("sawtooth", sawtooth())
         ctrl.set("to_table", toTable())
+        ctrl.set("to_score", toScore())
         ctrl.set("empty_score", emptyScore())
         ctrl.set("sfx", sfx())
         arg2.set("sfx", ctrl)
@@ -202,16 +202,89 @@ class SfxLib(
         }
     }
 
-    inner class toTable : OneArgFunction() {
+    inner class toScore : OneArgFunction() {
+        override fun call(arg: LuaValue): LuaValue {
+            val table = arg.checktable() ?: return NIL
+            val bpm = table["bpm"].toint()
+            val beatDuration = (60f / bpm / 8f)
 
-        private fun WaveGenerator.toLuaTable(): LuaTable {
-            val note = LuaTable()
-            note.set("type", this.name)
-            note.set("index", this.index)
-            note.set("note", this.note.index)
-            note.set("volume", (this.volume * 255).toInt())
-            return note
+            val tracksTable = table["tracks"].checktable()!!
+            val tracks = tracksTable.keys().map { key ->
+                val track = tracksTable[key].checktable()!!
+
+                val envelope = track["env"].checktable()!!.toEnv()
+                val mod = track["mod"].checktable()!!.toMod()
+
+                val patternsTable = track["patterns"].checktable()!!
+                val patterns = patternsTable.keys().map { pkey ->
+                    patternsTable[pkey].checktable()!!.toPattern(pkey.toint(), mod, envelope)
+                }.associateBy { it.index }
+
+                val musicTable = track["music"].checktable()!!
+                val music = musicTable.keys().map {
+                    val index = musicTable[it].toint()
+                    patterns[index]!!
+                }
+
+                Track(patterns, music, beatDuration, envelope, mod)
+            }
+            val score = Song2(
+                bpm = bpm,
+                volume = table["volume"].toint() / 255f,
+                tracks = tracks.toTypedArray(),
+            ).toString()
+
+            return valueOf(score)
         }
+
+        fun LuaTable.toWave(mod: Modulation?, env: Envelope) : SoundGenerator {
+            val noteIndex = this["note"].toint()
+            val volume = this["volume"].toint() / 255f
+            return when (this["type"].tojstring()) {
+                "Sine" -> Sine2(Note.fromIndex(noteIndex), mod, env, volume)
+                "Square" -> Square2(Note.fromIndex(noteIndex), mod, env, volume)
+                "Triangle" -> Triangle2(Note.fromIndex(noteIndex), mod, env, volume)
+                "Noise" -> Noise2(Note.fromIndex(noteIndex), mod, env, volume)
+                "Pulse" -> Pulse2(Note.fromIndex(noteIndex), mod, env, volume)
+                "Sawtooth" -> SawTooth2(Note.fromIndex(noteIndex), mod, env, volume)
+                else -> Silence2(Note.C0, null, null, 0f)
+            }
+        }
+
+        fun LuaTable.toEnv(): Envelope {
+            val envelope = Envelope(
+                (this["attack"].todouble().toFloat() / 255f) ,
+                (this["decay"].todouble().toFloat() / 255f) ,
+                this["sustain"].todouble().toFloat() / 255f,
+                (this["release"].todouble().toFloat() / 255f) ,
+            )
+
+            return envelope
+        }
+        fun LuaTable.toPattern(index: Int, mod: Modulation?, env: Envelope): Pattern2 {
+            val notes = this.keys().map { key ->
+                this[key].checktable()!!.toWave(mod, env)
+            }
+            return Pattern2(index, notes)
+        }
+
+        fun LuaTable.toMod(): Modulation? {
+            val mod = when (this["type"].toint()) {
+                1 -> Sweep(
+                    Note.fromIndex(this["a"].toint()).frequency.toInt(),
+                    this["b"].toint() == 1,
+                )
+                2 -> Vibrato(
+                    Note.fromIndex(this["a"].toint()).frequency,
+                    this["b"].toint() / 255f,
+                )
+                else -> null
+            }
+            return mod
+        }
+    }
+
+    inner class toTable : OneArgFunction() {
 
         private fun SoundGenerator.toLuaTable(): LuaTable {
             val note = LuaTable()
@@ -339,22 +412,6 @@ class SfxLib(
 
     companion object {
 
-        fun convertToWave(note: String, duration: Seconds): WaveGenerator {
-            val wave = note.substring(0, 2).toInt(16)
-            val noteIndex = note.substring(2, 4).toInt(16)
-            val volume = note.substring(4, 6).toInt(16) / 255f
-
-            return when (wave) {
-                1 -> SineWave(Note.fromIndex(noteIndex), duration, volume)
-                2 -> SquareWave(Note.fromIndex(noteIndex), duration, volume)
-                3 -> TriangleWave(Note.fromIndex(noteIndex), duration, volume)
-                4 -> NoiseWave(Note.fromIndex(noteIndex), duration, volume)
-                5 -> PulseWave(Note.fromIndex(noteIndex), duration, volume)
-                6 -> SawToothWave(Note.fromIndex(noteIndex), duration, volume)
-                else -> SilenceWave(duration)
-            }
-        }
-
         fun convertToSound(note: String, mod: Modulation?, env: Envelope?): SoundGenerator {
             val wave = note.substring(0, 2).toInt(16)
             val noteIndex = note.substring(2, 4).toInt(16)
@@ -367,7 +424,7 @@ class SfxLib(
                 4 -> Noise2(Note.fromIndex(noteIndex), mod, env, volume)
                 5 -> Pulse2(Note.fromIndex(noteIndex), mod, env, volume)
                 6 -> SawTooth2(Note.fromIndex(noteIndex), mod, env, volume)
-                else -> Silence2(Note.C0, null, null, volume)
+                else -> Silence2(Note.C0, null, null, 0f)
             }
         }
 

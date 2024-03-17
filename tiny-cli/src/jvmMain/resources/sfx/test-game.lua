@@ -20,6 +20,7 @@ local mode = {
     }
 }
 
+
 local button_type = {
     Sine = {
         spr = 60,
@@ -37,6 +38,14 @@ local button_type = {
         spr = 62,
         color = 10
     },
+    Square = {
+        spr = 62,
+        color = 11
+    },
+    Silence = {
+        spr = 62,
+        color = 2
+    },
     Play = {
         spr = 31
     },
@@ -47,11 +56,29 @@ local button_type = {
         spr = 32 * 5 + 29
     }
 }
+
+
+mode.score.configure = function(self, content)
+    local content = self.file_selector:current()
+    --
+    -- TODO: allow to select another pattern
+    for index, note in ipairs(content.tracks[1].patterns[1]) do
+        self.sound.notes[index].value = note.note / 108
+        self.sound.notes[index].tip_color = button_type[note.type].color 
+        self.sound.volumes[index].value = note.volume / 255
+    end
+
+    self.sound.bpm.value = content.bpm / 255
+    self.sound.volume.value = content.volume / 255
+end
+
 local current_mode = mode.score
 
 function switch_to(new_mode)
     current_mode = new_mode
-    -- configure every buttons?
+    if current_mode.configure ~= nil then
+        current_mode:configure()
+    end
 end
 
 local find_widget = function(widgets, ref)
@@ -103,32 +130,63 @@ function _init()
 
     local FileSelector = {
         current_file = 1,
-        files = {},
-        screen = nil
+        files = {}, -- item -> {file, content}
+        screen = nil,
+        current = function(self)
+            return self.files[self.current_file].content
+        end,
+        currentName = function(self)
+            return self.files[self.current_file].file
+        end
     }
     local file_selector = nil
-   
+
     for i in all(map.entities["FilesSelector"]) do
         file_selector = new(FileSelector, i)
-        file_selector.files = ws.list()
+        local files = ws.list()
+        if #files == 0 then
+            local new_file = ws.create("sfx", "sfx")
+            table.insert(file_selector.files, {
+                file = new_file,
+                content = sfx.to_table(sfx.empty_score())
+            })
+        else
+            for f in all(files) do
+                table.insert(file_selector.files, {
+                    file = f,
+                    content = sfx.to_table(ws.load(f))
+                })
+            end
+        end
         file_selector.next = find_widget(menu, file_selector.customFields.Next)
         file_selector.previous = find_widget(menu, file_selector.customFields.Previous)
         file_selector.screen = find_widget(menu, file_selector.customFields.Screen)
+        file_selector.save = find_widget(menu, file_selector.customFields.Save)
+
         file_selector.next.on_click = function(self)
             file_selector.current_file = math.min(#file_selector.files, file_selector.current_file + 1)
-            file_selector.screen.label = file_selector.files[file_selector.current_file]
-            
+            file_selector.screen.label = file_selector.files[file_selector.current_file].file
+
         end
 
         file_selector.previous.on_click = function(self)
             file_selector.current_file = math.max(1, file_selector.current_file - 1)
-            file_selector.screen.label = file_selector.files[file_selector.current_file]
+            file_selector.screen.label = file_selector.files[file_selector.current_file].file
+        end
+
+        file_selector.save.on_click = function(self)
+            debug.console("saving file...")
+            local score = sfx.to_score(file_selector:current())
+            ws.save(file_selector:currentName(), score)
+            debug.console("savedfile!") --
         end
         file_selector.previous:on_click()
     end
 
     -- preload mode
     for name, m in pairs(mode) do
+        m.file_selector = file_selector
+
         debug.console("preload screen " .. name)
         map.level(m.id)
         for k in all(map.entities["Knob"]) do
@@ -142,6 +200,7 @@ function _init()
             knob.on_hover = on_menu_item_hover
             knob.overlay = button_type[k.customFields.Type].spr
             knob.type = k.customFields.Type
+
             table.insert(m.widgets, knob)
         end
 
@@ -269,6 +328,7 @@ function _init()
             local e = find_widget(m.widgets, knob.customFields.Sine)
             table.insert(knob.selector, e)
             e.on_changed = on_changed
+            e:on_changed() -- default selection
 
             e = find_widget(m.widgets, knob.customFields.Triangle)
             table.insert(knob.selector, e)
@@ -288,25 +348,46 @@ function _init()
         for k in all(map.entities["Sound"]) do
             local Sound = {
                 volumes = {},
-                notes = {}
+                notes = {},
+                _draw = function(self)
+                end,
+                _update = function(self)
+                end
             }
             local s = new(Sound, k)
             local selector = find_widget(m.widgets, k.customFields.WaveSelector)
             for key, v in ipairs(k.customFields.Volumes) do
                 local f = find_widget(m.widgets, v)
+                s.volumes[key] = f
                 f.on_value_update = function(self, value)
-                    s.volumes[key] = value
+                    local content = file_selector:current()
+                    content.tracks[1].patterns[1][key].volume = value * 255
                 end
             end
-
+            
             for key, v in ipairs(k.customFields.Notes) do
                 local f = find_widget(m.widgets, v)
+                s.notes[key] = f
                 f.on_value_update = function(self, value)
-                    s.notes[key] = value
                     self.tip_color = button_type[selector.selected].color
-                    debug.console(self.tip_color)
+                    local content = file_selector:current()
+                    content.tracks[1].patterns[1][key].type = selector.selected
+                    content.tracks[1].patterns[1][key].index = selector.selectedIndex
+                    content.tracks[1].patterns[1][key].note = value * 108 -- 108 = number of total notes
                 end
             end
+            s.bpm = find_widget(m.widgets, k.customFields.BPM)
+            s.bpm.on_update = function(self)
+                local content = file_selector:current()
+                -- TODO: update here
+                content.bpm = self.value * 255
+            end
+            s.volume = find_widget(m.widgets, k.customFields.Volume)
+            s.volume.on_update = function(self)
+                local content = file_selector:current()
+                content.volume = self.value * 255
+            end
+            m.sound = s
         end
     end
 

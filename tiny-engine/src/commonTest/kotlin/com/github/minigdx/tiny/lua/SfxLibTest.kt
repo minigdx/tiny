@@ -10,8 +10,6 @@ import com.github.minigdx.tiny.resources.GameScript
 import com.github.minigdx.tiny.resources.ResourceType
 import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.resources.SpriteSheet
-import com.github.minigdx.tiny.sound.SilenceWave
-import com.github.minigdx.tiny.sound.SineWave
 import com.github.minigdx.tiny.sound.Song2
 import com.github.minigdx.tiny.sound.WaveGenerator
 import kotlin.test.Test
@@ -32,7 +30,11 @@ class SfxLibTest {
         )
         override val frameBuffer: FrameBuffer = FrameBuffer(10, 10, ColorPalette(emptyList()))
         override fun spritesheet(index: Int): SpriteSheet? = null
+        override fun spritesheet(name: String): Int? = null
+
         override fun spritesheet(sheet: SpriteSheet) = Unit
+        override fun newSpritesheetIndex(): Int = 0
+
         override fun level(index: Int): GameLevel? = null
         override fun sound(index: Int): Sound? = null
         override fun script(name: String): GameScript? = null
@@ -65,26 +67,27 @@ class SfxLibTest {
     }
 
     @Test
-    fun convertToNote() {
-        val wave = SfxLib.convertToWave("0101FF", 0.1f)
-        assertTrue(wave::class == SineWave::class)
-        assertEquals(Note.C0, wave.note)
-    }
-
-    @Test
-    fun convertToNoteWithSilence() {
-        val wave = SfxLib.convertToWave("FFFFFF", 0.1f)
-        assertTrue(wave::class == SilenceWave::class)
-        assertTrue(wave.isSilence)
-        assertEquals(0.1f, wave.duration)
-    }
-
-    @Test
     fun toTable() {
         val lib = SfxLib(mockResources, false)
         val table = lib.toTable().call(lib.emptyScore().call())
         val r = table["tracks"][1]["patterns"][1].checktable()!!.keys()
         assertTrue(r.isEmpty())
+    }
+
+    @Test
+    fun toScore() {
+        val lib = SfxLib(mockResources, false)
+        val score = lib.toScore().call(lib.toTable().call(lib.emptyScore().call()))
+        val expectedScore = """tiny-sfx 120 127
+            |1 01 19 00 FF 19 00 00 00 00 00
+    |
+    |1
+    |0 01 19 00 FF 19 00 00 00 00 00
+    |0 01 19 00 FF 19 00 00 00 00 00
+    |0 01 19 00 FF 19 00 00 00 00 00
+        """.trimMargin()
+
+        assertEquals(expectedScore, score.tojstring())
     }
 
     @Test

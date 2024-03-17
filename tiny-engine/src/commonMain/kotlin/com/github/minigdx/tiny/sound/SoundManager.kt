@@ -78,20 +78,6 @@ abstract class SoundManager {
         playBuffer(mix, numberOfSamples)
     }
 
-    private val converter = SoundConverter()
-
-    fun createBufferFromSong(song: Song): SoundBuffer {
-        val numberOfSamplesPerBeat = (song.durationOfBeat * SAMPLE_RATE).toInt()
-
-        val result = converter.createStrip(
-            song.volume,
-            numberOfSamplesPerBeat,
-            song.music.flatMap { p -> p.notes }.toTypedArray(),
-        )
-
-        return result
-    }
-
     fun createBufferFromSong(song: Song2): SoundBuffer {
         val numberOfSample = song.numberOfTotalSample
 

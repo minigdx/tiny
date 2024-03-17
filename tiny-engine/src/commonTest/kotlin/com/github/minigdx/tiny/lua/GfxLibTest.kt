@@ -19,7 +19,10 @@ class GfxLibTest {
         override val bootSpritesheet: SpriteSheet? = null
         override val frameBuffer: FrameBuffer = FrameBuffer(10, 10, ColorPalette(listOf("#FFFFFF")))
         override fun spritesheet(index: Int): SpriteSheet? = null
+        override fun spritesheet(name: String): Int? = null
         override fun spritesheet(sheet: SpriteSheet) = Unit
+        override fun newSpritesheetIndex(): Int = 0
+
         override fun level(index: Int): GameLevel? = null
         override fun sound(index: Int): Sound? = null
         override fun script(name: String): GameScript? = null

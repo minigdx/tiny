@@ -218,11 +218,14 @@ Knob._update = function(self)
 
     -- the click started in the widget?
     if touching ~= nil and inside_widget(self, touching.x, touching.y) then
+        if self.start_value == nil then
+            self.start_value = self.value
+        end
         local touch = ctrl.touch()
 
         local dst = self.y + 4 - touch.y
-        local percent = math.max(math.min(1, dst / 32), 0)
-        self.value = percent
+        local percent = math.max(math.min(1, dst / 32), -1)
+        self.value = math.min(math.max(0, self.start_value + percent), 1)
         if self.on_update ~= nil then
             self:on_update(self.value)
         end
@@ -233,6 +236,10 @@ Knob._update = function(self)
         if self.on_hover ~= nil then
             self:on_hover()
         end
+    end
+
+    if touching == nil then
+        self.start_value = nil
     end
 end
 
