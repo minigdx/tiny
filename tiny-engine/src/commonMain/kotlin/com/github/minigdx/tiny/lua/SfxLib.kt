@@ -237,7 +237,7 @@ class SfxLib(
             return valueOf(score)
         }
 
-        fun LuaTable.toWave(mod: Modulation?, env: Envelope) : SoundGenerator {
+        fun LuaTable.toWave(mod: Modulation?, env: Envelope): SoundGenerator {
             val noteIndex = this["note"].toint()
             val volume = this["volume"].toint() / 255f
             return when (this["type"].tojstring()) {
@@ -253,14 +253,15 @@ class SfxLib(
 
         fun LuaTable.toEnv(): Envelope {
             val envelope = Envelope(
-                (this["attack"].todouble().toFloat() / 255f) ,
-                (this["decay"].todouble().toFloat() / 255f) ,
+                (this["attack"].todouble().toFloat() / 255f),
+                (this["decay"].todouble().toFloat() / 255f),
                 this["sustain"].todouble().toFloat() / 255f,
-                (this["release"].todouble().toFloat() / 255f) ,
+                (this["release"].todouble().toFloat() / 255f),
             )
 
             return envelope
         }
+
         fun LuaTable.toPattern(index: Int, mod: Modulation?, env: Envelope): Pattern2 {
             val notes = this.keys().map { key ->
                 this[key].checktable()!!.toWave(mod, env)
@@ -274,10 +275,12 @@ class SfxLib(
                     Note.fromIndex(this["a"].toint()).frequency.toInt(),
                     this["b"].toint() == 1,
                 )
+
                 2 -> Vibrato(
                     Note.fromIndex(this["a"].toint()).frequency,
                     this["b"].toint() / 255f,
                 )
+
                 else -> null
             }
             return mod
@@ -468,14 +471,22 @@ class SfxLib(
                 val (env, envA, envB, envC, envD) = configuration.drop(1)
                 val (mod, modA, modB, _, _) = configuration.drop(6)
 
-                val modulation = if (mod > 0) {
-                    if (mod == 1) {
-                        Sweep(Note.fromIndex(1 + modA * Note.B8.index / 255).frequency.toInt(), modB / 255f > 0.5f)
-                    } else {
-                        Vibrato(Note.fromIndex(1 + modA * Note.B8.index / 255).frequency, modB / 255f)
+                val modulation = when (mod) {
+                    1 -> {
+                        Sweep(
+                            sweep = Note.fromIndex(modA).frequency.toInt(),
+                            acceleration = modB / 255f > 0.5f,
+                        )
                     }
-                } else {
-                    null
+
+                    2 -> {
+                        Vibrato(
+                            vibratoFrequency = Note.fromIndex(modA).frequency,
+                            depth = modB / 255f,
+                        )
+                    }
+
+                    else -> null
                 }
 
                 val envelope = if (env > 0) {

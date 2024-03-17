@@ -348,7 +348,7 @@ Checkbox._update = function(self)
         }
         if inside_widget(w, pos.x, pos.y) then
             self.value = not self.value
-            if self.on_change then
+            if self.on_changed then
                 self:on_changed(self.value)
             end
         end

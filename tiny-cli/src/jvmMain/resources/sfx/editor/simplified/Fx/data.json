@@ -186,7 +186,7 @@
 				"height": 8,
 				"color": 14120515,
 				"customFields": {
-					"Label": "Acceleration",
+					"Label": "Sweep",
 					"Help": "Speed of the sweep"
 				}
 			},
@@ -214,7 +214,7 @@
 				"height": 8,
 				"color": 14120515,
 				"customFields": {
-					"Label": null,
+					"Label": "Acceleration",
 					"Help": null
 				}
 			}
@@ -296,6 +296,44 @@
 					},
 					"Depth": {
 						"entityIid": "02a5cc60-d7b0-11ee-9c45-2734f6647c99",
+						"layerIid": "ec22d820-d7b0-11ee-9c45-8bfde102ddf7",
+						"levelIid": "ec22b110-d7b0-11ee-9c45-ab95af96fe31",
+						"worldIid": "d3199781-d7b0-11ee-9c45-11db300be03a"
+					}
+				}
+			}
+		],
+		"Fx": [
+			{
+				"id": "Fx",
+				"iid": "bf5e2790-d7b0-11ee-9c45-bde55a100c82",
+				"layer": "Entities",
+				"x": 152,
+				"y": 88,
+				"width": 16,
+				"height": 16,
+				"color": 2943221,
+				"customFields": {
+					"Envelope": {
+						"entityIid": "23d6cd90-d7b0-11ee-9c45-ad1ff16e75a4",
+						"layerIid": "ec22d820-d7b0-11ee-9c45-8bfde102ddf7",
+						"levelIid": "ec22b110-d7b0-11ee-9c45-ab95af96fe31",
+						"worldIid": "d3199781-d7b0-11ee-9c45-11db300be03a"
+					},
+					"Vibrato": {
+						"entityIid": "b53b2880-d7b0-11ee-9c45-1305f3f9e32a",
+						"layerIid": "ec22d820-d7b0-11ee-9c45-8bfde102ddf7",
+						"levelIid": "ec22b110-d7b0-11ee-9c45-ab95af96fe31",
+						"worldIid": "d3199781-d7b0-11ee-9c45-11db300be03a"
+					},
+					"Sweep": {
+						"entityIid": "b121cfb0-d7b0-11ee-9c45-873cbd53dbe4",
+						"layerIid": "ec22d820-d7b0-11ee-9c45-8bfde102ddf7",
+						"levelIid": "ec22b110-d7b0-11ee-9c45-ab95af96fe31",
+						"worldIid": "d3199781-d7b0-11ee-9c45-11db300be03a"
+					},
+					"TiledNotes": {
+						"entityIid": "e7cbddd0-d7b0-11ee-9c45-253ec4365407",
 						"layerIid": "ec22d820-d7b0-11ee-9c45-8bfde102ddf7",
 						"levelIid": "ec22b110-d7b0-11ee-9c45-ab95af96fe31",
 						"worldIid": "d3199781-d7b0-11ee-9c45-11db300be03a"

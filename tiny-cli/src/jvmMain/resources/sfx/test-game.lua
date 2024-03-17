@@ -57,19 +57,40 @@ local button_type = {
     }
 }
 
-
+-- from a content, set the correct values in the score pannel
 mode.score.configure = function(self, content)
     local content = self.file_selector:current()
-    --
-    -- TODO: allow to select another pattern
+    
     for index, note in ipairs(content.tracks[1].patterns[1]) do
         self.sound.notes[index].value = note.note / 108
         self.sound.notes[index].tip_color = button_type[note.type].color 
         self.sound.volumes[index].value = note.volume / 255
     end
-
+    
     self.sound.bpm.value = content.bpm / 255
     self.sound.volume.value = content.volume / 255
+end
+
+-- from a content, set the correct values in the fx pannel
+mode.fx.configure = function(self, content)
+    local content = self.file_selector:current()
+
+    local mod = content.tracks[1].mod
+    if mod.type == 1 then
+        self.fx.sweep.checkbox.value = true
+        self.fx.sweep.enabled = true
+        self.fx.sweep.sweep = mod.a / 108
+        self.fx.sweep.acceleration = mod.b / 255
+        self.fx.sweep.knob_sweep.value = self.fx.sweep.sweep
+        self.fx.sweep.knob_acceleration.value = self.fx.sweep.acceleration
+    elseif mod.type == 2 then
+        self.fx.vibrato.checkbox.value = true
+        self.fx.vibrato.enabled = true
+        self.fx.vibrato.vibrato = mod.a / 108
+        self.fx.vibrato.depth = mod.b / 255
+        self.fx.vibrato.knob_vibrato.value = self.fx.vibrato.vibrato
+        self.fx.vibrato.knob_depth.value = self.fx.vibrato.depth
+    end
 end
 
 local current_mode = mode.score
@@ -176,6 +197,7 @@ function _init()
 
         file_selector.save.on_click = function(self)
             debug.console("saving file...")
+            debug.console(file_selector:current())
             local score = sfx.to_score(file_selector:current())
             ws.save(file_selector:currentName(), score)
             debug.console("savedfile!") --
@@ -257,6 +279,16 @@ function _init()
                 _update = function(self)
                 end,
                 _draw = function(self)
+                end,
+                switch = function(self, active)
+                    self.enabled = active
+                    self.checkbox.value = active
+                    if active then
+                        local content = file_selector:current()
+                        content.tracks[1].mod.type = 2
+                        content.tracks[1].mod.a = self.vibrato * 108
+                        content.tracks[1].mod.b = self.depth * 255
+                    end
                 end
             }
             local knob = new(Vibrato, k)
@@ -264,14 +296,21 @@ function _init()
             e.on_changed = function(self, value)
                 knob.enabled = value
             end
+            knob.checkbox = e
 
             local v = find_widget(m.widgets, knob.customFields.Vibrato)
+            knob.knob_vibrato = v
             v.on_update = function(self, value)
                 knob.vibrato = value
+                local content = file_selector:current()
+                content.tracks[1].mod.a = knob.vibrato * 108
             end
             local d = find_widget(m.widgets, knob.customFields.Depth)
+            knob.knob_depth = d
             d.on_update = function(self, value)
                 knob.depth = value
+                local content = file_selector:current()
+                content.tracks[1].mod.b = knob.depth * 255
             end
 
             table.insert(m.widgets, knob)
@@ -285,21 +324,39 @@ function _init()
                 _update = function(self)
                 end,
                 _draw = function(self)
+                end,
+
+                switch = function(self, active)
+                    self.enabled = active
+                    self.checkbox.value = active
+                    if active then
+                        local content = file_selector:current()
+                        content.tracks[1].mod.type = 1
+                        content.tracks[1].mod.a = self.sweep * 108
+                        content.tracks[1].mod.b = self.acceleration * 255
+                    end
                 end
             }
             local knob = new(Sweep, k)
             local e = find_widget(m.widgets, knob.customFields.Enabled)
+            knob.checkbox = e
             e.on_changed = function(self, value)
                 knob.enabled = value
             end
-
+            
             local v = find_widget(m.widgets, knob.customFields.Sweep)
+            knob.knob_sweep = v
             v.on_update = function(self, value)
                 knob.sweep = value
+                local content = file_selector:current()
+                content.tracks[1].mod.a = knob.sweep * 108
             end
             local d = find_widget(m.widgets, knob.customFields.Acceleration)
+            knob.knob_acceleration = d
             d.on_update = function(self, value)
                 knob.acceleration = value
+                local content = file_selector:current()
+                content.tracks[1].mod.b = knob.acceleration * 255
             end
 
             table.insert(m.widgets, knob)
@@ -317,8 +374,6 @@ function _init()
             local knob = new(WaveSelector, k)
             local on_changed = function(self)
                 knob.selected = self.type
-                debug.console("selected?")
-                debug.console(knob.selected)
                 for b in all(knob.selector) do
                     b.status = 0
                 end
@@ -388,6 +443,31 @@ function _init()
                 content.volume = self.value * 255
             end
             m.sound = s
+        end
+
+        for k in all(map.entities["Fx"]) do
+            local Fx = {
+                envelope = nil,
+                sweep = nil,
+                vibrato = nil,
+                tied_notes = nil
+            }
+
+            local fx = new(Fx, k)
+            fx.envelope = find_widget(m.widgets, k.customFields.Envelope)
+            fx.sweep = find_widget(m.widgets, k.customFields.Sweep)
+            fx.vibrato = find_widget(m.widgets, k.customFields.Vibrato)
+
+            fx.sweep.checkbox.on_changed = function(self)
+                fx.sweep:switch(self.value)
+                fx.vibrato:switch(not self.value)
+            end
+            fx.vibrato.checkbox.on_changed = function(self)
+                fx.sweep:switch(not self.value)
+                fx.vibrato:switch(self.value)
+            end
+            fx.tied_notes = find_widget(m.widgets, k.customFields.Envelope)
+            m.fx = fx
         end
     end
 

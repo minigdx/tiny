@@ -1,6 +1,7 @@
 package com.github.minigdx.tiny.sound
 
 import com.github.minigdx.tiny.Seconds
+import com.github.minigdx.tiny.lua.Note
 import com.github.minigdx.tiny.sound.SoundManager.Companion.SAMPLE_RATE
 
 /**
@@ -76,6 +77,10 @@ class Song2(
         }.uppercase()
     }
 
+    private fun Boolean.toHex(): String {
+        return if (this) 255.toHex() else 0.toHex()
+    }
+
     override fun toString(): String {
         val header = "tiny-sfx $bpm ${(volume * 255).toInt()}\n"
 
@@ -86,20 +91,24 @@ class Song2(
                 "00 00 00 00 00"
             } else {
                 "01 " +
-                        "${track.envelope.attack.toHex()} " +
-                        "${track.envelope.decay.toHex()} " +
-                        "${track.envelope.sustain.toHex()} " +
-                        "${track.envelope.release.toHex()} "
+                    "${track.envelope.attack.toHex()} " +
+                    "${track.envelope.decay.toHex()} " +
+                    "${track.envelope.sustain.toHex()} " +
+                    "${track.envelope.release.toHex()} "
             }
-            // TODO: support modulation
-            trackHeader += "00 00 00 00 00"
+
+            trackHeader += when (track.modulation) {
+                is Sweep -> "01 ${Note.fromFrequency(track.modulation.sweep).index.toHex()} ${track.modulation.acceleration.toHex()} 00 00"
+                is Vibrato -> "02 ${Note.fromFrequency(track.modulation.vibratoFrequency).index.toHex()} ${track.modulation.depth.toHex()} 00 00"
+                else -> "00 00 00 00 00"
+            }
 
             val patternsInOrder = track.patterns.map { it }.sortedBy { it.key }.map { it.value }
             val patternsStr = patternsInOrder.joinToString("\n") { pattern ->
                 pattern.notes.joinToString(" ") { wave ->
                     wave.index.toHex() +
-                            wave.note.index.toHex() +
-                            wave.volume.toHex()
+                        wave.note.index.toHex() +
+                        wave.volume.toHex()
                 }
             }
 
