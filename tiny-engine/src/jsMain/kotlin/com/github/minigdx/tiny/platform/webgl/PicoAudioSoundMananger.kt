@@ -56,7 +56,7 @@ class PicoAudioSoundMananger : SoundManager() {
 
     override suspend fun createSfxSound(bytes: ByteArray): Sound {
         val score = bytes.decodeToString()
-        val song = SfxLib.convertScoreToSong(score)
+        val song = SfxLib.convertScoreToSong2(score)
         val (buf, length) = createBufferFromSong(song)
         val buffer = convertBuffer(buf, length)
         return SfxSound(buffer, this)
@@ -68,14 +68,14 @@ class PicoAudioSoundMananger : SoundManager() {
         return PicoAudioSound(audio, smf)
     }
 
-    override fun playBuffer(buffer: FloatArray, numberOfSamples: Int) {
+    override fun playBuffer(buffer: FloatArray, numberOfSamples: Long) {
         val result = convertBuffer(buffer, numberOfSamples)
         playSfxBuffer(result)
     }
 
-    private fun convertBuffer(buffer: FloatArray, length: Int): Float32Array {
-        val result = Float32Array(length)
-        (0 until length).forEach { index ->
+    private fun convertBuffer(buffer: FloatArray, length: Long): Float32Array {
+        val result = Float32Array(length.toInt())
+        (0 until length.toInt()).forEach { index ->
             val byte = buffer[index]
             result[index] = byte
         }

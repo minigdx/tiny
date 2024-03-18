@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="tiny-engine-jvm-1.0-SNAPSHOT">
-    <output-path>$PROJECT_DIR$/tiny-engine/build/libs</output-path>
-    <root id="archive" name="tiny-engine-jvm-1.0-SNAPSHOT.jar">
-      <element id="module-output" name="tiny.tiny-engine.jvmMain" />
-    </root>
-  </artifact>
-</component>

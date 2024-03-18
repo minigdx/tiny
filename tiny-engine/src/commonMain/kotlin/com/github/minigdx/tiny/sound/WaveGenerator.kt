@@ -14,7 +14,10 @@ sealed class WaveGenerator(
     val volume: Percent,
 ) {
 
-    val period = SAMPLE_RATE.toFloat() / note.frequency
+    var frequency: Float = note.frequency
+
+    val period: Float
+        get() = SAMPLE_RATE.toFloat() / frequency
 
     val numberOfSample = SAMPLE_RATE * duration
 
@@ -59,7 +62,7 @@ class SineWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGene
 
     override fun copy(duration: Seconds, volume: Percent): WaveGenerator = SineWave(note, duration, volume)
 
-    override val name: String = "sine"
+    override val name: String = "Sine"
 
     override val index: Int = 1
 }
@@ -76,7 +79,7 @@ class SquareWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGe
 
     override fun copy(duration: Seconds, volume: Percent): WaveGenerator = SquareWave(note, duration, volume)
 
-    override val name: String = "square"
+    override val name: String = "Square"
 
     override val index: Int = 2
 }
@@ -90,7 +93,7 @@ class TriangleWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : Wave
 
     override fun copy(duration: Seconds, volume: Percent): WaveGenerator = TriangleWave(note, duration, volume)
 
-    override val name: String = "triangle"
+    override val name: String = "Triangle"
 
     override val index: Int = 3
 }
@@ -107,7 +110,7 @@ class NoiseWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGen
 
     override fun copy(duration: Seconds, volume: Percent): WaveGenerator = NoiseWave(note, duration, volume)
 
-    override val name: String = "noise"
+    override val name: String = "Noise"
 
     override val index: Int = 4
 }
@@ -125,7 +128,7 @@ class PulseWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : WaveGen
 
     override fun copy(duration: Seconds, volume: Percent): WaveGenerator = PulseWave(note, duration, volume)
 
-    override val name: String = "pulse"
+    override val name: String = "Pulse"
 
     override val index: Int = 5
 }
@@ -139,12 +142,12 @@ class SawToothWave(note: Note, duration: Seconds, volume: Percent = 1.0f) : Wave
 
     override fun copy(duration: Seconds, volume: Percent): WaveGenerator = SawToothWave(note, duration, volume)
 
-    override val name: String = "sawtooth"
+    override val name: String = "Sawtooth"
 
     override val index: Int = 6
 }
 
-class SilenceWave(duration: Seconds) : WaveGenerator(Note.C0, duration, 1.0f) {
+class SilenceWave(duration: Seconds) : WaveGenerator(Note.C0, duration, 0.0f) {
 
     override val isSilence: Boolean = true
     override fun generate(sample: Int): Float {
@@ -153,7 +156,7 @@ class SilenceWave(duration: Seconds) : WaveGenerator(Note.C0, duration, 1.0f) {
 
     override fun copy(duration: Seconds, volume: Percent): WaveGenerator = SilenceWave(duration)
 
-    override val name: String = " "
+    override val name: String = "Silence"
 
     override val index: Int = 0
 }

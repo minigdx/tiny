@@ -46,7 +46,12 @@ class StdLib(
         @TinyCall("Create new instance of class using default values.")
         override fun call(@TinyArg("class") arg1: LuaValue, @TinyArg("default") arg2: LuaValue): LuaValue {
             val default = if (arg2.istable()) {
-                arg2.checktable()!!
+                val result = LuaTable()
+                val toCopy = arg2.checktable()!!
+                toCopy.keys().forEach { key ->
+                    result.set(key, toCopy.get(key))
+                }
+                result
             } else {
                 LuaTable()
             }

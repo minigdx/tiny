@@ -6,8 +6,7 @@ local Fader = {
     enabled = true,
     min_value = 0,
     max_value = 10,
-    value = nil,
-    values = nil,
+    value = 0,
     tip_color = 9,
     disabled_color = 7,
     label = "",
@@ -16,11 +15,6 @@ local Fader = {
     index = 0,
     on_value_update = function(fader, value)
     end
-}
-
-local FaderValue = {
-    value = 0,
-    color = 0
 }
 
 local Button = {
@@ -45,7 +39,19 @@ local Tab = {
     label = "+",
     content = nil,
     status = 0, -- 0 : inactive ; 1 : active
-    new_tab = false
+    new_tab = false,
+    on_active_tab = nil,
+    on_new_tab = nil
+}
+
+local TabManager = {
+    x = 0,
+    y = 0,
+    width = 0,
+    height = 0,
+    on_new_tab = nil,
+    tabs = {},
+    active_tab = nil
 }
 
 local Counter = {
@@ -64,290 +70,408 @@ local Counter = {
     spr = 32
 }
 
+local Envelop = {
+    label = "",
+    value = 0,
+    x = 0,
+    y = 0,
+    width = 128,
+    height = 64,
+    enabled = true,
+    attack = 0,
+    decay = 0.2,
+    sustain = 0.5,
+    release = 0,
+
+    attack_end_x = 0,
+    attack_end_y = 0,
+    decay_end_x = 0,
+    decay_end_y = 0,
+    release_start_x = 0,
+    release_start_y = 0
+}
+
+local Checkbox = {
+    label = "",
+    value = false,
+    x = 0,
+    y = 0,
+    width = 8,
+    height = 8,
+    enabled = true
+}
+
+local Knob = {
+    label = "",
+    value = 0,
+    x = 0,
+    y = 0,
+    width = 16,
+    height = 16,
+    enabled = true,
+    on_update = nil
+}
+
 local buttons = {}
 local tabs = {}
 local faders = {}
 local widgets = {}
 local counters = {}
+local envelops = {}
+local checkboxes = {}
+local knobs = {}
 
-local factory = {}
-
-factory.createCounter = function(value)
-    local result = new(Counter, value)
-    table.insert(widgets, result)
-    table.insert(counters, result)
-    return result
-end
-
-factory.createTab = function(value)
-    local result = new(Tab, value)
-    table.insert(widgets, result)
-    table.insert(tabs, result)
-    return result
-end
-
-factory.createButton = function(value)
-    local result = new(Button, value)
-    table.insert(widgets, result)
-    table.insert(buttons, result)
-    return result
-end
-
-factory.setFaderValue = function(fader, index, value, color)
-    if fader.values == nil then
-        fader.values = {}
-    end
-
-    if value <= 0 then
-        fader.values[index] = nil
-    else
-        fader.values[index] = {
-            value = value,
-            color = color
-        }
-    end
-end
-
-factory.resetFaderValue = function(fader)
-    fader.values = {}
-end
-
-factory.createFader = function(value)
-    local result = new(Fader, value)
-    table.insert(widgets, result)
-    table.insert(faders, result)
-
-    result.index = #faders
-
-    return result
-end
+local factory = {
+    tabs = {},
+    widgets = {}
+}
 
 function inside_widget(w, x, y)
     return w.x <= x and x <= w.x + w.width and w.y <= y and y <= w.y + w.height
 end
 
-factory.on_update = function(x, y)
-    for f in all(buttons) do
-        if f.status == 1 then
-            f.status = 0
-        end
+factory.create_button = function(self, value)
+    local result = new(Button, value)
+    result.help = result.customFields.Help
+    return result
+end
 
-        if f.status == 0 and inside_widget(f, x, y) then
-            f.status = 1
-        end
+Button._update = function(self)
+    if self.status == 2 then
+        return
     end
 
-    for c in all(counters) do
-        -- inside the widgets
-        local left = {
-            width = 8,
-            height = 8,
-            x = c.x,
-            y = c.y + 8
-        }
-
-        local right = {
-            width = 8,
-            height = 8,
-            x = c.x + 8,
-            y = c.y + 8
-        }
-        if inside_widget(left, x, y) then
-            c.status = 1
-        elseif inside_widget(right, x, y) then
-            c.status = 2
-        else
-            c.status = 0
+    local pos = ctrl.touch()
+    
+    if inside_widget(self, pos.x, pos.y) then
+        self.status = 1
+        if self.on_hover ~= nil then
+            self:on_hover()
         end
+        local touched = ctrl.touched(0)
+        if touched and self.on_changed ~= nil then
+            self:on_changed()
+        end
+    else
+        self.status = 0
+    end
+
+end
+
+Button._draw = function(self)
+    local background = 0
+    if self.status > 0 then
+        background = 1
+    end
+
+    spr.draw(28 + background, self.x, self.y)
+
+    if self.overlay ~= nil then
+        spr.draw(self.overlay, self.x, self.y)
     end
 end
 
-factory.on_click = function(x, y)
-    -- on click faders
-    for f in all(faders) do
-        local box = {
-            x = f.x,
-            y = f.y,
-            width = f.width,
-            height = f.height + 12
-        }
-        if f.enabled and inside_widget(box, x, y) then
-            local percent = math.max(0.0, 1.0 - ((y - f.y) / f.height))
-            local value = percent * (f.max_value - f.min_value) + f.min_value
-            f.on_value_update(f, value)
+factory.create_fader = function(self, value)
+    local result = new(Fader, value)
+    result.help = result.customFields.Help
+    result.label = result.customFields.Label
+    return result
+end
+
+factory.create_envelop = function(self, data)
+    local result = new(Envelop, data)
+    result.attack_start_x = result.x
+    result.attack_start_y = result.y + result.height
+
+    return result
+end
+
+factory.create_knob = function(self, value)
+    local result = new(Knob, value)
+    result.label = result.customFields.Label
+    result.help = result.customFields.Help
+    return result
+end
+
+factory.create_tabs = function(self)
+    local tabs = new(TabManager)
+    tabs:_init()
+    table.insert(self.tabs, tabs)
+    table.insert(self.widgets, tabs)
+    return tabs
+end
+
+Knob._draw = function(self)
+    local angle = (1.8 * math.pi) * self.value + math.pi * 0.6
+
+    local target_x = math.cos(angle) * 3 + self.x + 4
+    local target_y = math.sin(angle) * 3 + self.y + 3
+
+    spr.draw(30, self.x, self.y)
+    shape.line(self.x + 4, self.y + 3, target_x, target_y, 9)
+    print(self.label, self.x - 1, self.y + 10)
+end
+
+Knob._update = function(self)
+
+    local touching = ctrl.touching(0)
+
+    -- the click started in the widget?
+    if touching ~= nil and inside_widget(self, touching.x, touching.y) then
+        if self.start_value == nil then
+            self.start_value = self.value
         end
+        local touch = ctrl.touch()
+
+        local dst = self.y + 4 - touch.y
+        local percent = math.max(math.min(1, dst / 32), -1)
+        self.value = math.min(math.max(0, self.start_value + percent), 1)
+        if self.on_update ~= nil then
+            self:on_update(self.value)
+        end
+    end
+
+    local pos = ctrl.touch()
+    if inside_widget(self, pos.x, pos.y) then
+        if self.on_hover ~= nil then
+            self:on_hover()
+        end
+    end
+
+    if touching == nil then
+        self.start_value = nil
     end
 end
 
-factory.on_clicked = function(x, y)
-    -- on click buttons
-    local prec = nil
-    local current = nil
-    for f in all(buttons) do
-        if f.status == 2 then
-            prec = f
-        elseif f.status == 1 and inside_widget(f, x, y) then
-            current = f
-        end
-    end
-    -- active the current button and deactive the previous activated
-    if current ~= nil and current.enabled and current.grouped then
-        if prec ~= nil then
-            prec.status = 0
-        end
-        current.status = 2
-    end
 
-    if current ~= nil and current.enabled then
-        current.on_active_button(current, prec)
-    end
+factory._init = function(self)
 
-    -- on click tab
-    local new_active = nil
-    local current_active = nil
-    for t in all(tabs) do
-        if t.status == 1 then
-            current_active = t
-        elseif inside_widget(t, x, y) and t.status == 0 then
-            new_active = t
-        end
-
-    end
-
-    if new_active ~= nil then
-        if new_active.new_tab then
-            new_active.width = 2 * 16 + 8
-            new_active.label = ""
-            new_active.new_tab = false
-
-            if #tabs < 12 then
-                factory.createTab({
-                    width = 24,
-                    new_tab = true,
-                    x = new_active.x + new_active.width,
-                    on_active_tab = new_active.on_active_tab
-                })
-
-            end
-
-            factory.on_new_tab(new_active)
-        end
-        current_active.status = 0
-        new_active.status = 1
-        new_active.on_active_tab(new_active, current_active)
-    end
-
-    for c in all(counters) do
-        if c.enabled and c.status == 1 then
-            c.on_left(c)
-        elseif c.enabled and c.status == 2 then
-            c.on_right(c)
-        end
-    end
 end
 
 factory._update = function(mouse)
 
 end
 
-function draw_tabs()
-    local active_tab = tabs[1]
-    for index = #tabs, 1, -1 do
-        local v = tabs[index]
-        if v.status == 0 then
-            draw_tab(v)
-        else
-            active_tab = v
+Fader._update = function(self)
+    local pos = ctrl.touch()
+    if inside_widget(self, pos.x, pos.y) then
+        if self.on_hover ~= nil then
+            self:on_hover()
+        end
+
+        if ctrl.touching(0) then
+            local percent = math.max(0.0, 1.0 - ((pos.y - self.y) / self.height))
+            self.value = percent
+
+            if self.on_value_update then
+                self:on_value_update(self.value)
+            end
         end
     end
-
-    draw_tab(active_tab)
 end
 
-function draw_tab(tab)
-    local offset = tab.status * 8
+Fader._draw = function(self)
+    local color = self.disabled_color
 
-    -- body
-    local time = math.floor(tab.width / 16)
-    local rest = tab.width % 16
-    for i = 0, time - 1 do
-        spr.sdraw(tab.x + (i) * 16, 0, 80, offset, 16, 8)
-
+    if self.value ~= nil and self.value > 0 then
+        color = self.tip_color
     end
-
-    spr.sdraw(tab.x + (time) * 16, 0, 80, offset, rest, 8)
-
-    -- right
-    spr.sdraw(tab.x + tab.width, 0, 96, offset, 8, 8)
-
-    local center = tab.width * 0.5 - #tab.label * 0.5 * 4
-
-    print(tab.label, tab.x + center, tab.y + 2)
-
-    -- left
-    if tab.status == 1 then
-        spr.sdraw(tab.x - 8, 0, 64, 8, 8, 8)
-    end
-
-end
-
-function draw_fader(f)
-    if f.values ~= nil and next(f.values) then
-        for v in all(f.values) do
-            local y = f.height - ((v.value - f.min_value) / (f.max_value - f.min_value) * f.height)
-            local tipy = f.y + y
-            shape.rectf(f.x, tipy, f.width, 4, v.color)
-        end
-    else
-        local y = f.height - (0 / (f.max_value - f.min_value) * f.height)
-        local tipy = f.y + y
-        shape.rectf(f.x, tipy, f.width, 4, f.disabled_color)
-    end
-
-    print(f.label, f.x, f.y + f.height + 5)
-end
-
-function draw_button(button)
-    local background = 0
-    if button.status > 0 then
-        background = 1
-    end
-
-    spr.draw(background, button.x, button.y)
-
-    if button.overlay ~= nil then
-        spr.draw(button.overlay, button.x, button.y)
-    end
+    local y = self.height - self.value * self.height
+    local tipy = self.y + y
+    shape.rectf(self.x + 1, tipy, self.width - 2, 2, self.tip_color)
 end
 
 function draw_counter(counter)
-
     spr.draw(counter.spr + counter.status, counter.x, counter.y)
 
     print(counter.label, counter.x + 1, counter.y - 4)
     print(string.sub(counter.value, 1, 4), counter.x + 3, counter.y + 2)
 end
 
-factory._draw = function()
-    for c in all(counters) do
-        if c.enabled then
-            draw_counter(c)
+Envelop._update = function(self)
+
+    self.decay = math.min(self.decay, 1 - self.attack)
+    self.release = math.min(self.release, 1 - (self.decay + self.attack))
+
+    self.attack_end_x = self.x + self.attack * self.width 
+    self.attack_end_y = self.y
+
+    self.decay_end_x = self.attack_end_x + self.decay * self.width 
+    self.decay_end_y = self.y + self.height * (1 - self.sustain)
+
+    self.release_start_x = self.x + self.width - self.release * self.width 
+    self.release_start_y = self.y + self.height * (1 - self.sustain)
+
+    self.attack_fader.value = self.attack
+    self.decay_fader.value = self.decay
+    self.release_fader.value = self.release
+end
+
+Envelop._draw = function(self)
+    shape.rect(self.x, self.y, self.width + 1, self.height + 1, 9)
+
+    -- attack
+    shape.line(self.x, self.y + self.height, self.attack_end_x, self.attack_end_y, 8)
+    shape.circle(self.attack_end_x, self.attack_end_y, 2, 8)
+
+    -- decay
+    shape.line(self.attack_end_x, self.attack_end_y, self.decay_end_x, self.decay_end_y, 10)
+    shape.circle(self.decay_end_x, self.decay_end_y, 2, 10)
+
+    -- release
+    shape.line(self.release_start_x, self.release_start_y, self.x + self.width, self.y + self.height, 9)
+    shape.circle(self.release_start_x, self.release_start_y, 2, 9)
+
+    shape.line(self.decay_end_x, self.decay_end_y, self.release_start_x, self.release_start_y, 9)
+
+    -- sustain
+    local width = 8
+    local height = 4
+    shape.rect(self.decay_end_x + (self.release_start_x - self.decay_end_x - width) * 0.5, self.y + (1 - self.sustain) * self.height - height * 0.5, width, height, 8)
+end
+
+factory.create_checkbox = function(self, data)
+    local result = new(Checkbox, data)
+    result.help = result.customFields.Help
+    result.label = result.customFields.Label
+    return result
+end
+
+Checkbox._update = function(self)
+    local pos = ctrl.touched(0)
+    if pos ~= nil then
+        local w = {
+            x = self.x,
+            y = self.y,
+            height = self.height,
+            width = self.width + #self.label * 4
+        }
+        if inside_widget(w, pos.x, pos.y) then
+            self.value = not self.value
+            if self.on_changed then
+                self:on_changed(self.value)
+            end
         end
     end
 
-    for f in all(faders) do
-        if f.enabled then
-            draw_fader(f)
-        end
+    pos = ctrl.touch()
+    if self.on_hover and inside_widget(self, pos.x, pos.y) then
+        self:on_hover()
+    end
+end
+
+Checkbox._draw = function(self)
+    if self.value then
+        spr.sdraw(self.x, self.y, 8, 48, 8, 8)
+    else
+        spr.sdraw(self.x, self.y, 0, 48, 8, 8)
+    end
+    print(self.label, self.x + 10, self.y + 2)
+end
+
+local Help = {
+    _type = "Help",
+    label = ""
+}
+
+Help._update = function(self)
+
+end
+
+Help._draw = function(self)
+    print(self.label, self.x, self.y + 2)
+    shape.rect(self.x, self.y, self.width, self.height)
+end
+
+factory.create_help = function(self, data)
+    local help = new(Help, data)
+    return help
+end
+
+local MenuItem = {
+    _type = "MenuItem",
+    spr = nil,
+    hold = false,
+    status = 0,
+    active = 0,
+    help = "",
+    on_click = function()
+    end,
+    on_hover = function()
+    end
+}
+
+local menuItems = {}
+
+MenuItem._update = function(self)
+    local pos = ctrl.touch()
+    if not self.hold then
+        self.active = 0
     end
 
-    for b in all(buttons) do
-        if b.enabled then
-            draw_button(b)
+    if inside_widget(self, pos.x, pos.y) then
+        if self.active == 0 then
+            self.status = 1
         end
+        if ctrl.touched(0) then
+            self:on_click()
+            if self.hold then
+                for i in all(menuItems) do
+                    i.active = 0
+                end
+            end
+            self.active = 1
+            self.status = 0
+        end
+        self:on_hover()
+    else
+        self.status = 0
     end
 
-    draw_tabs()
+end
+
+MenuItem._draw = function(self)
+    if self.spr ~= nil then
+        spr.draw(self.spr + self.status * 128 + self.active * (128 + 32), self.x, self.y)
+    end
+    
+    if self.label ~= nil then
+        print(self.label, self.x + 5, self.y + 2)
+    end
+end
+
+factory.create_menu_item = function(self, data)
+    local menu = new(MenuItem, data)
+
+    local item = data.customFields.Item
+    -- todo: move outside the widgets factory this configuration
+    if item == "Wave" then
+        menu.spr = 14
+        menu.hold = true
+    elseif item == "Fx" then
+        menu.spr = 15
+        menu.hold = true
+    elseif item == "Music" then
+        menu.spr = 16
+        menu.hold = true
+    elseif item == "Save" then
+        menu.spr = 17
+    elseif item == "Prev" then
+        menu.spr = 21
+    elseif item == "Next" then
+        menu.spr = 22
+    end
+    menu.item = item
+    menu.help = data.customFields.Help
+
+    table.insert(menuItems, menu)
+    return menu
+end
+
+factory._draw = function(self)
+    for w in all(self.widgets) do
+        w:_draw()
+    end
 end
 
 return factory

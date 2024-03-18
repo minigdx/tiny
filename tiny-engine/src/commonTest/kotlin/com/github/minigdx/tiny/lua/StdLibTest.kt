@@ -11,7 +11,7 @@ import com.github.minigdx.tiny.resources.GameScript
 import com.github.minigdx.tiny.resources.ResourceType
 import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.resources.SpriteSheet
-import com.github.minigdx.tiny.sound.Song
+import com.github.minigdx.tiny.sound.Song2
 import com.github.minigdx.tiny.sound.WaveGenerator
 import org.luaj.vm2.LuaValue.Companion.valueOf
 import org.luaj.vm2.LuaValue.Companion.varargsOf
@@ -34,12 +34,16 @@ class StdLibTest {
         )
         override val frameBuffer: FrameBuffer = FrameBuffer(10, 10, ColorPalette(colors))
         override fun spritesheet(index: Int): SpriteSheet? = null
+        override fun spritesheet(name: String): Int? = null
+
         override fun spritesheet(sheet: SpriteSheet) = Unit
+        override fun newSpritesheetIndex(): Int = 0
+
         override fun level(index: Int): GameLevel? = null
         override fun sound(index: Int): Sound? = null
         override fun script(name: String): GameScript? = null
         override fun note(wave: WaveGenerator) = Unit
-        override fun sfx(song: Song) = Unit
+        override fun sfx(song: Song2) = Unit
     }
 
     private val gameOptions = GameOptions(

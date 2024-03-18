@@ -105,8 +105,13 @@ class JavaMidiSoundManager : SoundManager() {
 
             while (isActive) {
                 val nextBuffer = bufferQueue.take()
+                if (notesLine.isActive) {
+                    notesLine.close()
+                    notesLine.open()
+                    notesLine.start()
+                }
                 if (isActive) {
-                    notesLine.write(nextBuffer, 0, nextBuffer.size)
+                    Thread { notesLine.write(nextBuffer, 0, nextBuffer.size) }.start()
                 }
             }
             notesLine.close()
@@ -123,23 +128,23 @@ class JavaMidiSoundManager : SoundManager() {
 
     override suspend fun createSfxSound(bytes: ByteArray): Sound {
         val score = bytes.decodeToString()
-        val waves = SfxLib.convertScoreToSong(score)
+        val waves = SfxLib.convertScoreToSong2(score)
 
         val (buf, length) = createBufferFromSong(waves)
         val buffer = convertBuffer(buf, length)
         return SfxSound(buffer)
     }
 
-    override fun playBuffer(buffer: FloatArray, numberOfSamples: Int) {
+    override fun playBuffer(buffer: FloatArray, numberOfSamples: Long) {
         bufferQueue.offer(convertBuffer(buffer, numberOfSamples))
     }
 
     private fun convertBuffer(
         audioBuffer: FloatArray,
-        length: Int,
+        length: Long,
     ): ByteArray {
-        val buffer = ByteArray(length * 2)
-        (0 until length).forEach { i ->
+        val buffer = ByteArray(length.toInt() * 2)
+        (0 until length.toInt()).forEach { i ->
             val sample = audioBuffer[i]
             val sampleValue: Float = (sample * Short.MAX_VALUE)
             val clippedValue = sampleValue.coerceIn(Short.MIN_VALUE.toFloat(), Short.MAX_VALUE.toFloat())

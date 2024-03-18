@@ -4,6 +4,7 @@ import com.github.mingdx.tiny.doc.TinyLib
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.TwoArgFunction
+import kotlin.math.abs
 
 private const val OCTAVE_0 = 0
 private const val OCTAVE_1 = OCTAVE_0 + 12
@@ -183,8 +184,14 @@ enum class Note(val frequency: Float, val index: Int) {
         private val notesPerIndex = Note.values().distinctBy { it.index }.sortedBy { it.index }.toTypedArray()
 
         fun fromIndex(noteIndex: Int): Note {
-            return notesPerIndex[noteIndex - 1]
+            return notesPerIndex[noteIndex]
         }
+
+        fun fromFrequency(frequency: Float): Note {
+            return Note.values().minBy { abs(it.frequency - frequency) }
+        }
+
+        fun fromFrequency(frequency: Int): Note = fromFrequency(frequency.toFloat())
     }
 }
 

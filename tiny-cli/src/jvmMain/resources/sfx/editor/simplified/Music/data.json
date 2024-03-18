@@ -1,0 +1,15 @@
+{
+	"identifier": "Music",
+	"uniqueIdentifer": "db58e2f0-d7b0-11ee-9c45-b50aaf7f2761",
+	"x": -184,
+	"y": 272,
+	"width": 176,
+	"height": 128,
+	"bgColor": "#696A79",
+	"neighbourLevels": [],
+	"customFields" : {},
+	"layers": [
+		"Tiles.png"
+	],
+	"entities" : {}
+}

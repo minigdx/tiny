@@ -27,6 +27,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.w3c.dom.HTMLCanvasElement
+import kotlin.math.min
 
 class WebGlPlatform(
     private val canvas: HTMLCanvasElement,
@@ -70,7 +71,7 @@ class WebGlPlatform(
             then = nowInSeconds
 
             uiScope.launch {
-                gameLoop.advance(delta.toFloat())
+                gameLoop.advance(min(delta.toFloat(), 1 / 60f))
             }
             gameLoop.draw()
 

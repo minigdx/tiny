@@ -1,0 +1,168 @@
+{
+	"identifier": "Level_0",
+	"uniqueIdentifer": "d319e5a0-d7b0-11ee-9c45-898e2a016ceb",
+	"x": 0,
+	"y": 0,
+	"width": 192,
+	"height": 128,
+	"bgColor": "#696A79",
+	"neighbourLevels": [],
+	"customFields" : {},
+	"layers": [
+		"Tiles.png"
+	],
+	"entities": {
+		"MenuItem": [
+			{
+				"id": "MenuItem",
+				"iid": "a32b9540-d7b0-11ee-9c45-491e1f214479",
+				"layer": "Entities",
+				"x": 0,
+				"y": 0,
+				"width": 8,
+				"height": 8,
+				"color": 12470831,
+				"customFields": {
+					"Item": "Wave",
+					"Help": "Sound editor"
+				}
+			},
+			{
+				"id": "MenuItem",
+				"iid": "ae1f62b0-d7b0-11ee-9c45-3b41b8a1c01f",
+				"layer": "Entities",
+				"x": 8,
+				"y": 0,
+				"width": 8,
+				"height": 8,
+				"color": 12470831,
+				"customFields": {
+					"Item": "Fx",
+					"Help": "Fx editor"
+				}
+			},
+			{
+				"id": "MenuItem",
+				"iid": "b3dbe430-d7b0-11ee-9c45-fdbc2054fa36",
+				"layer": "Entities",
+				"x": 16,
+				"y": 0,
+				"width": 8,
+				"height": 8,
+				"color": 12470831,
+				"customFields": {
+					"Item": "Music",
+					"Help": "Music editor"
+				}
+			},
+			{
+				"id": "MenuItem",
+				"iid": "b93e5ed0-d7b0-11ee-9c45-7fcf1ae264e3",
+				"layer": "Entities",
+				"x": 32,
+				"y": 0,
+				"width": 8,
+				"height": 8,
+				"color": 12470831,
+				"customFields": {
+					"Item": "Save",
+					"Help": "Save files"
+				}
+			},
+			{
+				"id": "MenuItem",
+				"iid": "fce7b3d0-d7b0-11ee-9c45-9dddf90ef7e1",
+				"layer": "Entities",
+				"x": 48,
+				"y": 0,
+				"width": 8,
+				"height": 8,
+				"color": 12470831,
+				"customFields": {
+					"Item": "Prev",
+					"Help": "Previous file"
+				}
+			},
+			{
+				"id": "MenuItem",
+				"iid": "04f9be10-d7b0-11ee-9c45-5153c382042a",
+				"layer": "Entities",
+				"x": 88,
+				"y": 0,
+				"width": 8,
+				"height": 8,
+				"color": 12470831,
+				"customFields": {
+					"Item": "Next",
+					"Help": "Next File"
+				}
+			},
+			{
+				"id": "MenuItem",
+				"iid": "f0987fa0-d7b0-11ee-9c45-4bfc6d23b807",
+				"layer": "Entities",
+				"x": 56,
+				"y": 0,
+				"width": 32,
+				"height": 8,
+				"color": 12470831,
+				"customFields": {
+					"Item": "Filename",
+					"Help": ""
+				}
+			},
+			{
+				"id": "MenuItem",
+				"iid": "f564d4c0-d7b0-11ee-9c45-958bceaa5715",
+				"layer": "Entities",
+				"x": 104,
+				"y": 0,
+				"width": 80,
+				"height": 8,
+				"color": 12470831,
+				"customFields": {
+					"Item": "Help",
+					"Help": ""
+				}
+			}
+		],
+		"FilesSelector": [
+			{
+				"id": "FilesSelector",
+				"iid": "34029630-d7b0-11ee-9c45-c74f5e3eabe3",
+				"layer": "Entities",
+				"x": 64,
+				"y": 16,
+				"width": 8,
+				"height": 8,
+				"color": 39387,
+				"customFields": {
+					"Previous": {
+						"entityIid": "fce7b3d0-d7b0-11ee-9c45-9dddf90ef7e1",
+						"layerIid": "8a2f1940-d7b0-11ee-9c45-cd8bc568018a",
+						"levelIid": "d319e5a0-d7b0-11ee-9c45-898e2a016ceb",
+						"worldIid": "d3199781-d7b0-11ee-9c45-11db300be03a"
+					},
+					"Next": {
+						"entityIid": "04f9be10-d7b0-11ee-9c45-5153c382042a",
+						"layerIid": "8a2f1940-d7b0-11ee-9c45-cd8bc568018a",
+						"levelIid": "d319e5a0-d7b0-11ee-9c45-898e2a016ceb",
+						"worldIid": "d3199781-d7b0-11ee-9c45-11db300be03a"
+					},
+					"Screen": {
+						"entityIid": "f0987fa0-d7b0-11ee-9c45-4bfc6d23b807",
+						"layerIid": "8a2f1940-d7b0-11ee-9c45-cd8bc568018a",
+						"levelIid": "d319e5a0-d7b0-11ee-9c45-898e2a016ceb",
+						"worldIid": "d3199781-d7b0-11ee-9c45-11db300be03a"
+					},
+					"Save": {
+						"entityIid": "b93e5ed0-d7b0-11ee-9c45-7fcf1ae264e3",
+						"layerIid": "8a2f1940-d7b0-11ee-9c45-cd8bc568018a",
+						"levelIid": "d319e5a0-d7b0-11ee-9c45-898e2a016ceb",
+						"worldIid": "d3199781-d7b0-11ee-9c45-11db300be03a"
+					}
+				}
+			}
+		]
+	}
+}
