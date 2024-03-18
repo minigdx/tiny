@@ -261,8 +261,6 @@ class GlfwPlatform(
     }
 
     override fun screenshot() {
-        // FIXME: it doesn't play well with camera
-        // FIXME: debug and camera doesn't play well also.
         val buffer = lastBuffer ?: return
 
         recordScope.launch {
@@ -273,7 +271,12 @@ class GlfwPlatform(
 
             for (y in 0 until height) {
                 for (x in 0 until width) {
-                    val colorData = buffer.gamePalette.getRGBA(buffer.pixel(x, y))
+                    val colorData = buffer.gamePalette.getRGBA(
+                        buffer.pixel(
+                            x = buffer.camera.x + x,
+                            y = buffer.camera.y + y,
+                        ),
+                    )
                     val r = colorData[0].toInt() and 0xff
                     val g = colorData[1].toInt() and 0xff
                     val b = colorData[2].toInt() and 0xff

@@ -240,7 +240,7 @@ class SfxLib(
         fun LuaTable.toWave(mod: Modulation?, env: Envelope): SoundGenerator {
             val noteIndex = this["note"].toint()
             val volume = this["volume"].toint() / 255f
-            if(noteIndex == 0 || volume <= 0) {
+            if (noteIndex == 0 || volume <= 0) {
                 return Silence2(Note.C0, null, null, 0f)
             }
             return when (this["type"].tojstring()) {
