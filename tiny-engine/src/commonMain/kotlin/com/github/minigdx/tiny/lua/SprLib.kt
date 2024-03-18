@@ -87,7 +87,9 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
     @TinyFunction(
         "Switch to another spritesheet. " +
             "The index of the spritesheet is given by it's position in the spritesheets field from the `_tiny.json` file." +
-            "The first spritesheet is at the index 0. It retuns the previous spritesheet.",
+            "The first spritesheet is at the index 0. It retuns the previous spritesheet. " +
+                "The spritesheet can also be referenced by its filename.",
+        example = SPR_SHEET_EXAMPLE
     )
     internal inner class sheet : OneArgFunction() {
 

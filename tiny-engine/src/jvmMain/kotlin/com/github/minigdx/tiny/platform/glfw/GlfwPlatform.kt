@@ -262,7 +262,6 @@ class GlfwPlatform(
 
     override fun screenshot() {
         // FIXME: it doesn't play well with camera
-        // FIXME: battle test the change of sprite sheets with name.
         // FIXME: debug and camera doesn't play well also.
         val buffer = lastBuffer ?: return
 

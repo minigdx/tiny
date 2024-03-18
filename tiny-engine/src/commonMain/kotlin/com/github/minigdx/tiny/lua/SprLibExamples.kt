@@ -58,3 +58,33 @@ function _draw()
     spr.draw(id, 120, 120)
 end
 """
+
+//language=Lua
+const val SPR_SHEET_EXAMPLE = """
+local current = 0
+function _update()
+    local x = math.perlin((tiny.frame % 100) / 100, (tiny.frame % 100) / 100, (tiny.frame % 100) / 100)
+    local y = math.perlin((tiny.frame  * 0.5 % 100) / 100, (tiny.frame % 100) / 100, (tiny.frame * 0.5 % 100) / 100)
+
+    gfx.cls()
+    shape.circlef(x * 256, y * 256, 10, 8)
+    gfx.to_sheet("circle.png")
+    
+    gfx.cls()
+    shape.rectf(x * 256, y * 256, 20, 20, 8)
+    gfx.to_sheet("rect.png")
+
+    if ctrl.pressed(keys.space) then
+        current = (current + 1) % 2
+    end
+end
+
+function _draw()
+    if current == 0 then
+        spr.sheet("circle.png")
+    else
+        spr.sheet("rect.png")
+    end
+    spr.sdraw()
+end
+"""
