@@ -134,14 +134,23 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
 
         @TinyCall("Reset the game camera to it's default position (0,0).")
         override fun call(): LuaValue {
+            val previous = coordinates()
             resourceAccess.frameBuffer.camera.set(0, 0)
-            return NONE
+            return previous
         }
 
         @TinyCall("Set game camera to the position x, y.")
         override fun call(@TinyArg("x") arg1: LuaValue, @TinyArg("y") arg2: LuaValue): LuaValue {
+            val previous = coordinates()
             resourceAccess.frameBuffer.camera.set(arg1.toint(), arg2.toint())
-            return NONE
+            return previous
+        }
+
+        private fun coordinates(): LuaTable {
+            return LuaTable().apply {
+                set("x", resourceAccess.frameBuffer.camera.x)
+                set("y", resourceAccess.frameBuffer.camera.y)
+            }
         }
     }
 
