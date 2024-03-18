@@ -240,6 +240,9 @@ class SfxLib(
         fun LuaTable.toWave(mod: Modulation?, env: Envelope): SoundGenerator {
             val noteIndex = this["note"].toint()
             val volume = this["volume"].toint() / 255f
+            if(noteIndex == 0 || volume <= 0) {
+                return Silence2(Note.C0, null, null, 0f)
+            }
             return when (this["type"].tojstring()) {
                 "Sine" -> Sine2(Note.fromIndex(noteIndex), mod, env, volume)
                 "Square" -> Square2(Note.fromIndex(noteIndex), mod, env, volume)

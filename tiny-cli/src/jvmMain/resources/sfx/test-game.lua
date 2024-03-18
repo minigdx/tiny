@@ -62,7 +62,7 @@ mode.score.configure = function(self, content)
     local content = self.file_selector:current()
     
     for index, note in ipairs(content.tracks[1].patterns[1]) do
-        self.sound.notes[index].value = note.note / 108
+        self.sound.notes[index].value = note.note / 107
         self.sound.notes[index].tip_color = button_type[note.type].color 
         self.sound.volumes[index].value = note.volume / 255
     end
@@ -79,14 +79,14 @@ mode.fx.configure = function(self, content)
     if mod.type == 1 then
         self.fx.sweep.checkbox.value = true
         self.fx.sweep.enabled = true
-        self.fx.sweep.sweep = mod.a / 108
+        self.fx.sweep.sweep = mod.a / 107
         self.fx.sweep.acceleration = mod.b / 255
         self.fx.sweep.knob_sweep.value = self.fx.sweep.sweep
         self.fx.sweep.knob_acceleration.value = self.fx.sweep.acceleration
     elseif mod.type == 2 then
         self.fx.vibrato.checkbox.value = true
         self.fx.vibrato.enabled = true
-        self.fx.vibrato.vibrato = mod.a / 108
+        self.fx.vibrato.vibrato = mod.a / 107
         self.fx.vibrato.depth = mod.b / 255
         self.fx.vibrato.knob_vibrato.value = self.fx.vibrato.vibrato
         self.fx.vibrato.knob_depth.value = self.fx.vibrato.depth
@@ -210,10 +210,9 @@ function _init()
 
         file_selector.save.on_click = function(self)
             debug.console("saving file...")
-            debug.console(file_selector:current())
             local score = sfx.to_score(file_selector:current())
             ws.save(file_selector:currentName(), score)
-            debug.console("savedfile!") --
+            debug.console("file saved!") --
         end
         file_selector.previous:on_click()
     end
@@ -307,7 +306,7 @@ function _init()
                     if active then
                         local content = file_selector:current()
                         content.tracks[1].mod.type = 2
-                        content.tracks[1].mod.a = self.vibrato * 108
+                        content.tracks[1].mod.a = self.vibrato * 107
                         content.tracks[1].mod.b = self.depth * 255
                     end
                 end
@@ -324,7 +323,7 @@ function _init()
             v.on_update = function(self, value)
                 knob.vibrato = value
                 local content = file_selector:current()
-                content.tracks[1].mod.a = knob.vibrato * 108
+                content.tracks[1].mod.a = knob.vibrato * 107
             end
             local d = find_widget(m.widgets, knob.customFields.Depth)
             knob.knob_depth = d
@@ -353,7 +352,7 @@ function _init()
                     if active then
                         local content = file_selector:current()
                         content.tracks[1].mod.type = 1
-                        content.tracks[1].mod.a = self.sweep * 108
+                        content.tracks[1].mod.a = self.sweep * 107
                         content.tracks[1].mod.b = self.acceleration * 255
                     end
                 end
@@ -370,7 +369,7 @@ function _init()
             v.on_update = function(self, value)
                 knob.sweep = value
                 local content = file_selector:current()
-                content.tracks[1].mod.a = knob.sweep * 108
+                content.tracks[1].mod.a = knob.sweep * 107
             end
             local d = find_widget(m.widgets, knob.customFields.Acceleration)
             knob.knob_acceleration = d
@@ -421,6 +420,13 @@ function _init()
             table.insert(m.widgets, knob)
         end
 
+        local play = function(self)
+            debug.console("play")
+            local content = file_selector:current()
+            local score = sfx.to_score(content)
+            sfx.sfx(score)
+        end
+
         for k in all(map.entities["Sound"]) do
             local Sound = {
                 volumes = {},
@@ -449,7 +455,7 @@ function _init()
                     local content = file_selector:current()
                     content.tracks[1].patterns[1][key].type = selector.selected
                     content.tracks[1].patterns[1][key].index = selector.selectedIndex
-                    content.tracks[1].patterns[1][key].note = value * 108 -- 108 = number of total notes
+                    content.tracks[1].patterns[1][key].note = value * 107 -- 107 = number of total notes
                 end
             end
             s.bpm = find_widget(m.widgets, k.customFields.BPM)
@@ -463,6 +469,9 @@ function _init()
                 local content = file_selector:current()
                 content.volume = self.value * 255
             end
+
+            s.play = find_widget(m.widgets, k.customFields.Play)
+            s.play.on_changed = play
             m.sound = s
         end
 
@@ -488,6 +497,8 @@ function _init()
                 fx.vibrato:switch(self.value)
             end
             fx.tied_notes = find_widget(m.widgets, k.customFields.Envelope)
+            fx.play = find_widget(m.widgets, k.customFields.Play)
+            fx.play.on_changed = play
             m.fx = fx
         end
     end

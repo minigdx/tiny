@@ -11,7 +11,7 @@
 	"iid": "d3199780-d7b0-11ee-9c45-618e61de5acd",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 68,
+	"nextUid": 70,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -1732,6 +1732,43 @@
 					"allowedRefsEntityUid": 9,
 					"allowedRefTags": [],
 					"tilesetUid": null
+				},
+				{
+					"identifier": "Play",
+					"doc": null,
+					"__type": "EntityRef",
+					"uid": 68,
+					"type": "F_EntityRef",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "RefLinkBetweenCenters",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "CurvedArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": false,
+					"allowOutOfLevelRef": false,
+					"allowedRefs": "OnlySpecificEntity",
+					"allowedRefsEntityUid": 17,
+					"allowedRefTags": [],
+					"tilesetUid": null
 				}
 			]
 		},
@@ -2098,6 +2135,43 @@
 					"allowOutOfLevelRef": false,
 					"allowedRefs": "OnlySpecificEntity",
 					"allowedRefsEntityUid": 27,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				},
+				{
+					"identifier": "Play",
+					"doc": null,
+					"__type": "EntityRef",
+					"uid": 69,
+					"type": "F_EntityRef",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "RefLinkBetweenCenters",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "CurvedArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": false,
+					"allowOutOfLevelRef": false,
+					"allowedRefs": "OnlySpecificEntity",
+					"allowedRefsEntityUid": 17,
 					"allowedRefTags": [],
 					"tilesetUid": null
 				}
@@ -4265,10 +4339,38 @@
 								}, "__tile": null, "defUid": 62, "realEditorValues": [{
 									"id": "V_String",
 									"params": ["81bb5b70-d7b0-11ee-9c45-1393fc15fd52"]
+								}] },
+								{ "__identifier": "Play", "__type": "EntityRef", "__value": {
+									"entityIid": "5c45e690-d7b0-11ee-9c45-79131b730640",
+									"layerIid": "4a687451-d7b0-11ee-9c45-f9fbfe85abb1",
+									"levelIid": "4a687450-d7b0-11ee-9c45-2f52ca2677e5",
+									"worldIid": "d3199781-d7b0-11ee-9c45-11db300be03a"
+								}, "__tile": null, "defUid": 68, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["5c45e690-d7b0-11ee-9c45-79131b730640"]
 								}] }
 							],
 							"__worldX": -16,
 							"__worldY": 16
+						},
+						{
+							"__identifier": "MenuItem",
+							"__grid": [20,8],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 1, "x": 152, "y": 8, "w": 8, "h": 8 },
+							"__smartColor": "#BE4A2F",
+							"iid": "55fe7f30-d7b0-11ee-9ced-4b325d09db57",
+							"width": 8,
+							"height": 8,
+							"defUid": 2,
+							"px": [160,64],
+							"fieldInstances": [
+								{ "__identifier": "Item", "__type": "LocalEnum.Item", "__value": "Space", "__tile": { "tilesetUid": 1, "x": 152, "y": 8, "w": 8, "h": 8 }, "defUid": 6, "realEditorValues": [] },
+								{ "__identifier": "Help", "__type": "String", "__value": "", "__tile": null, "defUid": 21, "realEditorValues": [] }
+							],
+							"__worldX": -24,
+							"__worldY": 64
 						}
 					]
 				},
@@ -5176,10 +5278,44 @@
 								}, "__tile": null, "defUid": 67, "realEditorValues": [{
 									"id": "V_String",
 									"params": ["e7cbddd0-d7b0-11ee-9c45-253ec4365407"]
+								}] },
+								{ "__identifier": "Play", "__type": "EntityRef", "__value": {
+									"entityIid": "7983b550-d7b0-11ee-9ced-73ee7bb15ec6",
+									"layerIid": "ec22d820-d7b0-11ee-9c45-8bfde102ddf7",
+									"levelIid": "ec22b110-d7b0-11ee-9c45-ab95af96fe31",
+									"worldIid": "d3199781-d7b0-11ee-9c45-11db300be03a"
+								}, "__tile": null, "defUid": 69, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["7983b550-d7b0-11ee-9ced-73ee7bb15ec6"]
 								}] }
 							],
 							"__worldX": -32,
 							"__worldY": 224
+						},
+						{
+							"__identifier": "Button",
+							"__grid": [1,2],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 1, "x": 248, "y": 0, "w": 8, "h": 8 },
+							"__smartColor": "#EAD4AA",
+							"iid": "7983b550-d7b0-11ee-9ced-73ee7bb15ec6",
+							"width": 8,
+							"height": 8,
+							"defUid": 17,
+							"px": [8,16],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.ButtonType", "__value": "Play", "__tile": { "tilesetUid": 1, "x": 248, "y": 0, "w": 8, "h": 8 }, "defUid": 20, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Play"]
+								}] },
+								{ "__identifier": "Help", "__type": "String", "__value": "Play", "__tile": null, "defUid": 23, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Play"]
+								}] }
+							],
+							"__worldX": -176,
+							"__worldY": 152
 						}
 					]
 				},

@@ -184,7 +184,7 @@ enum class Note(val frequency: Float, val index: Int) {
         private val notesPerIndex = Note.values().distinctBy { it.index }.sortedBy { it.index }.toTypedArray()
 
         fun fromIndex(noteIndex: Int): Note {
-            return notesPerIndex[noteIndex - 1]
+            return notesPerIndex[noteIndex]
         }
 
         fun fromFrequency(frequency: Float): Note {
