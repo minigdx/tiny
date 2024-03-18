@@ -23,8 +23,10 @@ function popup(logo, text, color, keep)
 end
 
 function printDebug(index, text, color)
+    local prev = gfx.camera()
     shape.rectf(0, index * 6, #text * 6 + 6, 6, color)
     print(text, 6, index * 6 + 1, "#FFFFFF")
+    gfx.camera(prev.x, prev.y)
 end
 
 function clear()
@@ -40,8 +42,9 @@ end
 
 function _draw()
     if forever or dt > 0 then
+        local prev = gfx.camera()
         shape.rectf(0, 0, width, 6 * msg.lines, msg.color)
-        -- TODO: display the logo
         print(msg.text, 6, 1, "#FFFFFF")
+        gfx.camera(prev.x, prev.y)
     end
 end

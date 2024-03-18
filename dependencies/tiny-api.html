@@ -533,7 +533,17 @@ end
 </tiny-editor>
 </div>
 <div class="sect3">
-<h4 id="_ctrl_touched">ctrl.touched()</h4>
+<h4 id="_ctrl_2">ctrl.</h4>
+<div class="paragraph">
+<p>function _draw()
+    local pos = ctrl.touched(0)
+    if pos ~= nil then
+        shape.circlef(pos.x, pos.y, 4, 9)
+        print("("..pos.x .. ", "..pos.y..")", pos.x + 3, pos.y + 3)
+    end
+end
+()</p>
+</div>
 <div class="paragraph">
 <p>Return the position of the touch (as <code>{x, y}</code>)if the screen was touched or the mouse button was pressed during the last frame. <code>nil</code> otherwise.
 The touch can be :</p>
@@ -556,7 +566,15 @@ The touch can be :</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">ctrl.touched(touch) -- Is the screen was touched or mouse button was pressed?</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">ctrl.
+function _draw()
+    local pos = ctrl.touched(0)
+    if pos ~= nil then
+        shape.circlef(pos.x, pos.y, 4, 9)
+        print("("..pos.x .. ", "..pos.y..")", pos.x + 3, pos.y + 3)
+    end
+end
+(touch) -- Is the screen was touched or mouse button was pressed?</code></pre>
 </div>
 </div>
 </div>
@@ -586,35 +604,15 @@ The touch can be :</p>
 </div>
 <tiny-editor style="display: none;"  >
 
-function _init()
-   t = {}
-end
-
-function _update()
-    local touch = ctrl.touching(0)
-    if(touch) then
-       table.insert(t, {str = " touching "..touch.x.."-"..touch.y, ttl = 3})
-    end
-
-for i,s in rpairs(t) do
-    s.ttl = s.ttl - 1/60
-    if s.ttl < 0 then
-      table.remove(t, i)
-    end
-end
-end
-
 function _draw()
     gfx.cls()
-
-    local p = 0
-    for i, s in rpairs(t) do
-      print(i..s.str, 10, 6 * p, 2)
-      p = p + 1
+    local start = ctrl.touching(0)
+    if start ~= nil then
+        local pos = ctrl.touch()
+        shape.line(start.x, start.y, pos.x, pos.y, 9)
+        print("("..start.x .. ", "..start.y..")", start.x, start.y)
+        print("("..pos.x .. ", "..pos.y..")", pos.x, pos.y)
     end
-
-    local touch = ctrl.touch()
-    shape.circlef(touch.x, touch.y, 2, 8)
 end
 
 </tiny-editor>
@@ -3461,7 +3459,7 @@ end
 <div class="sect3">
 <h4 id="_spr_sheet">spr.sheet()</h4>
 <div class="paragraph">
-<p>Switch to another spritesheet. The index of the spritesheet is given by it&#8217;s position in the spritesheets field from the <code>_tiny.json</code> file.The first spritesheet is at the index 0. It retuns the previous spritesheet.</p>
+<p>Switch to another spritesheet. The index of the spritesheet is given by it&#8217;s position in the spritesheets field from the <code>_tiny.json</code> file.The first spritesheet is at the index 0. It retuns the previous spritesheet. The spritesheet can also be referenced by its filename.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -3469,6 +3467,36 @@ end
 spr.sheet(spritesheetN) -- Switch to the N spritesheet</code></pre>
 </div>
 </div>
+<tiny-editor style="display: none;"  >
+
+local current = 0
+function _update()
+    local x = math.perlin((tiny.frame % 100) / 100, (tiny.frame % 100) / 100, (tiny.frame % 100) / 100)
+    local y = math.perlin((tiny.frame  * 0.5 % 100) / 100, (tiny.frame % 100) / 100, (tiny.frame * 0.5 % 100) / 100)
+
+    gfx.cls()
+    shape.circlef(x * 256, y * 256, 10, 8)
+    gfx.to_sheet("circle.png")
+
+    gfx.cls()
+    shape.rectf(x * 256, y * 256, 20, 20, 8)
+    gfx.to_sheet("rect.png")
+
+    if ctrl.pressed(keys.space) then
+        current = (current + 1) % 2
+    end
+end
+
+function _draw()
+    if current == 0 then
+        spr.sheet("circle.png")
+    else
+        spr.sheet("rect.png")
+    end
+    spr.sdraw()
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_spr_sdraw">spr.sdraw()</h4>
@@ -3747,6 +3775,89 @@ function _draw()
 end
 
 </tiny-editor>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_test">test</h3>
+<div class="paragraph">
+<p>Test method utilities used when tests are run. See <a href="#_the_tiny_cli_run_command">Run command</a></p>
+</div>
+<div class="sect3">
+<h4 id="_test_eq">test.eq()</h4>
+<div class="paragraph">
+<p>Assert that <code>expected</code> and <code>actual</code> are equals</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">test.eq(expected, actual) -- Assert that `expected` and `actual` are equals</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_test_neq">test.neq()</h4>
+<div class="paragraph">
+<p>Assert that <code>expected</code> and <code>actual</code> are <em>not</em> equals</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">test.neq(expected, actual) -- Assert that `expected` and `actual` are not equals</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_test_t">test.t()</h4>
+<div class="paragraph">
+<p>Assert that <code>actual</code> is true</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">test.t(actual) -- Assert that `actual` is true</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_test_t_2">test.t()</h4>
+<div class="paragraph">
+<p>Assert that <code>actual</code> is false</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">test.t(actual) -- Assert that `actual` is false</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_test_create">test.create()</h4>
+<div class="paragraph">
+<p>Create a new <code>test</code> named <code>name</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">test.create(name, test) -- Create a new `test` named `name`</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the test</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">test</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The test: it has to be a function</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 <div class="sect2">
@@ -4215,8 +4326,8 @@ ws.list(extension) -- List all files available in the workspace and filter by th
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 1.2.2<br>
-Last updated 2024-02-18 11:10:33 UTC
+Version 1.3.0<br>
+Last updated 2024-03-18 22:45:30 UTC
 </div>
 </div>
 </body>
