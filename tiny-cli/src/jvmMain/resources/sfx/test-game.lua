@@ -91,6 +91,19 @@ mode.fx.configure = function(self, content)
         self.fx.vibrato.knob_vibrato.value = self.fx.vibrato.vibrato
         self.fx.vibrato.knob_depth.value = self.fx.vibrato.depth
     end
+
+    local env = content.tracks[1].env
+    if env ~= nil then
+        -- self.fx.
+        self.fx.envelope.attack_fader.value = env.attack / 255
+        self.fx.envelope.attack = env.attack / 255
+        self.fx.envelope.decay_fader.value = env.decay / 255
+        self.fx.envelope.decay = env.decay / 255
+        self.fx.envelope.sustain_fader.value = env.sustain / 255
+        self.fx.envelope.sustain = env.sustain / 255
+        self.fx.envelope.release_fader.value = env.release / 255
+        self.fx.envelope.release = env.release / 255
+    end
 end
 
 local current_mode = mode.score
