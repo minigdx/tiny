@@ -14,7 +14,6 @@ import com.github.minigdx.tiny.sound.Song2
 import com.github.minigdx.tiny.sound.WaveGenerator
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class SfxLibTest {
 
@@ -71,7 +70,7 @@ class SfxLibTest {
         val lib = SfxLib(mockResources, false)
         val table = lib.toTable().call(lib.emptyScore().call())
         val r = table["tracks"][1]["patterns"][1].checktable()!!.keys()
-        assertTrue(r.isEmpty())
+        assertEquals(16, r.size)
     }
 
     @Test
@@ -79,8 +78,8 @@ class SfxLibTest {
         val lib = SfxLib(mockResources, false)
         val score = lib.toScore().call(lib.toTable().call(lib.emptyScore().call()))
         val expectedScore = """tiny-sfx 120 127
-            |1 01 19 00 FF 19 00 00 00 00 00
-    |
+    |1 01 19 00 FF 19 00 00 00 00 00
+    |000100 000100 000100 000100 000100 000100 000100 000100 000100 000100 000100 000100 000100 000100 000100 000100
     |1
     |0 01 19 00 FF 19 00 00 00 00 00
     |0 01 19 00 FF 19 00 00 00 00 00
@@ -93,8 +92,8 @@ class SfxLibTest {
     @Test
     fun createEmptyScore() {
         val expectedScore = """tiny-sfx 120 127
-            |1 01 19 00 FF 19 00 00 00 00 00
-    |
+    |1 01 19 00 FF 19 00 00 00 00 00
+    |000100 000100 000100 000100 000100 000100 000100 000100 000100 000100 000100 000100 000100 000100 000100 000100
     |1
     |0 01 19 00 FF 19 00 00 00 00 00
     |0 01 19 00 FF 19 00 00 00 00 00
