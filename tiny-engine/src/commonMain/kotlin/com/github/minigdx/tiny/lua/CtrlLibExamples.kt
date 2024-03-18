@@ -51,34 +51,24 @@ end
 """
 
 const val CTRL_TOUCHING_EXAMPLE = """
-function _init()
-   t = {}
-end
-
-function _update()
-    local touch = ctrl.touching(0)
-    if(touch) then
-       table.insert(t, {str = " touching "..touch.x.."-"..touch.y, ttl = 3})
-    end
-
-for i,s in rpairs(t) do
-    s.ttl = s.ttl - 1/60
-    if s.ttl < 0 then
-      table.remove(t, i)
-    end
-end
-end
-
 function _draw()
     gfx.cls()
-
-    local p = 0
-    for i, s in rpairs(t) do
-      print(i..s.str, 10, 6 * p, 2)
-      p = p + 1
+    local start = ctrl.touching(0)
+    if start ~= nil then
+        local pos = ctrl.touch()
+        shape.line(start.x, start.y, pos.x, pos.y, 9)
+        print("("..start.x .. ", "..start.y..")", start.x, start.y)
+        print("("..pos.x .. ", "..pos.y..")", pos.x, pos.y)
     end
+end
+"""
 
-    local touch = ctrl.touch()
-    shape.circlef(touch.x, touch.y, 2, 8)
+const val CTRL_TOUCHED_EXAMPLE = """
+function _draw()
+    local pos = ctrl.touched(0)
+    if pos ~= nil then
+        shape.circlef(pos.x, pos.y, 4, 9)
+        print("("..pos.x .. ", "..pos.y..")", pos.x + 3, pos.y + 3)
+    end
 end
 """
