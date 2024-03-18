@@ -177,7 +177,7 @@ function _init()
 
     for i in all(map.entities["FilesSelector"]) do
         file_selector = new(FileSelector, i)
-        local files = ws.list()
+        local files = ws.list("sfx")
         if #files == 0 then
             local new_file = ws.create("sfx", "sfx")
             table.insert(file_selector.files, {
