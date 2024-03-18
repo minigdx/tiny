@@ -261,24 +261,32 @@ function _init()
             knob.attack_fader = f
             f.on_value_update = function(self, value)
                 knob.attack = value
+                local content = file_selector:current()
+                content.tracks[1].env.attack = value * 255
             end
 
             f = find_widget(m.widgets, knob.customFields.Decay)
             knob.decay_fader = f
             f.on_value_update = function(self, value)
                 knob.decay = value
+                local content = file_selector:current()
+                content.tracks[1].env.decay = value * 255
             end
 
             f = find_widget(m.widgets, knob.customFields.Sustain)
             knob.sustain_fader = f
             f.on_value_update = function(self, value)
                 knob.sustain = value
+                local content = file_selector:current()
+                content.tracks[1].env.sustain = value * 255
             end
 
             f = find_widget(m.widgets, knob.customFields.Release)
             knob.release_fader = f
             f.on_value_update = function(self, value)
                 knob.release = value
+                local content = file_selector:current()
+                content.tracks[1].env.release = value * 255
             end
 
             table.insert(m.widgets, knob)
