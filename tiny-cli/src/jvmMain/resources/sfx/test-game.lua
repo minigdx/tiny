@@ -421,7 +421,6 @@ function _init()
         end
 
         local play = function(self)
-            debug.console("play")
             local content = file_selector:current()
             local score = sfx.to_score(content)
             sfx.sfx(score)
@@ -453,6 +452,7 @@ function _init()
                 f.on_value_update = function(self, value)
                     self.tip_color = button_type[selector.selected].color
                     local content = file_selector:current()
+                    
                     content.tracks[1].patterns[1][key].type = selector.selected
                     content.tracks[1].patterns[1][key].index = selector.selectedIndex
                     content.tracks[1].patterns[1][key].note = value * 107 -- 107 = number of total notes

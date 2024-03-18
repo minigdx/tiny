@@ -378,7 +378,10 @@ class SfxLib(
 
     inner class emptyScore : ZeroArgFunction() {
         override fun call(): LuaValue {
-            val pattern = Pattern2(1, emptyList())
+            val silences = (0 until 16).map {
+                Silence2(Note.C0, null, null, 0f)
+            }
+            val pattern = Pattern2(1, silences)
             val track = Track(
                 mapOf(1 to pattern),
                 listOf(pattern),
