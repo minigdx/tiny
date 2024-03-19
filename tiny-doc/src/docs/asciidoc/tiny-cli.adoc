@@ -234,9 +234,9 @@ The tiny-cli sfx command is used to start a SFX edtor to generate sound to use i
 
 https://dwursteisen.itch.io/tiny-sfx-editor[This SFX editor can be tried online] on itch.io.
 
-image:sample/tiny-cli-sfx1.png[]
+image:sample/tiny-cli-sfx1.gif[]
 
-image:sample/tiny-cli-sfx0.png[]
+image:sample/tiny-cli-sfx0.gif[]
 
 
 ==== Usage
