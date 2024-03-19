@@ -705,7 +705,7 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <div id="header">
 <h1>Tiny 🧸</h1>
 <div class="details">
-<span id="revnumber">version 1.3.1</span>
+<span id="revnumber">version 1.3.2</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -1806,6 +1806,38 @@ end
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">ctrl</span><span class="p">.</span><span class="n">pressed</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="c1">-- Is the key was pressed?</span></code></pre>
 </div>
 </div>
+<tiny-editor style="display: none;"  >
+
+local percent_a = 1
+local percent_b = 1
+
+function _update()
+    percent_a = math.min(percent_a + 0.05, 1)
+    percent_b = math.min(percent_b + 0.05, 1)
+
+    if ctrl.pressed(keys.space) then
+        percent_a = 0
+    end
+
+    if ctrl.pressing(keys.space) then
+        percent_b = 0
+    end
+
+    local offset_a = juice.powIn2(0, 8, percent_a)
+    local offset_b = juice.powIn2(0, 8, percent_b)
+
+    gfx.cls()
+    shape.rectf(64, 128 - 16, 32, 32, 7)
+    shape.rectf(64, 128 - 32 + offset_a, 32, 32, 8)
+
+    shape.rectf(32 + 128, 128 - 16, 32, 32, 7)
+    shape.rectf(32 + 128, 128 - 32 + offset_b, 32, 32, 8)
+
+    print("pressed", 64, 128 + 32)
+    print("pressing", 32 + 128, 128 + 32)
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_ctrl_pressing">ctrl.pressing()</h4>
@@ -1819,41 +1851,33 @@ end
 </div>
 <tiny-editor style="display: none;"  >
 
-function _init()
-    circle = {
-        x = 256 * 0.5,
-        y = 256 * 0.5,
-        radius = 10
-    }
-end
+local percent_a = 1
+local percent_b = 1
 
 function _update()
-    -- check keys for horizontal move
-    if (ctrl.pressing(keys.left)) then
-        circle.x = math.max(circle.x - 1, 0)
-    elseif (ctrl.pressing(keys.right)) then
-        circle.x = math.min(circle.x + 1, 256)
+    percent_a = math.min(percent_a + 0.05, 1)
+    percent_b = math.min(percent_b + 0.05, 1)
+
+    if ctrl.pressed(keys.space) then
+        percent_a = 0
     end
 
-    -- check keys for vertical move
-    if (ctrl.pressing(keys.up)) then
-        circle.y = math.max(circle.y - 1, 0)
-    elseif (ctrl.pressing(keys.down)) then
-        circle.y = math.min(circle.y + 1, 256)
+    if ctrl.pressing(keys.space) then
+        percent_b = 0
     end
 
-    -- check keys for update circle size
-    if (ctrl.pressing(keys.space)) then
-        circle.radius = math.min(circle.radius + 1, 256)
-    elseif (ctrl.pressing(keys.enter)) then
-        circle.radius = math.max(circle.radius - 1, 0)
-    end
-end
+    local offset_a = juice.powIn2(0, 8, percent_a)
+    local offset_b = juice.powIn2(0, 8, percent_b)
 
-function _draw()
-    gfx.cls(1)
-    shape.circlef(circle.x, circle.y, circle.radius, 8)
-    shape.circle(circle.x, circle.y, 2, 9)
+    gfx.cls()
+    shape.rectf(64, 128 - 16, 32, 32, 7)
+    shape.rectf(64, 128 - 32 + offset_a, 32, 32, 8)
+
+    shape.rectf(32 + 128, 128 - 16, 32, 32, 7)
+    shape.rectf(32 + 128, 128 - 32 + offset_b, 32, 32, 8)
+
+    print("pressed", 64, 128 + 32)
+    print("pressing", 32 + 128, 128 + 32)
 end
 
 </tiny-editor>
@@ -1887,9 +1911,20 @@ The touch can be :</p>
 </div>
 <tiny-editor style="display: none;"  >
 
-function _draw()
+local circles = {}
+
+function _update()
     local pos = ctrl.touched(0)
     if pos ~= nil then
+        table.insert(circles, pos)
+    end
+end
+
+function _draw()
+    gfx.cls()
+    local p = ctrl.touch()
+    shape.circlef(p.x, p.y, 4, 8)
+    for pos in all(circles) do
         shape.circlef(pos.x, pos.y, 4, 9)
         print("("..pos.x .. ", "..pos.y..")", pos.x + 3, pos.y + 3)
     end
@@ -1925,10 +1960,13 @@ The touch can be :</p>
 
 function _draw()
     gfx.cls()
+    local p = ctrl.touch()
+    shape.circlef(p.x, p.y, 4, 8)
+
     local start = ctrl.touching(0)
     if start ~= nil then
         local pos = ctrl.touch()
-        shape.line(start.x, start.y, pos.x, pos.y, 9)
+        shape.line(start.x, start.y, pos.x, pos.y, 1)
         print("("..start.x .. ", "..start.y..")", start.x, start.y)
         print("("..pos.x .. ", "..pos.y..")", pos.x, pos.y)
     end
@@ -2279,7 +2317,8 @@ function _draw()
    local pos = ctrl.touching(0)
    if pos ~= nil then
       -- set the pixel with the color 9 when the mouse is pressed
-      gfx.pset(pos.x, pos.y, 9)
+      local p = ctrl.touch()
+      gfx.pset(p.x, p.y, 9)
    end
 end
 </tiny-editor>
@@ -2580,46 +2619,33 @@ All interpolations available:</p>
 </table>
 <tiny-editor style="display: none;"  >
 
-function _init()
-  t = 0
-end
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
 
 function _update()
-  t = t + 1/60
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.pow2(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.pow2(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "pow2"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
 end
 
-function _draw()
-  gfx.cls()
-  progress = math.abs(math.cos(t))
-
-  print("pow", 0, 0)
-  shape.circlef(juice.pow2(20, 236, progress), 10, 10, 2)
-  shape.circlef(juice.pow3(20, 236, progress), 20, 10, 3)
-  shape.circlef(juice.pow4(20, 236, progress), 30, 10, 4)
-
-
-  print("bounce", 0, 50)
-  shape.circlef(juice.bounce(20, 236, progress), 60, 10, 5)
-
-  print("exp", 0, 80)
-  shape.circlef(juice.exp10(20, 236, progress), 90, 10, 6)
-
-
-  print("swing", 0, 110)
-  shape.circlef(juice.swing(20, 236, progress), 120, 10, 7)
-
-  print("sine", 0, 140)
-  shape.circlef(juice.sine(20, 236, progress), 150, 10, 8)
-
-  print("circle", 0, 170)
-  shape.circlef(juice.circle(20, 236, progress), 180, 10, 9)
-
-  print("elastic", 0, 200)
-  shape.circlef(juice.elastic(20, 236, progress), 210, 10, 10)
-
-  print("linear", 0, 230)
-  shape.circlef(juice.linear(20, 236, progress), 240, 10, 1)
-end
 
 </tiny-editor>
 </div>
@@ -2649,6 +2675,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.pow3(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.pow3(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "pow3"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_pow4">juice.pow4()</h4>
@@ -2676,6 +2733,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.pow4(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.pow4(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "pow4"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_pow5">juice.pow5()</h4>
@@ -2703,6 +2791,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.pow5(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.pow5(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "pow5"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_powin2">juice.powIn2()</h4>
@@ -2730,6 +2849,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.powIn2(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.powIn2(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "powIn2"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_powin3">juice.powIn3()</h4>
@@ -2757,6 +2907,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.powIn3(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.powIn3(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "powIn3"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_powin4">juice.powIn4()</h4>
@@ -2784,6 +2965,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.powIn4(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.powIn4(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "powIn4"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_powin5">juice.powIn5()</h4>
@@ -2811,6 +3023,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.powIn5(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.powIn5(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "powIn5"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_powout2">juice.powOut2()</h4>
@@ -2838,6 +3081,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.powOut2(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.powOut2(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "powOut2"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_powout3">juice.powOut3()</h4>
@@ -2865,6 +3139,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.powOut3(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.powOut3(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "powOut3"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_powout4">juice.powOut4()</h4>
@@ -2892,6 +3197,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.powOut4(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.powOut4(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "powOut4"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_powout5">juice.powOut5()</h4>
@@ -2919,6 +3255,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.powOut5(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.powOut5(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "powOut5"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_sine">juice.sine()</h4>
@@ -2946,6 +3313,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.sine(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.sine(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "sine"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_sinein">juice.sineIn()</h4>
@@ -2973,6 +3371,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.sineIn(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.sineIn(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "sineIn"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_sineout">juice.sineOut()</h4>
@@ -3000,6 +3429,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.sineOut(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.sineOut(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "sineOut"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_circle">juice.circle()</h4>
@@ -3027,6 +3487,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.circle(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.circle(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "circle"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_circlein">juice.circleIn()</h4>
@@ -3054,6 +3545,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.circleIn(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.circleIn(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "circleIn"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_circleout">juice.circleOut()</h4>
@@ -3081,6 +3603,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.circleOut(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.circleOut(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "circleOut"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_elastic">juice.elastic()</h4>
@@ -3108,6 +3661,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.elastic(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.elastic(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "elastic"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_elasticin">juice.elasticIn()</h4>
@@ -3135,6 +3719,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.elasticIn(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.elasticIn(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "elasticIn"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_elasticout">juice.elasticOut()</h4>
@@ -3162,6 +3777,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.elasticOut(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.elasticOut(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "elasticOut"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_swing">juice.swing()</h4>
@@ -3189,6 +3835,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.swing(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.swing(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "swing"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_swingin">juice.swingIn()</h4>
@@ -3216,6 +3893,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.swingIn(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.swingIn(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "swingIn"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_swingout">juice.swingOut()</h4>
@@ -3243,6 +3951,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.swingOut(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.swingOut(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "swingOut"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_bounce">juice.bounce()</h4>
@@ -3270,6 +4009,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.bounce(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.bounce(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "bounce"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_bouncein">juice.bounceIn()</h4>
@@ -3297,6 +4067,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.bounceIn(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.bounceIn(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "bounceIn"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_bounceout">juice.bounceOut()</h4>
@@ -3324,6 +4125,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.bounceOut(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.bounceOut(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "bounceOut"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_exp10">juice.exp10()</h4>
@@ -3351,6 +4183,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.exp10(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.exp10(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "exp10"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_expin10">juice.expIn10()</h4>
@@ -3378,6 +4241,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.expIn10(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.expIn10(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "expIn10"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_expout10">juice.expOut10()</h4>
@@ -3405,6 +4299,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.expOut10(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.expOut10(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "expOut10"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_exp5">juice.exp5()</h4>
@@ -3432,6 +4357,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.exp5(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.exp5(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "exp5"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_expin5">juice.expIn5()</h4>
@@ -3459,6 +4415,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.expIn5(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.expIn5(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "expIn5"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_expout5">juice.expOut5()</h4>
@@ -3486,6 +4473,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.expOut5(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.expOut5(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "expOut5"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_linear">juice.linear()</h4>
@@ -3513,6 +4531,37 @@ end
 </tr>
 </tbody>
 </table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.linear(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.linear(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "linear"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 </div>
 <div class="sect2">
@@ -4796,7 +5845,7 @@ function _draw()
    spr.sdraw()
 
    if touching ~= nil then
-      spr.pset(touching.x, touching.y, 9)
+      spr.pset(pos.x, pos.y, 9)
    end
    print("click to alter", 45, 96)
    shape.circle(64 + 8, 128 + 8, 32, 1)
@@ -4805,6 +5854,7 @@ function _draw()
 
    shape.circlef(pos.x, pos.y, 2, 3)
 end
+
 
 </tiny-editor>
 </div>
@@ -5728,8 +6778,8 @@ Support us by crediting Kenney or www.kenney.nl (this is not mandatory)</pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 1.3.1<br>
-Last updated 2024-03-19 09:16:02 UTC
+Version 1.3.2<br>
+Last updated 2024-03-19 23:26:24 UTC
 </div>
 </div>
 <style>
