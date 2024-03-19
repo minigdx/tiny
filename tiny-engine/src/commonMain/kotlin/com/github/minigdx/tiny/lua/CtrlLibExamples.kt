@@ -45,10 +45,13 @@ end
 const val CTRL_TOUCHING_EXAMPLE = """
 function _draw()
     gfx.cls()
+    local p = ctrl.touch()
+    shape.circlef(p.x, p.y, 4, 8)
+
     local start = ctrl.touching(0)
     if start ~= nil then
         local pos = ctrl.touch()
-        shape.line(start.x, start.y, pos.x, pos.y, 9)
+        shape.line(start.x, start.y, pos.x, pos.y, 1)
         print("("..start.x .. ", "..start.y..")", start.x, start.y)
         print("("..pos.x .. ", "..pos.y..")", pos.x, pos.y)
     end
@@ -56,9 +59,20 @@ end
 """
 
 const val CTRL_TOUCHED_EXAMPLE = """
-function _draw()
+local circles = {}
+
+function _update()
     local pos = ctrl.touched(0)
     if pos ~= nil then
+        table.insert(circles, pos)
+    end
+end
+
+function _draw()
+    gfx.cls()
+    local p = ctrl.touch()
+    shape.circlef(p.x, p.y, 4, 8)
+    for pos in all(circles) do 
         shape.circlef(pos.x, pos.y, 4, 9)
         print("("..pos.x .. ", "..pos.y..")", pos.x + 3, pos.y + 3)
     end

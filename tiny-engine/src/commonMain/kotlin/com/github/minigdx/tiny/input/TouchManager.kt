@@ -208,16 +208,12 @@ class TouchManager(lastKeyCode: KeyCode) {
     private fun processTouchEvent(event: InternalTouchEvent) {
         when (event.way) {
             InternalTouchEventWay.DOWN -> {
-                justTouch[event.touchSignal.ordinal] = event.position
-                touch[event.touchSignal.ordinal] = event.position
+                justTouch[event.touchSignal.ordinal] = event.position.copy()
+                touch[event.touchSignal.ordinal] = event.position.copy()
                 lastTouch.set(event.position)
             }
 
             InternalTouchEventWay.MOVE -> {
-                touch[event.touchSignal.ordinal]?.run {
-                    x = event.position.x
-                    y = event.position.y
-                }
                 lastTouch.set(event.position)
             }
 

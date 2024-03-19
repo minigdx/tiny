@@ -148,6 +148,7 @@ class CtrlLib(
             "- 1: right click or two fingers\n" +
             "- 2: middle click or three fingers\n\n",
         example = CTRL_TOUCHING_EXAMPLE,
+        name = "touching"
     )
     inner class touching : OneArgFunction() {
         @TinyCall("Is the screen is still touched or mouse button is still pressed?")
