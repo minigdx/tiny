@@ -74,6 +74,7 @@ class CtrlLib(
     @TinyFunction(
         "Return true if the key was pressed during the last frame. " +
             "If you need to check that the key is still pressed, see `ctrl.pressing` instead.",
+        example = CTRL_PRESSING_EXAMPLE
     )
     inner class pressed : OneArgFunction() {
 
