@@ -705,7 +705,7 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <div id="header">
 <h1>Tiny 🧸</h1>
 <div class="details">
-<span id="revnumber">version 1.3.0</span>
+<span id="revnumber">version 1.3.1</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -787,7 +787,7 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <li><a href="#_ctrl_touch">ctrl.touch()</a></li>
 <li><a href="#_ctrl_pressed">ctrl.pressed()</a></li>
 <li><a href="#_ctrl_pressing">ctrl.pressing()</a></li>
-<li><a href="#_ctrl_2">ctrl.</a></li>
+<li><a href="#_ctrl_touched">ctrl.touched()</a></li>
 <li><a href="#_ctrl_touching">ctrl.touching()</a></li>
 </ul>
 </li>
@@ -1243,7 +1243,8 @@ end
 <span class="image"><a class="image" href="https://dwursteisen.itch.io/connect-me"><img src="sample/connect_me.gif" alt="connect me"></a></span>
 <span class="image"><a class="image" href="https://dwursteisen.itch.io/one-light-for-three-seconds"><img src="sample/only_three_seconds.gif" alt="only three seconds"></a></span>
 <span class="image"><a class="image" href="https://dwursteisen.itch.io/meiro-de"><img src="sample/meiro_de_maigo2.gif" alt="meiro de maigo2"></a></span>
-<span class="image"><a class="image" href="https://dwursteisen.itch.io/freezming"><img src="sample/freezming.gif" alt="freezming"></a></span></p>
+<span class="image"><a class="image" href="https://dwursteisen.itch.io/freezming"><img src="sample/freezming.gif" alt="freezming"></a></span>
+<span class="image"><a class="image" href="https://dwursteisen.itch.io/gravity-balls"><img src="sample/gravity-balls.gif" alt="gravity balls"></a></span></p>
 </div>
 <div class="admonitionblock tip">
 <table>
@@ -1675,10 +1676,10 @@ The tiny serve command is intended for local testing only and should not be used
 <p><a href="https://dwursteisen.itch.io/tiny-sfx-editor">This SFX editor can be tried online</a> on itch.io.</p>
 </div>
 <div class="paragraph">
-<p><span class="image"><img src="sample/tiny-cli-sfx1.png" alt="tiny cli sfx1"></span></p>
+<p><span class="image"><img src="sample/tiny-cli-sfx1.gif" alt="tiny cli sfx1"></span></p>
 </div>
 <div class="paragraph">
-<p><span class="image"><img src="sample/tiny-cli-sfx0.png" alt="tiny cli sfx0"></span></p>
+<p><span class="image"><img src="sample/tiny-cli-sfx0.gif" alt="tiny cli sfx0"></span></p>
 </div>
 <div class="sect3">
 <h4 id="_usage_7">Usage</h4>
@@ -1858,17 +1859,7 @@ end
 </tiny-editor>
 </div>
 <div class="sect3">
-<h4 id="_ctrl_2">ctrl.</h4>
-<div class="paragraph">
-<p>function _draw()
-    local pos = ctrl.touched(0)
-    if pos ~= nil then
-        shape.circlef(pos.x, pos.y, 4, 9)
-        print("("..pos.x .. ", "..pos.y..")", pos.x + 3, pos.y + 3)
-    end
-end
-()</p>
-</div>
+<h4 id="_ctrl_touched">ctrl.touched()</h4>
 <div class="paragraph">
 <p>Return the position of the touch (as <code>{x, y}</code>)if the screen was touched or the mouse button was pressed during the last frame. <code>nil</code> otherwise.
 The touch can be :</p>
@@ -1891,17 +1882,20 @@ The touch can be :</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">ctrl</span><span class="p">.</span>
-<span class="k">function</span> <span class="nf">_draw</span><span class="p">()</span>
-    <span class="kd">local</span> <span class="n">pos</span> <span class="o">=</span> <span class="n">ctrl</span><span class="p">.</span><span class="n">touched</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">pos</span> <span class="o">~=</span> <span class="kc">nil</span> <span class="k">then</span>
-        <span class="n">shape</span><span class="p">.</span><span class="n">circlef</span><span class="p">(</span><span class="n">pos</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">pos</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"("</span><span class="o">..</span><span class="n">pos</span><span class="p">.</span><span class="n">x</span> <span class="o">..</span> <span class="s2">", "</span><span class="o">..</span><span class="n">pos</span><span class="p">.</span><span class="n">y</span><span class="o">..</span><span class="s2">")"</span><span class="p">,</span> <span class="n">pos</span><span class="p">.</span><span class="n">x</span> <span class="o">+</span> <span class="mi">3</span><span class="p">,</span> <span class="n">pos</span><span class="p">.</span><span class="n">y</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)</span>
-    <span class="k">end</span>
-<span class="k">end</span>
-<span class="p">(</span><span class="n">touch</span><span class="p">)</span> <span class="c1">-- Is the screen was touched or mouse button was pressed?</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">ctrl</span><span class="p">.</span><span class="n">touched</span><span class="p">(</span><span class="n">touch</span><span class="p">)</span> <span class="c1">-- Is the screen was touched or mouse button was pressed?</span></code></pre>
 </div>
 </div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    local pos = ctrl.touched(0)
+    if pos ~= nil then
+        shape.circlef(pos.x, pos.y, 4, 9)
+        print("("..pos.x .. ", "..pos.y..")", pos.x + 3, pos.y + 3)
+    end
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_ctrl_touching">ctrl.touching()</h4>
@@ -2405,6 +2399,39 @@ end
 <span class="n">gfx</span><span class="p">.</span><span class="n">camera</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- Set game camera to the position x, y.</span></code></pre>
 </div>
 </div>
+<tiny-editor style="display: none;"  >
+
+local x = 0
+local y = 0
+
+function _update()
+    if ctrl.pressing(keys.left) then
+        x = x - 0.5
+    elseif ctrl.pressing(keys.right) then
+        x = x + 0.5
+    end
+
+    if ctrl.pressing(keys.up) then
+        y = y - 0.5
+    elseif ctrl.pressing(keys.down) then
+        y = y + 0.5
+    end
+    gfx.camera(math.floor(x), math.floor(y))
+end
+
+function _draw()
+    gfx.cls(2)
+    for x = 0 - 64, 256 + 64, 16 do
+        for y = 0 - 64, 256 + 64, 16 do
+            shape.line(x - 2, y, x + 2, y, 9)
+            shape.line(x, y - 2, x, y + 2, 9)
+        end
+    end
+    print("camera: ("..x..", "..y..")", 6, 6)
+
+    shape.rect(0, 0, 256, 256, 1)
+end
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_gfx_dither">gfx.dither()</h4>
@@ -5701,8 +5728,8 @@ Support us by crediting Kenney or www.kenney.nl (this is not mandatory)</pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 1.3.0<br>
-Last updated 2024-03-18 22:41:37 UTC
+Version 1.3.1<br>
+Last updated 2024-03-19 09:16:02 UTC
 </div>
 </div>
 <style>
