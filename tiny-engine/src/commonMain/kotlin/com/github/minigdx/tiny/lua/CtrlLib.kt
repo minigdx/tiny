@@ -114,7 +114,7 @@ class CtrlLib(
             "- 1: right click or two fingers\n" +
             "- 2: middle click or three fingers\n\n" +
             "If you need to check that the touch/mouse button is still active, see `ctrl.touching` instead.",
-        CTRL_TOUCHED_EXAMPLE,
+        example = CTRL_TOUCHED_EXAMPLE,
     )
     inner class touched : OneArgFunction() {
 

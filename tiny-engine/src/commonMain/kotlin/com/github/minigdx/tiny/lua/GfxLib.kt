@@ -129,7 +129,7 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         }
     }
 
-    @TinyFunction("Move the game camera.")
+    @TinyFunction("Move the game camera.", example = GFX_CAMERA_EXAMPLE)
     inner class camera : TwoArgFunction() {
 
         @TinyCall("Reset the game camera to it's default position (0,0).")
