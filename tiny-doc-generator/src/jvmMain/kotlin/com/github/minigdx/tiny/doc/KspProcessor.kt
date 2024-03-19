@@ -120,7 +120,7 @@ class AsciidocLibSection(val title: String?) {
         )
     }
 
-    fun example(lua: String?, spritePath: String? = null, levelPath: String? = null) {
+    fun example(functionName: String, lua: String?, spritePath: String? = null, levelPath: String? = null) {
         if (lua == null) return
         val spr = spritePath?.let { """sprite="$it"""" } ?: ""
         val lvl = levelPath?.let { """level="$it"""" } ?: ""
@@ -128,7 +128,7 @@ class AsciidocLibSection(val title: String?) {
             """
                 >++++
                 ><tiny-editor style="display: none;" $spr $lvl>
-                >$lua
+                >${lua.replace("##function##", functionName)}
                 ></tiny-editor>
                 >++++
                """.trimMargin(">"),
@@ -365,6 +365,7 @@ class KspProcessor(
                         lib(prefix) {
                             paragraph(variable.description)
                             example(
+                                prefix,
                                 """
                                 function _update()
                                     gfx.cls()
@@ -403,7 +404,7 @@ class KspProcessor(
                                 )
                             }
 
-                            example(func.example, func.spritePath, func.levelPath)
+                            example(func.name, func.example, func.spritePath, func.levelPath)
                         }
                     }
                 }

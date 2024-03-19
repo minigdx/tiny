@@ -1,6 +1,7 @@
 package com.github.minigdx.tiny.input
 
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -30,7 +31,7 @@ class TouchManagerTest {
     }
 
     @Test
-    fun key_just_presset() {
+    fun key_just_pressed() {
         // push key
         val touchManager = TouchManager(10)
         touchManager.onKeyPressed(1)
@@ -54,7 +55,7 @@ class TouchManagerTest {
     }
 
     @Test
-    fun key_presset_without_released() {
+    fun key_pressed_without_released() {
         // push key
         val touchManager = TouchManager(10)
         touchManager.onKeyPressed(1)
@@ -76,5 +77,18 @@ class TouchManagerTest {
         touchManager.processReceivedEvent()
         assertFalse(touchManager.isAnyKeyPressed)
         assertFalse(touchManager.isKeyPressed(1))
+    }
+
+    @Test
+    fun touching() {
+        // push key
+        val touchManager = TouchManager(10)
+        touchManager.onTouchDown(TouchSignal.TOUCH1, 0f, 0f)
+        touchManager.processReceivedEvent()
+        touchManager.onTouchMove(TouchSignal.TOUCH1, 10f, 0f)
+        touchManager.processReceivedEvent()
+
+        val pos = touchManager.isTouched(TouchSignal.TOUCH1)
+        assertEquals(0f, pos?.x)
     }
 }
