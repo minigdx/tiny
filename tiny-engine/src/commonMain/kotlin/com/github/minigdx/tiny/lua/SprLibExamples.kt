@@ -27,9 +27,9 @@ function _draw()
     gfx.cls()
 
    spr.sdraw()
-   
+
    if touching ~= nil then
-      spr.pset(touching.x, touching.y, 9)
+      spr.pset(pos.x, pos.y, 9)
    end
    print("click to alter", 45, 96)
    shape.circle(64 + 8, 128 + 8, 32, 1)
@@ -38,6 +38,7 @@ function _draw()
 
    shape.circlef(pos.x, pos.y, 2, 3)
 end
+
 """
 
 //language=Lua

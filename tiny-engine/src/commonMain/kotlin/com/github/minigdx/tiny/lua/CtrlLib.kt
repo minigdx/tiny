@@ -74,7 +74,7 @@ class CtrlLib(
     @TinyFunction(
         "Return true if the key was pressed during the last frame. " +
             "If you need to check that the key is still pressed, see `ctrl.pressing` instead.",
-        example = CTRL_PRESSING_EXAMPLE
+        example = CTRL_PRESSING_EXAMPLE,
     )
     inner class pressed : OneArgFunction() {
 
@@ -148,7 +148,6 @@ class CtrlLib(
             "- 1: right click or two fingers\n" +
             "- 2: middle click or three fingers\n\n",
         example = CTRL_TOUCHING_EXAMPLE,
-        name = "touching"
     )
     inner class touching : OneArgFunction() {
         @TinyCall("Is the screen is still touched or mouse button is still pressed?")

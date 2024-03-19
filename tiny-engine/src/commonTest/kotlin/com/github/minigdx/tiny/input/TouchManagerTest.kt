@@ -91,5 +91,4 @@ class TouchManagerTest {
         val pos = touchManager.isTouched(TouchSignal.TOUCH1)
         assertEquals(0f, pos?.x)
     }
-
 }

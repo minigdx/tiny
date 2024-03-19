@@ -73,7 +73,8 @@ function _draw()
    local pos = ctrl.touching(0)
    if pos ~= nil then
       -- set the pixel with the color 9 when the mouse is pressed
-      gfx.pset(pos.x, pos.y, 9)
+      local p = ctrl.touch()
+      gfx.pset(p.x, p.y, 9)
    end
 end"""
 
