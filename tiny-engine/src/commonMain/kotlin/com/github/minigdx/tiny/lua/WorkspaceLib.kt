@@ -107,7 +107,7 @@ class WorkspaceLib(
             val ext = arg.optjstring(null).let { it?.lowercase() }
             val result = LuaTable()
             resources.forEach {
-                if ((ext == null || it.name.endsWith(ext))) {
+                if ((ext == null || it.extension.endsWith(ext))) {
                     result.insert(0, valueOf(it.name))
                 }
             }
