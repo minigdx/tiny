@@ -435,6 +435,8 @@ factory.create_menu_item = function(self, data)
         menu.spr = 21
     elseif item == "Next" then
         menu.spr = 22
+    elseif item == "NewFile" then
+        menu.spr = 13
     end
     menu.item = item
     menu.help = data.customFields.Help

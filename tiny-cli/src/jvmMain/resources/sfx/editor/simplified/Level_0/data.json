@@ -73,7 +73,7 @@
 				"id": "MenuItem",
 				"iid": "fce7b3d0-d7b0-11ee-9c45-9dddf90ef7e1",
 				"layer": "Entities",
-				"x": 48,
+				"x": 64,
 				"y": 0,
 				"width": 8,
 				"height": 8,
@@ -87,7 +87,7 @@
 				"id": "MenuItem",
 				"iid": "04f9be10-d7b0-11ee-9c45-5153c382042a",
 				"layer": "Entities",
-				"x": 88,
+				"x": 104,
 				"y": 0,
 				"width": 8,
 				"height": 8,
@@ -101,7 +101,7 @@
 				"id": "MenuItem",
 				"iid": "f0987fa0-d7b0-11ee-9c45-4bfc6d23b807",
 				"layer": "Entities",
-				"x": 56,
+				"x": 72,
 				"y": 0,
 				"width": 32,
 				"height": 8,
@@ -115,14 +115,28 @@
 				"id": "MenuItem",
 				"iid": "f564d4c0-d7b0-11ee-9c45-958bceaa5715",
 				"layer": "Entities",
-				"x": 104,
+				"x": 120,
 				"y": 0,
-				"width": 80,
+				"width": 72,
 				"height": 8,
 				"color": 12470831,
 				"customFields": {
 					"Item": "Help",
 					"Help": ""
+				}
+			},
+			{
+				"id": "MenuItem",
+				"iid": "f7259960-d7b0-11ee-9a4d-e1816015be80",
+				"layer": "Entities",
+				"x": 48,
+				"y": 0,
+				"width": 8,
+				"height": 8,
+				"color": 12470831,
+				"customFields": {
+					"Item": "NewFile",
+					"Help": "New File"
 				}
 			}
 		],
@@ -157,6 +171,12 @@
 					},
 					"Save": {
 						"entityIid": "b93e5ed0-d7b0-11ee-9c45-7fcf1ae264e3",
+						"layerIid": "8a2f1940-d7b0-11ee-9c45-cd8bc568018a",
+						"levelIid": "d319e5a0-d7b0-11ee-9c45-898e2a016ceb",
+						"worldIid": "d3199781-d7b0-11ee-9c45-11db300be03a"
+					},
+					"NewFile": {
+						"entityIid": "f7259960-d7b0-11ee-9a4d-e1816015be80",
 						"layerIid": "8a2f1940-d7b0-11ee-9c45-cd8bc568018a",
 						"levelIid": "d319e5a0-d7b0-11ee-9c45-898e2a016ceb",
 						"worldIid": "d3199781-d7b0-11ee-9c45-11db300be03a"

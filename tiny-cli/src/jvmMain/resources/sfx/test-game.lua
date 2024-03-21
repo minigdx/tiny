@@ -54,7 +54,7 @@ local button_type = {
     },
     Next = {
         spr = 32 * 5 + 29
-    }
+    },
 }
 
 -- from a content, set the correct values in the score pannel
@@ -195,20 +195,30 @@ function _init()
         file_selector.previous = find_widget(menu, file_selector.customFields.Previous)
         file_selector.screen = find_widget(menu, file_selector.customFields.Screen)
         file_selector.save = find_widget(menu, file_selector.customFields.Save)
+        file_selector.new_file = find_widget(menu, file_selector.customFields.NewFile)
         file_selector.screen.label = true
 
         file_selector.next:on_update(function(self)
-            debug.console("next")
             file_selector.current_file = math.min(#file_selector.files, file_selector.current_file + 1)
             file_selector.screen:set_value(file_selector.files[file_selector.current_file].file)
             switch_to(current_mode)
         end)
         
         file_selector.previous:on_update(function(self)
-            debug.console("previous")
             file_selector.current_file = math.max(1, file_selector.current_file - 1)
             file_selector.screen:set_value(file_selector.files[file_selector.current_file].file)
             switch_to(current_mode)
+        end)
+
+        file_selector.new_file:on_update(function(self)
+           debug.console("creating file") 
+           local new_file = ws.create("sfx", "sfx")
+            table.insert(file_selector.files, {
+                file = new_file,
+                content = sfx.to_table(sfx.empty_score())
+            })
+            file_selector.current_file = #file_selector.files
+            file_selector.next:set_value()
         end)
 
         file_selector.save:on_update(function(self)
