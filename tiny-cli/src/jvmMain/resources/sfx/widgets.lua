@@ -1,3 +1,18 @@
+local on_update = function(self, listener)
+    table.insert(self.listeners, listener)
+end
+
+local fire_on_update = function(self, value)
+    for l in all(self.listeners) do
+        l(self, value)
+    end
+end
+
+local set_value = function(self, value)
+    self.value = value
+    self:fire_on_update(value)
+end
+
 local Fader = {
     x = 0,
     y = 0,
@@ -14,7 +29,11 @@ local Fader = {
     data = nil,
     index = 0,
     on_value_update = function(fader, value)
-    end
+    end,
+    listeners = {},
+    on_update = on_update,
+    fire_on_update = fire_on_update,
+    set_value = set_value,
 }
 
 local Button = {
@@ -27,47 +46,10 @@ local Button = {
     status = 0, -- 0 : idle ; 1 : over ; 2 : active
     overlay = 0, -- sprite index,
     on_active_button = function(current, prec)
-    end
-}
-
-local Tab = {
-    x = 0,
-    y = 0,
-    width = 0,
-    height = 8,
-    enabled = true,
-    label = "+",
-    content = nil,
-    status = 0, -- 0 : inactive ; 1 : active
-    new_tab = false,
-    on_active_tab = nil,
-    on_new_tab = nil
-}
-
-local TabManager = {
-    x = 0,
-    y = 0,
-    width = 0,
-    height = 0,
-    on_new_tab = nil,
-    tabs = {},
-    active_tab = nil
-}
-
-local Counter = {
-    label = "",
-    value = 0,
-    x = 0,
-    y = 0,
-    width = 16,
-    height = 16,
-    enabled = true,
-    status = 0, -- 0 : iddle ; 1 : over left ; 2 : over right
-    on_left = function(counter)
     end,
-    on_right = function(counter)
-    end,
-    spr = 32
+    listeners = {},
+    on_update = on_update,
+    fire_on_update = fire_on_update,
 }
 
 local Envelop = {
@@ -112,19 +94,25 @@ local Knob = {
     on_update = nil
 }
 
-local buttons = {}
-local tabs = {}
-local faders = {}
-local widgets = {}
-local counters = {}
-local envelops = {}
-local checkboxes = {}
-local knobs = {}
 
-local factory = {
-    tabs = {},
-    widgets = {}
+local MenuItem = {
+    _type = "MenuItem",
+    spr = nil,
+    hold = false,
+    status = 0,
+    active = 0,
+    help = "",
+    on_click = function()
+    end,
+    on_hover = function()
+    end,
+    listeners = {},
+    on_update = on_update,
+    fire_on_update = fire_on_update,
+    set_value = set_value,
 }
+
+local factory = { }
 
 function inside_widget(w, x, y)
     return w.x <= x and x <= w.x + w.width and w.y <= y and y <= w.y + w.height
@@ -149,8 +137,8 @@ Button._update = function(self)
             self:on_hover()
         end
         local touched = ctrl.touched(0)
-        if touched and self.on_changed ~= nil then
-            self:on_changed()
+        if touched then
+            self:fire_on_update(self.status)
         end
     else
         self.status = 0
@@ -169,13 +157,6 @@ Button._draw = function(self)
     if self.overlay ~= nil then
         spr.draw(self.overlay, self.x, self.y)
     end
-end
-
-factory.create_fader = function(self, value)
-    local result = new(Fader, value)
-    result.help = result.customFields.Help
-    result.label = result.customFields.Label
-    return result
 end
 
 factory.create_envelop = function(self, data)
@@ -243,18 +224,22 @@ Knob._update = function(self)
     end
 end
 
-
-factory._init = function(self)
-
-end
-
-factory._update = function(mouse)
-
+factory.create_fader = function(self, value)
+    local result = new(Fader, value)
+    result.help = result.customFields.Help
+    result.label = result.customFields.Label
+    result.hitbox = {
+        x = result.x,
+        y = result.y,
+        width = result.width,
+        height = result.height + 4
+    }
+    return result
 end
 
 Fader._update = function(self)
     local pos = ctrl.touch()
-    if inside_widget(self, pos.x, pos.y) then
+    if inside_widget(self.hitbox, pos.x, pos.y) then
         if self.on_hover ~= nil then
             self:on_hover()
         end
@@ -263,9 +248,12 @@ Fader._update = function(self)
             local percent = math.max(0.0, 1.0 - ((pos.y - self.y) / self.height))
             self.value = percent
 
+            -- todo: to be removed as fire_on_update should be used instead
             if self.on_value_update then
                 self:on_value_update(self.value)
             end
+
+            self:fire_on_update(self.value)
         end
     end
 end
@@ -388,19 +376,6 @@ factory.create_help = function(self, data)
     return help
 end
 
-local MenuItem = {
-    _type = "MenuItem",
-    spr = nil,
-    hold = false,
-    status = 0,
-    active = 0,
-    help = "",
-    on_click = function()
-    end,
-    on_hover = function()
-    end
-}
-
 local menuItems = {}
 
 MenuItem._update = function(self)
@@ -414,7 +389,7 @@ MenuItem._update = function(self)
             self.status = 1
         end
         if ctrl.touched(0) then
-            self:on_click()
+            self:fire_on_update(self.status)
             if self.hold then
                 for i in all(menuItems) do
                     i.active = 0
@@ -436,7 +411,7 @@ MenuItem._draw = function(self)
     end
     
     if self.label ~= nil then
-        print(self.label, self.x + 5, self.y + 2)
+        print(self.value, self.x + 5, self.y + 2)
     end
 end
 
