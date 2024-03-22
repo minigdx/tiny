@@ -20,7 +20,6 @@ local mode = {
     }
 }
 
-
 local button_type = {
     Sine = {
         spr = 60,
@@ -54,20 +53,26 @@ local button_type = {
     },
     Next = {
         spr = 32 * 5 + 29
-    },
+    }
 }
 
 -- from a content, set the correct values in the score pannel
 mode.score.configure = function(self, content)
     local content = self.file_selector:current()
-    
+
+    debug.console(content)
     for index, note in ipairs(content.tracks[1].patterns[1]) do
-        self.sound.selector.selected = note.type
-        self.sound.notes[index].tip_color = button_type[note.type].color 
-        self.sound.notes[index]:set_value(note.note / 107)
-        self.sound.volumes[index]:set_value(note.volume / 255)
+        if (note.type == "Silence") then
+            self.sound.notes[index]:set_value(0)
+            self.sound.volumes[index]:set_value(0)
+        else
+            self.sound.selector.selected = note.type
+            self.sound.notes[index]:set_value(note.note / 107)
+            self.sound.notes[index].tip_color = button_type[note.type].color
+            self.sound.volumes[index]:set_value(note.volume / 255)
+        end
     end
-    
+
     self.sound.bpm.value = content.bpm / 255
     self.sound.volume.value = content.volume / 255
 end
@@ -181,13 +186,12 @@ function _init()
                 content = sfx.to_table(sfx.empty_score())
             })
         else
-            local i = 1
             for f in all(files) do
+                debug.console(f)
                 table.insert(file_selector.files, {
                     file = f,
                     content = sfx.to_table(ws.load(f))
                 })
-                i = i + 1
             end
         end
 
@@ -203,7 +207,7 @@ function _init()
             file_selector.screen:set_value(file_selector.files[file_selector.current_file].file)
             switch_to(current_mode)
         end)
-        
+
         file_selector.previous:on_update(function(self)
             file_selector.current_file = math.max(1, file_selector.current_file - 1)
             file_selector.screen:set_value(file_selector.files[file_selector.current_file].file)
@@ -211,8 +215,8 @@ function _init()
         end)
 
         file_selector.new_file:on_update(function(self)
-           debug.console("creating file") 
-           local new_file = ws.create("sfx", "sfx")
+            debug.console("creating file")
+            local new_file = ws.create("sfx", "sfx")
             table.insert(file_selector.files, {
                 file = new_file,
                 content = sfx.to_table(sfx.empty_score())
@@ -288,7 +292,6 @@ function _init()
                 content.tracks[1].env.decay = value * 255
             end
             f:on_update(on_value_update)
-
 
             f = find_widget(m.widgets, knob.customFields.Sustain)
             knob.sustain_fader = f
@@ -383,7 +386,7 @@ function _init()
             e.on_changed = function(self, value)
                 knob.enabled = value
             end
-            
+
             local v = find_widget(m.widgets, knob.customFields.Sweep)
             knob.knob_sweep = v
             v.on_update = function(self, value)
@@ -428,15 +431,15 @@ function _init()
             e = find_widget(m.widgets, knob.customFields.Triangle)
             table.insert(knob.selector, e)
             e:on_update(on_update)
-            
+
             e = find_widget(m.widgets, knob.customFields.Noise)
             table.insert(knob.selector, e)
             e:on_update(on_update)
-            
+
             e = find_widget(m.widgets, knob.customFields.Pulse)
             table.insert(knob.selector, e)
             e:on_update(on_update)
-            
+
             table.insert(m.widgets, knob)
         end
 
@@ -466,7 +469,7 @@ function _init()
                 end
                 f:on_update(on_update)
             end
-            
+
             for key, v in ipairs(k.customFields.Notes) do
                 local f = find_widget(m.widgets, v)
                 s.notes[key] = f
@@ -537,7 +540,7 @@ function _update()
     end, function()
     end, function()
     end)
-    
+
     for w in all(menu) do
         w:_update()
     end
