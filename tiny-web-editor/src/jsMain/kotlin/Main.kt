@@ -24,7 +24,8 @@ import kotlinx.dom.createElement
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLCanvasElement
-import org.w3c.dom.HTMLTextAreaElement
+import org.w3c.dom.HTMLDivElement
+import org.w3c.dom.Node
 import org.w3c.dom.url.URLSearchParams
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -79,6 +80,57 @@ fun main() {
     }
 }
 
+fun getCaretPosition(el: Element): Int {
+    val selection = window.asDynamic().getSelection() ?: return -1
+    val range = selection.getRangeAt(0)
+    val prefix = range.cloneRange()
+    prefix.selectNodeContents(el)
+    prefix.setEnd(range.endContainer, range.endOffset)
+    return prefix.toString().length
+}
+
+fun setCaret(pos: Int, parent: Node): Int {
+    var position = pos
+    for (i in 0 until parent.childNodes.length) {
+        val node = parent.childNodes.item(i)!!
+        if (node.nodeType == Node.TEXT_NODE) {
+            if (node.textContent!!.length >= position) {
+                val range = document.createRange()
+                val sel = window.asDynamic().getSelection()
+                range.setStart(node, position)
+                range.collapse(true)
+                sel?.removeAllRanges()
+                sel?.addRange(range)
+                return -1
+            } else {
+                position -= node.textContent!!.length
+            }
+        } else {
+            position = setCaret(position, node)
+            if (position < 0) {
+                return position
+            }
+        }
+    }
+    return position
+}
+
+fun highlight(content: String): String {
+    return content
+        .split("\n").map { "<div>${it.ifBlank { " " }}</div>" }.joinToString("\n")
+        // String
+        .replace(Regex("(\".*?\")"), "<strong class=\"code_string\">$1</strong>")
+        // Comment
+        .replace(Regex("--(.*)"), """<em class="code_comment">--$1</em>""")
+        // Keyword
+        .replace(
+            Regex("\\b(if|else|elif|end|while|for|in|of|continue|break|return|function|local|do)\\b"),
+            """<strong class="code_keyword">$1</strong>""",
+        )
+        // Numbers
+        .replace(Regex("\\b(\\d+)"), "<em class=\"code_number\">$1</em>")
+}
+
 @OptIn(ExperimentalEncodingApi::class)
 private fun createGame(
     container: Element,
@@ -96,13 +148,21 @@ private fun createGame(
     }
     container.appendChild(canvas)
 
-    val textarea = (document.createElement("textarea") as HTMLTextAreaElement).apply {
+    val textarea = (document.createElement("div") as HTMLDivElement).apply {
         setAttribute("id", "editor-$index")
         setAttribute("spellcheck", "false")
         setAttribute("class", "tiny-textarea")
+        setAttribute("contenteditable", "true")
 
         innerHTML = code
+
+        onkeydown = { event ->
+            val pos = getCaretPosition(this)
+            this.innerHTML = highlight(this.innerText)
+            setCaret(pos, this)
+        }
     }
+    textarea.innerHTML = highlight(textarea.innerText)
     container.appendChild(textarea)
 
     val link = (document.createElement("a") as HTMLAnchorElement).apply {
@@ -183,9 +243,11 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
         }
     }
 
-    override fun createImageStream(name: String, canUseJarPrefix: Boolean): SourceStream<ImageData> = delegate.createImageStream(
-        name,
-    )
+    override fun createImageStream(name: String, canUseJarPrefix: Boolean): SourceStream<ImageData> =
+        delegate.createImageStream(
+            name,
+        )
+
     override fun createSoundStream(name: String): SourceStream<SoundData> = delegate.createSoundStream(name)
     override fun createLocalFile(name: String): LocalFile = delegate.createLocalFile(name)
 }

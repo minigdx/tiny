@@ -1,3 +1,4 @@
+<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
 <style>
     .tiny-container {
         display: flex;
@@ -13,12 +14,39 @@
         cursor: none;
     }
 
+    .tiny-textarea div {
+        display: block;
+        position: relative;
+        white-space: pre-wrap;
+    }
+
+    .tiny-textarea div::before {
+        color: #bababa;
+        content: counter(line);   /* insert a div with the value of the counter */
+        counter-increment: line;  /* increment the counter */
+        position: absolute;
+        right: calc(100% + 16px); /* add some space between this and the code line next to it */
+    }
+
     .tiny-textarea {
+        padding-left: 48px;
+        counter-reset: line; /* reset the "line" counter */
         height: 512px;
-        width: 47%;
-        min-width: 200px;
-        font-family: monospace;
+        width: 100%;
+        font-family: "Source Code Pro", monospace;
         resize:none;
+    }
+
+    .code_comment {
+        color: #979797
+    }
+
+    .code_keyword {
+        color: #3b66db
+    }
+
+    .code_string {
+        color: #128427
     }
 
     .no-resize {
