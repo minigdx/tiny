@@ -53,6 +53,9 @@ local button_type = {
     },
     Next = {
         spr = 32 * 5 + 29
+    },
+    PatternId = {
+        spr = 32 * 5 + 29 + 16
     }
 }
 
@@ -529,6 +532,9 @@ function _init()
             fx.play = find_widget(m.widgets, k.customFields.Play)
             fx.play:on_update(play)
             m.fx = fx
+        end
+
+        for k in all(map.entities["PatternSelector"]) do
         end
     end
 
