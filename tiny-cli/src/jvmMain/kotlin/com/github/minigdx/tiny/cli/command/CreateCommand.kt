@@ -42,7 +42,7 @@ class CreateCommand : CliktCommand(name = "create", help = "Create a new game.")
         .default(File("."))
 
     private val gameName by option(help = "🏷 The name of the game")
-            .prompt(text = "🏷  The name of the game", default = generateRandomGameName())
+        .prompt(text = "🏷  The name of the game", default = generateRandomGameName())
 
     private val gameResolution by option(help = "🖥 The game resolution (e.g., 800x600)")
         .prompt(text = "\uD83D\uDDA5  Game resolution (e.g., 800x600)", default = "256x256")
@@ -82,8 +82,8 @@ ${
         )
 
     private val hideMouseCursor by option(help = "\uD83D\uDDB1\uFE0F Hide system cursor mouse")
-            .prompt("\uD83D\uDDB1\uFE0F  Hide system cursor mouse? (yes or no)", default = "No")
-            .validate { it.lowercase() == "yes" || it.lowercase() == "no" }
+        .prompt("\uD83D\uDDB1\uFE0F  Hide system cursor mouse? (yes or no)", default = "No")
+        .validate { it.lowercase() == "yes" || it.lowercase() == "no" }
 
     override fun run() {
         echo("➡\uFE0F  Game Name: $gameName")
