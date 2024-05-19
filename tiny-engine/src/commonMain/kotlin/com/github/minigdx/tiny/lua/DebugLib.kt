@@ -17,6 +17,7 @@ import org.luaj.vm2.Varargs
 import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
+import org.luaj.vm2.lib.VarArgFunction
 
 private class DebugShape {
 
@@ -208,18 +209,18 @@ class DebugLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
     }
 
     @TinyFunction("Log a message on the screen.", example = DEBUG_EXAMPLE)
-    internal inner class log : TwoArgFunction() {
+    internal inner class log : VarArgFunction() {
 
         @TinyCall("Log a message on the screen.")
-        override fun call(@TinyArg("str") arg1: LuaValue, @TinyArg("color") arg2: LuaValue): LuaValue {
-            val message = formatValue(arg1)
-            val color = arg2.optjstring("#32CD32")!!
-            resourceAccess.debug(DebugMessage(message, color))
+        override fun invoke(@TinyArg("str") args: Varargs): Varargs {
+            val nbArgs = args.narg()
+            val message = (1..nbArgs).map {
+                formatValue(args.arg(it))
+            }.joinToString("")
+
+            resourceAccess.debug(DebugMessage(message, "#32CD32"))
             return NIL
         }
-
-        @TinyCall("Log a message on the screen.")
-        override fun call(@TinyArg("str") arg: LuaValue): LuaValue = super.call(arg)
     }
 
     @TinyFunction("Log a message into the console.", example = DEBUG_EXAMPLE)
