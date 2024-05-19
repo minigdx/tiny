@@ -675,6 +675,7 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body class="article toc2 toc-left">
+<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
 <style>
     .tiny-container {
         display: flex;
@@ -690,12 +691,39 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
         cursor: none;
     }
 
+    .tiny-textarea div {
+        display: block;
+        position: relative;
+        white-space: pre-wrap;
+    }
+
+    .tiny-textarea div::before {
+        color: #bababa;
+        content: counter(line);   /* insert a div with the value of the counter */
+        counter-increment: line;  /* increment the counter */
+        position: absolute;
+        right: calc(100% + 16px); /* add some space between this and the code line next to it */
+    }
+
     .tiny-textarea {
+        padding-left: 48px;
+        counter-reset: line; /* reset the "line" counter */
         height: 512px;
-        width: 47%;
-        min-width: 200px;
-        font-family: monospace;
+        width: 100%;
+        font-family: "Source Code Pro", monospace;
         resize:none;
+    }
+
+    .code_comment {
+        color: #979797
+    }
+
+    .code_keyword {
+        color: #3b66db
+    }
+
+    .code_string {
+        color: #128427
     }
 
     .no-resize {
@@ -705,7 +733,7 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <div id="header">
 <h1>Tiny 🧸</h1>
 <div class="details">
-<span id="revnumber">version 1.3.2</span>
+<span id="revnumber">version 1.3.3-alpha</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -2066,8 +2094,7 @@ end
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">debug</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Log a message on the screen.</span>
-<span class="n">debug</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="n">str</span><span class="p">)</span> <span class="c1">-- Log a message on the screen.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">debug</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="n">str</span><span class="p">)</span> <span class="c1">-- Log a message on the screen.</span></code></pre>
 </div>
 </div>
 <tiny-editor style="display: none;"  >
@@ -6392,7 +6419,7 @@ end
 <div class="sect3">
 <h4 id="_vec2_sub">vec2.sub()</h4>
 <div class="paragraph">
-<p>Subtract another vector to a vector</p>
+<p>Subtract another vector from another vector</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -6778,8 +6805,8 @@ Support us by crediting Kenney or www.kenney.nl (this is not mandatory)</pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 1.3.2<br>
-Last updated 2024-03-19 23:26:24 UTC
+Version 1.3.3-alpha<br>
+Last updated 2024-05-19 08:07:09 UTC
 </div>
 </div>
 <style>
