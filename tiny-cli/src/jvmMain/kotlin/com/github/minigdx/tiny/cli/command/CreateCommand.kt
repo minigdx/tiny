@@ -42,26 +42,26 @@ class CreateCommand : CliktCommand(name = "create", help = "Create a new game.")
         .default(File("."))
 
     private val gameName by option(help = "🏷 The name of the game")
-        .prompt(default = generateRandomGameName())
+        .prompt(text = "🏷  The name of the game", default = generateRandomGameName())
 
     private val gameResolution by option(help = "🖥 The game resolution (e.g., 800x600)")
-        .prompt(default = "256x256")
+        .prompt(text = "\uD83D\uDDA5  Game resolution (e.g., 800x600)", default = "256x256")
         .validate { require(it.matches(Regex("\\d+x\\d+"))) { "Invalid resolution format: $it" } }
 
     private val gameScript by option(help = "\uD83D\uDCDD Name of the default game script")
-        .prompt(default = "game.lua")
+        .prompt(text = "\uD83D\uDCDD Name of the first game script", default = "game.lua")
         .validate { require(it.endsWith(".lua")) { "Invalid game script extension: $it" } }
 
     private val spriteSize by option(help = "📐 The sprite size (e.g., 16x16)")
-        .prompt(default = "16x16")
+        .prompt(text = "\uD83D\uDCD0  Sprite size (e.g., 16x16)", default = "16x16")
         .validate { require(it.matches(Regex("\\d+x\\d+"))) { "Invalid resolution format: $it" } }
 
     private val zoom by option(help = "🔍 Game zoom")
         .int()
-        .prompt(default = "2")
+        .prompt(text = "\uD83D\uDD0D  Game zoom", default = "2")
 
     private val spritesheets by option(help = "\uD83D\uDCC4 The filenames of the sprite sheets, separated by a comma (e.g., file1.png, file2.png)")
-        .prompt(default = "")
+        .prompt(text = "\uD83D\uDCC4  Sprite sheet name to include", default = "")
         .validate {
             require(
                 it.isEmpty() || it.split(",")
@@ -72,7 +72,7 @@ class CreateCommand : CliktCommand(name = "create", help = "Create a new game.")
     private val palette by option(help = "🎨 The Color palette to use")
         .int()
         .prompt(
-            """Please choose a game color palette:
+            """🎨  Please choose a game color palette:
 ${
             GamePalette.ALL.mapIndexed { index, gamePalette ->
                 "[${index + 1}] ${gamePalette.name}"
@@ -80,6 +80,10 @@ ${
             }
 """,
         )
+
+    private val hideMouseCursor by option(help = "\uD83D\uDDB1\uFE0F Hide system cursor mouse")
+        .prompt("\uD83D\uDDB1\uFE0F  Hide system cursor mouse? (yes or no)", default = "No")
+        .validate { it.lowercase() == "yes" || it.lowercase() == "no" }
 
     override fun run() {
         echo("➡\uFE0F  Game Name: $gameName")
@@ -95,6 +99,7 @@ ${
             zoom = zoom,
             colors = GamePalette.ALL[palette - 1].colors,
             scripts = listOf(gameScript),
+            hideMouseCursor = hideMouseCursor == "yes".lowercase(),
         ) as GameParameters
 
         if (!gameDirectory.exists()) gameDirectory.mkdirs()

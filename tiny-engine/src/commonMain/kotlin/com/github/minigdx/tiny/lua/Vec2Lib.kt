@@ -9,9 +9,11 @@ import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
 import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.TwoArgFunction
+import org.luaj.vm2.lib.VarArgFunction
 
 @TinyLib("vec2", "Vector2 manipulation library.")
 class Vec2Lib : TwoArgFunction() {
+
     override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
         val vector2 = LuaTable()
         vector2["create"] = create()
@@ -33,7 +35,18 @@ class Vec2Lib : TwoArgFunction() {
         @TinyCall("Create a vector 2 as a table { x, y }.")
         override fun call(@TinyArg("x") arg1: LuaValue, @TinyArg("y") arg2: LuaValue): LuaValue {
             val (x, y) = extract(arg1, arg2)
-            return v2(x, y)
+            val defaultX = if (x.isnil()) {
+                ZERO
+            } else {
+                x
+            }
+
+            val defaultY = if (y.isnil()) {
+                ZERO
+            } else {
+                y
+            }
+            return v2(defaultX, defaultY)
         }
 
         @TinyCall("Create a vector 2 as a table { x, y } using another vector 2.")
@@ -41,7 +54,7 @@ class Vec2Lib : TwoArgFunction() {
     }
 
     @TinyFunction("Add vector2 to another vector2", example = VECTOR2_ADD)
-    class add : LibFunction() {
+    class add : VarArgFunction() {
         override fun invoke(args: Varargs): Varargs {
             val (x1, y1, x2, y2) = extract(args)
             return v2(
@@ -65,8 +78,8 @@ class Vec2Lib : TwoArgFunction() {
         ): LuaValue = super.call(a, b, c, d)
     }
 
-    @TinyFunction("Subtract another vector to a vector", example = VECTOR2_SUB)
-    class sub : LibFunction() {
+    @TinyFunction("Subtract another vector from another vector", example = VECTOR2_SUB)
+    class sub : VarArgFunction() {
         override fun invoke(args: Varargs): Varargs {
             val (x1, y1, x2, y2) = extract(args)
             return v2(
@@ -113,7 +126,7 @@ class Vec2Lib : TwoArgFunction() {
     }
 
     @TinyFunction("Calculate the magnitude (length) of a vector")
-    class mag : LibFunction() {
+    class mag : VarArgFunction() {
         override fun invoke(args: Varargs): Varargs {
             val (x1, y1) = extract(args)
             return valueOf(kotlin.math.sqrt(x1.todouble() * x1.todouble() + y1.todouble() * y1.todouble()))
@@ -121,9 +134,9 @@ class Vec2Lib : TwoArgFunction() {
 
         @TinyCall("Calculate the magnitude (length) of a vector 2 {x, y}")
         override fun call(
-            @TinyArg("x") a: LuaValue,
-            @TinyArg("y") b: LuaValue,
-        ): LuaValue = super.call(a, b)
+            @TinyArg("x") arg1: LuaValue,
+            @TinyArg("y") arg2: LuaValue,
+        ): LuaValue = super.call(arg1, arg2)
 
         @TinyCall("Calculate the magnitude (length) of a vector 2 {x, y}")
         override fun call(
@@ -132,29 +145,29 @@ class Vec2Lib : TwoArgFunction() {
     }
 
     @TinyFunction("Normalize a vector", example = VECTOR_NOR)
-    class nor : LibFunction() {
+    class nor : VarArgFunction() {
         override fun invoke(args: Varargs): Varargs {
             val (x1, y1) = extract(args)
             val len = kotlin.math.sqrt(x1.todouble() * x1.todouble() + y1.todouble() * y1.todouble())
             return if (len != 0.0) {
                 v2(valueOf(x1.todouble() / len), valueOf(y1.todouble() / len))
             } else {
-                NIL
+                v2(valueOf(0), valueOf(0))
             }
         }
 
         @TinyCall("Normalize a vector 2 {x, y}")
         override fun call(
-            @TinyArg("x") a: LuaValue,
-            @TinyArg("y") b: LuaValue,
-        ): LuaValue = super.call(a, b)
+            @TinyArg("x") arg1: LuaValue,
+            @TinyArg("y") arg2: LuaValue,
+        ): LuaValue = super.call(arg1, arg2)
 
         @TinyCall("Normalize a vector 2 {x, y}")
-        override fun call(@TinyArg("v1", "vector 2 as a table {x, y}") a: LuaValue): LuaValue = super.call(a)
+        override fun call(@TinyArg("v1", "vector 2 as a table {x, y}") arg: LuaValue): LuaValue = super.call(arg)
     }
 
     @TinyFunction("Cross product")
-    class crs : LibFunction() {
+    class crs : VarArgFunction() {
         override fun invoke(args: Varargs): Varargs {
             val (x1, y1, x2, y2) = extract(args)
             return valueOf(
@@ -178,7 +191,7 @@ class Vec2Lib : TwoArgFunction() {
     }
 
     @TinyFunction("Scale a vector", example = VECTOR2_SCL)
-    class scl : LibFunction() {
+    class scl : VarArgFunction() {
         override fun invoke(args: Varargs): Varargs {
             val (x1, y1, scale) = extract(args)
             return v2(valueOf(x1.todouble() * scale.todouble()), valueOf(y1.todouble() * scale.todouble()))
@@ -186,16 +199,16 @@ class Vec2Lib : TwoArgFunction() {
 
         @TinyCall("Scale a vector 2 {x, y} using the factor scl")
         override fun call(
-            @TinyArg("x") a: LuaValue,
-            @TinyArg("y") b: LuaValue,
-            @TinyArg("scl") c: LuaValue,
-        ): LuaValue = super.call(a, b, c)
+            @TinyArg("x") arg1: LuaValue,
+            @TinyArg("y") arg2: LuaValue,
+            @TinyArg("scl") arg3: LuaValue,
+        ): LuaValue = super.call(arg1, arg2, arg3)
 
         @TinyCall("Scale a vector 2 {x, y} using the factor scl")
         override fun call(
             @TinyArg("v1", "vector 2 as a table {x, y}") a: LuaValue,
-            @TinyArg("scl") b: LuaValue,
-        ): LuaValue = super.call(a, b)
+            @TinyArg("scl") arg2: LuaValue,
+        ): LuaValue = super.call(a, arg2)
     }
 
     companion object {

@@ -17,6 +17,7 @@ import org.luaj.vm2.Varargs
 import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
+import org.luaj.vm2.lib.VarArgFunction
 
 private class DebugShape {
 
@@ -189,49 +190,47 @@ class DebugLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
         }
     }
 
+    private fun formatValue(arg: LuaValue, recursiveSecurity: MutableSet<Int> = mutableSetOf()): String = if (arg.istable()) {
+        val table = arg as LuaTable
+        if (recursiveSecurity.contains(table.hashCode())) {
+            "table[<${table.hashCode()}>]"
+        } else {
+            recursiveSecurity.add(table.hashCode())
+            val keys = table.keys()
+            val str = keys.joinToString(" ") {
+                it.optjstring("nil") + ":" + formatValue(table[it], recursiveSecurity)
+            }
+            "table[$str]"
+        }
+    } else if (arg.isfunction()) {
+        "function(" + (0 until arg.narg()).joinToString(", ") { "arg" } + ")"
+    } else {
+        arg.toString()
+    }
+
     @TinyFunction("Log a message on the screen.", example = DEBUG_EXAMPLE)
-    internal inner class log : TwoArgFunction() {
+    internal inner class log : VarArgFunction() {
 
         @TinyCall("Log a message on the screen.")
-        override fun call(@TinyArg("str") arg1: LuaValue, @TinyArg("color") arg2: LuaValue): LuaValue {
-            val message = arg1.optjstring("")!!
-            val color = arg2.optjstring("#32CD32")!!
-            resourceAccess.debug(DebugMessage(message, color))
+        override fun invoke(@TinyArg("str") args: Varargs): Varargs {
+            val nbArgs = args.narg()
+            val message = (1..nbArgs).map {
+                formatValue(args.arg(it))
+            }.joinToString("")
+
+            resourceAccess.debug(DebugMessage(message, "#32CD32"))
             return NIL
         }
-
-        @TinyCall("Log a message on the screen.")
-        override fun call(@TinyArg("str") arg: LuaValue): LuaValue = super.call(arg)
     }
 
     @TinyFunction("Log a message into the console.", example = DEBUG_EXAMPLE)
     internal inner class console : OneArgFunction() {
 
-        private val recursiveSecurity = mutableSetOf<Int>()
-
         @TinyCall("Log a message into the console.")
         override fun call(@TinyArg("str") arg: LuaValue): LuaValue {
             val str = formatValue(arg)
-            recursiveSecurity.clear()
             println("\uD83D\uDC1B $str")
             return NIL
-        }
-
-        private fun formatValue(arg: LuaValue): String = if (arg.istable()) {
-            val table = arg as LuaTable
-            if (recursiveSecurity.contains(table.hashCode())) {
-                "table[<${table.hashCode()}>]"
-            } else {
-                recursiveSecurity.add(table.hashCode())
-                val keys = table.keys()
-                val str = keys.map { it.optjstring("nil") + ":" + formatValue(table.get(it)) }
-                    .joinToString(" ")
-                "table[$str]"
-            }
-        } else if (arg.isfunction()) {
-            "function(" + (0 until arg.narg()).map { "arg" }.joinToString(", ") + ")"
-        } else {
-            arg.toString()
         }
     }
 

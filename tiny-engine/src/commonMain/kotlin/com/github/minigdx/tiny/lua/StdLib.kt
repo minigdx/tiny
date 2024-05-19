@@ -46,18 +46,28 @@ class StdLib(
         @TinyCall("Create new instance of class using default values.")
         override fun call(@TinyArg("class") arg1: LuaValue, @TinyArg("default") arg2: LuaValue): LuaValue {
             val default = if (arg2.istable()) {
-                val result = LuaTable()
-                val toCopy = arg2.checktable()!!
-                toCopy.keys().forEach { key ->
-                    result.set(key, toCopy.get(key))
-                }
-                result
+                arg2.checktable()!!.deepCopy()
             } else {
                 LuaTable()
             }
-            default.setmetatable(arg1)
-            arg1.rawset("__index", arg1)
+            val reference = arg1.checktable()!!.deepCopy()
+            default.setmetatable(reference)
+            reference.rawset("__index", reference)
             return default
+        }
+
+        private fun LuaTable.deepCopy(): LuaTable {
+            val result = LuaTable()
+            this.keys().forEach { key ->
+                var value = this[key]
+                value = if (value.istable()) {
+                    value.checktable()!!.deepCopy()
+                } else {
+                    value
+                }
+                result[key] = value
+            }
+            return result
         }
     }
 

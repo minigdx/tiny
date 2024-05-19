@@ -295,7 +295,6 @@ class SfxLib(
         private fun SoundGenerator.toLuaTable(): LuaTable {
             val note = LuaTable()
             note.set("type", this.name)
-            note.set("index", this.index)
             note.set("note", this.note.index)
             note.set("volume", (this.volume * 255).toInt())
             return note

@@ -20,7 +20,6 @@ local mode = {
     }
 }
 
-
 local button_type = {
     Sine = {
         spr = 60,
@@ -54,19 +53,29 @@ local button_type = {
     },
     Next = {
         spr = 32 * 5 + 29
+    },
+    PatternId = {
+        spr = 32 * 5 + 29 + 16
     }
 }
 
 -- from a content, set the correct values in the score pannel
 mode.score.configure = function(self, content)
     local content = self.file_selector:current()
-    
+
+    debug.console(content)
     for index, note in ipairs(content.tracks[1].patterns[1]) do
-        self.sound.notes[index].value = note.note / 107
-        self.sound.notes[index].tip_color = button_type[note.type].color 
-        self.sound.volumes[index].value = note.volume / 255
+        if (note.type == "Silence") then
+            self.sound.notes[index]:set_value(0)
+            self.sound.volumes[index]:set_value(0)
+        else
+            self.sound.selector.selected = note.type
+            self.sound.notes[index]:set_value(note.note / 107)
+            self.sound.notes[index].tip_color = button_type[note.type].color
+            self.sound.volumes[index]:set_value(note.volume / 255)
+        end
     end
-    
+
     self.sound.bpm.value = content.bpm / 255
     self.sound.volume.value = content.volume / 255
 end
@@ -94,15 +103,10 @@ mode.fx.configure = function(self, content)
 
     local env = content.tracks[1].env
     if env ~= nil then
-        -- self.fx.
-        self.fx.envelope.attack_fader.value = env.attack / 255
-        self.fx.envelope.attack = env.attack / 255
-        self.fx.envelope.decay_fader.value = env.decay / 255
-        self.fx.envelope.decay = env.decay / 255
-        self.fx.envelope.sustain_fader.value = env.sustain / 255
-        self.fx.envelope.sustain = env.sustain / 255
-        self.fx.envelope.release_fader.value = env.release / 255
-        self.fx.envelope.release = env.release / 255
+        self.fx.envelope.attack_fader:set_value(env.attack / 255)
+        self.fx.envelope.decay_fader:set_value(env.decay / 255)
+        self.fx.envelope.sustain_fader:set_value(env.sustain / 255)
+        self.fx.envelope.release_fader:set_value(env.release / 255)
     end
 end
 
@@ -124,7 +128,6 @@ local find_widget = function(widgets, ref)
 end
 
 function _init()
-    widgets:_init()
     help = nil
     menu = {}
 
@@ -156,7 +159,7 @@ function _init()
         local w = widgets:create_menu_item(i)
         table.insert(menu, w)
         w.on_hover = on_menu_item_hover
-        w.on_click = on_click[i.customFields.Item]
+        w:on_update(on_click[i.customFields.Item])
         if i.customFields.Item == "Wave" then
             w.active = 1
         end
@@ -178,6 +181,7 @@ function _init()
     for i in all(map.entities["FilesSelector"]) do
         file_selector = new(FileSelector, i)
         local files = ws.list("sfx")
+        table.sort(files)
         if #files == 0 then
             local new_file = ws.create("sfx", "sfx")
             table.insert(file_selector.files, {
@@ -186,35 +190,53 @@ function _init()
             })
         else
             for f in all(files) do
+                debug.console(f)
                 table.insert(file_selector.files, {
                     file = f,
                     content = sfx.to_table(ws.load(f))
                 })
             end
         end
+
         file_selector.next = find_widget(menu, file_selector.customFields.Next)
         file_selector.previous = find_widget(menu, file_selector.customFields.Previous)
         file_selector.screen = find_widget(menu, file_selector.customFields.Screen)
         file_selector.save = find_widget(menu, file_selector.customFields.Save)
+        file_selector.new_file = find_widget(menu, file_selector.customFields.NewFile)
+        file_selector.screen.label = true
 
-        file_selector.next.on_click = function(self)
+        file_selector.next:on_update(function(self)
             file_selector.current_file = math.min(#file_selector.files, file_selector.current_file + 1)
-            file_selector.screen.label = file_selector.files[file_selector.current_file].file
+            file_selector.screen:set_value(file_selector.files[file_selector.current_file].file)
+            switch_to(current_mode)
+        end)
 
-        end
-
-        file_selector.previous.on_click = function(self)
+        file_selector.previous:on_update(function(self)
             file_selector.current_file = math.max(1, file_selector.current_file - 1)
-            file_selector.screen.label = file_selector.files[file_selector.current_file].file
-        end
+            file_selector.screen:set_value(file_selector.files[file_selector.current_file].file)
+            switch_to(current_mode)
+        end)
 
-        file_selector.save.on_click = function(self)
+        file_selector.new_file:on_update(function(self)
+            debug.console("creating file")
+            local new_file = ws.create("sfx", "sfx")
+            table.insert(file_selector.files, {
+                file = new_file,
+                content = sfx.to_table(sfx.empty_score())
+            })
+            file_selector.current_file = #file_selector.files
+            file_selector.next:set_value()
+        end)
+
+        file_selector.save:on_update(function(self)
             debug.console("saving file...")
             local score = sfx.to_score(file_selector:current())
+            debug.console(file_selector:current())
+            debug.console(score)
             ws.save(file_selector:currentName(), score)
             debug.console("file saved!") --
-        end
-        file_selector.previous:on_click()
+        end)
+        file_selector.screen:set_value(file_selector.files[file_selector.current_file].file)
     end
 
     -- preload mode
@@ -258,35 +280,39 @@ function _init()
             knob.on_hover = on_menu_item_hover
             local f = find_widget(m.widgets, knob.customFields.Attack)
             knob.attack_fader = f
-            f.on_value_update = function(self, value)
+            local on_value_update = function(self, value)
                 knob.attack = value
                 local content = file_selector:current()
                 content.tracks[1].env.attack = value * 255
             end
+            f:on_update(on_value_update)
 
             f = find_widget(m.widgets, knob.customFields.Decay)
             knob.decay_fader = f
-            f.on_value_update = function(self, value)
+            local on_value_update = function(self, value)
                 knob.decay = value
                 local content = file_selector:current()
                 content.tracks[1].env.decay = value * 255
             end
+            f:on_update(on_value_update)
 
             f = find_widget(m.widgets, knob.customFields.Sustain)
             knob.sustain_fader = f
-            f.on_value_update = function(self, value)
+            local on_value_update = function(self, value)
                 knob.sustain = value
                 local content = file_selector:current()
                 content.tracks[1].env.sustain = value * 255
             end
+            f:on_update(on_value_update)
 
             f = find_widget(m.widgets, knob.customFields.Release)
             knob.release_fader = f
-            f.on_value_update = function(self, value)
+            local on_value_update = function(self, value)
                 knob.release = value
                 local content = file_selector:current()
                 content.tracks[1].env.release = value * 255
             end
+            f:on_update(on_value_update)
 
             table.insert(m.widgets, knob)
         end
@@ -363,7 +389,7 @@ function _init()
             e.on_changed = function(self, value)
                 knob.enabled = value
             end
-            
+
             local v = find_widget(m.widgets, knob.customFields.Sweep)
             knob.knob_sweep = v
             v.on_update = function(self, value)
@@ -392,7 +418,7 @@ function _init()
                 end
             }
             local knob = new(WaveSelector, k)
-            local on_changed = function(self)
+            local on_update = function(self)
                 knob.selected = self.type
                 for b in all(knob.selector) do
                     b.status = 0
@@ -402,20 +428,20 @@ function _init()
 
             local e = find_widget(m.widgets, knob.customFields.Sine)
             table.insert(knob.selector, e)
-            e.on_changed = on_changed
-            e:on_changed() -- default selection
+            e:on_update(on_update)
+            on_update(e) -- default selection
 
             e = find_widget(m.widgets, knob.customFields.Triangle)
             table.insert(knob.selector, e)
-            e.on_changed = on_changed
+            e:on_update(on_update)
 
             e = find_widget(m.widgets, knob.customFields.Noise)
             table.insert(knob.selector, e)
-            e.on_changed = on_changed
+            e:on_update(on_update)
 
             e = find_widget(m.widgets, knob.customFields.Pulse)
             table.insert(knob.selector, e)
-            e.on_changed = on_changed
+            e:on_update(on_update)
 
             table.insert(m.widgets, knob)
         end
@@ -440,23 +466,28 @@ function _init()
             for key, v in ipairs(k.customFields.Volumes) do
                 local f = find_widget(m.widgets, v)
                 s.volumes[key] = f
-                f.on_value_update = function(self, value)
+                local on_update = function(self, value)
                     local content = file_selector:current()
                     content.tracks[1].patterns[1][key].volume = value * 255
                 end
+                f:on_update(on_update)
             end
-            
+
             for key, v in ipairs(k.customFields.Notes) do
                 local f = find_widget(m.widgets, v)
                 s.notes[key] = f
-                f.on_value_update = function(self, value)
+                local on_update = function(self, value)
                     self.tip_color = button_type[selector.selected].color
                     local content = file_selector:current()
-                    
                     content.tracks[1].patterns[1][key].type = selector.selected
-                    content.tracks[1].patterns[1][key].index = selector.selectedIndex
                     content.tracks[1].patterns[1][key].note = value * 107 -- 107 = number of total notes
+
+                    if content.tracks[1].patterns[1][key].volume <= 0 then
+                        s.volumes[key]:set_value(1)
+                    end
                 end
+
+                f:on_update(on_update)
             end
             s.bpm = find_widget(m.widgets, k.customFields.BPM)
             s.bpm.on_update = function(self)
@@ -471,7 +502,8 @@ function _init()
             end
 
             s.play = find_widget(m.widgets, k.customFields.Play)
-            s.play.on_changed = play
+            s.play:on_update(play)
+            s.selector = selector
             m.sound = s
         end
 
@@ -498,8 +530,11 @@ function _init()
             end
             fx.tied_notes = find_widget(m.widgets, k.customFields.Envelope)
             fx.play = find_widget(m.widgets, k.customFields.Play)
-            fx.play.on_changed = play
+            fx.play:on_update(play)
             m.fx = fx
+        end
+
+        for k in all(map.entities["PatternSelector"]) do
         end
     end
 
@@ -511,7 +546,6 @@ function _update()
     end, function()
     end, function()
     end)
-    widgets:_update()
 
     for w in all(menu) do
         w:_update()
@@ -537,8 +571,6 @@ function _draw()
         w:_draw()
     end
     help:_draw()
-
-    widgets:_draw()
 
     for w in all(current_mode.widgets) do
         w:_draw()
