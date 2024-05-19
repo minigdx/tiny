@@ -35,7 +35,7 @@ class Vec2Lib : TwoArgFunction() {
         @TinyCall("Create a vector 2 as a table { x, y }.")
         override fun call(@TinyArg("x") arg1: LuaValue, @TinyArg("y") arg2: LuaValue): LuaValue {
             val (x, y) = extract(arg1, arg2)
-            val defaultX = if(x.isnil()) {
+            val defaultX = if (x.isnil()) {
                 ZERO
             } else {
                 x
@@ -78,7 +78,7 @@ class Vec2Lib : TwoArgFunction() {
         ): LuaValue = super.call(a, b, c, d)
     }
 
-    @TinyFunction("Subtract another vector to a vector", example = VECTOR2_SUB)
+    @TinyFunction("Subtract another vector from another vector", example = VECTOR2_SUB)
     class sub : VarArgFunction() {
         override fun invoke(args: Varargs): Varargs {
             val (x1, y1, x2, y2) = extract(args)
