@@ -8,14 +8,17 @@ kotlin-ksp = "1.8.20-1.0.10"
 kotlin-serialization = "1.8.0"
 kotlin-serialization-json = "1.5.1"
 ktor = "2.3.0"
-luak = "1.0.0-alpha3"
+luak = "LATEST-SNAPSHOT"
 lwjgl = "3.3.1"
 minigdx-developer = "1.3.2"
+mordant = "2.6.0"
 slf4j = "2.0.7"
 
 
 [libraries]
 clikt = { module = "com.github.ajalt.clikt:clikt", version.ref = "clikt" }
+mordant = {module = "com.github.ajalt.mordant:mordant", version.ref = "mordant" }
+mordant-coroutines = {module = "com.github.ajalt.mordant:mordant-coroutines", version.ref = "mordant" }
 
 kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
 kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization-json" }
@@ -34,12 +37,14 @@ jvm-gifencoder = { module = "com.squareup:gifencoder", version.ref = "gifencoder
 
 jvm-ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 jvm-ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+jvm-ktor-client-websockets = { module = "io.ktor:ktor-client-websockets", version.ref = "ktor" }
 
 jvm-slf4j = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
 jvm-ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
 jvm-ktor-server-netty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor" }
 jvm-ktor-server-status-pages = { module = "io.ktor:ktor-server-status-pages-jvm", version.ref = "ktor" }
 jvm-ktor-server-default-headers = { module = "io.ktor:ktor-server-default-headers-jvm", version.ref = "ktor" }
+jvm-ktor-server-websockets = { module = "io.ktor:ktor-server-websockets-jvm", version.ref = "ktor" }
 
 [bundles]
 jvm-ktor-server = [
@@ -47,11 +52,13 @@ jvm-ktor-server = [
     "jvm-ktor-server-core",
     "jvm-ktor-server-netty",
     "jvm-ktor-server-status-pages",
-    "jvm-ktor-server-default-headers"
+    "jvm-ktor-server-default-headers",
+    "jvm-ktor-server-websockets"
 ]
 jvm-ktor-client = [
     "jvm-ktor-client-okhttp",
-    "jvm-ktor-client-core"
+    "jvm-ktor-client-core",
+    "jvm-ktor-client-websockets"
 ]
 
 [plugins]

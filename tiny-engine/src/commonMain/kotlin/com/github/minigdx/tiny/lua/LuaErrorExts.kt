@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.lua
 
+import com.github.minigdx.tiny.engine.TinyException
 import org.luaj.vm2.LuaError
 
 fun LuaError.errorLine(): Pair<Int, String>? {
@@ -14,4 +15,14 @@ fun LuaError.errorLine(): Pair<Int, String>? {
         }
         lineNumber to line
     }
+}
+
+fun LuaError.toTinyException(content: String): TinyException {
+    throw TinyException(
+        name = this.script,
+        content = content,
+        lineNumber = this.line,
+        message = this.message,
+        cause = this,
+    )
 }

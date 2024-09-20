@@ -7,6 +7,7 @@ import com.github.ajalt.clikt.parameters.arguments.default
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.minigdx.tiny.cli.config.GameParameters
 import com.github.minigdx.tiny.engine.GameEngine
+import com.github.minigdx.tiny.engine.TinyException
 import com.github.minigdx.tiny.file.CommonVirtualFileSystem
 import com.github.minigdx.tiny.file.JvmLocalFile
 import com.github.minigdx.tiny.log.StdOutLogger
@@ -95,6 +96,9 @@ class SfxCommand : CliktCommand(name = "sfx", help = "Start the SFX Editor") {
                 is LuaError -> {
                     val (nb, line) = ex.errorLine() ?: (null to null)
                     echo("Error found line $nb:$line")
+                }
+                is TinyException -> {
+                    echo("Error found in the script ${ex.name} on line ${ex.lineNumber}:${ex.line}")
                 }
             }
             echo()

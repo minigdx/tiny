@@ -5,6 +5,11 @@ enum class LogLevel {
     INFO,
     WARN,
     ERROR,
+
+    /**
+     * Disable logging.
+     */
+    NONE,
 }
 
 interface Logger {
@@ -31,6 +36,7 @@ class StdOutLogger(val name: String, override val level: LogLevel = LogLevel.DEB
                 LogLevel.INFO -> "ℹ️"
                 LogLevel.WARN -> "⚠️"
                 LogLevel.ERROR -> "💥"
+                LogLevel.NONE -> return
             }
             println("$l |- $name -| - [$tag] : " + message())
             exception?.printStackTrace()

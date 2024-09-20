@@ -13,7 +13,10 @@ import java.io.FileOutputStream
 
 @Serializable
 @JsonClassDiscriminator("version")
-sealed class GameParameters() {
+sealed class GameParameters {
+
+    abstract val name: String
+
     abstract fun toGameOptions(): GameOptions
 
     fun write(output: File) {
@@ -58,7 +61,7 @@ data class Size(val width: Int, val height: Int)
 @SerialName("V1")
 @Serializable
 data class GameParametersV1(
-    val name: String,
+    override val name: String,
     val resolution: Size,
     val sprites: Size,
     val zoom: Int,

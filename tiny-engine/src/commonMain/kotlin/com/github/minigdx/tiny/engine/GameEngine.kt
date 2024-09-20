@@ -7,7 +7,7 @@ import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.input.Key
 import com.github.minigdx.tiny.log.Logger
-import com.github.minigdx.tiny.lua.errorLine
+import com.github.minigdx.tiny.lua.toTinyException
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.RenderContext
 import com.github.minigdx.tiny.resources.GameLevel
@@ -44,6 +44,7 @@ class GameEngine(
     val vfs: VirtualFileSystem,
     val logger: Logger,
     val customizeLuaGlobal: GameResourceAccess.(Globals) -> Unit = {},
+    val listener: GameEngineListener? = null,
 ) : GameLoop, GameResourceAccess {
 
     private val events: MutableList<GameResource> = mutableListOf()
@@ -211,7 +212,7 @@ class GameEngine(
                             resource.isValid(customizeLuaGlobal)
                             true
                         } catch (ex: LuaError) {
-                            popupError(ex)
+                            popupError(ex.toTinyException(resource.content.decodeToString()))
                             false
                         }
                         if (isValid) {
@@ -257,6 +258,7 @@ class GameEngine(
             if (this == null) return
 
             if (exited >= 0) {
+                val previous = current
                 // next script
                 current = min(exited + 1, scripts.size - 1)
                 try {
@@ -268,8 +270,10 @@ class GameEngine(
                     // Reevaluate the game to flush the previous state.
                     scripts[current]?.evaluate(customizeLuaGlobal)
                     scripts[current]?.setState(state)
+
+                    listener?.switchScript(scripts[previous], scripts[current])
                 } catch (ex: LuaError) {
-                    popupError(ex)
+                    popupError(ex.toTinyException(content.decodeToString()))
                 }
             } else if (reload) {
                 clear()
@@ -279,9 +283,12 @@ class GameEngine(
                     val state = getState()
                     evaluate(customizeLuaGlobal)
                     setState(state)
+
+                    listener?.switchScript(this, this)
+
                     inError = false
                 } catch (ex: LuaError) {
-                    popupError(ex)
+                    popupError(ex.toTinyException(content.decodeToString()))
                 }
             }
 
@@ -299,7 +306,7 @@ class GameEngine(
                 inError = try {
                     scripts[current]?.advance()
                     false
-                } catch (ex: LuaError) {
+                } catch (ex: TinyException) {
                     if (!inError) { // display the log only once.
                         popupError(ex)
                     }
@@ -387,20 +394,14 @@ class GameEngine(
         }
     }
 
-    private suspend fun GameEngine.popupError(ex: LuaError) {
-        val errorLine = ex.errorLine()
+    private suspend fun GameEngine.popupError(ex: TinyException) {
         logger.warn(
             "TINY",
         ) {
-            val error =
-                errorLine?.let { (l, line) -> "line $l:$line <-- the \uD83D\uDC1E is around here (${ex.getLuaMessage()})" }
-            "The line ${ex.level} trigger an execution error (${ex.getLuaMessage()}). Please fix your script!\n" + error
+            val error = "line ${ex.lineNumber}:${ex.line} <-- the \uD83D\uDC1E is around here (${ex.message})"
+            "The line ${ex.lineNumber} trigger an execution error (${ex.message}). Please fix your script!\n" + error
         }
-
-        val msg = errorLine?.let { (l, line) ->
-            "error line $l:$line (${ex.getLuaMessage()})"
-        } ?: "Error: ${ex.getLuaMessage()}"
-
+        val msg = "error line ${ex.lineNumber}:${ex.line} (${ex.message})"
         popup(msg, "#FF0000", true)
     }
 

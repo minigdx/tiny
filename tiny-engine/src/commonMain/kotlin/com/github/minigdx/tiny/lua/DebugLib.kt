@@ -11,6 +11,7 @@ import com.github.minigdx.tiny.engine.DebugMessage
 import com.github.minigdx.tiny.engine.DebugPoint
 import com.github.minigdx.tiny.engine.DebugRect
 import com.github.minigdx.tiny.engine.GameResourceAccess
+import com.github.minigdx.tiny.log.Logger
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
@@ -129,7 +130,7 @@ private class DebugShape {
 }
 
 @TinyLib("debug", "Helpers to debug your game by drawing or printing information on screen.")
-class DebugLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() {
+class DebugLib(private val resourceAccess: GameResourceAccess, private val logger: Logger) : TwoArgFunction() {
 
     private val shape = DebugShape()
 
@@ -228,8 +229,7 @@ class DebugLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
 
         @TinyCall("Log a message into the console.")
         override fun call(@TinyArg("str") arg: LuaValue): LuaValue {
-            val str = formatValue(arg)
-            println("\uD83D\uDC1B $str")
+            logger.debug("\uD83D\uDC1B") { formatValue(arg) }
             return NIL
         }
     }

@@ -19,6 +19,11 @@ dependencies {
     commonMainImplementation(libs.kotlin.serialization.json)
     commonMainImplementation(libs.clikt)
 
+    // Exception in thread "main" java.lang.NoClassDefFoundError: com/sun/jna/Platform
+    // https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform
+    jvmMainImplementation("net.java.dev.jna:jna-platform:5.14.0")
+    jvmMainImplementation("com.fifesoft:rsyntaxtextarea:3.6.0")
+
     jvmMainImplementation(project(":tiny-engine", "jvmRuntimeElements"))!!
         .because("Depends on the JVM Jar containing commons resources in the JAR.")
 

@@ -46,6 +46,8 @@ dependencies {
     }
 }
 
+// build.gradle.kts
+
 project.tasks.register("tinyEngineJsZip", Zip::class.java) {
     from(tasks.getByName("jsBrowserDistribution"))
     this.destinationDirectory.set(project.buildDir.resolve("tiny-distributions"))

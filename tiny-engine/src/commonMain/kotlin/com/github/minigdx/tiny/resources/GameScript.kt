@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.resources
 
+import com.github.minigdx.tiny.engine.DebugInterruption
 import com.github.minigdx.tiny.engine.Exit
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
@@ -23,6 +24,7 @@ import com.github.minigdx.tiny.lua.TinyBaseLib
 import com.github.minigdx.tiny.lua.TinyLib
 import com.github.minigdx.tiny.lua.Vec2Lib
 import com.github.minigdx.tiny.lua.WorkspaceLib
+import com.github.minigdx.tiny.lua.toTinyException
 import com.github.minigdx.tiny.platform.Platform
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LoadState
@@ -68,7 +70,7 @@ class GameScript(
     private var setStateFunction: LuaValue? = null
     private var getStateFunction: LuaValue? = null
 
-    private var globals: Globals? = null
+    var globals: Globals? = null
 
     private val tinyLib: TinyLib = TinyLib()
 
@@ -76,7 +78,10 @@ class GameScript(
 
     class State(val args: LuaValue)
 
-    private fun createLuaGlobals(customizeLuaGlobal: GameResourceAccess.(Globals) -> Unit, forValidation: Boolean = false): Globals = Globals().apply {
+    private fun createLuaGlobals(
+        customizeLuaGlobal: GameResourceAccess.(Globals) -> Unit,
+        forValidation: Boolean = false,
+    ): Globals = Globals().apply {
         val sprLib = SprLib(this@GameScript.gameOptions, this@GameScript.resourceAccess)
 
         load(TinyBaseLib(this@GameScript.resourceAccess))
@@ -91,7 +96,7 @@ class GameScript(
         load(CtrlLib(inputHandler, sprLib))
         load(SfxLib(this@GameScript.resourceAccess, playSound = !forValidation))
         load(ShapeLib(this@GameScript.resourceAccess))
-        load(DebugLib(this@GameScript.resourceAccess))
+        load(DebugLib(this@GameScript.resourceAccess, this@GameScript.logger))
         load(KeysLib())
         load(MathLib())
         load(Vec2Lib())
@@ -123,7 +128,6 @@ class GameScript(
                     }
                 }.forEach { scriptContent ->
                     val globalForTest = createLuaGlobals(customizeLuaGlobal, forValidation = true)
-                    println(scriptContent)
                     globalForTest.load(scriptContent).call()
                     globalForTest.get("_test").callSuspend()
                 }
@@ -147,7 +151,7 @@ class GameScript(
         exited = -1
         reload = false
         try {
-            globals?.load(content.decodeToString())?.callSuspend()
+            globals?.load(content.decodeToString(), name)?.callSuspend()
 
             initFunction = globals?.get("_init")?.nullIfNil()
             updateFunction = globals?.get("_update")?.nullIfNil()
@@ -162,7 +166,7 @@ class GameScript(
             if (luaCause is Exit) {
                 exited = luaCause.script
             } else {
-                throw ex
+                throw ex.toTinyException(content.decodeToString())
             }
         }
     }
@@ -199,15 +203,23 @@ class GameScript(
     suspend fun advance() {
         tinyLib.advance()
         try {
-            updateFunction?.callSuspend()
+            try {
+                updateFunction?.callSuspend()
+            } catch (ex: LuaError) {
+                if (ex.luaCause !is DebugInterruption) {
+                    throw ex
+                }
+            }
             drawFunction?.callSuspend()
         } catch (ex: LuaError) {
             val luaCause = ex.luaCause
             // The user want to load another script.
             if (luaCause is Exit) {
                 exited = luaCause.script
+            } else if (luaCause is DebugInterruption) {
+                return
             } else {
-                throw ex
+                throw ex.toTinyException(content.decodeToString())
             }
         }
     }
