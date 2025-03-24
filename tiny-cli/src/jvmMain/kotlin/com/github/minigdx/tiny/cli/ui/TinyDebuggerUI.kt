@@ -107,14 +107,17 @@ class TinyDebuggerUI(
                 when (command) {
                     is BreakpointHit -> {
                         SwingUtilities.invokeLater {
-                            (0 until tableModel.rowCount).forEach {
-                                val name = tableModel.getValueAt(it, 0).toString()
-                                val rowIndex = command.locals.containsKey(name)
-                                if (!rowIndex) {
-                                    tableModel.removeRow(it)
+                            command.locals.forEach { (name, value) ->
+                                val rowIndex = findRowIndex(name)
+                                if (rowIndex != -1) {
+                                    // Update existing row
+                                    tableModel.setValueAt(value, rowIndex, 1)
+                                } else {
+                                    // Add new row
+                                    tableModel.addRow(arrayOf(name, value))
                                 }
                             }
-                            command.locals.forEach { (name, value) ->
+                            command.upValues.forEach { (name, value) ->
                                 val rowIndex = findRowIndex(name)
                                 if (rowIndex != -1) {
                                     // Update existing row

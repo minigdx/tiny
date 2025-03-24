@@ -15,6 +15,7 @@ import org.luaj.vm2.LuaClosure
 import org.luaj.vm2.LuaFunction
 import org.luaj.vm2.LuaThread
 import org.luaj.vm2.LuaValue
+import org.luaj.vm2.Upvaldesc
 import org.luaj.vm2.Varargs
 import org.luaj.vm2.lib.ExecutionListener
 import kotlin.math.max
@@ -90,6 +91,7 @@ class DebuggerExecutionListener(
         // Computes the line of the pc.
         breakpoints.filter { (executionPoint, breakpoint) -> !breakpoint.init && executionPoint.scriptName == currentExecutionPoint.script }
             .values
+            .filter { breakpoint -> (lineinfo ?: intArrayOf()).contains(breakpoint.line) }
             .forEach { breakpoint ->
                 breakpoint.pc = lineinfo?.indexOfFirst { breakpoint.line == it } ?: -1
                 breakpoint.init = true
@@ -110,6 +112,17 @@ class DebuggerExecutionListener(
                 // TODO: dump all variables (local + globals + upvals ?)
                 val frames = callstack(globals.running).getCallFrames()
 
+                val upValues = frames.flatMap { frame ->
+                    val upValues = (frame.f as? LuaClosure)?.upValues ?: emptyArray()
+                    val upValuesDesc = (frame.f as? LuaClosure)?.p?.upvalues ?: emptyArray()
+
+                    upValues.zip(upValuesDesc) { value, name ->
+                        val upValueName = name.name?.tojstring() ?: ""
+                        val upValueValue = value?.value?.tojstring() ?: ""
+                        upValueName to upValueValue
+                    }
+                }.toMap()
+
                 val locals = frames.flatMap {
                     it.getLocals()
                 }.associate {
@@ -122,6 +135,7 @@ class DebuggerExecutionListener(
                         script = breakpoint.script,
                         line = breakpoint.line,
                         locals = locals,
+                        upValues = upValues,
                     ),
                 )
                 throw DebugInterruption()

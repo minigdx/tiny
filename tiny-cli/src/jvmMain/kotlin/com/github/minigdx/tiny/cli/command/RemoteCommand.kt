@@ -45,4 +45,5 @@ data class BreakpointHit(
     val script: String,
     val line: Int,
     val locals: Map<String, String>,
+    val upValues: Map<String, String>,
 ) : EngineRemoteCommand
