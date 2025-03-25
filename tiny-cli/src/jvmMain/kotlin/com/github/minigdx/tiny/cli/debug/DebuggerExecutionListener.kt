@@ -55,13 +55,13 @@ class DebuggerExecutionListener(
             for (debugRemoteCommand in debugCommandReceiver) {
                 when (debugRemoteCommand) {
                     is ToggleBreakpoint -> toggleBreakpoint(debugRemoteCommand)
-                    is ResumeExecution -> resumeExecution(debugRemoteCommand)
+                    is ResumeExecution -> resumeExecution()
                 }
             }
         }
     }
 
-    private fun resumeExecution(debugRemoteCommand: ResumeExecution) {
+    private fun resumeExecution() {
         blocker.unblock()
         // TODO: if resume to another point, add it as temporary into breakpoints
     }

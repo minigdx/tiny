@@ -119,7 +119,6 @@ class TinyDebuggerUI(
                             textArea?.setActiveLineRange(command.line - 1, command.line - 1)
                             textArea?.highlightLine(command.line, LIGHT_RED)
 
-
                             tableModel.rowCount = 0
                             command.locals.forEach { (name, value) ->
                                 tableModel.addRow(arrayOf(name, value))
