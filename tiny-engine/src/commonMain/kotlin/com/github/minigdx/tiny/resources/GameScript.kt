@@ -1,6 +1,5 @@
 package com.github.minigdx.tiny.resources
 
-import com.github.minigdx.tiny.engine.DebugInterruption
 import com.github.minigdx.tiny.engine.Exit
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
@@ -203,21 +202,13 @@ class GameScript(
     suspend fun advance() {
         tinyLib.advance()
         try {
-            try {
-                updateFunction?.callSuspend()
-            } catch (ex: LuaError) {
-                if (ex.luaCause !is DebugInterruption) {
-                    throw ex
-                }
-            }
+            updateFunction?.callSuspend()
             drawFunction?.callSuspend()
         } catch (ex: LuaError) {
             val luaCause = ex.luaCause
             // The user want to load another script.
             if (luaCause is Exit) {
                 exited = luaCause.script
-            } else if (luaCause is DebugInterruption) {
-                return
             } else {
                 throw ex.toTinyException(content.decodeToString())
             }

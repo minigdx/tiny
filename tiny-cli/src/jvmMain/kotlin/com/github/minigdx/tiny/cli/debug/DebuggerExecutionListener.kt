@@ -3,8 +3,8 @@ package com.github.minigdx.tiny.cli.debug
 import com.github.minigdx.tiny.cli.command.BreakpointHit
 import com.github.minigdx.tiny.cli.command.DebugRemoteCommand
 import com.github.minigdx.tiny.cli.command.EngineRemoteCommand
+import com.github.minigdx.tiny.cli.command.ResumeExecution
 import com.github.minigdx.tiny.cli.command.ToggleBreakpoint
-import com.github.minigdx.tiny.engine.DebugInterruption
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -15,7 +15,6 @@ import org.luaj.vm2.LuaClosure
 import org.luaj.vm2.LuaFunction
 import org.luaj.vm2.LuaThread
 import org.luaj.vm2.LuaValue
-import org.luaj.vm2.Upvaldesc
 import org.luaj.vm2.Varargs
 import org.luaj.vm2.lib.ExecutionListener
 import kotlin.math.max
@@ -49,14 +48,22 @@ class DebuggerExecutionListener(
 
     private var lineinfo: IntArray? = null
 
+    private val blocker = CoroutineBlocker()
+
     init {
         CoroutineScope(Dispatchers.IO).launch {
             for (debugRemoteCommand in debugCommandReceiver) {
                 when (debugRemoteCommand) {
                     is ToggleBreakpoint -> toggleBreakpoint(debugRemoteCommand)
+                    is ResumeExecution -> resumeExecution(debugRemoteCommand)
                 }
             }
         }
+    }
+
+    private fun resumeExecution(debugRemoteCommand: ResumeExecution) {
+        blocker.unblock()
+        // TODO: if resume to another point, add it as temporary into breakpoints
     }
 
     private fun toggleBreakpoint(debugRemoteCommand: ToggleBreakpoint) {
@@ -138,7 +145,7 @@ class DebuggerExecutionListener(
                         upValues = upValues,
                     ),
                 )
-                throw DebugInterruption()
+                blocker.block()
             }
         }
     }

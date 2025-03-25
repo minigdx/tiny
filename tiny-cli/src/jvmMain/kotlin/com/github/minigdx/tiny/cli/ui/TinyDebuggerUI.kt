@@ -3,6 +3,7 @@ package com.github.minigdx.tiny.cli.ui
 import com.github.minigdx.tiny.cli.command.BreakpointHit
 import com.github.minigdx.tiny.cli.command.DebugRemoteCommand
 import com.github.minigdx.tiny.cli.command.EngineRemoteCommand
+import com.github.minigdx.tiny.cli.command.ResumeExecution
 import com.github.minigdx.tiny.cli.command.ToggleBreakpoint
 import com.github.minigdx.tiny.cli.config.GameParameters
 import kotlinx.coroutines.CoroutineScope
@@ -19,6 +20,7 @@ import org.fife.ui.rtextarea.LineNumberList
 import org.fife.ui.rtextarea.RTextArea
 import org.fife.ui.rtextarea.RTextScrollPane
 import java.awt.BorderLayout
+import java.awt.Component
 import java.awt.Dimension
 import java.awt.Point
 import java.awt.event.MouseAdapter
@@ -26,6 +28,7 @@ import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
 import java.io.File
 import javax.swing.BoxLayout
+import javax.swing.JButton
 import javax.swing.JFrame
 import javax.swing.JPanel
 import javax.swing.JScrollPane
@@ -78,7 +81,10 @@ class TinyDebuggerUI(
             },
         )
         add(
-            JScrollPane(table).apply {
+            JPanel(BorderLayout()).apply {
+                add(Toolbar(), BorderLayout.PAGE_START)
+                add(JScrollPane(table), BorderLayout.CENTER)
+            }.apply {
                 preferredSize = Dimension(200, 600)
             },
         )
@@ -131,6 +137,21 @@ class TinyDebuggerUI(
                     }
                 }
             }
+        }
+    }
+
+    private fun Toolbar(): Component {
+        return JPanel().apply {
+            contentPane.layout = BoxLayout(contentPane, BoxLayout.X_AXIS)
+            add(
+                JButton("⏯").apply {
+                    addActionListener {
+                        io.launch {
+                            debugCommandSender.send(ResumeExecution(null, null))
+                        }
+                    }
+                },
+            )
         }
     }
 

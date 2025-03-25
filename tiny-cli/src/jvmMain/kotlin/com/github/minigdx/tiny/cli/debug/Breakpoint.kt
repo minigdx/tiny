@@ -9,6 +9,10 @@ class Breakpoint(
     var init: Boolean = false,
     var enabled: Boolean = false,
     var function: LuaClosure? = null,
+    /**
+     * Is the breakpoint temporary? (ie: when hit, will be deactivated)
+     */
+    var temporary: Boolean = false,
 ) {
 
     fun hit(other: Breakpoint): Boolean {

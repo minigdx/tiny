@@ -91,9 +91,7 @@ class RunCommand : CliktCommand(name = "run", help = "Run your game.") {
                     for (frame in incoming) {
                         if (frame is Frame.Text) {
                             val command = Json.decodeFromString<DebugRemoteCommand>(frame.readText())
-                            when (command) {
-                                is ToggleBreakpoint -> debugCommandReceiver.send(command)
-                            }
+                            debugCommandReceiver.send(command)
                         } else {
                             TODO("$frame content not expected")
                         }

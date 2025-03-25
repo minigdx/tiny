@@ -34,6 +34,15 @@ data class HandshakeRequest(val name: String, val gamescripts: List<String>) : R
 data class ToggleBreakpoint(val script: String, val line: Int, val enabled: Boolean) : DebugRemoteCommand
 
 /**
+ * Resume game execution.
+ *
+ * @param script the name of the script where the execution should resume.
+ * @param line the line number of the execution point. If null, the program should resume normally.
+ */
+@Serializable
+data class ResumeExecution(val script: String?, val line: Int?) : DebugRemoteCommand
+
+/**
  * A breakpoint has been hit in the game engine.
  *
  * @param script the name of the script where the breakpoint is.
