@@ -20,6 +20,7 @@ import org.fife.ui.rtextarea.LineNumberList
 import org.fife.ui.rtextarea.RTextArea
 import org.fife.ui.rtextarea.RTextScrollPane
 import java.awt.BorderLayout
+import java.awt.Color
 import java.awt.Component
 import java.awt.Dimension
 import java.awt.Point
@@ -38,6 +39,7 @@ import javax.swing.SwingUtilities
 import javax.swing.UIManager
 import javax.swing.table.DefaultTableModel
 import javax.swing.text.BadLocationException
+import javax.swing.text.DefaultHighlighter
 
 /**
  * [TinyDebuggerUI] is the main class of the debugger.
@@ -113,6 +115,12 @@ class TinyDebuggerUI(
                 when (command) {
                     is BreakpointHit -> {
                         SwingUtilities.invokeLater {
+                            val textArea = textAreas[command.script]
+                            textArea?.setActiveLineRange(command.line - 1, command.line - 1)
+                            textArea?.highlightLine(command.line, Color.RED)
+                            tableModel.dataVector.clear()
+                            tableModel.fireTableDataChanged()
+
                             command.locals.forEach { (name, value) ->
                                 val rowIndex = findRowIndex(name)
                                 if (rowIndex != -1) {
@@ -148,10 +156,26 @@ class TinyDebuggerUI(
                     addActionListener {
                         io.launch {
                             debugCommandSender.send(ResumeExecution(null, null))
+                            textAreas.values.forEach {
+                                it.highlighter.removeAllHighlights()
+                            }
                         }
                     }
                 },
             )
+        }
+    }
+
+    private fun RSyntaxTextArea.highlightLine(lineNumber: Int, color: Color) {
+        try {
+            // Convert line number to offset
+            val start = this.getLineStartOffset(lineNumber - 1)
+            val end = this.getLineEndOffset(lineNumber - 1)
+
+            // Highlight the line
+            this.highlighter.addHighlight(start, end, DefaultHighlighter.DefaultHighlightPainter(color))
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
@@ -161,6 +185,7 @@ class TinyDebuggerUI(
             isCodeFoldingEnabled = true
             isEditable = false
             text = scriptContent
+            highlightCurrentLine = false
         }
         textAreas[scriptName] = textArea
 
