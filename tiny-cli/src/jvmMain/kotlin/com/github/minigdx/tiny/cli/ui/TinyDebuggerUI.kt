@@ -117,29 +117,15 @@ class TinyDebuggerUI(
                         SwingUtilities.invokeLater {
                             val textArea = textAreas[command.script]
                             textArea?.setActiveLineRange(command.line - 1, command.line - 1)
-                            textArea?.highlightLine(command.line, Color.RED)
-                            tableModel.dataVector.clear()
-                            tableModel.fireTableDataChanged()
+                            textArea?.highlightLine(command.line, LIGHT_RED)
 
+
+                            tableModel.rowCount = 0
                             command.locals.forEach { (name, value) ->
-                                val rowIndex = findRowIndex(name)
-                                if (rowIndex != -1) {
-                                    // Update existing row
-                                    tableModel.setValueAt(value, rowIndex, 1)
-                                } else {
-                                    // Add new row
-                                    tableModel.addRow(arrayOf(name, value))
-                                }
+                                tableModel.addRow(arrayOf(name, value))
                             }
                             command.upValues.forEach { (name, value) ->
-                                val rowIndex = findRowIndex(name)
-                                if (rowIndex != -1) {
-                                    // Update existing row
-                                    tableModel.setValueAt(value, rowIndex, 1)
-                                } else {
-                                    // Add new row
-                                    tableModel.addRow(arrayOf(name, value))
-                                }
+                                tableModel.addRow(arrayOf(name, value))
                             }
                         }
                     }
@@ -234,5 +220,9 @@ class TinyDebuggerUI(
                 debugCommandSender.send(ToggleBreakpoint(scriptName, e.line + 1, false))
             }
         }
+    }
+
+    companion object {
+        private val LIGHT_RED = Color(255, 102, 102, 100)
     }
 }

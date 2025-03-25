@@ -80,8 +80,6 @@ class RunCommand : CliktCommand(name = "run", help = "Run your game.") {
 
             routing {
                 webSocket("/debug") {
-                    println("Someone is connected!")
-
                     launch {
                         for (command in engineCommandSender) {
                             outgoing.send(Frame.Text(Json.encodeToString(command)))
