@@ -35,12 +35,9 @@ data class ToggleBreakpoint(val script: String, val line: Int, val enabled: Bool
 
 /**
  * Resume game execution.
- *
- * @param script the name of the script where the execution should resume.
- * @param line the line number of the execution point. If null, the program should resume normally.
  */
 @Serializable
-data class ResumeExecution(val script: String?, val line: Int?) : DebugRemoteCommand
+data class ResumeExecution(val advanceByStep: Boolean = false) : DebugRemoteCommand
 
 /**
  * A breakpoint has been hit in the game engine.

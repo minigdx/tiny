@@ -101,16 +101,6 @@ class TinyDebuggerUI(
                 }
             }
 
-            // Find row index for a given key (if it exists)
-            fun findRowIndex(key: String): Int {
-                for (i in 0 until tableModel.rowCount) {
-                    if (tableModel.getValueAt(i, 0) == key) {
-                        return i
-                    }
-                }
-                return -1
-            }
-
             for (command in engineCommandReceiver) {
                 when (command) {
                     is BreakpointHit -> {
@@ -140,7 +130,20 @@ class TinyDebuggerUI(
                 JButton("⏯").apply {
                     addActionListener {
                         io.launch {
-                            debugCommandSender.send(ResumeExecution(null, null))
+                            debugCommandSender.send(ResumeExecution())
+                            textAreas.values.forEach {
+                                it.highlighter.removeAllHighlights()
+                            }
+                        }
+                    }
+                },
+            )
+            add(
+                JButton("⤵").apply {
+                    addActionListener {
+                        io.launch {
+                            // Goes to the next line
+                            debugCommandSender.send(ResumeExecution(advanceByStep = true))
                             textAreas.values.forEach {
                                 it.highlighter.removeAllHighlights()
                             }
@@ -220,6 +223,8 @@ class TinyDebuggerUI(
             }
         }
     }
+
+    data class CurrentBreakpoint(var scriptName: String, var line: Int)
 
     companion object {
         private val LIGHT_RED = Color(255, 102, 102, 100)

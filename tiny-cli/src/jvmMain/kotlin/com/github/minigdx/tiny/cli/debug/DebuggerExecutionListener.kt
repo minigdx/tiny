@@ -50,20 +50,26 @@ class DebuggerExecutionListener(
 
     private val blocker = CoroutineBlocker()
 
+    private var advanceByStep: Boolean = false
+    // Current line when the execution resume.
+    // So when the step advance of one step, it's to another line.
+    private var advanceByStepCurrentLine: Int = -1
+
     init {
         CoroutineScope(Dispatchers.IO).launch {
             for (debugRemoteCommand in debugCommandReceiver) {
                 when (debugRemoteCommand) {
                     is ToggleBreakpoint -> toggleBreakpoint(debugRemoteCommand)
-                    is ResumeExecution -> resumeExecution()
+                    is ResumeExecution -> resumeExecution(debugRemoteCommand)
                 }
             }
         }
     }
 
-    private fun resumeExecution() {
+    private fun resumeExecution(debugRemoteCommand: ResumeExecution) {
+        advanceByStep = debugRemoteCommand.advanceByStep
+        advanceByStepCurrentLine = currentExecutionPoint.line
         blocker.unblock()
-        // TODO: if resume to another point, add it as temporary into breakpoints
     }
 
     private fun toggleBreakpoint(debugRemoteCommand: ToggleBreakpoint) {
@@ -113,41 +119,53 @@ class DebuggerExecutionListener(
     override suspend fun onInstruction(pc: Int, v: Varargs, top: Int) {
         callstack(globals.running).onInstruction(pc, v, top)
 
+        val line = lineinfo!!.get(pc)
+
         currentExecutionPoint.pc = pc
+        currentExecutionPoint.line = line
+
+        if(advanceByStep && line != advanceByStepCurrentLine) {
+            pauseExecution(currentExecutionPoint.script, line)
+        }
+
         breakpoints.values.forEach { breakpoint ->
             if (currentExecutionPoint.hit(breakpoint)) {
-                // TODO: dump all variables (local + globals + upvals ?)
-                val frames = callstack(globals.running).getCallFrames()
-
-                val upValues = frames.flatMap { frame ->
-                    val upValues = (frame.f as? LuaClosure)?.upValues ?: emptyArray()
-                    val upValuesDesc = (frame.f as? LuaClosure)?.p?.upvalues ?: emptyArray()
-
-                    upValues.zip(upValuesDesc) { value, name ->
-                        val upValueName = name.name?.tojstring() ?: ""
-                        val upValueValue = value?.value?.tojstring() ?: ""
-                        upValueName to upValueValue
-                    }
-                }.toMap()
-
-                val locals = frames.flatMap {
-                    it.getLocals()
-                }.associate {
-                    // name to value
-                    it.arg(1).tojstring() to it.arg(2).tojstring()
-                }
-
-                engineCommandSender.send(
-                    BreakpointHit(
-                        script = breakpoint.script,
-                        line = breakpoint.line,
-                        locals = locals,
-                        upValues = upValues,
-                    ),
-                )
-                blocker.block()
+                pauseExecution(breakpoint.script, breakpoint.line)
             }
         }
+    }
+
+    private suspend fun pauseExecution(scriptName: String, line: Int) {
+        // TODO: dump all variables (local + globals + upvals ?)
+        val frames = callstack(globals.running).getCallFrames()
+
+        val upValues = frames.flatMap { frame ->
+            val upValues = (frame.f as? LuaClosure)?.upValues ?: emptyArray()
+            val upValuesDesc = (frame.f as? LuaClosure)?.p?.upvalues ?: emptyArray()
+
+            upValues.zip(upValuesDesc) { value, name ->
+                val upValueName = name.name?.tojstring() ?: ""
+                val upValueValue = value?.value?.tojstring() ?: ""
+                upValueName to upValueValue
+            }
+        }.toMap()
+
+        val locals = frames.flatMap {
+            it.getLocals()
+        }.associate {
+            // name to value
+            it.arg(1).tojstring() to it.arg(2).tojstring()
+        }
+
+        engineCommandSender.send(
+            BreakpointHit(
+                script = scriptName,
+                line = line,
+                locals = locals,
+                upValues = upValues,
+            ),
+        )
+        blocker.block()
     }
 
     override fun onReturn() {
