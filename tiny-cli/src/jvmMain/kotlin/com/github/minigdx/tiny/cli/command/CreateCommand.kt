@@ -111,6 +111,10 @@ ${
 
         gameDirectory.resolve(gameScript).writeText(DEFAULT_GAME_SCRIPT)
 
+        CreateCommand::class.java.getResourceAsStream("/_tiny.stub.lua")?.let { content ->
+            gameDirectory.resolve("_tiny.stub.lua").writeBytes(content.readAllBytes())
+        }
+
         echo("\uD83C\uDFD7\uFE0F  Game created into: ${gameDirectory.absolutePath}")
         echo("\uD83C\uDFC3\u200D♂\uFE0F To run the game: tiny-cli run ${computePath(gameDirectory)}")
     }
