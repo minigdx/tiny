@@ -67,10 +67,18 @@ class LuaStubFunction {
     var namespace: String? = null
     var name: String = ""
     var description: String = ""
+    var calls: List<LuaStubCall> = emptyList()
+
+    fun call(block: LuaStubCall.() -> Unit) {
+        val call = LuaStubCall()
+        call.block()
+        calls += call
+    }
 
     fun generate(): String {
         return buildString {
             appendLine(comment(description))
+            appendLine(calls.joinToString("\n") { it.generate() })
             if (namespace == null) {
                 appendLine("function $name() end")
             } else {
@@ -80,6 +88,37 @@ class LuaStubFunction {
     }
 }
 
+@LuaStubDslMarker
+class LuaStubCall {
+    var description: String = ""
+    var args: List<LuaStubArg> = emptyList()
+
+    fun arg(block: LuaStubArg.() -> Unit) {
+        val arg = LuaStubArg()
+        arg.block()
+        args += arg
+    }
+
+    fun generate(): String {
+        return buildString {
+            // ---@overload fun([param: type[, param: type...]]): [return_value[,return_value]] -- description
+            val args = args.joinToString(", ") { it.generate() }
+            append(comment("@overload fun($args): any -- $description"))
+        }
+    }
+}
+
+@LuaStubDslMarker
+class LuaStubArg {
+    var name: String = ""
+    var type: String = ""
+    var description: String = ""
+
+    fun generate(): String {
+        return "$name: $type"
+    }
+}
+
 private fun comment(content: String, headline: String = "---"): String {
-    return content.split("\n").map { line -> "$headline $line" }.joinToString("\n")
+    return content.split("\n").joinToString("\n") { line -> "$headline $line" }
 }

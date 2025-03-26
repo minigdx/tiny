@@ -55,6 +55,19 @@ class TinyToLuaStubKspProcessor(
                             namespace = it.name.takeIf { it.isNotBlank() }
                             name = function.name
                             description = function.description
+
+                            function.calls.forEach { call ->
+                                call {
+                                    description = call.description
+                                    call.args.forEach { arg ->
+                                        arg {
+                                            name = arg.name
+                                            type = "any"
+                                            description = arg.description
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
