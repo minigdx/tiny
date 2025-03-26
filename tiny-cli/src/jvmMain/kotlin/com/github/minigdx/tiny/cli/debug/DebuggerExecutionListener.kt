@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LuaClosure
 import org.luaj.vm2.LuaFunction
+import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaThread
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
@@ -51,6 +52,7 @@ class DebuggerExecutionListener(
     private val blocker = CoroutineBlocker()
 
     private var advanceByStep: Boolean = false
+
     // Current line when the execution resume.
     // So when the step advance of one step, it's to another line.
     private var advanceByStepCurrentLine: Int = -1
@@ -86,6 +88,30 @@ class DebuggerExecutionListener(
         } else {
             storedBreakpoint.enabled = debugRemoteCommand.enabled
         }
+    }
+
+    /**
+     * Format a LuaValue to a human-readable String.
+     */
+    private fun formatValue(
+        arg: LuaValue,
+        recursiveSecurity: MutableSet<Int> = mutableSetOf(),
+    ): String = if (arg.istable()) {
+        val table = arg as LuaTable
+        if (recursiveSecurity.contains(table.hashCode())) {
+            "table[<${table.hashCode()}>]"
+        } else {
+            recursiveSecurity.add(table.hashCode())
+            val keys = table.keys()
+            val str = keys.joinToString(" ") {
+                it.optjstring("nil") + ":" + formatValue(table[it], recursiveSecurity)
+            }
+            "table[$str]"
+        }
+    } else if (arg.isfunction()) {
+        "function(" + (0 until arg.narg()).joinToString(", ") { "arg" } + ")"
+    } else {
+        arg.toString()
     }
 
     override suspend fun onCall(c: LuaClosure, varargs: Varargs, stack: Array<LuaValue>) {
@@ -124,7 +150,7 @@ class DebuggerExecutionListener(
         currentExecutionPoint.pc = pc
         currentExecutionPoint.line = line
 
-        if(advanceByStep && line != advanceByStepCurrentLine) {
+        if (advanceByStep && line != advanceByStepCurrentLine) {
             pauseExecution(currentExecutionPoint.script, line)
         }
 
@@ -136,7 +162,6 @@ class DebuggerExecutionListener(
     }
 
     private suspend fun pauseExecution(scriptName: String, line: Int) {
-        // TODO: dump all variables (local + globals + upvals ?)
         val frames = callstack(globals.running).getCallFrames()
 
         val upValues = frames.flatMap { frame ->
@@ -145,16 +170,19 @@ class DebuggerExecutionListener(
 
             upValues.zip(upValuesDesc) { value, name ->
                 val upValueName = name.name?.tojstring() ?: ""
-                val upValueValue = value?.value?.tojstring() ?: ""
+                val upValueValue = value?.value ?: LuaValue.NIL
                 upValueName to upValueValue
             }
+                // Skip the _ENV upvalue
+                .filterNot { (name, _) -> name == "_ENV" }
         }.toMap()
+            .mapValues { (_, value) -> formatValue(value) }
 
         val locals = frames.flatMap {
             it.getLocals()
         }.associate {
             // name to value
-            it.arg(1).tojstring() to it.arg(2).tojstring()
+            it.arg(1).tojstring() to formatValue(it.arg(2))
         }
 
         engineCommandSender.send(
