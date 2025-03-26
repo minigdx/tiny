@@ -7,12 +7,17 @@ plugins {
     application
 }
 
-configurations.create("tinyEngineJsZip") {
+val tinyEngineJsZip by configurations.creating {
     isCanBeResolved = true
     isCanBeConsumed = false
     attributes {
         attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class, "tiny-engine-js-browser-distribution"))
     }
+}
+
+val tinyApiluaStub by configurations.creating {
+    isCanBeConsumed = false
+    isCanBeResolved = true
 }
 
 dependencies {
@@ -32,9 +37,21 @@ dependencies {
     jvmMainImplementation(libs.bundles.jvm.ktor.server)
     jvmMainImplementation(libs.bundles.jvm.ktor.client)
 
-    add("tinyEngineJsZip", project(":tiny-engine"))?.because(
+    add(tinyEngineJsZip.name, project(":tiny-engine"))?.because(
         "Embed the JS engine in the CLI " +
             "so it can be included when the game is exported.",
+    )
+
+    add(
+        tinyApiluaStub.name,
+        project(
+            mapOf(
+                "path" to ":tiny-engine",
+                "configuration" to "tinyApiLuaStub",
+            ),
+        ),
+    )?.because(
+        "Embed the Lua API stub so it can be included when a new game is created.",
     )
 }
 
@@ -52,7 +69,8 @@ application {
     ) {
         val jvmJar by tasks.existing
         this.from(jvmJar)
-        this.from(project.configurations.getByName("tinyEngineJsZip"))
+        this.from(tinyEngineJsZip)
+        this.from(tinyApiluaStub)
         this.into("lib")
     }
 }
@@ -61,7 +79,8 @@ application {
 project.tasks.withType(CreateStartScripts::class.java).configureEach {
     this.classpath = project.tasks.getByName("jvmJar").outputs.files
         .plus(project.configurations.getByName("jvmRuntimeClasspath"))
-        .plus(project.configurations.getByName("tinyEngineJsZip"))
+        .plus(tinyEngineJsZip)
+        .plus(tinyApiluaStub)
 }
 
 // Make the application plugin start with the right classpath
@@ -70,8 +89,9 @@ project.tasks.withType(JavaExec::class.java).configureEach {
     val jvmJar by tasks.existing
     val jvmRuntimeClasspath by configurations.existing
     val tinyEngineJsZip by configurations.existing
+    val tinyApiLuaStub by configurations.existing
 
-    classpath(jvmJar, jvmRuntimeClasspath, tinyEngineJsZip)
+    classpath(jvmJar, jvmRuntimeClasspath, tinyEngineJsZip, tinyApiLuaStub)
 }
 
 // Create custom script for Mac + LWJGL with "-XstartOnFirstThread" JVM option.

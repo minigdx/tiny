@@ -65,6 +65,7 @@ configurations.create("tinyWebEngine") {
     outgoing.artifact(tasks.getByName("tinyEngineJsZip"))
 }
 
+// -- Asciidoctor artifact configuration
 configurations.create("tinyApiAsciidoctor") {
     isCanBeResolved = false
     isCanBeConsumed = true
@@ -72,6 +73,22 @@ configurations.create("tinyApiAsciidoctor") {
 
 artifacts {
     add("tinyApiAsciidoctor", project.buildDir.resolve("generated/ksp/jvm/jvmMain/resources/tiny-api.adoc")) {
+        builtBy("kspKotlinJvm")
+    }
+}
+
+// -- LUA Stub artifact configuration
+configurations.create("tinyApiLuaStub") {
+    isCanBeResolved = false
+    isCanBeConsumed = true
+
+    attributes {
+        attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class, "tiny-api-lua-stub"))
+    }
+}
+
+artifacts {
+    add("tinyApiLuaStub", project.buildDir.resolve("generated/ksp/jvm/jvmMain/resources/_tiny.stub.lua")) {
         builtBy("kspKotlinJvm")
     }
 }
