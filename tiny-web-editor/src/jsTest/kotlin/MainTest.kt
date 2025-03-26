@@ -81,4 +81,19 @@ class MainTest {
             elt.innerHTML,
         )
     }
+
+    @Test
+    fun highlight_extra_line_return() {
+        val elt = document.createElement("div") as HTMLDivElement
+        elt.innerHTML = "<div> </div>\n" +
+            "<div> </div>\n"
+        elt.innerHTML = highlight(elt.innerText)
+
+        assertEquals(
+            "<div> </div>\n" +
+                "<div> </div>\n" +
+                "<div> </div>",
+            elt.innerHTML,
+        )
+    }
 }

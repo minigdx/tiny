@@ -80,6 +80,14 @@ fun main() {
     }
 }
 
+/**
+ * Get the caret position in the editor.
+ *
+ * @param el the element where the caret is.
+ *
+ * @return the position of the caret.
+ * -1 if the caret is not found.
+ */
 fun getCaretPosition(el: Element): Int {
     val selection = window.asDynamic().getSelection() ?: return -1
     val range = selection.getRangeAt(0)
@@ -89,6 +97,25 @@ fun getCaretPosition(el: Element): Int {
     return prefix.toString().length
 }
 
+/**
+ * Set the caret position in the editor.
+ *
+ * @param pos the position of the caret.
+ * @param parent the parent node where the caret should be set.
+ *
+ * @return -1 if the caret has been set. Otherwise, the remaining position to set.
+ *
+ * The function will iterate over the child nodes of the parent.
+ * If the node is a text node, it will check if the position is within the text node.
+ * If it is, it will set the caret at the position and return -1.
+ * Otherwise, it will subtract the length of the text node from the position and continue.
+ * If the node is not a text node, it will recursively call itself with the node as the parent.
+ * If the recursive call returns a negative value, it means the caret has been set, so it will return the negative value.
+ * Otherwise, it will continue.
+ * If the loop finishes without setting the caret, it will return the remaining position.
+ *
+ * This function is used to set the caret position after updating the content of the editor.
+ */
 fun setCaret(pos: Int, parent: Node): Int {
     var position = pos
     for (i in 0 until parent.childNodes.length) {
@@ -115,6 +142,14 @@ fun setCaret(pos: Int, parent: Node): Int {
     return position
 }
 
+/**
+ * Highlight the code with HTML tags.
+ *
+ * - String: <strong class="code_string">
+ * - Comment: <em class="code_comment">
+ * - Keyword: <strong class="code_keyword">
+ * - Number: <em class="code_number">
+ */
 fun highlight(content: String): String {
     return content
         .split("\n").map { "<div>${it.ifBlank { " " }}</div>" }.joinToString("\n")
