@@ -27,8 +27,12 @@ import java.awt.Point
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.awt.event.MouseListener
+import java.awt.image.BufferedImage
 import java.io.File
+import javax.imageio.ImageIO
 import javax.swing.BoxLayout
+import javax.swing.Icon
+import javax.swing.ImageIcon
 import javax.swing.JButton
 import javax.swing.JFrame
 import javax.swing.JPanel
@@ -36,7 +40,6 @@ import javax.swing.JScrollPane
 import javax.swing.JTabbedPane
 import javax.swing.JTable
 import javax.swing.SwingUtilities
-import javax.swing.UIManager
 import javax.swing.table.DefaultTableModel
 import javax.swing.text.BadLocationException
 import javax.swing.text.DefaultHighlighter
@@ -96,8 +99,13 @@ class TinyDebuggerUI(
                 .map { it to File(it).readText() }
 
             SwingUtilities.invokeLater {
+                val breakpointIcon = ImageIO.read(TinyDebuggerUI::class.java.getResource("/icons/flag_square.png"))
+                    .let { recolorImage(it, LIGHT_RED) }
+                    .getScaledInstance(16, 16, 0)
+                    .let { ImageIcon(it) }
+
                 scriptsContent.forEach { (scriptName, scriptContent) ->
-                    addScriptTab(scriptName, scriptContent)
+                    addScriptTab(scriptName, scriptContent, breakpointIcon)
                 }
             }
 
@@ -124,10 +132,22 @@ class TinyDebuggerUI(
     }
 
     private fun Toolbar(): Component {
+        val iconResume = ImageIO.read(TinyDebuggerUI::class.java.getResource("/icons/pawn_right.png"))
+            .let { recolorImage(it, LIGHT_GREY) }
+            .getScaledInstance(24, 24, 0)
+            .let { ImageIcon(it) }
+
+        val iconStep = ImageIO.read(TinyDebuggerUI::class.java.getResource("/icons/pawn_skip.png"))
+            .let { recolorImage(it, LIGHT_GREY) }
+            .getScaledInstance(24, 24, 0)
+            .let { ImageIcon(it) }
+
         return JPanel().apply {
             contentPane.layout = BoxLayout(contentPane, BoxLayout.X_AXIS)
             add(
-                JButton("⏯").apply {
+                JButton(iconResume).apply {
+                    toolTipText = "Resume execution until the next breakpoint"
+                    preferredSize = Dimension(32, 32)
                     addActionListener {
                         io.launch {
                             debugCommandSender.send(ResumeExecution())
@@ -139,7 +159,9 @@ class TinyDebuggerUI(
                 },
             )
             add(
-                JButton("⤵").apply {
+                JButton(iconStep).apply {
+                    toolTipText = "Step over the current line"
+                    preferredSize = Dimension(32, 32)
                     addActionListener {
                         io.launch {
                             // Goes to the next line
@@ -167,7 +189,7 @@ class TinyDebuggerUI(
         }
     }
 
-    private fun addScriptTab(scriptName: String, scriptContent: String) {
+    private fun addScriptTab(scriptName: String, scriptContent: String, bookmarkIcon: Icon) {
         val textArea = RSyntaxTextArea(20, 60).apply {
             syntaxEditingStyle = SyntaxConstants.SYNTAX_STYLE_LUA
             isCodeFoldingEnabled = true
@@ -178,7 +200,7 @@ class TinyDebuggerUI(
         textAreas[scriptName] = textArea
 
         val scrollPane = RTextScrollPane(textArea)
-        scrollPane.gutter.bookmarkIcon = UIManager.getIcon("FileView.directoryIcon")
+        scrollPane.gutter.bookmarkIcon = bookmarkIcon
         scrollPane.gutter.isBookmarkingEnabled = true
         scrollPane.gutter.addIconRowListener(GutterListener(scriptName))
         scrollPane.gutter.addLineNumberListener(LineNumberListener(scrollPane))
@@ -224,9 +246,54 @@ class TinyDebuggerUI(
         }
     }
 
-    data class CurrentBreakpoint(var scriptName: String, var line: Int)
+    /**
+     * Creates a new BufferedImage by replacing pixels of a specific color (like white)
+     * in the source image with a target color, while preserving transparency.
+     *
+     * @param sourceImage The original BufferedImage.
+     * @param targetColor The Color object representing the new color.
+     * @return A new BufferedImage with the specified color replaced.
+     */
+    private fun recolorImage(
+        sourceImage: BufferedImage,
+        targetColor: Color,
+    ): BufferedImage {
+        if (sourceImage.width <= 0 || sourceImage.height <= 0) {
+            throw IllegalArgumentException("Image size is invalid")
+        }
+
+        val width = sourceImage.width
+        val height = sourceImage.height
+
+        // Create a new image with the same dimensions and support for transparency (ARGB)
+        val newImage = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
+
+        // Iterate through each pixel
+        for (y in 0 until height) {
+            for (x in 0 until width) {
+                val originalPixelARGB = sourceImage.getRGB(x, y) // Get pixel data including alpha
+                val originalAlpha = (originalPixelARGB shr 24) and 0xFF
+
+                // Check if the RGB portion matches the color to replace
+                // We compare ignoring the original alpha channel using a mask
+                if (originalAlpha == 0x00) {
+                    newImage.setRGB(x, y, originalPixelARGB)
+                } else {
+                    // Create new pixel value: (alpha << 24) | (red << 16) | (green << 8) | blue
+                    val newPixelARGB = (originalAlpha shl 24) or
+                        (targetColor.red shl 16) or
+                        (targetColor.green shl 8) or
+                        targetColor.blue
+                    newImage.setRGB(x, y, newPixelARGB)
+                }
+            }
+        }
+
+        return newImage
+    }
 
     companion object {
         private val LIGHT_RED = Color(255, 102, 102, 100)
+        private val LIGHT_GREY = Color(151, 151, 151, 100)
     }
 }

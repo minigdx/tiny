@@ -1,0 +1,21 @@
+=================================
+THIRD-PARTY ASSET CREDITS
+=================================
+
+This application utilizes graphical assets, including icons, provided by third-party creators.
+We deeply appreciate their contribution to the open/creative community.
+Proper attribution for these assets is provided below.
+
+---------------------------------
+ICON CREDITS
+---------------------------------
+
+Item:           icons located in the icons folder
+Author/Creator: Kenney
+Source URL:     https://kenney.nl/assets/board-game-icons
+License:        Creative Commons CC0
+License URL:    https://creativecommons.org/publicdomain/zero/1.0/
+
+=================================
+
+Please consult the specific license URL(s) listed above for the full terms and conditions governing the use of each asset.
