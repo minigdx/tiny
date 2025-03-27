@@ -6,6 +6,8 @@ To get started, simply install the Tiny CLI on your system and create a new proj
 
 The Tiny CLI also includes a powerful development server that allows you to preview your game in real-time as you develop it. Simply run the tiny command and start to update your game.
 
+The Tiny CLI includes the `tuny-cli debug` command, which starts a debugging tool. Connect it to your running game to set breakpoints and examine variables. As with typical debuggers, you can resume execution or step through your code line by line.
+
 When you're ready to share your game with the world, the Tiny CLI makes it easy to export your game for web browsers. You can use the `tiny-cli export` command to generate a distributable version of your game that can be published on the web. You can also try the `export` result by using the command `tiny-cli serve`.
 
 Whether you're a seasoned game developer or just getting started, the Tiny CLI is a powerful tool that can help you create, run, develop, and export amazing 2D games with the Tiny engine. With its intuitive command-line interface and powerful features, the Tiny CLI is the ultimate tool for building your next great game.
@@ -58,8 +60,6 @@ TIP: With the `tiny-cli create` command, you can quickly and easily create new g
 === The `tiny-cli run` command
 
 The `tiny-cli run` command is a command line tool for running and testing your tiny game. This command takes only one parameter: the path to the directory containing your game's assets and `_tiny.json` file.
-
-WARNING: If the command is run on Mac OS and some JRE/JDK, the command might not work as it requires to use the JVM option `-XstartOnFirstThread`. In such case, instead of `tiny-cli`, use `tiny-cli-mac` which add this option.
 
 ==== Usage
 
@@ -120,6 +120,24 @@ WARNING: Note that the added resource is not automatically copied to your game's
 Alternatively, you can also manually add resources to your game by editing the `_tiny.json` file directly. Simply open the file in a text editor and add the resource to the appropriate array.
 
 With the `tiny-cli add` command, you can easily add new resources to your game and customize its functionality and appearance. Whether you are adding new spritesheets, sounds, or fonts, this command makes it easy to create the game of your dreams with the tiny game engine.
+
+=== The `tiny-cli debug` command
+
+The `tiny-cli debug` command is a debug tool to debug the current game.
+
+==== Usage
+
+To use the `tiny-cli debug` command, simply open your terminal and type the following command:
+
+```
+tiny-cli debug <game folder>
+```
+
+where `<game folder>` is the path to the directory containing your game's assets and `_tiny.json` file.
+
+image:sample/tiny-cli-debug.png[]
+
+Clicking in the editor's gutter adds a breakpoint, indicated by a red flag. When execution reaches a breakpoint, it pauses the execution, displaying variables within that context. Use the buttons above the variable display to resume execution or step through code line by line.
 
 === the `tiny-cli palette` command
 
