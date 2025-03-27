@@ -75,7 +75,10 @@ class RunCommand : CliktCommand(name = "run", help = "Run your game.") {
         val debugCommandReceiver = Channel<DebugRemoteCommand>()
         val engineCommandSender = Channel<EngineRemoteCommand>()
 
-        embeddedServer(Netty, port = debug) {
+        embeddedServer(Netty, port = debug, configure = {
+            shutdownTimeout = 0
+            shutdownGracePeriod = 0
+        },) {
             install(WebSockets)
 
             routing {
