@@ -1,4 +1,5 @@
-import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
+
+import java.io.Reader
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
@@ -57,11 +58,6 @@ dependencies {
 
 application {
     mainClass.set("com.github.minigdx.tiny.cli.MainKt")
-    applicationDefaultJvmArgs = if (System.getProperty("os.name").toLowerCaseAsciiOnly().contains("mac")) {
-        listOf("-XstartOnFirstThread")
-    } else {
-        emptyList()
-    }
 
     // Copy the JARs from the Kotlin MPP dependencies.
     this.applicationDistribution.from(
@@ -81,6 +77,24 @@ project.tasks.withType(CreateStartScripts::class.java).configureEach {
         .plus(project.configurations.getByName("jvmRuntimeClasspath"))
         .plus(tinyEngineJsZip)
         .plus(tinyApiluaStub)
+
+    (this.unixStartScriptGenerator as TemplateBasedScriptGenerator).template = object : TextResource {
+        override fun getBuildDependencies(): TaskDependency = TODO("Not yet implemented")
+
+        override fun asString(): String = TODO("Not yet implemented")
+
+        override fun asReader(): Reader {
+            return project.file("unixCustomStartScript.txt").reader()
+        }
+
+        override fun asFile(charset: String): File = TODO("Not yet implemented")
+
+        override fun asFile(): File = TODO("Not yet implemented")
+
+        override fun getInputProperties(): Any? = TODO("Not yet implemented")
+
+        override fun getInputFiles(): FileCollection? = TODO("Not yet implemented")
+    }
 }
 
 // Make the application plugin start with the right classpath
@@ -92,27 +106,4 @@ project.tasks.withType(JavaExec::class.java).configureEach {
     val tinyApiLuaStub by configurations.existing
 
     classpath(jvmJar, jvmRuntimeClasspath, tinyEngineJsZip, tinyApiLuaStub)
-}
-
-// Create custom script for Mac + LWJGL with "-XstartOnFirstThread" JVM option.
-val macStartScripts = project.tasks.register("startScriptsForMac", CreateStartScripts::class.java) {
-    val startScripts = project.tasks.getByName("startScripts", CreateStartScripts::class)
-
-    description = "Create Mac OS custom start script"
-    classpath = startScripts.classpath
-
-    mainModule.set(startScripts.mainModule)
-    mainClass.set(startScripts.mainClass)
-
-    conventionMapping.map("applicationName") { startScripts.conventionMapping.getConventionValue(null as String?, "applicationName", false) + "-mac" }
-    conventionMapping.map("outputDir") { startScripts.conventionMapping.getConventionValue(null as File?, "outputDir", false) }
-    conventionMapping.map("executableDir") { startScripts.conventionMapping.getConventionValue(null as String?, "executableDir", false) }
-    conventionMapping.map("defaultJvmOpts") { listOf("-XstartOnFirstThread") }
-
-    modularity.inferModulePath.convention(startScripts.modularity.inferModulePath)
-}
-
-project.afterEvaluate {
-    project.tasks["distTar"].dependsOn(macStartScripts)
-    project.tasks["distZip"].dependsOn(macStartScripts)
 }
