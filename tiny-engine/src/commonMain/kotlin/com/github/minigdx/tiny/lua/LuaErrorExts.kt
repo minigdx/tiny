@@ -18,7 +18,7 @@ fun LuaError.errorLine(): Pair<Int, String>? {
 }
 
 fun LuaError.toTinyException(content: String): TinyException {
-    throw TinyException(
+    return TinyException(
         name = this.script,
         content = content,
         lineNumber = this.line,
