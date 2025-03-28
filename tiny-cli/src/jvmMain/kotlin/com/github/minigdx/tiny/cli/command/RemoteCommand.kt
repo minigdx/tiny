@@ -40,6 +40,12 @@ data class ToggleBreakpoint(val script: String, val line: Int, val enabled: Bool
 data class ResumeExecution(val advanceByStep: Boolean = false) : DebugRemoteCommand
 
 /**
+ * Resume game execution.
+ */
+@Serializable
+object Disconnect : DebugRemoteCommand
+
+/**
  * A breakpoint has been hit in the game engine.
  *
  * @param script the name of the script where the breakpoint is.

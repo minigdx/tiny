@@ -2,6 +2,7 @@ package com.github.minigdx.tiny.cli.ui
 
 import com.github.minigdx.tiny.cli.command.BreakpointHit
 import com.github.minigdx.tiny.cli.command.DebugRemoteCommand
+import com.github.minigdx.tiny.cli.command.Disconnect
 import com.github.minigdx.tiny.cli.command.EngineRemoteCommand
 import com.github.minigdx.tiny.cli.command.ResumeExecution
 import com.github.minigdx.tiny.cli.command.ToggleBreakpoint
@@ -132,6 +133,11 @@ class TinyDebuggerUI(
     }
 
     private fun Toolbar(): Component {
+        val iconDisconnect = ImageIO.read(TinyDebuggerUI::class.java.getResource("/icons/character_remove.png"))
+            .let { recolorImage(it, LIGHT_GREY) }
+            .getScaledInstance(24, 24, 0)
+            .let { ImageIcon(it) }
+
         val iconResume = ImageIO.read(TinyDebuggerUI::class.java.getResource("/icons/pawn_right.png"))
             .let { recolorImage(it, LIGHT_GREY) }
             .getScaledInstance(24, 24, 0)
@@ -144,6 +150,20 @@ class TinyDebuggerUI(
 
         return JPanel().apply {
             contentPane.layout = BoxLayout(contentPane, BoxLayout.X_AXIS)
+            add(
+                JButton(iconDisconnect).apply {
+                    toolTipText = "Disconnect from the game"
+                    preferredSize = Dimension(32, 32)
+                    addActionListener {
+                        io.launch {
+                            debugCommandSender.send(Disconnect)
+                            textAreas.values.forEach {
+                                it.highlighter.removeAllHighlights()
+                            }
+                        }
+                    }
+                },
+            )
             add(
                 JButton(iconResume).apply {
                     toolTipText = "Resume execution until the next breakpoint"

@@ -14,6 +14,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.websocket.Frame
+import io.ktor.websocket.close
 import io.ktor.websocket.readText
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -81,6 +82,9 @@ class DebugCommand : CliktCommand(name = "debug", help = "Debug the current game
             launch {
                 for (message in channel) {
                     session.outgoing.send(Frame.Text(Json.encodeToString(message)))
+                    if(message is Disconnect) {
+                        session.close()
+                    }
                 }
             }
 

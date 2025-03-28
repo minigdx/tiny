@@ -2,6 +2,7 @@ package com.github.minigdx.tiny.cli.debug
 
 import com.github.minigdx.tiny.cli.command.BreakpointHit
 import com.github.minigdx.tiny.cli.command.DebugRemoteCommand
+import com.github.minigdx.tiny.cli.command.Disconnect
 import com.github.minigdx.tiny.cli.command.EngineRemoteCommand
 import com.github.minigdx.tiny.cli.command.ResumeExecution
 import com.github.minigdx.tiny.cli.command.ToggleBreakpoint
@@ -63,6 +64,7 @@ class DebuggerExecutionListener(
                 when (debugRemoteCommand) {
                     is ToggleBreakpoint -> toggleBreakpoint(debugRemoteCommand)
                     is ResumeExecution -> resumeExecution(debugRemoteCommand)
+                    Disconnect -> disconnect()
                 }
             }
         }
@@ -71,6 +73,11 @@ class DebuggerExecutionListener(
     private fun resumeExecution(debugRemoteCommand: ResumeExecution) {
         advanceByStep = debugRemoteCommand.advanceByStep
         advanceByStepCurrentLine = currentExecutionPoint.line
+        blocker.unblock()
+    }
+
+    private fun disconnect() {
+        breakpoints = emptyMap()
         blocker.unblock()
     }
 
