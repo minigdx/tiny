@@ -145,7 +145,7 @@ class DebuggerExecutionListener(
     override suspend fun onInstruction(pc: Int, v: Varargs, top: Int) {
         callstack(globals.running).onInstruction(pc, v, top)
 
-        val line = lineinfo!!.get(pc)
+        val line = lineinfo?.getOrNull(pc) ?: -1
 
         currentExecutionPoint.pc = pc
         currentExecutionPoint.line = line
