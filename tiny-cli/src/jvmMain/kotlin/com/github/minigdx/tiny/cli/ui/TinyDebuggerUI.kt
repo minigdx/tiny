@@ -4,6 +4,7 @@ import com.github.minigdx.tiny.cli.command.BreakpointHit
 import com.github.minigdx.tiny.cli.command.DebugRemoteCommand
 import com.github.minigdx.tiny.cli.command.Disconnect
 import com.github.minigdx.tiny.cli.command.EngineRemoteCommand
+import com.github.minigdx.tiny.cli.command.Reload
 import com.github.minigdx.tiny.cli.command.ResumeExecution
 import com.github.minigdx.tiny.cli.command.ToggleBreakpoint
 import com.github.minigdx.tiny.cli.config.GameParameters
@@ -126,6 +127,10 @@ class TinyDebuggerUI(
                                 tableModel.addRow(arrayOf(name, value))
                             }
                         }
+                    }
+                    is Reload -> SwingUtilities.invokeLater {
+                        val textArea = textAreas[command.script]!!
+                        textArea.text = File(command.script).readText()
                     }
                 }
             }

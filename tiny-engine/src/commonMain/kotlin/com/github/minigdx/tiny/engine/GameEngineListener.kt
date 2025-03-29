@@ -11,4 +11,6 @@ import com.github.minigdx.tiny.resources.GameScript
 interface GameEngineListener {
 
     fun switchScript(before: GameScript?, after: GameScript?)
+
+    fun reload(gameScript: GameScript?)
 }

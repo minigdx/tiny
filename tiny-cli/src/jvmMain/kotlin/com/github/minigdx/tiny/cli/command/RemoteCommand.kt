@@ -21,7 +21,7 @@ sealed interface DebugRemoteCommand : RemoteCommand
 sealed interface EngineRemoteCommand : RemoteCommand
 
 @Serializable
-data class HandshakeRequest(val name: String, val gamescripts: List<String>) : RemoteCommand
+data class Reload(val script: String) : EngineRemoteCommand
 
 /**
  * Toggle a breakpoint in the game engine.

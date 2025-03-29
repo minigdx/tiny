@@ -284,7 +284,7 @@ class GameEngine(
                     evaluate(customizeLuaGlobal)
                     setState(state)
 
-                    listener?.switchScript(this, this)
+                    listener?.reload(scripts[current])
 
                     inError = false
                 } catch (ex: LuaError) {

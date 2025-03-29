@@ -31,6 +31,8 @@ import io.ktor.server.websocket.WebSockets
 import io.ktor.server.websocket.webSocket
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
@@ -75,10 +77,14 @@ class RunCommand : CliktCommand(name = "run", help = "Run your game.") {
         val debugCommandReceiver = Channel<DebugRemoteCommand>()
         val engineCommandSender = Channel<EngineRemoteCommand>()
 
-        embeddedServer(Netty, port = debug, configure = {
-            shutdownTimeout = 0
-            shutdownGracePeriod = 0
-        },) {
+        embeddedServer(
+            Netty,
+            port = debug,
+            configure = {
+                shutdownTimeout = 0
+                shutdownGracePeriod = 0
+            },
+        ) {
             install(WebSockets)
 
             routing {
@@ -128,6 +134,17 @@ class RunCommand : CliktCommand(name = "run", help = "Run your game.") {
                         if (after != null) {
                             debugListener.globals = after.globals!!
                             debugListener.globals.debuglib = debugListener
+                        }
+                    }
+
+                    override fun reload(gameScript: GameScript?) {
+                        gameScript?.run {
+                            debugListener.globals = gameScript.globals!!
+                            debugListener.globals.debuglib = debugListener
+
+                            CoroutineScope(Dispatchers.IO).launch {
+                                engineCommandSender.send(Reload(gameScript.name))
+                            }
                         }
                     }
                 },

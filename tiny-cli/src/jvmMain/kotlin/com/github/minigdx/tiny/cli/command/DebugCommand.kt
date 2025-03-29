@@ -82,7 +82,7 @@ class DebugCommand : CliktCommand(name = "debug", help = "Debug the current game
             launch {
                 for (message in channel) {
                     session.outgoing.send(Frame.Text(Json.encodeToString(message)))
-                    if(message is Disconnect) {
+                    if (message is Disconnect) {
                         session.close()
                     }
                 }
