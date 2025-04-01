@@ -115,7 +115,7 @@ class RunCommand : CliktCommand(name = "run", help = "Run your game.") {
             }
             val gameParameters = GameParameters.read(configFile)
 
-            val logger = StdOutLogger("tiny-cli", level = LogLevel.INFO)
+            val logger = StdOutLogger("tiny-cli", level = LogLevel.DEBUG)
 
             val vfs = CommonVirtualFileSystem()
             val gameOption = gameParameters.toGameOptions()
