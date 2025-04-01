@@ -124,6 +124,15 @@ class DebuggerExecutionListener(
     override suspend fun onCall(c: LuaClosure, varargs: Varargs, stack: Array<LuaValue>) {
         callstack(globals.running).onCall(c, varargs, stack)
 
+        onCall(c)
+    }
+
+    override fun onCall(f: LuaFunction) {
+        callstack(globals.running).onCall(f)
+        (f as? LuaClosure)?.run { onCall(this) }
+    }
+
+    private fun onCall(c: LuaClosure) {
         val name = c.p.source.tojstring()
         currentExecutionPoint.script = if (name.startsWith("@")) {
             name.drop(1)
@@ -143,10 +152,6 @@ class DebuggerExecutionListener(
                 breakpoint.init = true
                 breakpoint.function = c
             }
-    }
-
-    override fun onCall(f: LuaFunction) {
-        callstack(globals.running).onCall(f)
     }
 
     override suspend fun onInstruction(pc: Int, v: Varargs, top: Int) {
@@ -205,6 +210,18 @@ class DebuggerExecutionListener(
 
     override fun onReturn() {
         callstack(globals.running).onReturn()
+
+        val frame = callstack(globals.running).getCurrentFrame()
+
+        val p = (frame?.f as? LuaClosure)?.p
+        val name = p?.source?.tojstring()
+        currentExecutionPoint.script = if (name?.startsWith("@") == true) {
+            name.drop(1)
+        } else {
+            name ?: "anonymous"
+        }
+        currentExecutionPoint.function = frame?.f as LuaClosure?
+        lineinfo = p?.lineinfo
     }
 
     override fun traceback(level: Int): String = ""
@@ -253,6 +270,10 @@ class DebuggerExecutionListener(
 
         fun getCallFrames(): List<CallFrame> {
             return frame.asList().take(calls + 1)
+        }
+
+        fun getCurrentFrame(): CallFrame? {
+            return frame.getOrNull(calls - 1)
         }
     }
 
