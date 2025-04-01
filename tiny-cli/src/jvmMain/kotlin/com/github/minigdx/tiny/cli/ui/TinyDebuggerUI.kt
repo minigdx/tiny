@@ -209,6 +209,9 @@ class TinyDebuggerUI(
 
             // Highlight the line
             this.highlighter.addHighlight(start, end, DefaultHighlighter.DefaultHighlightPainter(color))
+
+            // Set the focus on that line
+            this.caretPosition = start
         } catch (e: Exception) {
             e.printStackTrace()
         }
