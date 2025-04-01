@@ -212,7 +212,7 @@ class StdLib(
             @TinyArg("y") c: LuaValue,
             @TinyArg("color") d: LuaValue,
         ): LuaValue {
-            val str = a.checkjstring() ?: return NONE
+            val str = a.tojstring()
             val x = b.checkint()
             val y = c.checkint()
             val color = d.checkColorIndex()
