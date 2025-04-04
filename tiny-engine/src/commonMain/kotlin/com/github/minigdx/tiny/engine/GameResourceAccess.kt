@@ -1,5 +1,7 @@
 package com.github.minigdx.tiny.engine
 
+import com.github.minigdx.tiny.ColorIndex
+import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.resources.GameLevel
 import com.github.minigdx.tiny.resources.GameScript
@@ -75,4 +77,44 @@ interface GameResourceAccess {
      * after the game rendered.
      */
     fun debug(action: DebugAction) = Unit
+
+    /**
+     * Add an Ops to be executed by the shader
+     */
+    fun addOp(op: Operation) = Unit
+}
+
+sealed interface Operation {
+    fun write(index: Int, image: ByteArray): Int
+
+    val type: Int
+}
+
+/**
+ * Set a pixel [color] at the coordinates [x] and [y].
+ */
+data class SetPixel(val x: Pixel, val y: Pixel, val color: ColorIndex) : Operation {
+
+    override val type: Int = 1
+
+    override fun write(index: Int, image: ByteArray): Int {
+        var cursor = index
+        image[cursor++] = x.toByte()
+        image[cursor++] = y.toByte()
+        image[cursor++] = color.toByte()
+        return cursor
+    }
+}
+
+/**
+ * Clear the full screen by filling it with [color].
+ */
+data class ClearScreen(val color: ColorIndex) : Operation {
+    override val type: Int = 0
+
+    override fun write(index: Int, image: ByteArray): Int {
+        var cursor = index
+        image[cursor++] = color.toByte()
+        return cursor
+    }
 }

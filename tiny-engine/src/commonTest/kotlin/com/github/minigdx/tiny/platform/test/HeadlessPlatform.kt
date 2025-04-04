@@ -2,6 +2,7 @@ package com.github.minigdx.tiny.platform.test
 
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
+import com.github.minigdx.tiny.engine.Operation
 import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.graphic.FrameBuffer
@@ -63,6 +64,8 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
 
         frames.add(newBuffer)
     }
+
+    override fun draw(context: RenderContext, ops: List<Operation>) = Unit
 
     override fun record() {
         super.record()

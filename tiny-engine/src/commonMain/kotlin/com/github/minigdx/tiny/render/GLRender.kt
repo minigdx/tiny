@@ -30,6 +30,7 @@ import com.danielgergely.kgl.Kgl
 import com.danielgergely.kgl.Shader
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameOptions
+import com.github.minigdx.tiny.engine.Operation
 import com.github.minigdx.tiny.graphic.PixelFormat
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.RenderContext
@@ -54,8 +55,18 @@ class GLRender(
         ),
     )
 
+    private val vertexData = floatArrayOf(
+        3f,
+        -1f,
+        -1f,
+        3f,
+        -1f,
+        -1f,
+    )
+
     override fun init(windowManager: WindowManager): RenderContext {
         // Load and compile the shaders
+        //language=Glsl
         val vertexShader = """
         #ifdef GL_ES
             precision highp float;
@@ -72,19 +83,91 @@ class GLRender(
         }
         """.trimIndent()
 
+        //language=Glsl
         val fragmentShader = """
         #ifdef GL_ES
             precision highp float;
         #endif
         
+        #define MAX_TEXTURE_WIDTH 32 
+        #define MAX_TEXTURE_HEIGHT 32
+        #define MAX_OPTS (MAX_TEXTURE_WIDTH * MAX_TEXTURE_HEIGHT)
+        
         varying vec2 texture;
         
-        uniform sampler2D image;
         uniform sampler2D colors;
+        // Opcodes are passed as a texture as it's the best way to pass 
+        uniform sampler2D opcodes;
+        // Number of opcode. It's also the size of the texture `opcodes`.
+        uniform int opcodesSize;  
+        
+        // TODO: generate user texture uniform regarding the number of texture in the game (spritesheets + levels)
+        //       warning: what about the "to_sheet" method? -> rajouter 5 blocks pour ça ? 
+        
+        /**
+        * Extract data from a "kind of" texture1D
+        */
+        vec4 readData(sampler2D txt, int index, int indexSize) {
+            return texture2D(txt, vec2((float(index) + 0.5) / float(indexSize), 0.0));
+        }
+        
+        /**
+        * Read data from the opcodes texture.
+        */
+        vec4 readOpsAsVec4(int index) {
+            return readData(opcodes, index, MAX_OPTS);
+        }
+        
+        /**
+        * Read data from the opcodes texture. Return the value as int.
+        */
+        int readOpsAsInt(int index) {
+            return int(readData(opcodes, index, MAX_TEXTURE_WIDTH).r * 255.0);
+        }
+        
+        /**
+        * Read a color from the colors texture.
+        */
+        vec4 readColor(int index) {
+            return readData(colors, index, 256);
+        }
+        
+        vec4 cls(int color) {
+            return readColor(color);
+        }
         
         void main() {
-            vec4 point = texture2D(image, texture);
-            vec4 color = texture2D(colors, vec2(point.r, 1.0));
+            // Number of ops to skip as it's args.
+            int opsToSkip = 0;
+            vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
+            // Index of the pixel in the opcode texture
+            // Loop over all pixels (ie: opcode) of the opcodes texture
+            // OpenGL ES needs loop that can be evaluated at compile time.
+            for (int pixelIndex = 0 ; pixelIndex < MAX_OPTS ; pixelIndex++) {
+                // Safe guard: execute only expected ops 
+                if(pixelIndex < opcodesSize && opsToSkip == 0) {
+                    // Get the base pixel of the opcode. 
+                    // It will give the type of the opcode, the number of parameters and the first parameters (if any)
+                    int opcode = readOpsAsInt(pixelIndex);
+                    
+                    // TODO: make the engine generate this part ??
+                    if(opcode == 0) { 
+                        int arg1 = readOpsAsInt(pixelIndex + 1);
+                        color = cls(arg1);
+                        opsToSkip = 1;
+                    } else if (opcode == 1) {
+                        opsToSkip = 4;
+                    } else if (opcode == 2) {
+                        opsToSkip = 2;
+                    } else {
+                        color = vec4(1.0, 0.0, 0.0, 1.0); // RED
+                    }
+                } else if(opsToSkip > 0) {
+                    // it's an arg processed by the current ops.
+                    // Let's skip it until we reach the next ops.
+                    opsToSkip--;
+                }
+            }
             
             gl_FragColor = color;
         }
@@ -120,15 +203,7 @@ class GLRender(
         gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
         gl.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
 
-        val vertexData = floatArrayOf(
-            3f,
-            -1f,
-            -1f,
-            3f,
-            -1f,
-            -1f,
-        )
-
+        // Setup the drawing surface
         val positionBuffer = gl.createBuffer()
         gl.bindBuffer(GL_ARRAY_BUFFER, positionBuffer)
         gl.bufferData(GL_ARRAY_BUFFER, FloatBuffer(vertexData), vertexData.size, GL_STATIC_DRAW)
@@ -168,17 +243,18 @@ class GLRender(
         val colors = gameOptions.colors()
         // texture of one pixel height and 256 pixel width.
         // one pixel of the texture = one index.
+        // OpenGL ES required a texture with squared size.
+        // So it's a 256*256 texture, even if only the first
+        // row of this texture is used.
         buffer = ByteArray(256 * 256 * PixelFormat.RGBA)
         var pos = 0
-        for (y in 0 until 256) {
-            for (index in 0 until 256) {
+        for (index in 0 until 256) {
                 val color = colors.getRGBA(index)
 
                 buffer[pos++] = color[0]
                 buffer[pos++] = color[1]
                 buffer[pos++] = color[2]
                 buffer[pos++] = color[3]
-            }
         }
         val index = gl.createTexture()
         gl.bindTexture(GL_TEXTURE_2D, index)
@@ -209,9 +285,74 @@ class GLRender(
         )
     }
 
-    private fun createShader(vertexShader: String, shaderType: Int): Shader {
+    override fun draw(context: RenderContext, ops: List<Operation>) {
+        context as GLRenderContext
+
+        gl.viewport(
+            gameOptions.gutter.first * gameOptions.zoom * context.windowManager.ratioWidth,
+            gameOptions.gutter.second * gameOptions.zoom * context.windowManager.ratioHeight,
+            gameOptions.width * gameOptions.zoom * context.windowManager.ratioWidth,
+            gameOptions.height * gameOptions.zoom * context.windowManager.ratioHeight,
+        )
+
+        // -- game screen -- //
+        // Push instructions as textures
+        gl.activeTexture(GL_TEXTURE0)
+        gl.bindTexture(GL_TEXTURE_2D, context.texture)
+
+        // FIXME: for performance reason, it can be created before
+        val image = ByteArray(32 * 32 * PixelFormat.INDEX)
+        // Inject each instruction into the texture
+        var index = 0
+        ops.forEach { op ->
+            check(index < image.size) {
+                "Writing too many ops in the ops texture!! " +
+                        "You need to use less ops or adjust the engine to support more ops"
+            }
+            image[index++] = op.type.toByte()
+            index = op.write(index, image)
+        }
+
+        gl.texImage2D(
+            target = GL_TEXTURE_2D,
+            level = 0,
+            internalFormat = GL_R8,
+            width = 32, // See Shader for the size of texture
+            height = 32, // See Shader for the size of the texture
+            border = 0,
+            format = GL_RED, // For now: put only one component of the color
+            type = GL_UNSIGNED_BYTE,
+            buffer = ByteBuffer(image),
+        )
+        gl.uniform1i(gl.getUniformLocation(context.program, "opcodes")!!, 0)
+
+        // setup shaders
+        gl.activeTexture(GL_TEXTURE1)
+        gl.bindTexture(GL_TEXTURE_2D, context.colors)
+        gl.uniform1i(gl.getUniformLocation(context.program, "colors")!!, 1) // Unité de texture 1 pour 'colors'
+
+
+        val uniformLocation = gl.getUniformLocation(context.program, "opcodesSize")
+        gl.uniform1i(uniformLocation!!, ops.size)
+
+        gl.clear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
+
+        gl.clearColor(0f, 0f, 0f, 1.0f)
+        gl.drawArrays(GL_TRIANGLES, 0, 3)
+    }
+
+    private fun createShader(shader: String, shaderType: Int): Shader {
+        fun addLineNumbers(text: String): String {
+            val lines = text.lines()
+            val lineNumberWidth = lines.size.toString().length
+            return lines.mapIndexed { index, line ->
+                val lineNumber = (index + 1).toString().padStart(lineNumberWidth, ' ')
+                "$lineNumber: $line"
+            }.joinToString("\n")
+        }
+
         val vertexShaderId = gl.createShader(shaderType)!!
-        gl.shaderSource(vertexShaderId, vertexShader)
+        gl.shaderSource(vertexShaderId, shader)
         gl.compileShader(vertexShaderId)
         if (gl.getShaderParameter(vertexShaderId, GL_COMPILE_STATUS) == GL_FALSE) {
             val log = gl.getShaderInfoLog(vertexShaderId)
@@ -220,7 +361,7 @@ class GLRender(
                 "Shader compilation error: $log \n" +
                     "---------- \n" +
                     "Shader code in error: \n" +
-                    vertexShader,
+                    addLineNumbers(shader),
             )
         }
         return vertexShaderId

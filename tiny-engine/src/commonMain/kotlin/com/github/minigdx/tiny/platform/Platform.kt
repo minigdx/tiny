@@ -3,6 +3,7 @@ package com.github.minigdx.tiny.platform
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
+import com.github.minigdx.tiny.engine.Operation
 import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.graphic.FrameBuffer
@@ -47,6 +48,11 @@ interface Platform {
      * Draw the image on the screen
      */
     fun draw(context: RenderContext, frameBuffer: FrameBuffer)
+
+    /**
+     * Draw on the screen by executing the list of operations
+     */
+    fun draw(context: RenderContext, ops: List<Operation>)
 
     /**
      * Save the last 30 seconds of the game.

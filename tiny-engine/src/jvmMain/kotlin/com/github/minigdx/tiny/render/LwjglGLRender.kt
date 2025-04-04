@@ -8,6 +8,7 @@ import com.danielgergely.kgl.GL_VERSION
 import com.danielgergely.kgl.KglLwjgl
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameOptions
+import com.github.minigdx.tiny.engine.Operation
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.RenderContext
 import com.github.minigdx.tiny.platform.WindowManager
@@ -34,4 +35,6 @@ class LwjglGLRender(
         width: Pixel,
         height: Pixel,
     ) = gl.draw(context, image, width, height)
+
+    override fun draw(context: RenderContext, ops: List<Operation>) = gl.draw(context, ops)
 }

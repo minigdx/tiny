@@ -4,6 +4,7 @@ import com.danielgergely.kgl.KglJs
 import com.danielgergely.kgl.WebGL2RenderingContext
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
+import com.github.minigdx.tiny.engine.Operation
 import com.github.minigdx.tiny.file.AjaxStream
 import com.github.minigdx.tiny.file.ImageDataStream
 import com.github.minigdx.tiny.file.JsLocalFile
@@ -82,6 +83,10 @@ class WebGlPlatform(
     override fun draw(context: RenderContext, frameBuffer: FrameBuffer) {
         val image = frameBuffer.generateBuffer()
         render.draw(context, image, frameBuffer.width, frameBuffer.height)
+    }
+
+    override fun draw(context: RenderContext, ops: List<Operation>) {
+        render.draw(context, ops)
     }
 
     override fun endGameLoop() = Unit

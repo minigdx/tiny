@@ -140,6 +140,10 @@ sealed interface Layer {
         override val pxOffsetY: Int,
         override val seed: Long,
         val autoLayer: List<Tile>,
+        /**
+         * The relative path to corresponding Tileset, if any.
+         */
+        val __tilesetRelPath: String,
     ) : Layer
 
     @SerialName("Tiles")
@@ -153,6 +157,14 @@ sealed interface Layer {
         override val pxOffsetY: Int,
         override val seed: Long,
         val gridTiles: List<Tile>,
+        /**
+         * The relative path to corresponding Tileset, if any.
+         */
+        val __tilesetRelPath: String,
+        /**
+         * This layer can use another tileset by overriding the tileset UID here.
+         */
+        val overrideTilesetUid: String? = null,
     ) : Layer
 
     @SerialName("Entities")

@@ -4,7 +4,9 @@ import com.github.mingdx.tiny.doc.TinyArg
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
+import com.github.minigdx.tiny.engine.ClearScreen
 import com.github.minigdx.tiny.engine.GameResourceAccess
+import com.github.minigdx.tiny.engine.SetPixel
 import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.resources.ResourceType
 import com.github.minigdx.tiny.resources.SpriteSheet
@@ -28,8 +30,10 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         func["camera"] = camera()
         func["to_sheet"] = toSheet()
         func["pset"] = pset()
+        func["pset2"] = pset2()
         func["pget"] = pget()
         func["cls"] = cls()
+        func["cls2"] = cls2()
 
         arg2["gfx"] = func
         arg2["package"]["loaded"]["gfx"] = func
@@ -53,11 +57,37 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         }
     }
 
+    @TinyFunction("clear the screen", example = GFX_CLS_EXAMPLE)
+    internal inner class cls2 : OneArgFunction() {
+        @TinyCall("Clear the screen with a default color.")
+        override fun call(): LuaValue = super.call()
+
+        @TinyCall("Clear the screen with a color.")
+        override fun call(@TinyArg("color") arg: LuaValue): LuaValue {
+            val color = if (arg.isnil()) {
+                valueOf("#000000").checkColorIndex()
+            } else {
+                arg.checkColorIndex()
+            }
+            resourceAccess.addOp(ClearScreen(color))
+            return NIL
+        }
+    }
+
     @TinyFunction("Set the color index at the coordinate (x,y).", example = GFX_PSET_EXAMPLE)
     internal inner class pset : ThreeArgFunction() {
         @TinyCall("set the color index at the coordinate (x,y).")
         override fun call(@TinyArg("x")arg1: LuaValue, @TinyArg("y")arg2: LuaValue, @TinyArg("color")arg3: LuaValue): LuaValue {
             resourceAccess.frameBuffer.pixel(arg1.checkint(), arg2.checkint(), arg3.checkint())
+            return NIL
+        }
+    }
+
+    @TinyFunction("Set the color index at the coordinate (x,y).", example = GFX_PSET_EXAMPLE)
+    internal inner class pset2 : ThreeArgFunction() {
+        @TinyCall("set the color index at the coordinate (x,y).")
+        override fun call(@TinyArg("x")arg1: LuaValue, @TinyArg("y")arg2: LuaValue, @TinyArg("color")arg3: LuaValue): LuaValue {
+            resourceAccess.addOp(SetPixel(arg1.checkint(), arg2.checkint(), arg3.checkint()))
             return NIL
         }
     }

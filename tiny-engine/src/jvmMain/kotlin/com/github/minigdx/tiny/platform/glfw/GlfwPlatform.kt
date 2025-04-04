@@ -4,6 +4,7 @@ import com.danielgergely.kgl.KglLwjgl
 import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
+import com.github.minigdx.tiny.engine.Operation
 import com.github.minigdx.tiny.file.FileStream
 import com.github.minigdx.tiny.file.InputStreamStream
 import com.github.minigdx.tiny.file.JvmLocalFile
@@ -88,9 +89,10 @@ class GlfwPlatform(
             throw IllegalStateException("Unable to initialize GLFW")
         }
 
-        GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 2)
-        GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 0)
+        GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 3)
+        GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 3)
         GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE)
+        GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_FORWARD_COMPAT, GLFW.GLFW_TRUE)
         GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_DEBUG_CONTEXT, GLFW.GLFW_TRUE)
 
         GLFW.glfwDefaultWindowHints() // optional, the current window hints are already the default
@@ -208,6 +210,10 @@ class GlfwPlatform(
             gifFrameCache.add(convert(imageCopy))
         }
         lastBuffer = frameBuffer
+    }
+
+    override fun draw(context: RenderContext, ops: List<Operation>) {
+        render.draw(context, ops)
     }
 
     override fun endGameLoop() = Unit

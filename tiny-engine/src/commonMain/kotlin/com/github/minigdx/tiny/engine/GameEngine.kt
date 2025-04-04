@@ -55,6 +55,8 @@ class GameEngine(
     private var debugEnabled: Boolean = true
     private val debugActions = mutableListOf<DebugAction>()
 
+    private val ops = mutableListOf<Operation>()
+
     private val notes = mutableListOf<WaveGenerator>()
 
     private var song: Song2? = null
@@ -304,6 +306,7 @@ class GameEngine(
             if (accumulator >= REFRESH_LIMIT) {
                 inputManager.record()
                 inError = try {
+                    ops.clear() // Remove all drawing operation to prepare the new frame.
                     scripts[current]?.advance()
                     false
                 } catch (ex: TinyException) {
@@ -470,8 +473,13 @@ class GameEngine(
             .firstOrNull { script -> script?.name == name }
     }
 
+    override fun addOp(op: Operation) {
+        ops.add(op)
+    }
+
     override fun draw() {
-        platform.draw(renderContext, frameBuffer)
+        // platform.draw(renderContext, frameBuffer)
+        platform.draw(renderContext, ops)
     }
 
     override fun end() {

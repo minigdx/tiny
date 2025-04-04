@@ -1,6 +1,7 @@
 import com.github.minigdx.tiny.engine.GameEngine
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
+import com.github.minigdx.tiny.engine.Operation
 import com.github.minigdx.tiny.file.CommonVirtualFileSystem
 import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SourceStream
@@ -260,6 +261,8 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
     override fun gameLoop(gameLoop: GameLoop) = delegate.gameLoop(gameLoop)
 
     override fun draw(context: RenderContext, frameBuffer: FrameBuffer) = delegate.draw(context, frameBuffer)
+
+    override fun draw(context: RenderContext, ops: List<Operation>) = delegate.draw(context, ops)
 
     override fun endGameLoop() = delegate.endGameLoop()
 
