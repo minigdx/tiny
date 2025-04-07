@@ -1,5 +1,8 @@
 package com.github.minigdx.tiny.platform.test
 
+import com.github.minigdx.tiny.ColorIndex
+import com.github.minigdx.tiny.Pixel
+import com.github.minigdx.tiny.engine.Frame
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.Operation
@@ -130,6 +133,12 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
         override fun readAll(): ByteArray = ByteArray(0)
 
         override fun save(content: ByteArray) = Unit
+    }
+
+    override fun drawOffscreen(renderContext: RenderContext, ops: List<Operation>): Frame {
+        return object : Frame {
+            override fun get(x: Pixel, y: Pixel): ColorIndex = 0
+        }
     }
 
     fun saveAnimation(name: String) = toGif(name, frames)

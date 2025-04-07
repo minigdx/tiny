@@ -37,4 +37,6 @@ class LwjglGLRender(
     ) = gl.draw(context, image, width, height)
 
     override fun draw(context: RenderContext, ops: List<Operation>) = gl.draw(context, ops)
+
+    override fun drawOffscreen(context: RenderContext, ops: List<Operation>) = gl.drawOffscreen(context, ops)
 }

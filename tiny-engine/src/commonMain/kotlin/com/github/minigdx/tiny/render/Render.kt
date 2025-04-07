@@ -1,6 +1,7 @@
 package com.github.minigdx.tiny.render
 
 import com.github.minigdx.tiny.Pixel
+import com.github.minigdx.tiny.engine.Frame
 import com.github.minigdx.tiny.engine.Operation
 import com.github.minigdx.tiny.platform.RenderContext
 import com.github.minigdx.tiny.platform.WindowManager
@@ -11,4 +12,6 @@ interface Render {
     fun draw(context: RenderContext, image: ByteArray, width: Pixel, height: Pixel)
 
     fun draw(context: RenderContext, ops: List<Operation>)
+
+    fun drawOffscreen(context: RenderContext, ops: List<Operation>): Frame
 }

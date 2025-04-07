@@ -1,6 +1,7 @@
 package com.github.minigdx.tiny.platform
 
 import com.github.minigdx.tiny.Pixel
+import com.github.minigdx.tiny.engine.Frame
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.Operation
@@ -108,4 +109,11 @@ interface Platform {
      * @param: name of the file, with the extension, if any.
      */
     fun createLocalFile(name: String): LocalFile
+
+    /**
+     * Render the actual drawing operation offscreen and
+     * return the frame.
+     *
+     */
+    fun drawOffscreen(renderContext: RenderContext, ops: List<Operation>): Frame
 }

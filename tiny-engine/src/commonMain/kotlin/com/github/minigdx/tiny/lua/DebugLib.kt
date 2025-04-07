@@ -225,11 +225,16 @@ class DebugLib(private val resourceAccess: GameResourceAccess, private val logge
     }
 
     @TinyFunction("Log a message into the console.", example = DEBUG_EXAMPLE)
-    internal inner class console : OneArgFunction() {
+    internal inner class console : VarArgFunction() {
 
         @TinyCall("Log a message into the console.")
-        override fun call(@TinyArg("str") arg: LuaValue): LuaValue {
-            logger.debug("\uD83D\uDC1B") { formatValue(arg) }
+        override fun invoke(@TinyArg("str") args: Varargs): Varargs {
+            val nbArgs = args.narg()
+            val message = (1..nbArgs).map {
+                formatValue(args.arg(it))
+            }.joinToString(" ")
+
+            logger.debug("\uD83D\uDC1B") { message }
             return NIL
         }
     }

@@ -18,6 +18,10 @@ data class DebugLine(val x1: Int, val y1: Int, val x2: Int, val y2: Int, val col
 
 data class DebugEnabled(val enabled: Boolean) : DebugAction
 
+interface Frame {
+    fun get(x: Pixel, y: Pixel): ColorIndex
+}
+
 /**
  * Descriptor to access the game resource
  */
@@ -82,6 +86,8 @@ interface GameResourceAccess {
      * Add an Ops to be executed by the shader
      */
     fun addOp(op: Operation) = Unit
+
+    fun drawOffscreen(): Frame
 }
 
 sealed interface Operation {

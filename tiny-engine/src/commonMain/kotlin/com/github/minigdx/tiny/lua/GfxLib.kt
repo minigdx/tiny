@@ -32,6 +32,7 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         func["pset"] = pset()
         func["pset2"] = pset2()
         func["pget"] = pget()
+        func["pget2"] = pget2()
         func["cls"] = cls()
         func["cls2"] = cls2()
 
@@ -98,6 +99,16 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
         override fun call(@TinyArg("x")arg1: LuaValue, @TinyArg("y")arg2: LuaValue): LuaValue {
             val index = resourceAccess.frameBuffer.pixel(arg1.checkint(), arg2.checkint())
             return valueOf(index)
+        }
+    }
+
+    @TinyFunction("Get the color index at the coordinate (x,y).", example = GFX_PGET_EXAMPLE)
+    internal inner class pget2 : TwoArgFunction() {
+        @TinyCall("get the color index at the coordinate (x,y).")
+        override fun call(@TinyArg("x")arg1: LuaValue, @TinyArg("y")arg2: LuaValue): LuaValue {
+            val frame = resourceAccess.drawOffscreen()
+            val result = frame.get(arg1.checkint(), arg2.checkint())
+            return valueOf(result)
         }
     }
 

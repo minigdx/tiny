@@ -50,4 +50,11 @@ data class GameOptions(
         val yy = y / zoom - gutter.second
         return Vector2(xx, yy)
     }
+
+    override fun unproject(x: Pixel, y: Pixel): Vector2 {
+        val xx = (x + gutter.first) * zoom
+        val yy = (y + gutter.second) * zoom
+
+        return Vector2(xx.toFloat(), yy.toFloat())
+    }
 }

@@ -482,6 +482,10 @@ class GameEngine(
         platform.draw(renderContext, ops)
     }
 
+    override fun drawOffscreen(): Frame {
+        return platform.drawOffscreen(renderContext, ops)
+    }
+
     override fun end() {
         sounds.forEach { it?.stop() }
         soundManager.destroy()
