@@ -9,8 +9,8 @@ import com.github.minigdx.tiny.platform.WindowManager
 
 class GLRenderContext(
     val program: Program,
-    val texture: Texture,
-    val colors: Texture,
+    val gameTexture: Texture,
+    val colorPalette: Texture,
     val fbo: Framebuffer,
     val fboBuffer: ByteBuffer,
     val windowManager: WindowManager,
