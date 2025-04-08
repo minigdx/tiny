@@ -164,7 +164,7 @@ sealed interface Layer {
         /**
          * This layer can use another tileset by overriding the tileset UID here.
          */
-        val overrideTilesetUid: String? = null,
+        val overrideTilesetUid: Int? = null,
     ) : Layer
 
     @SerialName("Entities")
