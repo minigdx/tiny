@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.lua
 
+import com.github.minigdx.tiny.engine.Frame
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.graphic.ColorPalette
 import com.github.minigdx.tiny.graphic.FrameBuffer
@@ -26,6 +27,10 @@ class GfxLibTest {
         override fun level(index: Int): GameLevel? = null
         override fun sound(index: Int): Sound? = null
         override fun script(name: String): GameScript? = null
+        override fun drawOffscreen(): Frame {
+            TODO("Not yet implemented")
+        }
+
         override fun note(wave: WaveGenerator) = Unit
 
         override fun sfx(song: Song2) = Unit

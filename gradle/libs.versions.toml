@@ -2,7 +2,7 @@
 asciidoctorj = "3.3.2"
 clikt = "3.5.2"
 gifencoder = "0.10.1"
-kgl = "0.7.2"
+kgl = "0.7.3"
 kotlin-coroutines = "1.7.1"
 kotlin-ksp = "1.8.20-1.0.10"
 kotlin-serialization = "1.8.0"

@@ -372,6 +372,8 @@ class GLRender(
         gl.bindTexture(GL_TEXTURE_2D, context.texture)
 
         // FIXME: for performance reason, it can be created before
+        // FIXME: fill up the ops texture. When it's filled, run the batch
+        //    and executed the remaining instructions
         val image = ByteArray(64 * 64 * PixelFormat.INDEX)
         // Inject each instruction into the texture
         var index = 0

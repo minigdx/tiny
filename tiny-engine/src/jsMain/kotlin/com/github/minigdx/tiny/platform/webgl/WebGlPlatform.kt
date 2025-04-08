@@ -2,6 +2,7 @@ package com.github.minigdx.tiny.platform.webgl
 
 import com.danielgergely.kgl.KglJs
 import com.danielgergely.kgl.WebGL2RenderingContext
+import com.github.minigdx.tiny.engine.Frame
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.Operation
@@ -121,5 +122,9 @@ class WebGlPlatform(
 
     override fun createLocalFile(name: String): LocalFile {
         return JsLocalFile(name)
+    }
+
+    override fun drawOffscreen(renderContext: RenderContext, ops: List<Operation>): Frame {
+        return render.drawOffscreen(renderContext, ops)
     }
 }
