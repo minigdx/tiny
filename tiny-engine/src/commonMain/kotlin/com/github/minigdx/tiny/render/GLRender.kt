@@ -44,7 +44,6 @@ import com.github.minigdx.tiny.graphic.PixelFormat
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.RenderContext
 import com.github.minigdx.tiny.platform.WindowManager
-import kotlin.random.Random
 
 class GLRender(
     private val gl: Kgl,
@@ -260,6 +259,13 @@ class GLRender(
             gl.uniform1f(gl.getUniformLocation(context.program, "u_arg3")!!, 9.toFloat())
             gl.drawArrays(GL_TRIANGLES, 0, 3)
         }
+/*
+        gl.uniform1f(gl.getUniformLocation(context.program, "u_type")!!, 1f)
+        gl.uniform1f(gl.getUniformLocation(context.program, "u_arg1")!!, 1.toFloat())
+        gl.uniform1f(gl.getUniformLocation(context.program, "u_arg2")!!, 60.toFloat())
+        gl.uniform1f(gl.getUniformLocation(context.program, "u_arg3")!!, 9.toFloat())
+        gl.drawArraysInstanced(GL_TRIANGLES, 0, 3, 36000)
+*/
     }
 
     override fun draw(context: RenderContext, image: ByteArray, width: Pixel, height: Pixel) {
