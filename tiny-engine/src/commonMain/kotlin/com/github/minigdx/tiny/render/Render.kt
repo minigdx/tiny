@@ -9,9 +9,20 @@ import com.github.minigdx.tiny.platform.WindowManager
 interface Render {
     fun init(windowManager: WindowManager): RenderContext
 
-    fun draw(context: RenderContext, image: ByteArray, width: Pixel, height: Pixel)
+    fun draw(
+        context: RenderContext,
+        image: ByteArray,
+        width: Pixel,
+        height: Pixel,
+    )
 
-    fun draw(context: RenderContext, ops: List<Operation>)
+    fun draw(
+        context: RenderContext,
+        ops: List<Operation>,
+    )
 
-    fun drawOffscreen(context: RenderContext, ops: List<Operation>): Frame
+    fun drawOffscreen(
+        context: RenderContext,
+        ops: List<Operation>,
+    ): Frame
 }

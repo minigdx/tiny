@@ -41,7 +41,6 @@ class DebuggerExecutionListener(
     private val debugCommandReceiver: ReceiveChannel<DebugRemoteCommand>,
     private val engineCommandSender: SendChannel<EngineRemoteCommand>,
 ) : ExecutionListener {
-
     lateinit var globals: Globals
 
     private var breakpoints: Map<ExecutionPoint, Breakpoint> = emptyMap()
@@ -86,11 +85,13 @@ class DebuggerExecutionListener(
         val storedBreakpoint = breakpoints[executionPoint]
 
         if (storedBreakpoint == null) {
-            val entry = executionPoint to Breakpoint(
-                script = debugRemoteCommand.script,
-                line = debugRemoteCommand.line,
-                enabled = debugRemoteCommand.enabled,
-            )
+            val entry =
+                executionPoint to
+                    Breakpoint(
+                        script = debugRemoteCommand.script,
+                        line = debugRemoteCommand.line,
+                        enabled = debugRemoteCommand.enabled,
+                    )
             breakpoints = breakpoints + entry
         } else {
             storedBreakpoint.enabled = debugRemoteCommand.enabled
@@ -103,25 +104,31 @@ class DebuggerExecutionListener(
     private fun formatValue(
         arg: LuaValue,
         recursiveSecurity: MutableSet<Int> = mutableSetOf(),
-    ): String = if (arg.istable()) {
-        val table = arg as LuaTable
-        if (recursiveSecurity.contains(table.hashCode())) {
-            "table[<${table.hashCode()}>]"
-        } else {
-            recursiveSecurity.add(table.hashCode())
-            val keys = table.keys()
-            val str = keys.joinToString(" ") {
-                it.optjstring("nil") + ":" + formatValue(table[it], recursiveSecurity)
+    ): String =
+        if (arg.istable()) {
+            val table = arg as LuaTable
+            if (recursiveSecurity.contains(table.hashCode())) {
+                "table[<${table.hashCode()}>]"
+            } else {
+                recursiveSecurity.add(table.hashCode())
+                val keys = table.keys()
+                val str =
+                    keys.joinToString(" ") {
+                        it.optjstring("nil") + ":" + formatValue(table[it], recursiveSecurity)
+                    }
+                "table[$str]"
             }
-            "table[$str]"
+        } else if (arg.isfunction()) {
+            "function(" + (0 until arg.narg()).joinToString(", ") { "arg" } + ")"
+        } else {
+            arg.toString()
         }
-    } else if (arg.isfunction()) {
-        "function(" + (0 until arg.narg()).joinToString(", ") { "arg" } + ")"
-    } else {
-        arg.toString()
-    }
 
-    override suspend fun onCall(c: LuaClosure, varargs: Varargs, stack: Array<LuaValue>) {
+    override suspend fun onCall(
+        c: LuaClosure,
+        varargs: Varargs,
+        stack: Array<LuaValue>,
+    ) {
         callstack(globals.running).onCall(c, varargs, stack)
 
         onCall(c)
@@ -134,11 +141,12 @@ class DebuggerExecutionListener(
 
     private fun onCall(c: LuaClosure) {
         val name = c.p.source.tojstring()
-        currentExecutionPoint.script = if (name.startsWith("@")) {
-            name.drop(1)
-        } else {
-            name
-        }
+        currentExecutionPoint.script =
+            if (name.startsWith("@")) {
+                name.drop(1)
+            } else {
+                name
+            }
         currentExecutionPoint.enabled = true
         currentExecutionPoint.function = c
 
@@ -154,7 +162,11 @@ class DebuggerExecutionListener(
             }
     }
 
-    override suspend fun onInstruction(pc: Int, v: Varargs, top: Int) {
+    override suspend fun onInstruction(
+        pc: Int,
+        v: Varargs,
+        top: Int,
+    ) {
         callstack(globals.running).onInstruction(pc, v, top)
 
         val line = lineinfo?.getOrNull(pc) ?: -1
@@ -173,29 +185,34 @@ class DebuggerExecutionListener(
         }
     }
 
-    private suspend fun pauseExecution(scriptName: String, line: Int) {
+    private suspend fun pauseExecution(
+        scriptName: String,
+        line: Int,
+    ) {
         val frames = callstack(globals.running).getCallFrames()
 
-        val upValues = frames.flatMap { frame ->
-            val upValues = (frame.f as? LuaClosure)?.upValues ?: emptyArray()
-            val upValuesDesc = (frame.f as? LuaClosure)?.p?.upvalues ?: emptyArray()
+        val upValues =
+            frames.flatMap { frame ->
+                val upValues = (frame.f as? LuaClosure)?.upValues ?: emptyArray()
+                val upValuesDesc = (frame.f as? LuaClosure)?.p?.upvalues ?: emptyArray()
 
-            upValues.zip(upValuesDesc) { value, name ->
-                val upValueName = name.name?.tojstring() ?: ""
-                val upValueValue = value?.value ?: LuaValue.NIL
-                upValueName to upValueValue
+                upValues.zip(upValuesDesc) { value, name ->
+                    val upValueName = name.name?.tojstring() ?: ""
+                    val upValueValue = value?.value ?: LuaValue.NIL
+                    upValueName to upValueValue
+                }
+                    // Skip the _ENV upvalue
+                    .filterNot { (name, _) -> name == "_ENV" }
+            }.toMap()
+                .mapValues { (_, value) -> formatValue(value) }
+
+        val locals =
+            frames.flatMap {
+                it.getLocals()
+            }.associate {
+                // name to value
+                it.arg(1).tojstring() to formatValue(it.arg(2))
             }
-                // Skip the _ENV upvalue
-                .filterNot { (name, _) -> name == "_ENV" }
-        }.toMap()
-            .mapValues { (_, value) -> formatValue(value) }
-
-        val locals = frames.flatMap {
-            it.getLocals()
-        }.associate {
-            // name to value
-            it.arg(1).tojstring() to formatValue(it.arg(2))
-        }
 
         engineCommandSender.send(
             BreakpointHit(
@@ -215,11 +232,12 @@ class DebuggerExecutionListener(
 
         val p = (frame?.f as? LuaClosure)?.p
         val name = p?.source?.tojstring()
-        currentExecutionPoint.script = if (name?.startsWith("@") == true) {
-            name.drop(1)
-        } else {
-            name ?: "anonymous"
-        }
+        currentExecutionPoint.script =
+            if (name?.startsWith("@") == true) {
+                name.drop(1)
+            } else {
+                name ?: "anonymous"
+            }
         currentExecutionPoint.function = frame?.f as LuaClosure?
         lineinfo = p?.lineinfo
     }
@@ -233,7 +251,6 @@ class DebuggerExecutionListener(
     }
 
     private class CallStack {
-
         var calls = 0
         var frame = emptyArray<CallFrame>()
 
@@ -243,16 +260,21 @@ class DebuggerExecutionListener(
 
         fun pushCall(): CallFrame {
             if (calls >= frame.size) {
-                frame = Array(max(4, frame.size * 3 / 2)) { i ->
-                    frame.getOrNull(i) ?: CallFrame().apply {
-                        previous = frame.getOrNull(i - 1)
+                frame =
+                    Array(max(4, frame.size * 3 / 2)) { i ->
+                        frame.getOrNull(i) ?: CallFrame().apply {
+                            previous = frame.getOrNull(i - 1)
+                        }
                     }
-                }
             }
             return frame[calls++]
         }
 
-        fun onCall(luaFunction: LuaClosure, varargs: Varargs, stack: Array<LuaValue>) {
+        fun onCall(
+            luaFunction: LuaClosure,
+            varargs: Varargs,
+            stack: Array<LuaValue>,
+        ) {
             pushCall().set(luaFunction, varargs, stack)
         }
 
@@ -262,7 +284,11 @@ class DebuggerExecutionListener(
             }
         }
 
-        fun onInstruction(pc: Int, v: Varargs, top: Int) {
+        fun onInstruction(
+            pc: Int,
+            v: Varargs,
+            top: Int,
+        ) {
             if (calls > 0) {
                 frame[calls - 1].instr(pc, v, top)
             }
@@ -289,13 +315,21 @@ class DebuggerExecutionListener(
             this.f = luaFunction
         }
 
-        fun set(function: LuaClosure, varargs: Varargs, stack: Array<LuaValue>) {
+        fun set(
+            function: LuaClosure,
+            varargs: Varargs,
+            stack: Array<LuaValue>,
+        ) {
             this.f = function
             this.v = varargs
             this.stack = stack
         }
 
-        fun instr(pc: Int, v: Varargs, top: Int) {
+        fun instr(
+            pc: Int,
+            v: Varargs,
+            top: Int,
+        ) {
             this.pc = pc
             this.v = v
             this.top = top
@@ -311,8 +345,9 @@ class DebuggerExecutionListener(
             with(f) {
                 if (this == null || !this.isclosure()) return emptyList()
 
-                val locvars = this.checkclosure()!!.p.locvars
-                    .map { it.varname }
+                val locvars =
+                    this.checkclosure()!!.p.locvars
+                        .map { it.varname }
 
                 return locvars.zip(stack!!) { name, value -> LuaValue.varargsOf(name, value) }
             }

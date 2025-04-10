@@ -22,6 +22,7 @@ class ImageData(
     // Height of the Image
     val height: Pixel,
 )
+
 class SoundData(val name: String, val sound: Sound)
 
 interface Platform {
@@ -48,12 +49,18 @@ interface Platform {
     /**
      * Draw the image on the screen
      */
-    fun draw(context: RenderContext, frameBuffer: FrameBuffer)
+    fun draw(
+        context: RenderContext,
+        frameBuffer: FrameBuffer,
+    )
 
     /**
      * Draw on the screen by executing the list of operations
      */
-    fun draw(context: RenderContext, ops: List<Operation>)
+    fun draw(
+        context: RenderContext,
+        ops: List<Operation>,
+    )
 
     /**
      * Save the last 30 seconds of the game.
@@ -75,6 +82,7 @@ interface Platform {
      * Initialise the input manager.
      */
     fun initInputHandler(): InputHandler
+
     fun initInputManager(): InputManager
 
     /**
@@ -91,12 +99,18 @@ interface Platform {
      * Create a SourceStream from the name of the resource.
      * Regarding the platform, the name can be adjusted.
      */
-    fun createByteArrayStream(name: String, canUseJarPrefix: Boolean = true): SourceStream<ByteArray>
+    fun createByteArrayStream(
+        name: String,
+        canUseJarPrefix: Boolean = true,
+    ): SourceStream<ByteArray>
 
     /**
      * Create a SourceStream from an image from uncompressed data.
      */
-    fun createImageStream(name: String, canUseJarPrefix: Boolean = true): SourceStream<ImageData>
+    fun createImageStream(
+        name: String,
+        canUseJarPrefix: Boolean = true,
+    ): SourceStream<ImageData>
 
     /**
      * Create a SourceStream from a midi file.
@@ -115,5 +129,8 @@ interface Platform {
      * return the frame.
      *
      */
-    fun drawOffscreen(renderContext: RenderContext, ops: List<Operation>): Frame
+    fun drawOffscreen(
+        renderContext: RenderContext,
+        ops: List<Operation>,
+    ): Frame
 }

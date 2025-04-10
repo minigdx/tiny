@@ -12,7 +12,11 @@ class AsciidocDocument {
     var author: String? = null
     val sections = mutableListOf<AsciidocSection>()
 
-    fun section(title: String? = null, description: String? = null, block: AsciidocSection.() -> Unit) {
+    fun section(
+        title: String? = null,
+        description: String? = null,
+        block: AsciidocSection.() -> Unit,
+    ) {
         val section = AsciidocSection(title, description)
         section.block()
         sections.add(section)
@@ -37,10 +41,12 @@ class AsciidocDocument {
 
 @AsciidocDslMarker
 class AsciidocSection(val title: String?, val description: String?) {
-
     val childs = mutableListOf<AsciidocLibSection>()
 
-    fun lib(title: String? = null, block: AsciidocLibSection.() -> Unit) {
+    fun lib(
+        title: String? = null,
+        block: AsciidocLibSection.() -> Unit,
+    ) {
         val libSection = AsciidocLibSection(title)
         libSection.block()
         childs.add(libSection)
@@ -85,9 +91,10 @@ class AsciidocLibSection(val title: String?) {
 
     // List<Name
     fun tableArgs(args: List<Pair<ArgName, ArgDescription>>) {
-        val rows = args.map {
-            "|${it.first} |${it.second}"
-        }.joinToString("\n")
+        val rows =
+            args.map {
+                "|${it.first} |${it.second}"
+            }.joinToString("\n")
         paragraph(
             """
         >[cols="1,1"]
@@ -100,7 +107,12 @@ class AsciidocLibSection(val title: String?) {
         )
     }
 
-    fun example(functionName: String, lua: String?, spritePath: String? = null, levelPath: String? = null) {
+    fun example(
+        functionName: String,
+        lua: String?,
+        spritePath: String? = null,
+        levelPath: String? = null,
+    ) {
         if (lua == null) return
         val spr = spritePath?.let { """sprite="$it"""" } ?: ""
         val lvl = levelPath?.let { """level="$it"""" } ?: ""

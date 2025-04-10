@@ -2,6 +2,7 @@ package com.github.minigdx.tiny.cli.command
 
 import com.github.ajalt.clikt.core.Abort
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.default
 import com.github.ajalt.clikt.parameters.options.default
@@ -28,8 +29,7 @@ import kotlinx.serialization.json.Json
 import java.io.File
 import javax.swing.SwingUtilities
 
-class DebugCommand : CliktCommand(name = "debug", help = "Debug the current game") {
-
+class DebugCommand : CliktCommand(name = "debug") {
     val gameDirectory by argument(help = "The directory containing all game information.")
         .file(mustExist = true, canBeDir = true, canBeFile = false)
         .default(File("."))
@@ -37,6 +37,8 @@ class DebugCommand : CliktCommand(name = "debug", help = "Debug the current game
     val debug by option(help = "Debug port used by the game.")
         .int()
         .default(8080)
+
+    override fun help(context: Context) = "Debug the current game"
 
     override fun run() {
         val configFile = gameDirectory.resolve("_tiny.json")
@@ -54,9 +56,10 @@ class DebugCommand : CliktCommand(name = "debug", help = "Debug the current game
         }
 
         runBlocking {
-            val client = HttpClient {
-                install(WebSockets)
-            }
+            val client =
+                HttpClient {
+                    install(WebSockets)
+                }
 
             var connected = false
             while (!connected) {

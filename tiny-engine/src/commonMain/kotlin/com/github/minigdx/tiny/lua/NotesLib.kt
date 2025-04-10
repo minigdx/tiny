@@ -201,8 +201,10 @@ enum class Note(val frequency: Float, val index: Int) {
         "Please note that bemols are the note with b (ie: Gb2) while sharps are the note with s (ie: As3).",
 )
 class NotesLib : TwoArgFunction() {
-
-    override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
+    override fun call(
+        arg1: LuaValue,
+        arg2: LuaValue,
+    ): LuaValue {
         val keys = LuaTable()
 
         Note.values().forEach { note ->

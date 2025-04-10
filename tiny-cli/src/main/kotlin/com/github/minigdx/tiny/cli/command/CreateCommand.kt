@@ -1,6 +1,7 @@
 package com.github.minigdx.tiny.cli.command
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.default
 import com.github.ajalt.clikt.parameters.options.option
@@ -35,8 +36,8 @@ function _draw()
     print("Congratulation! Your game is running!")
 end
 """
-class CreateCommand : CliktCommand(name = "create", help = "Create a new game.") {
 
+class CreateCommand : CliktCommand(name = "create") {
     val gameDirectory by argument(help = "The directory containing all game information")
         .file(mustExist = false, canBeDir = true, canBeFile = false)
         .default(File("."))
@@ -58,14 +59,17 @@ class CreateCommand : CliktCommand(name = "create", help = "Create a new game.")
 
     private val zoom by option(help = "🔍 Game zoom")
         .int()
-        .prompt(text = "\uD83D\uDD0D  Game zoom", default = "2")
+        .prompt(text = "\uD83D\uDD0D  Game zoom", default = 2)
 
-    private val spritesheets by option(help = "\uD83D\uDCC4 The filenames of the sprite sheets, separated by a comma (e.g., file1.png, file2.png)")
+    private val spritesheets by option(
+        help = "\uD83D\uDCC4 The filenames of the sprite sheets, separated by a comma (e.g., file1.png, file2.png)",
+    )
         .prompt(text = "\uD83D\uDCC4  Sprite sheet name to include", default = "")
         .validate {
             require(
-                it.isEmpty() || it.split(",")
-                    .all { f -> f.trim().endsWith(".png") },
+                it.isEmpty() ||
+                    it.split(",")
+                        .all { f -> f.trim().endsWith(".png") },
             ) { "Invalid image file $it. Only *.png are supported" }
         }
 
@@ -74,9 +78,9 @@ class CreateCommand : CliktCommand(name = "create", help = "Create a new game.")
         .prompt(
             """🎨  Please choose a game color palette:
 ${
-            GamePalette.ALL.mapIndexed { index, gamePalette ->
-                "[${index + 1}] ${gamePalette.name}"
-            }.joinToString("\n")
+                GamePalette.ALL.mapIndexed { index, gamePalette ->
+                    "[${index + 1}] ${gamePalette.name}"
+                }.joinToString("\n")
             }
 """,
         )
@@ -85,6 +89,8 @@ ${
         .prompt("\uD83D\uDDB1\uFE0F  Hide system cursor mouse? (yes or no)", default = "No")
         .validate { it.lowercase() == "yes" || it.lowercase() == "no" }
 
+    override fun help(context: Context) = "Create a new game."
+
     override fun run() {
         echo("➡\uFE0F  Game Name: $gameName")
         echo("➡\uFE0F  Game Resolution: $gameResolution")
@@ -92,15 +98,16 @@ ${
         echo("➡\uFE0F  Sprite Sheet Filenames: ${spritesheets.ifBlank { "No spritesheet added!" }}")
         echo("➡\uFE0F  Color palette: ${GamePalette.ALL[palette - 1].name}")
 
-        val configuration = GameParametersV1(
-            name = gameName,
-            resolution = gameResolution.toSize(),
-            sprites = spriteSize.toSize(),
-            zoom = zoom,
-            colors = GamePalette.ALL[palette - 1].colors,
-            scripts = listOf(gameScript),
-            hideMouseCursor = hideMouseCursor == "yes".lowercase(),
-        ) as GameParameters
+        val configuration =
+            GameParametersV1(
+                name = gameName,
+                resolution = gameResolution.toSize(),
+                sprites = spriteSize.toSize(),
+                zoom = zoom,
+                colors = GamePalette.ALL[palette - 1].colors,
+                scripts = listOf(gameScript),
+                hideMouseCursor = hideMouseCursor == "yes".lowercase(),
+            ) as GameParameters
 
         if (!gameDirectory.exists()) gameDirectory.mkdirs()
 

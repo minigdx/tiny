@@ -3,7 +3,7 @@ import java.io.Reader
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    alias(libs.plugins.minigdx.mpp)
+    alias(libs.plugins.minigdx.jvm)
     alias(libs.plugins.kotlin.serialization)
     application
 }
@@ -22,21 +22,21 @@ val tinyApiluaStub by configurations.creating {
 }
 
 dependencies {
-    commonMainImplementation(libs.kotlin.serialization.json)
-    commonMainImplementation(libs.clikt)
+    implementation(libs.kotlin.serialization.json)
+    implementation(libs.clikt)
 
     // Exception in thread "main" java.lang.NoClassDefFoundError: com/sun/jna/Platform
     // https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform
-    jvmMainImplementation("net.java.dev.jna:jna-platform:5.14.0")
-    jvmMainImplementation("com.fifesoft:rsyntaxtextarea:3.6.0")
+    implementation("net.java.dev.jna:jna-platform:5.14.0")
+    implementation("com.fifesoft:rsyntaxtextarea:3.6.0")
 
-    jvmMainImplementation(project(":tiny-engine", "jvmRuntimeElements"))!!
+    implementation(project(":tiny-engine", "jvmRuntimeElements"))!!
         .because("Depends on the JVM Jar containing commons resources in the JAR.")
 
-    jvmMainImplementation(libs.kgl.lwjgl)
+    implementation(libs.kgl.lwjgl)
 
-    jvmMainImplementation(libs.bundles.jvm.ktor.server)
-    jvmMainImplementation(libs.bundles.jvm.ktor.client)
+    implementation(libs.bundles.jvm.ktor.server)
+    implementation(libs.bundles.jvm.ktor.client)
 
     add(tinyEngineJsZip.name, project(":tiny-engine"))?.because(
         "Embed the JS engine in the CLI " +
@@ -61,10 +61,10 @@ application {
 
     // Copy the JARs from the Kotlin MPP dependencies.
     this.applicationDistribution.from(
-        project.configurations.getByName("jvmRuntimeClasspath"),
+        project.configurations.getByName("runtimeClasspath"),
     ) {
-        val jvmJar by tasks.existing
-        this.from(jvmJar)
+        val jar by tasks.existing
+        this.from(jar)
         this.from(tinyEngineJsZip)
         this.from(tinyApiluaStub)
         this.into("lib")
@@ -73,28 +73,30 @@ application {
 
 // Update the start script to include jar from the Kotlin MPP dependencies
 project.tasks.withType(CreateStartScripts::class.java).configureEach {
-    this.classpath = project.tasks.getByName("jvmJar").outputs.files
-        .plus(project.configurations.getByName("jvmRuntimeClasspath"))
-        .plus(tinyEngineJsZip)
-        .plus(tinyApiluaStub)
+    this.classpath =
+        project.tasks.getByName("jar").outputs.files
+            .plus(project.configurations.getByName("runtimeClasspath"))
+            .plus(tinyEngineJsZip)
+            .plus(tinyApiluaStub)
 
-    (this.unixStartScriptGenerator as TemplateBasedScriptGenerator).template = object : TextResource {
-        override fun getBuildDependencies(): TaskDependency = TODO("Not yet implemented")
+    (this.unixStartScriptGenerator as TemplateBasedScriptGenerator).template =
+        object : TextResource {
+            override fun getBuildDependencies(): TaskDependency = TODO("Not yet implemented")
 
-        override fun asString(): String = TODO("Not yet implemented")
+            override fun asString(): String = TODO("Not yet implemented")
 
-        override fun asReader(): Reader {
-            return project.file("unixCustomStartScript.txt").reader()
+            override fun asReader(): Reader {
+                return project.file("unixCustomStartScript.txt").reader()
+            }
+
+            override fun asFile(charset: String): File = TODO("Not yet implemented")
+
+            override fun asFile(): File = TODO("Not yet implemented")
+
+            override fun getInputProperties(): Any? = TODO("Not yet implemented")
+
+            override fun getInputFiles(): FileCollection? = TODO("Not yet implemented")
         }
-
-        override fun asFile(charset: String): File = TODO("Not yet implemented")
-
-        override fun asFile(): File = TODO("Not yet implemented")
-
-        override fun getInputProperties(): Any? = TODO("Not yet implemented")
-
-        override fun getInputFiles(): FileCollection? = TODO("Not yet implemented")
-    }
 }
 
 // Make the application plugin start with the right classpath

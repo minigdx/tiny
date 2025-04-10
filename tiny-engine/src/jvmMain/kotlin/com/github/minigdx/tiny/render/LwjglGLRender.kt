@@ -19,7 +19,6 @@ class LwjglGLRender(
     private val gameOptions: GameOptions,
     private val gl: GLRender = GLRender(KglLwjgl, logger, gameOptions),
 ) : Render {
-
     override fun init(windowManager: WindowManager): RenderContext {
         logger.info("GLFW") { "GL_VENDOR:                \t" + GL33.glGetString(GL_VENDOR) }
         logger.info("GLFW") { "GL_VERSION:               \t" + GL33.glGetString(GL_VERSION) }
@@ -36,7 +35,13 @@ class LwjglGLRender(
         height: Pixel,
     ) = gl.draw(context, image, width, height)
 
-    override fun draw(context: RenderContext, ops: List<Operation>) = gl.draw(context, ops)
+    override fun draw(
+        context: RenderContext,
+        ops: List<Operation>,
+    ) = gl.draw(context, ops)
 
-    override fun drawOffscreen(context: RenderContext, ops: List<Operation>) = gl.drawOffscreen(context, ops)
+    override fun drawOffscreen(
+        context: RenderContext,
+        ops: List<Operation>,
+    ) = gl.drawOffscreen(context, ops)
 }

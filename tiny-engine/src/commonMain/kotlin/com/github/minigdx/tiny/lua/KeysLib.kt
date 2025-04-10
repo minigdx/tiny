@@ -15,8 +15,10 @@ import org.luaj.vm2.lib.TwoArgFunction
         "- `keys.space` and `keys.enter` for other keys.\n",
 )
 class KeysLib : TwoArgFunction() {
-
-    override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
+    override fun call(
+        arg1: LuaValue,
+        arg2: LuaValue,
+    ): LuaValue {
         val keys = LuaTable()
         // chars
         ('a'..'z').forEach { char ->

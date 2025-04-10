@@ -20,45 +20,54 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class StdLibTest {
-
     private val colors = listOf("#FFFFFF", "#000000")
 
-    private val mockResources = object : GameResourceAccess {
-        override val bootSpritesheet: SpriteSheet = SpriteSheet(
-            0,
-            0,
-            "boot",
-            ResourceType.BOOT_SPRITESHEET,
-            PixelArray(1, 1, PixelFormat.INDEX),
-            1,
-            1,
-        )
-        override val frameBuffer: FrameBuffer = FrameBuffer(10, 10, ColorPalette(colors))
-        override fun spritesheet(index: Int): SpriteSheet? = null
-        override fun spritesheet(name: String): Int? = null
+    private val mockResources =
+        object : GameResourceAccess {
+            override val bootSpritesheet: SpriteSheet =
+                SpriteSheet(
+                    0,
+                    0,
+                    "boot",
+                    ResourceType.BOOT_SPRITESHEET,
+                    PixelArray(1, 1, PixelFormat.INDEX),
+                    1,
+                    1,
+                )
+            override val frameBuffer: FrameBuffer = FrameBuffer(10, 10, ColorPalette(colors))
 
-        override fun spritesheet(sheet: SpriteSheet) = Unit
-        override fun newSpritesheetIndex(): Int = 0
+            override fun spritesheet(index: Int): SpriteSheet? = null
 
-        override fun level(index: Int): GameLevel? = null
-        override fun sound(index: Int): Sound? = null
-        override fun script(name: String): GameScript? = null
-        override fun drawOffscreen(): Frame {
-            TODO("Not yet implemented")
+            override fun spritesheet(name: String): Int? = null
+
+            override fun spritesheet(sheet: SpriteSheet) = Unit
+
+            override fun newSpritesheetIndex(): Int = 0
+
+            override fun level(index: Int): GameLevel? = null
+
+            override fun sound(index: Int): Sound? = null
+
+            override fun script(name: String): GameScript? = null
+
+            override fun drawOffscreen(): Frame {
+                TODO("Not yet implemented")
+            }
+
+            override fun note(wave: WaveGenerator) = Unit
+
+            override fun sfx(song: Song2) = Unit
         }
 
-        override fun note(wave: WaveGenerator) = Unit
-        override fun sfx(song: Song2) = Unit
-    }
-
-    private val gameOptions = GameOptions(
-        10,
-        10,
-        colors,
-        gameScripts = emptyList(),
-        spriteSheets = emptyList(),
-        gameLevels = emptyList(),
-    )
+    private val gameOptions =
+        GameOptions(
+            10,
+            10,
+            colors,
+            gameScripts = emptyList(),
+            spriteSheets = emptyList(),
+            gameLevels = emptyList(),
+        )
 
     @Test
     fun it_print_text() {

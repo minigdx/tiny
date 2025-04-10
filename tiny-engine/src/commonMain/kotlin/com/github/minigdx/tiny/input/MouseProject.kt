@@ -3,7 +3,6 @@ package com.github.minigdx.tiny.input
 import com.github.minigdx.tiny.Pixel
 
 interface MouseProject {
-
     /**
      * Project the mouse coordinate from the drawing area into game screen coordinates.
      *
@@ -12,7 +11,13 @@ interface MouseProject {
      *
      * The method return null when the mouse is out-of the drawing area.
      */
-    fun project(x: Float, y: Float): Vector2?
+    fun project(
+        x: Float,
+        y: Float,
+    ): Vector2?
 
-    fun unproject(x: Pixel, y: Pixel): Vector2? = TODO()
+    fun unproject(
+        x: Pixel,
+        y: Pixel,
+    ): Vector2? = TODO()
 }

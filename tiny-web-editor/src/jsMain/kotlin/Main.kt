@@ -39,27 +39,30 @@ fun main() {
 
     val url = URLSearchParams(window.location.search)
     val savedCode = url.get("game")
-    val decodedCode = if (savedCode?.isNotBlank() == true) {
-        Base64.decode(savedCode.encodeToByteArray()).decodeToString()
-    } else {
-        null
-    }
+    val decodedCode =
+        if (savedCode?.isNotBlank() == true) {
+            Base64.decode(savedCode.encodeToByteArray()).decodeToString()
+        } else {
+            null
+        }
 
     elts.forEachIndexed { index, game ->
         val code = game.textContent ?: ""
         val spritePath = game.getAttribute("sprite")
         val levelPath = game.getAttribute("level")
 
-        val link = document.createElement("a") {
-            setAttribute("id", "link-editor-$index")
-            setAttribute("class", "tiny-play")
-            setAttribute("href", "#link-editor-$index")
-        } as HTMLAnchorElement
+        val link =
+            document.createElement("a") {
+                setAttribute("id", "link-editor-$index")
+                setAttribute("class", "tiny-play")
+                setAttribute("href", "#link-editor-$index")
+            } as HTMLAnchorElement
         game.before(link)
 
-        val playLink = document.createElement("div").apply {
-            setAttribute("class", "tiny-container")
-        }
+        val playLink =
+            document.createElement("div").apply {
+                setAttribute("class", "tiny-container")
+            }
         link.after(playLink)
 
         val codeToUse = decodedCode ?: "-- Update the code to update the game!\n$code"
@@ -117,7 +120,10 @@ fun getCaretPosition(el: Element): Int {
  *
  * This function is used to set the caret position after updating the content of the editor.
  */
-fun setCaret(pos: Int, parent: Node): Int {
+fun setCaret(
+    pos: Int,
+    parent: Node,
+): Int {
     var position = pos
     for (i in 0 until parent.childNodes.length) {
         val node = parent.childNodes.item(i)!!
@@ -176,71 +182,76 @@ private fun createGame(
     levelPath: String?,
     rootPath: String,
 ) {
-    val canvas = document.createElement("canvas").apply {
-        setAttribute("width", "512")
-        setAttribute("height", "512")
-        setAttribute("class", "tiny-canvas")
-        setAttribute("tabindex", "1")
-    }
+    val canvas =
+        document.createElement("canvas").apply {
+            setAttribute("width", "512")
+            setAttribute("height", "512")
+            setAttribute("class", "tiny-canvas")
+            setAttribute("tabindex", "1")
+        }
     container.appendChild(canvas)
 
-    val textarea = (document.createElement("div") as HTMLDivElement).apply {
-        setAttribute("id", "editor-$index")
-        setAttribute("spellcheck", "false")
-        setAttribute("class", "tiny-textarea")
-        setAttribute("contenteditable", "true")
+    val textarea =
+        (document.createElement("div") as HTMLDivElement).apply {
+            setAttribute("id", "editor-$index")
+            setAttribute("spellcheck", "false")
+            setAttribute("class", "tiny-textarea")
+            setAttribute("contenteditable", "true")
 
-        innerHTML = code
+            innerHTML = code
 
-        onkeydown = { event ->
-            val pos = getCaretPosition(this)
-            this.innerHTML = highlight(this.innerText)
-            setCaret(pos, this)
+            onkeydown = { event ->
+                val pos = getCaretPosition(this)
+                this.innerHTML = highlight(this.innerText)
+                setCaret(pos, this)
+            }
         }
-    }
     textarea.innerHTML = highlight(textarea.innerText)
     container.appendChild(textarea)
 
-    val link = (document.createElement("a") as HTMLAnchorElement).apply {
-        val b64 = Base64.encode(code.encodeToByteArray())
-        id = "share-$index"
-        href = "sandbox.html?game=$b64"
-        textContent = "\uD83D\uDD17 Share this game!"
-    }
+    val link =
+        (document.createElement("a") as HTMLAnchorElement).apply {
+            val b64 = Base64.encode(code.encodeToByteArray())
+            id = "share-$index"
+            href = "sandbox.html?game=$b64"
+            textContent = "\uD83D\uDD17 Share this game!"
+        }
 
     container.after(link)
 
     val logger = StdOutLogger("tiny-editor-$index")
 
-    val gameOptions = GameOptions(
-        width = 256,
-        height = 256,
-        // https://lospec.com/palette-list/rgr-proto16
-        palette = listOf(
-            "#FFF9B3",
-            "#B9C5CC",
-            "#4774B3",
-            "#144B66",
-            "#8FB347",
-            "#2E994E",
-            "#F29066",
-            "#E65050",
-            "#707D7C",
-            "#293C40",
-            "#170B1A",
-            "#0A010D",
-            "#570932",
-            "#871E2E",
-            "#FFBF40",
-            "#CC1424",
-        ),
-        gameScripts = listOf("#editor-$index"),
-        spriteSheets = spritePath?.let { listOf(it) } ?: emptyList(),
-        gameLevels = levelPath?.let { listOf(it) } ?: emptyList(),
-        zoom = 2,
-        gutter = 0 to 0,
-        spriteSize = 16 to 16,
-    )
+    val gameOptions =
+        GameOptions(
+            width = 256,
+            height = 256,
+            // https://lospec.com/palette-list/rgr-proto16
+            palette =
+                listOf(
+                    "#FFF9B3",
+                    "#B9C5CC",
+                    "#4774B3",
+                    "#144B66",
+                    "#8FB347",
+                    "#2E994E",
+                    "#F29066",
+                    "#E65050",
+                    "#707D7C",
+                    "#293C40",
+                    "#170B1A",
+                    "#0A010D",
+                    "#570932",
+                    "#871E2E",
+                    "#FFBF40",
+                    "#CC1424",
+                ),
+            gameScripts = listOf("#editor-$index"),
+            spriteSheets = spritePath?.let { listOf(it) } ?: emptyList(),
+            gameLevels = levelPath?.let { listOf(it) } ?: emptyList(),
+            zoom = 2,
+            gutter = 0 to 0,
+            spriteSize = 16 to 16,
+        )
 
     GameEngine(
         gameOptions = gameOptions,
@@ -251,29 +262,38 @@ private fun createGame(
 }
 
 class EditorWebGlPlatform(val delegate: Platform) : Platform {
-
     override val gameOptions: GameOptions = delegate.gameOptions
+
     override fun initWindowManager(): WindowManager = delegate.initWindowManager()
 
-    override fun initRenderManager(windowManager: WindowManager): RenderContext =
-        delegate.initRenderManager(windowManager)
+    override fun initRenderManager(windowManager: WindowManager): RenderContext = delegate.initRenderManager(windowManager)
 
     override fun gameLoop(gameLoop: GameLoop) = delegate.gameLoop(gameLoop)
 
-    override fun draw(context: RenderContext, frameBuffer: FrameBuffer) = delegate.draw(context, frameBuffer)
+    override fun draw(
+        context: RenderContext,
+        frameBuffer: FrameBuffer,
+    ) = delegate.draw(context, frameBuffer)
 
-    override fun draw(context: RenderContext, ops: List<Operation>) = delegate.draw(context, ops)
+    override fun draw(
+        context: RenderContext,
+        ops: List<Operation>,
+    ) = delegate.draw(context, ops)
 
     override fun endGameLoop() = delegate.endGameLoop()
 
     override fun initInputHandler(): InputHandler = delegate.initInputHandler()
 
     override fun initInputManager(): InputManager = delegate.initInputManager()
+
     override fun initSoundManager(inputHandler: InputHandler): SoundManager = delegate.initSoundManager(inputHandler)
 
     override fun io(): CoroutineDispatcher = delegate.io()
 
-    override fun createByteArrayStream(name: String, canUseJarPrefix: Boolean): SourceStream<ByteArray> {
+    override fun createByteArrayStream(
+        name: String,
+        canUseJarPrefix: Boolean,
+    ): SourceStream<ByteArray> {
         return if (name.startsWith("#")) {
             EditorStream(name)
         } else {
@@ -281,11 +301,23 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
         }
     }
 
-    override fun createImageStream(name: String, canUseJarPrefix: Boolean): SourceStream<ImageData> =
+    override fun createImageStream(
+        name: String,
+        canUseJarPrefix: Boolean,
+    ): SourceStream<ImageData> =
         delegate.createImageStream(
             name,
         )
 
     override fun createSoundStream(name: String): SourceStream<SoundData> = delegate.createSoundStream(name)
+
     override fun createLocalFile(name: String): LocalFile = delegate.createLocalFile(name)
+
+    override fun drawOffscreen(
+        renderContext: RenderContext,
+        ops: List<Operation>,
+    ) = delegate.drawOffscreen(
+        renderContext,
+        ops,
+    )
 }

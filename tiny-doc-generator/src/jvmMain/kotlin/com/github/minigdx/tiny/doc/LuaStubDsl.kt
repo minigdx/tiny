@@ -3,10 +3,14 @@ package com.github.minigdx.tiny.doc
 @DslMarker
 annotation class LuaStubDslMarker
 
-fun stub(description: String, block: LuaStubDocument.() -> Unit): LuaStubDocument {
-    val doc = LuaStubDocument().apply {
-        this.description = description
-    }
+fun stub(
+    description: String,
+    block: LuaStubDocument.() -> Unit,
+): LuaStubDocument {
+    val doc =
+        LuaStubDocument().apply {
+            this.description = description
+        }
     block(doc)
     return doc
 }
@@ -119,6 +123,9 @@ class LuaStubArg {
     }
 }
 
-private fun comment(content: String, headline: String = "---"): String {
+private fun comment(
+    content: String,
+    headline: String = "---",
+): String {
     return content.split("\n").joinToString("\n") { line -> "$headline $line" }
 }

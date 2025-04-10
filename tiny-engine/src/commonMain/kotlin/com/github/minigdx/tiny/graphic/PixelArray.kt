@@ -6,7 +6,6 @@ import kotlin.math.max
 import kotlin.math.min
 
 class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = PixelFormat.INDEX) {
-
     internal var pixels = ByteArray(width * height * pixelFormat) { 0 }
 
     val size = width * height * pixelFormat
@@ -17,27 +16,38 @@ class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = Pix
         pixels = array.pixels.copyOf()
     }
 
-    fun reset(pixel: Int, left: Int = 0, top: Int = 0, right: Int = width, bottom: Int = height) {
+    fun reset(
+        pixel: Int,
+        left: Int = 0,
+        top: Int = 0,
+        right: Int = width,
+        bottom: Int = height,
+    ) {
         val cleft = 0 - left
         val cright = right + 2 * cleft
 
         val ctop = 0 - top
         val cbottom = bottom + 2 * ctop
 
-        pixels = ByteArray(width * height * pixelFormat) { index ->
-            val p = index / pixelFormat
-            val x = p % width
-            val y = p / width
+        pixels =
+            ByteArray(width * height * pixelFormat) { index ->
+                val p = index / pixelFormat
+                val x = p % width
+                val y = p / width
 
-            if (x in cleft..cright && y in ctop..cbottom) {
-                pixel.toByte()
-            } else {
-                0
+                if (x in cleft..cright && y in ctop..cbottom) {
+                    pixel.toByte()
+                } else {
+                    0
+                }
             }
-        }
     }
 
-    fun set(x: Pixel, y: Pixel, vararg pixel: Int) {
+    fun set(
+        x: Pixel,
+        y: Pixel,
+        vararg pixel: Int,
+    ) {
         assert(x in 0 until width) { "x ($x) has to be between 0 and $width (excluded)" }
         assert(y in 0 until height) { "y ($y) has to be between 0 and $height (excluded)" }
         assert(pixel.size == pixelFormat) { "the assigned pixel needs to conform the pixel format ($pixelFormat)" }
@@ -51,7 +61,10 @@ class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = Pix
         }
     }
 
-    fun get(x: Pixel, y: Pixel): ByteArray {
+    fun get(
+        x: Pixel,
+        y: Pixel,
+    ): ByteArray {
         assert(x >= 0 && x < width) { "x ($x) has to be between 0 and $width (excluded)" }
         assert(y >= 0 && y < height) { "y ($y) has to be between 0 and $height (excluded)" }
         val position = (x + y * width) * pixelFormat
@@ -81,7 +94,10 @@ class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = Pix
      * The pixel format should be equals to 1 otherwise
      * it will returns only the first component of the color.
      */
-    fun getOne(x: Pixel, y: Pixel): Int = get(x, y)[0].toInt()
+    fun getOne(
+        x: Pixel,
+        y: Pixel,
+    ): Int = get(x, y)[0].toInt()
 
     fun copyFrom(
         source: PixelArray,
@@ -104,20 +120,22 @@ class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = Pix
             min(height, min(height - (dstY + height - this.height), height - (sourceY + height - source.height)))
 
         for (h in 0 until minHeight) {
-            val offsetY = if (reverseY) {
-                minHeight - h - 1
-            } else {
-                h
-            }
+            val offsetY =
+                if (reverseY) {
+                    minHeight - h - 1
+                } else {
+                    h
+                }
 
             for (w in 0 until minWidth) {
                 val dstPosition = (w + dstX + (h + dstY) * this.width) * pixelFormat
 
-                val offsetX = if (reverseX) {
-                    minWidth - w - 1
-                } else {
-                    w
-                }
+                val offsetX =
+                    if (reverseX) {
+                        minWidth - w - 1
+                    } else {
+                        w
+                    }
 
                 val sourcePosition = (offsetX + sourceX + (offsetY + sourceY) * source.width) * pixelFormat
 
@@ -138,11 +156,21 @@ class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = Pix
 
     // operator fun iterator(): Iterator<Int> = pixels.iterator()
 
-    fun fill(startX: Int, endX: Int, y: Int, value: Int) {
+    fun fill(
+        startX: Int,
+        endX: Int,
+        y: Int,
+        value: Int,
+    ) {
         fill(startX, endX, y, value.toByte())
     }
 
-    fun fill(startX: Int, endX: Int, y: Int, value: Byte) {
+    fun fill(
+        startX: Int,
+        endX: Int,
+        y: Int,
+        value: Byte,
+    ) {
         val yy = (y * width * pixelFormat)
         pixels.fill(value, yy + startX * pixelFormat, yy + endX * pixelFormat)
     }

@@ -3,8 +3,7 @@ package com.github.minigdx.tiny.cli.command
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.subcommands
 
-class MainCommand : CliktCommand(invokeWithoutSubcommand = true) {
-
+class MainCommand : CliktCommand() {
     init {
         subcommands(
             CreateCommand(),

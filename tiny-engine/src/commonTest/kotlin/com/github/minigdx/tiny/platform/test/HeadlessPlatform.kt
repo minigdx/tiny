@@ -26,7 +26,6 @@ class NoopRenderContext : RenderContext
 
 class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map<String, Any>, frames: Int = 10) :
     Platform {
-
     val input = VirtualInputHandler()
 
     val frames: MutableFixedSizeList<FrameBuffer> = MutableFixedSizeList(frames)
@@ -55,20 +54,27 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
         this.gameLoop = gameLoop
     }
 
-    override fun draw(context: RenderContext, frameBuffer: FrameBuffer) {
-        val newBuffer = FrameBuffer(
-            frameBuffer.width,
-            frameBuffer.height,
-            frameBuffer.gamePalette,
-        ).apply {
-            colorIndexBuffer.copyFrom(frameBuffer.colorIndexBuffer)
-            generateBuffer()
-        }
+    override fun draw(
+        context: RenderContext,
+        frameBuffer: FrameBuffer,
+    ) {
+        val newBuffer =
+            FrameBuffer(
+                frameBuffer.width,
+                frameBuffer.height,
+                frameBuffer.gamePalette,
+            ).apply {
+                colorIndexBuffer.copyFrom(frameBuffer.colorIndexBuffer)
+                generateBuffer()
+            }
 
         frames.add(newBuffer)
     }
 
-    override fun draw(context: RenderContext, ops: List<Operation>) = Unit
+    override fun draw(
+        context: RenderContext,
+        ops: List<Operation>,
+    ) = Unit
 
     override fun record() {
         super.record()
@@ -77,11 +83,13 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
     override fun endGameLoop() = Unit
 
     override fun initInputHandler(): InputHandler = input
+
     override fun initInputManager(): InputManager = input
 
     override fun initSoundManager(inputHandler: InputHandler): SoundManager {
         return object : SoundManager() {
             override fun initSoundManager(inputHandler: InputHandler) = Unit
+
             override suspend fun createSfxSound(bytes: ByteArray): Sound {
                 return object : Sound {
                     override fun play() = Unit
@@ -102,7 +110,10 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
                 }
             }
 
-            override fun playBuffer(buffer: FloatArray, numberOfSamples: Long) = Unit
+            override fun playBuffer(
+                buffer: FloatArray,
+                numberOfSamples: Long,
+            ) = Unit
         }
     }
 
@@ -110,13 +121,20 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
         return Dispatchers.Unconfined
     }
 
-    override fun createByteArrayStream(name: String, canUseJarPrefix: Boolean): SourceStream<ByteArray> {
-        val data = (resources[name] as? String?)?.encodeToByteArray() ?: resources[name] as? ByteArray
-            ?: throw IllegalStateException("$name is not a valid ByteArray.")
+    override fun createByteArrayStream(
+        name: String,
+        canUseJarPrefix: Boolean,
+    ): SourceStream<ByteArray> {
+        val data =
+            (resources[name] as? String?)?.encodeToByteArray() ?: resources[name] as? ByteArray
+                ?: throw IllegalStateException("$name is not a valid ByteArray.")
         return ObjectStream(data)
     }
 
-    override fun createImageStream(name: String, canUseJarPrefix: Boolean): SourceStream<ImageData> {
+    override fun createImageStream(
+        name: String,
+        canUseJarPrefix: Boolean,
+    ): SourceStream<ImageData> {
         val data = resources[name] as? ImageData ?: throw IllegalStateException("$name is not a valid ImageData.")
         return ObjectStream(data)
     }
@@ -126,18 +144,25 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
         return ObjectStream(data)
     }
 
-    override fun createLocalFile(name: String): LocalFile = object : LocalFile {
-        override val name: String = "name"
-        override val extension: String = ""
+    override fun createLocalFile(name: String): LocalFile =
+        object : LocalFile {
+            override val name: String = "name"
+            override val extension: String = ""
 
-        override fun readAll(): ByteArray = ByteArray(0)
+            override fun readAll(): ByteArray = ByteArray(0)
 
-        override fun save(content: ByteArray) = Unit
-    }
+            override fun save(content: ByteArray) = Unit
+        }
 
-    override fun drawOffscreen(renderContext: RenderContext, ops: List<Operation>): Frame {
+    override fun drawOffscreen(
+        renderContext: RenderContext,
+        ops: List<Operation>,
+    ): Frame {
         return object : Frame {
-            override fun get(x: Pixel, y: Pixel): ColorIndex = 0
+            override fun get(
+                x: Pixel,
+                y: Pixel,
+            ): ColorIndex = 0
         }
     }
 

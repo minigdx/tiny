@@ -14,7 +14,6 @@ interface Sound {
 }
 
 abstract class SoundManager {
-
     abstract fun initSoundManager(inputHandler: InputHandler)
 
     open fun destroy() = Unit
@@ -23,7 +22,10 @@ abstract class SoundManager {
 
     abstract suspend fun createMidiSound(data: ByteArray): Sound
 
-    fun playNotes(notes: List<WaveGenerator>, longestDuration: Seconds) {
+    fun playNotes(
+        notes: List<WaveGenerator>,
+        longestDuration: Seconds,
+    ) {
         if (notes.isEmpty()) return
 
         val result = createNotesBuffer(longestDuration, notes)
@@ -48,9 +50,15 @@ abstract class SoundManager {
     /**
      * @param buffer byte array representing the sound. Each sample is represented with a float from -1.0f to 1.0f
      */
-    abstract fun playBuffer(buffer: FloatArray, numberOfSamples: Long)
+    abstract fun playBuffer(
+        buffer: FloatArray,
+        numberOfSamples: Long,
+    )
 
-    private fun mix(sample: Int, notes: List<WaveGenerator>): Float {
+    private fun mix(
+        sample: Int,
+        notes: List<WaveGenerator>,
+    ): Float {
         var result = 0f
         notes.forEach {
             if (it.accept(sample)) {
@@ -65,7 +73,12 @@ abstract class SoundManager {
         return ((longestDuration - FADE_OUT_DURATION) * SAMPLE_RATE).toInt()
     }
 
-    fun fadeOut(sample: Float, index: Int, fadeOutIndex: Int, endIndex: Int): Float {
+    fun fadeOut(
+        sample: Float,
+        index: Int,
+        fadeOutIndex: Int,
+        endIndex: Int,
+    ): Float {
         return if (index < fadeOutIndex) {
             sample
         } else {
@@ -96,7 +109,6 @@ abstract class SoundManager {
     }
 
     companion object {
-
         const val SAMPLE_RATE = 44100
         private const val FADE_OUT_DURATION: Seconds = 0.5f
     }
@@ -105,8 +117,11 @@ abstract class SoundManager {
 data class SoundBuffer(val samples: FloatArray, val numberOfSamples: Long)
 
 class SoundConverter {
-
-    internal fun createStrip(songVolume: Float, numberOfSamplesPerBeat: Int, waves: Array<WaveGenerator>): SoundBuffer {
+    internal fun createStrip(
+        songVolume: Float,
+        numberOfSamplesPerBeat: Int,
+        waves: Array<WaveGenerator>,
+    ): SoundBuffer {
         // 1/4 of a beat is used to fade
         val fader = Fader(0.25f * numberOfSamplesPerBeat / SAMPLE_RATE.toFloat())
 
@@ -157,7 +172,6 @@ class Cursor(var previous: Int = 0, var current: Int = 0, var absolute: Int = 0)
 }
 
 class Fader(duration: Seconds) {
-
     private val cuteoff = (duration * SAMPLE_RATE).toInt()
 
     fun fadeWith(
@@ -171,11 +185,12 @@ class Fader(duration: Seconds) {
         val cur = current?.generate(currentSample) ?: 0f
         val curVol = current?.volume ?: 1f
 
-        val alpha = if (previous?.note == current?.note) {
-            1f
-        } else {
-            1f - min(cur / cuteoff, 1f)
-        }
+        val alpha =
+            if (previous?.note == current?.note) {
+                1f
+            } else {
+                1f - min(cur / cuteoff, 1f)
+            }
 
         return cur * curVol + prec * alpha * precVol
     }

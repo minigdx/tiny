@@ -19,8 +19,10 @@ class StdLib(
     val gameOptions: GameOptions,
     val resourceAccess: GameResourceAccess,
 ) : TwoArgFunction() {
-
-    override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
+    override fun call(
+        arg1: LuaValue,
+        arg2: LuaValue,
+    ): LuaValue {
         val tiny = LuaTable()
         arg2["all"] = all()
         arg2["rpairs"] = rpairs()
@@ -37,19 +39,24 @@ class StdLib(
         example = STD_NEW_EXAMPLE,
     )
     inner class new : TwoArgFunction() {
-
         @TinyCall("Create new instance of class.")
-        override fun call(@TinyArg("class") arg: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("class") arg: LuaValue,
+        ): LuaValue {
             return super.call(arg)
         }
 
         @TinyCall("Create new instance of class using default values.")
-        override fun call(@TinyArg("class") arg1: LuaValue, @TinyArg("default") arg2: LuaValue): LuaValue {
-            val default = if (arg2.istable()) {
-                arg2.checktable()!!.deepCopy()
-            } else {
-                LuaTable()
-            }
+        override fun call(
+            @TinyArg("class") arg1: LuaValue,
+            @TinyArg("default") arg2: LuaValue,
+        ): LuaValue {
+            val default =
+                if (arg2.istable()) {
+                    arg2.checktable()!!.deepCopy()
+                } else {
+                    LuaTable()
+                }
             val reference = arg1.checktable()!!.deepCopy()
             default.setmetatable(reference)
             reference.rawset("__index", reference)
@@ -60,11 +67,12 @@ class StdLib(
             val result = LuaTable()
             this.keys().forEach { key ->
                 var value = this[key]
-                value = if (value.istable()) {
-                    value.checktable()!!.deepCopy()
-                } else {
-                    value
-                }
+                value =
+                    if (value.istable()) {
+                        value.checktable()!!.deepCopy()
+                    } else {
+                        value
+                    }
                 result[key] = value
             }
             return result
@@ -76,9 +84,11 @@ class StdLib(
         example = STD_MERGE_EXAMPLE,
     )
     inner class merge : TwoArgFunction() {
-
         @TinyCall("Merge source into dest.")
-        override fun call(@TinyArg("source") arg1: LuaValue, @TinyArg("dest") arg2: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("source") arg1: LuaValue,
+            @TinyArg("dest") arg2: LuaValue,
+        ): LuaValue {
             return if (arg1.istable() and arg2.istable()) {
                 arg1 as LuaTable
                 arg2 as LuaTable
@@ -100,9 +110,11 @@ class StdLib(
         example = STD_APPEND_EXAMPLE,
     )
     inner class append : TwoArgFunction() {
-
         @TinyCall("Copy source into dest.")
-        override fun call(@TinyArg("source") arg1: LuaValue, @TinyArg("dest") arg2: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("source") arg1: LuaValue,
+            @TinyArg("dest") arg2: LuaValue,
+        ): LuaValue {
             return if (arg1.istable() and arg2.istable()) {
                 arg1 as LuaTable
                 arg2 as LuaTable
@@ -125,30 +137,32 @@ class StdLib(
             "- If you want to iterate in reverse, use `rpairs(table)`.\n",
     )
     internal inner class all : VarArgFunction() {
-
         @TinyCall("Iterate over the values of the table")
-        override fun invoke(@TinyArgs(["table"]) args: Varargs): Varargs {
-            val iterator = object : VarArgFunction() {
+        override fun invoke(
+            @TinyArgs(["table"]) args: Varargs,
+        ): Varargs {
+            val iterator =
+                object : VarArgFunction() {
+                    var index = 0
 
-                var index = 0
+                    override fun invoke(args: Varargs): Varargs {
+                        val table = args.checktable(1)!!
+                        val keys = table.keys()
+                        if (index >= keys.size) return NONE
 
-                override fun invoke(args: Varargs): Varargs {
-                    val table = args.checktable(1)!!
-                    val keys = table.keys()
-                    if (index >= keys.size) return NONE
+                        val key = keys[index++]
+                        val result = table.get(key)
 
-                    val key = keys[index++]
-                    val result = table.get(key)
-
-                    return result
+                        return result
+                    }
                 }
-            }
             // If the expected table is nil, don't iterate.
-            val table = if (args.isnil(1)) {
-                LuaTable()
-            } else {
-                args.checktable(1)!!
-            }
+            val table =
+                if (args.isnil(1)) {
+                    LuaTable()
+                } else {
+                    args.checktable(1)!!
+                }
             // iterator, object to iterate, seed value.
             return varargsOf(iterator, table)
         }
@@ -162,24 +176,25 @@ class StdLib(
         example = STD_RPAIRS_EXAMPLE,
     )
     internal inner class rpairs : VarArgFunction() {
-
         @TinyCall("Iterate over the values of the table")
-        override fun invoke(@TinyArgs(["table"]) args: Varargs): Varargs {
-            val iterator = object : VarArgFunction() {
+        override fun invoke(
+            @TinyArgs(["table"]) args: Varargs,
+        ): Varargs {
+            val iterator =
+                object : VarArgFunction() {
+                    override fun invoke(args: Varargs): Varargs {
+                        val table = args.checktable(1)!!
+                        val index = args.checkint(2) - 1
 
-                override fun invoke(args: Varargs): Varargs {
-                    val table = args.checktable(1)!!
-                    val index = args.checkint(2) - 1
+                        if (index < 1) return NONE
 
-                    if (index < 1) return NONE
+                        val luaValue = table[index]
+                        if (luaValue.isnil()) return NONE
 
-                    val luaValue = table[index]
-                    if (luaValue.isnil()) return NONE
-
-                    // Return only the value.
-                    return varargsOf(arrayOf(valueOf(index), luaValue))
+                        // Return only the value.
+                        return varargsOf(arrayOf(valueOf(index), luaValue))
+                    }
                 }
-            }
             val table = args.checktable(1)!!
             // iterator, object to iterate, seed value.
             return varargsOf(iterator, table, valueOf(table.length() + 1))
@@ -188,18 +203,23 @@ class StdLib(
 
     @TinyFunction("Print on the screen a string.", example = STD_PRINT_EXAMPLE)
     internal inner class print : LibFunction() {
-
         @TinyCall(
             description = "print on the screen a string at (0,0) with a default color.",
         )
-        override fun call(@TinyArg("str") a: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("str") a: LuaValue,
+        ): LuaValue {
             return call(a, valueOf(0), valueOf(0), valueOf("#FFFFFF"))
         }
 
         @TinyCall(
             description = "print on the screen a string with a default color.",
         )
-        override fun call(@TinyArg("str") a: LuaValue, @TinyArg("x") b: LuaValue, @TinyArg("y") c: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("str") a: LuaValue,
+            @TinyArg("x") b: LuaValue,
+            @TinyArg("y") c: LuaValue,
+        ): LuaValue {
             return call(a, b, c, valueOf("#FFFFFF"))
         }
 
@@ -224,38 +244,40 @@ class StdLib(
             var currentY = y
             str.forEach { char ->
 
-                val coord = if (char.isLetter()) {
-                    // The character has an accent. Let's try to get rid of it
-                    val l = if (char.hasAccent) {
-                        ACCENT_MAP[char.lowercaseChar()] ?: char.lowercaseChar()
+                val coord =
+                    if (char.isLetter()) {
+                        // The character has an accent. Let's try to get rid of it
+                        val l =
+                            if (char.hasAccent) {
+                                ACCENT_MAP[char.lowercaseChar()] ?: char.lowercaseChar()
+                            } else {
+                                char.lowercaseChar()
+                            }
+                        val index = l - 'a'
+                        index to 0
+                    } else if (char.isDigit()) {
+                        val index = char.lowercaseChar() - '0'
+                        index to 1
+                    } else if (char in '!'..'/') {
+                        val index = char.lowercaseChar() - '!'
+                        index to 2
+                    } else if (char in '['..'`') {
+                        val index = char.lowercaseChar() - '['
+                        index to 3
+                    } else if (char in '{'..'~') {
+                        val index = char.lowercaseChar() - '{'
+                        index to 4
+                    } else if (char in ':'..'@') {
+                        val index = char.lowercaseChar() - ':'
+                        index to 5
+                    } else if (char == '\n') {
+                        currentY += 6
+                        currentX = x - space // compensate the next space
+                        null
                     } else {
-                        char.lowercaseChar()
+                        // Maybe it's an emoji: try EMOJI MAP conversion
+                        EMOJI_MAP[char]
                     }
-                    val index = l - 'a'
-                    index to 0
-                } else if (char.isDigit()) {
-                    val index = char.lowercaseChar() - '0'
-                    index to 1
-                } else if (char in '!'..'/') {
-                    val index = char.lowercaseChar() - '!'
-                    index to 2
-                } else if (char in '['..'`') {
-                    val index = char.lowercaseChar() - '['
-                    index to 3
-                } else if (char in '{'..'~') {
-                    val index = char.lowercaseChar() - '{'
-                    index to 4
-                } else if (char in ':'..'@') {
-                    val index = char.lowercaseChar() - ':'
-                    index to 5
-                } else if (char == '\n') {
-                    currentY += 6
-                    currentX = x - space // compensate the next space
-                    null
-                } else {
-                    // Maybe it's an emoji: try EMOJI MAP conversion
-                    EMOJI_MAP[char]
-                }
                 if (coord != null) {
                     val (indexX, indexY) = coord
                     resourceAccess.frameBuffer.copyFrom(
@@ -294,19 +316,21 @@ class StdLib(
     }
 
     companion object {
-        val ACCENT_MAP = mapOf(
-            'à' to 'a', 'á' to 'a', 'â' to 'a', 'ã' to 'a', 'ä' to 'a', 'å' to 'a',
-            'ç' to 'c',
-            'è' to 'e', 'é' to 'e', 'ê' to 'e', 'ë' to 'e',
-            'ì' to 'i', 'í' to 'i', 'î' to 'i', 'ï' to 'i',
-            'ñ' to 'n',
-            'ò' to 'o', 'ó' to 'o', 'ô' to 'o', 'õ' to 'o', 'ö' to 'o',
-            'ù' to 'u', 'ú' to 'u', 'û' to 'u', 'ü' to 'u',
-            'ý' to 'y', 'ÿ' to 'y',
-        )
+        val ACCENT_MAP =
+            mapOf(
+                'à' to 'a', 'á' to 'a', 'â' to 'a', 'ã' to 'a', 'ä' to 'a', 'å' to 'a',
+                'ç' to 'c',
+                'è' to 'e', 'é' to 'e', 'ê' to 'e', 'ë' to 'e',
+                'ì' to 'i', 'í' to 'i', 'î' to 'i', 'ï' to 'i',
+                'ñ' to 'n',
+                'ò' to 'o', 'ó' to 'o', 'ô' to 'o', 'õ' to 'o', 'ö' to 'o',
+                'ù' to 'u', 'ú' to 'u', 'û' to 'u', 'ü' to 'u',
+                'ý' to 'y', 'ÿ' to 'y',
+            )
 
-        val EMOJI_MAP = mapOf(
-            '⚠' to (0 to 0),
-        )
+        val EMOJI_MAP =
+            mapOf(
+                '⚠' to (0 to 0),
+            )
     }
 }

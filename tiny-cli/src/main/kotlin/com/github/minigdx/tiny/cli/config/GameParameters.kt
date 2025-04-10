@@ -14,7 +14,6 @@ import java.io.FileOutputStream
 @Serializable
 @JsonClassDiscriminator("version")
 sealed class GameParameters {
-
     abstract val name: String
 
     abstract fun toGameOptions(): GameOptions
@@ -26,6 +25,7 @@ sealed class GameParameters {
     }
 
     abstract fun addLevel(level: String): GameParameters
+
     abstract fun addSpritesheet(sprite: String): GameParameters
 
     abstract fun addScript(script: String): GameParameters
@@ -45,9 +45,10 @@ sealed class GameParameters {
     abstract fun addLibrary(lib: String): GameParameters
 
     companion object {
-        val JSON = Json {
-            ignoreUnknownKeys = true
-        }
+        val JSON =
+            Json {
+                ignoreUnknownKeys = true
+            }
 
         fun read(file: File): GameParameters {
             return JSON.decodeFromStream<GameParameters>(FileInputStream(file))
@@ -124,9 +125,10 @@ data class GameParametersV1(
             }
         }
 
-        return scripts + libraries.map { lib ->
-            extractName(lib) + ".lua"
-        }
+        return scripts +
+            libraries.map { lib ->
+                extractName(lib) + ".lua"
+            }
     }
 
     override fun addLevel(level: String): GameParameters {

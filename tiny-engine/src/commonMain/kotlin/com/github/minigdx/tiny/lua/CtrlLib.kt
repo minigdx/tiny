@@ -20,7 +20,10 @@ class CtrlLib(
     private val inputHandler: InputHandler,
     sprLib: SprLib,
 ) : TwoArgFunction() {
-    override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
+    override fun call(
+        arg1: LuaValue,
+        arg2: LuaValue,
+    ): LuaValue {
         val ctrl = LuaTable()
 
         ctrl["pressed"] = pressed()
@@ -45,18 +48,20 @@ class CtrlLib(
         example = CTRL_TOUCH_EXAMPLE,
     )
     inner class touch : OneArgFunction() {
-
         @TinyCall("Get the mouse coordinates.")
         override fun call(): LuaValue = super.call()
 
         @TinyCall("Get the mouse coordinate and draw a sprite on those coordinates.")
-        override fun call(@TinyArg("sprN") arg: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("sprN") arg: LuaValue,
+        ): LuaValue {
             val pos = inputHandler.currentTouch
 
-            val coordinates = LuaTable().apply {
-                this.set("x", pos.x.toInt())
-                this.set("y", pos.y.toInt())
-            }
+            val coordinates =
+                LuaTable().apply {
+                    this.set("x", pos.x.toInt())
+                    this.set("y", pos.y.toInt())
+                }
 
             // return the coordinates
             return if (arg.isnil()) {
@@ -77,9 +82,10 @@ class CtrlLib(
         example = CTRL_PRESSING_EXAMPLE,
     )
     inner class pressed : OneArgFunction() {
-
         @TinyCall("Is the key was pressed?")
-        override fun call(@TinyArg("key") arg: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("key") arg: LuaValue,
+        ): LuaValue {
             val values = Key.values()
             val int = arg.checkint()
             if (int >= values.size || int < 0) return BFALSE
@@ -96,7 +102,9 @@ class CtrlLib(
     )
     inner class pressing : OneArgFunction() {
         @TinyCall("Is the key is still pressed?")
-        override fun call(@TinyArg("key") arg: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("key") arg: LuaValue,
+        ): LuaValue {
             val values = Key.values()
             val int = arg.checkint()
             if (int >= values.size || int < 0) return BFALSE
@@ -118,9 +126,10 @@ class CtrlLib(
         example = CTRL_TOUCHED_EXAMPLE,
     )
     inner class touched : OneArgFunction() {
-
         @TinyCall("Is the screen was touched or mouse button was pressed?")
-        override fun call(@TinyArg("touch") arg: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("touch") arg: LuaValue,
+        ): LuaValue {
             val values = TouchSignal.values()
             val int = arg.checkint()
             if (int >= values.size || int < 0) return BFALSE
@@ -128,12 +137,13 @@ class CtrlLib(
             val touchSignal = TouchSignal.values()[int]
             val touched = inputHandler.isJustTouched(touchSignal)
 
-            val coordinates = touched?.let {
-                val result = LuaTable()
-                result["x"] = touched.x.toInt()
-                result["y"] = touched.y.toInt()
-                result
-            } ?: NIL
+            val coordinates =
+                touched?.let {
+                    val result = LuaTable()
+                    result["x"] = touched.x.toInt()
+                    result["y"] = touched.y.toInt()
+                    result
+                } ?: NIL
 
             return coordinates
         }
@@ -151,7 +161,9 @@ class CtrlLib(
     )
     inner class touching : OneArgFunction() {
         @TinyCall("Is the screen is still touched or mouse button is still pressed?")
-        override fun call(@TinyArg("touch") arg: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("touch") arg: LuaValue,
+        ): LuaValue {
             val values = TouchSignal.values()
             val int = arg.checkint()
             if (int >= values.size || int < 0) return BFALSE
@@ -159,12 +171,13 @@ class CtrlLib(
             val touchSignal = TouchSignal.values()[int]
             val touched = inputHandler.isTouched(touchSignal)
 
-            val coordinates = touched?.let {
-                val result = LuaTable()
-                result["x"] = touched.x.toInt()
-                result["y"] = touched.y.toInt()
-                result
-            } ?: NIL
+            val coordinates =
+                touched?.let {
+                    val result = LuaTable()
+                    result["x"] = touched.x.toInt()
+                    result["y"] = touched.y.toInt()
+                    result
+                } ?: NIL
 
             return coordinates
         }

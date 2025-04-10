@@ -1,7 +1,6 @@
 package com.github.minigdx.tiny.input.internal
 
 abstract class ObjectPool<T>(private val size: Int) {
-
     private val pool = mutableListOf<T>()
 
     @Suppress("UNCHECKED_CAST")

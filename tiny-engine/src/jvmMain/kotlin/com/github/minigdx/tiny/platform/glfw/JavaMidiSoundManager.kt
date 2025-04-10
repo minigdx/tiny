@@ -18,7 +18,6 @@ import javax.sound.sampled.Clip
 import kotlin.experimental.and
 
 class SfxSound(byteArray: ByteArray) : Sound {
-
     private val clip: Clip
 
     init {
@@ -27,6 +26,7 @@ class SfxSound(byteArray: ByteArray) : Sound {
         clip = AudioSystem.getClip()
         clip.open(audioStream)
     }
+
     override fun play() {
         stop()
         clip.start()
@@ -41,11 +41,11 @@ class SfxSound(byteArray: ByteArray) : Sound {
         clip.framePosition = 0
     }
 }
-class JavaMidiSound(private val data: ByteArray) : Sound {
 
+class JavaMidiSound(private val data: ByteArray) : Sound {
     private var sequencer: Sequencer? = null
 
-    private fun _play(loop: Int) {
+    private fun play(loop: Int) {
         val seq: Sequencer = MidiSystem.getSequencer()
 
         seq.open()
@@ -60,11 +60,11 @@ class JavaMidiSound(private val data: ByteArray) : Sound {
     }
 
     override fun play() {
-        _play(0)
+        play(0)
     }
 
     override fun loop() {
-        _play(LOOP_CONTINUOUSLY)
+        play(LOOP_CONTINUOUSLY)
     }
 
     override fun stop() {
@@ -80,43 +80,45 @@ class JavaMidiSound(private val data: ByteArray) : Sound {
 }
 
 class JavaMidiSoundManager : SoundManager() {
-
     // When closing the application, switch isActive to false to stop the background thread.
     private var isActive = true
 
     private val bufferQueue: BlockingQueue<ByteArray> = ArrayBlockingQueue(10)
 
-    private val backgroundAudio = object : Thread() {
-        override fun run() {
-            val notesLine = AudioSystem.getSourceDataLine(
-                AudioFormat(
-                    AudioFormat.Encoding.PCM_SIGNED,
-                    SAMPLE_RATE.toFloat(),
-                    16,
-                    1, // TODO: set 2 to get Stereo
-                    2,
-                    SAMPLE_RATE.toFloat(),
-                    false,
-                ),
-            )
+    private val backgroundAudio =
+        object : Thread() {
+            override fun run() {
+                val notesLine =
+                    AudioSystem.getSourceDataLine(
+                        AudioFormat(
+                            AudioFormat.Encoding.PCM_SIGNED,
+                            SAMPLE_RATE.toFloat(),
+                            16,
+                            // TODO: set 2 to get Stereo
+                            1,
+                            2,
+                            SAMPLE_RATE.toFloat(),
+                            false,
+                        ),
+                    )
 
-            notesLine.open()
-            notesLine.start()
+                notesLine.open()
+                notesLine.start()
 
-            while (isActive) {
-                val nextBuffer = bufferQueue.take()
-                if (notesLine.isActive) {
-                    notesLine.close()
-                    notesLine.open()
-                    notesLine.start()
+                while (isActive) {
+                    val nextBuffer = bufferQueue.take()
+                    if (notesLine.isActive) {
+                        notesLine.close()
+                        notesLine.open()
+                        notesLine.start()
+                    }
+                    if (isActive) {
+                        Thread { notesLine.write(nextBuffer, 0, nextBuffer.size) }.start()
+                    }
                 }
-                if (isActive) {
-                    Thread { notesLine.write(nextBuffer, 0, nextBuffer.size) }.start()
-                }
+                notesLine.close()
             }
-            notesLine.close()
         }
-    }
 
     override fun initSoundManager(inputHandler: InputHandler) {
         backgroundAudio.start()
@@ -135,7 +137,10 @@ class JavaMidiSoundManager : SoundManager() {
         return SfxSound(buffer)
     }
 
-    override fun playBuffer(buffer: FloatArray, numberOfSamples: Long) {
+    override fun playBuffer(
+        buffer: FloatArray,
+        numberOfSamples: Long,
+    ) {
         bufferQueue.offer(convertBuffer(buffer, numberOfSamples))
     }
 

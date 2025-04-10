@@ -11,8 +11,10 @@ import kotlin.math.sin
 import kotlin.random.Random
 
 interface Modulation {
-
-    fun apply(index: Int, frequency: Float): Float
+    fun apply(
+        index: Int,
+        frequency: Float,
+    ): Float
 }
 
 /**
@@ -23,14 +25,17 @@ class Sweep(
     val sweep: Frequency,
     val acceleration: Boolean,
 ) : Modulation {
+    private val way =
+        if (acceleration) {
+            1
+        } else {
+            -1
+        }
 
-    private val way = if (acceleration) {
-        1
-    } else {
-        -1
-    }
-
-    override fun apply(index: Int, frequency: Float): Float {
+    override fun apply(
+        index: Int,
+        frequency: Float,
+    ): Float {
         return frequency + index * (sweep * way) / SAMPLE_RATE.toFloat()
     }
 }
@@ -39,7 +44,10 @@ class Vibrato(
     val vibratoFrequency: Float,
     val depth: Percent,
 ) : Modulation {
-    override fun apply(index: Int, frequency: Float): Float {
+    override fun apply(
+        index: Int,
+        frequency: Float,
+    ): Float {
         val t = index / SAMPLE_RATE.toFloat()
         val vibrato = sin(TWO_PI * vibratoFrequency * t) * depth
         return frequency + vibrato
@@ -47,7 +55,6 @@ class Vibrato(
 }
 
 sealed interface SoundGenerator {
-
     val modulation: Modulation?
 
     val envelope: Envelope?
@@ -72,7 +79,10 @@ sealed interface SoundGenerator {
 
     fun apply(index: Int): Float
 
-    fun generate(index: Int, beatDuration: Int): Float {
+    fun generate(
+        index: Int,
+        beatDuration: Int,
+    ): Float {
         val sample = apply(index)
         return envelope?.apply(sample, index, beatDuration) ?: sample
     }
@@ -84,7 +94,6 @@ class Sine2(
     override val envelope: Envelope? = null,
     override val volume: Float,
 ) : SoundGenerator {
-
     override val index: Int = 1
     override val name: String = "Sine"
     override val frequency: Float = note.frequency
@@ -100,7 +109,6 @@ class Square2(
     override val envelope: Envelope?,
     override val volume: Float,
 ) : SoundGenerator {
-
     override val index: Int = 2
     override val name: String = "Square"
     override val frequency: Float = note.frequency
@@ -121,7 +129,6 @@ class Triangle2(
     override val envelope: Envelope?,
     override val volume: Float,
 ) : SoundGenerator {
-
     override val index: Int = 3
     override val name: String = "Triangle"
     override val frequency: Float = note.frequency
@@ -139,7 +146,6 @@ class Pulse2(
     override val envelope: Envelope?,
     override val volume: Float,
 ) : SoundGenerator {
-
     override val index: Int = 5
     override val name: String = "Pulse"
     override val frequency: Float = note.frequency
@@ -161,7 +167,6 @@ class SawTooth2(
     override val envelope: Envelope?,
     override val volume: Float,
 ) : SoundGenerator {
-
     override val index: Int = 6
     override val name: String = "Sawtooth"
     override val frequency: Float = note.frequency
@@ -179,7 +184,6 @@ class Silence2(
     override val envelope: Envelope?,
     override val volume: Float,
 ) : SoundGenerator {
-
     override val index: Int = 0
     override val name: String = "Silence"
     override val frequency: Float = note.frequency
@@ -193,7 +197,6 @@ class Noise2(
     override val envelope: Envelope?,
     override val volume: Float,
 ) : SoundGenerator {
-
     override val index: Int = 4
     override val name: String = "Noise"
     override val frequency: Float = note.frequency
@@ -229,7 +232,6 @@ class Envelope(
      */
     val release: Seconds,
 ) {
-
     private val endOfAttackIndex = (attack * SAMPLE_RATE).toInt()
 
     private val decayDuration = (decay * SAMPLE_RATE).toInt()
@@ -238,7 +240,11 @@ class Envelope(
 
     private val releaseDuration = (release * SAMPLE_RATE).toInt()
 
-    fun apply(sample: Float, index: Int, nbSample: Int): Float {
+    fun apply(
+        sample: Float,
+        index: Int,
+        nbSample: Int,
+    ): Float {
         // attack phase
         if (index <= endOfAttackIndex) {
             val percentAttack = index / endOfAttackIndex.toFloat()

@@ -13,6 +13,5 @@ class TinyException(
     message: String?,
     cause: Throwable?,
 ) : RuntimeException(message, cause) {
-
     val line: String = content.split("\n").getOrNull(lineNumber - 1)?.trim() ?: ""
 }

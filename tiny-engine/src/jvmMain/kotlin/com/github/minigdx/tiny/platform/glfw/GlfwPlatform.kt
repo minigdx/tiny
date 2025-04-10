@@ -55,7 +55,6 @@ class GlfwPlatform(
     private val render: Render = GLRender(KglLwjgl, logger, gameOptions),
     private val jarResourcePrefix: String = "",
 ) : Platform {
-
     private var window: Long = 0
 
     private var lastFrame: Long = getTime()
@@ -110,20 +109,22 @@ class GlfwPlatform(
         // Create the window
         val windowWidth = (gameOptions.width + gameOptions.gutter.first * 2) * gameOptions.zoom
         val windowHeight = (gameOptions.height + gameOptions.gutter.first * 2) * gameOptions.zoom
-        window = GLFW.glfwCreateWindow(
-            windowWidth,
-            windowHeight,
-            "Tiny",
-            MemoryUtil.NULL,
-            MemoryUtil.NULL,
-        )
+        window =
+            GLFW.glfwCreateWindow(
+                windowWidth,
+                windowHeight,
+                "Tiny",
+                MemoryUtil.NULL,
+                MemoryUtil.NULL,
+            )
         if (window == MemoryUtil.NULL) {
             throw IllegalStateException("Failed to create the GLFW window")
         }
 
         // Get the resolution of the primary monitor
-        val vidmode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor())
-            ?: throw IllegalStateException("No primary monitor found")
+        val vidmode =
+            GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor())
+                ?: throw IllegalStateException("No primary monitor found")
         // Center our window
         GLFW.glfwSetWindowPos(
             window,
@@ -203,7 +204,10 @@ class GlfwPlatform(
         return result
     }
 
-    override fun draw(context: RenderContext, frameBuffer: FrameBuffer) {
+    override fun draw(
+        context: RenderContext,
+        frameBuffer: FrameBuffer,
+    ) {
         val image = frameBuffer.generateBuffer()
         render.draw(context, image, frameBuffer.width, frameBuffer.height)
         val imageCopy = image.copyOf()
@@ -213,11 +217,17 @@ class GlfwPlatform(
         lastBuffer = frameBuffer
     }
 
-    override fun draw(context: RenderContext, ops: List<Operation>) {
+    override fun draw(
+        context: RenderContext,
+        ops: List<Operation>,
+    ) {
         render.draw(context, ops)
     }
 
-    override fun drawOffscreen(renderContext: RenderContext, ops: List<Operation>): Frame {
+    override fun drawOffscreen(
+        renderContext: RenderContext,
+        ops: List<Operation>,
+    ): Frame {
         return render.drawOffscreen(renderContext, ops)
     }
 
@@ -227,23 +237,26 @@ class GlfwPlatform(
         val origin = newFile("video", "gif")
 
         logger.info("GLWF") { "Starting to generate GIF in '${origin.absolutePath}' (Wait for it...)" }
-        val buffer = mutableListOf<IntArray>().apply {
-            addAll(gifFrameCache)
-        }
+        val buffer =
+            mutableListOf<IntArray>().apply {
+                addAll(gifFrameCache)
+            }
 
         recordScope.launch {
             val now = System.currentTimeMillis()
-            val options = ImageOptions().apply {
-                this.setDelay(20, TimeUnit.MILLISECONDS)
-            }
+            val options =
+                ImageOptions().apply {
+                    this.setDelay(20, TimeUnit.MILLISECONDS)
+                }
             ByteArrayOutputStream().use { out ->
-                val encoder = FastGifEncoder(
-                    out,
-                    gameOptions.width,
-                    gameOptions.height,
-                    0,
-                    gameOptions.colors(),
-                )
+                val encoder =
+                    FastGifEncoder(
+                        out,
+                        gameOptions.width,
+                        gameOptions.height,
+                        0,
+                        gameOptions.colors(),
+                    )
 
                 buffer.forEach { img ->
                     encoder.addImage(img, gameOptions.width, options)
@@ -255,7 +268,10 @@ class GlfwPlatform(
         }
     }
 
-    private fun newFile(prefixName: String, extension: String): File {
+    private fun newFile(
+        prefixName: String,
+        extension: String,
+    ): File {
         var index = 0
         var origin = workdirectory.resolve("output_${index.toString().padStart(3, '0')}.$extension")
         while (origin.exists()) {
@@ -282,12 +298,13 @@ class GlfwPlatform(
 
             for (y in 0 until height) {
                 for (x in 0 until width) {
-                    val colorData = buffer.gamePalette.getRGBA(
-                        buffer.pixel(
-                            x = buffer.camera.x + x,
-                            y = buffer.camera.y + y,
-                        ),
-                    )
+                    val colorData =
+                        buffer.gamePalette.getRGBA(
+                            buffer.pixel(
+                                x = buffer.camera.x + x,
+                                y = buffer.camera.y + y,
+                            ),
+                        )
                     val r = colorData[0].toInt() and 0xff
                     val g = colorData[1].toInt() and 0xff
                     val b = colorData[2].toInt() and 0xff
@@ -326,12 +343,16 @@ class GlfwPlatform(
         return ImageData(result, width, height)
     }
 
-    override fun createByteArrayStream(name: String, canUseJarPrefix: Boolean): SourceStream<ByteArray> {
-        val resourceName = if (canUseJarPrefix) {
-            "$jarResourcePrefix/$name"
-        } else {
-            "/$name"
-        }
+    override fun createByteArrayStream(
+        name: String,
+        canUseJarPrefix: Boolean,
+    ): SourceStream<ByteArray> {
+        val resourceName =
+            if (canUseJarPrefix) {
+                "$jarResourcePrefix/$name"
+            } else {
+                "/$name"
+            }
 
         val fromJar = GlfwPlatform::class.java.getResourceAsStream(resourceName)
         return if (fromJar != null) {
@@ -341,9 +362,11 @@ class GlfwPlatform(
         }
     }
 
-    override fun createImageStream(name: String, canUseJarPrefix: Boolean): SourceStream<ImageData> {
+    override fun createImageStream(
+        name: String,
+        canUseJarPrefix: Boolean,
+    ): SourceStream<ImageData> {
         return object : SourceStream<ImageData> {
-
             private val delegate = createByteArrayStream(name, canUseJarPrefix)
 
             override suspend fun exists(): Boolean = delegate.exists()

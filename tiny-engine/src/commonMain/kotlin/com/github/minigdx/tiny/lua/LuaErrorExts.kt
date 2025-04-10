@@ -8,11 +8,12 @@ fun LuaError.errorLine(): Pair<Int, String>? {
         val separator = fileline.lastIndexOf(':')
         val lineNumber = fileline.substring(separator + 1).toInt()
 
-        val line = if (fileline.startsWith("@")) {
-            "into the file $fileline"
-        } else {
-            fileline.lines()[lineNumber - 1]
-        }
+        val line =
+            if (fileline.startsWith("@")) {
+                "into the file $fileline"
+            } else {
+                fileline.lines()[lineNumber - 1]
+            }
         lineNumber to line
     }
 }

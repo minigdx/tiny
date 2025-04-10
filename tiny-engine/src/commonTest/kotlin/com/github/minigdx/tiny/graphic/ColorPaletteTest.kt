@@ -4,7 +4,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class ColorPaletteTest {
-
     private val palette = ColorPalette(listOf("#FF0000", "#00FF00", "#0000FF"))
 
     @Test

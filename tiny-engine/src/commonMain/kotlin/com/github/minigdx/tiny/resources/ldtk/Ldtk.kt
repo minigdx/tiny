@@ -75,11 +75,12 @@ data class Ldtk(
 ) {
     companion object {
         fun read(content: String): Ldtk {
-            val json = Json {
-                allowStructuredMapKeys = true
-                ignoreUnknownKeys = true
-                classDiscriminator = "__type"
-            }
+            val json =
+                Json {
+                    allowStructuredMapKeys = true
+                    ignoreUnknownKeys = true
+                    classDiscriminator = "__type"
+                }
             return json.decodeFromString(Ldtk.serializer(), content)
         }
     }
@@ -96,7 +97,6 @@ data class Level(
 
 @Serializable
 sealed interface Layer {
-
     val __identifier: String
     val __cWid: GridInt
     val __cHei: GridInt
@@ -197,17 +197,14 @@ data class Tile(
      * Examples: f=0 (no flip), f=1 (X flip only), f=2 (Y flip only), f=3 (both flips)
      */
     val f: Int,
-
     /**
      * Pixel coordinates of the tile in the layer ([x,y] format). Don't forget optional layer offsets, if they exist!
      */
     val px: PixelCoord,
-
     /**
      * Pixel coordinates of the tile in the tileset ([x,y] format)
      */
     val src: PixelCoord,
-
     /**
      * The Tile ID in the corresponding tileset.
      */

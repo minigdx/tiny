@@ -2,6 +2,7 @@ package com.github.minigdx.tiny.cli.command
 
 import com.github.ajalt.clikt.core.Abort
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.default
 import com.github.ajalt.clikt.parameters.types.file
@@ -19,8 +20,7 @@ import kotlinx.serialization.json.decodeFromStream
 import org.luaj.vm2.LuaError
 import java.io.File
 
-class SfxCommand : CliktCommand(name = "sfx", help = "Start the SFX Editor") {
-
+class SfxCommand : CliktCommand(name = "sfx") {
     val gameDirectory by argument(help = "The directory containing all game information")
         .file(mustExist = true, canBeDir = true, canBeFile = false)
         .default(File("."))
@@ -34,6 +34,8 @@ class SfxCommand : CliktCommand(name = "sfx", help = "Start the SFX Editor") {
         val os = System.getProperty("os.name").lowercase()
         return os.contains("mac") || os.contains("darwin")
     }
+
+    override fun help(context: Context) = "Start the SFX Editor"
 
     override fun run() {
         if (isMacOS() && isOracleOrOpenJDK()) {
@@ -55,9 +57,10 @@ class SfxCommand : CliktCommand(name = "sfx", help = "Start the SFX Editor") {
             val gameConfig = gameDirectory.resolve("_tiny.json")
             if (gameConfig.exists()) {
                 val parameters = GameParameters.read(gameConfig)
-                WorkspaceLib.DEFAULT = parameters.toGameOptions().sounds.map {
-                    JvmLocalFile(it, gameDirectory)
-                }
+                WorkspaceLib.DEFAULT =
+                    parameters.toGameOptions().sounds.map {
+                        JvmLocalFile(it, gameDirectory)
+                    }
             } else {
                 WorkspaceLib.DEFAULT = listOf(JvmLocalFile("sfx1.sfx", workingDirectory = gameDirectory))
             }
@@ -65,19 +68,21 @@ class SfxCommand : CliktCommand(name = "sfx", help = "Start the SFX Editor") {
             val logger = StdOutLogger("tiny-cli")
             val vfs = CommonVirtualFileSystem()
             val commandOptions = commandParameters.toGameOptions()
-            val gameEngine = GameEngine(
-                gameOptions = commandOptions,
-                platform = GlfwPlatform(
-                    commandOptions,
-                    logger,
-                    vfs,
-                    File("."),
-                    LwjglGLRender(logger, commandOptions),
-                    jarResourcePrefix = "/sfx",
-                ),
-                vfs = vfs,
-                logger = logger,
-            )
+            val gameEngine =
+                GameEngine(
+                    gameOptions = commandOptions,
+                    platform =
+                        GlfwPlatform(
+                            commandOptions,
+                            logger,
+                            vfs,
+                            File("."),
+                            LwjglGLRender(logger, commandOptions),
+                            jarResourcePrefix = "/sfx",
+                        ),
+                    vfs = vfs,
+                    logger = logger,
+                )
             Runtime.getRuntime().addShutdownHook(
                 Thread {
                     gameEngine.end()

@@ -2,6 +2,7 @@ package com.github.minigdx.tiny.cli.command
 
 import com.github.ajalt.clikt.core.Abort
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.default
 import com.github.ajalt.clikt.parameters.options.default
@@ -35,14 +36,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.luaj.vm2.LuaError
 import java.io.File
 import kotlin.time.ExperimentalTime
 
-class RunCommand : CliktCommand(name = "run", help = "Run your game.") {
-
+class RunCommand : CliktCommand(name = "run") {
     val gameDirectory by argument(help = "The directory containing all game information.")
         .file(mustExist = true, canBeDir = true, canBeFile = false)
         .default(File("."))
@@ -53,6 +52,8 @@ class RunCommand : CliktCommand(name = "run", help = "Run your game.") {
     val debug by option(help = "Port used for debugging")
         .int()
         .default(8080)
+
+    override fun help(context: Context) = "Run your game."
 
     private fun isOracleOrOpenJDK(): Boolean {
         val vendor = System.getProperty("java.vendor")?.lowercase()
@@ -78,12 +79,8 @@ class RunCommand : CliktCommand(name = "run", help = "Run your game.") {
         val engineCommandSender = Channel<EngineRemoteCommand>()
 
         embeddedServer(
-            Netty,
+            factory = Netty,
             port = debug,
-            configure = {
-                shutdownTimeout = 0
-                shutdownGracePeriod = 0
-            },
         ) {
             install(WebSockets)
 
@@ -118,37 +115,42 @@ class RunCommand : CliktCommand(name = "run", help = "Run your game.") {
             val logger = StdOutLogger("tiny-cli", level = LogLevel.DEBUG)
 
             val vfs = CommonVirtualFileSystem()
-            val gameOption = gameParameters.toGameOptions()
-                .copy(runTests = test)
+            val gameOption =
+                gameParameters.toGameOptions()
+                    .copy(runTests = test)
 
             val debugListener = DebuggerExecutionListener(debugCommandReceiver, engineCommandSender)
 
-            val gameEngine = GameEngine(
-                gameOptions = gameOption,
-                platform = GlfwPlatform(gameOption, logger, vfs, gameDirectory, LwjglGLRender(logger, gameOption)),
-                vfs = vfs,
-                logger = logger,
-                listener = object : GameEngineListener {
-
-                    override fun switchScript(before: GameScript?, after: GameScript?) {
-                        if (after != null) {
-                            debugListener.globals = after.globals!!
-                            debugListener.globals.debuglib = debugListener
-                        }
-                    }
-
-                    override fun reload(gameScript: GameScript?) {
-                        gameScript?.run {
-                            debugListener.globals = gameScript.globals!!
-                            debugListener.globals.debuglib = debugListener
-
-                            CoroutineScope(Dispatchers.IO).launch {
-                                engineCommandSender.send(Reload(gameScript.name))
+            val gameEngine =
+                GameEngine(
+                    gameOptions = gameOption,
+                    platform = GlfwPlatform(gameOption, logger, vfs, gameDirectory, LwjglGLRender(logger, gameOption)),
+                    vfs = vfs,
+                    logger = logger,
+                    listener =
+                        object : GameEngineListener {
+                            override fun switchScript(
+                                before: GameScript?,
+                                after: GameScript?,
+                            ) {
+                                if (after != null) {
+                                    debugListener.globals = after.globals!!
+                                    debugListener.globals.debuglib = debugListener
+                                }
                             }
-                        }
-                    }
-                },
-            )
+
+                            override fun reload(gameScript: GameScript?) {
+                                gameScript?.run {
+                                    debugListener.globals = gameScript.globals!!
+                                    debugListener.globals.debuglib = debugListener
+
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        engineCommandSender.send(Reload(gameScript.name))
+                                    }
+                                }
+                            }
+                        },
+                )
             Runtime.getRuntime().addShutdownHook(
                 Thread {
                     gameEngine.end()
@@ -162,7 +164,11 @@ class RunCommand : CliktCommand(name = "run", help = "Run your game.") {
             }
             gameEngine.main()
         } catch (ex: Exception) {
-            echo("\uD83E\uDDE8 An unexpected exception occurred. The application will stop. It might be a bug in Tiny. If so, please report it.")
+            echo(
+                "\uD83E\uDDE8 An unexpected exception occurred. " +
+                    "The application will stop. It might be a bug in Tiny. " +
+                    "If so, please report it.",
+            )
             when (ex) {
                 // FIXME: catch TinyException?
                 is LuaError -> {

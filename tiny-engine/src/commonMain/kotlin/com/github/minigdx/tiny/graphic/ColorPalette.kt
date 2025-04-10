@@ -14,7 +14,6 @@ import kotlin.math.abs
  *
  */
 class ColorPalette(colors: List<HexColor>) {
-
     private val rgba: Array<ByteArray>
     private val rgb: Array<ByteArray>
     private val rgbForGif: Array<Int>
@@ -27,18 +26,20 @@ class ColorPalette(colors: List<HexColor>) {
         val rgbaColors = listOf(TRANSPARENT) + colors.map { str -> hexStringToByteArray(str) }
 
         rgba = Array(rgbaColors.size) { index -> rgbaColors[index] }
-        rgb = Array(rgbaColors.size) { index ->
-            val bytes = rgbaColors[index]
-            byteArrayOf(bytes[0], bytes[1], bytes[2])
-        }
+        rgb =
+            Array(rgbaColors.size) { index ->
+                val bytes = rgbaColors[index]
+                byteArrayOf(bytes[0], bytes[1], bytes[2])
+            }
 
-        rgbForGif = rgb.map { color ->
-            val r = color[0].toInt()
-            val g = color[1].toInt()
-            val b = color[2].toInt()
-            val rgb = ((r and 0xFF) shl 16) or ((g and 0xFF) shl 8) or (b and 0xFF)
-            rgb
-        }.toTypedArray()
+        rgbForGif =
+            rgb.map { color ->
+                val r = color[0].toInt()
+                val g = color[1].toInt()
+                val b = color[2].toInt()
+                val rgb = ((r and 0xFF) shl 16) or ((g and 0xFF) shl 8) or (b and 0xFF)
+                rgb
+            }.toTypedArray()
 
         size = rgba.size
     }
@@ -57,7 +58,16 @@ class ColorPalette(colors: List<HexColor>) {
         return byteArrayOf(red.toByte(), green.toByte(), blue.toByte(), alpha.toByte())
     }
 
-    private fun dst(r1: Byte, g1: Byte, b1: Byte, a1: Byte, r2: Byte, g2: Byte, b2: Byte, a2: Byte): Int {
+    private fun dst(
+        r1: Byte,
+        g1: Byte,
+        b1: Byte,
+        a1: Byte,
+        r2: Byte,
+        g2: Byte,
+        b2: Byte,
+        a2: Byte,
+    ): Int {
         val r = (r1.toUByte() - r2.toUByte()) * (r1.toUByte() - r2.toUByte())
         val g = (g1.toUByte() - g2.toUByte()) * (g1.toUByte() - g2.toUByte())
         val b = (b1.toUByte() - b2.toUByte()) * (b1.toUByte() - b2.toUByte())
@@ -107,16 +117,17 @@ class ColorPalette(colors: List<HexColor>) {
         var index = 0
         // Look for the index with the closest color.
         rgba.forEachIndexed { i, palette ->
-            val d = dst(
-                palette[0],
-                palette[1],
-                palette[2],
-                palette[3],
-                color[0],
-                color[1],
-                color[2],
-                color[3],
-            )
+            val d =
+                dst(
+                    palette[0],
+                    palette[1],
+                    palette[2],
+                    palette[3],
+                    color[0],
+                    color[1],
+                    color[2],
+                    color[3],
+                )
             if (d < current) {
                 index = i
                 current = d

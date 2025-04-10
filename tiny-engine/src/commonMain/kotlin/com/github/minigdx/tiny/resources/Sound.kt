@@ -10,7 +10,6 @@ data class Sound(
     override val type: ResourceType = ResourceType.GAME_SOUND,
     override var reload: Boolean = false,
 ) : GameResource {
-
     fun play() {
         data.sound.play()
     }

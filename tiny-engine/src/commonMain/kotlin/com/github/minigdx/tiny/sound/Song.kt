@@ -16,7 +16,6 @@ data class Track(
     val envelope: Envelope? = null,
     val modulation: Modulation? = null,
 ) {
-
     private val samplePerBeat = (beatDuration * SAMPLE_RATE).toInt()
     private val samplePerPattern = samplePerBeat * 32
 
@@ -84,37 +83,45 @@ class Song2(
     override fun toString(): String {
         val header = "tiny-sfx $bpm ${(volume * 255).toInt()}\n"
 
-        val tracks = tracks.map { track ->
+        val tracks =
+            tracks.map { track ->
 
-            var trackHeader = "${track.patterns.size} "
-            trackHeader += if (track.envelope == null) {
-                "00 00 00 00 00"
-            } else {
-                "01 " +
-                    "${track.envelope.attack.toHex()} " +
-                    "${track.envelope.decay.toHex()} " +
-                    "${track.envelope.sustain.toHex()} " +
-                    "${track.envelope.release.toHex()} "
-            }
+                var trackHeader = "${track.patterns.size} "
+                trackHeader +=
+                    if (track.envelope == null) {
+                        "00 00 00 00 00"
+                    } else {
+                        "01 " +
+                            "${track.envelope.attack.toHex()} " +
+                            "${track.envelope.decay.toHex()} " +
+                            "${track.envelope.sustain.toHex()} " +
+                            "${track.envelope.release.toHex()} "
+                    }
 
-            trackHeader += when (track.modulation) {
-                is Sweep -> "01 ${Note.fromFrequency(track.modulation.sweep).index.toHex()} ${track.modulation.acceleration.toHex()} 00 00"
-                is Vibrato -> "02 ${Note.fromFrequency(track.modulation.vibratoFrequency).index.toHex()} ${track.modulation.depth.toHex()} 00 00"
-                else -> "00 00 00 00 00"
-            }
+                trackHeader +=
+                    when (track.modulation) {
+                        is Sweep ->
+                            "01 ${Note.fromFrequency(track.modulation.sweep).index.toHex()} " +
+                                "${track.modulation.acceleration.toHex()} 00 00"
+                        is Vibrato ->
+                            "02 ${Note.fromFrequency(track.modulation.vibratoFrequency).index.toHex()} " +
+                                "${track.modulation.depth.toHex()} 00 00"
+                        else -> "00 00 00 00 00"
+                    }
 
-            val patternsInOrder = track.patterns.map { it }.sortedBy { it.key }.map { it.value }
-            val patternsStr = patternsInOrder.joinToString("\n") { pattern ->
-                pattern.notes.joinToString(" ") { wave ->
-                    wave.index.toHex() +
-                        wave.note.index.toHex() +
-                        wave.volume.toHex()
-                }
-            }
+                val patternsInOrder = track.patterns.map { it }.sortedBy { it.key }.map { it.value }
+                val patternsStr =
+                    patternsInOrder.joinToString("\n") { pattern ->
+                        pattern.notes.joinToString(" ") { wave ->
+                            wave.index.toHex() +
+                                wave.note.index.toHex() +
+                                wave.volume.toHex()
+                        }
+                    }
 
-            val patternOrder = track.music.map { it.index }.joinToString(" ")
-            trackHeader + ("\n" + patternsStr + "\n" + patternOrder).ifBlank { "" }
-        }.joinToString("\n")
+                val patternOrder = track.music.map { it.index }.joinToString(" ")
+                trackHeader + ("\n" + patternsStr + "\n" + patternOrder).ifBlank { "" }
+            }.joinToString("\n")
         return header + tracks
     }
 }

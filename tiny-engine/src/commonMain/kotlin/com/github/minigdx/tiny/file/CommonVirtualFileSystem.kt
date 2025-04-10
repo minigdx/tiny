@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.flow
 import kotlin.time.Duration.Companion.seconds
 
 class CommonVirtualFileSystem : VirtualFileSystem {
-
     private val delay = 1.seconds
+
     override fun <T> watch(source: SourceStream<T>): Flow<T> {
         return flow {
             if (source.exists()) {
@@ -23,7 +23,10 @@ class CommonVirtualFileSystem : VirtualFileSystem {
         }
     }
 
-    override suspend fun save(targetStream: TargetStream<ByteArray>, data: ByteArray) {
+    override suspend fun save(
+        targetStream: TargetStream<ByteArray>,
+        data: ByteArray,
+    ) {
         targetStream.write(data)
     }
 }

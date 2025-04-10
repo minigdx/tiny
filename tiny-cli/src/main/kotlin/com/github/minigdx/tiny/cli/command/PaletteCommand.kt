@@ -1,6 +1,7 @@
 package com.github.minigdx.tiny.cli.command
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
@@ -15,8 +16,7 @@ import com.github.minigdx.tiny.platform.glfw.GlfwPlatform
 import kotlinx.coroutines.runBlocking
 import java.io.File
 
-class PaletteCommand : CliktCommand(name = "palette", help = "Extract the color palette from an image.") {
-
+class PaletteCommand : CliktCommand(name = "palette") {
     val game by option(
         help = "The directory containing all game information",
     )
@@ -33,6 +33,8 @@ class PaletteCommand : CliktCommand(name = "palette", help = "Extract the color 
     val print by option(help = "Print in the console the palette information, without updating the game.")
         .flag()
 
+    override fun help(context: Context) = "Extract the color palette from an image."
+
     override fun run() {
         val tiny = game.resolve("_tiny.json")
         if (!tiny.exists()) {
@@ -42,9 +44,10 @@ class PaletteCommand : CliktCommand(name = "palette", help = "Extract the color 
         val gameParameters = GameParameters.read(tiny)
         val gameOptions = gameParameters.toGameOptions()
         val platform = GlfwPlatform(gameOptions, StdOutLogger("whatever"), CommonVirtualFileSystem(), game)
-        val imageData = runBlocking {
-            platform.createImageStream(image.relativeTo(game).path).read()
-        }
+        val imageData =
+            runBlocking {
+                platform.createImageStream(image.relativeTo(game).path).read()
+            }
 
         val colors = mutableSetOf<String>()
         if (append) {
@@ -77,11 +80,12 @@ class PaletteCommand : CliktCommand(name = "palette", help = "Extract the color 
             return
         }
 
-        val replacedColors = if (append) {
-            gameOptions.palette + extractedColors
-        } else {
-            extractedColors
-        }
+        val replacedColors =
+            if (append) {
+                gameOptions.palette + extractedColors
+            } else {
+                extractedColors
+            }
 
         gameParameters.setPalette(replacedColors).write(tiny)
         echo("\uD83C\uDFA8 Game has been updated with the new color palette (with ${replacedColors.size} colors)")

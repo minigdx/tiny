@@ -20,7 +20,6 @@ import kotlin.random.Random
     "Math functions. Please note that standard Lua math methods are also available.",
 )
 class MathLib : org.luaj.vm2.lib.MathLib() {
-
     @TinyVariable("pi", "value of pi (~3.14)")
     // Provided by Luak Math lib.
     @TinyVariable("huge", "positive infinity value.")
@@ -38,9 +37,10 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
 
     @TinyFunction("Return the sign of the number: -1 if negative. 1 otherwise.", example = MATH_SIGN_EXAMPLE)
     internal inner class sign : OneArgFunction() {
-
         @TinyCall("Return the sign of the number.")
-        override fun call(@TinyArg("number") arg: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("number") arg: LuaValue,
+        ): LuaValue {
             return if (arg.todouble() >= 0) {
                 ONE
             } else {
@@ -51,30 +51,30 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
 
     @TinyFunction("Clamp the value between 2 values.", example = MATH_CLAMP_EXAMPLE)
     internal inner class clamp : ThreeArgFunction() {
-
         @TinyCall("Clamp the value between a and b. If a is greater than b, then b will be returned.")
         override fun call(
             @TinyArg("a", "The minimum value.") arg1: LuaValue,
             @TinyArg("value", "The value to be clamped.") arg2: LuaValue,
             @TinyArg("b", "The maximum value.") arg3: LuaValue,
         ): LuaValue {
-            val max = if (arg1.todouble() > arg2.todouble()) {
-                arg1
-            } else {
-                arg2
-            }
-            val min = if (max.todouble() < arg3.todouble()) {
-                max
-            } else {
-                arg3
-            }
+            val max =
+                if (arg1.todouble() > arg2.todouble()) {
+                    arg1
+                } else {
+                    arg2
+                }
+            val min =
+                if (max.todouble() < arg3.todouble()) {
+                    max
+                } else {
+                    arg3
+                }
             return min
         }
     }
 
     @TinyFunction("Compute the distance between two points.", example = MATH_DST_EXAMPLE)
     internal inner class dst : LibFunction() {
-
         private val dst2 = dst2()
 
         @TinyCall(
@@ -97,7 +97,6 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
         example = MATH_DST2_EXAMPLE,
     )
     internal inner class dst2 : LibFunction() {
-
         @TinyCall(
             description = "Distance not squared between (x1, y1) and (x2, y2).",
         )
@@ -124,7 +123,9 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
             "Generate a random value between 1 until the argument. " +
                 "If a table is passed, it'll return a random element of the table.",
         )
-        override fun call(@TinyArg("until") arg: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("until") arg: LuaValue,
+        ): LuaValue {
             if (arg.isnil()) return call()
             return if (arg.istable()) {
                 val table = arg.checktable()!!
@@ -144,7 +145,10 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
         }
 
         @TinyCall("Generate a random value between a and b.")
-        override fun call(@TinyArg("a") arg1: LuaValue, @TinyArg("b") arg2: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("a") arg1: LuaValue,
+            @TinyArg("b") arg2: LuaValue,
+        ): LuaValue {
             if (arg2.isnil()) {
                 return call(arg1)
             }
@@ -175,19 +179,23 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
 
     @TinyFunction("Perlin noise. The random generated value is between 0.0 and 1.0.", example = MATH_PERLIN_EXAMPLE)
     inner class perlin(seed: Long) : ThreeArgFunction() {
-
         private val permutation: MutableList<Int>
 
         init {
             val source = (0..255).toList().shuffled(Random(seed))
-            permutation = mutableListOf<Int>().apply {
-                repeat(512) {
-                    add(source[it and 255])
+            permutation =
+                mutableListOf<Int>().apply {
+                    repeat(512) {
+                        add(source[it and 255])
+                    }
                 }
-            }
         }
 
-        fun noise(x: Double, y: Double, z: Double): Double {
+        fun noise(
+            x: Double,
+            y: Double,
+            z: Double,
+        ): Double {
             val xi = floor(x).toInt() and 255
             val yi = floor(y).toInt() and 255
             val zi = floor(z).toInt() and 255
@@ -228,14 +236,30 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
             return (num + 1) and 255
         }
 
-        private fun grad(hash: Int, x: Double, y: Double, z: Double): Double {
+        private fun grad(
+            hash: Int,
+            x: Double,
+            y: Double,
+            z: Double,
+        ): Double {
             val h = hash and 15
             val u = if (h < 8) x else y
-            val v = if (h < 4) y else if (h == 12 || h == 14) x else z
+            val v =
+                if (h < 4) {
+                    y
+                } else if (h == 12 || h == 14) {
+                    x
+                } else {
+                    z
+                }
             return (if (h and 1 == 0) u else -u) + (if (h and 2 == 0) v else -v)
         }
 
-        private fun lerp(a: Double, b: Double, t: Double): Double {
+        private fun lerp(
+            a: Double,
+            b: Double,
+            t: Double,
+        ): Double {
             return a + t * (b - a)
         }
 
@@ -250,7 +274,6 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
     }
 
     companion object {
-
         private val MINUS_ONE = valueOf(-1)
     }
 }

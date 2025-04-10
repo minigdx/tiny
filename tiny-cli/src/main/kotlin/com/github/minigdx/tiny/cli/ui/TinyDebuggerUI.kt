@@ -67,7 +67,6 @@ class TinyDebuggerUI(
     private val engineCommandReceiver: ReceiveChannel<EngineRemoteCommand>,
     private var gameParameters: GameParameters,
 ) : JFrame("\uD83E\uDDF8 Tiny Debugger") {
-
     private val tabbedPane = JTabbedPane()
 
     private val tableModel = DefaultTableModel(arrayOf("Name", "Value"), 0)
@@ -89,7 +88,7 @@ class TinyDebuggerUI(
         )
         add(
             JPanel(BorderLayout()).apply {
-                add(Toolbar(), BorderLayout.PAGE_START)
+                add(toolbar(), BorderLayout.PAGE_START)
                 add(JScrollPane(table), BorderLayout.CENTER)
             }.apply {
                 preferredSize = Dimension(200, 600)
@@ -97,14 +96,16 @@ class TinyDebuggerUI(
         )
 
         io.launch {
-            val scriptsContent = gameParameters.getAllScripts()
-                .map { it to File(it).readText() }
+            val scriptsContent =
+                gameParameters.getAllScripts()
+                    .map { it to File(it).readText() }
 
             SwingUtilities.invokeLater {
-                val breakpointIcon = ImageIO.read(TinyDebuggerUI::class.java.getResource("/icons/flag_square.png"))
-                    .let { recolorImage(it, LIGHT_RED) }
-                    .getScaledInstance(16, 16, 0)
-                    .let { ImageIcon(it) }
+                val breakpointIcon =
+                    ImageIO.read(TinyDebuggerUI::class.java.getResource("/icons/flag_square.png"))
+                        .let { recolorImage(it, LIGHT_RED) }
+                        .getScaledInstance(16, 16, 0)
+                        .let { ImageIcon(it) }
 
                 scriptsContent.forEach { (scriptName, scriptContent) ->
                     addScriptTab(scriptName, scriptContent, breakpointIcon)
@@ -128,30 +129,34 @@ class TinyDebuggerUI(
                             }
                         }
                     }
-                    is Reload -> SwingUtilities.invokeLater {
-                        val textArea = textAreas[command.script]!!
-                        textArea.text = File(command.script).readText()
-                    }
+                    is Reload ->
+                        SwingUtilities.invokeLater {
+                            val textArea = textAreas[command.script]!!
+                            textArea.text = File(command.script).readText()
+                        }
                 }
             }
         }
     }
 
-    private fun Toolbar(): Component {
-        val iconDisconnect = ImageIO.read(TinyDebuggerUI::class.java.getResource("/icons/character_remove.png"))
-            .let { recolorImage(it, LIGHT_GREY) }
-            .getScaledInstance(24, 24, 0)
-            .let { ImageIcon(it) }
+    private fun toolbar(): Component {
+        val iconDisconnect =
+            ImageIO.read(TinyDebuggerUI::class.java.getResource("/icons/character_remove.png"))
+                .let { recolorImage(it, LIGHT_GREY) }
+                .getScaledInstance(24, 24, 0)
+                .let { ImageIcon(it) }
 
-        val iconResume = ImageIO.read(TinyDebuggerUI::class.java.getResource("/icons/pawn_right.png"))
-            .let { recolorImage(it, LIGHT_GREY) }
-            .getScaledInstance(24, 24, 0)
-            .let { ImageIcon(it) }
+        val iconResume =
+            ImageIO.read(TinyDebuggerUI::class.java.getResource("/icons/pawn_right.png"))
+                .let { recolorImage(it, LIGHT_GREY) }
+                .getScaledInstance(24, 24, 0)
+                .let { ImageIcon(it) }
 
-        val iconStep = ImageIO.read(TinyDebuggerUI::class.java.getResource("/icons/pawn_skip.png"))
-            .let { recolorImage(it, LIGHT_GREY) }
-            .getScaledInstance(24, 24, 0)
-            .let { ImageIcon(it) }
+        val iconStep =
+            ImageIO.read(TinyDebuggerUI::class.java.getResource("/icons/pawn_skip.png"))
+                .let { recolorImage(it, LIGHT_GREY) }
+                .getScaledInstance(24, 24, 0)
+                .let { ImageIcon(it) }
 
         return JPanel().apply {
             contentPane.layout = BoxLayout(contentPane, BoxLayout.X_AXIS)
@@ -201,7 +206,10 @@ class TinyDebuggerUI(
         }
     }
 
-    private fun RSyntaxTextArea.highlightLine(lineNumber: Int, color: Color) {
+    private fun RSyntaxTextArea.highlightLine(
+        lineNumber: Int,
+        color: Color,
+    ) {
         try {
             // Convert line number to offset
             val start = this.getLineStartOffset(lineNumber - 1)
@@ -217,14 +225,19 @@ class TinyDebuggerUI(
         }
     }
 
-    private fun addScriptTab(scriptName: String, scriptContent: String, bookmarkIcon: Icon) {
-        val textArea = RSyntaxTextArea(20, 60).apply {
-            syntaxEditingStyle = SyntaxConstants.SYNTAX_STYLE_LUA
-            isCodeFoldingEnabled = true
-            isEditable = false
-            text = scriptContent
-            highlightCurrentLine = false
-        }
+    private fun addScriptTab(
+        scriptName: String,
+        scriptContent: String,
+        bookmarkIcon: Icon,
+    ) {
+        val textArea =
+            RSyntaxTextArea(20, 60).apply {
+                syntaxEditingStyle = SyntaxConstants.SYNTAX_STYLE_LUA
+                isCodeFoldingEnabled = true
+                isEditable = false
+                text = scriptContent
+                highlightCurrentLine = false
+            }
         textAreas[scriptName] = textArea
 
         val scrollPane = RTextScrollPane(textArea)
@@ -233,9 +246,10 @@ class TinyDebuggerUI(
         scrollPane.gutter.addIconRowListener(GutterListener(scriptName))
         scrollPane.gutter.addLineNumberListener(LineNumberListener(scrollPane))
 
-        val panel = JPanel(BorderLayout()).apply {
-            add(scrollPane, BorderLayout.CENTER)
-        }
+        val panel =
+            JPanel(BorderLayout()).apply {
+                add(scrollPane, BorderLayout.CENTER)
+            }
 
         tabbedPane.addTab(scriptName, panel)
     }
@@ -254,7 +268,10 @@ class TinyDebuggerUI(
         }
 
         @Throws(BadLocationException::class)
-        private fun viewToModelLine(textArea: RTextArea, p: Point): Int {
+        private fun viewToModelLine(
+            textArea: RTextArea,
+            p: Point,
+        ): Int {
             val offs: Int = textArea.viewToModel2D(p)
             return if (offs > -1) textArea.getLineOfOffset(offs) else -1
         }
@@ -308,10 +325,11 @@ class TinyDebuggerUI(
                     newImage.setRGB(x, y, originalPixelARGB)
                 } else {
                     // Create new pixel value: (alpha << 24) | (red << 16) | (green << 8) | blue
-                    val newPixelARGB = (originalAlpha shl 24) or
-                        (targetColor.red shl 16) or
-                        (targetColor.green shl 8) or
-                        targetColor.blue
+                    val newPixelARGB =
+                        (originalAlpha shl 24) or
+                            (targetColor.red shl 16) or
+                            (targetColor.green shl 8) or
+                            targetColor.blue
                     newImage.setRGB(x, y, newPixelARGB)
                 }
             }

@@ -7,7 +7,6 @@ import org.w3c.dom.get
 import kotlin.js.Date
 
 class EditorStream(field: String) : SourceStream<ByteArray> {
-
     private val exist: Boolean
     private var updated: Boolean = false
     private var timeout: Double = 0.0
@@ -25,7 +24,7 @@ class EditorStream(field: String) : SourceStream<ByteArray> {
             textarea.addEventListener("input", {
                 updated = true
                 timeout = Date.now() + 1500 // add 1.5 second
-            }, null,)
+            }, null)
         }
         share = document.getElementById(field.replace("#editor", "share")) as? HTMLAnchorElement
     }

@@ -7,9 +7,9 @@ import com.github.minigdx.tiny.input.TouchSignal
 import com.github.minigdx.tiny.input.Vector2
 
 class VirtualInputHandler : InputHandler, InputManager {
-
     private val previousFrame: MutableSet<Key> = mutableSetOf()
     private var pressed: MutableSet<Key> = mutableSetOf()
+
     fun press(key: Key) {
         pressed.add(key)
         previousFrame.add(key)

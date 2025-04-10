@@ -1,6 +1,7 @@
 package com.github.minigdx.tiny.cli.command
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.default
 import com.github.ajalt.clikt.parameters.options.default
@@ -16,8 +17,7 @@ import java.io.FileOutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
-class ExportCommand : CliktCommand(name = "export", help = "Export your game as a web game.") {
-
+class ExportCommand : CliktCommand(name = "export") {
     val gameDirectory by argument(help = "The directory containing all game information")
         .file(mustExist = true, canBeDir = true, canBeFile = false)
         .default(File("."))
@@ -26,6 +26,8 @@ class ExportCommand : CliktCommand(name = "export", help = "Export your game as 
         .default("tiny-export.zip")
 
     private val gameExporter = GameExporter()
+
+    override fun help(context: Context) = "Export your game as a web game."
 
     override fun run() {
         echo("\uD83D\uDC77 Export ${gameDirectory.absolutePath}")
@@ -37,8 +39,10 @@ class ExportCommand : CliktCommand(name = "export", help = "Export your game as 
 }
 
 class GameExporter {
-
-    fun export(gameDirectory: File, archive: String) {
+    fun export(
+        gameDirectory: File,
+        archive: String,
+    ) {
         val configFile = gameDirectory.resolve("_tiny.json")
         val gameParameters = JSON.decodeFromStream<GameParameters>(FileInputStream(configFile))
 
@@ -97,8 +101,20 @@ class GameExporter {
                 template = template.replace("{GAME_SPRH}", gameParameters.sprites.height.toString())
                 template = template.replace("{GAME_HIDE_MOUSE}", gameParameters.hideMouseCursor.toString())
 
-                template = replaceList(template, (gameParameters.scripts + gameParameters.libraries.map { "$it.lua" }), "{GAME_SCRIPT}", "GAME_SCRIPT")
-                template = replaceList(template, gameParameters.spritesheets, "{GAME_SPRITESHEET}", "GAME_SPRITESHEET")
+                template =
+                    replaceList(
+                        template,
+                        (gameParameters.scripts + gameParameters.libraries.map { "$it.lua" }),
+                        "{GAME_SCRIPT}",
+                        "GAME_SCRIPT",
+                    )
+                template =
+                    replaceList(
+                        template,
+                        gameParameters.spritesheets,
+                        "{GAME_SPRITESHEET}",
+                        "GAME_SPRITESHEET",
+                    )
                 template = replaceList(template, gameParameters.levels, "{GAME_LEVEL}", "GAME_LEVEL")
                 template = replaceList(template, gameParameters.sounds, "{GAME_SOUND}", "GAME_SOUND")
 
@@ -113,7 +129,12 @@ class GameExporter {
         exportedGame.close()
     }
 
-    private fun replaceList(template: String, values: List<String>, tag: String, delimiter: String): String {
+    private fun replaceList(
+        template: String,
+        values: List<String>,
+        tag: String,
+        delimiter: String,
+    ): String {
         val pattern = ("<!-- $delimiter -->(.*?)<!-- ${delimiter}_END -->").toRegex(RegexOption.DOT_MATCHES_ALL)
         val delimiterTag = pattern.find(template)!!.groupValues[1]
 
@@ -125,11 +146,12 @@ class GameExporter {
     }
 
     companion object {
-        val ENGINE_FILES = listOf(
-            "_boot.lua",
-            "_boot.png",
-            "_engine.lua",
-            "tiny-engine.js",
-        )
+        val ENGINE_FILES =
+            listOf(
+                "_boot.lua",
+                "_boot.png",
+                "_engine.lua",
+                "tiny-engine.js",
+            )
     }
 }

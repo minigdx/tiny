@@ -17,38 +17,47 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class SfxLibTest {
+    private val mockResources =
+        object : GameResourceAccess {
+            override val bootSpritesheet: SpriteSheet =
+                SpriteSheet(
+                    0,
+                    0,
+                    "boot",
+                    ResourceType.BOOT_SPRITESHEET,
+                    PixelArray(1, 1, PixelFormat.INDEX),
+                    1,
+                    1,
+                )
+            override val frameBuffer: FrameBuffer = FrameBuffer(10, 10, ColorPalette(emptyList()))
 
-    private val mockResources = object : GameResourceAccess {
-        override val bootSpritesheet: SpriteSheet = SpriteSheet(
-            0,
-            0,
-            "boot",
-            ResourceType.BOOT_SPRITESHEET,
-            PixelArray(1, 1, PixelFormat.INDEX),
-            1,
-            1,
-        )
-        override val frameBuffer: FrameBuffer = FrameBuffer(10, 10, ColorPalette(emptyList()))
-        override fun spritesheet(index: Int): SpriteSheet? = null
-        override fun spritesheet(name: String): Int? = null
+            override fun spritesheet(index: Int): SpriteSheet? = null
 
-        override fun spritesheet(sheet: SpriteSheet) = Unit
-        override fun newSpritesheetIndex(): Int = 0
+            override fun spritesheet(name: String): Int? = null
 
-        override fun level(index: Int): GameLevel? = null
-        override fun sound(index: Int): Sound? = null
-        override fun script(name: String): GameScript? = null
-        override fun drawOffscreen(): Frame {
-            TODO("Not yet implemented")
+            override fun spritesheet(sheet: SpriteSheet) = Unit
+
+            override fun newSpritesheetIndex(): Int = 0
+
+            override fun level(index: Int): GameLevel? = null
+
+            override fun sound(index: Int): Sound? = null
+
+            override fun script(name: String): GameScript? = null
+
+            override fun drawOffscreen(): Frame {
+                TODO("Not yet implemented")
+            }
+
+            override fun note(wave: WaveGenerator) = Unit
+
+            override fun sfx(song: Song2) = Unit
         }
-
-        override fun note(wave: WaveGenerator) = Unit
-        override fun sfx(song: Song2) = Unit
-    }
 
     @Test
     fun scoreToSong2() {
-        val score = """tiny-sfx 120 255
+        val score =
+            """tiny-sfx 120 255
             |02 00 00 00 00 00 00 00 00 00 00
     |0101FF 0101FF 
     |0101FF 0101FF
@@ -56,7 +65,7 @@ class SfxLibTest {
     |00 00 00 00 00 00 00 00 00 00 00
     |00 00 00 00 00 00 00 00 00 00 00
     |00 00 00 00 00 00 00 00 00 00 00
-        """.trimMargin()
+            """.trimMargin()
 
         val song = SfxLib.convertScoreToSong2(score)
 
@@ -82,28 +91,30 @@ class SfxLibTest {
     fun toScore() {
         val lib = SfxLib(mockResources, false)
         val score = lib.toScore().call(lib.toTable().call(lib.emptyScore().call()))
-        val expectedScore = """tiny-sfx 120 127
+        val expectedScore =
+            """tiny-sfx 120 127
     |1 01 19 00 FF 19 00 00 00 00 00
     |000100 000100 000100 000100 000100 000100 000100 000100 000100 000100 000100 000100 000100 000100 000100 000100
     |1
     |0 01 19 00 FF 19 00 00 00 00 00
     |0 01 19 00 FF 19 00 00 00 00 00
     |0 01 19 00 FF 19 00 00 00 00 00
-        """.trimMargin()
+            """.trimMargin()
 
         assertEquals(expectedScore, score.tojstring())
     }
 
     @Test
     fun createEmptyScore() {
-        val expectedScore = """tiny-sfx 120 127
+        val expectedScore =
+            """tiny-sfx 120 127
     |1 01 19 00 FF 19 00 00 00 00 00
     |000100 000100 000100 000100 000100 000100 000100 000100 000100 000100 000100 000100 000100 000100 000100 000100
     |1
     |0 01 19 00 FF 19 00 00 00 00 00
     |0 01 19 00 FF 19 00 00 00 00 00
     |0 01 19 00 FF 19 00 00 00 00 00
-        """.trimMargin()
+            """.trimMargin()
 
         val score = SfxLib(mockResources, false).emptyScore().call()
         assertEquals(expectedScore, score.tojstring())

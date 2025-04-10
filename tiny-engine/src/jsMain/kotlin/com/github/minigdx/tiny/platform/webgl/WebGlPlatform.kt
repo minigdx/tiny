@@ -37,7 +37,6 @@ class WebGlPlatform(
     override val gameOptions: GameOptions,
     val rootUrl: String,
 ) : Platform {
-
     private lateinit var render: GLRender
 
     private val jsInputHandler = JsInputHandler(canvas, gameOptions)
@@ -56,12 +55,13 @@ class WebGlPlatform(
     }
 
     override fun initRenderManager(windowManager: WindowManager): RenderContext {
-        val context = canvas.getContext("webgl2") as? WebGL2RenderingContext
-            ?: throw IllegalStateException(
-                "The canvas context is expected to be a webgl2 context. " +
-                    "WebGL2 doesn't seems to be supported by your browser. " +
-                    "Please update to a compatible browser to run the game in WebGL2.",
-            )
+        val context =
+            canvas.getContext("webgl2") as? WebGL2RenderingContext
+                ?: throw IllegalStateException(
+                    "The canvas context is expected to be a webgl2 context. " +
+                        "WebGL2 doesn't seems to be supported by your browser. " +
+                        "Please update to a compatible browser to run the game in WebGL2.",
+                )
         render = GLRender(KglJs(context), logger, gameOptions)
         return render.init(windowManager)
     }
@@ -81,12 +81,18 @@ class WebGlPlatform(
         }
     }
 
-    override fun draw(context: RenderContext, frameBuffer: FrameBuffer) {
+    override fun draw(
+        context: RenderContext,
+        frameBuffer: FrameBuffer,
+    ) {
         val image = frameBuffer.generateBuffer()
         render.draw(context, image, frameBuffer.width, frameBuffer.height)
     }
 
-    override fun draw(context: RenderContext, ops: List<Operation>) {
+    override fun draw(
+        context: RenderContext,
+        ops: List<Operation>,
+    ) {
         render.draw(context, ops)
     }
 
@@ -100,11 +106,17 @@ class WebGlPlatform(
         return Dispatchers.Default
     }
 
-    override fun createByteArrayStream(name: String, canUseJarPrefix: Boolean): SourceStream<ByteArray> {
+    override fun createByteArrayStream(
+        name: String,
+        canUseJarPrefix: Boolean,
+    ): SourceStream<ByteArray> {
         return AjaxStream("$rootUrl/$name")
     }
 
-    override fun createImageStream(name: String, canUseJarPrefix: Boolean): SourceStream<ImageData> {
+    override fun createImageStream(
+        name: String,
+        canUseJarPrefix: Boolean,
+    ): SourceStream<ImageData> {
         return ImageDataStream("$rootUrl/$name")
     }
 
@@ -124,7 +136,10 @@ class WebGlPlatform(
         return JsLocalFile(name)
     }
 
-    override fun drawOffscreen(renderContext: RenderContext, ops: List<Operation>): Frame {
+    override fun drawOffscreen(
+        renderContext: RenderContext,
+        ops: List<Operation>,
+    ): Frame {
         return render.drawOffscreen(renderContext, ops)
     }
 }

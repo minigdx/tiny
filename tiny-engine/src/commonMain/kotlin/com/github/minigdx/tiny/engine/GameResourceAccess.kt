@@ -11,15 +11,22 @@ import com.github.minigdx.tiny.sound.Song2
 import com.github.minigdx.tiny.sound.WaveGenerator
 
 sealed interface DebugAction
+
 data class DebugMessage(val mesage: String, val color: String) : DebugAction
+
 data class DebugRect(val x: Int, val y: Int, val width: Int, val height: Int, val color: String, val filed: Boolean = false) : DebugAction
+
 data class DebugPoint(val x: Int, val y: Int, val color: String) : DebugAction
+
 data class DebugLine(val x1: Int, val y1: Int, val x2: Int, val y2: Int, val color: String) : DebugAction
 
 data class DebugEnabled(val enabled: Boolean) : DebugAction
 
 interface Frame {
-    fun get(x: Pixel, y: Pixel): ColorIndex
+    fun get(
+        x: Pixel,
+        y: Pixel,
+    ): ColorIndex
 }
 
 /**
@@ -91,7 +98,10 @@ interface GameResourceAccess {
 }
 
 sealed interface Operation {
-    fun write(index: Int, image: ByteArray): Int
+    fun write(
+        index: Int,
+        image: ByteArray,
+    ): Int
 
     val type: Int
 }
@@ -100,10 +110,12 @@ sealed interface Operation {
  * Set a pixel [color] at the coordinates [x] and [y].
  */
 data class SetPixel(val x: Pixel, val y: Pixel, val color: ColorIndex) : Operation {
-
     override val type: Int = 1
 
-    override fun write(index: Int, image: ByteArray): Int {
+    override fun write(
+        index: Int,
+        image: ByteArray,
+    ): Int {
         var cursor = index
         image[cursor++] = x.toByte()
         image[cursor++] = y.toByte()
@@ -118,7 +130,10 @@ data class SetPixel(val x: Pixel, val y: Pixel, val color: ColorIndex) : Operati
 data class ClearScreen(val color: ColorIndex) : Operation {
     override val type: Int = 0
 
-    override fun write(index: Int, image: ByteArray): Int {
+    override fun write(
+        index: Int,
+        image: ByteArray,
+    ): Int {
         var cursor = index
         image[cursor++] = color.toByte()
         return cursor

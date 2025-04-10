@@ -46,7 +46,6 @@ class GameEngine(
     val customizeLuaGlobal: GameResourceAccess.(Globals) -> Unit = {},
     val listener: GameEngineListener? = null,
 ) : GameLoop, GameResourceAccess {
-
     private val events: MutableList<GameResource> = mutableListOf()
     private val workEvents: MutableList<GameResource> = mutableListOf()
 
@@ -101,31 +100,36 @@ class GameEngine(
 
         val resourcesScope = CoroutineScope(platform.io())
 
-        val gameScripts = gameOptions.gameScripts.mapIndexed { index, script ->
-            resourceFactory.gamescript(index + 1, script, inputHandler, gameOptions)
-        }
+        val gameScripts =
+            gameOptions.gameScripts.mapIndexed { index, script ->
+                resourceFactory.gamescript(index + 1, script, inputHandler, gameOptions)
+            }
         this.scripts = Array(gameScripts.size + 1) { null }
 
-        val spriteSheets = gameOptions.spriteSheets.mapIndexed { index, sheet ->
-            resourceFactory.gameSpritesheet(index, sheet)
-        }
+        val spriteSheets =
+            gameOptions.spriteSheets.mapIndexed { index, sheet ->
+                resourceFactory.gameSpritesheet(index, sheet)
+            }
         this.spriteSheets = Array(spriteSheets.size) { null }
 
-        val gameLevels = gameOptions.gameLevels.mapIndexed { index, level ->
-            resourceFactory.gameLevel(index, level)
-        }
+        val gameLevels =
+            gameOptions.gameLevels.mapIndexed { index, level ->
+                resourceFactory.gameLevel(index, level)
+            }
         this.levels = Array(gameLevels.size) { null }
 
-        val sounds = gameOptions.sounds.mapIndexed { index, soundName ->
-            resourceFactory.soundEffect(index, soundName)
-        }
+        val sounds =
+            gameOptions.sounds.mapIndexed { index, soundName ->
+                resourceFactory.soundEffect(index, soundName)
+            }
         this.sounds = Array(sounds.size) { null }
 
-        val resources = listOf(
-            resourceFactory.bootscript("_boot.lua", inputHandler, gameOptions),
-            resourceFactory.enginescript("_engine.lua", inputHandler, gameOptions),
-            resourceFactory.bootSpritesheet("_boot.png"),
-        ) + gameScripts + spriteSheets + gameLevels + sounds
+        val resources =
+            listOf(
+                resourceFactory.bootscript("_boot.lua", inputHandler, gameOptions),
+                resourceFactory.enginescript("_engine.lua", inputHandler, gameOptions),
+                resourceFactory.bootSpritesheet("_boot.png"),
+            ) + gameScripts + spriteSheets + gameLevels + sounds
 
         numberOfResources = resources.size
 
@@ -210,13 +214,14 @@ class GameEngine(
                     GAME_GAMESCRIPT -> {
                         resource as GameScript
                         resource.resourceAccess = this
-                        val isValid = try {
-                            resource.isValid(customizeLuaGlobal)
-                            true
-                        } catch (ex: LuaError) {
-                            popupError(ex.toTinyException(resource.content.decodeToString()))
-                            false
-                        }
+                        val isValid =
+                            try {
+                                resource.isValid(customizeLuaGlobal)
+                                true
+                            } catch (ex: LuaError) {
+                                popupError(ex.toTinyException(resource.content.decodeToString()))
+                                false
+                            }
                         if (isValid) {
                             scripts[resource.index] = resource
                             // Force the reloading of the script, as the script update might be used as resource of
@@ -305,16 +310,17 @@ class GameEngine(
             accumulator += delta
             if (accumulator >= REFRESH_LIMIT) {
                 inputManager.record()
-                inError = try {
-                    ops.clear() // Remove all drawing operation to prepare the new frame.
-                    scripts[current]?.advance()
-                    false
-                } catch (ex: TinyException) {
-                    if (!inError) { // display the log only once.
-                        popupError(ex)
+                inError =
+                    try {
+                        ops.clear() // Remove all drawing operation to prepare the new frame.
+                        scripts[current]?.advance()
+                        false
+                    } catch (ex: TinyException) {
+                        if (!inError) { // display the log only once.
+                            popupError(ex)
+                        }
+                        true
                     }
-                    true
-                }
                 engineGameScript?.advance()
                 accumulator -= REFRESH_LIMIT
 
@@ -408,7 +414,11 @@ class GameEngine(
         popup(msg, "#FF0000", true)
     }
 
-    private suspend fun popup(message: String, color: String, forever: Boolean = false) {
+    private suspend fun popup(
+        message: String,
+        color: String,
+        forever: Boolean = false,
+    ) {
         engineGameScript?.invoke("popup", valueOf(0), valueOf(message), valueOf(color), valueOf(forever))
     }
 

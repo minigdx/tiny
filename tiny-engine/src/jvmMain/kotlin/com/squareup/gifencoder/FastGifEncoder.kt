@@ -12,12 +12,12 @@ class FastGifEncoder(
     private val loopCount: Int,
     private val rgbPalette: ColorPalette,
 ) {
-
-    private val colorTable = ColorTable.fromColors(
-        (0 until rgbPalette.size).map { index -> rgbPalette.getRGAasInt(index) }
-            .map { rgb -> Color.fromRgbInt(rgb) }
-            .toSet(),
-    )
+    private val colorTable =
+        ColorTable.fromColors(
+            (0 until rgbPalette.size).map { index -> rgbPalette.getRGAasInt(index) }
+                .map { rgb -> Color.fromRgbInt(rgb) }
+                .toSet(),
+        )
 
     init {
         HeaderBlock.write(outputStream)
@@ -38,7 +38,11 @@ class FastGifEncoder(
      * @throws IOException if there was a problem writing to the given output stream
      */
     @Throws(IOException::class)
-    fun addImage(rgbData: IntArray, width: Int, options: ImageOptions): FastGifEncoder {
+    fun addImage(
+        rgbData: IntArray,
+        width: Int,
+        options: ImageOptions,
+    ): FastGifEncoder {
         addImage(Image.fromRgb(rgbData, width), options)
         return this
     }
@@ -60,12 +64,15 @@ class FastGifEncoder(
 
     @Synchronized
     @Throws(IOException::class)
-    fun addImage(image: Image, options: ImageOptions) {
+    fun addImage(
+        image: Image,
+        options: ImageOptions,
+    ) {
         require(
             !(
                 options.left + image.width > screenWidth ||
                     options.top + image.height > screenHeight
-                ),
+            ),
         ) { "Image does not fit in screen." }
 
         val paddedColorCount = colorTable.paddedSize()
@@ -145,18 +152,19 @@ internal class FastLzwEncoder(colorTableSize: Int) {
     private fun processIndex(index: Int) {
         val indexAsStr = index.toChar().toString()
         val extendedIndexBuffer = indexBuffer + indexAsStr
-        indexBuffer = if (codeTable.containsKey(extendedIndexBuffer)) {
-            extendedIndexBuffer
-        } else {
-            writeCode(codeTable[indexBuffer]!!)
-            if (codeTable.size == MAX_CODE_TABLE_SIZE) {
-                writeCode(codeTable[CLEAR_CODE]!!)
-                resetCodeTableAndCodeSize()
+        indexBuffer =
+            if (codeTable.containsKey(extendedIndexBuffer)) {
+                extendedIndexBuffer
             } else {
-                addCodeToTable(extendedIndexBuffer)
+                writeCode(codeTable[indexBuffer]!!)
+                if (codeTable.size == MAX_CODE_TABLE_SIZE) {
+                    writeCode(codeTable[CLEAR_CODE]!!)
+                    resetCodeTableAndCodeSize()
+                } else {
+                    addCodeToTable(extendedIndexBuffer)
+                }
+                indexAsStr
             }
-            indexAsStr
-        }
     }
 
     /**
@@ -235,7 +243,10 @@ internal class FastLzwEncoder(colorTableSize: Int) {
             return size
         }
 
-        private fun <T> append(list: List<T>, value: T): List<T> {
+        private fun <T> append(
+            list: List<T>,
+            value: T,
+        ): List<T> {
             return list + value
         }
     }

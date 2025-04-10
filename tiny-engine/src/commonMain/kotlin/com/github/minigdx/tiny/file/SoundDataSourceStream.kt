@@ -8,17 +8,17 @@ class SoundDataSourceStream(
     val soundManager: SoundManager,
     val delegate: SourceStream<ByteArray>,
 ) : SourceStream<SoundData> {
-
     override suspend fun exists(): Boolean = delegate.exists()
 
     override suspend fun read(): SoundData {
         val bytes = delegate.read()
 
-        val sound = if (name.endsWith(".sfx")) {
-            soundManager.createSfxSound(bytes)
-        } else {
-            soundManager.createMidiSound(bytes)
-        }
+        val sound =
+            if (name.endsWith(".sfx")) {
+                soundManager.createSfxSound(bytes)
+            } else {
+                soundManager.createMidiSound(bytes)
+            }
         return SoundData(name, sound)
     }
 

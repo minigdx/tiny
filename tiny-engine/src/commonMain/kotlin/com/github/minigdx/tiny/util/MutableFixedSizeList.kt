@@ -3,7 +3,6 @@ package com.github.minigdx.tiny.util
 import kotlin.math.max
 
 class MutableFixedSizeList<T>(val maxSize: Int) : MutableList<T> {
-
     private val delegate: MutableList<T> = ArrayList<T>(maxSize)
 
     override val size: Int
@@ -28,12 +27,18 @@ class MutableFixedSizeList<T>(val maxSize: Int) : MutableList<T> {
         return result
     }
 
-    override fun add(index: Int, element: T) {
+    override fun add(
+        index: Int,
+        element: T,
+    ) {
         delegate.add(index, element)
         evictOldElements()
     }
 
-    override fun addAll(index: Int, elements: Collection<T>): Boolean {
+    override fun addAll(
+        index: Int,
+        elements: Collection<T>,
+    ): Boolean {
         val result = delegate.addAll(index, elements)
         evictOldElements()
         return result
@@ -58,9 +63,15 @@ class MutableFixedSizeList<T>(val maxSize: Int) : MutableList<T> {
 
     override fun removeAt(index: Int): T = delegate.removeAt(index)
 
-    override fun subList(fromIndex: Int, toIndex: Int): MutableList<T> = delegate.subList(fromIndex, toIndex)
+    override fun subList(
+        fromIndex: Int,
+        toIndex: Int,
+    ): MutableList<T> = delegate.subList(fromIndex, toIndex)
 
-    override fun set(index: Int, element: T): T = delegate.set(index, element)
+    override fun set(
+        index: Int,
+        element: T,
+    ): T = delegate.set(index, element)
 
     override fun retainAll(elements: Collection<T>): Boolean = delegate.retainAll(elements)
 

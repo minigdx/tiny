@@ -21,7 +21,6 @@ import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.VarArgFunction
 
 private class DebugShape {
-
     fun rectArgs(args: Varargs): List<LuaValue>? {
         when (args.narg()) {
             // rect including color
@@ -131,10 +130,12 @@ private class DebugShape {
 
 @TinyLib("debug", "Helpers to debug your game by drawing or printing information on screen.")
 class DebugLib(private val resourceAccess: GameResourceAccess, private val logger: Logger) : TwoArgFunction() {
-
     private val shape = DebugShape()
 
-    override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
+    override fun call(
+        arg1: LuaValue,
+        arg2: LuaValue,
+    ): LuaValue {
         val tiny = LuaTable()
         tiny["enabled"] = enabled()
         tiny["log"] = log()
@@ -152,11 +153,12 @@ class DebugLib(private val resourceAccess: GameResourceAccess, private val logge
 
     @TinyFunction("Enable or disable debug feature.", example = DEBUG_ENABLED_EXAMPLE)
     internal inner class enabled : OneArgFunction() {
-
         private var status = false
 
         @TinyCall("Enable or disable debug by passing true to enable, false to disable.")
-        override fun call(@TinyArg("enabled") arg: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("enabled") arg: LuaValue,
+        ): LuaValue {
             if (arg.isnil()) {
                 return valueOf(status)
             }
@@ -174,50 +176,61 @@ class DebugLib(private val resourceAccess: GameResourceAccess, private val logge
     @TinyFunction("Display a table.", example = DEBUG_EXAMPLE)
     internal inner class table : OneArgFunction() {
         @TinyCall("Display a table.")
-        override fun call(@TinyArg("table") arg: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("table") arg: LuaValue,
+        ): LuaValue {
             val luaTable = arg.opttable(null) ?: return NIL
             val keys = luaTable.keys()
-            val str = keys.joinToString("") { k ->
-                val value = luaTable[k]
-                val v = if (value.isnumber() || value.isstring()) {
-                    value.optjstring("nil")
-                } else {
-                    "nil"
+            val str =
+                keys.joinToString("") { k ->
+                    val value = luaTable[k]
+                    val v =
+                        if (value.isnumber() || value.isstring()) {
+                            value.optjstring("nil")
+                        } else {
+                            "nil"
+                        }
+                    "[$k:$v]"
                 }
-                "[$k:$v]"
-            }
             resourceAccess.debug(DebugMessage(str, "#32CD32"))
             return NIL
         }
     }
 
-    private fun formatValue(arg: LuaValue, recursiveSecurity: MutableSet<Int> = mutableSetOf()): String = if (arg.istable()) {
-        val table = arg as LuaTable
-        if (recursiveSecurity.contains(table.hashCode())) {
-            "table[<${table.hashCode()}>]"
-        } else {
-            recursiveSecurity.add(table.hashCode())
-            val keys = table.keys()
-            val str = keys.joinToString(" ") {
-                it.optjstring("nil") + ":" + formatValue(table[it], recursiveSecurity)
+    private fun formatValue(
+        arg: LuaValue,
+        recursiveSecurity: MutableSet<Int> = mutableSetOf(),
+    ): String =
+        if (arg.istable()) {
+            val table = arg as LuaTable
+            if (recursiveSecurity.contains(table.hashCode())) {
+                "table[<${table.hashCode()}>]"
+            } else {
+                recursiveSecurity.add(table.hashCode())
+                val keys = table.keys()
+                val str =
+                    keys.joinToString(" ") {
+                        it.optjstring("nil") + ":" + formatValue(table[it], recursiveSecurity)
+                    }
+                "table[$str]"
             }
-            "table[$str]"
+        } else if (arg.isfunction()) {
+            "function(" + (0 until arg.narg()).joinToString(", ") { "arg" } + ")"
+        } else {
+            arg.toString()
         }
-    } else if (arg.isfunction()) {
-        "function(" + (0 until arg.narg()).joinToString(", ") { "arg" } + ")"
-    } else {
-        arg.toString()
-    }
 
     @TinyFunction("Log a message on the screen.", example = DEBUG_EXAMPLE)
     internal inner class log : VarArgFunction() {
-
         @TinyCall("Log a message on the screen.")
-        override fun invoke(@TinyArg("str") args: Varargs): Varargs {
+        override fun invoke(
+            @TinyArg("str") args: Varargs,
+        ): Varargs {
             val nbArgs = args.narg()
-            val message = (1..nbArgs).map {
-                formatValue(args.arg(it))
-            }.joinToString("")
+            val message =
+                (1..nbArgs).map {
+                    formatValue(args.arg(it))
+                }.joinToString("")
 
             resourceAccess.debug(DebugMessage(message, "#32CD32"))
             return NIL
@@ -226,13 +239,15 @@ class DebugLib(private val resourceAccess: GameResourceAccess, private val logge
 
     @TinyFunction("Log a message into the console.", example = DEBUG_EXAMPLE)
     internal inner class console : VarArgFunction() {
-
         @TinyCall("Log a message into the console.")
-        override fun invoke(@TinyArg("str") args: Varargs): Varargs {
+        override fun invoke(
+            @TinyArg("str") args: Varargs,
+        ): Varargs {
             val nbArgs = args.narg()
-            val message = (1..nbArgs).map {
-                formatValue(args.arg(it))
-            }.joinToString(" ")
+            val message =
+                (1..nbArgs).map {
+                    formatValue(args.arg(it))
+                }.joinToString(" ")
 
             logger.debug("\uD83D\uDC1B") { message }
             return NIL
@@ -241,9 +256,10 @@ class DebugLib(private val resourceAccess: GameResourceAccess, private val logge
 
     @TinyFunction("Draw a rectangle on the screen", example = DEBUG_ENABLED_EXAMPLE)
     internal inner class rect : LibFunction() {
-
         @TinyCall("Draw a debug rectangle.")
-        override fun invoke(@TinyArgs(["x", "y", "width", "height", "color"]) args: Varargs): Varargs {
+        override fun invoke(
+            @TinyArgs(["x", "y", "width", "height", "color"]) args: Varargs,
+        ): Varargs {
             val (x, y, width, height, color) = shape.rectArgs(args) ?: return NIL
             resourceAccess.debug(
                 DebugRect(
@@ -258,7 +274,9 @@ class DebugLib(private val resourceAccess: GameResourceAccess, private val logge
         }
 
         @TinyCall("Draw a debug rectangle.")
-        override fun call(@TinyArg("rect", "A rectangle {x, y, width, height, color}") a: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("rect", "A rectangle {x, y, width, height, color}") a: LuaValue,
+        ): LuaValue {
             return super.call(a)
         }
 
@@ -271,9 +289,10 @@ class DebugLib(private val resourceAccess: GameResourceAccess, private val logge
 
     @TinyFunction("Draw a point on the screen")
     internal inner class point : LibFunction() {
-
         @TinyCall("Draw a debug point.")
-        override fun invoke(@TinyArgs(["x", "y", "color"]) args: Varargs): Varargs {
+        override fun invoke(
+            @TinyArgs(["x", "y", "color"]) args: Varargs,
+        ): Varargs {
             val (x, y, color) = shape.pointArgs(args) ?: return NIL
             resourceAccess.debug(
                 DebugPoint(
@@ -286,7 +305,9 @@ class DebugLib(private val resourceAccess: GameResourceAccess, private val logge
         }
 
         @TinyCall("Draw a debug point.")
-        override fun call(@TinyArg("point", "A point {x, y, color}") a: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("point", "A point {x, y, color}") a: LuaValue,
+        ): LuaValue {
             return super.call(a)
         }
 
@@ -299,9 +320,10 @@ class DebugLib(private val resourceAccess: GameResourceAccess, private val logge
 
     @TinyFunction("Draw a point on the screen")
     internal inner class line : LibFunction() {
-
         @TinyCall("Draw a debug line.")
-        override fun invoke(@TinyArgs(["x1", "y1", "x2", "y2", "color"]) args: Varargs): Varargs {
+        override fun invoke(
+            @TinyArgs(["x1", "y1", "x2", "y2", "color"]) args: Varargs,
+        ): Varargs {
             val (x1, y1, x2, y2, color) = shape.lineArgs(args) ?: return NIL
             resourceAccess.debug(
                 DebugLine(

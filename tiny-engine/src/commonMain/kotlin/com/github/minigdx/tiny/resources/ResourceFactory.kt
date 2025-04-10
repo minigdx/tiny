@@ -50,10 +50,12 @@ class ResourceFactory(
     private val logger: Logger,
     private val colorPalette: ColorPalette,
 ) {
-
     private val json = Json { ignoreUnknownKeys = true }
 
-    fun soundEffect(index: Int, name: String): Flow<Sound> {
+    fun soundEffect(
+        index: Int,
+        name: String,
+    ): Flow<Sound> {
         var version = 0
         return vfs.watch(platform.createSoundStream(name))
             .map { soundData -> Sound(version++, index, name, soundData) }
@@ -64,7 +66,10 @@ class ResourceFactory(
             }
     }
 
-    fun gameLevel(index: Int, name: String): Flow<GameLevel> {
+    fun gameLevel(
+        index: Int,
+        name: String,
+    ): Flow<GameLevel> {
         var version = 0
         return flowOf("$name/data.json")
             .map { platform.createByteArrayStream(it) }
@@ -78,58 +83,62 @@ class ResourceFactory(
                 }
             }.map { level ->
                 val layers = listOf("$name/_composite.png") + level.layers.map { layer -> "$name/$layer" }
-                val pngLayers = layers
-                    .mapIndexed { index, layer ->
-                        LdKtImageLayer(
-                            name = layer,
-                            index = index,
-                            x = level.x,
-                            y = level.y,
-                            width = level.width,
-                            height = level.height,
-                        )
-                    }.mapNotNull { layer ->
-                        val stream = platform.createImageStream(layer.name)
-                        if (stream.exists()) {
-                            val imageData = stream.read()
-                            val texture = convertToColorIndex(imageData.data, level.width, level.height)
-                            layer.apply {
-                                pixels = texture
-                            }
-                        } else {
-                            null
-                        }
-                    }
-
-                val intLayers = layers
-                    .map { layer -> layer.replace(".png", ".csv") }
-                    .mapIndexedNotNull { index, layer ->
-                        val stream = platform.createByteArrayStream(layer)
-                        if (stream.exists()) {
-                            val data = stream.read()
-                            val lines = data.decodeToString()
-                                .lines()
-                                .map { l -> l.split(",").filter { it.isNotBlank() } }
-                                .filterNot { it.isEmpty() }
-                            val l = LdKtIntLayer(
+                val pngLayers =
+                    layers
+                        .mapIndexed { index, layer ->
+                            LdKtImageLayer(
                                 name = layer,
                                 index = index,
                                 x = level.x,
                                 y = level.y,
-                                width = lines.first().size,
-                                height = lines.size,
+                                width = level.width,
+                                height = level.height,
                             )
-
-                            lines.forEachIndexed { y, columns ->
-                                columns.forEachIndexed { x, i ->
-                                    l.ints.set(x, y, i.toInt())
+                        }.mapNotNull { layer ->
+                            val stream = platform.createImageStream(layer.name)
+                            if (stream.exists()) {
+                                val imageData = stream.read()
+                                val texture = convertToColorIndex(imageData.data, level.width, level.height)
+                                layer.apply {
+                                    pixels = texture
                                 }
+                            } else {
+                                null
                             }
-                            l
-                        } else {
-                            null
                         }
-                    }
+
+                val intLayers =
+                    layers
+                        .map { layer -> layer.replace(".png", ".csv") }
+                        .mapIndexedNotNull { index, layer ->
+                            val stream = platform.createByteArrayStream(layer)
+                            if (stream.exists()) {
+                                val data = stream.read()
+                                val lines =
+                                    data.decodeToString()
+                                        .lines()
+                                        .map { l -> l.split(",").filter { it.isNotBlank() } }
+                                        .filterNot { it.isEmpty() }
+                                val l =
+                                    LdKtIntLayer(
+                                        name = layer,
+                                        index = index,
+                                        x = level.x,
+                                        y = level.y,
+                                        width = lines.first().size,
+                                        height = lines.size,
+                                    )
+
+                                lines.forEachIndexed { y, columns ->
+                                    columns.forEachIndexed { x, i ->
+                                        l.ints.set(x, y, i.toInt())
+                                    }
+                                }
+                                l
+                            } else {
+                                null
+                            }
+                        }
 
                 GameLevel(version++, index, GAME_LEVEL, name, level.layers.size + 1, level).apply {
                     pngLayers.forEach { layer ->
@@ -142,14 +151,24 @@ class ResourceFactory(
             }
     }
 
-    fun gamescript(index: Int, name: String, inputHandler: InputHandler, gameOptions: GameOptions) =
-        script(index, name, inputHandler, gameOptions, GAME_GAMESCRIPT)
+    fun gamescript(
+        index: Int,
+        name: String,
+        inputHandler: InputHandler,
+        gameOptions: GameOptions,
+    ) = script(index, name, inputHandler, gameOptions, GAME_GAMESCRIPT)
 
-    fun enginescript(name: String, inputHandler: InputHandler, gameOptions: GameOptions) =
-        script(0, name, inputHandler, gameOptions, ENGINE_GAMESCRIPT)
+    fun enginescript(
+        name: String,
+        inputHandler: InputHandler,
+        gameOptions: GameOptions,
+    ) = script(0, name, inputHandler, gameOptions, ENGINE_GAMESCRIPT)
 
-    fun bootscript(name: String, inputHandler: InputHandler, gameOptions: GameOptions) =
-        script(0, name, inputHandler, gameOptions, BOOT_GAMESCRIPT)
+    fun bootscript(
+        name: String,
+        inputHandler: InputHandler,
+        gameOptions: GameOptions,
+    ) = script(0, name, inputHandler, gameOptions, BOOT_GAMESCRIPT)
 
     private val protectedResources = setOf(BOOT_GAMESCRIPT, ENGINE_GAMESCRIPT, BOOT_SPRITESHEET)
 
@@ -177,7 +196,10 @@ class ResourceFactory(
         }
     }
 
-    fun gameSpritesheet(index: Int, name: String): Flow<SpriteSheet> {
+    fun gameSpritesheet(
+        index: Int,
+        name: String,
+    ): Flow<SpriteSheet> {
         return spritesheet(index, name, GAME_SPRITESHEET)
     }
 
@@ -185,7 +207,11 @@ class ResourceFactory(
         return spritesheet(0, name, BOOT_SPRITESHEET)
     }
 
-    private fun spritesheet(index: Int, name: String, resourceType: ResourceType): Flow<SpriteSheet> {
+    private fun spritesheet(
+        index: Int,
+        name: String,
+        resourceType: ResourceType,
+    ): Flow<SpriteSheet> {
         var version = 0
         return vfs.watch(
             platform.createImageStream(
@@ -202,20 +228,25 @@ class ResourceFactory(
         }
     }
 
-    private fun convertToColorIndex(data: ByteArray, width: Pixel, height: Pixel): PixelArray {
+    private fun convertToColorIndex(
+        data: ByteArray,
+        width: Pixel,
+        height: Pixel,
+    ): PixelArray {
         val result = PixelArray(width, height)
 
         (0 until width).forEach { x ->
             (0 until height).forEach { y ->
                 val coord = (x + y * width) * PixelFormat.RGBA
-                val index = colorPalette.fromRGBA(
-                    byteArrayOf(
-                        data[coord + 0],
-                        data[coord + 1],
-                        data[coord + 2],
-                        data[coord + 3],
-                    ),
-                )
+                val index =
+                    colorPalette.fromRGBA(
+                        byteArrayOf(
+                            data[coord + 0],
+                            data[coord + 1],
+                            data[coord + 2],
+                            data[coord + 3],
+                        ),
+                    )
 
                 result.set(x, y, index)
             }

@@ -6,7 +6,6 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class MutableFixedSizeListTest {
-
     @Test
     fun add_it_adds_an_element() {
         val list = MutableFixedSizeList<Int>(3)

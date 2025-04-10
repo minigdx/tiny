@@ -29,7 +29,6 @@ class SfxSound(
     private val buffer: Float32Array,
     private val picoAudioSoundMananger: PicoAudioSoundMananger,
 ) : Sound {
-
     private var currentSource: AudioBufferSourceNode? = null
 
     override fun play() {
@@ -47,7 +46,6 @@ class SfxSound(
 }
 
 class PicoAudioSoundMananger : SoundManager() {
-
     lateinit var audioContext: AudioContext
 
     override fun initSoundManager(inputHandler: InputHandler) {
@@ -68,12 +66,18 @@ class PicoAudioSoundMananger : SoundManager() {
         return PicoAudioSound(audio, smf)
     }
 
-    override fun playBuffer(buffer: FloatArray, numberOfSamples: Long) {
+    override fun playBuffer(
+        buffer: FloatArray,
+        numberOfSamples: Long,
+    ) {
         val result = convertBuffer(buffer, numberOfSamples)
         playSfxBuffer(result)
     }
 
-    private fun convertBuffer(buffer: FloatArray, length: Long): Float32Array {
+    private fun convertBuffer(
+        buffer: FloatArray,
+        length: Long,
+    ): Float32Array {
         val result = Float32Array(length.toInt())
         (0 until length.toInt()).forEach { index ->
             val byte = buffer[index]
@@ -82,12 +86,16 @@ class PicoAudioSoundMananger : SoundManager() {
         return result
     }
 
-    internal fun playSfxBuffer(result: Float32Array, loop: Boolean = false): AudioBufferSourceNode {
-        val sfxBuffer = audioContext.createBuffer(
-            1,
-            result.length,
-            SAMPLE_RATE,
-        )
+    internal fun playSfxBuffer(
+        result: Float32Array,
+        loop: Boolean = false,
+    ): AudioBufferSourceNode {
+        val sfxBuffer =
+            audioContext.createBuffer(
+                1,
+                result.length,
+                SAMPLE_RATE,
+            )
 
         val channel = sfxBuffer.getChannelData(0)
         channel.set(result)

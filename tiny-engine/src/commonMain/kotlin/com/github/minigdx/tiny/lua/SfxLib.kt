@@ -62,7 +62,10 @@ class SfxLib(
     // When validating the script, don't play sound
     private val playSound: Boolean = true,
 ) : TwoArgFunction() {
-    override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
+    override fun call(
+        arg1: LuaValue,
+        arg2: LuaValue,
+    ): LuaValue {
         val ctrl = LuaTable()
         ctrl.set("play", play())
         ctrl.set("loop", loop())
@@ -93,11 +96,12 @@ class SfxLib(
             @TinyArg("duration", description = "Duration in the note in seconds (default 0.1 second)") arg2: LuaValue,
             @TinyArg("volume", description = "Volume express in percentage (between 0.0 and 1.0)") arg3: LuaValue,
         ): LuaValue {
-            val note = if (arg1.isint()) {
-                notes[arg1.checkint()] ?: return NIL
-            } else {
-                return NIL
-            }
+            val note =
+                if (arg1.isint()) {
+                    notes[arg1.checkint()] ?: return NIL
+                } else {
+                    return NIL
+                }
 
             val duration = arg2.optdouble(0.1)
             val volume = max(min(arg3.optdouble(1.0), 1.0), 0.0)
@@ -105,43 +109,71 @@ class SfxLib(
             return NIL
         }
 
-        abstract fun wave(note: Note, duration: Seconds, volume: Percent): WaveGenerator
+        abstract fun wave(
+            note: Note,
+            duration: Seconds,
+            volume: Percent,
+        ): WaveGenerator
     }
 
     @TinyFunction("Generate and play a sine wave sound.", example = SFX_WAVE_EXAMPLE)
     inner class sine : WaveFunction() {
         @TinyCall("Generate and play a sound using one note.")
-        override fun wave(note: Note, duration: Seconds, volume: Percent) = SineWave(note, duration, volume)
+        override fun wave(
+            note: Note,
+            duration: Seconds,
+            volume: Percent,
+        ) = SineWave(note, duration, volume)
     }
 
     @TinyFunction("Generate and play a sawtooth wave sound.", example = SFX_WAVE_EXAMPLE)
     inner class sawtooth : WaveFunction() {
         @TinyCall("Generate and play a sound using one note.")
-        override fun wave(note: Note, duration: Seconds, volume: Percent) = SawToothWave(note, duration, volume)
+        override fun wave(
+            note: Note,
+            duration: Seconds,
+            volume: Percent,
+        ) = SawToothWave(note, duration, volume)
     }
 
     @TinyFunction("Generate and play a square wave sound.", example = SFX_WAVE_EXAMPLE)
     inner class square : WaveFunction() {
         @TinyCall("Generate and play a sound using one note.")
-        override fun wave(note: Note, duration: Seconds, volume: Percent) = SquareWave(note, duration, volume)
+        override fun wave(
+            note: Note,
+            duration: Seconds,
+            volume: Percent,
+        ) = SquareWave(note, duration, volume)
     }
 
     @TinyFunction("Generate and play a triangle wave sound.", example = SFX_WAVE_EXAMPLE)
     inner class triangle : WaveFunction() {
         @TinyCall("Generate and play a sound using one note.")
-        override fun wave(note: Note, duration: Seconds, volume: Percent) = TriangleWave(note, duration, volume)
+        override fun wave(
+            note: Note,
+            duration: Seconds,
+            volume: Percent,
+        ) = TriangleWave(note, duration, volume)
     }
 
     @TinyFunction("Generate and play a noise wave sound.", example = SFX_WAVE_EXAMPLE)
     inner class noise : WaveFunction() {
         @TinyCall("Generate and play a sound using one note.")
-        override fun wave(note: Note, duration: Seconds, volume: Percent) = NoiseWave(note, duration, volume)
+        override fun wave(
+            note: Note,
+            duration: Seconds,
+            volume: Percent,
+        ) = NoiseWave(note, duration, volume)
     }
 
     @TinyFunction("Generate and play a pulse wave sound.", example = SFX_WAVE_EXAMPLE)
     inner class pulse : WaveFunction() {
         @TinyCall("Generate and play a sound using one note.")
-        override fun wave(note: Note, duration: Seconds, volume: Percent) = PulseWave(note, duration, volume)
+        override fun wave(
+            note: Note,
+            duration: Seconds,
+            volume: Percent,
+        ) = PulseWave(note, duration, volume)
     }
 
     @TinyFunction(
@@ -150,17 +182,19 @@ class SfxLib(
             "The first sound is at the index 0.",
     )
     inner class play : OneArgFunction() {
-
         @TinyCall("Play the sound at the index 0.")
         override fun call(): LuaValue = super.call()
 
         @TinyCall("Play the sound by it's index.")
-        override fun call(@TinyArg("sound") arg: LuaValue): LuaValue {
-            val index = if (arg.isnumber()) {
-                arg.checkint()
-            } else {
-                0
-            }
+        override fun call(
+            @TinyArg("sound") arg: LuaValue,
+        ): LuaValue {
+            val index =
+                if (arg.isnumber()) {
+                    arg.checkint()
+                } else {
+                    0
+                }
             canPlay(resourceAccess.sound(index))?.play()
             return NIL
         }
@@ -168,17 +202,19 @@ class SfxLib(
 
     @TinyFunction("Play a sound and loop over it.")
     inner class loop : OneArgFunction() {
-
         @TinyCall("Play the sound at the index 0.")
         override fun call(): LuaValue = super.call()
 
         @TinyCall("Play the sound by it's index.")
-        override fun call(@TinyArg("sound") arg: LuaValue): LuaValue {
-            val index = if (arg.isnumber()) {
-                arg.checkint()
-            } else {
-                0
-            }
+        override fun call(
+            @TinyArg("sound") arg: LuaValue,
+        ): LuaValue {
+            val index =
+                if (arg.isnumber()) {
+                    arg.checkint()
+                } else {
+                    0
+                }
             canPlay(resourceAccess.sound(index))?.loop()
             return NIL
         }
@@ -186,17 +222,19 @@ class SfxLib(
 
     @TinyFunction("Stop a sound.")
     inner class stop : OneArgFunction() {
-
         @TinyCall("Stop the sound at the index 0.")
         override fun call(): LuaValue = super.call()
 
         @TinyCall("Stop the sound by it's index.")
-        override fun call(@TinyArg("sound") arg: LuaValue): LuaValue {
-            val index = if (arg.isnumber()) {
-                arg.checkint()
-            } else {
-                0
-            }
+        override fun call(
+            @TinyArg("sound") arg: LuaValue,
+        ): LuaValue {
+            val index =
+                if (arg.isnumber()) {
+                    arg.checkint()
+                } else {
+                    0
+                }
             canPlay(resourceAccess.sound(index))?.stop()
             return NIL
         }
@@ -209,35 +247,42 @@ class SfxLib(
             val beatDuration = (60f / bpm / 8f)
 
             val tracksTable = table["tracks"].checktable()!!
-            val tracks = tracksTable.keys().map { key ->
-                val track = tracksTable[key].checktable()!!
+            val tracks =
+                tracksTable.keys().map { key ->
+                    val track = tracksTable[key].checktable()!!
 
-                val envelope = track["env"].checktable()!!.toEnv()
-                val mod = track["mod"].checktable()!!.toMod()
+                    val envelope = track["env"].checktable()!!.toEnv()
+                    val mod = track["mod"].checktable()!!.toMod()
 
-                val patternsTable = track["patterns"].checktable()!!
-                val patterns = patternsTable.keys().map { pkey ->
-                    patternsTable[pkey].checktable()!!.toPattern(pkey.toint(), mod, envelope)
-                }.associateBy { it.index }
+                    val patternsTable = track["patterns"].checktable()!!
+                    val patterns =
+                        patternsTable.keys().map { pkey ->
+                            patternsTable[pkey].checktable()!!.toPattern(pkey.toint(), mod, envelope)
+                        }.associateBy { it.index }
 
-                val musicTable = track["music"].checktable()!!
-                val music = musicTable.keys().map {
-                    val index = musicTable[it].toint()
-                    patterns[index]!!
+                    val musicTable = track["music"].checktable()!!
+                    val music =
+                        musicTable.keys().map {
+                            val index = musicTable[it].toint()
+                            patterns[index]!!
+                        }
+
+                    Track(patterns, music, beatDuration, envelope, mod)
                 }
-
-                Track(patterns, music, beatDuration, envelope, mod)
-            }
-            val score = Song2(
-                bpm = bpm,
-                volume = table["volume"].toint() / 255f,
-                tracks = tracks.toTypedArray(),
-            ).toString()
+            val score =
+                Song2(
+                    bpm = bpm,
+                    volume = table["volume"].toint() / 255f,
+                    tracks = tracks.toTypedArray(),
+                ).toString()
 
             return valueOf(score)
         }
 
-        fun LuaTable.toWave(mod: Modulation?, env: Envelope): SoundGenerator {
+        fun LuaTable.toWave(
+            mod: Modulation?,
+            env: Envelope,
+        ): SoundGenerator {
             val noteIndex = this["note"].toint()
             val volume = this["volume"].toint() / 255f
             if (noteIndex == 0 || volume <= 0) {
@@ -255,43 +300,51 @@ class SfxLib(
         }
 
         fun LuaTable.toEnv(): Envelope {
-            val envelope = Envelope(
-                (this["attack"].todouble().toFloat() / 255f),
-                (this["decay"].todouble().toFloat() / 255f),
-                this["sustain"].todouble().toFloat() / 255f,
-                (this["release"].todouble().toFloat() / 255f),
-            )
+            val envelope =
+                Envelope(
+                    (this["attack"].todouble().toFloat() / 255f),
+                    (this["decay"].todouble().toFloat() / 255f),
+                    this["sustain"].todouble().toFloat() / 255f,
+                    (this["release"].todouble().toFloat() / 255f),
+                )
 
             return envelope
         }
 
-        fun LuaTable.toPattern(index: Int, mod: Modulation?, env: Envelope): Pattern2 {
-            val notes = this.keys().map { key ->
-                this[key].checktable()!!.toWave(mod, env)
-            }
+        fun LuaTable.toPattern(
+            index: Int,
+            mod: Modulation?,
+            env: Envelope,
+        ): Pattern2 {
+            val notes =
+                this.keys().map { key ->
+                    this[key].checktable()!!.toWave(mod, env)
+                }
             return Pattern2(index, notes)
         }
 
         fun LuaTable.toMod(): Modulation? {
-            val mod = when (this["type"].toint()) {
-                1 -> Sweep(
-                    Note.fromIndex(this["a"].toint()).frequency.toInt(),
-                    this["b"].toint() == 1,
-                )
+            val mod =
+                when (this["type"].toint()) {
+                    1 ->
+                        Sweep(
+                            Note.fromIndex(this["a"].toint()).frequency.toInt(),
+                            this["b"].toint() == 1,
+                        )
 
-                2 -> Vibrato(
-                    Note.fromIndex(this["a"].toint()).frequency,
-                    this["b"].toint() / 255f,
-                )
+                    2 ->
+                        Vibrato(
+                            Note.fromIndex(this["a"].toint()).frequency,
+                            this["b"].toint() / 255f,
+                        )
 
-                else -> null
-            }
+                    else -> null
+                }
             return mod
         }
     }
 
     inner class toTable : OneArgFunction() {
-
         private fun SoundGenerator.toLuaTable(): LuaTable {
             val note = LuaTable()
             note.set("type", this.name)
@@ -377,32 +430,37 @@ class SfxLib(
 
     inner class emptyScore : ZeroArgFunction() {
         override fun call(): LuaValue {
-            val silences = (0 until 16).map {
-                Silence2(Note.C0, null, null, 0f)
-            }
+            val silences =
+                (0 until 16).map {
+                    Silence2(Note.C0, null, null, 0f)
+                }
             val pattern = Pattern2(1, silences)
-            val track = Track(
-                mapOf(1 to pattern),
-                listOf(pattern),
-                (60f / 120 / 8f),
-                Envelope(0.1f, 0f, 1f, 0.1f),
-                null,
-            )
-            val emptyTrack = Track(
-                emptyMap(),
-                emptyList(),
-                (60f / 120 / 8f),
-                Envelope(0.1f, 0f, 1f, 0.1f),
-                null,
-            )
+            val track =
+                Track(
+                    mapOf(1 to pattern),
+                    listOf(pattern),
+                    (60f / 120 / 8f),
+                    Envelope(0.1f, 0f, 1f, 0.1f),
+                    null,
+                )
+            val emptyTrack =
+                Track(
+                    emptyMap(),
+                    emptyList(),
+                    (60f / 120 / 8f),
+                    Envelope(0.1f, 0f, 1f, 0.1f),
+                    null,
+                )
             val song = Song2(120, 0.5f, arrayOf(track, emptyTrack, emptyTrack, emptyTrack))
             return valueOf(song.toString())
         }
     }
 
     inner class sfx : TwoArgFunction() {
-
-        override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
+        override fun call(
+            arg1: LuaValue,
+            arg2: LuaValue,
+        ): LuaValue {
             val score = arg1.optjstring("")!!
             val waves = convertScoreToSong2(score)
             resourceAccess.sfx(waves)
@@ -419,8 +477,11 @@ class SfxLib(
     }
 
     companion object {
-
-        fun convertToSound(note: String, mod: Modulation?, env: Envelope?): SoundGenerator {
+        fun convertToSound(
+            note: String,
+            mod: Modulation?,
+            env: Envelope?,
+        ): SoundGenerator {
             val wave = note.substring(0, 2).toInt(16)
             val noteIndex = note.substring(2, 4).toInt(16)
             val volume = note.substring(4, 6).toInt(16) / 255f
@@ -476,54 +537,58 @@ class SfxLib(
                 val (env, envA, envB, envC, envD) = configuration.drop(1)
                 val (mod, modA, modB, _, _) = configuration.drop(6)
 
-                val modulation = when (mod) {
-                    1 -> {
-                        Sweep(
-                            sweep = Note.fromIndex(modA).frequency.toInt(),
-                            acceleration = modB / 255f > 0.5f,
-                        )
+                val modulation =
+                    when (mod) {
+                        1 -> {
+                            Sweep(
+                                sweep = Note.fromIndex(modA).frequency.toInt(),
+                                acceleration = modB / 255f > 0.5f,
+                            )
+                        }
+
+                        2 -> {
+                            Vibrato(
+                                vibratoFrequency = Note.fromIndex(modA).frequency,
+                                depth = modB / 255f,
+                            )
+                        }
+
+                        else -> null
                     }
 
-                    2 -> {
-                        Vibrato(
-                            vibratoFrequency = Note.fromIndex(modA).frequency,
-                            depth = modB / 255f,
+                val envelope =
+                    if (env > 0) {
+                        Envelope(
+                            attack = (envA / 255f) * duration,
+                            decay = (envB / 255f) * duration,
+                            sustain = envC / 255f,
+                            release = (envD / 255f) * duration,
                         )
+                    } else {
+                        null
                     }
+                val (patterns, patternsOrdered) =
+                    if (nbPattern > 0) {
+                        val patternsStr = tail.drop(1)
 
-                    else -> null
-                }
+                        // Map<Index, Pattern>
+                        val patterns =
+                            patternsStr.take(nbPattern).mapIndexed { indexPattern, pattern ->
+                                val beatsStr = pattern.trim().split(" ")
+                                val beats = convertToSound(beatsStr, modulation, envelope)
+                                Pattern2(indexPattern + 1, beats)
+                            }.associateBy { it.index }
 
-                val envelope = if (env > 0) {
-                    Envelope(
-                        attack = (envA / 255f) * duration,
-                        decay = (envB / 255f) * duration,
-                        sustain = envC / 255f,
-                        release = (envD / 255f) * duration,
-                    )
-                } else {
-                    null
-                }
-                val (patterns, patternsOrdered) = if (nbPattern > 0) {
-                    val patternsStr = tail.drop(1)
+                        val patternOrder = patternsStr.drop(nbPattern).first()
+                        val orders = patternOrder.trim().split(" ").map { it.toInt() }
 
-                    // Map<Index, Pattern>
-                    val patterns = patternsStr.take(nbPattern).mapIndexed { indexPattern, pattern ->
-                        val beatsStr = pattern.trim().split(" ")
-                        val beats = convertToSound(beatsStr, modulation, envelope)
-                        Pattern2(indexPattern + 1, beats)
-                    }.associateBy { it.index }
-
-                    val patternOrder = patternsStr.drop(nbPattern).first()
-                    val orders = patternOrder.trim().split(" ").map { it.toInt() }
-
-                    val patternsOrdered = orders.map { patterns[it]!! }
-                    tail = tail.drop(nbPattern + 2) // drop patterns + configuration + patterns order
-                    patterns to patternsOrdered
-                } else {
-                    tail = tail.drop(1) // drop  configuration
-                    emptyMap<Int, Pattern2>() to emptyList()
-                }
+                        val patternsOrdered = orders.map { patterns[it]!! }
+                        tail = tail.drop(nbPattern + 2) // drop patterns + configuration + patterns order
+                        patterns to patternsOrdered
+                    } else {
+                        tail = tail.drop(1) // drop  configuration
+                        emptyMap<Int, Pattern2>() to emptyList()
+                    }
 
                 tracks.add(Track(patterns, patternsOrdered, duration, envelope = envelope, modulation = modulation))
 
@@ -533,11 +598,16 @@ class SfxLib(
             return Song2(bpm.toInt(), volume.toInt() / 255f, tracks.toTypedArray())
         }
 
-        private fun convertToSound(beatsStr: List<String>, mod: Modulation?, env: Envelope?): List<SoundGenerator> {
-            val beats = beatsStr
-                .asSequence()
-                .filter { it.isNotBlank() }
-                .map { beat -> convertToSound(beat, mod, env) }
+        private fun convertToSound(
+            beatsStr: List<String>,
+            mod: Modulation?,
+            env: Envelope?,
+        ): List<SoundGenerator> {
+            val beats =
+                beatsStr
+                    .asSequence()
+                    .filter { it.isNotBlank() }
+                    .map { beat -> convertToSound(beat, mod, env) }
             return beats.toList()
         }
 

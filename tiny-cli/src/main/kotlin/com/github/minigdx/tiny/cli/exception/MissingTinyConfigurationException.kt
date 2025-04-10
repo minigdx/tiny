@@ -3,7 +3,6 @@ package com.github.minigdx.tiny.cli.exception
 import java.io.File
 
 class MissingTinyConfigurationException(message: String? = null, cause: Throwable? = null) : RuntimeException(message, cause) {
-
     constructor(file: File) : this(
         "The file '${file.absolutePath}' doesn't exist. " +
             "It's required to load the game configuration. " +

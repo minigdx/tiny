@@ -4,7 +4,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class MainTest {
-
     @Test
     fun highlight_example() {
         val elt = document.createElement("div") as HTMLDivElement

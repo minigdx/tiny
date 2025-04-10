@@ -8,7 +8,6 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class TouchManagerTest {
-
     @Test
     fun touch_down_then_is_just_touched_then_reset() {
         val touchManager = TouchManager(10)

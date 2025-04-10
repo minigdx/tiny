@@ -18,52 +18,57 @@ class TinyToLuaStubKspProcessor(
 
         val symbolsWithAnnotation = resolver.getSymbolsWithAnnotation(TinyLib::class.qualifiedName!!)
 
-        val sourceFiles = symbolsWithAnnotation
-            .filterIsInstance<KSClassDeclaration>()
-            .mapNotNull { it.containingFile }
-            .toList()
-            .toTypedArray()
+        val sourceFiles =
+            symbolsWithAnnotation
+                .filterIsInstance<KSClassDeclaration>()
+                .mapNotNull { it.containingFile }
+                .toList()
+                .toTypedArray()
 
-        val file = env.codeGenerator.createNewFile(
-            Dependencies(true, *sourceFiles),
-            "/",
-            "_tiny.stub",
-            "lua",
-        )
+        val file =
+            env.codeGenerator.createNewFile(
+                Dependencies(true, *sourceFiles),
+                "/",
+                "_tiny.stub",
+                "lua",
+            )
 
-        val libs = symbolsWithAnnotation.map { s ->
-            val accept = s.accept(TinyLibVisitor(), TinyLibDescriptor())
-            accept
-        }
+        val libs =
+            symbolsWithAnnotation.map { s ->
+                val accept = s.accept(TinyLibVisitor(), TinyLibDescriptor())
+                accept
+            }
 
-        val result = stub(
-            """
-            -- DO NOT EDIT // DO NOT EDIT // DO NOT EDIT // DO NOT EDIT // DO NOT EDIT
-            -- Tiny stub lua file generated automatically
-            -- The file is used only to help Lua editors with autocomplete
-            -- 
-            -- An error, an issue? Please consult https://github.com/minigdx/tiny
-            """.trimIndent(),
-        ) {
-            libs.forEach {
-                lib {
-                    name = it.name
-                    description = it.description
+        val result =
+            stub(
+                """
+                -- DO NOT EDIT // DO NOT EDIT // DO NOT EDIT // DO NOT EDIT // DO NOT EDIT
+                -- Tiny stub lua file generated automatically
+                -- The file is used only to help Lua editors with autocomplete
+                -- 
+                -- An error, an issue? Please consult https://github.com/minigdx/tiny
+                """.trimIndent(),
+            ) {
+                libs.forEach {
+                    lib {
+                        name = it.name
+                        description = it.description
 
-                    it.functions.forEach { function ->
-                        function {
-                            namespace = it.name.takeIf { it.isNotBlank() }
-                            name = function.name
-                            description = function.description
+                        it.functions.forEach { function ->
+                            function {
+                                namespace = it.name.takeIf { it.isNotBlank() }
+                                name = function.name
+                                description = function.description
 
-                            function.calls.forEach { call ->
-                                call {
-                                    description = call.description
-                                    call.args.forEach { arg ->
-                                        arg {
-                                            name = arg.name
-                                            type = "any"
-                                            description = arg.description
+                                function.calls.forEach { call ->
+                                    call {
+                                        description = call.description
+                                        call.args.forEach { arg ->
+                                            arg {
+                                                name = arg.name
+                                                type = "any"
+                                                description = arg.description
+                                            }
                                         }
                                     }
                                 }
@@ -72,7 +77,6 @@ class TinyToLuaStubKspProcessor(
                     }
                 }
             }
-        }
         file.write(result.generate().toByteArray(charset = Charsets.UTF_8))
 
         return emptyList()
@@ -80,9 +84,7 @@ class TinyToLuaStubKspProcessor(
 }
 
 class TinyToLuaStubKspProcessorProvider : SymbolProcessorProvider {
-    override fun create(
-        environment: SymbolProcessorEnvironment,
-    ): SymbolProcessor {
+    override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
         return TinyToLuaStubKspProcessor(environment)
     }
 }

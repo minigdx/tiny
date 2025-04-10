@@ -8,7 +8,6 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 class SongTest {
-
     @Test
     fun getPosition() {
         val pattern = Pattern2(1, listOf(Sine2(Note.C0, null, null, 1f)))

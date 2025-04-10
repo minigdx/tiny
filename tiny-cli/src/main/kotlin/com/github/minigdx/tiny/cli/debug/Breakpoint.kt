@@ -14,7 +14,6 @@ class Breakpoint(
      */
     var temporary: Boolean = false,
 ) {
-
     fun hit(other: Breakpoint): Boolean {
         return enabled &&
             other.enabled &&

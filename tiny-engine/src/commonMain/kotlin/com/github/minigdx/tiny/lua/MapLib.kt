@@ -44,12 +44,14 @@ class MapLib(
     private val colors: ColorPalette,
 ) :
     TwoArgFunction() {
-
     private var currentLevel: Int = 0
 
     private var currentLayer: Int = 0
 
-    override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
+    override fun call(
+        arg1: LuaValue,
+        arg2: LuaValue,
+    ): LuaValue {
         val map = LuaTable()
         map["draw"] = draw()
         map["layer"] = layer()
@@ -78,10 +80,11 @@ class MapLib(
     ) : ZeroArgFunction() {
         override fun call(): LuaValue {
             val level = resourceAccess.level(currentLevel)?.ldktLevel ?: return NIL
-            val value = int?.invoke(level)?.let { valueOf(it) }
-                ?: str?.invoke(level)?.let { valueOf(it) }
-                ?: json?.invoke(level)?.toLua()
-                ?: NIL
+            val value =
+                int?.invoke(level)?.let { valueOf(it) }
+                    ?: str?.invoke(level)?.let { valueOf(it) }
+                    ?: json?.invoke(level)?.toLua()
+                    ?: NIL
             return value
         }
     }
@@ -98,32 +101,35 @@ class MapLib(
                 "The level can be an index or the id defined by LDTK. " +
                 "Return the previous index level.",
         )
-        override fun call(@TinyArg("level") arg: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("level") arg: LuaValue,
+        ): LuaValue {
             if (arg.isnil()) return valueOf(currentLevel)
 
             val prec = currentLevel
-            currentLevel = if (!arg.isnumber()) {
-                var index = 0
-                var found = false
-                var level = resourceAccess.level(index)
-                val levelId = arg.checkjstring()
-                while (level != null && !found) {
-                    if (level.ldktLevel.uniqueIdentifer == levelId) {
-                        found = true
-                    } else {
-                        level = resourceAccess.level(++index)
+            currentLevel =
+                if (!arg.isnumber()) {
+                    var index = 0
+                    var found = false
+                    var level = resourceAccess.level(index)
+                    val levelId = arg.checkjstring()
+                    while (level != null && !found) {
+                        if (level.ldktLevel.uniqueIdentifer == levelId) {
+                            found = true
+                        } else {
+                            level = resourceAccess.level(++index)
+                        }
                     }
-                }
-                if (!found) {
-                    // Level not found by its identifier
-                    // Return the actual level and ignore the modification
-                    prec
+                    if (!found) {
+                        // Level not found by its identifier
+                        // Return the actual level and ignore the modification
+                        prec
+                    } else {
+                        index
+                    }
                 } else {
-                    index
+                    arg.checkint()
                 }
-            } else {
-                arg.checkint()
-            }
 
             return valueOf(prec)
         }
@@ -132,14 +138,17 @@ class MapLib(
     @TinyFunction("Set the current layer to draw.")
     inner class layer : OneArgFunction() {
         @TinyCall("Set the current index layer to draw. Return the previous layer index.")
-        override fun call(@TinyArg("layer_index") arg: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("layer_index") arg: LuaValue,
+        ): LuaValue {
             val prec = currentLayer
-            currentLayer = if (arg.isnil()) {
-                0
-            } else {
-                val nbLayers = resourceAccess.level(currentLevel)?.numberOfLayers ?: 1
-                min(max(0, arg.checkint()), nbLayers - 1)
-            }
+            currentLayer =
+                if (arg.isnil()) {
+                    0
+                } else {
+                    val nbLayers = resourceAccess.level(currentLevel)?.numberOfLayers ?: 1
+                    min(max(0, arg.checkint()), nbLayers - 1)
+                }
 
             return valueOf(prec)
         }
@@ -151,12 +160,16 @@ class MapLib(
     @TinyFunction("Convert cell coordinates cx, cy into map screen coordinates x, y.")
     inner class from : TwoArgFunction() {
         @TinyCall("Convert the cell coordinates into coordinates as a table [x,y].")
-        override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
-            val (cx, cy) = if (arg1.istable()) {
-                arg1["cx"].toint() to arg1["cy"].toint()
-            } else {
-                arg1.checkint() to arg2.checkint()
-            }
+        override fun call(
+            arg1: LuaValue,
+            arg2: LuaValue,
+        ): LuaValue {
+            val (cx, cy) =
+                if (arg1.istable()) {
+                    arg1["cx"].toint() to arg1["cy"].toint()
+                } else {
+                    arg1.checkint() to arg2.checkint()
+                }
 
             return LuaTable(2, 2).apply {
                 set("x", valueOf(cx * spriteSize.first.toDouble()))
@@ -165,7 +178,9 @@ class MapLib(
         }
 
         @TinyCall("Convert the cell coordinates from a table [cx,cy] into screen coordinates as a table [x,y].")
-        override fun call(@TinyArg("cell") arg: LuaValue): LuaValue = super.call(arg)
+        override fun call(
+            @TinyArg("cell") arg: LuaValue,
+        ): LuaValue = super.call(arg)
     }
 
     @TinyFunction(
@@ -175,12 +190,16 @@ class MapLib(
     )
     inner class to : TwoArgFunction() {
         @TinyCall("Convert the coordinates into cell coordinates as a table [cx,cy].")
-        override fun call(@TinyArg("x") arg1: LuaValue, @TinyArg("y") arg2: LuaValue): LuaValue {
-            val (x, y) = if (arg1.istable()) {
-                arg1["x"].toint() to arg1["y"].toint()
-            } else {
-                arg1.checkint() to arg2.checkint()
-            }
+        override fun call(
+            @TinyArg("x") arg1: LuaValue,
+            @TinyArg("y") arg2: LuaValue,
+        ): LuaValue {
+            val (x, y) =
+                if (arg1.istable()) {
+                    arg1["x"].toint() to arg1["y"].toint()
+                } else {
+                    arg1.checkint() to arg2.checkint()
+                }
 
             return LuaTable(2, 2).apply {
                 set("cx", valueOf(floor(x / spriteSize.first.toDouble())))
@@ -189,19 +208,24 @@ class MapLib(
         }
 
         @TinyCall("Convert the coordinates from a table [x,y] into cell coordinates as a table [cx,cy].")
-        override fun call(@TinyArg("coordinates") arg: LuaValue) = super.call(arg)
+        override fun call(
+            @TinyArg("coordinates") arg: LuaValue,
+        ) = super.call(arg)
     }
 
     @TinyFunction("Get the flag from a tile.")
     inner class flag : TwoArgFunction() {
-
         @TinyCall("Get the flag from the tile at the coordinate cx,cy.")
-        override fun call(@TinyArg("cx") arg1: LuaValue, @TinyArg("cy") arg2: LuaValue): LuaValue {
-            val (tileX, tileY) = if (arg1.istable()) {
-                arg1["cx"].toint() to arg1["cy"].toint()
-            } else {
-                arg1.checkint() to arg2.checkint()
-            }
+        override fun call(
+            @TinyArg("cx") arg1: LuaValue,
+            @TinyArg("cy") arg2: LuaValue,
+        ): LuaValue {
+            val (tileX, tileY) =
+                if (arg1.istable()) {
+                    arg1["cx"].toint() to arg1["cy"].toint()
+                } else {
+                    arg1.checkint() to arg2.checkint()
+                }
 
             val layer = resourceAccess.level(currentLevel)?.intLayers?.firstOrNull { l -> l != null } ?: return NIL
 
@@ -213,7 +237,9 @@ class MapLib(
         }
 
         @TinyCall("Get the flag from the tile at the coordinate table [cx,cy].")
-        override fun call(@TinyArg("cell") arg: LuaValue): LuaValue = super.call(arg)
+        override fun call(
+            @TinyArg("cell") arg: LuaValue,
+        ): LuaValue = super.call(arg)
     }
 
     @TinyFunction(
@@ -229,7 +255,6 @@ entity.customFields -- access custom field of the entity
         """,
     )
     inner class entities : LuaTable() {
-
         private val cachedEntities: MutableMap<Int, LuaValue> = mutableMapOf()
 
         private var currentLevelVersion = currentLevel to -1
@@ -286,7 +311,6 @@ entity.customFields -- access custom field of the entity
 
     @TinyFunction("Draw map tiles on the screen.")
     inner class draw : LibFunction() {
-
         @TinyCall(
             description = "Draw the default layer on the screen.",
         )
@@ -309,7 +333,10 @@ entity.customFields -- access custom field of the entity
         @TinyCall(
             description = "Draw the default layer on the screen at the x/y coordinates.",
         )
-        override fun call(@TinyArg("x") a: LuaValue, @TinyArg("y") b: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("x") a: LuaValue,
+            @TinyArg("y") b: LuaValue,
+        ): LuaValue {
             val layer = resourceAccess.level(currentLevel)?.imageLayers?.get(currentLayer)
             if (layer != null) {
                 resourceAccess.frameBuffer.copyFrom(
@@ -326,8 +353,9 @@ entity.customFields -- access custom field of the entity
         }
 
         @TinyCall(
-            description = "Draw the default layer on the screen at the x/y coordinates " +
-                "starting the mx/my coordinates from the map.",
+            description =
+                "Draw the default layer on the screen at the x/y coordinates " +
+                    "starting the mx/my coordinates from the map.",
         )
         override fun call(
             @TinyArg("x", "x screen coordinate") a: LuaValue,
@@ -351,8 +379,9 @@ entity.customFields -- access custom field of the entity
         }
 
         @TinyCall(
-            description = "Draw the default layer on the screen at the x/y coordinates " +
-                "starting the mx/my coordinates from the map using the size width/height.",
+            description =
+                "Draw the default layer on the screen at the x/y coordinates " +
+                    "starting the mx/my coordinates from the map using the size width/height.",
         )
         override fun invoke(
             @TinyArgs(

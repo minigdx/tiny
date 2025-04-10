@@ -50,25 +50,32 @@ class GLRender(
     private val logger: Logger,
     private val gameOptions: GameOptions,
 ) : Render {
-
     private var colorBuffer = ByteArray(0)
 
-    private val uvsData = FloatBuffer(
-        floatArrayOf(
-            2f, // bottom right
-            1f,
-            0f, // top left
-            -1f,
-            0f, // bottom left
-            1f,
-        ),
-    )
+    private val uvsData =
+        FloatBuffer(
+            floatArrayOf(
+                // bottom right
+                2f,
+                1f,
+                // top left
+                0f,
+                -1f,
+                // bottom left
+                0f,
+                1f,
+            ),
+        )
 
-    private val vertexData = floatArrayOf(
-        1f, 0f,
-        0f, 1f,
-        0f, 0f,
-    )
+    private val vertexData =
+        floatArrayOf(
+            1f,
+            0f,
+            0f,
+            1f,
+            0f,
+            0f,
+        )
 
     override fun init(windowManager: WindowManager): RenderContext {
         // Load and compile the shaders
@@ -215,7 +222,10 @@ class GLRender(
         )
     }
 
-    override fun draw(context: RenderContext, ops: List<Operation>) {
+    override fun draw(
+        context: RenderContext,
+        ops: List<Operation>,
+    ) {
         context as GLRenderContext
 
         gl.viewport(
@@ -226,7 +236,6 @@ class GLRender(
         )
         gl.enable(GL_BLEND)
         gl.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) // Or import these constants
-
 
         // -- game screen -- //
         // Push instructions as textures
@@ -268,11 +277,19 @@ class GLRender(
 */
     }
 
-    override fun draw(context: RenderContext, image: ByteArray, width: Pixel, height: Pixel) {
+    override fun draw(
+        context: RenderContext,
+        image: ByteArray,
+        width: Pixel,
+        height: Pixel,
+    ) {
         TODO()
     }
 
-    override fun drawOffscreen(context: RenderContext, ops: List<Operation>): Frame {
+    override fun drawOffscreen(
+        context: RenderContext,
+        ops: List<Operation>,
+    ): Frame {
         context as GLRenderContext
         context.fbo.usingFramebuffer {
             draw(context, ops)
@@ -303,7 +320,10 @@ class GLRender(
         gl.bindTexture(GL_TEXTURE_2D, null)
     }
 
-    private fun createShader(shader: String, shaderType: Int): Shader {
+    private fun createShader(
+        shader: String,
+        shaderType: Int,
+    ): Shader {
         fun addLineNumbers(text: String): String {
             val lines = text.lines()
             val lineNumberWidth = lines.size.toString().length
@@ -321,9 +341,9 @@ class GLRender(
             gl.deleteShader(vertexShaderId)
             throw RuntimeException(
                 "Shader compilation error: $log \n" +
-                        "---------- \n" +
-                        "Shader code in error: \n" +
-                        addLineNumbers(shader),
+                    "---------- \n" +
+                    "Shader code in error: \n" +
+                    addLineNumbers(shader),
             )
         }
         return vertexShaderId
@@ -331,100 +351,102 @@ class GLRender(
 
     companion object {
         //language=Glsl
-        val VERTEX_SHADER = """
-        #ifdef GL_ES
-            precision highp float;
-        #endif
-        
-        attribute vec2 position;
-        attribute vec2 uvs;
-        
-        varying vec2 viewport;
-        
-        void main() {
-            gl_Position = vec4(position, 0.0, 1.0);
-            viewport = uvs;
-        }
-        """.trimIndent()
+        val VERTEX_SHADER =
+            """
+            #ifdef GL_ES
+                precision highp float;
+            #endif
+            
+            attribute vec2 position;
+            attribute vec2 uvs;
+            
+            varying vec2 viewport;
+            
+            void main() {
+                gl_Position = vec4(position, 0.0, 1.0);
+                viewport = uvs;
+            }
+            """.trimIndent()
 
         //language=Glsl
-        val FRAGMENT_SHADER = """
-        #ifdef GL_ES
-            precision highp float;
-        #endif
+        val FRAGMENT_SHADER =
+            """
+            #ifdef GL_ES
+                precision highp float;
+            #endif
+                    
+            // it goes from 0.0 -> 1.0
+            varying vec2 viewport;
+            
+            uniform sampler2D colors;
+            // Size of the game screen, in pixel, in the game resolution (see _tiny.json)
+            uniform vec2 game_screen;
+            
+            // Type of the shape
+            uniform float u_type;
+            uniform float u_arg1;
+            uniform float u_arg2;
+            uniform float u_arg3;
+            uniform float u_arg4;
+            uniform float u_arg5;
+            uniform float u_arg6;
+            
+            
+            /**
+            * Extract data from a "kind of" texture1D
+            */
+            vec4 readData(sampler2D txt, int index, int textureWidth, int textureHeight) {
+                int x = index - textureWidth * (index / textureWidth); // index % textureWidth
+                int y =  index / textureWidth;
+                vec2 uv = vec2((float(x) + 0.5) / float(textureWidth), (float(y) + 0.5) / float(textureHeight));
+                return texture2D(txt, uv);
+            }
+            
+            /**
+            * Read a color from the colors texture.
+            */
+            vec4 readColor(int index) {
+                int icolor = index - 256 * (index / 256);
+                return readData(colors, icolor, 256, 256);
+            }
+            
+            vec4 cls(int color) {
+                return readColor(color);
+            }
+            
+            bool is_pixel(int x, int y) {
+                int current_x = int(viewport.x * game_screen.x);
+                int current_y = int(viewport.y * game_screen.y);
                 
-        // it goes from 0.0 -> 1.0
-        varying vec2 viewport;
-        
-        uniform sampler2D colors;
-        // Size of the game screen, in pixel, in the game resolution (see _tiny.json)
-        uniform vec2 game_screen;
-        
-        // Type of the shape
-        uniform float u_type;
-        uniform float u_arg1;
-        uniform float u_arg2;
-        uniform float u_arg3;
-        uniform float u_arg4;
-        uniform float u_arg5;
-        uniform float u_arg6;
-        
-        
-        /**
-        * Extract data from a "kind of" texture1D
-        */
-        vec4 readData(sampler2D txt, int index, int textureWidth, int textureHeight) {
-            int x = index - textureWidth * (index / textureWidth); // index % textureWidth
-            int y =  index / textureWidth;
-            vec2 uv = vec2((float(x) + 0.5) / float(textureWidth), (float(y) + 0.5) / float(textureHeight));
-            return texture2D(txt, uv);
-        }
-        
-        /**
-        * Read a color from the colors texture.
-        */
-        vec4 readColor(int index) {
-            int icolor = index - 256 * (index / 256);
-            return readData(colors, icolor, 256, 256);
-        }
-        
-        vec4 cls(int color) {
-            return readColor(color);
-        }
-        
-        bool is_pixel(int x, int y) {
-            int current_x = int(viewport.x * game_screen.x);
-            int current_y = int(viewport.y * game_screen.y);
-            
-            return x <= current_x && current_x < x + 1 &&
-                   y <= current_y && current_y < y + 1; 
+                return x <= current_x && current_x < x + 1 &&
+                       y <= current_y && current_y < y + 1; 
 
-        }
-        
-        vec4 pset(int x, int y, int icolor) {
-            if(is_pixel(x, y)) {
-                 return readColor(icolor);
-            } else {
-                return vec4(0.0, 0.0, 0.0, 0.0);
             }
-        }
-        
-        void main() {
-            vec4 color = vec4(1.0, 0.0, 0.0, 0.0);
             
-            int type = int(u_type);
-            if(type == 0) {
-                color = cls(int(u_arg1));
-            } else if (type == 1) {
-                color = pset(
-                            int(u_arg1), 
-                            int(u_arg2),
-                            int(u_arg3)
-                        );
+            vec4 pset(int x, int y, int icolor) {
+                if(is_pixel(x, y)) {
+                     return readColor(icolor);
+                } else {
+                    return vec4(0.0, 0.0, 0.0, 0.0);
+                }
             }
-            gl_FragColor = color;
-        }
-        """.trimIndent()
+            
+            void main() {
+                vec4 color = vec4(1.0, 0.0, 0.0, 0.0);
+                
+                int type = int(u_type);
+                if(type == 0) {
+                    color = cls(int(u_arg1));
+                } else if (type == 1) {
+                    color = pset(
+                                int(u_arg1), 
+                                int(u_arg2),
+                                int(u_arg3)
+                            );
+                }
+                gl_FragColor = color;
+            }
+            """.trimIndent()
     }
 }
 
@@ -432,7 +454,10 @@ class GLFrame(
     private val buffer: ByteBuffer,
     private val gameOptions: GameOptions,
 ) : Frame {
-    override fun get(x: Pixel, y: Pixel): ColorIndex {
+    override fun get(
+        x: Pixel,
+        y: Pixel,
+    ): ColorIndex {
         val i = x * gameOptions.zoom + y * gameOptions.width * gameOptions.zoom * PixelFormat.RGBA
         val result = ByteArray(PixelFormat.RGBA)
         buffer.position = i

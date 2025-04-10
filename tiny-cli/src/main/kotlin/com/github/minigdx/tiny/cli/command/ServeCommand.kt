@@ -1,6 +1,7 @@
 package com.github.minigdx.tiny.cli.command
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
@@ -9,42 +10,42 @@ import com.github.ajalt.clikt.parameters.types.int
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
-import io.ktor.server.application.ApplicationCall
-import io.ktor.server.application.call
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondBytes
+import io.ktor.server.routing.RoutingContext
 import io.ktor.server.routing.get
 import io.ktor.server.routing.head
 import io.ktor.server.routing.routing
-import io.ktor.util.pipeline.PipelineContext
 import java.io.FileInputStream
 import java.util.zip.ZipInputStream
 
-class ServeCommand : CliktCommand(name = "serve", help = "Run your game as a web game.") {
-
+class ServeCommand : CliktCommand(name = "serve") {
     private val port by option(help = "Port of the local webserver.")
         .int()
         .default(8080)
 
     private val game by argument(
         help =
-        "The game to serve. It has to be a tiny game exported " +
-            "by the export command (ie: zip file).",
+            "The game to serve. It has to be a tiny game exported " +
+                "by the export command (ie: zip file).",
     )
         .file(mustExist = true, canBeDir = true, canBeFile = true)
 
     private val resources = mutableMapOf<String, ByteArray>()
 
+    override fun help(context: Context) = "Run your game as a web game."
+
     override fun run() {
         // Get the zip
-        val zipFile = if (game.isDirectory) {
-            GameExporter().export(game, "tiny-export.zip")
-            game.resolve("tiny-export.zip")
-        } else {
-            game
-        }
+        val zipFile =
+            if (game.isDirectory) {
+                GameExporter().export(game, "tiny-export.zip")
+                game.resolve("tiny-export.zip")
+            } else {
+                game
+            }
 
         // Uncompressed in memory
         val zip = ZipInputStream(FileInputStream(zipFile))
@@ -70,17 +71,18 @@ class ServeCommand : CliktCommand(name = "serve", help = "Run your game as a web
                     if (resources.containsKey(key)) {
                         val value = resources[key]
                         if (value != null) {
-                            val contentType = if (key.endsWith(".js")) {
-                                ContentType.Application.JavaScript
-                            } else if (key.endsWith(".png")) {
-                                ContentType.Image.PNG
-                            } else if (key.endsWith(".json")) {
-                                ContentType.Application.Json
-                            } else if (key.endsWith(".mid")) {
-                                ContentType.Application.OctetStream
-                            } else {
-                                ContentType.Application.OctetStream
-                            }
+                            val contentType =
+                                if (key.endsWith(".js")) {
+                                    ContentType.Application.JavaScript
+                                } else if (key.endsWith(".png")) {
+                                    ContentType.Image.PNG
+                                } else if (key.endsWith(".json")) {
+                                    ContentType.Application.Json
+                                } else if (key.endsWith(".mid")) {
+                                    ContentType.Application.OctetStream
+                                } else {
+                                    ContentType.Application.OctetStream
+                                }
                             call.respondBytes(value, contentType)
                         } else {
                             call.respond(HttpStatusCode.NotFound)
@@ -119,16 +121,17 @@ class ServeCommand : CliktCommand(name = "serve", help = "Run your game as a web
         // route to files from the zip.
     }
 
-    private fun PipelineContext<Unit, ApplicationCall>.resourceKey(): String {
-        val key = call.request.local.uri.let { k ->
-            // Small hack as the engine add a /.
-            // Need to fix it...
-            if (k.startsWith("/")) {
-                k.drop(1)
-            } else {
-                k
+    private fun RoutingContext.resourceKey(): String {
+        val key =
+            call.request.local.uri.let { k ->
+                // Small hack as the engine add a /.
+                // Need to fix it...
+                if (k.startsWith("/")) {
+                    k.drop(1)
+                } else {
+                    k
+                }
             }
-        }
         return key
     }
 }

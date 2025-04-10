@@ -18,7 +18,6 @@ class TestResult(val script: String, val test: String, val passed: Boolean, val 
         "See link:#_the_tiny_cli_run_command[Run command]",
 )
 class TestLib(private val script: GameScript) : TwoArgFunction() {
-
     private val currentScript = script.name
 
     private var currentTest: String = ""
@@ -30,7 +29,10 @@ class TestLib(private val script: GameScript) : TwoArgFunction() {
         private val invert: Boolean = false,
         private val message: String = "#1 expected to be equals to #2 but is not!",
     ) : TwoArgFunction() {
-        override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
+        override fun call(
+            arg1: LuaValue,
+            arg2: LuaValue,
+        ): LuaValue {
             val luaValue = default ?: arg2
             val result = arg1.eq_b(luaValue)
             return if (invert && !result) {
@@ -39,9 +41,10 @@ class TestLib(private val script: GameScript) : TwoArgFunction() {
                 BTRUE
             } else {
                 if (firstFailure == null) {
-                    val msg = message
-                        .replace("#1", arg1.tojstring())
-                        .replace("#2", luaValue.tojstring())
+                    val msg =
+                        message
+                            .replace("#1", arg1.tojstring())
+                            .replace("#2", luaValue.tojstring())
                     firstFailure = msg
                 }
                 BFALSE
@@ -51,9 +54,11 @@ class TestLib(private val script: GameScript) : TwoArgFunction() {
 
     @TinyFunction(name = "eq", description = "Assert that `expected` and `actual` are equals")
     inner class isEqual : Assertor() {
-
         @TinyCall("Assert that `expected` and `actual` are equals")
-        override fun call(@TinyArg("expected") arg1: LuaValue, @TinyArg("actual") arg2: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("expected") arg1: LuaValue,
+            @TinyArg("actual") arg2: LuaValue,
+        ): LuaValue {
             return super.call(arg1, arg2)
         }
     }
@@ -61,7 +66,10 @@ class TestLib(private val script: GameScript) : TwoArgFunction() {
     @TinyFunction(name = "neq", description = "Assert that `expected` and `actual` are __not__ equals")
     inner class isNotEquals : Assertor(invert = true) {
         @TinyCall("Assert that `expected` and `actual` are not equals")
-        override fun call(@TinyArg("expected") arg1: LuaValue, @TinyArg("actual") arg2: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("expected") arg1: LuaValue,
+            @TinyArg("actual") arg2: LuaValue,
+        ): LuaValue {
             return super.call(arg1, arg2)
         }
     }
@@ -69,20 +77,27 @@ class TestLib(private val script: GameScript) : TwoArgFunction() {
     @TinyFunction(name = "t", description = "Assert that `actual` is true")
     inner class isTrue : Assertor(default = BTRUE) {
         @TinyCall("Assert that `actual` is true")
-        override fun call(@TinyArg("actual") arg: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("actual") arg: LuaValue,
+        ): LuaValue {
             return super.call(arg)
         }
     }
 
     @TinyFunction(name = "t", description = "Assert that `actual` is false")
     inner class isFalse : Assertor(default = BFALSE) {
-
         @TinyCall("Assert that `actual` is false")
-        override fun call(@TinyArg("actual") arg: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("actual") arg: LuaValue,
+        ): LuaValue {
             return super.call(arg)
         }
     }
-    override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
+
+    override fun call(
+        arg1: LuaValue,
+        arg2: LuaValue,
+    ): LuaValue {
         val test = LuaTable()
         test["create"] = create()
         test["eq"] = isEqual()

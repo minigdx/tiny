@@ -6,12 +6,12 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class GifEncoderTest {
-
     private val encoder = GifEncoder(3, 5, ColorPalette((0 until 255).map { "#0000" + it.toString(16).uppercase().padStart(2, '0') }))
 
     class ByteArrayStream : TargetStream<ByteArray> {
         var output: ByteArray = byteArrayOf()
             private set
+
         override fun write(data: ByteArray) {
             output += data
         }
@@ -44,7 +44,10 @@ class GifEncoderTest {
         assertEquals(byteArrayOf(0x98.toByte()), output.output)
     }
 
-    private fun assertEquals(expected: ByteArray, actual: ByteArray) {
+    private fun assertEquals(
+        expected: ByteArray,
+        actual: ByteArray,
+    ) {
         expected.indices.forEach { index ->
             assertEquals(
                 expected[index],

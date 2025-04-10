@@ -5,7 +5,6 @@ import com.github.minigdx.tiny.resources.ResourceType
 import kotlinx.coroutines.flow.FlowCollector
 
 class ScriptsCollector(private val events: MutableList<GameResource>) : FlowCollector<GameResource> {
-
     private var bootscriptLoaded = false
 
     private val waitingList: MutableList<GameResource> = mutableListOf()

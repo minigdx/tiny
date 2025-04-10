@@ -6,7 +6,6 @@ import kotlin.math.max
 import kotlin.math.min
 
 class Blender(private val gamePalette: ColorPalette) {
-
     private var switch: Array<ColorIndex> = Array(gamePalette.size) { index -> index }
 
     private var dithering: Int = 0xFFFF
@@ -26,11 +25,19 @@ class Blender(private val gamePalette: ColorPalette) {
         switch = Array(gamePalette.size) { index -> index }
     }
 
-    fun pal(source: ColorIndex, target: ColorIndex) {
+    fun pal(
+        source: ColorIndex,
+        target: ColorIndex,
+    ) {
         switch[gamePalette.check(source)] = gamePalette.check(target)
     }
 
-    fun mix(colors: ByteArray, x: Pixel, y: Pixel, transparency: Array<Int>?): ByteArray? {
+    fun mix(
+        colors: ByteArray,
+        x: Pixel,
+        y: Pixel,
+        transparency: Array<Int>?,
+    ): ByteArray? {
         fun dither(pattern: Int): Boolean {
             val a = x % 4
             val b = (y % 4) * 4
@@ -56,7 +63,10 @@ class Camera() {
     var y = 0
         internal set
 
-    fun set(x: Int, y: Int) {
+    fun set(
+        x: Int,
+        y: Int,
+    ) {
         this.x = x
         this.y = y
     }
@@ -75,7 +85,6 @@ class FrameBuffer(
     val height: Pixel,
     val gamePalette: ColorPalette,
 ) {
-
     internal val colorIndexBuffer: PixelArray = PixelArray(width, height, PixelFormat.INDEX)
 
     internal val clipper: Clipper = Clipper(width, height)
@@ -88,13 +97,20 @@ class FrameBuffer(
 
     private val transparency = arrayOf(0)
 
-    fun pixel(x: Pixel, y: Pixel): ColorIndex {
+    fun pixel(
+        x: Pixel,
+        y: Pixel,
+    ): ColorIndex {
         val cx = camera.cx(x)
         val cy = camera.cy(y)
         return colorIndexBuffer.getOne(cx, cy)
     }
 
-    fun pixel(x: Pixel, y: Pixel, colorIndex: ColorIndex) {
+    fun pixel(
+        x: Pixel,
+        y: Pixel,
+        colorIndex: ColorIndex,
+    ) {
         val cx = camera.cx(x)
         val cy = camera.cy(y)
         if (!clipper.isIn(cx, cy)) return
@@ -104,7 +120,12 @@ class FrameBuffer(
         colorIndexBuffer.set(cx, cy, index[0].toInt())
     }
 
-    fun fill(startX: Pixel, endX: Pixel, y: Pixel, colorIndex: ColorIndex) {
+    fun fill(
+        startX: Pixel,
+        endX: Pixel,
+        y: Pixel,
+        colorIndex: ColorIndex,
+    ) {
         val cy = camera.cy(y)
         val leftX = min(startX, endX)
         val rightX = max(startX, endX)

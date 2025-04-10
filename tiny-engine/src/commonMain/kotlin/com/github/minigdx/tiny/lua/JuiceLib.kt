@@ -28,7 +28,6 @@ import org.luaj.vm2.lib.TwoArgFunction
         "- exp10, expIn10, expOut10,\n" +
         "- exp5, expIn5, expOut5,\n" +
         "- linear ",
-
 )
 class JuiceLib : TwoArgFunction() {
     @TinyFunction(name = "pow2", example = JUICE_EXAMPLE)
@@ -66,9 +65,10 @@ class JuiceLib : TwoArgFunction() {
     @TinyFunction(name = "expOut5", example = JUICE_EXAMPLE)
     @TinyFunction(name = "linear", example = JUICE_EXAMPLE)
     inner class InterpolationLib(private val interpolation: Interpolation) : LibFunction() {
-
         @TinyCall("Give a percentage (progress) of the interpolation")
-        override fun call(@TinyArg("progress") a: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("progress") a: LuaValue,
+        ): LuaValue {
             return valueOf(interpolation.interpolate(a.tofloat()).toDouble())
         }
 
@@ -94,7 +94,10 @@ class JuiceLib : TwoArgFunction() {
         }
     }
 
-    override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
+    override fun call(
+        arg1: LuaValue,
+        arg2: LuaValue,
+    ): LuaValue {
         val func = LuaTable()
         Interpolations.all
             .forEach { interpolation ->

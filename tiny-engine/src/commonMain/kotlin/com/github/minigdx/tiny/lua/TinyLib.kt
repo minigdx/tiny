@@ -18,10 +18,10 @@ import org.luaj.vm2.lib.TwoArgFunction
         "to switch to another script using `exit`.",
 )
 class TinyLib : TwoArgFunction() {
-
     private var time: Double = 0.0
     private var frame: Int = 0
     private val tiny = LuaTable()
+
     fun advance() {
         frame++
         time += 1 / 60.0
@@ -37,7 +37,10 @@ class TinyLib : TwoArgFunction() {
     )
     @TinyVariable("t", "Time elapsed since the start of the game.")
     @TinyVariable("frame", "Number of frames elapsed since the start of the game.")
-    override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
+    override fun call(
+        arg1: LuaValue,
+        arg2: LuaValue,
+    ): LuaValue {
         tiny["dt"] = valueOf(1 / 60.0)
         tiny["t"] = valueOf(time)
         tiny["frame"] = valueOf(frame)
@@ -54,9 +57,10 @@ class TinyLib : TwoArgFunction() {
             "The first script is at the index 0.",
     )
     internal inner class exit : OneArgFunction() {
-
         @TinyCall("Exit the actual script to switch to another one.")
-        override fun call(@TinyArg("scriptIndex") arg: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("scriptIndex") arg: LuaValue,
+        ): LuaValue {
             throw Exit(arg.checkint())
         }
     }

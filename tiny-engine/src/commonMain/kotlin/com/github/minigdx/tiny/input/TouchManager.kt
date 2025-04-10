@@ -7,7 +7,6 @@ import com.github.minigdx.tiny.input.internal.ObjectPool
 typealias KeyCode = Int
 
 class TouchManager(lastKeyCode: KeyCode) {
-
     private val touchSignalCache = TouchSignal.values()
 
     internal val lastTouch: Vector2 = Vector2(0f, 0f)
@@ -41,7 +40,6 @@ class TouchManager(lastKeyCode: KeyCode) {
     private val eventsPool = InternalTouchEventObjectPool()
 
     inner class InternalTouchEventObjectPool : ObjectPool<InternalTouchEvent>(10) {
-
         override fun newInstance(): InternalTouchEvent {
             return InternalTouchEvent()
         }
@@ -56,7 +54,10 @@ class TouchManager(lastKeyCode: KeyCode) {
     /**
      * Converting the platform specific touch [id] into a [TouchSignal].
      */
-    fun getTouchSignal(id: Any, default: TouchSignal): TouchSignal {
+    fun getTouchSignal(
+        id: Any,
+        default: TouchSignal,
+    ): TouchSignal {
         type.forEachIndexed { index, savedId ->
             if (id == savedId) {
                 return touchSignalCache[index]
@@ -65,7 +66,10 @@ class TouchManager(lastKeyCode: KeyCode) {
         return assignTouchSignal(id, default)
     }
 
-    private fun assignTouchSignal(id: Any, default: TouchSignal): TouchSignal {
+    private fun assignTouchSignal(
+        id: Any,
+        default: TouchSignal,
+    ): TouchSignal {
         type[default.ordinal] = id
         return default
     }
@@ -78,7 +82,11 @@ class TouchManager(lastKeyCode: KeyCode) {
      *
      * The coordinates [x] and [y] are screen coordinates.
      */
-    fun onTouchDown(touchSignal: TouchSignal, x: Float, y: Float) {
+    fun onTouchDown(
+        touchSignal: TouchSignal,
+        x: Float,
+        y: Float,
+    ) {
         val event = eventsPool.newInstance()
 
         val ordinal = touchSignal.ordinal
@@ -87,10 +95,11 @@ class TouchManager(lastKeyCode: KeyCode) {
 
         event.way = InternalTouchEventWay.DOWN
         event.touchSignal = touchSignal
-        event.position = position.apply {
-            position.x = x
-            position.y = y
-        }
+        event.position =
+            position.apply {
+                position.x = x
+                position.y = y
+            }
         queueEvents.add(event)
     }
 
@@ -102,7 +111,11 @@ class TouchManager(lastKeyCode: KeyCode) {
      *
      * The coordinates [x] and [y] are screen coordinates.
      */
-    fun onTouchMove(touchSignal: TouchSignal, x: Float, y: Float) {
+    fun onTouchMove(
+        touchSignal: TouchSignal,
+        x: Float,
+        y: Float,
+    ) {
         val event = eventsPool.obtain()
         event.way = InternalTouchEventWay.MOVE
         event.position.x = x

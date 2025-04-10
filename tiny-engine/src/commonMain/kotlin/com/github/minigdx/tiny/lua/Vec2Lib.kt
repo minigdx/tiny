@@ -13,8 +13,10 @@ import org.luaj.vm2.lib.VarArgFunction
 
 @TinyLib("vec2", "Vector2 manipulation library.")
 class Vec2Lib : TwoArgFunction() {
-
-    override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
+    override fun call(
+        arg1: LuaValue,
+        arg2: LuaValue,
+    ): LuaValue {
         val vector2 = LuaTable()
         vector2["create"] = create()
         vector2["add"] = add()
@@ -31,26 +33,32 @@ class Vec2Lib : TwoArgFunction() {
 
     @TinyFunction("Create a vector 2 as a table { x, y }.")
     class create : TwoArgFunction() {
-
         @TinyCall("Create a vector 2 as a table { x, y }.")
-        override fun call(@TinyArg("x") arg1: LuaValue, @TinyArg("y") arg2: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("x") arg1: LuaValue,
+            @TinyArg("y") arg2: LuaValue,
+        ): LuaValue {
             val (x, y) = extract(arg1, arg2)
-            val defaultX = if (x.isnil()) {
-                ZERO
-            } else {
-                x
-            }
+            val defaultX =
+                if (x.isnil()) {
+                    ZERO
+                } else {
+                    x
+                }
 
-            val defaultY = if (y.isnil()) {
-                ZERO
-            } else {
-                y
-            }
+            val defaultY =
+                if (y.isnil()) {
+                    ZERO
+                } else {
+                    y
+                }
             return v2(defaultX, defaultY)
         }
 
         @TinyCall("Create a vector 2 as a table { x, y } using another vector 2.")
-        override fun call(@TinyArg("vec2") arg: LuaValue): LuaValue = super.call(arg)
+        override fun call(
+            @TinyArg("vec2") arg: LuaValue,
+        ): LuaValue = super.call(arg)
     }
 
     @TinyFunction("Add vector2 to another vector2", example = VECTOR2_ADD)
@@ -65,9 +73,9 @@ class Vec2Lib : TwoArgFunction() {
 
         @TinyCall("Add a vector 2 {x, y} to another vector 2 {x, y}")
         override fun call(
-            @TinyArg("v1", "vector 2 as a table {x, y}") a: LuaValue,
-            @TinyArg("v2", "vector 2 as a table {x, y}") b: LuaValue,
-        ): LuaValue = super.call(a, b)
+            @TinyArg("v1", "vector 2 as a table {x, y}") arg1: LuaValue,
+            @TinyArg("v2", "vector 2 as a table {x, y}") arg2: LuaValue,
+        ): LuaValue = super.call(arg1, arg2)
 
         @TinyCall("Add a destructured vector 2 to another destructured vector 2")
         override fun call(
@@ -90,9 +98,9 @@ class Vec2Lib : TwoArgFunction() {
 
         @TinyCall("Subtract a vector 2 {x, y} from another vector 2 {x, y}")
         override fun call(
-            @TinyArg("v1", "vector 2 as a table {x, y}") a: LuaValue,
-            @TinyArg("v2", "vector 2 as a table {x, y}") b: LuaValue,
-        ): LuaValue = super.call(a, b)
+            @TinyArg("v1", "vector 2 as a table {x, y}") arg1: LuaValue,
+            @TinyArg("v2", "vector 2 as a table {x, y}") arg2: LuaValue,
+        ): LuaValue = super.call(arg1, arg2)
 
         @TinyCall("Subtract a destructured vector 2 from another destructured vector 2")
         override fun call(
@@ -140,8 +148,8 @@ class Vec2Lib : TwoArgFunction() {
 
         @TinyCall("Calculate the magnitude (length) of a vector 2 {x, y}")
         override fun call(
-            @TinyArg("v1", "vector 2 as a table {x, y}") a: LuaValue,
-        ): LuaValue = super.call(a)
+            @TinyArg("v1", "vector 2 as a table {x, y}") arg: LuaValue,
+        ): LuaValue = super.call(arg)
     }
 
     @TinyFunction("Normalize a vector", example = VECTOR_NOR)
@@ -163,7 +171,9 @@ class Vec2Lib : TwoArgFunction() {
         ): LuaValue = super.call(arg1, arg2)
 
         @TinyCall("Normalize a vector 2 {x, y}")
-        override fun call(@TinyArg("v1", "vector 2 as a table {x, y}") arg: LuaValue): LuaValue = super.call(arg)
+        override fun call(
+            @TinyArg("v1", "vector 2 as a table {x, y}") arg: LuaValue,
+        ): LuaValue = super.call(arg)
     }
 
     @TinyFunction("Cross product")
@@ -177,9 +187,9 @@ class Vec2Lib : TwoArgFunction() {
 
         @TinyCall("Cross product between a vector 2 {x, y} and another vector 2 {x, y}")
         override fun call(
-            @TinyArg("v1", "vector 2 as a table {x, y}") a: LuaValue,
-            @TinyArg("v2", "vector 2 as a table {x, y}") b: LuaValue,
-        ): LuaValue = super.call(a, b)
+            @TinyArg("v1", "vector 2 as a table {x, y}") arg1: LuaValue,
+            @TinyArg("v2", "vector 2 as a table {x, y}") arg2: LuaValue,
+        ): LuaValue = super.call(arg1, arg2)
 
         @TinyCall("Cross product between a destructured vector 2 and another destructured vector 2")
         override fun call(
@@ -206,13 +216,16 @@ class Vec2Lib : TwoArgFunction() {
 
         @TinyCall("Scale a vector 2 {x, y} using the factor scl")
         override fun call(
-            @TinyArg("v1", "vector 2 as a table {x, y}") a: LuaValue,
+            @TinyArg("v1", "vector 2 as a table {x, y}") arg1: LuaValue,
             @TinyArg("scl") arg2: LuaValue,
-        ): LuaValue = super.call(a, arg2)
+        ): LuaValue = super.call(arg1, arg2)
     }
 
     companion object {
-        fun extract(arg1: LuaValue, arg2: LuaValue): List<LuaValue> {
+        fun extract(
+            arg1: LuaValue,
+            arg2: LuaValue,
+        ): List<LuaValue> {
             return if (arg1.istable()) {
                 listOf(arg1.get("x"), arg1.get("y"))
             } else {
@@ -241,7 +254,10 @@ class Vec2Lib : TwoArgFunction() {
             return result
         }
 
-        fun v2(arg1: LuaValue, arg2: LuaValue): LuaTable {
+        fun v2(
+            arg1: LuaValue,
+            arg2: LuaValue,
+        ): LuaTable {
             return LuaTable().apply {
                 set("x", arg1)
                 set("y", arg2)

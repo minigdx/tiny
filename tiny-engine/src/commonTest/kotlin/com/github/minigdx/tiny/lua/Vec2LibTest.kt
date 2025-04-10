@@ -5,7 +5,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class Vec2LibTest {
-
     @Test
     fun it_creates_empty_vec2() {
         val result = Vec2Lib.create().call()

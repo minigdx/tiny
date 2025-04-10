@@ -1,17 +1,17 @@
 [versions]
 asciidoctorj = "3.3.2"
-clikt = "3.5.2"
+clikt = "5.0.3"
 gifencoder = "0.10.1"
-kgl = "0.7.3"
-kotlin-coroutines = "1.7.1"
-kotlin-ksp = "1.8.20-1.0.10"
-kotlin-serialization = "1.8.0"
-kotlin-serialization-json = "1.5.1"
-ktor = "2.3.0"
-luak = "1.0.0-alpha4"
-lwjgl = "3.3.1"
-minigdx-developer = "1.3.2"
-mordant = "2.6.0"
+kgl = "1.0.0K2"
+kotlin-coroutines = "1.10.2"
+kotlin-ksp = "2.1.20-1.0.32"
+kotlin-serialization = "2.1.20"
+kotlin-serialization-json = "1.8.1"
+ktor = "3.1.2"
+luak = "1.0.0K2"
+lwjgl = "3.3.6"
+minigdx-developer = "1.0-KOTLIN20"
+mordant = "3.0.2"
 slf4j = "2.0.7"
 
 
@@ -64,6 +64,7 @@ jvm-ktor-client = [
 [plugins]
 asciidoctorj = { id = "org.asciidoctor.jvm.convert", version.ref = "asciidoctorj" }
 minigdx-mpp = { id = "com.github.minigdx.gradle.plugin.developer.mpp", version.ref = "minigdx-developer" }
+minigdx-jvm = { id = "com.github.minigdx.gradle.plugin.developer.jvm" }
 minigdx-developer = { id = "com.github.minigdx.gradle.plugin.developer", version.ref = "minigdx-developer" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin-serialization" }
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "kotlin-ksp" }

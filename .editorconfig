@@ -1,3 +1,6 @@
 [*.{kt,kts}]
 ij_kotlin_allow_trailing_comma = true
 ij_kotlin_allow_trailing_comma_on_call_site = true
+ktlint_standard_property-naming = disabled
+ktlint_standard_class-naming = disabled
+ktlint_standard_function-naming = disabled

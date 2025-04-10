@@ -40,6 +40,8 @@ dependencies {
 
     // See https://github.com/cagpie/PicoAudio.js
     jsMainImplementation(npm("picoaudio", "1.1.2"))?.because("get midi over web audio API.")
+    jsMainImplementation("org.jetbrains.kotlin:kotlinx-atomicfu-runtime:2.1.20")
+        ?.because("https://youtrack.jetbrains.com/issue/KT-57235")
 
     add("kspJvm", project(":tiny-doc-generator")) {
         because("KSP will generate the asciidoctor documentation of all Lua libs from Tiny.")
