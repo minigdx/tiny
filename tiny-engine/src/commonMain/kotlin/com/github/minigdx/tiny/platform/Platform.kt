@@ -4,7 +4,7 @@ import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.Frame
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.engine.Operation
+import com.github.minigdx.tiny.engine.RenderOperation
 import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.graphic.FrameBuffer
@@ -59,7 +59,7 @@ interface Platform {
      */
     fun draw(
         context: RenderContext,
-        ops: List<Operation>,
+        ops: List<RenderOperation>,
     )
 
     /**
@@ -131,6 +131,6 @@ interface Platform {
      */
     fun drawOffscreen(
         renderContext: RenderContext,
-        ops: List<Operation>,
+        ops: List<RenderOperation>,
     ): Frame
 }

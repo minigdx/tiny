@@ -5,10 +5,11 @@ import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.Frame
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.engine.Operation
+import com.github.minigdx.tiny.engine.RenderOperation
 import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.graphic.FrameBuffer
+import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.platform.ImageData
@@ -73,7 +74,7 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
 
     override fun draw(
         context: RenderContext,
-        ops: List<Operation>,
+        ops: List<RenderOperation>,
     ) = Unit
 
     override fun record() {
@@ -156,13 +157,17 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
 
     override fun drawOffscreen(
         renderContext: RenderContext,
-        ops: List<Operation>,
+        ops: List<RenderOperation>,
     ): Frame {
         return object : Frame {
             override fun get(
                 x: Pixel,
                 y: Pixel,
             ): ColorIndex = 0
+
+            override fun toPixelArray(): PixelArray {
+                TODO("Not yet implemented")
+            }
         }
     }
 

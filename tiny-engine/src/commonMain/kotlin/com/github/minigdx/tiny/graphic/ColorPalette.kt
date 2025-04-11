@@ -92,14 +92,14 @@ class ColorPalette(colors: List<HexColor>) {
     /**
      * Get the RGB value already packed for GIF attached to this color index.
      */
-    fun getRGAasInt(index: ColorIndex): Int {
+    fun getRGAasInt(index: ColorIndex): ColorIndex {
         return rgbForGif[check(index)]
     }
 
     /**
      * Return the color index of the closest color matching the hexadecimal color.
      */
-    fun getColorIndex(hexString: String): Int {
+    fun getColorIndex(hexString: String): ColorIndex {
         return hexToColorCache.getOrPut(hexString) { fromRGBA(hexStringToByteArray(hexString)) }
     }
 

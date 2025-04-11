@@ -8,7 +8,7 @@ import com.danielgergely.kgl.GL_VERSION
 import com.danielgergely.kgl.KglLwjgl
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.engine.Operation
+import com.github.minigdx.tiny.engine.RenderOperation
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.RenderContext
 import com.github.minigdx.tiny.platform.WindowManager
@@ -37,11 +37,11 @@ class LwjglGLRender(
 
     override fun draw(
         context: RenderContext,
-        ops: List<Operation>,
+        ops: List<RenderOperation>,
     ) = gl.draw(context, ops)
 
     override fun drawOffscreen(
         context: RenderContext,
-        ops: List<Operation>,
+        ops: List<RenderOperation>,
     ) = gl.drawOffscreen(context, ops)
 }

@@ -18,6 +18,8 @@ import com.danielgergely.kgl.GL_LINEAR
 import com.danielgergely.kgl.GL_LINK_STATUS
 import com.danielgergely.kgl.GL_NEAREST
 import com.danielgergely.kgl.GL_ONE_MINUS_SRC_ALPHA
+import com.danielgergely.kgl.GL_R8
+import com.danielgergely.kgl.GL_RED
 import com.danielgergely.kgl.GL_REPEAT
 import com.danielgergely.kgl.GL_RGBA
 import com.danielgergely.kgl.GL_SRC_ALPHA
@@ -39,7 +41,8 @@ import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.Frame
 import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.engine.Operation
+import com.github.minigdx.tiny.engine.RenderOperation
+import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.graphic.PixelFormat
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.RenderContext
@@ -69,12 +72,15 @@ class GLRender(
 
     private val vertexData =
         floatArrayOf(
-            1f,
-            0f,
-            0f,
-            1f,
-            0f,
-            0f,
+            // bottom right
+            3f,
+            -1f,
+            // top left
+            -1f,
+            3f,
+            // bottom left
+            -1f,
+            -1f,
         )
 
     override fun init(windowManager: WindowManager): RenderContext {
@@ -98,6 +104,12 @@ class GLRender(
 
         gl.deleteShader(vertexShaderId)
         gl.deleteShader(fragmentShaderId)
+
+        gl.uniform2f(
+            gl.getUniformLocation(shaderProgram, "game_screen")!!,
+            gameOptions.width.toFloat(),
+            gameOptions.height.toFloat(),
+        )
 
         // Prepare the FBO
         val fboBuffer = ByteBuffer(windowManager.screenWidth * windowManager.screenHeight * PixelFormat.RGBA)
@@ -224,7 +236,7 @@ class GLRender(
 
     override fun draw(
         context: RenderContext,
-        ops: List<Operation>,
+        ops: List<RenderOperation>,
     ) {
         context as GLRenderContext
 
@@ -237,44 +249,14 @@ class GLRender(
         gl.enable(GL_BLEND)
         gl.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) // Or import these constants
 
-        // -- game screen -- //
-        // Push instructions as textures
-        gl.activeTexture(GL_TEXTURE0)
-        gl.bindTexture(GL_TEXTURE_2D, context.gameTexture)
-
-        // setup shaders
-        gl.activeTexture(GL_TEXTURE1)
-        gl.bindTexture(GL_TEXTURE_2D, context.colorPalette)
-        gl.uniform1i(gl.getUniformLocation(context.program, "colors")!!, 1)
-
-        // TODO: ça peut être fait avant car cette resolution ne change jamais!
-        gl.uniform2f(
-            gl.getUniformLocation(context.program, "game_screen")!!,
-            gameOptions.width.toFloat(),
-            gameOptions.height.toFloat(),
-        )
-
         gl.clear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
         gl.clearColor(0f, 0f, 0f, 1.0f)
 
-        gl.uniform1f(gl.getUniformLocation(context.program, "u_type")!!, 0f)
-        gl.uniform1f(gl.getUniformLocation(context.program, "u_arg1")!!, 8f)
-        gl.drawArrays(GL_TRIANGLES, 0, 3)
-
-        (0..36000).forEach {
-            gl.uniform1f(gl.getUniformLocation(context.program, "u_type")!!, 1f)
-            gl.uniform1f(gl.getUniformLocation(context.program, "u_arg1")!!, it.toFloat())
-            gl.uniform1f(gl.getUniformLocation(context.program, "u_arg2")!!, 60.toFloat())
-            gl.uniform1f(gl.getUniformLocation(context.program, "u_arg3")!!, 9.toFloat())
-            gl.drawArrays(GL_TRIANGLES, 0, 3)
+        ops.forEach {
+            // draw arrays ?
+            // fixme: only gpu
         }
-/*
-        gl.uniform1f(gl.getUniformLocation(context.program, "u_type")!!, 1f)
-        gl.uniform1f(gl.getUniformLocation(context.program, "u_arg1")!!, 1.toFloat())
-        gl.uniform1f(gl.getUniformLocation(context.program, "u_arg2")!!, 60.toFloat())
-        gl.uniform1f(gl.getUniformLocation(context.program, "u_arg3")!!, 9.toFloat())
-        gl.drawArraysInstanced(GL_TRIANGLES, 0, 3, 36000)
-*/
+
     }
 
     override fun draw(
@@ -283,12 +265,48 @@ class GLRender(
         width: Pixel,
         height: Pixel,
     ) {
-        TODO()
+        context as GLRenderContext
+
+        gl.viewport(
+            gameOptions.gutter.first * gameOptions.zoom * context.windowManager.ratioWidth,
+            gameOptions.gutter.second * gameOptions.zoom * context.windowManager.ratioHeight,
+            gameOptions.width * gameOptions.zoom * context.windowManager.ratioWidth,
+            gameOptions.height * gameOptions.zoom * context.windowManager.ratioHeight,
+        )
+        gl.disable(GL_BLEND)
+
+        // -- game screen -- //
+        // Push instructions as textures
+        gl.activeTexture(GL_TEXTURE0)
+        gl.bindTexture(GL_TEXTURE_2D, context.gameTexture)
+        gl.uniform1i(gl.getUniformLocation(context.program, "frameBuffer")!!, 0)
+        gl.texImage2D(
+            GL_TEXTURE_2D,
+            0,
+            GL_R8,
+            width,
+            height,
+            0,
+            GL_RED,
+            GL_UNSIGNED_BYTE,
+            ByteBuffer(image),
+        )
+
+        // setup shaders
+        gl.activeTexture(GL_TEXTURE1)
+        gl.bindTexture(GL_TEXTURE_2D, context.colorPalette)
+        gl.uniform1i(gl.getUniformLocation(context.program, "colors")!!, 1)
+
+        gl.clear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT) // FIXME: supprimer GL_DEPTH_BUFFER ?
+        gl.clearColor(0f, 0f, 0f, 1.0f)
+
+        gl.drawArrays(GL_TRIANGLES, 0, 3)
+
     }
 
     override fun drawOffscreen(
         context: RenderContext,
-        ops: List<Operation>,
+        ops: List<RenderOperation>,
     ): Frame {
         context as GLRenderContext
         context.fbo.usingFramebuffer {
@@ -378,6 +396,48 @@ class GLRender(
             // it goes from 0.0 -> 1.0
             varying vec2 viewport;
             
+            // Color palette
+            uniform sampler2D colors;
+            // Frame Buffer
+            uniform sampler2D frameBuffer;
+            // Size of the game screen, in pixel, in the game resolution (see _tiny.json)
+            uniform vec2 game_screen;
+            
+            /**
+            * Extract data from a "kind of" texture1D
+            */
+            vec4 readData(sampler2D txt, int index, int textureWidth, int textureHeight) {
+                int x = index - textureWidth * (index / textureWidth); // index % textureWidth
+                int y =  index / textureWidth;
+                vec2 uv = vec2((float(x) + 0.5) / float(textureWidth), (float(y) + 0.5) / float(textureHeight));
+                return texture2D(txt, uv);
+            }
+            
+            /**
+            * Read a color from the colors texture.
+            */
+            vec4 readColor(int index) {
+                int icolor = index - 256 * (index / 256);
+                return readData(colors, icolor, 256, 256);
+            }
+            
+            void main() {
+                vec4 color = texture2D(frameBuffer, viewport);
+                gl_FragColor = readColor(int(color.r * 256.0));
+            }
+            """.trimIndent()
+
+        //language=Glsl
+        val FRAGMENT_SHADER_BACKUP =
+            """
+            #ifdef GL_ES
+                precision highp float;
+            #endif
+                    
+            // it goes from 0.0 -> 1.0
+            varying vec2 viewport;
+            
+            // Color palette
             uniform sampler2D colors;
             // Size of the game screen, in pixel, in the game resolution (see _tiny.json)
             uniform vec2 game_screen;
@@ -463,5 +523,22 @@ class GLFrame(
         buffer.position = i
         buffer.get(result)
         return gameOptions.colors().fromRGBA(result)
+    }
+
+    /**
+     * Convert the actual Frame (with RGBA) into a Pixel Array of Color index.
+     */
+    override fun toPixelArray(): PixelArray {
+        val result = PixelArray(gameOptions.width, gameOptions.height, pixelFormat = PixelFormat.INDEX)
+        buffer.position = 0
+        val tmp = ByteArray(PixelFormat.RGBA)
+        var index = 0
+        (0 until gameOptions.width * gameOptions.height * PixelFormat.RGBA step PixelFormat.RGBA).forEach { i ->
+            buffer.position = i
+            buffer.get(tmp)
+            result.pixels[index++] = gameOptions.colors().fromRGBA(tmp).toByte()
+        }
+
+        return result
     }
 }

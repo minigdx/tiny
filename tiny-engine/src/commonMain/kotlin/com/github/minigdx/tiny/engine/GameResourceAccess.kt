@@ -3,6 +3,7 @@ package com.github.minigdx.tiny.engine
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.graphic.FrameBuffer
+import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.resources.GameLevel
 import com.github.minigdx.tiny.resources.GameScript
 import com.github.minigdx.tiny.resources.Sound
@@ -22,11 +23,16 @@ data class DebugLine(val x1: Int, val y1: Int, val x2: Int, val y2: Int, val col
 
 data class DebugEnabled(val enabled: Boolean) : DebugAction
 
+/**
+ * Generated frame by the GPU.
+ */
 interface Frame {
     fun get(
         x: Pixel,
         y: Pixel,
     ): ColorIndex
+
+    fun toPixelArray(): PixelArray
 }
 
 /**
@@ -92,50 +98,170 @@ interface GameResourceAccess {
     /**
      * Add an Ops to be executed by the shader
      */
-    fun addOp(op: Operation) = Unit
+    fun addOp(op: RenderOperation) = Unit
 
     fun drawOffscreen(): Frame
 }
 
-sealed interface Operation {
-    fun write(
-        index: Int,
-        image: ByteArray,
-    ): Int
+/**
+ * Specifies the target processing unit for rendering operations.
+ */
+enum class RenderUnit {
+    /**
+     * Target the Central Processing Unit (CPU).
+     * Often used for tasks less suitable for massive parallelism or requiring complex logic.
+     */
+    CPU,
 
-    val type: Int
+    /**
+     * Target the Graphics Processing Unit (GPU).
+     * Ideal for highly parallel rendering tasks like processing large numbers of pixels.
+     */
+    GPU,
+
+    /**
+     * Target both unit (CPU/GPU).
+     *
+     * Can be applied in any unit. Because can do both or because it's altering the state of the next operation.
+     *
+     * Selecting the right unit might depend on the operation by itself or the previous operation, to keep the
+     * same unit.
+     */
+    BOTH,
+    ;
+
+    fun compatibleWith(target: RenderUnit): Boolean {
+        return when(this) {
+            CPU -> target == CPU || target == BOTH
+            GPU -> target == GPU || target == BOTH
+            BOTH -> true
+        }
+    }
+}
+
+sealed interface RenderOperation {
+
+    val target: RenderUnit
+
+    /**
+     * Render the operation on the CPU, by updating the current frame.
+     */
+    fun executeCPU(): Unit = invalidTarget(RenderUnit.CPU)
+
+    /**
+     * Render the operation on the GPU, by using a shader.
+     */
+    fun executeGPU(): Unit = invalidTarget(RenderUnit.GPU)
+
+    /**
+     * Try to merge the current operation with the previous one, to batch operations.
+     */
+    fun mergeWith(previousOperation: RenderOperation?): Boolean = false
+
+    private fun invalidTarget(renderUnit: RenderUnit): Nothing =
+        throw IllegalStateException(
+            "The operation ${this::class.simpleName} does not support $renderUnit render operations. "
+        )
 }
 
 /**
  * Set a pixel [color] at the coordinates [x] and [y].
  */
-data class SetPixel(val x: Pixel, val y: Pixel, val color: ColorIndex) : Operation {
-    override val type: Int = 1
+data class SetPixel(
+    val x: Pixel,
+    val y: Pixel,
+    val color: ColorIndex,
+    private val frameBuffer: FrameBuffer,
+) : RenderOperation {
 
-    override fun write(
-        index: Int,
-        image: ByteArray,
-    ): Int {
-        var cursor = index
-        image[cursor++] = x.toByte()
-        image[cursor++] = y.toByte()
-        image[cursor++] = color.toByte()
-        return cursor
+    override val target = RenderUnit.CPU
+
+    override fun executeCPU() {
+        frameBuffer.pixel(x, y, color)
     }
 }
 
 /**
  * Clear the full screen by filling it with [color].
  */
-data class ClearScreen(val color: ColorIndex) : Operation {
-    override val type: Int = 0
+data class ClearScreen(
+    val color: ColorIndex,
+    private val frameBuffer: FrameBuffer,
+) : RenderOperation {
 
-    override fun write(
-        index: Int,
-        image: ByteArray,
-    ): Int {
-        var cursor = index
-        image[cursor++] = color.toByte()
-        return cursor
+    override val target = RenderUnit.CPU
+
+    override fun executeCPU() {
+        frameBuffer.clear(color)
     }
+}
+
+data class SwapPalette(
+    val origin: ColorIndex,
+    val destination: ColorIndex,
+    private val frameBuffer: FrameBuffer,
+) : RenderOperation {
+
+    override val target = RenderUnit.BOTH
+
+    override fun executeCPU() {
+        frameBuffer.blender.pal(origin, destination)
+    }
+
+    override fun executeGPU() {
+        TODO()
+    }
+}
+
+class DrawSprite(
+    val source: SpriteSheet,
+    sourceX: Pixel,
+    sourceY: Pixel,
+    sourceWidth: Pixel,
+    sourceHeight: Pixel,
+    destinationX: Pixel,
+    destinationY: Pixel,
+    flipX: Boolean,
+    flipY: Boolean,
+) : RenderOperation {
+
+    override val target = RenderUnit.GPU
+
+    private val attributes =
+        mutableListOf(
+            DrawSpriteAttribute(
+                sourceX,
+                sourceY,
+                sourceWidth,
+                sourceHeight,
+                destinationX,
+                destinationY,
+                flipX,
+                flipY,
+            ),
+        )
+
+    override fun executeGPU() {
+        TODO()
+    }
+
+    override fun mergeWith(previousOperation: RenderOperation?): Boolean {
+        val operation = previousOperation as? DrawSprite ?: return false
+        if (operation.source != source) {
+            return false
+        }
+        operation.attributes.addAll(attributes)
+        return true
+    }
+
+    private data class DrawSpriteAttribute(
+        val sourceX: Pixel,
+        val sourceY: Pixel,
+        val sourceWidth: Pixel,
+        val sourceHeight: Pixel,
+        val destinationX: Pixel,
+        val destinationY: Pixel,
+        val flipX: Boolean,
+        val flipY: Boolean,
+    )
 }

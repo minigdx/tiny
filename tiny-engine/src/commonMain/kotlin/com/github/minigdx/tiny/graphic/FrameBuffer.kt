@@ -229,4 +229,15 @@ class FrameBuffer(
     fun generateBuffer(): ByteArray {
         return this.colorIndexBuffer.pixels
     }
+
+    /**
+     * Fast copy color index from another pixel array.
+     * It's a raw copy of each element.
+     */
+    fun fastCopyFrom(pixelArray: PixelArray) {
+        if(pixelArray.pixelFormat != colorIndexBuffer.pixelFormat) {
+            throw IllegalStateException("Only copy from a Pixel array of the same format is possible")
+        }
+        pixelArray.pixels.copyInto(colorIndexBuffer.pixels, 0, 0, colorIndexBuffer.size)
+    }
 }

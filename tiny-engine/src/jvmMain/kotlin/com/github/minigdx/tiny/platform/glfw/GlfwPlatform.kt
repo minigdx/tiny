@@ -5,7 +5,7 @@ import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.engine.Frame
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.engine.Operation
+import com.github.minigdx.tiny.engine.RenderOperation
 import com.github.minigdx.tiny.file.FileStream
 import com.github.minigdx.tiny.file.InputStreamStream
 import com.github.minigdx.tiny.file.JvmLocalFile
@@ -219,14 +219,14 @@ class GlfwPlatform(
 
     override fun draw(
         context: RenderContext,
-        ops: List<Operation>,
+        ops: List<RenderOperation>,
     ) {
         render.draw(context, ops)
     }
 
     override fun drawOffscreen(
         renderContext: RenderContext,
-        ops: List<Operation>,
+        ops: List<RenderOperation>,
     ): Frame {
         return render.drawOffscreen(renderContext, ops)
     }

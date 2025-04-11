@@ -54,7 +54,7 @@ class GameEngine(
     private var debugEnabled: Boolean = true
     private val debugActions = mutableListOf<DebugAction>()
 
-    private val ops = mutableListOf<Operation>()
+    private val ops = mutableListOf<RenderOperation>()
 
     private val notes = mutableListOf<WaveGenerator>()
 
@@ -483,13 +483,53 @@ class GameEngine(
             .firstOrNull { script -> script?.name == name }
     }
 
-    override fun addOp(op: Operation) {
-        ops.add(op)
+    override fun addOp(op: RenderOperation) {
+        val last = ops.lastOrNull()
+        if(op.mergeWith(last)) {
+            return
+        }
+
+        if(last == null || op.target.compatibleWith(last.target)) {
+            ops.add(op)
+        } else {
+            when(op.target) {
+                RenderUnit.CPU -> {
+                    val renderedFrame = platform.drawOffscreen(renderContext, ops)
+                    ops.clear()
+                    frameBuffer.fastCopyFrom(renderedFrame.toPixelArray())
+                    ops.add(op)
+                }
+                RenderUnit.GPU -> {
+                    ops.forEach {
+                        check(it.target.compatibleWith(RenderUnit.CPU)) { "Expected only ops than can be executed on CPU!"}
+                        it.executeCPU()
+                    }
+                    platform.draw(renderContext, frameBuffer)
+                    ops.clear()
+                    ops.add(op)
+                }
+                RenderUnit.BOTH -> throw IllegalStateException("RenderUnit.BOTH should be compatible with anything.")
+            }
+        }
     }
 
     override fun draw() {
-        // platform.draw(renderContext, frameBuffer)
-        platform.draw(renderContext, ops)
+        val last = ops.lastOrNull()
+
+        if(last == null) {
+            platform.draw(renderContext, frameBuffer)
+        } else if(last.target.compatibleWith(RenderUnit.CPU)) {
+            ops.forEach {
+                check(it.target.compatibleWith(RenderUnit.CPU)) { "Expected only ops than can be executed on CPU!"}
+                it.executeCPU()
+            }
+            platform.draw(renderContext, frameBuffer)
+        } else {
+            val renderedFrame = platform.drawOffscreen(renderContext, ops)
+            frameBuffer.fastCopyFrom(renderedFrame.toPixelArray())
+            platform.draw(renderContext, frameBuffer)
+        }
+        ops.clear()
     }
 
     override fun drawOffscreen(): Frame {
