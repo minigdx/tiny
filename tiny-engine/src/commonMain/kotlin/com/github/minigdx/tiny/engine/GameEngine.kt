@@ -9,7 +9,7 @@ import com.github.minigdx.tiny.input.Key
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.lua.toTinyException
 import com.github.minigdx.tiny.platform.Platform
-import com.github.minigdx.tiny.platform.RenderContext
+import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.resources.GameLevel
 import com.github.minigdx.tiny.resources.GameResource
 import com.github.minigdx.tiny.resources.GameScript
@@ -485,55 +485,49 @@ class GameEngine(
 
     override fun addOp(op: RenderOperation) {
         val last = ops.lastOrNull()
-        if(op.mergeWith(last)) {
+        if (op.mergeWith(last)) {
             return
         }
 
-        if(last == null || op.target.compatibleWith(last.target)) {
+        if (last == null || op.target.compatibleWith(last.target)) {
             ops.add(op)
         } else {
-            when(op.target) {
-                RenderUnit.CPU -> {
-                    val renderedFrame = platform.drawOffscreen(renderContext, ops)
-                    ops.clear()
-                    frameBuffer.fastCopyFrom(renderedFrame.toPixelArray())
-                    ops.add(op)
-                }
-                RenderUnit.GPU -> {
-                    ops.forEach {
-                        check(it.target.compatibleWith(RenderUnit.CPU)) { "Expected only ops than can be executed on CPU!"}
-                        it.executeCPU()
-                    }
-                    platform.draw(renderContext, frameBuffer)
-                    ops.clear()
-                    ops.add(op)
-                }
-                RenderUnit.BOTH -> throw IllegalStateException("RenderUnit.BOTH should be compatible with anything.")
-            }
+            val renderedFrame = drawToFrameBuffer()
+            frameBuffer.fastCopyFrom(renderedFrame)
+            ops.add(op)
         }
     }
 
+    /**
+     * Will render the actual frame on the screen.
+     */
     override fun draw() {
-        val last = ops.lastOrNull()
+        // Will execute the last remaining operations.
+        // Those operations should be of same type.
+        val render = drawToFrameBuffer()
 
-        if(last == null) {
-            platform.draw(renderContext, frameBuffer)
-        } else if(last.target.compatibleWith(RenderUnit.CPU)) {
+        frameBuffer.fastCopyFrom(render)
+        platform.draw(renderContext, frameBuffer)
+    }
+
+    override fun drawToFrameBuffer(): FrameBuffer {
+        val last = ops.lastOrNull() ?: return frameBuffer
+
+        if (last.target.compatibleWith(RenderUnit.CPU)) {
+            // The remaining operations are only for the CPU.
+            // Let's execute it now.
             ops.forEach {
-                check(it.target.compatibleWith(RenderUnit.CPU)) { "Expected only ops than can be executed on CPU!"}
+                check(it.target.compatibleWith(RenderUnit.CPU)) { "Expected only ops than can be executed on CPU!" }
                 it.executeCPU()
             }
-            platform.draw(renderContext, frameBuffer)
         } else {
-            val renderedFrame = platform.drawOffscreen(renderContext, ops)
-            frameBuffer.fastCopyFrom(renderedFrame.toPixelArray())
-            platform.draw(renderContext, frameBuffer)
+            // There is only GPU operations remaining.
+            // Let's draw this last operations into the current frame buffer.
+            val renderedFrame = platform.drawToFrameBuffer(renderContext, frameBuffer, ops)
+            frameBuffer.fastCopyFrom(renderedFrame)
         }
         ops.clear()
-    }
-
-    override fun drawOffscreen(): Frame {
-        return platform.drawOffscreen(renderContext, ops)
+        return frameBuffer
     }
 
     override fun end() {

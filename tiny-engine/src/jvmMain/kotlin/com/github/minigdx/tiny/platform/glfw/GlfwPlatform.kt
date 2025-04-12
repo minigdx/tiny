@@ -2,7 +2,6 @@ package com.github.minigdx.tiny.platform.glfw
 
 import com.danielgergely.kgl.KglLwjgl
 import com.github.minigdx.tiny.Seconds
-import com.github.minigdx.tiny.engine.Frame
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.RenderOperation
@@ -20,11 +19,11 @@ import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.ImageData
 import com.github.minigdx.tiny.platform.Platform
-import com.github.minigdx.tiny.platform.RenderContext
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
-import com.github.minigdx.tiny.render.GLRender
+import com.github.minigdx.tiny.render.OpenGLRender
 import com.github.minigdx.tiny.render.Render
+import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.sound.SoundManager
 import com.github.minigdx.tiny.util.MutableFixedSizeList
 import com.squareup.gifencoder.FastGifEncoder
@@ -52,7 +51,7 @@ class GlfwPlatform(
     private val logger: Logger,
     private val vfs: VirtualFileSystem,
     private val workdirectory: File,
-    private val render: Render = GLRender(KglLwjgl, logger, gameOptions),
+    private val render: Render = OpenGLRender(KglLwjgl, logger, gameOptions),
     private val jarResourcePrefix: String = "",
 ) : Platform {
     private var window: Long = 0
@@ -217,18 +216,12 @@ class GlfwPlatform(
         lastBuffer = frameBuffer
     }
 
-    override fun draw(
-        context: RenderContext,
-        ops: List<RenderOperation>,
-    ) {
-        render.draw(context, ops)
-    }
-
-    override fun drawOffscreen(
+    override fun drawToFrameBuffer(
         renderContext: RenderContext,
+        frameBuffer: FrameBuffer,
         ops: List<RenderOperation>,
-    ): Frame {
-        return render.drawOffscreen(renderContext, ops)
+    ): FrameBuffer {
+        return render.drawToFrameBuffer(renderContext, frameBuffer, ops)
     }
 
     override fun endGameLoop() = Unit

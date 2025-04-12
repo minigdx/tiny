@@ -1,6 +1,5 @@
 package com.github.minigdx.tiny.lua
 
-import com.github.minigdx.tiny.engine.Frame
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.graphic.ColorPalette
 import com.github.minigdx.tiny.graphic.FrameBuffer
@@ -34,7 +33,7 @@ class GfxLibTest {
 
             override fun script(name: String): GameScript? = null
 
-            override fun drawOffscreen(): Frame {
+            override fun drawToFrameBuffer(): FrameBuffer {
                 TODO("Not yet implemented")
             }
 

@@ -5,6 +5,7 @@ import com.github.mingdx.tiny.doc.TinyArgs
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
+import com.github.minigdx.tiny.engine.DrawSprite
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.graphic.PixelArray
@@ -232,6 +233,8 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
 
             val column = sprN % nbSpritePerRow
             val row = (sprN - column) / nbSpritePerRow
+
+            /*
             resourceAccess.frameBuffer.copyFrom(
                 source = spritesheet.pixels,
                 dstX = x,
@@ -242,6 +245,21 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
                 height = sh,
                 reverseX = flipX,
                 reverseY = flipY,
+            )*/
+
+            resourceAccess.addOp(
+                DrawSprite(
+                    spritesheet,
+                    sourceX = column * sw,
+                    sourceY = row * sh,
+                    sourceWidth = sw,
+                    sourceHeight = sh,
+                    flipX = flipX,
+                    flipY = flipY,
+                    destinationX = x,
+                    destinationY = y,
+                    blender = resourceAccess.frameBuffer.blender,
+                ),
             )
 
             return NIL

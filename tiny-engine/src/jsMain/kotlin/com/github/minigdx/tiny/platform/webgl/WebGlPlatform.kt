@@ -2,7 +2,6 @@ package com.github.minigdx.tiny.platform.webgl
 
 import com.danielgergely.kgl.KglJs
 import com.danielgergely.kgl.WebGL2RenderingContext
-import com.github.minigdx.tiny.engine.Frame
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.RenderOperation
@@ -18,10 +17,10 @@ import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.ImageData
 import com.github.minigdx.tiny.platform.Platform
-import com.github.minigdx.tiny.platform.RenderContext
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
-import com.github.minigdx.tiny.render.GLRender
+import com.github.minigdx.tiny.render.OpenGLRender
+import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineDispatcher
@@ -37,7 +36,7 @@ class WebGlPlatform(
     override val gameOptions: GameOptions,
     val rootUrl: String,
 ) : Platform {
-    private lateinit var render: GLRender
+    private lateinit var render: OpenGLRender
 
     private val jsInputHandler = JsInputHandler(canvas, gameOptions)
 
@@ -62,7 +61,7 @@ class WebGlPlatform(
                         "WebGL2 doesn't seems to be supported by your browser. " +
                         "Please update to a compatible browser to run the game in WebGL2.",
                 )
-        render = GLRender(KglJs(context), logger, gameOptions)
+        render = OpenGLRender(KglJs(context), logger, gameOptions)
         return render.init(windowManager)
     }
 
@@ -87,13 +86,6 @@ class WebGlPlatform(
     ) {
         val image = frameBuffer.generateBuffer()
         render.draw(context, image, frameBuffer.width, frameBuffer.height)
-    }
-
-    override fun draw(
-        context: RenderContext,
-        ops: List<RenderOperation>,
-    ) {
-        render.draw(context, ops)
     }
 
     override fun endGameLoop() = Unit
@@ -136,10 +128,11 @@ class WebGlPlatform(
         return JsLocalFile(name)
     }
 
-    override fun drawOffscreen(
+    override fun drawToFrameBuffer(
         renderContext: RenderContext,
+        frameBuffer: FrameBuffer,
         ops: List<RenderOperation>,
-    ): Frame {
-        return render.drawOffscreen(renderContext, ops)
+    ): FrameBuffer {
+        return render.drawToFrameBuffer(renderContext, frameBuffer, ops)
     }
 }

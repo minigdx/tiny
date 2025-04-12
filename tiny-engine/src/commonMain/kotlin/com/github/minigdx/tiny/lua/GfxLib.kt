@@ -69,12 +69,14 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
             @TinyArg("y")arg2: LuaValue,
             @TinyArg("color")arg3: LuaValue,
         ): LuaValue {
-            resourceAccess.addOp(SetPixel(
-                x = arg1.checkint(),
-                y = arg2.checkint(),
-                color = arg3.checkColorIndex(),
-                frameBuffer = resourceAccess.frameBuffer,
-            ))
+            resourceAccess.addOp(
+                SetPixel(
+                    x = arg1.checkint(),
+                    y = arg2.checkint(),
+                    color = arg3.checkColorIndex(),
+                    frameBuffer = resourceAccess.frameBuffer,
+                ),
+            )
             return NIL
         }
     }

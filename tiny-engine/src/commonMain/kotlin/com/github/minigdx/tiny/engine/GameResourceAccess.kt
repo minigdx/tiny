@@ -2,8 +2,10 @@ package com.github.minigdx.tiny.engine
 
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
+import com.github.minigdx.tiny.graphic.Blender
 import com.github.minigdx.tiny.graphic.FrameBuffer
-import com.github.minigdx.tiny.graphic.PixelArray
+import com.github.minigdx.tiny.render.GPUOperationRenderUnit
+import com.github.minigdx.tiny.render.GPURenderContext
 import com.github.minigdx.tiny.resources.GameLevel
 import com.github.minigdx.tiny.resources.GameScript
 import com.github.minigdx.tiny.resources.Sound
@@ -15,7 +17,14 @@ sealed interface DebugAction
 
 data class DebugMessage(val mesage: String, val color: String) : DebugAction
 
-data class DebugRect(val x: Int, val y: Int, val width: Int, val height: Int, val color: String, val filed: Boolean = false) : DebugAction
+data class DebugRect(
+    val x: Int,
+    val y: Int,
+    val width: Int,
+    val height: Int,
+    val color: String,
+    val filed: Boolean = false,
+) : DebugAction
 
 data class DebugPoint(val x: Int, val y: Int, val color: String) : DebugAction
 
@@ -27,12 +36,7 @@ data class DebugEnabled(val enabled: Boolean) : DebugAction
  * Generated frame by the GPU.
  */
 interface Frame {
-    fun get(
-        x: Pixel,
-        y: Pixel,
-    ): ColorIndex
-
-    fun toPixelArray(): PixelArray
+    fun toFrameBuffer(): FrameBuffer
 }
 
 /**
@@ -100,7 +104,12 @@ interface GameResourceAccess {
      */
     fun addOp(op: RenderOperation) = Unit
 
-    fun drawOffscreen(): Frame
+    /**
+     * Draw the actual frame into the frame buffer.
+     *
+     * Please copy it into another framebuffer if it needs to be altered.
+     */
+    fun drawToFrameBuffer(): FrameBuffer
 }
 
 /**
@@ -128,10 +137,11 @@ enum class RenderUnit {
      * same unit.
      */
     BOTH,
+
     ;
 
     fun compatibleWith(target: RenderUnit): Boolean {
-        return when(this) {
+        return when (this) {
             CPU -> target == CPU || target == BOTH
             GPU -> target == GPU || target == BOTH
             BOTH -> true
@@ -140,7 +150,6 @@ enum class RenderUnit {
 }
 
 sealed interface RenderOperation {
-
     val target: RenderUnit
 
     /**
@@ -151,7 +160,10 @@ sealed interface RenderOperation {
     /**
      * Render the operation on the GPU, by using a shader.
      */
-    fun executeGPU(): Unit = invalidTarget(RenderUnit.GPU)
+    fun executeGPU(
+        context: GPURenderContext,
+        renderUnit: GPUOperationRenderUnit,
+    ): Unit = invalidTarget(RenderUnit.GPU)
 
     /**
      * Try to merge the current operation with the previous one, to batch operations.
@@ -160,7 +172,7 @@ sealed interface RenderOperation {
 
     private fun invalidTarget(renderUnit: RenderUnit): Nothing =
         throw IllegalStateException(
-            "The operation ${this::class.simpleName} does not support $renderUnit render operations. "
+            "The operation ${this::class.simpleName} does not support $renderUnit render operations. ",
         )
 }
 
@@ -173,7 +185,6 @@ data class SetPixel(
     val color: ColorIndex,
     private val frameBuffer: FrameBuffer,
 ) : RenderOperation {
-
     override val target = RenderUnit.CPU
 
     override fun executeCPU() {
@@ -188,7 +199,6 @@ data class ClearScreen(
     val color: ColorIndex,
     private val frameBuffer: FrameBuffer,
 ) : RenderOperation {
-
     override val target = RenderUnit.CPU
 
     override fun executeCPU() {
@@ -201,14 +211,16 @@ data class SwapPalette(
     val destination: ColorIndex,
     private val frameBuffer: FrameBuffer,
 ) : RenderOperation {
-
     override val target = RenderUnit.BOTH
 
     override fun executeCPU() {
         frameBuffer.blender.pal(origin, destination)
     }
 
-    override fun executeGPU() {
+    override fun executeGPU(
+        context: GPURenderContext,
+        renderUnit: GPUOperationRenderUnit,
+    ) {
         TODO()
     }
 }
@@ -223,11 +235,12 @@ class DrawSprite(
     destinationY: Pixel,
     flipX: Boolean,
     flipY: Boolean,
+    // FIXME: is there is another way for the GPU unit to access it?
+    val blender: Blender,
 ) : RenderOperation {
-
     override val target = RenderUnit.GPU
 
-    private val attributes =
+    private val _attributes =
         mutableListOf(
             DrawSpriteAttribute(
                 sourceX,
@@ -241,8 +254,13 @@ class DrawSprite(
             ),
         )
 
-    override fun executeGPU() {
-        TODO()
+    val attributes: List<DrawSpriteAttribute> = _attributes.toList()
+
+    override fun executeGPU(
+        context: GPURenderContext,
+        renderUnit: GPUOperationRenderUnit,
+    ) {
+        renderUnit.drawSprite(context, this)
     }
 
     override fun mergeWith(previousOperation: RenderOperation?): Boolean {
@@ -250,11 +268,11 @@ class DrawSprite(
         if (operation.source != source) {
             return false
         }
-        operation.attributes.addAll(attributes)
+        operation._attributes.addAll(_attributes)
         return true
     }
 
-    private data class DrawSpriteAttribute(
+    data class DrawSpriteAttribute(
         val sourceX: Pixel,
         val sourceY: Pixel,
         val sourceWidth: Pixel,

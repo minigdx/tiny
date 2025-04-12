@@ -5,8 +5,8 @@ import com.github.minigdx.tiny.Pixel
 import kotlin.math.max
 import kotlin.math.min
 
-class Blender(private val gamePalette: ColorPalette) {
-    private var switch: Array<ColorIndex> = Array(gamePalette.size) { index -> index }
+class Blender(internal val gamePalette: ColorPalette) {
+    internal var switch: Array<ColorIndex> = Array(gamePalette.size) { index -> index }
 
     private var dithering: Int = 0xFFFF
 
@@ -231,13 +231,19 @@ class FrameBuffer(
     }
 
     /**
-     * Fast copy color index from another pixel array.
+     * Fast copy another frame buffer into this frame buffer.
      * It's a raw copy of each element.
      */
-    fun fastCopyFrom(pixelArray: PixelArray) {
-        if(pixelArray.pixelFormat != colorIndexBuffer.pixelFormat) {
-            throw IllegalStateException("Only copy from a Pixel array of the same format is possible")
+    fun fastCopyFrom(frameBuffer: FrameBuffer) {
+        // Copying into itself. So there is nothing to do.
+        if (frameBuffer == this) {
+            return
         }
-        pixelArray.pixels.copyInto(colorIndexBuffer.pixels, 0, 0, colorIndexBuffer.size)
+        frameBuffer.colorIndexBuffer.pixels.copyInto(
+            colorIndexBuffer.pixels,
+            0,
+            0,
+            colorIndexBuffer.size,
+        )
     }
 }

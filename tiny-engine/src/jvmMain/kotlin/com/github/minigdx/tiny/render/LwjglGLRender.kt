@@ -9,15 +9,15 @@ import com.danielgergely.kgl.KglLwjgl
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.RenderOperation
+import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.log.Logger
-import com.github.minigdx.tiny.platform.RenderContext
 import com.github.minigdx.tiny.platform.WindowManager
 import org.lwjgl.opengl.GL33
 
 class LwjglGLRender(
     private val logger: Logger,
     private val gameOptions: GameOptions,
-    private val gl: GLRender = GLRender(KglLwjgl, logger, gameOptions),
+    private val gl: OpenGLRender = OpenGLRender(KglLwjgl, logger, gameOptions),
 ) : Render {
     override fun init(windowManager: WindowManager): RenderContext {
         logger.info("GLFW") { "GL_VENDOR:                \t" + GL33.glGetString(GL_VENDOR) }
@@ -35,13 +35,9 @@ class LwjglGLRender(
         height: Pixel,
     ) = gl.draw(context, image, width, height)
 
-    override fun draw(
+    override fun drawToFrameBuffer(
         context: RenderContext,
+        frameBuffer: FrameBuffer,
         ops: List<RenderOperation>,
-    ) = gl.draw(context, ops)
-
-    override fun drawOffscreen(
-        context: RenderContext,
-        ops: List<RenderOperation>,
-    ) = gl.drawOffscreen(context, ops)
+    ) = gl.drawToFrameBuffer(context, frameBuffer, ops)
 }

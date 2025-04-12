@@ -1,29 +1,26 @@
 package com.github.minigdx.tiny.platform.test
 
-import com.github.minigdx.tiny.ColorIndex
-import com.github.minigdx.tiny.Pixel
-import com.github.minigdx.tiny.engine.Frame
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.RenderOperation
 import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.graphic.FrameBuffer
-import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.platform.ImageData
 import com.github.minigdx.tiny.platform.Platform
-import com.github.minigdx.tiny.platform.RenderContext
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
+import com.github.minigdx.tiny.render.CPURenderContext
+import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.sound.Sound
 import com.github.minigdx.tiny.sound.SoundManager
 import com.github.minigdx.tiny.util.MutableFixedSizeList
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 
-class NoopRenderContext : RenderContext
+class NoopRenderContext : CPURenderContext
 
 class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map<String, Any>, frames: Int = 10) :
     Platform {
@@ -71,11 +68,6 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
 
         frames.add(newBuffer)
     }
-
-    override fun draw(
-        context: RenderContext,
-        ops: List<RenderOperation>,
-    ) = Unit
 
     override fun record() {
         super.record()
@@ -155,20 +147,12 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
             override fun save(content: ByteArray) = Unit
         }
 
-    override fun drawOffscreen(
+    override fun drawToFrameBuffer(
         renderContext: RenderContext,
+        frameBuffer: FrameBuffer,
         ops: List<RenderOperation>,
-    ): Frame {
-        return object : Frame {
-            override fun get(
-                x: Pixel,
-                y: Pixel,
-            ): ColorIndex = 0
-
-            override fun toPixelArray(): PixelArray {
-                TODO("Not yet implemented")
-            }
-        }
+    ): FrameBuffer {
+        TODO()
     }
 
     fun saveAnimation(name: String) = toGif(name, frames)

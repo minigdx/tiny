@@ -29,8 +29,10 @@ data class GameOptions(
         require(zoom > 0) { "The zoom needs to be a positive non null value." }
     }
 
+    private val colorPalette: ColorPalette = ColorPalette(palette)
+
     fun colors(): ColorPalette {
-        return ColorPalette(palette)
+        return colorPalette
     }
 
     override fun project(

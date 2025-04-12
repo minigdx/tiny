@@ -13,10 +13,10 @@ import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.log.StdOutLogger
 import com.github.minigdx.tiny.platform.ImageData
 import com.github.minigdx.tiny.platform.Platform
-import com.github.minigdx.tiny.platform.RenderContext
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.webgl.WebGlPlatform
+import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.browser.document
 import kotlinx.browser.window
@@ -275,11 +275,6 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
         frameBuffer: FrameBuffer,
     ) = delegate.draw(context, frameBuffer)
 
-    override fun draw(
-        context: RenderContext,
-        ops: List<RenderOperation>,
-    ) = delegate.draw(context, ops)
-
     override fun endGameLoop() = delegate.endGameLoop()
 
     override fun initInputHandler(): InputHandler = delegate.initInputHandler()
@@ -313,11 +308,13 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
 
     override fun createLocalFile(name: String): LocalFile = delegate.createLocalFile(name)
 
-    override fun drawOffscreen(
+    override fun drawToFrameBuffer(
         renderContext: RenderContext,
+        frameBuffer: FrameBuffer,
         ops: List<RenderOperation>,
-    ) = delegate.drawOffscreen(
+    ) = delegate.drawToFrameBuffer(
         renderContext,
+        frameBuffer,
         ops,
     )
 }

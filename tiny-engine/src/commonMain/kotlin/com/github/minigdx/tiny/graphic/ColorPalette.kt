@@ -20,7 +20,11 @@ class ColorPalette(colors: List<HexColor>) {
 
     private val hexToColorCache: MutableMap<String, Int> = mutableMapOf()
 
+    private val rgbaToColor: Map<Int, ColorIndex>
+
     val size: Int
+
+    private data class ColorKey(var r: Int, var g: Int, var b: Int, var a: Int)
 
     init {
         val rgbaColors = listOf(TRANSPARENT) + colors.map { str -> hexStringToByteArray(str) }
@@ -41,11 +45,21 @@ class ColorPalette(colors: List<HexColor>) {
                 rgb
             }.toTypedArray()
 
+        rgbaToColor = rgbaColors.mapIndexed { index, color -> rgbaToInt(color) to index }.toMap()
         size = rgba.size
     }
 
     fun check(color: ColorIndex): ColorIndex {
         return abs(color) % size
+    }
+
+    private fun rgbaToInt(rgba: ByteArray): Int {
+        val r = rgba[0].toInt() and 0xFF
+        val g = rgba[1].toInt() and 0xFF
+        val b = rgba[2].toInt() and 0xFF
+        val a = rgba[3].toInt() and 0xFF
+
+        return (r shl 24) or (g shl 16) or (b shl 8) or a
     }
 
     private fun hexStringToByteArray(hexString: String): ByteArray {
@@ -92,7 +106,7 @@ class ColorPalette(colors: List<HexColor>) {
     /**
      * Get the RGB value already packed for GIF attached to this color index.
      */
-    fun getRGAasInt(index: ColorIndex): ColorIndex {
+    fun getRGAasInt(index: ColorIndex): Int {
         return rgbForGif[check(index)]
     }
 
@@ -101,6 +115,25 @@ class ColorPalette(colors: List<HexColor>) {
      */
     fun getColorIndex(hexString: String): ColorIndex {
         return hexToColorCache.getOrPut(hexString) { fromRGBA(hexStringToByteArray(hexString)) }
+    }
+
+    /**
+     * Return the color index of the color. Throw exception if the color
+     * is not part of the color palette.
+     */
+    fun getColorIndex(color: ByteArray): ColorIndex {
+        fun rgbaBytesToString(colorBytes: ByteArray): String {
+            val r = colorBytes[0].toInt() and 0xFF
+            val g = colorBytes[1].toInt() and 0xFF
+            val b = colorBytes[2].toInt() and 0xFF
+            val a = colorBytes[3].toInt() and 0xFF
+
+            return "R: $r, G: $g, B: $b, A: $a"
+        }
+
+        return rgbaToColor[rgbaToInt(color)] ?: throw IllegalArgumentException(
+            "Color ${rgbaBytesToString(color)} is not part of the color palette",
+        )
     }
 
     /**
