@@ -26,7 +26,6 @@ class OpenGLRender(
     private val logger: Logger,
     private val gameOptions: GameOptions,
 ) : Render {
-
     data class OpenGLRenderContext(
         val cpuContext: OpenGLCPURenderContext,
         val gpuContext: OpenGLGPURenderContext,
@@ -36,7 +35,7 @@ class OpenGLRender(
     ) :
         RenderContext
 
-    private val cpuRenderUnit = OpenGlCPURenderUnit(gl, logger, gameOptions)
+    private val cpuRenderUnit = OpenGLCPURenderUnit(gl, logger, gameOptions)
     private val gpuRenderUnit = OpenGLGPURenderUnit(gl, logger, gameOptions)
 
     override fun init(windowManager: WindowManager): RenderContext {
@@ -132,5 +131,4 @@ class OpenGLRender(
         val toFrameBuffer = openGLFrame.toFrameBuffer()
         return toFrameBuffer
     }
-
 }

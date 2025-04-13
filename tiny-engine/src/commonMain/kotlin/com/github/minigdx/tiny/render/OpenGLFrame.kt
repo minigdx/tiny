@@ -18,14 +18,14 @@ class OpenGLFrame(
         val frame = FrameBuffer(gameOptions.width, gameOptions.height, gameOptions.colors())
 
         buffer.position = 0
-        var index = 0
 
         (0 until gameOptions.width * gameOptions.height).forEach { i ->
             buffer.position = i * PixelFormat.RGBA
             buffer.get(tmp)
-            frame.colorIndexBuffer.pixels[index++] = gameOptions.colors().getColorIndex(tmp).toByte()
+            frame.colorIndexBuffer.pixels[i] = gameOptions.colors().getColorIndex(tmp).toByte()
         }
 
+        // Reset buffer position so it can be reused.
         buffer.position = 0
 
         return frame

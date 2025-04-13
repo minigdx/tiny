@@ -41,7 +41,7 @@ class ServeCommand : CliktCommand(name = "serve") {
         // Get the zip
         val zipFile =
             if (game.isDirectory) {
-                GameExporter().export(game, "tiny-export.zip")
+                GameExporter(withSourceMap = true).export(game, "tiny-export.zip")
                 game.resolve("tiny-export.zip")
             } else {
                 game

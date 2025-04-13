@@ -1,13 +1,9 @@
 package com.github.minigdx.tiny.render
 
-import com.danielgergely.kgl.Framebuffer
 import com.danielgergely.kgl.GL_COMPILE_STATUS
 import com.danielgergely.kgl.GL_FALSE
-import com.danielgergely.kgl.GL_FRAMEBUFFER
-import com.danielgergely.kgl.GL_TEXTURE_2D
 import com.danielgergely.kgl.Kgl
 import com.danielgergely.kgl.Shader
-import com.danielgergely.kgl.Texture
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.RenderOperation
@@ -67,5 +63,4 @@ abstract class RendererUnit<CONTEXT : RenderContext>(
         width: Pixel,
         height: Pixel,
     ): Unit = invalidRendererUnit(RenderUnit.CPU)
-
 }

@@ -29,7 +29,6 @@ tasks.withType(Zip::class).configureEach {
     duplicatesStrategy = DuplicatesStrategy.WARN
 }
 
-
 dependencies {
     implementation(libs.kotlin.serialization.json)
     implementation(libs.clikt)

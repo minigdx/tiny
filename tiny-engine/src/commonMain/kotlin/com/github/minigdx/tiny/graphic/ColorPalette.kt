@@ -131,9 +131,15 @@ class ColorPalette(colors: List<HexColor>) {
             return "R: $r, G: $g, B: $b, A: $a"
         }
 
+        // FIXME: PAS PERFORMANT!!
+        return rgbaToColor[rgbaToInt(color)] ?: fromRGBA(color)
+
+        /*
         return rgbaToColor[rgbaToInt(color)] ?: throw IllegalArgumentException(
             "Color ${rgbaBytesToString(color)} is not part of the color palette",
         )
+
+         */
     }
 
     /**

@@ -36,7 +36,7 @@ class DebugCommand : CliktCommand(name = "debug") {
 
     val debug by option(help = "Debug port used by the game.")
         .int()
-        .default(8080)
+        .default(8081)
 
     override fun help(context: Context) = "Debug the current game"
 

@@ -13,7 +13,7 @@ test:
 
 install:
 	./gradlew clean assembleDist --stacktrace
-	unzip tiny-cli/build/distributions/tiny-cli-DEV-SNAPSHOT.zip
+	unzip -o tiny-cli/build/distributions/tiny-cli-DEV-SNAPSHOT.zip
 	rm -rf ~/.bin/tiny-cli
 	mv tiny-cli-DEV-SNAPSHOT ~/.bin/tiny-cli
 

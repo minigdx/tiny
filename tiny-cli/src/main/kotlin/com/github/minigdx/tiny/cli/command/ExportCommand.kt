@@ -38,7 +38,7 @@ class ExportCommand : CliktCommand(name = "export") {
     }
 }
 
-class GameExporter {
+class GameExporter(private val withSourceMap: Boolean = false) {
     fun export(
         gameDirectory: File,
         archive: String,
@@ -52,6 +52,13 @@ class GameExporter {
         ENGINE_FILES.forEach { name ->
             val content = ExportCommand::class.java.getResourceAsStream("/tiny-engine-js/$name")
             exportedGame.putNextEntry(ZipEntry(name))
+            exportedGame.write(content!!.readAllBytes())
+            exportedGame.closeEntry()
+        }
+
+        if(withSourceMap) {
+            val content = ExportCommand::class.java.getResourceAsStream("/tiny-engine-js/tiny-engine.js.map")
+            exportedGame.putNextEntry(ZipEntry("tiny-engine.js.map"))
             exportedGame.write(content!!.readAllBytes())
             exportedGame.closeEntry()
         }
