@@ -1,12 +1,13 @@
 package com.github.minigdx.tiny.render
 
 import com.danielgergely.kgl.ByteBuffer
-import com.github.minigdx.tiny.graphic.FrameBuffer
 
-actual fun saveAsScreenshot(
+actual fun readBytes(
     buffer: ByteBuffer,
-    frame: FrameBuffer,
-    width: Int,
-    height: Int,
+    out: ByteArray,
 ) {
+    for (n in 0 until out.size) {
+        out[n] = buffer.get()
+        buffer.position++
+    }
 }

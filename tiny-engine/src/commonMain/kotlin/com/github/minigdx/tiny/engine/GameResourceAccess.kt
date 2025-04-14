@@ -36,7 +36,7 @@ data class DebugEnabled(val enabled: Boolean) : DebugAction
  * Generated frame by the GPU.
  */
 interface Frame {
-    fun toFrameBuffer(): FrameBuffer
+    fun toFrameBuffer(frameBuffer: FrameBuffer): FrameBuffer
 }
 
 /**

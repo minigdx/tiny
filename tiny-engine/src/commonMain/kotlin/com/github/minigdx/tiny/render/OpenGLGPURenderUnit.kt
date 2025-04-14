@@ -66,7 +66,6 @@ class OpenGLGPURenderUnit(gl: Kgl, logger: Logger, gameOptions: GameOptions) :
 
         val vertexData =
             op.attributes.flatMap { a ->
-                /*
                 listOf(
                     a.destinationX,
                     a.destinationY,
@@ -77,22 +76,26 @@ class OpenGLGPURenderUnit(gl: Kgl, logger: Logger, gameOptions: GameOptions) :
                     a.destinationX,
                     a.destinationY + a.sourceHeight,
                 )
+            }.map { it.toFloat() }
+                .toFloatArray()
 
-                 */
+        val spr =
+            op.attributes.flatMap { a ->
                 listOf(
-                    160,
-                    0,
-                    320,
-                    0,
-                    320,
-                    180,
-                    160,
-                    180,
+                    8f,
+                    8f,
+                    24f,
+                    8f,
+                    24f,
+                    24f,
+                    8f,
+                    24f,
                 )
             }.map { it.toFloat() }
                 .toFloatArray()
 
         context.program.vertexShader.aPos.apply(vertexData)
+        context.program.vertexShader.aSpr.apply(spr)
 
         context.program.vertexShader.uSpritesheet.apply(
             op.source.width.toFloat(),
@@ -119,6 +122,17 @@ class OpenGLGPURenderUnit(gl: Kgl, logger: Logger, gameOptions: GameOptions) :
 
         context.program.fragmentShader.paletteColors.applyRGBA(colorPaletteBuffer, 256, 256)
 
+        /**
+         * DEBUG
+         */
+        context.program.vertexShader.uViewport.apply(
+            gameOptions.width.toFloat(),
+            // Flip the vertical
+            gameOptions.height.toFloat() * -1,
+        )
+        /**
+         * END DEBUG
+         */
         context.program.bind()
         context.program.drawArrays(GL_TRIANGLE_FAN, 0, 4)
         context.program.unbind()
@@ -126,6 +140,7 @@ class OpenGLGPURenderUnit(gl: Kgl, logger: Logger, gameOptions: GameOptions) :
 
     class VShader : VertexShader(VERTEX_SHADER) {
         val aPos = attributeVec2("a_pos") // position of the sprite in the viewport
+        val aSpr = attributeVec2("a_spr")
         val uViewport = uniformVec2("u_viewport") // Size of the viewport; in pixel.
         val uSpritesheet = uniformVec2("u_spritesheet") // Size of the viewport; in pixel.
         val vUvs = varyingVec2("v_uvs")
@@ -145,15 +160,13 @@ class OpenGLGPURenderUnit(gl: Kgl, logger: Logger, gameOptions: GameOptions) :
                 // Convert the pixel coordinates into NDC coordinates
                 vec2 ndc_pos = a_pos / u_viewport ;
                 // Move the origin to the left/up corner
-                vec2 origin_pos = ndc_pos - vec2(1.0, -1.0);
-                // Stretch as the OpenGL viewport with and heigt is from -1 to 1 (so 2 unit)
-                vec2 scale_pos = origin_pos * 2.0;
+                vec2 origin_pos = vec2(-1.0, 1.0) + ndc_pos * 2.0;
                 
-                gl_Position = vec4(scale_pos, 0.0, 1.0);
-            
+                gl_Position = vec4(origin_pos, 0.0, 1.0);
+                
                 // UV computation
                 // Convert the texture coordinates to NDC coordinates
-                vec2 ndc_spr = vec2(16.0, 16.0) / u_spritesheet;
+                vec2 ndc_spr = a_spr / u_spritesheet;
                 v_uvs = ndc_spr; // managing flip
                 
             }
@@ -183,7 +196,6 @@ class OpenGLGPURenderUnit(gl: Kgl, logger: Logger, gameOptions: GameOptions) :
             void main() {
                 int index = int(texture2D(spritesheet, v_uvs).r * 255.0 + 0.5);
                 gl_FragColor = readColor(index);
-                gl_FragColor = vec4(1.0, 0.0, 1.0, 1.0);
             }
             """.trimIndent()
     }

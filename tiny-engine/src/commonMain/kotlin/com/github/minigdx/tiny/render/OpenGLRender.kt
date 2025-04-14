@@ -7,7 +7,9 @@ import com.danielgergely.kgl.GL_COLOR_ATTACHMENT0
 import com.danielgergely.kgl.GL_FRAMEBUFFER
 import com.danielgergely.kgl.GL_FRAMEBUFFER_COMPLETE
 import com.danielgergely.kgl.GL_LINEAR
+import com.danielgergely.kgl.GL_ONE_MINUS_SRC_ALPHA
 import com.danielgergely.kgl.GL_RGBA
+import com.danielgergely.kgl.GL_SRC_ALPHA
 import com.danielgergely.kgl.GL_TEXTURE_2D
 import com.danielgergely.kgl.GL_TEXTURE_MAG_FILTER
 import com.danielgergely.kgl.GL_TEXTURE_MIN_FILTER
@@ -114,10 +116,11 @@ class OpenGLRender(
         gl.bindFramebuffer(GL_FRAMEBUFFER, context.fbo)
 
         gl.viewport(0, 0, frameBuffer.width, frameBuffer.height)
-        gl.disable(GL_BLEND)
+         gl.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+         gl.disable(GL_BLEND)
         cpuRenderUnit.drawCPU(context.cpuContext, image, frameBuffer.width, frameBuffer.height)
-        gl.enable(GL_BLEND)
-        gpuRenderUnit.drawGPU(context.gpuContext, ops)
+         gl.enable(GL_BLEND)
+         gpuRenderUnit.drawGPU(context.gpuContext, ops)
 
         gl.readPixels(
             0,
@@ -128,7 +131,11 @@ class OpenGLRender(
             GL_UNSIGNED_BYTE,
             context.fboBuffer,
         )
+
+
         gl.bindFramebuffer(GL_FRAMEBUFFER, null)
+        gl.disable(GL_BLEND)
+
         // Process the result
         val openGLFrame =
             OpenGLFrame(
@@ -136,7 +143,8 @@ class OpenGLRender(
                 gameOptions = gameOptions,
             )
 
-        val toFrameBuffer = openGLFrame.toFrameBuffer()
-        return toFrameBuffer
+        val toFrameBuffer = openGLFrame.toFrameBuffer(frameBuffer)
+
+        return frameBuffer
     }
 }

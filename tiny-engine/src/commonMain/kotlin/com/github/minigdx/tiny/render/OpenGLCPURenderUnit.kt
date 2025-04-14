@@ -87,6 +87,9 @@ class OpenGLCPURenderUnit(gl: Kgl, logger: Logger, gameOptions: GameOptions) : R
         val program = context.shaderProgram
         program.use()
 
+        program.vertexShader.position.apply(vertexData)
+        program.vertexShader.uvs.apply(uvsData)
+
         program.fragmentShader.frameBuffer.applyIndex(image, width, height)
 
         program.bind()
