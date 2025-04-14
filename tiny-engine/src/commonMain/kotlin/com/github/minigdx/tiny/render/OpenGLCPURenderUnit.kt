@@ -91,7 +91,7 @@ class OpenGLCPURenderUnit(gl: Kgl, logger: Logger, gameOptions: GameOptions) : R
 
         program.bind()
 
-        program.clear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT) // FIXME: supprimer GL_DEPTH_BUFFER ?
+        program.clear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
         program.clearColor(0f, 0f, 0f, 1.0f)
 
         program.drawArrays(GL_TRIANGLES, 0, 3)

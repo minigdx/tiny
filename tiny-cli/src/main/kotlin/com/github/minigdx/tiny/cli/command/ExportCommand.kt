@@ -56,7 +56,7 @@ class GameExporter(private val withSourceMap: Boolean = false) {
             exportedGame.closeEntry()
         }
 
-        if(withSourceMap) {
+        if (withSourceMap) {
             val content = ExportCommand::class.java.getResourceAsStream("/tiny-engine-js/tiny-engine.js.map")
             exportedGame.putNextEntry(ZipEntry("tiny-engine.js.map"))
             exportedGame.write(content!!.readAllBytes())

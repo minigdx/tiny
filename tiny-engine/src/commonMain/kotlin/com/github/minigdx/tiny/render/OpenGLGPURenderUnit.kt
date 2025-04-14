@@ -37,7 +37,8 @@ class OpenGLGPURenderUnit(gl: Kgl, logger: Logger, gameOptions: GameOptions) :
 
         program.vertexShader.uViewport.apply(
             gameOptions.width.toFloat(),
-            gameOptions.height.toFloat(),
+            // Flip the vertical
+            gameOptions.height.toFloat() * -1,
         )
         return OpenGLGPURenderContext(
             windowManager = windowManager,
@@ -65,6 +66,7 @@ class OpenGLGPURenderUnit(gl: Kgl, logger: Logger, gameOptions: GameOptions) :
 
         val vertexData =
             op.attributes.flatMap { a ->
+                /*
                 listOf(
                     a.destinationX,
                     a.destinationY,
@@ -75,14 +77,28 @@ class OpenGLGPURenderUnit(gl: Kgl, logger: Logger, gameOptions: GameOptions) :
                     a.destinationX,
                     a.destinationY + a.sourceHeight,
                 )
+
+                 */
+                listOf(
+                    160,
+                    0,
+                    320,
+                    0,
+                    320,
+                    180,
+                    160,
+                    180,
+                )
             }.map { it.toFloat() }
                 .toFloatArray()
 
         context.program.vertexShader.aPos.apply(vertexData)
+
         context.program.vertexShader.uSpritesheet.apply(
             op.source.width.toFloat(),
             op.source.height.toFloat(),
         )
+
         context.program.fragmentShader.spritesheet.applyIndex(
             op.source.pixels.pixels,
             op.source.width,
@@ -127,9 +143,13 @@ class OpenGLGPURenderUnit(gl: Kgl, logger: Logger, gameOptions: GameOptions) :
             """
             void main() {
                 // Convert the pixel coordinates into NDC coordinates
-                vec2 ndc_pos = a_pos / u_viewport - vec2(1.0, 1.0) ;
+                vec2 ndc_pos = a_pos / u_viewport ;
+                // Move the origin to the left/up corner
+                vec2 origin_pos = ndc_pos - vec2(1.0, -1.0);
+                // Stretch as the OpenGL viewport with and heigt is from -1 to 1 (so 2 unit)
+                vec2 scale_pos = origin_pos * 2.0;
                 
-                gl_Position = vec4(ndc_pos, 0.0, 1.0);
+                gl_Position = vec4(scale_pos, 0.0, 1.0);
             
                 // UV computation
                 // Convert the texture coordinates to NDC coordinates
@@ -163,6 +183,7 @@ class OpenGLGPURenderUnit(gl: Kgl, logger: Logger, gameOptions: GameOptions) :
             void main() {
                 int index = int(texture2D(spritesheet, v_uvs).r * 255.0 + 0.5);
                 gl_FragColor = readColor(index);
+                gl_FragColor = vec4(1.0, 0.0, 1.0, 1.0);
             }
             """.trimIndent()
     }

@@ -19,15 +19,29 @@ class OpenGLFrame(
 
         buffer.position = 0
 
-        (0 until gameOptions.width * gameOptions.height).forEach { i ->
-            buffer.position = i * PixelFormat.RGBA
-            buffer.get(tmp)
-            frame.colorIndexBuffer.pixels[i] = gameOptions.colors().getColorIndex(tmp).toByte()
+        // Read the buffer starting the last list as
+        // the bottom line is the first line in the buffer
+        for (x in 0 until gameOptions.width) {
+            for (y in 0 until gameOptions.height) {
+                val i = x + y * gameOptions.width
+
+                buffer.position = i * PixelFormat.RGBA
+                buffer.get(tmp)
+                frame.colorIndexBuffer.set(x, (gameOptions.height - 1) - y, gameOptions.colors().getColorIndex(tmp))
+            }
         }
 
         // Reset buffer position so it can be reused.
         buffer.position = 0
 
+        saveAsScreenshot(buffer, frame, gameOptions.width, gameOptions.height)
         return frame
     }
 }
+
+expect fun saveAsScreenshot(
+    buffer: ByteBuffer,
+    frame: FrameBuffer,
+    width: Int,
+    height: Int,
+)
