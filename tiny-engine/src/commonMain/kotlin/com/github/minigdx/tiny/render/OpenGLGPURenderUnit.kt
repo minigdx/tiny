@@ -3,6 +3,7 @@ package com.github.minigdx.tiny.render
 import com.danielgergely.kgl.GL_TRIANGLES
 import com.danielgergely.kgl.Kgl
 import com.github.minigdx.tiny.engine.DrawSprite
+import com.github.minigdx.tiny.engine.DrawSprite.Companion.MAX_SPRITE_PER_COMMAND
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.RenderOperation
 import com.github.minigdx.tiny.graphic.PixelFormat
@@ -55,6 +56,9 @@ class OpenGLGPURenderUnit(gl: Kgl, logger: Logger, gameOptions: GameOptions) :
         ops.forEach { op -> op.executeGPU(context, this) }
     }
 
+    private val vertexData = FloatArray(MAX_SPRITE_PER_COMMAND * FLOAT_PER_SPRITE)
+    private val spr = FloatArray(MAX_SPRITE_PER_COMMAND * FLOAT_PER_SPRITE)
+
     /**
      * Execture the operation of drawing a sprite
      */
@@ -64,52 +68,57 @@ class OpenGLGPURenderUnit(gl: Kgl, logger: Logger, gameOptions: GameOptions) :
     ) {
         context as OpenGLGPURenderContext
 
-        val vertexData =
-            op.attributes.flatMap { a ->
-                listOf(
-                    // A - Left/Up
-                    a.positionLeft, a.positionUp,
-                    // A - Right/Up
-                    a.positionRight, a.positionUp,
-                    // A - Right/Down
-                    a.positionRight, a.positionDown,
-                    // B - Right/Down
-                    a.positionRight, a.positionDown,
-                    // B - Left/Down
-                    a.positionLeft, a.positionDown,
-                    // B - Left/Up
-                    a.positionLeft, a.positionUp,
-                )
-            }.map { it.toFloat() }
-                .toFloatArray()
+        var indexVertex = 0
+        op.attributes.forEach { a ->
+            // A - Left/Up
+            vertexData[indexVertex++] = a.positionLeft.toFloat()
+            vertexData[indexVertex++] = a.positionUp.toFloat()
+            // A - Right/Up
+            vertexData[indexVertex++] = a.positionRight.toFloat()
+            vertexData[indexVertex++] = a.positionUp.toFloat()
+            // A - Right/Down
+            vertexData[indexVertex++] = a.positionRight.toFloat()
+            vertexData[indexVertex++] = a.positionDown.toFloat()
+            // B - Right/Down
+            vertexData[indexVertex++] = a.positionRight.toFloat()
+            vertexData[indexVertex++] = a.positionDown.toFloat()
+            // B - Left/Down
+            vertexData[indexVertex++] = a.positionLeft.toFloat()
+            vertexData[indexVertex++] = a.positionDown.toFloat()
+            // B - Left/Up
+            vertexData[indexVertex++] = a.positionLeft.toFloat()
+            vertexData[indexVertex++] = a.positionUp.toFloat()
 
-        val spr =
-            op.attributes.flatMap { a ->
-                // A - Left/Up
-                val v1 = a.uvLeft to a.uvUp
-                // A - Right/Up
-                val v2 = a.uvRight to a.uvUp
-                // A - Right/Down
-                val v3 = a.uvRight to a.uvDown
-                // B - Right/Down
-                val va = a.uvRight to a.uvDown
-                // B - Left/Down
-                val vb = a.uvLeft to a.uvDown
-                // B - Left/Up
-                val vc = a.uvLeft to a.uvUp
+        }
 
-                if (!a.flipX && !a.flipY) {
-                    listOf(v1, v2, v3, va, vb, vc)
-                } else if (a.flipX && !a.flipY) {
-                    listOf(v2, v1, vb, vb, va, v2)
-                } else if (!a.flipX && a.flipY) {
-                    listOf(vb, va, v2, v2, vc, vb)
-                } else {
-                    listOf(va, vb, vc, v1, v2, v3)
-                }
-            }.flatMap { listOf(it.first, it.second) }
-                .map { it.toFloat() }
-                .toFloatArray()
+        indexVertex = 0
+        op.attributes.flatMap { a ->
+            // A - Left/Up
+            val v1 = a.uvLeft to a.uvUp
+            // A - Right/Up
+            val v2 = a.uvRight to a.uvUp
+            // A - Right/Down
+            val v3 = a.uvRight to a.uvDown
+            // B - Right/Down
+            val va = a.uvRight to a.uvDown
+            // B - Left/Down
+            val vb = a.uvLeft to a.uvDown
+            // B - Left/Up
+            val vc = a.uvLeft to a.uvUp
+
+            if (!a.flipX && !a.flipY) {
+                listOf(v1, v2, v3, va, vb, vc)
+            } else if (a.flipX && !a.flipY) {
+                listOf(v2, v1, vb, vb, va, v2)
+            } else if (!a.flipX && a.flipY) {
+                listOf(vb, va, v2, v2, vc, vb)
+            } else {
+                listOf(va, vb, vc, v1, v2, v3)
+            }
+        }.forEach { (x, y) ->
+            spr[indexVertex++] = x.toFloat()
+            spr[indexVertex++] = y.toFloat()
+        }
 
         context.program.vertexShader.aPos.apply(vertexData)
         context.program.vertexShader.aSpr.apply(spr)
@@ -146,7 +155,7 @@ class OpenGLGPURenderUnit(gl: Kgl, logger: Logger, gameOptions: GameOptions) :
         )
 
         // There is 2 components per vertex. So the number of vertex = number of components / 2
-        val nbVertex = (vertexData.size * 0.5).toInt()
+        val nbVertex = VERTEX_PER_SPRITE * op.attributes.size
 
         context.program.bind()
         context.program.drawArrays(GL_TRIANGLES, 0, nbVertex)
@@ -168,6 +177,10 @@ class OpenGLGPURenderUnit(gl: Kgl, logger: Logger, gameOptions: GameOptions) :
     }
 
     companion object {
+        private const val VERTEX_PER_SPRITE = 6
+        private const val FLOAT_PER_SPRITE =
+            VERTEX_PER_SPRITE * 2 // 12 floats are required to generate coordinates for a sprite.
+
         //language=Glsl
         private val VERTEX_SHADER =
             """

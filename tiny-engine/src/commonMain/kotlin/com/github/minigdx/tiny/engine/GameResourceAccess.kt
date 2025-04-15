@@ -2,7 +2,6 @@ package com.github.minigdx.tiny.engine
 
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
-import com.github.minigdx.tiny.graphic.Blender
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.render.GPUOperationRenderUnit
 import com.github.minigdx.tiny.render.GPURenderContext
@@ -235,8 +234,6 @@ class DrawSprite(
     destinationY: Pixel,
     flipX: Boolean,
     flipY: Boolean,
-    // FIXME: is there is another way for the GPU unit to access it?
-    val blender: Blender,
 ) : RenderOperation {
     override val target = RenderUnit.GPU
 
@@ -269,6 +266,10 @@ class DrawSprite(
         if (operation.source != source) {
             return false
         }
+        // Too many elements in this operation, lets create a new one.
+        if(operation._attributes.size >= MAX_SPRITE_PER_COMMAND) {
+            return false
+        }
         operation._attributes.addAll(_attributes)
         return true
     }
@@ -291,5 +292,9 @@ class DrawSprite(
         val uvRight = sourceX + sourceWidth
         val uvUp = sourceY
         val uvDown = sourceY + sourceHeight
+    }
+
+    companion object {
+        const val MAX_SPRITE_PER_COMMAND = 100
     }
 }

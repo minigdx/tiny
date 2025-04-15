@@ -254,11 +254,10 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
                     sourceY = row * sh,
                     sourceWidth = sw,
                     sourceHeight = sh,
-                    flipX = flipX,
-                    flipY = flipY,
                     destinationX = x,
                     destinationY = y,
-                    blender = resourceAccess.frameBuffer.blender,
+                    flipX = flipX,
+                    flipY = flipY,
                 ),
             )
 
