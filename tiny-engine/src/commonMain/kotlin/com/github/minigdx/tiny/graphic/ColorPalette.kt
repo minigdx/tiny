@@ -20,11 +20,10 @@ class ColorPalette(colors: List<HexColor>) {
 
     private val hexToColorCache: MutableMap<String, Int> = mutableMapOf()
 
-    private val rgbaToColor: Map<Int, ColorIndex>
+    private val indexOfRgba: List<Int>
+    private val indexOfColor: List<ColorIndex>
 
     val size: Int
-
-    private data class ColorKey(var r: Int, var g: Int, var b: Int, var a: Int)
 
     init {
         val rgbaColors = listOf(TRANSPARENT) + colors.map { str -> hexStringToByteArray(str) }
@@ -45,7 +44,9 @@ class ColorPalette(colors: List<HexColor>) {
                 rgb
             }.toTypedArray()
 
-        rgbaToColor = rgbaColors.mapIndexed { index, color -> rgbaToInt(color) to index }.toMap()
+        val rgbaToColor = rgbaColors.mapIndexed { index, color -> rgbaToInt(color) to index }.sortedBy { it.first }
+        indexOfRgba = List(rgbaToColor.size) { index -> rgbaToColor[index].first }
+        indexOfColor = List(rgbaToColor.size) { index -> rgbaToColor[index].second }
         size = rgba.size
     }
 
@@ -131,15 +132,19 @@ class ColorPalette(colors: List<HexColor>) {
             return "R: $r, G: $g, B: $b, A: $a"
         }
 
-        // FIXME: PAS PERFORMANT!!
-        return rgbaToColor[rgbaToInt(color)] ?: fromRGBA(color)
+        val a = color[3].toInt() and 0xFF
+        // The color is transparent. We do know already the result.
+        if(a == 0) {
+            return TRANSPARENT_INDEX
+        }
 
-        /*
-        return rgbaToColor[rgbaToInt(color)] ?: throw IllegalArgumentException(
-            "Color ${rgbaBytesToString(color)} is not part of the color palette",
-        )
-
-         */
+        val index = indexOfRgba.binarySearch(rgbaToInt(color))
+        if(index < 0) {
+            throw IllegalArgumentException(
+                "Color ${rgbaBytesToString(color)} is not part of the color palette",
+            )
+        }
+        return indexOfColor[index]
     }
 
     /**
@@ -179,10 +184,11 @@ class ColorPalette(colors: List<HexColor>) {
      * Is this color index transparent?
      */
     fun isTransparent(index: ColorIndex): Boolean {
-        return index == 0
+        return index == TRANSPARENT_INDEX
     }
 
     companion object {
         private val TRANSPARENT = byteArrayOf(0, 0, 0, 0)
+        private val TRANSPARENT_INDEX = 0
     }
 }

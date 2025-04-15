@@ -16,20 +16,18 @@ class OpenGLFrame(
     override fun toFrameBuffer(frameBuffer: FrameBuffer): FrameBuffer {
         buffer.position = 0
 
+        // Read the buffer starting the last list as
+        // the bottom line is the first line in the buffer
+        for (x in 0 until gameOptions.width) {
+            for (y in 0 until gameOptions.height) {
+                val i = x + y * gameOptions.width
+                buffer.position = i * PixelFormat.RGBA
 
-                // Read the buffer starting the last list as
-                // the bottom line is the first line in the buffer
-                for (x in 0 until gameOptions.width) {
-                    for (y in 0 until gameOptions.height) {
-                        val i = x + y * gameOptions.width
-                        buffer.position = i * PixelFormat.RGBA
+                readBytes(buffer, tmp)
 
-                        readBytes(buffer, tmp)
-
-                        frameBuffer.colorIndexBuffer.set(x, (gameOptions.height - 1) - y, gameOptions.colors().getColorIndex(tmp))
-                    }
-                }
-
+                frameBuffer.colorIndexBuffer.set(x, (gameOptions.height - 1) - y, gameOptions.colors().getColorIndex(tmp))
+            }
+        }
 
         // Reset buffer position so it can be reused.
         buffer.position = 0

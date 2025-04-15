@@ -254,7 +254,8 @@ class DrawSprite(
             ),
         )
 
-    val attributes: List<DrawSpriteAttribute> = _attributes.toList()
+    val attributes: List<DrawSpriteAttribute>
+        get() = _attributes
 
     override fun executeGPU(
         context: GPURenderContext,
@@ -281,5 +282,14 @@ class DrawSprite(
         val destinationY: Pixel,
         val flipX: Boolean,
         val flipY: Boolean,
-    )
+    ) {
+        val positionLeft = destinationX
+        val positionRight = destinationX + sourceWidth
+        val positionUp = destinationY
+        val positionDown = destinationY + sourceHeight
+        val uvLeft = sourceX
+        val uvRight = sourceX + sourceWidth
+        val uvUp = sourceY
+        val uvDown = sourceY + sourceHeight
+    }
 }

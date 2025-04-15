@@ -3,13 +3,13 @@ package com.github.minigdx.tiny.render.shader
 import com.danielgergely.kgl.ByteBuffer
 import com.danielgergely.kgl.FloatBuffer
 import com.danielgergely.kgl.GL_ARRAY_BUFFER
+import com.danielgergely.kgl.GL_DYNAMIC_DRAW
 import com.danielgergely.kgl.GL_FLOAT
 import com.danielgergely.kgl.GL_NEAREST
 import com.danielgergely.kgl.GL_R8
 import com.danielgergely.kgl.GL_RED
 import com.danielgergely.kgl.GL_REPEAT
 import com.danielgergely.kgl.GL_RGBA
-import com.danielgergely.kgl.GL_STATIC_DRAW
 import com.danielgergely.kgl.GL_TEXTURE0
 import com.danielgergely.kgl.GL_TEXTURE_2D
 import com.danielgergely.kgl.GL_TEXTURE_MAG_FILTER
@@ -239,7 +239,7 @@ sealed class ShaderParameter(val name: String) {
             stride: Int = 0,
         ) {
             program.bindBuffer(GL_ARRAY_BUFFER, buffer)
-            program.bufferData(GL_ARRAY_BUFFER, FloatBuffer(data), data.size * GL_FLOAT, GL_STATIC_DRAW)
+            program.bufferData(GL_ARRAY_BUFFER, FloatBuffer(data), data.size * GL_FLOAT, GL_DYNAMIC_DRAW)
             program.vertexAttribPointer(
                 location = program.getAttrib(name),
                 size = 2,
