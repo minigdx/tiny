@@ -154,7 +154,6 @@ class FrameBuffer(
 
     fun clear(clearIndx: Int) {
         val clearIndex = gamePalette.check(clearIndx)
-        // colorIndexBuffer.reset(clearIndex, camera.x, camera.y, camera.x + width, camera.y + height)
         colorIndexBuffer.reset(clearIndex)
     }
 
