@@ -313,7 +313,8 @@ sealed class ShaderParameter(val name: String) {
         override fun toString() = "attribute vec3 $name;"
     }
 
-    class UniformSample2D(name: String, override val index: Int) : ShaderParameter(name), Uniform, Sampler {
+    class UniformSample2D(name: String, override val index: Int, private val existingTexture: Boolean = false) :
+        ShaderParameter(name), Uniform, Sampler {
         private var texture: Texture? = null
 
         private lateinit var program: ShaderProgram<*, *>
@@ -324,14 +325,16 @@ sealed class ShaderParameter(val name: String) {
             program.createUniform(name)
 
             this.program = program
-            texture = program.createTexture()
-            program.bindTexture(GL_TEXTURE_2D, texture)
-            program.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
-            program.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
+            if (!existingTexture) {
+                texture = program.createTexture()
+                program.bindTexture(GL_TEXTURE_2D, texture)
+                program.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+                program.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
 
-            program.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-            program.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-            program.bindTexture(GL_TEXTURE_2D, null)
+                program.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+                program.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+                program.bindTexture(GL_TEXTURE_2D, null)
+            }
         }
 
         fun applyRGBA(
@@ -351,29 +354,6 @@ sealed class ShaderParameter(val name: String) {
                 GL_RGBA,
                 GL_UNSIGNED_BYTE,
                 ByteBuffer(image),
-            )
-
-            program.bindTexture(GL_TEXTURE_2D, null)
-            ready = true
-        }
-
-        fun applyBuffer(
-            image: ByteBuffer,
-            width: Int,
-            height: Int,
-        ) {
-            program.bindTexture(GL_TEXTURE_2D, texture)
-
-            program.texImage2D(
-                GL_TEXTURE_2D,
-                0,
-                GL_RGBA,
-                width,
-                height,
-                0,
-                GL_RGBA,
-                GL_UNSIGNED_BYTE,
-                image,
             )
 
             program.bindTexture(GL_TEXTURE_2D, null)
@@ -403,11 +383,16 @@ sealed class ShaderParameter(val name: String) {
             ready = true
         }
 
+        fun applyTexture(texture: Texture) {
+            this.texture =texture
+            ready = true
+        }
+
         override fun bind() {
             if (!ready) {
                 throw IllegalStateException(
                     "No texture as been configured for $name. " +
-                        "Did you forget to set up a texture by calling apply method?",
+                            "Did you forget to set up a texture by calling apply method?",
                 )
             }
 

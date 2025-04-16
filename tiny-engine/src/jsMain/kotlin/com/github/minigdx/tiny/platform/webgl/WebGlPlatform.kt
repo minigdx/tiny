@@ -57,8 +57,8 @@ class WebGlPlatform(
             canvas.getContext("webgl2") as? WebGL2RenderingContext
                 ?: throw IllegalStateException(
                     "The canvas context is expected to be a webgl2 context. " +
-                        "WebGL2 doesn't seems to be supported by your browser. " +
-                        "Please update to a compatible browser to run the game in WebGL2.",
+                            "WebGL2 doesn't seems to be supported by your browser. " +
+                            "Please update to a compatible browser to run the game in WebGL2.",
                 )
         render = OpenGLRender(KglJs(context), logger, gameOptions)
         return render.init(windowManager)
@@ -119,12 +119,11 @@ class WebGlPlatform(
         return JsLocalFile(name)
     }
 
-    override fun draw(renderContext: RenderContext) = render.drawOnScreen(renderContext)
+    override fun draw(renderContext: RenderContext) {
+        render.drawOnScreen(renderContext)
+    }
 
-    override fun render(
-        renderContext: RenderContext,
-        ops: List<RenderOperation>,
-    ) {
-        return render.render(renderContext, ops)
+    override fun render(renderContext: RenderContext, ops: List<RenderOperation>) {
+        render.render(renderContext, ops)
     }
 }

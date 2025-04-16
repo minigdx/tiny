@@ -61,8 +61,7 @@ class FramebufferShader(val gl: Kgl, val logger: Logger, val gameOptions: GameOp
 
         program.vertexShader.position.apply(vertexData)
         program.vertexShader.uvs.apply(uvsData)
-
-        program.fragmentShader.frameBuffer.applyBuffer(context.fboBuffer, gameOptions.width, gameOptions.height)
+        program.fragmentShader.frameBuffer.applyTexture(context.fboTexture)
 
         program.bind()
 
@@ -82,7 +81,7 @@ class FramebufferShader(val gl: Kgl, val logger: Logger, val gameOptions: GameOp
 
     class FShader : FragmentShader(FRAGMENT_SHADER) {
         val viewport = varyingVec2("viewport")
-        val frameBuffer = uniformSample2D("frame_buffer")
+        val frameBuffer = uniformSample2D("frame_buffer", existingTexture = true)
     }
 
     companion object {

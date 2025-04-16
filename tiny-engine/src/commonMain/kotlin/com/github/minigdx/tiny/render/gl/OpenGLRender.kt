@@ -73,6 +73,7 @@ class OpenGLRender(
             windowManager = windowManager,
             fbo = fbo,
             fboBuffer = fboBuffer,
+            fboTexture = fboTexture,
         )
     }
 
