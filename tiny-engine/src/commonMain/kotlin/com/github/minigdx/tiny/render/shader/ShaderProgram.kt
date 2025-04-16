@@ -15,12 +15,11 @@ class ShaderProgram<V : VertexShader, F : FragmentShader>(
     val vertexShader: V,
     val fragmentShader: F,
 ) : Kgl by gl {
-    private val program: Program = gl.createProgram() ?: throw IllegalStateException("Could not create OpenGL program")
-
     private val attributes = mutableMapOf<String, Int>()
 
     private val uniforms = mutableMapOf<String, UniformLocation>()
 
+    private var program: Program? = null
     private var vertexShaderId: Shader? = null
     private var fragmentShaderId: Shader? = null
 
@@ -28,13 +27,15 @@ class ShaderProgram<V : VertexShader, F : FragmentShader>(
         val vertexShaderId = createShader(vertexShader.toString(), GL_VERTEX_SHADER)
         val fragmentShaderId = createShader(fragmentShader.toString(), GL_FRAGMENT_SHADER)
 
-        gl.attachShader(program, vertexShaderId)
-        gl.attachShader(program, fragmentShaderId)
+        program = gl.createProgram() ?: throw IllegalStateException("Could not create OpenGL program")
 
-        gl.linkProgram(program)
+        gl.attachShader(program!!, vertexShaderId)
+        gl.attachShader(program!!, fragmentShaderId)
 
-        if (gl.getProgramParameter(program, GL_LINK_STATUS) == GL_FALSE) {
-            val programInfoLog = gl.getProgramInfoLog(program)
+        gl.linkProgram(program!!)
+
+        if (gl.getProgramParameter(program!!, GL_LINK_STATUS) == GL_FALSE) {
+            val programInfoLog = gl.getProgramInfoLog(program!!)
             throw RuntimeException("Unable to link shader program: '$programInfoLog'")
         }
 
@@ -44,7 +45,7 @@ class ShaderProgram<V : VertexShader, F : FragmentShader>(
         this.vertexShaderId = vertexShaderId
         this.fragmentShaderId = fragmentShaderId
 
-        gl.useProgram(program)
+        gl.useProgram(program!!)
 
         vertexShader.parameters.forEach { parameter ->
             parameter.create(this)
@@ -84,12 +85,12 @@ class ShaderProgram<V : VertexShader, F : FragmentShader>(
     }
 
     fun createAttrib(name: String) {
-        attributes[name] = gl.getAttribLocation(program, name)
+        attributes[name] = gl.getAttribLocation(program!!, name)
     }
 
     fun createUniform(name: String) {
         uniforms[name] =
-            gl.getUniformLocation(program, name) ?: throw IllegalArgumentException("Uniform $name not found")
+            gl.getUniformLocation(program!!, name) ?: throw IllegalArgumentException("Uniform $name not found")
     }
 
     fun getAttrib(name: String): Int = attributes[name] ?: throw IllegalStateException("Attributes '$name' not created!")
@@ -99,7 +100,7 @@ class ShaderProgram<V : VertexShader, F : FragmentShader>(
     }
 
     fun use() {
-        useProgram(program)
+        useProgram(program!!)
     }
 
     fun bind() {

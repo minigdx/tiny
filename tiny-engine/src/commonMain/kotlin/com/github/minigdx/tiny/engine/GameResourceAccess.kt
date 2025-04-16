@@ -3,8 +3,8 @@ package com.github.minigdx.tiny.engine
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.graphic.FrameBuffer
-import com.github.minigdx.tiny.render.GPUOperationRenderUnit
-import com.github.minigdx.tiny.render.GPURenderContext
+import com.github.minigdx.tiny.render.OperationsRender
+import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.resources.GameLevel
 import com.github.minigdx.tiny.resources.GameScript
 import com.github.minigdx.tiny.resources.Sound
@@ -30,13 +30,6 @@ data class DebugPoint(val x: Int, val y: Int, val color: String) : DebugAction
 data class DebugLine(val x1: Int, val y1: Int, val x2: Int, val y2: Int, val color: String) : DebugAction
 
 data class DebugEnabled(val enabled: Boolean) : DebugAction
-
-/**
- * Generated frame by the GPU.
- */
-interface Frame {
-    fun toFrameBuffer(frameBuffer: FrameBuffer): FrameBuffer
-}
 
 /**
  * Descriptor to access the game resource
@@ -102,13 +95,6 @@ interface GameResourceAccess {
      * Add an Ops to be executed by the shader
      */
     fun addOp(op: RenderOperation) = Unit
-
-    /**
-     * Draw the actual frame into the frame buffer.
-     *
-     * Please copy it into another framebuffer if it needs to be altered.
-     */
-    fun drawToFrameBuffer(): FrameBuffer
 }
 
 /**
@@ -160,8 +146,8 @@ sealed interface RenderOperation {
      * Render the operation on the GPU, by using a shader.
      */
     fun executeGPU(
-        context: GPURenderContext,
-        renderUnit: GPUOperationRenderUnit,
+        context: RenderContext,
+        renderUnit: OperationsRender,
     ): Unit = invalidTarget(RenderUnit.GPU)
 
     /**
@@ -217,8 +203,8 @@ data class SwapPalette(
     }
 
     override fun executeGPU(
-        context: GPURenderContext,
-        renderUnit: GPUOperationRenderUnit,
+        context: RenderContext,
+        renderUnit: OperationsRender,
     ) {
         TODO()
     }
@@ -230,10 +216,10 @@ class DrawSprite(
     sourceY: Pixel,
     sourceWidth: Pixel,
     sourceHeight: Pixel,
-    destinationX: Pixel,
-    destinationY: Pixel,
-    flipX: Boolean,
-    flipY: Boolean,
+    destinationX: Pixel = 0,
+    destinationY: Pixel = 0,
+    flipX: Boolean = false,
+    flipY: Boolean = false,
 ) : RenderOperation {
     override val target = RenderUnit.GPU
 
@@ -255,8 +241,8 @@ class DrawSprite(
         get() = _attributes
 
     override fun executeGPU(
-        context: GPURenderContext,
-        renderUnit: GPUOperationRenderUnit,
+        context: RenderContext,
+        renderUnit: OperationsRender,
     ) {
         renderUnit.drawSprite(context, this)
     }
@@ -267,7 +253,7 @@ class DrawSprite(
             return false
         }
         // Too many elements in this operation, lets create a new one.
-        if(operation._attributes.size >= MAX_SPRITE_PER_COMMAND) {
+        if (operation._attributes.size >= MAX_SPRITE_PER_COMMAND) {
             return false
         }
         operation._attributes.addAll(_attributes)

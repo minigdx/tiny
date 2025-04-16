@@ -6,7 +6,6 @@ import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.RenderOperation
 import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SourceStream
-import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.render.RenderContext
@@ -45,14 +44,6 @@ interface Platform {
      * Let's run the game loop
      */
     fun gameLoop(gameLoop: GameLoop)
-
-    /**
-     * Draw the image on the screen
-     */
-    fun draw(
-        context: RenderContext,
-        frameBuffer: FrameBuffer,
-    )
 
     /**
      * Save the last 30 seconds of the game.
@@ -117,13 +108,15 @@ interface Platform {
     fun createLocalFile(name: String): LocalFile
 
     /**
-     * Render the frame buffer then the operations.
-     * return the generated frame as a frame buffer.
-     *
+     * Render the operations into the frame buffer.
      */
-    fun drawToFrameBuffer(
+    fun render(
         renderContext: RenderContext,
-        frameBuffer: FrameBuffer,
         ops: List<RenderOperation>,
-    ): FrameBuffer
+    )
+
+    /**
+     * Draw the frame buffer on the screen.
+     */
+    fun draw(renderContext: RenderContext)
 }

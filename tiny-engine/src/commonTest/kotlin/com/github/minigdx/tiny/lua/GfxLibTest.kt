@@ -33,10 +33,6 @@ class GfxLibTest {
 
             override fun script(name: String): GameScript? = null
 
-            override fun drawToFrameBuffer(): FrameBuffer {
-                TODO("Not yet implemented")
-            }
-
             override fun note(wave: WaveGenerator) = Unit
 
             override fun sfx(song: Song2) = Unit

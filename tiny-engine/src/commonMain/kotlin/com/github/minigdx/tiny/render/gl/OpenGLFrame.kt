@@ -1,19 +1,25 @@
-package com.github.minigdx.tiny.render
+package com.github.minigdx.tiny.render.gl
 
 import com.danielgergely.kgl.ByteBuffer
-import com.github.minigdx.tiny.engine.Frame
+import com.github.minigdx.tiny.ColorIndex
+import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.graphic.FrameBuffer
+import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.graphic.PixelFormat
+import com.github.minigdx.tiny.render.RenderFrame
 
 class OpenGLFrame(
     private val buffer: ByteBuffer,
     private val gameOptions: GameOptions,
-) : Frame {
+) : RenderFrame {
     /**
      * Convert the actual Frame (with RGBA) into a Pixel Array of Color index.
      */
-    override fun toFrameBuffer(frameBuffer: FrameBuffer): FrameBuffer {
+    override fun copyInto(pixelArray: PixelArray) {
+        check(pixelArray.pixelFormat == PixelFormat.INDEX) {
+            "The copyInto is expecting to copy the buffer into a index pixel format."
+        }
+
         buffer.position = 0
 
         // Read the buffer starting the last list as
@@ -25,14 +31,26 @@ class OpenGLFrame(
 
                 readBytes(buffer, tmp)
 
-                frameBuffer.colorIndexBuffer.set(x, (gameOptions.height - 1) - y, gameOptions.colors().getColorIndex(tmp))
+                val colorIndex = gameOptions.colors().getColorIndex(tmp)
+                pixelArray.set(x, (gameOptions.height - 1) - y, colorIndex)
             }
         }
 
         // Reset buffer position so it can be reused.
         buffer.position = 0
+    }
 
-        return frameBuffer
+    override fun getPixel(
+        x: Pixel,
+        y: Pixel,
+    ): ColorIndex {
+        buffer.position = (x + y * gameOptions.width) * PixelFormat.RGBA
+        readBytes(buffer, tmp)
+        val colorIndex = gameOptions.colors().getColorIndex(tmp)
+        // Reset buffer position so it can be reused.
+        buffer.position = 0
+
+        return colorIndex
     }
 
     companion object {

@@ -134,12 +134,12 @@ class ColorPalette(colors: List<HexColor>) {
 
         val a = color[3].toInt() and 0xFF
         // The color is transparent. We do know already the result.
-        if(a == 0) {
+        if (a == 0) {
             return TRANSPARENT_INDEX
         }
 
         val index = indexOfRgba.binarySearch(rgbaToInt(color))
-        if(index < 0) {
+        if (index < 0) {
             throw IllegalArgumentException(
                 "Color ${rgbaBytesToString(color)} is not part of the color palette",
             )
@@ -189,6 +189,6 @@ class ColorPalette(colors: List<HexColor>) {
 
     companion object {
         private val TRANSPARENT = byteArrayOf(0, 0, 0, 0)
-        private val TRANSPARENT_INDEX = 0
+        val TRANSPARENT_INDEX = 0
     }
 }

@@ -492,42 +492,56 @@ class GameEngine(
         if (last == null || op.target.compatibleWith(last.target)) {
             ops.add(op)
         } else {
-            val renderedFrame = drawToFrameBuffer()
-            frameBuffer.fastCopyFrom(renderedFrame)
+            // Render only the framebuffer OR GPU operations
+            render()
             ops.add(op)
         }
     }
 
     /**
-     * Will render the actual frame on the screen.
+     * Will render the remaining operations on the screen.
      */
     override fun draw() {
-        // Will execute the last remaining operations.
-        // Those operations should be of same type.
-        val render = drawToFrameBuffer()
-
-        frameBuffer.fastCopyFrom(render)
-        platform.draw(renderContext, frameBuffer)
+        render() // Render the last operation into the frame buffer
+        platform.draw(renderContext)
     }
 
-    override fun drawToFrameBuffer(): FrameBuffer {
-        val last = ops.lastOrNull() ?: return frameBuffer
+    /**
+     * Will render the actual operations on the screen.
+     */
+    fun render() {
+        val last = ops.lastOrNull() ?: return
 
-        if (last.target.compatibleWith(RenderUnit.CPU)) {
+        val frameBufferRender = last.target.compatibleWith(RenderUnit.CPU)
+        if (frameBufferRender) {
             // The remaining operations are only for the CPU.
             // Let's execute it now.
             ops.forEach {
                 check(it.target.compatibleWith(RenderUnit.CPU)) { "Expected only ops than can be executed on CPU!" }
                 it.executeCPU()
             }
-        } else {
-            // There is only GPU operations remaining.
-            // Let's draw this last operations into the current frame buffer.
-            val renderedFrame = platform.drawToFrameBuffer(renderContext, frameBuffer, ops)
-            frameBuffer.fastCopyFrom(renderedFrame)
+            ops.clear()
+            // The framebuffer will be the next render operation
+            ops.add(
+                DrawSprite(
+                    source = frameBuffer.asSpriteSheet,
+                    sourceX = 0,
+                    sourceY = 0,
+                    sourceWidth = frameBuffer.width,
+                    sourceHeight = frameBuffer.height,
+                ),
+            )
+        }
+
+        // Render operations on the screen.
+        platform.render(renderContext, ops)
+
+        // The framebuffer has been rendered.
+        // It can be reset.
+        if (frameBufferRender) {
+            frameBuffer.clear()
         }
         ops.clear()
-        return frameBuffer
     }
 
     override fun end() {

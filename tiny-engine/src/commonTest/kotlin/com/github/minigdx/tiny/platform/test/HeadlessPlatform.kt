@@ -52,27 +52,6 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
         this.gameLoop = gameLoop
     }
 
-    override fun draw(
-        context: RenderContext,
-        frameBuffer: FrameBuffer,
-    ) {
-        val newBuffer =
-            FrameBuffer(
-                frameBuffer.width,
-                frameBuffer.height,
-                frameBuffer.gamePalette,
-            ).apply {
-                colorIndexBuffer.copyFrom(frameBuffer.colorIndexBuffer)
-                generateBuffer()
-            }
-
-        frames.add(newBuffer)
-    }
-
-    override fun record() {
-        super.record()
-    }
-
     override fun endGameLoop() = Unit
 
     override fun initInputHandler(): InputHandler = input
@@ -147,12 +126,15 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
             override fun save(content: ByteArray) = Unit
         }
 
-    override fun drawToFrameBuffer(
+    override fun render(
         renderContext: RenderContext,
-        frameBuffer: FrameBuffer,
         ops: List<RenderOperation>,
-    ): FrameBuffer {
+    ) {
         TODO()
+    }
+
+    override fun draw(renderContext: RenderContext) {
+        TODO("Not yet implemented")
     }
 
     fun saveAnimation(name: String) = toGif(name, frames)

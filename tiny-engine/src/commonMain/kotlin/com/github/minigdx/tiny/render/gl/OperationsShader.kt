@@ -1,4 +1,4 @@
-package com.github.minigdx.tiny.render
+package com.github.minigdx.tiny.render.gl
 
 import com.danielgergely.kgl.GL_TRIANGLES
 import com.danielgergely.kgl.Kgl
@@ -9,50 +9,37 @@ import com.github.minigdx.tiny.engine.RenderOperation
 import com.github.minigdx.tiny.graphic.PixelFormat
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.WindowManager
+import com.github.minigdx.tiny.render.NopRenderContext
+import com.github.minigdx.tiny.render.OperationsRender
+import com.github.minigdx.tiny.render.RenderContext
+import com.github.minigdx.tiny.render.WriteRender
 import com.github.minigdx.tiny.render.shader.FragmentShader
 import com.github.minigdx.tiny.render.shader.ShaderProgram
 import com.github.minigdx.tiny.render.shader.VertexShader
 
-class OpenGLGPURenderContext(
-    val program: ShaderProgram<OpenGLGPURenderUnit.VShader, OpenGLGPURenderUnit.FShader>,
-    val windowManager: WindowManager,
-) : GPURenderContext
+class OperationsShader(
+    private val gl: Kgl,
+    private val logger: Logger,
+    private val gameOptions: GameOptions,
+) : OperationsRender, WriteRender {
+    private val program = ShaderProgram(gl, VShader(), FShader())
 
-interface GPUOperationRenderUnit {
-    fun drawSprite(
-        context: GPURenderContext,
-        op: DrawSprite,
-    )
-}
-
-class OpenGLGPURenderUnit(gl: Kgl, logger: Logger, gameOptions: GameOptions) :
-    GPUOperationRenderUnit,
-    RendererUnit<OpenGLGPURenderContext>(
-        gl,
-        logger,
-        gameOptions,
-    ) {
-    override fun init(windowManager: WindowManager): OpenGLGPURenderContext {
-        val program = ShaderProgram(gl, VShader(), FShader())
+    override fun init(windowManager: WindowManager): RenderContext {
         program.compileShader()
+        return NopRenderContext
+    }
 
+    override fun render(
+        context: RenderContext,
+        ops: List<RenderOperation>,
+    ) {
+        // Prepare to draw a list of operation, by preparing the shader and the viewport.
+        program.use()
         program.vertexShader.uViewport.apply(
             gameOptions.width.toFloat(),
             // Flip the vertical
             gameOptions.height.toFloat() * -1,
         )
-        return OpenGLGPURenderContext(
-            windowManager = windowManager,
-            program = program,
-        )
-    }
-
-    override fun drawGPU(
-        context: OpenGLGPURenderContext,
-        ops: List<RenderOperation>,
-    ) {
-        // Prepare to draw a list of operation, by preparing the shader and the viewport.
-        context.program.use()
         ops.forEach { op -> op.executeGPU(context, this) }
     }
 
@@ -60,14 +47,12 @@ class OpenGLGPURenderUnit(gl: Kgl, logger: Logger, gameOptions: GameOptions) :
     private val spr = FloatArray(MAX_SPRITE_PER_COMMAND * FLOAT_PER_SPRITE)
 
     /**
-     * Execture the operation of drawing a sprite
+     * Execute the operation of drawing a sprite
      */
     override fun drawSprite(
-        context: GPURenderContext,
+        context: RenderContext,
         op: DrawSprite,
     ) {
-        context as OpenGLGPURenderContext
-
         var indexVertex = 0
         op.attributes.forEach { a ->
             // A - Left/Up
@@ -88,7 +73,6 @@ class OpenGLGPURenderUnit(gl: Kgl, logger: Logger, gameOptions: GameOptions) :
             // B - Left/Up
             vertexData[indexVertex++] = a.positionLeft.toFloat()
             vertexData[indexVertex++] = a.positionUp.toFloat()
-
         }
 
         indexVertex = 0
@@ -120,15 +104,15 @@ class OpenGLGPURenderUnit(gl: Kgl, logger: Logger, gameOptions: GameOptions) :
             spr[indexVertex++] = y.toFloat()
         }
 
-        context.program.vertexShader.aPos.apply(vertexData)
-        context.program.vertexShader.aSpr.apply(spr)
+        program.vertexShader.aPos.apply(vertexData)
+        program.vertexShader.aSpr.apply(spr)
 
-        context.program.vertexShader.uSpritesheet.apply(
+        program.vertexShader.uSpritesheet.apply(
             op.source.width.toFloat(),
             op.source.height.toFloat(),
         )
 
-        context.program.fragmentShader.spritesheet.applyIndex(
+        program.fragmentShader.spritesheet.applyIndex(
             op.source.pixels.pixels,
             op.source.width,
             op.source.height,
@@ -146,9 +130,9 @@ class OpenGLGPURenderUnit(gl: Kgl, logger: Logger, gameOptions: GameOptions) :
             colorPaletteBuffer[pos++] = color[3]
         }
 
-        context.program.fragmentShader.paletteColors.applyRGBA(colorPaletteBuffer, 256, 256)
+        program.fragmentShader.paletteColors.applyRGBA(colorPaletteBuffer, 256, 256)
 
-        context.program.vertexShader.uViewport.apply(
+        program.vertexShader.uViewport.apply(
             gameOptions.width.toFloat(),
             // Flip the vertical
             gameOptions.height.toFloat() * -1,
@@ -157,9 +141,9 @@ class OpenGLGPURenderUnit(gl: Kgl, logger: Logger, gameOptions: GameOptions) :
         // There is 2 components per vertex. So the number of vertex = number of components / 2
         val nbVertex = VERTEX_PER_SPRITE * op.attributes.size
 
-        context.program.bind()
-        context.program.drawArrays(GL_TRIANGLES, 0, nbVertex)
-        context.program.unbind()
+        program.bind()
+        program.drawArrays(GL_TRIANGLES, 0, nbVertex)
+        program.unbind()
     }
 
     class VShader : VertexShader(VERTEX_SHADER) {

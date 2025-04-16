@@ -2,6 +2,8 @@ package com.github.minigdx.tiny.graphic
 
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
+import com.github.minigdx.tiny.resources.ResourceType
+import com.github.minigdx.tiny.resources.SpriteSheet
 import kotlin.math.max
 import kotlin.math.min
 
@@ -152,9 +154,12 @@ class FrameBuffer(
         }
     }
 
-    fun clear(clearIndx: Int) {
-        val clearIndex = gamePalette.check(clearIndx)
-        colorIndexBuffer.reset(clearIndex)
+    /**
+     * Clear the framebuffer and set the same color on each pixel.
+     */
+    fun clear(clearIndex: ColorIndex = ColorPalette.TRANSPARENT_INDEX) {
+        val colorIndex = gamePalette.check(clearIndex)
+        colorIndexBuffer.reset(colorIndex)
     }
 
     fun copyFrom(
@@ -245,4 +250,16 @@ class FrameBuffer(
             colorIndexBuffer.size,
         )
     }
+
+    val asSpriteSheet =
+        SpriteSheet(
+            0,
+            0,
+            "framebuffer",
+            type = ResourceType.GAME_SPRITESHEET,
+            pixels = this.colorIndexBuffer,
+            width = this.width,
+            height = this.height,
+            reload = false,
+        )
 }

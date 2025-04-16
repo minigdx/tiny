@@ -1,7 +1,5 @@
 package com.github.minigdx.tiny.render
 
-sealed interface RenderContext
+interface RenderContext
 
-interface GPURenderContext : RenderContext
-
-interface CPURenderContext : RenderContext
+object NopRenderContext : RenderContext

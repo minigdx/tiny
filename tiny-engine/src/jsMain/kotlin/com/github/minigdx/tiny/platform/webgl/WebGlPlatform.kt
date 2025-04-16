@@ -11,7 +11,6 @@ import com.github.minigdx.tiny.file.JsLocalFile
 import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SoundDataSourceStream
 import com.github.minigdx.tiny.file.SourceStream
-import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.log.Logger
@@ -19,8 +18,8 @@ import com.github.minigdx.tiny.platform.ImageData
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
-import com.github.minigdx.tiny.render.OpenGLRender
 import com.github.minigdx.tiny.render.RenderContext
+import com.github.minigdx.tiny.render.gl.OpenGLRender
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineDispatcher
@@ -80,14 +79,6 @@ class WebGlPlatform(
         }
     }
 
-    override fun draw(
-        context: RenderContext,
-        frameBuffer: FrameBuffer,
-    ) {
-        val image = frameBuffer.generateBuffer()
-        render.draw(context, image, frameBuffer.width, frameBuffer.height)
-    }
-
     override fun endGameLoop() = Unit
 
     override fun initInputHandler(): InputHandler = jsInputHandler
@@ -128,11 +119,12 @@ class WebGlPlatform(
         return JsLocalFile(name)
     }
 
-    override fun drawToFrameBuffer(
+    override fun draw(renderContext: RenderContext) = render.drawOnScreen(renderContext)
+
+    override fun render(
         renderContext: RenderContext,
-        frameBuffer: FrameBuffer,
         ops: List<RenderOperation>,
-    ): FrameBuffer {
-        return render.drawToFrameBuffer(renderContext, frameBuffer, ops)
+    ) {
+        return render.render(renderContext, ops)
     }
 }

@@ -1,4 +1,4 @@
-package com.github.minigdx.tiny.render
+package com.github.minigdx.tiny.render.gl
 
 import com.danielgergely.kgl.ByteBuffer
 

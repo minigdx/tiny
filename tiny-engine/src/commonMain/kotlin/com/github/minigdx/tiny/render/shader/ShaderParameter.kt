@@ -357,6 +357,29 @@ sealed class ShaderParameter(val name: String) {
             ready = true
         }
 
+        fun applyBuffer(
+            image: ByteBuffer,
+            width: Int,
+            height: Int,
+        ) {
+            program.bindTexture(GL_TEXTURE_2D, texture)
+
+            program.texImage2D(
+                GL_TEXTURE_2D,
+                0,
+                GL_RGBA,
+                width,
+                height,
+                0,
+                GL_RGBA,
+                GL_UNSIGNED_BYTE,
+                image,
+            )
+
+            program.bindTexture(GL_TEXTURE_2D, null)
+            ready = true
+        }
+
         fun applyIndex(
             image: ByteArray,
             width: Int,

@@ -7,7 +7,6 @@ import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.forEachIndexed
 import com.github.minigdx.tiny.getRootPath
-import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.log.StdOutLogger
@@ -270,11 +269,6 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
 
     override fun gameLoop(gameLoop: GameLoop) = delegate.gameLoop(gameLoop)
 
-    override fun draw(
-        context: RenderContext,
-        frameBuffer: FrameBuffer,
-    ) = delegate.draw(context, frameBuffer)
-
     override fun endGameLoop() = delegate.endGameLoop()
 
     override fun initInputHandler(): InputHandler = delegate.initInputHandler()
@@ -308,13 +302,13 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
 
     override fun createLocalFile(name: String): LocalFile = delegate.createLocalFile(name)
 
-    override fun drawToFrameBuffer(
+    override fun render(
         renderContext: RenderContext,
-        frameBuffer: FrameBuffer,
         ops: List<RenderOperation>,
-    ) = delegate.drawToFrameBuffer(
+    ) = delegate.render(
         renderContext,
-        frameBuffer,
         ops,
     )
+
+    override fun draw(renderContext: RenderContext) = delegate.draw(renderContext)
 }

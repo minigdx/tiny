@@ -12,7 +12,6 @@ import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SoundDataSourceStream
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.file.VirtualFileSystem
-import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.graphic.PixelFormat.RGBA
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
@@ -21,9 +20,9 @@ import com.github.minigdx.tiny.platform.ImageData
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
-import com.github.minigdx.tiny.render.OpenGLRender
 import com.github.minigdx.tiny.render.Render
 import com.github.minigdx.tiny.render.RenderContext
+import com.github.minigdx.tiny.render.gl.OpenGLRender
 import com.github.minigdx.tiny.sound.SoundManager
 import com.github.minigdx.tiny.util.MutableFixedSizeList
 import com.squareup.gifencoder.FastGifEncoder
@@ -61,7 +60,7 @@ class GlfwPlatform(
     // Keep 30 seconds at 60 frames per seconds
     private val gifFrameCache: MutableFixedSizeList<IntArray> = MutableFixedSizeList(gameOptions.record.toInt() * FPS)
 
-    private var lastBuffer: FrameBuffer? = null
+    private var lastDraw: ByteArray? = null
 
     private val lwjglInputHandler = LwjglInput(gameOptions)
 
@@ -203,25 +202,23 @@ class GlfwPlatform(
         return result
     }
 
-    override fun draw(
-        context: RenderContext,
-        frameBuffer: FrameBuffer,
-    ) {
-        val image = frameBuffer.generateBuffer()
-        render.draw(context, image, frameBuffer.width, frameBuffer.height)
-        val imageCopy = image.copyOf()
+    override fun draw(renderContext: RenderContext) {
+        render.drawOnScreen(renderContext)
+        val pixels = render.readRenderAsFrameBuffer(renderContext)
+
+        val imageCopy = pixels.pixels.copyOf()
         recordScope.launch {
             gifFrameCache.add(convert(imageCopy))
         }
-        lastBuffer = frameBuffer
+
+        lastDraw = imageCopy
     }
 
-    override fun drawToFrameBuffer(
+    override fun render(
         renderContext: RenderContext,
-        frameBuffer: FrameBuffer,
         ops: List<RenderOperation>,
-    ): FrameBuffer {
-        return render.drawToFrameBuffer(renderContext, frameBuffer, ops)
+    ) {
+        render.render(renderContext, ops)
     }
 
     override fun endGameLoop() = Unit
@@ -281,23 +278,18 @@ class GlfwPlatform(
     }
 
     override fun screenshot() {
-        val buffer = lastBuffer ?: return
+        val buffer = lastDraw ?: return
 
         recordScope.launch {
             val origin = newFile("screenshoot", "png")
-            val width = buffer.width
-            val height = buffer.height
+            val width = gameOptions.width
+            val height = gameOptions.height
             val image = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
 
             for (y in 0 until height) {
                 for (x in 0 until width) {
-                    val colorData =
-                        buffer.gamePalette.getRGBA(
-                            buffer.pixel(
-                                x = buffer.camera.x + x,
-                                y = buffer.camera.y + y,
-                            ),
-                        )
+                    val colorData = gameOptions.colors().getRGBA(buffer[x + y * width].toInt())
+
                     val r = colorData[0].toInt() and 0xff
                     val g = colorData[1].toInt() and 0xff
                     val b = colorData[2].toInt() and 0xff
