@@ -10,6 +10,7 @@ import com.github.minigdx.tiny.engine.DrawSprite
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.graphic.ColorPalette
 import com.github.minigdx.tiny.resources.GameLevel
+import com.github.minigdx.tiny.resources.GameLevel2
 import com.github.minigdx.tiny.resources.LdtkEntity
 import com.github.minigdx.tiny.resources.LdtkLevel
 import com.github.minigdx.tiny.resources.ldtk.Layer
@@ -149,23 +150,17 @@ class MapLib(
         override fun call(
             @TinyArg("layer_index") arg: LuaValue,
         ): LuaValue {
-            val level = activeLevel() ?: return NIL
+            val level = activeLevel()
 
             if (arg.isnil()) {
-                val activeLevel = activeLevel() ?: return NIL
-                val layersAsLua = activeLevel.layerInstances.mapIndexed { index, layer -> layer.toLua(index, activeLevel) }
+                val activeLevel = level ?: return NIL
+                val layersAsLua =
+                    activeLevel.layerInstances.mapIndexed { index, layer -> layer.toLua(index, activeLevel) }
                 return LuaValue.listOf(layersAsLua.toTypedArray())
             }
 
-            val layerIndex =
-                if (!arg.isint()) {
-                    val id = arg.checkjstring()
-                    level.layerInstances.indexOfFirst { it.__identifier == id }
-                } else {
-                    arg.checkint()
-                }
-
-            return level.layerInstances.getOrNull(layerIndex)?.toLua(layerIndex, level) ?: NIL
+            val layerIndex = layerIndex(arg) ?: return NIL
+            return level?.layerInstances?.getOrNull(layerIndex)?.toLua(layerIndex, level) ?: NIL
         }
 
         @TinyCall("Get the list of layers from the actual level.")
@@ -341,6 +336,17 @@ entity.customFields -- access custom field of the entity
             ?.getOrNull(currentLevel)
     }
 
+    // Return the index of the layer or null if not found (invalid data, layer names, ...).
+    private fun layerIndex(arg: LuaValue): Int? {
+        val level = activeLevel() ?: return null
+        return if (arg.isint()) {
+            arg.checkint().takeIf { level.layerInstances.getOrNull(it) != null }
+        } else {
+            val id = arg.checkjstring()
+            level.layerInstances.indexOfFirst { it.__identifier == id }.takeIf { it != -1 }
+        }
+    }
+
     @TinyFunction("Draw map tiles on the screen.")
     inner class draw : LibFunction() {
         @TinyCall(
@@ -358,41 +364,8 @@ entity.customFields -- access custom field of the entity
                     .asReversed()
                     .asSequence()
 
-            fun toAttribute(
-                size: Int,
-                tile: Tile,
-            ): DrawSprite.DrawSpriteAttribute {
-                fun Int.toFlip(): Pair<Boolean, Boolean> {
-                    return ((this and 0x01) == 0x01) to ((this and 0x02) == 0x02)
-                }
-                val (srcX, srcY) = tile.src
-                val (destX, destY) = tile.px
-                val (flipX, flipY) = tile.f.toFlip()
-
-                return DrawSprite.DrawSpriteAttribute(
-                    srcX,
-                    srcY,
-                    size,
-                    size,
-                    destX,
-                    destY,
-                    flipX,
-                    flipY,
-                )
-            }
-
-            layers.flatMap { layer ->
-                val tileset = world.tilesset[layer.__tilesetRelPath!!]!!
-
-                val attributesGrid = layer.gridTiles?.map { tile -> toAttribute(layer.__gridSize, tile) } ?: emptyList()
-                val attributesAutoLayer =
-                    layer.autoLayer?.map { tile -> toAttribute(layer.__gridSize, tile) } ?: emptyList()
-                val attributes = attributesGrid + attributesAutoLayer
-
-                DrawSprite.from(layer.__identifier, tileset, attributes)
-            }.forEach { opcode ->
-                resourceAccess.addOp(opcode)
-            }
+            layers.flatMap { layer -> toDrawSprite(world, layer) }
+                .forEach { opcode -> resourceAccess.addOp(opcode) }
 
             return NONE
         }
@@ -401,25 +374,22 @@ entity.customFields -- access custom field of the entity
             description = "Draw the layer with the name or the index on the screen.",
         )
         override fun call(
-            @TinyArg("x") a: LuaValue,
-            @TinyArg("y") b: LuaValue,
+            @TinyArg("index") a: LuaValue,
         ): LuaValue {
-            // FIXME: reworkd
-            return NONE
-        }
+            val layerIndex = layerIndex(a) ?: return NIL
+            if (!isActiveLayer(layerIndex)) {
+                return NIL
+            }
+            val layer = activeLevel()?.layerInstances[layerIndex] ?: return NIL
+            // Not a drawable layer.
+            if (layer.__tilesetRelPath == null) {
+                return NIL
+            }
 
-        @TinyCall(
-            description =
-                "Draw the default layer on the screen at the x/y coordinates " +
-                    "starting the mx/my coordinates from the map.",
-        )
-        override fun call(
-            @TinyArg("x", "x screen coordinate") a: LuaValue,
-            @TinyArg("y", "y screen coordinate") b: LuaValue,
-            @TinyArg("mx", "x map coordinate") c: LuaValue,
-            @TinyArg("my", "y map coordinate") d: LuaValue,
-        ): LuaValue {
-            // FIXME: reworkd
+            val world = resourceAccess.level(currentWorld) ?: return NIL
+            toDrawSprite(world, layer).forEach {
+                resourceAccess.addOp(it)
+            }
             return NONE
         }
 
@@ -445,14 +415,41 @@ entity.customFields -- access custom field of the entity
             return NONE
         }
 
-        @TinyCall(
-            description = "Draw the layer on the screen by it's index.",
-        )
-        override fun call(
-            @TinyArg("layer", "index of the layer") a: LuaValue,
-        ): LuaValue {
-            // FIXME: rework
-            return NONE
+        fun toAttribute(
+            size: Int,
+            tile: Tile,
+        ): DrawSprite.DrawSpriteAttribute {
+            fun Int.toFlip(): Pair<Boolean, Boolean> {
+                return ((this and 0x01) == 0x01) to ((this and 0x02) == 0x02)
+            }
+            val (srcX, srcY) = tile.src
+            val (destX, destY) = tile.px
+            val (flipX, flipY) = tile.f.toFlip()
+
+            return DrawSprite.DrawSpriteAttribute(
+                srcX,
+                srcY,
+                size,
+                size,
+                destX,
+                destY,
+                flipX,
+                flipY,
+            )
+        }
+
+        fun toDrawSprite(
+            world: GameLevel2,
+            layer: Layer,
+        ): List<DrawSprite> {
+            val tileset = world.tilesset[layer.__tilesetRelPath!!]!!
+
+            val attributesGrid = layer.gridTiles?.map { tile -> toAttribute(layer.__gridSize, tile) } ?: emptyList()
+            val attributesAutoLayer =
+                layer.autoLayer?.map { tile -> toAttribute(layer.__gridSize, tile) } ?: emptyList()
+            val attributes = attributesGrid + attributesAutoLayer
+
+            return DrawSprite.from(layer.__identifier, tileset, attributes)
         }
     }
 
