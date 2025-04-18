@@ -12,6 +12,8 @@ import com.github.minigdx.tiny.graphic.ColorPalette
 import com.github.minigdx.tiny.resources.GameLevel
 import com.github.minigdx.tiny.resources.LdtkEntity
 import com.github.minigdx.tiny.resources.LdtkLevel
+import com.github.minigdx.tiny.resources.ldtk.Layer
+import com.github.minigdx.tiny.resources.ldtk.Level
 import com.github.minigdx.tiny.resources.ldtk.Tile
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
@@ -53,9 +55,6 @@ import kotlin.math.floor
  *
  * map.cflag(cx, cy, "Layer") // get the flag on this specific layer
  *
- * map.layers() // return the list of layers. (name + type ? + state)
- * map.layers("Entities) // return the layer entity. It can be disable using the state. -> means not used by any method
- * map.layers(1)
  *
  * map.properties -> {
  *      worldIdentifier: ...
@@ -141,18 +140,56 @@ class MapLib(
         }
     }
 
-    @TinyFunction("Set the current layer to draw.")
+    @TinyFunction("Get the list of layers from the actual level.")
     inner class layer : OneArgFunction() {
-        @TinyCall("Set the current index layer to draw. Return the previous layer index.")
+        @TinyCall(
+            "Get the layer at the specified index or name from the actual level. " +
+                "The layer in the front is 0.",
+        )
         override fun call(
             @TinyArg("layer_index") arg: LuaValue,
         ): LuaValue {
-            // FIXME: reworkd
-            return NIL
+            val level = activeLevel() ?: return NIL
+
+            if (arg.isnil()) {
+                val activeLevel = activeLevel() ?: return NIL
+                val layersAsLua = activeLevel.layerInstances.mapIndexed { index, layer -> layer.toLua(index, activeLevel) }
+                return LuaValue.listOf(layersAsLua.toTypedArray())
+            }
+
+            val layerIndex =
+                if (!arg.isint()) {
+                    val id = arg.checkjstring()
+                    level.layerInstances.indexOfFirst { it.__identifier == id }
+                } else {
+                    arg.checkint()
+                }
+
+            return level.layerInstances.getOrNull(layerIndex)?.toLua(layerIndex, level) ?: NIL
         }
 
-        @TinyCall("Reset the current layer to draw to the first available layer (index 0).")
+        @TinyCall("Get the list of layers from the actual level.")
         override fun call(): LuaValue = super.call()
+
+        private fun Layer.toLua(
+            layerIndex: Int,
+            level: Level,
+        ): LuaValue {
+            val result = LuaTable()
+            result["toggle"] =
+                object : ZeroArgFunction() {
+                    override fun call(): LuaValue {
+                        if (layersState.isEmpty()) {
+                            // All layers are active by default
+                            layersState = Array(level.layerInstances.size) { true }
+                        }
+                        val current = layersState[layerIndex]
+                        layersState[layerIndex] = current.not()
+                        return valueOf(current)
+                    }
+                }
+            return result
+        }
     }
 
     @TinyFunction("Convert cell coordinates cx, cy into map screen coordinates x, y.")
@@ -296,19 +333,22 @@ entity.customFields -- access custom field of the entity
         return layersState.getOrElse(index) { return true }
     }
 
+    private fun activeLevel(): Level? {
+        val world = resourceAccess.level(currentWorld)
+        return world
+            ?.ldtk
+            ?.levels
+            ?.getOrNull(currentLevel)
+    }
+
     @TinyFunction("Draw map tiles on the screen.")
     inner class draw : LibFunction() {
         @TinyCall(
             description = "Draw the default layer on the screen.",
         )
         override fun call(): LuaValue {
-            val world = resourceAccess.level(currentWorld)
-            val level =
-                world
-                    ?.ldtk
-                    ?.levels
-                    ?.getOrNull(currentLevel)
-                    ?: return NONE
+            val world = resourceAccess.level(currentWorld) ?: return NONE
+            val level = activeLevel() ?: return NONE
 
             val layers =
                 level.layerInstances
@@ -358,7 +398,7 @@ entity.customFields -- access custom field of the entity
         }
 
         @TinyCall(
-            description = "Draw the default layer on the screen at the x/y coordinates.",
+            description = "Draw the layer with the name or the index on the screen.",
         )
         override fun call(
             @TinyArg("x") a: LuaValue,
