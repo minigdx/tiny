@@ -15,6 +15,8 @@ import com.github.minigdx.tiny.resources.ResourceType.ENGINE_GAMESCRIPT
 import com.github.minigdx.tiny.resources.ResourceType.GAME_GAMESCRIPT
 import com.github.minigdx.tiny.resources.ResourceType.GAME_LEVEL
 import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
+import com.github.minigdx.tiny.resources.ldtk.Layer
+import com.github.minigdx.tiny.resources.ldtk.Ldtk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapMerge
@@ -63,6 +65,59 @@ class ResourceFactory(
                 logger.debug("RESOURCE_FACTORY") {
                     "Loading sound '$name'"
                 }
+            }
+    }
+
+    /**
+     * Load LDTK files and put the tileset as map in it.
+     */
+    fun gameLevel2(
+        index: Int,
+        name: String,
+    ): Flow<GameLevel2> {
+        suspend fun getTilesets(ldtk: Ldtk): Map<String, PixelArray> {
+            return ldtk.levels.flatMap { level -> level.layerInstances }
+                .mapNotNull {
+                    when (it) {
+                        is Layer.AutoLayer -> it.__tilesetRelPath
+                        is Layer.EntitiesLayer -> null
+                        is Layer.IntGrid -> null
+                        is Layer.TilesLayer -> it.__tilesetRelPath
+                    }
+                }
+                .map { file -> file to platform.createImageStream(file).takeIf { it.exists() }?.read() }
+                .filter { it.second != null }
+                .associate { (file, imageData) ->
+                    file to
+                        convertToColorIndex(
+                            imageData!!.data,
+                            imageData.width,
+                            imageData.height,
+                        )
+                }
+        }
+
+        var version = 0
+        return flowOf(name)
+            .map { platform.createByteArrayStream(it) }
+            .flatMapMerge { filestream -> vfs.watch(filestream) }
+            .map { Ldtk.read(it.decodeToString()) }
+            .onEach { world ->
+                logger.debug("RESOURCE_FACTORY") {
+                    "Loading world " + world.iid + " with levels " + world.levels.joinToString(", ") { it.identifier }
+                }
+            }
+            .map { world -> world to getTilesets(world) }
+            .map { (world, tilesets) ->
+                GameLevel2(
+                    version++,
+                    index,
+                    name,
+                    GAME_LEVEL,
+                    reload = false,
+                    world,
+                    tilesets,
+                )
             }
     }
 

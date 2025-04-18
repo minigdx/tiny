@@ -6,11 +6,13 @@ import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.Pixel
+import com.github.minigdx.tiny.engine.DrawSprite
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.graphic.ColorPalette
 import com.github.minigdx.tiny.resources.GameLevel
 import com.github.minigdx.tiny.resources.LdtkEntity
 import com.github.minigdx.tiny.resources.LdtkLevel
+import com.github.minigdx.tiny.resources.ldtk.Tile
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
@@ -27,26 +29,60 @@ import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
 import kotlin.math.floor
-import kotlin.math.max
-import kotlin.math.min
 
+/**
+ * map.draw()
+ * map.draw("Wall") // draw layer Wall.
+ * map.draw("Entities") // NOP as Entities is not a drawalble layer
+ *
+ * map.sdraw(x, y, srcX, srcY, with, height)
+ * map.sdraw(x, y, srcX, srcY, with, height, "Layer")
+ *
+ * map.world("Another.ldtk") // load another world as current world
+ * map.world() // return the actual world identifier (index)
+ * map.world(2)
+ * map.level("AnotherLevel") // load another level from the current world
+ * map.level() // return the actual level identifier (index)
+ * map.level(3)
+ *
+ * map.entities()["Door"] // List all Door entities from all entities layer
+ * map.entities("NiceDoor")["Door"] // List all Door entities from the layer "NiceDoor"
+ *
+ * map.cflag(cx, cy) // get the flag to the FIRST IntLayer (by cell units)
+ * map.flag(x, y) // same, by screen coordinate
+ *
+ * map.cflag(cx, cy, "Layer") // get the flag on this specific layer
+ *
+ * map.layers() // return the list of layers. (name + type ? + state)
+ * map.layers("Entities) // return the layer entity. It can be disable using the state. -> means not used by any method
+ * map.layers(1)
+ *
+ * map.properties -> {
+ *      worldIdentifier: ...
+ *      worldLayer: ...
+ *      levelIdentifier: ...
+ *      x, y: ...
+ *
+ * }
+ *
+ */
 @TinyLib(
     "map",
-    "Map API to accessing maps data configured in a game. " +
-        "Map can be created using LDTk ( https://ldtk.io/ ). \n\n" +
-        "WARNING: Projects need to be exported using " +
-        "https://ldtk.io/docs/game-dev/super-simple-export/['Super simple export']. " +
-        "Also, Int layers _need_ to have an Auto Layer tileset otherwise, they will not be known by the engine.",
+    "Access map created with LDTk ( https://ldtk.io/ ).",
 )
 class MapLib(
     private val resourceAccess: GameResourceAccess,
     private val spriteSize: Pair<Pixel, Pixel>,
     private val colors: ColorPalette,
-) :
-    TwoArgFunction() {
+) : TwoArgFunction() {
+    private var currentWorld: Int = 0
     private var currentLevel: Int = 0
 
     private var currentLayer: Int = 0
+
+    // Empty array means that all layers are active.
+    // Otherwise, the state can be accessed using the index of the layer.
+    private var layersState: Array<Boolean> = emptyArray()
 
     override fun call(
         arg1: LuaValue,
@@ -79,12 +115,8 @@ class MapLib(
         val json: ((LdtkLevel) -> JsonElement)? = null,
     ) : ZeroArgFunction() {
         override fun call(): LuaValue {
-            val level = resourceAccess.level(currentLevel)?.ldktLevel ?: return NIL
-            val value =
-                int?.invoke(level)?.let { valueOf(it) }
-                    ?: str?.invoke(level)?.let { valueOf(it) }
-                    ?: json?.invoke(level)?.toLua()
-                    ?: NIL
+            // FIXME: rework that.
+            val value = NIL
             return value
         }
     }
@@ -104,34 +136,8 @@ class MapLib(
         override fun call(
             @TinyArg("level") arg: LuaValue,
         ): LuaValue {
-            if (arg.isnil()) return valueOf(currentLevel)
-
-            val prec = currentLevel
-            currentLevel =
-                if (!arg.isnumber()) {
-                    var index = 0
-                    var found = false
-                    var level = resourceAccess.level(index)
-                    val levelId = arg.checkjstring()
-                    while (level != null && !found) {
-                        if (level.ldktLevel.uniqueIdentifer == levelId) {
-                            found = true
-                        } else {
-                            level = resourceAccess.level(++index)
-                        }
-                    }
-                    if (!found) {
-                        // Level not found by its identifier
-                        // Return the actual level and ignore the modification
-                        prec
-                    } else {
-                        index
-                    }
-                } else {
-                    arg.checkint()
-                }
-
-            return valueOf(prec)
+            // FIXME: rework
+            return NIL
         }
     }
 
@@ -141,16 +147,8 @@ class MapLib(
         override fun call(
             @TinyArg("layer_index") arg: LuaValue,
         ): LuaValue {
-            val prec = currentLayer
-            currentLayer =
-                if (arg.isnil()) {
-                    0
-                } else {
-                    val nbLayers = resourceAccess.level(currentLevel)?.numberOfLayers ?: 1
-                    min(max(0, arg.checkint()), nbLayers - 1)
-                }
-
-            return valueOf(prec)
+            // FIXME: reworkd
+            return NIL
         }
 
         @TinyCall("Reset the current layer to draw to the first available layer (index 0).")
@@ -220,20 +218,8 @@ class MapLib(
             @TinyArg("cx") arg1: LuaValue,
             @TinyArg("cy") arg2: LuaValue,
         ): LuaValue {
-            val (tileX, tileY) =
-                if (arg1.istable()) {
-                    arg1["cx"].toint() to arg1["cy"].toint()
-                } else {
-                    arg1.checkint() to arg2.checkint()
-                }
-
-            val layer = resourceAccess.level(currentLevel)?.intLayers?.firstOrNull { l -> l != null } ?: return NIL
-
-            return if (tileX in 0 until layer.width && tileY in 0 until layer.height) {
-                valueOf(layer.ints.getOne(tileX, tileY))
-            } else {
-                NIL
-            }
+            // FIXME: rework
+            return NIL
         }
 
         @TinyCall("Get the flag from the tile at the coordinate table [cx,cy].")
@@ -257,16 +243,12 @@ entity.customFields -- access custom field of the entity
     inner class entities : LuaTable() {
         private val cachedEntities: MutableMap<Int, LuaValue> = mutableMapOf()
 
-        private var currentLevelVersion = currentLevel to -1
+        private var currentLevelVersion = currentWorld to -1
 
         private val entities: LuaValue
             get() {
-                // When the level is update, clear the cache.
-                val version = resourceAccess.level(currentLevel)?.version
-                if (currentLevel to version != currentLevelVersion) {
-                    cachedEntities.clear()
-                }
-                return cachedEntities[currentLevel] ?: cacheMe(resourceAccess.level(currentLevel))
+                // FIXME: rework
+                return NIL
             }
 
         private fun cacheMe(level: GameLevel?): LuaValue {
@@ -280,8 +262,8 @@ entity.customFields -- access custom field of the entity
                 toCache[key] = entitiesOfType
             }
 
-            cachedEntities[currentLevel] = toCache
-            currentLevelVersion = currentLevel to (level?.version ?: -1)
+            cachedEntities[currentWorld] = toCache
+            currentLevelVersion = currentWorld to (level?.version ?: -1)
             return toCache
         }
 
@@ -309,24 +291,69 @@ entity.customFields -- access custom field of the entity
         }
     }
 
+    private fun isActiveLayer(index: Int): Boolean {
+        if (layersState.isEmpty()) return true
+        return layersState.getOrElse(index) { return true }
+    }
+
     @TinyFunction("Draw map tiles on the screen.")
     inner class draw : LibFunction() {
         @TinyCall(
             description = "Draw the default layer on the screen.",
         )
         override fun call(): LuaValue {
-            val layer = resourceAccess.level(currentLevel)?.imageLayers?.get(currentLayer)
-            if (layer != null) {
-                resourceAccess.frameBuffer.copyFrom(
-                    source = layer.pixels,
-                    dstX = 0,
-                    dstY = 0,
-                    sourceX = 0,
-                    sourceY = 0,
-                    width = layer.width,
-                    height = layer.height,
+            val world = resourceAccess.level(currentWorld)
+            val level =
+                world
+                    ?.ldtk
+                    ?.levels
+                    ?.getOrNull(currentLevel)
+                    ?: return NONE
+
+            val layers =
+                level.layerInstances
+                    // Select only actives layers
+                    .filterIndexed { index, layer -> isActiveLayer(index) && layer.__tilesetRelPath != null }
+                    // Layers will be drawn in the reverse order (from the back to the front)
+                    .asReversed()
+                    .asSequence()
+
+            fun toAttribute(
+                size: Int,
+                tile: Tile,
+            ): DrawSprite.DrawSpriteAttribute {
+                fun Int.toFlip(): Pair<Boolean, Boolean> {
+                    return ((this and 0x01) == 0x01) to ((this and 0x02) == 0x02)
+                }
+                val (srcX, srcY) = tile.src
+                val (destX, destY) = tile.px
+                val (flipX, flipY) = tile.f.toFlip()
+
+                return DrawSprite.DrawSpriteAttribute(
+                    srcX,
+                    srcY,
+                    size,
+                    size,
+                    destX,
+                    destY,
+                    flipX,
+                    flipY,
                 )
             }
+
+            layers.flatMap { layer ->
+                val tileset = world.tilesset[layer.__tilesetRelPath!!]!!
+
+                val attributesGrid = layer.gridTiles?.map { tile -> toAttribute(layer.__gridSize, tile) } ?: emptyList()
+                val attributesAutoLayer =
+                    layer.autoLayer?.map { tile -> toAttribute(layer.__gridSize, tile) } ?: emptyList()
+                val attributes = attributesGrid + attributesAutoLayer
+
+                DrawSprite.from(layer.__identifier, tileset, attributes)
+            }.forEach { opcode ->
+                resourceAccess.addOp(opcode)
+            }
+
             return NONE
         }
 
@@ -337,18 +364,7 @@ entity.customFields -- access custom field of the entity
             @TinyArg("x") a: LuaValue,
             @TinyArg("y") b: LuaValue,
         ): LuaValue {
-            val layer = resourceAccess.level(currentLevel)?.imageLayers?.get(currentLayer)
-            if (layer != null) {
-                resourceAccess.frameBuffer.copyFrom(
-                    source = layer.pixels,
-                    dstX = a.checkint(),
-                    dstY = b.checkint(),
-                    sourceX = 0,
-                    sourceY = 0,
-                    width = layer.width,
-                    height = layer.height,
-                )
-            }
+            // FIXME: reworkd
             return NONE
         }
 
@@ -363,18 +379,7 @@ entity.customFields -- access custom field of the entity
             @TinyArg("mx", "x map coordinate") c: LuaValue,
             @TinyArg("my", "y map coordinate") d: LuaValue,
         ): LuaValue {
-            val layer = resourceAccess.level(currentLevel)?.imageLayers?.get(currentLayer)
-            if (layer != null) {
-                resourceAccess.frameBuffer.copyFrom(
-                    source = layer.pixels,
-                    dstX = a.checkint(),
-                    dstY = b.checkint(),
-                    sourceX = c.checkint(),
-                    sourceY = d.checkint(),
-                    width = layer.width,
-                    height = layer.height,
-                )
-            }
+            // FIXME: reworkd
             return NONE
         }
 
@@ -396,18 +401,7 @@ entity.customFields -- access custom field of the entity
             val width = args.arg(5).checkint()
             val height = args.arg(6).checkint()
 
-            val layer = resourceAccess.level(currentLevel)?.imageLayers?.get(currentLayer)
-            if (layer != null) {
-                resourceAccess.frameBuffer.copyFrom(
-                    source = layer.pixels,
-                    dstX = x,
-                    dstY = y,
-                    sourceX = sx,
-                    sourceY = sy,
-                    width = width,
-                    height = height,
-                )
-            }
+            // FIXME: rework
             return NONE
         }
 
@@ -417,18 +411,7 @@ entity.customFields -- access custom field of the entity
         override fun call(
             @TinyArg("layer", "index of the layer") a: LuaValue,
         ): LuaValue {
-            val layer = resourceAccess.level(currentLevel)?.imageLayers?.getOrNull(a.checkint())
-            if (layer != null) {
-                resourceAccess.frameBuffer.copyFrom(
-                    source = layer.pixels,
-                    dstX = 0,
-                    dstY = 0,
-                    sourceX = 0,
-                    sourceY = 0,
-                    width = layer.width,
-                    height = layer.height,
-                )
-            }
+            // FIXME: rework
             return NONE
         }
     }

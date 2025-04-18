@@ -70,6 +70,7 @@ enum class WorldLayout {
 
 @Serializable
 data class Ldtk(
+    val iid: StrIID,
     val worldLayout: WorldLayout,
     val levels: List<Level>,
 ) {
@@ -110,6 +111,18 @@ sealed interface Layer {
 
     val seed: Long
 
+    val __tilesetRelPath: String?
+
+    val overrideTilesetUid: Int?
+
+    val intGridCsv: List<Int>?
+
+    val entityInstances: List<Entity>?
+
+    val autoLayer: List<Tile>?
+
+    val gridTiles: List<Tile>?
+
     @SerialName("IntGrid")
     @Serializable
     data class IntGrid(
@@ -126,7 +139,27 @@ sealed interface Layer {
          * 0 means "empty cell" and IntGrid values start at 1.
          * The array size is __cWid x __cHei cells.
          */
-        val intGridCsv: List<Int>,
+        override val intGridCsv: List<Int>,
+        /**
+         * Always null
+         */
+        override val overrideTilesetUid: Int? = null,
+        /**
+         * Always null
+         */
+        override val entityInstances: List<Entity>? = null,
+        /**
+         * Always null
+         */
+        override val __tilesetRelPath: String? = null,
+        /**
+         * Always null
+         */
+        override val autoLayer: List<Tile>? = null,
+        /**
+         * Always null
+         */
+        override val gridTiles: List<Tile>? = null,
     ) : Layer
 
     @SerialName("AutoLayer")
@@ -139,11 +172,27 @@ sealed interface Layer {
         override val pxOffsetX: Int,
         override val pxOffsetY: Int,
         override val seed: Long,
-        val autoLayer: List<Tile>,
+        override val autoLayer: List<Tile>,
         /**
          * The relative path to corresponding Tileset, if any.
          */
-        val __tilesetRelPath: String,
+        override val __tilesetRelPath: String,
+        /**
+         * Always null
+         */
+        override val overrideTilesetUid: Int? = null,
+        /**
+         * Always null
+         */
+        override val intGridCsv: List<Int>? = null,
+        /**
+         * Always null
+         */
+        override val entityInstances: List<Entity>? = null,
+        /**
+         * Always null
+         */
+        override val gridTiles: List<Tile>? = null,
     ) : Layer
 
     @SerialName("Tiles")
@@ -156,15 +205,27 @@ sealed interface Layer {
         override val pxOffsetX: Int,
         override val pxOffsetY: Int,
         override val seed: Long,
-        val gridTiles: List<Tile>,
+        override val gridTiles: List<Tile>,
         /**
          * The relative path to corresponding Tileset, if any.
          */
-        val __tilesetRelPath: String,
+        override val __tilesetRelPath: String,
         /**
          * This layer can use another tileset by overriding the tileset UID here.
          */
-        val overrideTilesetUid: Int? = null,
+        override val overrideTilesetUid: Int? = null,
+        /**
+         * Always null
+         */
+        override val intGridCsv: List<Int>? = null,
+        /**
+         * Always null
+         */
+        override val entityInstances: List<Entity>? = null,
+        /**
+         * Always null
+         */
+        override val autoLayer: List<Tile>? = null,
     ) : Layer
 
     @SerialName("Entities")
@@ -177,7 +238,27 @@ sealed interface Layer {
         override val pxOffsetX: Int,
         override val pxOffsetY: Int,
         override val seed: Long,
-        val entityInstances: List<Entity>,
+        override val entityInstances: List<Entity>,
+        /**
+         * Always null
+         */
+        override val intGridCsv: List<Int>? = null,
+        /**
+         * Always null
+         */
+        override val __tilesetRelPath: String? = null,
+        /**
+         * Always null
+         */
+        override val overrideTilesetUid: Int? = null,
+        /**
+         * Always null
+         */
+        override val autoLayer: List<Tile>? = null,
+        /**
+         * Always null
+         */
+        override val gridTiles: List<Tile>? = null,
     ) : Layer
 }
 

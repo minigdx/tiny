@@ -384,7 +384,7 @@ sealed class ShaderParameter(val name: String) {
         }
 
         fun applyTexture(texture: Texture) {
-            this.texture =texture
+            this.texture = texture
             ready = true
         }
 
@@ -392,7 +392,7 @@ sealed class ShaderParameter(val name: String) {
             if (!ready) {
                 throw IllegalStateException(
                     "No texture as been configured for $name. " +
-                            "Did you forget to set up a texture by calling apply method?",
+                        "Did you forget to set up a texture by calling apply method?",
                 )
             }
 

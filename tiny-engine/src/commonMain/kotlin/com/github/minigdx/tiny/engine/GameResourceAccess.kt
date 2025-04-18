@@ -3,10 +3,12 @@ package com.github.minigdx.tiny.engine
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.graphic.FrameBuffer
+import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.render.OperationsRender
 import com.github.minigdx.tiny.render.RenderContext
-import com.github.minigdx.tiny.resources.GameLevel
+import com.github.minigdx.tiny.resources.GameLevel2
 import com.github.minigdx.tiny.resources.GameScript
+import com.github.minigdx.tiny.resources.ResourceType
 import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.resources.SpriteSheet
 import com.github.minigdx.tiny.sound.Song2
@@ -63,7 +65,7 @@ interface GameResourceAccess {
     /**
      * Access a level by its index.
      */
-    fun level(index: Int): GameLevel?
+    fun level(index: Int): GameLevel2?
 
     /**
      * Access sound by its index
@@ -212,19 +214,28 @@ data class SwapPalette(
 
 class DrawSprite(
     val source: SpriteSheet,
-    sourceX: Pixel,
-    sourceY: Pixel,
-    sourceWidth: Pixel,
-    sourceHeight: Pixel,
-    destinationX: Pixel = 0,
-    destinationY: Pixel = 0,
-    flipX: Boolean = false,
-    flipY: Boolean = false,
+    attributes: List<DrawSpriteAttribute>,
 ) : RenderOperation {
     override val target = RenderUnit.GPU
 
-    private val _attributes =
-        mutableListOf(
+    private val _attributes = attributes.toMutableList()
+
+    val attributes: List<DrawSpriteAttribute>
+        get() = _attributes
+
+    constructor(
+        source: SpriteSheet,
+        sourceX: Pixel,
+        sourceY: Pixel,
+        sourceWidth: Pixel,
+        sourceHeight: Pixel,
+        destinationX: Pixel = 0,
+        destinationY: Pixel = 0,
+        flipX: Boolean = false,
+        flipY: Boolean = false,
+    ) : this(
+        source,
+        listOf(
             DrawSpriteAttribute(
                 sourceX,
                 sourceY,
@@ -235,10 +246,8 @@ class DrawSprite(
                 flipX,
                 flipY,
             ),
-        )
-
-    val attributes: List<DrawSpriteAttribute>
-        get() = _attributes
+        ),
+    )
 
     override fun executeGPU(
         context: RenderContext,
@@ -282,5 +291,27 @@ class DrawSprite(
 
     companion object {
         const val MAX_SPRITE_PER_COMMAND = 100
+
+        fun from(
+            name: String,
+            tileset: PixelArray,
+            attributes: List<DrawSpriteAttribute>,
+        ): List<DrawSprite> {
+            val spriteSheet =
+                SpriteSheet(
+                    0,
+                    0,
+                    name,
+                    ResourceType.GAME_SPRITESHEET,
+                    tileset,
+                    tileset.width,
+                    tileset.height,
+                    false,
+                )
+
+            return attributes.chunked(MAX_SPRITE_PER_COMMAND).map { chunk ->
+                DrawSprite(spriteSheet, chunk)
+            }
+        }
     }
 }

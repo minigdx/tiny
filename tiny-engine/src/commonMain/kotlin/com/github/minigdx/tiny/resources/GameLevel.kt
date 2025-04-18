@@ -3,6 +3,7 @@ package com.github.minigdx.tiny.resources
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 
+@Deprecated("To be replace with GameLevel2")
 data class GameLevel(
     override val version: Int,
     override val index: Int,

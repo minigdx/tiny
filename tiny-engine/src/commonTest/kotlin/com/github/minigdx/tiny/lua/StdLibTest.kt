@@ -6,7 +6,7 @@ import com.github.minigdx.tiny.graphic.ColorPalette
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.graphic.PixelFormat
-import com.github.minigdx.tiny.resources.GameLevel
+import com.github.minigdx.tiny.resources.GameLevel2
 import com.github.minigdx.tiny.resources.GameScript
 import com.github.minigdx.tiny.resources.ResourceType
 import com.github.minigdx.tiny.resources.Sound
@@ -43,7 +43,7 @@ class StdLibTest {
 
             override fun newSpritesheetIndex(): Int = 0
 
-            override fun level(index: Int): GameLevel? = null
+            override fun level(index: Int): GameLevel2? = null
 
             override fun sound(index: Int): Sound? = null
 

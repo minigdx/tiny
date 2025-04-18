@@ -12,15 +12,13 @@ import com.github.minigdx.tiny.platform.ImageData
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
-import com.github.minigdx.tiny.render.CPURenderContext
+import com.github.minigdx.tiny.render.NopRenderContext
 import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.sound.Sound
 import com.github.minigdx.tiny.sound.SoundManager
 import com.github.minigdx.tiny.util.MutableFixedSizeList
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-
-class NoopRenderContext : CPURenderContext
 
 class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map<String, Any>, frames: Int = 10) :
     Platform {
@@ -40,7 +38,7 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
     }
 
     override fun initRenderManager(windowManager: WindowManager): RenderContext {
-        return NoopRenderContext()
+        return NopRenderContext
     }
 
     suspend fun advance() {

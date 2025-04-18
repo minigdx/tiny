@@ -10,6 +10,7 @@ import com.github.ajalt.clikt.parameters.types.file
 import com.github.minigdx.tiny.cli.config.GameParameters
 import com.github.minigdx.tiny.cli.config.GameParameters.Companion.JSON
 import com.github.minigdx.tiny.cli.config.GameParametersV1
+import com.github.minigdx.tiny.resources.ldtk.Ldtk
 import kotlinx.serialization.json.decodeFromStream
 import java.io.File
 import java.io.FileInputStream
@@ -86,15 +87,20 @@ class GameExporter(private val withSourceMap: Boolean = false) {
                     exportedGame.closeEntry()
                 }
                 gameParameters.levels.forEach { name ->
-                    val baseDirectory = gameDirectory.resolve(name)
-                    val files = baseDirectory.listFiles() ?: emptyArray()
-                    files.forEach { file ->
-                        if (file.isFile) {
-                            exportedGame.putNextEntry(ZipEntry(name + "/" + file.name))
+                    exportedGame.putNextEntry(ZipEntry(name))
+                    exportedGame.write(gameDirectory.resolve(name).readBytes())
+                    exportedGame.closeEntry()
+
+                    val ldtk = Ldtk.read(gameDirectory.resolve(name).readText())
+                    ldtk.levels.flatMap { level -> level.layerInstances }
+                        .mapNotNull { it.__tilesetRelPath }
+                        .map { gameDirectory.resolve(it) }
+                        .toSet()
+                        .forEach { file ->
+                            exportedGame.putNextEntry(ZipEntry(file.relativeTo(gameDirectory).name))
                             exportedGame.write(file.readBytes())
                             exportedGame.closeEntry()
                         }
-                    }
                 }
 
                 // Add index.html

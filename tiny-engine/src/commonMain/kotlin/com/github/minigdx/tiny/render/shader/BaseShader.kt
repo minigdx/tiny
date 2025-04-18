@@ -39,13 +39,15 @@ abstract class BaseShader(private val shader: String) {
         return ShaderParameter.VaryingVec2(name).also { parameters += it }
     }
 
-    fun uniformSample2D(name: String, existingTexture: Boolean = false): ShaderParameter.UniformSample2D {
+    fun uniformSample2D(
+        name: String,
+        existingTexture: Boolean = false,
+    ): ShaderParameter.UniformSample2D {
         return ShaderParameter.UniformSample2D(name, samplers.size, existingTexture).also {
             parameters += it
             samplers += it
         }
     }
-
 
     fun uniformFrameBufferSample2D(name: String): ShaderParameter.UniformSample2D {
         return ShaderParameter.UniformSample2D(name, samplers.size).also {
