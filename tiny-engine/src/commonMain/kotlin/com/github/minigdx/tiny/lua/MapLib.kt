@@ -38,11 +38,6 @@ import kotlin.math.floor
  * map.level("AnotherLevel") // load another level from the current world
  * map.level() // return the actual level identifier (index)
  * map.level(3)
- * map.cflag(cx, cy) // get the flag to the FIRST IntLayer (by cell units)
- * map.flag(x, y) // same, by screen coordinate
- *
- * map.cflag(cx, cy, "Layer") // get the flag on this specific layer
- *
  *
  * map.properties -> {
  *      worldIdentifier: ...
@@ -77,6 +72,7 @@ class MapLib(
         map["draw"] = draw()
         map["layer"] = layer()
         map["entities"] = entities()
+        map["cflag"] = cflag()
         map["flag"] = flag()
         map["from"] = from()
         map["to"] = to()
@@ -222,21 +218,67 @@ class MapLib(
         ) = super.call(arg)
     }
 
-    @TinyFunction("Get the flag from a tile.")
-    inner class flag : TwoArgFunction() {
+    @TinyFunction("Get the flag from a tile, using cell coordinates.")
+    inner class cflag : LibFunction() {
         @TinyCall("Get the flag from the tile at the coordinate cx,cy.")
         override fun call(
             @TinyArg("cx") arg1: LuaValue,
             @TinyArg("cy") arg2: LuaValue,
         ): LuaValue {
-            // FIXME: rework
-            return NIL
+            val level = activeLevel() ?: return NIL
+            return getCell(level.layerInstances.asSequence(), arg1.checkint(), arg2.checkint())
         }
 
-        @TinyCall("Get the flag from the tile at the coordinate table [cx,cy].")
+        @TinyCall("Get the flag from the tile at the coordinate cx,cy from a specific layer.")
         override fun call(
-            @TinyArg("cell") arg: LuaValue,
-        ): LuaValue = super.call(arg)
+            @TinyArg("cx") arg1: LuaValue,
+            @TinyArg("cy") arg2: LuaValue,
+            @TinyArg("layer") arg3: LuaValue,
+        ): LuaValue {
+            val level = activeLevel() ?: return NIL
+            val layer = layerIndex(arg3) ?: return NIL
+            return getCell(sequenceOf(level.layerInstances.get(layer)), arg1.checkint(), arg2.checkint())
+        }
+    }
+
+    @TinyFunction("Get the flag from a tile, using screen coordinates.")
+    inner class flag : LibFunction() {
+        @TinyCall("Get the flag from the tile at the coordinate x,y.")
+        override fun call(
+            @TinyArg("x") arg1: LuaValue,
+            @TinyArg("y") arg2: LuaValue,
+        ): LuaValue {
+            val level = activeLevel() ?: return NIL
+
+            return getCell(
+                level.layerInstances.asSequence(),
+                arg1.checkint(),
+                arg2.checkint(),
+            ) { layer, x, y ->
+                val cx = x / layer.__gridSize
+                val cy = y / layer.__gridSize
+                cx + cy * layer.__cWid
+            }
+        }
+
+        @TinyCall("Get the flag from the tile at the coordinate x,y from a specific layer.")
+        override fun call(
+            @TinyArg("x") arg1: LuaValue,
+            @TinyArg("y") arg2: LuaValue,
+            @TinyArg("layer") arg3: LuaValue,
+        ): LuaValue {
+            val level = activeLevel() ?: return NIL
+            val layer = layerIndex(arg3) ?: return NIL
+            return getCell(
+                sequenceOf(level.layerInstances.get(layer)),
+                arg1.checkint(),
+                arg2.checkint(),
+            ) { layer, x, y ->
+                val cx = x / layer.__gridSize
+                val cy = y / layer.__gridSize
+                cx + cy * layer.__cWid
+            }
+        }
     }
 
     @TinyFunction(
@@ -492,5 +534,23 @@ entity.fields -- access custom field of the entity
         result["h"] = valueOf(h)
         result["tilesetUid"] = valueOf(tilesetUid)
         return result
+    }
+
+    private fun getCell(
+        layers: Sequence<Layer>,
+        cx: Int,
+        cy: Int,
+        index: (Layer, Int, Int) -> Int = { layer, a, b -> a + b * layer.__cWid },
+    ): LuaValue {
+        val cell: Int =
+            layers.filter { layer -> layer.intGridCsv != null }
+                // Get the first cell != 0 in all IntLayers
+                .map { layer ->
+                    layer.intGridCsv!!.getOrElse(index(layer, cx, cy)) { 0 }
+                }.firstOrNull { cell -> cell != 0 }
+                ?: 0
+
+        if (cell == 0) return NIL
+        return LuaValue.valueOf(cell)
     }
 }
