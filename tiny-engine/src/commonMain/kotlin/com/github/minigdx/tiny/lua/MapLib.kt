@@ -1,7 +1,6 @@
 package com.github.minigdx.tiny.lua
 
 import com.github.mingdx.tiny.doc.TinyArg
-import com.github.mingdx.tiny.doc.TinyArgs
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
@@ -9,24 +8,19 @@ import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.DrawSprite
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.graphic.ColorPalette
-import com.github.minigdx.tiny.resources.GameLevel
 import com.github.minigdx.tiny.resources.GameLevel2
-import com.github.minigdx.tiny.resources.LdtkEntity
 import com.github.minigdx.tiny.resources.LdtkLevel
+import com.github.minigdx.tiny.resources.ldtk.CustomField
+import com.github.minigdx.tiny.resources.ldtk.Entity
+import com.github.minigdx.tiny.resources.ldtk.EntityRef
+import com.github.minigdx.tiny.resources.ldtk.GridPoint
 import com.github.minigdx.tiny.resources.ldtk.Layer
 import com.github.minigdx.tiny.resources.ldtk.Level
 import com.github.minigdx.tiny.resources.ldtk.Tile
-import kotlinx.serialization.json.JsonArray
+import com.github.minigdx.tiny.resources.ldtk.TilesetRect
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.booleanOrNull
-import kotlinx.serialization.json.doubleOrNull
-import kotlinx.serialization.json.intOrNull
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
-import org.luaj.vm2.Varargs
 import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
@@ -34,9 +28,6 @@ import org.luaj.vm2.lib.ZeroArgFunction
 import kotlin.math.floor
 
 /**
- * map.draw()
- * map.draw("Wall") // draw layer Wall.
- * map.draw("Entities") // NOP as Entities is not a drawalble layer
  *
  * map.sdraw(x, y, srcX, srcY, with, height)
  * map.sdraw(x, y, srcX, srcY, with, height, "Layer")
@@ -47,10 +38,6 @@ import kotlin.math.floor
  * map.level("AnotherLevel") // load another level from the current world
  * map.level() // return the actual level identifier (index)
  * map.level(3)
- *
- * map.entities()["Door"] // List all Door entities from all entities layer
- * map.entities("NiceDoor")["Door"] // List all Door entities from the layer "NiceDoor"
- *
  * map.cflag(cx, cy) // get the flag to the FIRST IntLayer (by cell units)
  * map.flag(x, y) // same, by screen coordinate
  *
@@ -78,8 +65,6 @@ class MapLib(
     private var currentWorld: Int = 0
     private var currentLevel: Int = 0
 
-    private var currentLayer: Int = 0
-
     // Empty array means that all layers are active.
     // Otherwise, the state can be accessed using the index of the layer.
     private var layersState: Array<Boolean> = emptyArray()
@@ -96,14 +81,7 @@ class MapLib(
         map["from"] = from()
         map["to"] = to()
         map["level"] = level()
-        map["x"] = property(int = { it.x })
-        map["y"] = property(int = { it.y })
-        map["identifier"] = property(str = { it.identifier })
-        map["unique_identifier"] = property(str = { it.uniqueIdentifer })
-        map["width"] = property(int = { it.width })
-        map["height"] = property(int = { it.height })
-        map["bgColors"] = property(int = { colors.getColorIndex(it.bgColor) })
-        map["customFields"] = property(json = { it.customFields })
+
         arg2["map"] = map
         arg2["package"]["loaded"]["map"] = map
         return map
@@ -201,6 +179,7 @@ class MapLib(
                     arg1.checkint() to arg2.checkint()
                 }
 
+            // FIXME: I believe I should instead use the grid size of the layer.
             return LuaTable(2, 2).apply {
                 set("x", valueOf(cx * spriteSize.first.toDouble()))
                 set("y", valueOf(cy * spriteSize.second.toDouble()))
@@ -264,62 +243,120 @@ class MapLib(
         """Table with all entities by type (ie: `map.entities["player"]`).
             
 ```
-local players = map.entities["player"]
-local entity = players[1] -- get the first player
-shape.rectf(entity.x, entity.y, entity.width, entity.height, 8) -- display an entity using a rectangle
+local entities = map.entities()
+local players = entities["Player"]
+for entity in all(players) do 
+    shape.rectf(entity.x, entity.y, entity.width, entity.height, 8) -- display an entity using a rectangle
+end
 [...]
-entity.customFields -- access custom field of the entity
+entity.fields -- access custom field of the entity
 ```
         """,
     )
-    inner class entities : LuaTable() {
-        private val cachedEntities: MutableMap<Int, LuaValue> = mutableMapOf()
+    inner class entities : LibFunction() {
+        private var currentWorldVersion = -1
+        private var currentWorldIndex = -1
+        private var currentLevelIndex = -1
 
-        private var currentLevelVersion = currentWorld to -1
+        // Layer name to cache
+        private var cachedEntities: MutableMap<String?, LuaValue> = mutableMapOf()
 
-        private val entities: LuaValue
-            get() {
-                // FIXME: rework
-                return NIL
+        private fun cacheMe(
+            name: String? = null,
+            factory: () -> LuaValue,
+        ): LuaValue {
+            val cache = cachedEntities[name]
+            return if (
+                // Entities aren't cached yet
+                cache == null ||
+                // Any change occurs on the current level used.
+                currentWorldIndex != currentWorld ||
+                currentWorldVersion != resourceAccess.level(currentWorld)?.version ||
+                currentLevelIndex != currentLevel
+            ) {
+                currentWorldIndex = currentWorld
+                currentWorldVersion = resourceAccess.level(currentWorld)?.version ?: -1
+                currentLevelIndex = currentLevel
+                // Create the entities and cache it.
+                factory().also { cachedEntities.put(name, it) }
+            } else {
+                cache
             }
-
-        private fun cacheMe(level: GameLevel?): LuaValue {
-            // Transform the list of entities into a table in Lua.
-            val toCache = LuaTable()
-            level?.entities?.forEach { (key, v) ->
-                val entitiesOfType = LuaTable()
-                v.forEach {
-                    entitiesOfType[it.iid] = it.toLuaTable()
-                }
-                toCache[key] = entitiesOfType
-            }
-
-            cachedEntities[currentWorld] = toCache
-            currentLevelVersion = currentWorld to (level?.version ?: -1)
-            return toCache
         }
 
-        override fun get(key: LuaValue): LuaValue {
-            if (key.isnil()) {
-                return entities
+        @TinyCall("Get all entities from all entities layer as a table, with an entry per type.")
+        override fun call(): LuaValue {
+            val level = activeLevel() ?: return NONE
+            return cacheMe {
+                getEntities(level.layerInstances)
             }
-            val strKey = key.checkjstring() ?: return NIL
-
-            return this.entities[strKey]
         }
 
-        private fun LdtkEntity.toLuaTable(): LuaTable {
+        @TinyCall("Get all entities from the specific layer as a table, with an entry per type.")
+        override fun call(arg: LuaValue): LuaValue {
+            val level = activeLevel() ?: return NONE
+            val index = layerIndex(arg) ?: return NONE
+            val layer = level.layerInstances[index]
+            return cacheMe(layer.__identifier) {
+                getEntities(listOf(layer))
+            }
+        }
+
+        private fun getEntities(layers: List<Layer>): LuaValue {
+            val entities =
+                layers.filter { layer -> layer.entityInstances != null }
+                    // Get layers with entities
+                    .flatMap { layer -> layer.entityInstances ?: emptyList() }
+                    // Group entities per type (__identifier)
+                    .groupBy { entity -> entity.__identifier }
+                    .flatMap { (name, values) ->
+                        kotlin.collections.listOf(
+                            LuaValue.valueOf(name),
+                            listOf(values.map { entity -> toLua(entity) }.toTypedArray()),
+                        )
+                    }
+                    .toTypedArray()
+
+            return tableOf(entities)
+        }
+
+        private fun toLua(entity: Entity): LuaTable {
             val table = LuaTable()
-            table["x"] = valueOf(this.x)
-            table["y"] = valueOf(this.y)
-            table["id"] = valueOf(id)
-            table["iid"] = valueOf(iid)
-            table["layer"] = valueOf(layer)
-            table["width"] = valueOf(width)
-            table["height"] = valueOf(height)
-            table["color"] = valueOf(color)
-            table["customFields"] = customFields.toLua()
+            val (x, y) = entity.px
+            table["x"] = valueOf(x)
+            table["y"] = valueOf(y)
+            val (cx, cy) = entity.__grid
+            table["cx"] = valueOf(cx)
+            table["cy"] = valueOf(cy)
+            entity.__worldX?.let { table["world_x"] = valueOf(it) }
+            entity.__worldY?.let { table["world_y"] = valueOf(it) }
+            table["iid"] = valueOf(entity.iid)
+            table["width"] = valueOf(entity.width)
+            table["height"] = valueOf(entity.height)
+            // Convert custom fields
+            table["fields"] = LuaValue.tableOf(entity.fieldInstances.flatMap { field -> toLua(field) }.toTypedArray())
             return table
+        }
+
+        private fun toLua(field: CustomField): List<LuaValue> {
+            fun toLua(value: Any?): LuaValue {
+                return when (value) {
+                    is Int -> valueOf(value)
+                    is Float -> valueOf(value.toDouble())
+                    is String -> valueOf(value)
+                    is Boolean -> valueOf(value)
+                    is EntityRef -> value.toLua()
+                    is GridPoint -> value.toLua()
+                    is TilesetRect -> value.toLua()
+                    is List<*> -> LuaValue.listOf(value.map { toLua(it) }.toTypedArray())
+                    null -> NIL
+                    else -> TODO()
+                }
+            }
+            return listOf(
+                LuaValue.valueOf(field.__identifier),
+                toLua(field.__value),
+            )
         }
     }
 
@@ -350,11 +387,11 @@ entity.customFields -- access custom field of the entity
     @TinyFunction("Draw map tiles on the screen.")
     inner class draw : LibFunction() {
         @TinyCall(
-            description = "Draw the default layer on the screen.",
+            description = "Draw all active layers on the screen.",
         )
         override fun call(): LuaValue {
-            val world = resourceAccess.level(currentWorld) ?: return NONE
-            val level = activeLevel() ?: return NONE
+            val world = resourceAccess.level(currentWorld) ?: return NIL
+            val level = activeLevel() ?: return NIL
 
             val layers =
                 level.layerInstances
@@ -390,28 +427,6 @@ entity.customFields -- access custom field of the entity
             toDrawSprite(world, layer).forEach {
                 resourceAccess.addOp(it)
             }
-            return NONE
-        }
-
-        @TinyCall(
-            description =
-                "Draw the default layer on the screen at the x/y coordinates " +
-                    "starting the mx/my coordinates from the map using the size width/height.",
-        )
-        override fun invoke(
-            @TinyArgs(
-                names = ["x", "y", "mx", "my", "width", "height"],
-            ) args: Varargs,
-        ): Varargs {
-            if (args.narg() < 6) return super.invoke(args)
-            val x = args.arg(1).checkint()
-            val y = args.arg(2).checkint()
-            val sx = args.arg(3).checkint()
-            val sy = args.arg(4).checkint()
-            val width = args.arg(5).checkint()
-            val height = args.arg(6).checkint()
-
-            // FIXME: rework
             return NONE
         }
 
@@ -453,41 +468,29 @@ entity.customFields -- access custom field of the entity
         }
     }
 
-    private fun JsonElement.toLua(): LuaValue {
-        return when (this) {
-            is JsonArray -> this.toLua()
-            is JsonObject -> this.toLua()
-            is JsonPrimitive -> this.toLua()
-            is JsonNull -> this.toLua()
-        }
-    }
-
-    private fun JsonNull.toLua(): LuaValue {
-        return NIL
-    }
-
-    private fun JsonObject.toLua(): LuaTable {
+    private fun EntityRef.toLua(): LuaTable {
         val result = LuaTable()
-        this.forEach { (key, value) ->
-            result[key] = value.toLua()
-        }
+        result["entityIid"] = valueOf(entityIid)
+        result["layerIid"] = valueOf(layerIid)
+        result["levelIid"] = valueOf(levelIid)
+        result["worldIid"] = valueOf(worldIid)
         return result
     }
 
-    private fun JsonPrimitive.toLua(): LuaValue {
-        return if (this.isString) {
-            return valueOf(this.content)
-        } else {
-            this.intOrNull?.let { valueOf(it) } ?: this.doubleOrNull?.let { valueOf(it) }
-                ?: this.booleanOrNull?.let { valueOf(it) } ?: valueOf(this.content)
-        }
+    private fun GridPoint.toLua(): LuaTable {
+        val result = LuaTable()
+        result["cx"] = valueOf(cx)
+        result["cy"] = valueOf(cy)
+        return result
     }
 
-    private fun JsonArray.toLua(): LuaTable {
+    private fun TilesetRect.toLua(): LuaTable {
         val result = LuaTable()
-        this.forEach {
-            result.insert(0, it.toLua())
-        }
+        result["x"] = valueOf(x)
+        result["y"] = valueOf(y)
+        result["w"] = valueOf(w)
+        result["h"] = valueOf(h)
+        result["tilesetUid"] = valueOf(tilesetUid)
         return result
     }
 }
