@@ -4,7 +4,6 @@ import com.danielgergely.kgl.KglLwjgl
 import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.engine.RenderOperation
 import com.github.minigdx.tiny.file.FileStream
 import com.github.minigdx.tiny.file.InputStreamStream
 import com.github.minigdx.tiny.file.JvmLocalFile
@@ -23,6 +22,7 @@ import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.render.Render
 import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.gl.OpenGLRender
+import com.github.minigdx.tiny.render.operations.RenderOperation
 import com.github.minigdx.tiny.sound.SoundManager
 import com.github.minigdx.tiny.util.MutableFixedSizeList
 import com.squareup.gifencoder.FastGifEncoder

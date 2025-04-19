@@ -15,7 +15,6 @@ import com.danielgergely.kgl.GL_TEXTURE_MIN_FILTER
 import com.danielgergely.kgl.GL_UNSIGNED_BYTE
 import com.danielgergely.kgl.Kgl
 import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.engine.RenderOperation
 import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.graphic.PixelFormat
 import com.github.minigdx.tiny.log.Logger
@@ -23,6 +22,7 @@ import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.render.Render
 import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.RenderFrame
+import com.github.minigdx.tiny.render.operations.RenderOperation
 
 class OpenGLRender(
     private val gl: Kgl,

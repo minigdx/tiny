@@ -7,11 +7,11 @@ import com.danielgergely.kgl.GL_VENDOR
 import com.danielgergely.kgl.GL_VERSION
 import com.danielgergely.kgl.KglLwjgl
 import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.engine.RenderOperation
 import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.render.gl.OpenGLRender
+import com.github.minigdx.tiny.render.operations.RenderOperation
 import org.lwjgl.opengl.GL33
 
 class LwjglGLRender(

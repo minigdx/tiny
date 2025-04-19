@@ -4,7 +4,6 @@ import com.danielgergely.kgl.KglJs
 import com.danielgergely.kgl.WebGL2RenderingContext
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.engine.RenderOperation
 import com.github.minigdx.tiny.file.AjaxStream
 import com.github.minigdx.tiny.file.ImageDataStream
 import com.github.minigdx.tiny.file.JsLocalFile
@@ -20,6 +19,7 @@ import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.gl.OpenGLRender
+import com.github.minigdx.tiny.render.operations.RenderOperation
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineDispatcher

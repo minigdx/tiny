@@ -1,5 +1,11 @@
 package com.github.minigdx.tiny.input.internal
 
+interface PoolObject<T> {
+    var pool: ObjectPool<T>?
+
+    fun release()
+}
+
 abstract class ObjectPool<T>(private val size: Int) {
     private val pool = mutableListOf<T>()
 

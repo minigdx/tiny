@@ -6,10 +6,17 @@ import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.input.Key
+import com.github.minigdx.tiny.input.internal.ObjectPool
+import com.github.minigdx.tiny.input.internal.PoolObject
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.lua.toTinyException
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.render.RenderContext
+import com.github.minigdx.tiny.render.RenderUnit
+import com.github.minigdx.tiny.render.operations.ClearScreen
+import com.github.minigdx.tiny.render.operations.DrawSprite
+import com.github.minigdx.tiny.render.operations.RenderOperation
+import com.github.minigdx.tiny.render.operations.SetPixel
 import com.github.minigdx.tiny.resources.GameLevel2
 import com.github.minigdx.tiny.resources.GameResource
 import com.github.minigdx.tiny.resources.GameScript
@@ -36,6 +43,7 @@ import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaValue.Companion.valueOf
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.reflect.KClass
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class GameEngine(
@@ -88,6 +96,8 @@ class GameEngine(
     lateinit var soundManager: SoundManager
 
     private lateinit var resourceFactory: ResourceFactory
+
+    private val operationFactory = OperationsObjectPool()
 
     fun main() {
         val windowManager = platform.initWindowManager()
@@ -549,7 +559,118 @@ class GameEngine(
         soundManager.destroy()
     }
 
+    override fun <T : PoolObject<T>> obtain(type: KClass<T>): T {
+        return operationFactory.obtain(type)
+    }
+
+    override fun <T : PoolObject<T>> releaseOperation(
+        operation: T,
+        type: KClass<T>,
+    ) {
+        operationFactory.release(operation, type)
+    }
+
     companion object {
         private const val REFRESH_LIMIT: Seconds = 1 / 60f
+    }
+}
+
+class OperationsObjectPool {
+    private abstract class PoolObjectPool<T : PoolObject<T>>(size: Int) : ObjectPool<T>(size) {
+        abstract fun new(): T
+
+        abstract fun destroy(obj: T)
+
+        override fun newInstance(): T {
+            return new().also {
+                it.pool = this
+            }
+        }
+
+        override fun destroyInstance(obj: T) {
+            destroy(obj)
+            obj.pool = null
+        }
+    }
+
+    private val drawSprite =
+        object : PoolObjectPool<DrawSprite>(256) {
+            override fun new(): DrawSprite {
+                return DrawSprite()
+            }
+
+            override fun destroy(obj: DrawSprite) {
+                obj.source = null
+                obj._attributes.forEach { attribute -> attribute.release() }
+                obj._attributes.clear()
+            }
+        }
+
+    private val drawSpriteAttribute =
+        object : PoolObjectPool<DrawSprite.DrawSpriteAttribute>(2048) {
+            override fun new(): DrawSprite.DrawSpriteAttribute {
+                return DrawSprite.DrawSpriteAttribute()
+            }
+
+            override fun destroy(obj: DrawSprite.DrawSpriteAttribute) {
+                obj.sourceX = 0
+                obj.sourceY = 0
+                obj.sourceWidth = 0
+                obj.sourceHeight = 0
+                obj.destinationX = 0
+                obj.destinationY = 0
+                obj.flipX = false
+                obj.flipY = false
+            }
+        }
+
+    private val clearScreen =
+        object : PoolObjectPool<ClearScreen>(5) {
+            override fun new(): ClearScreen {
+                return ClearScreen()
+            }
+
+            override fun destroy(obj: ClearScreen) {
+                obj.frameBuffer = null
+                obj.color = 0
+            }
+        }
+
+    private val setPixel =
+        object : PoolObjectPool<SetPixel>(10) {
+            override fun new(): SetPixel {
+                return SetPixel()
+            }
+
+            override fun destroy(obj: SetPixel) {
+                obj.color = 0
+                obj.x = 0
+                obj.y = 0
+                obj.frameBuffer = null
+            }
+        }
+
+    private fun <T : PoolObject<T>> getPool(type: KClass<T>): ObjectPool<T> {
+        @Suppress("UNCHECKED_CAST")
+        val pool: ObjectPool<T> =
+            when (type) {
+                DrawSprite::class -> drawSprite as ObjectPool<T>
+                DrawSprite.DrawSpriteAttribute::class -> drawSpriteAttribute as ObjectPool<T>
+                ClearScreen::class -> clearScreen as ObjectPool<T>
+                SetPixel::class -> setPixel as ObjectPool<T>
+                else -> throw IllegalArgumentException("No pool found for type: $type")
+            }
+        return pool
+    }
+
+    fun <T : PoolObject<T>> obtain(type: KClass<T>): T {
+        return getPool(type).obtain()
+    }
+
+    fun <T : PoolObject<T>> release(
+        operation: T,
+        type: KClass<T>,
+    ) {
+        getPool(type).destroyInstance(operation)
     }
 }

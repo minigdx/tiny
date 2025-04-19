@@ -2,7 +2,6 @@ package com.github.minigdx.tiny.platform.test
 
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.engine.RenderOperation
 import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.graphic.FrameBuffer
@@ -14,6 +13,7 @@ import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.render.NopRenderContext
 import com.github.minigdx.tiny.render.RenderContext
+import com.github.minigdx.tiny.render.operations.RenderOperation
 import com.github.minigdx.tiny.sound.Sound
 import com.github.minigdx.tiny.sound.SoundManager
 import com.github.minigdx.tiny.util.MutableFixedSizeList

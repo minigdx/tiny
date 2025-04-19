@@ -2,10 +2,7 @@ package com.github.minigdx.tiny.render.gl
 
 import com.danielgergely.kgl.GL_TRIANGLES
 import com.danielgergely.kgl.Kgl
-import com.github.minigdx.tiny.engine.DrawSprite
-import com.github.minigdx.tiny.engine.DrawSprite.Companion.MAX_SPRITE_PER_COMMAND
 import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.engine.RenderOperation
 import com.github.minigdx.tiny.graphic.PixelFormat
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.WindowManager
@@ -13,6 +10,9 @@ import com.github.minigdx.tiny.render.NopRenderContext
 import com.github.minigdx.tiny.render.OperationsRender
 import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.WriteRender
+import com.github.minigdx.tiny.render.operations.DrawSprite
+import com.github.minigdx.tiny.render.operations.DrawSprite.Companion.MAX_SPRITE_PER_COMMAND
+import com.github.minigdx.tiny.render.operations.RenderOperation
 import com.github.minigdx.tiny.render.shader.FragmentShader
 import com.github.minigdx.tiny.render.shader.ShaderProgram
 import com.github.minigdx.tiny.render.shader.VertexShader
@@ -107,15 +107,17 @@ class OperationsShader(
         program.vertexShader.aPos.apply(vertexData)
         program.vertexShader.aSpr.apply(spr)
 
+        val source = op.source!!
+
         program.vertexShader.uSpritesheet.apply(
-            op.source.width.toFloat(),
-            op.source.height.toFloat(),
+            source.width.toFloat(),
+            source.height.toFloat(),
         )
 
         program.fragmentShader.spritesheet.applyIndex(
-            op.source.pixels.pixels,
-            op.source.width,
-            op.source.height,
+            source.pixels.pixels,
+            source.width,
+            source.height,
         )
 
         // -- Configuration de l'uniforme palette_colors -- //
@@ -144,6 +146,8 @@ class OperationsShader(
         program.bind()
         program.drawArrays(GL_TRIANGLES, 0, nbVertex)
         program.unbind()
+
+        op.release()
     }
 
     class VShader : VertexShader(VERTEX_SHADER) {

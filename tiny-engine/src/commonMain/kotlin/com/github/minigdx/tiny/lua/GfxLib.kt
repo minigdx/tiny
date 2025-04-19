@@ -4,10 +4,10 @@ import com.github.mingdx.tiny.doc.TinyArg
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
-import com.github.minigdx.tiny.engine.ClearScreen
 import com.github.minigdx.tiny.engine.GameResourceAccess
-import com.github.minigdx.tiny.engine.SetPixel
 import com.github.minigdx.tiny.graphic.PixelArray
+import com.github.minigdx.tiny.render.operations.ClearScreen
+import com.github.minigdx.tiny.render.operations.SetPixel
 import com.github.minigdx.tiny.resources.ResourceType
 import com.github.minigdx.tiny.resources.SpriteSheet
 import org.luaj.vm2.LuaTable

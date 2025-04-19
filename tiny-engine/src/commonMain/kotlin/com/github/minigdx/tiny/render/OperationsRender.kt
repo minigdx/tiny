@@ -1,6 +1,6 @@
 package com.github.minigdx.tiny.render
 
-import com.github.minigdx.tiny.engine.DrawSprite
+import com.github.minigdx.tiny.render.operations.DrawSprite
 
 interface OperationsRender {
     fun drawSprite(

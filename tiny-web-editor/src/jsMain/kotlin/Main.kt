@@ -1,7 +1,6 @@
 import com.github.minigdx.tiny.engine.GameEngine
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.engine.RenderOperation
 import com.github.minigdx.tiny.file.CommonVirtualFileSystem
 import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SourceStream
@@ -16,6 +15,7 @@ import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.webgl.WebGlPlatform
 import com.github.minigdx.tiny.render.RenderContext
+import com.github.minigdx.tiny.render.operations.RenderOperation
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.browser.document
 import kotlinx.browser.window

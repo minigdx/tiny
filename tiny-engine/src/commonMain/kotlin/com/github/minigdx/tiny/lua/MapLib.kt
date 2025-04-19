@@ -5,9 +5,8 @@ import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.Pixel
-import com.github.minigdx.tiny.engine.DrawSprite
 import com.github.minigdx.tiny.engine.GameResourceAccess
-import com.github.minigdx.tiny.graphic.ColorPalette
+import com.github.minigdx.tiny.render.operations.DrawSprite
 import com.github.minigdx.tiny.resources.GameLevel2
 import com.github.minigdx.tiny.resources.LdtkLevel
 import com.github.minigdx.tiny.resources.ldtk.CustomField
@@ -55,7 +54,6 @@ import kotlin.math.floor
 class MapLib(
     private val resourceAccess: GameResourceAccess,
     private val spriteSize: Pair<Pixel, Pixel>,
-    private val colors: ColorPalette,
 ) : TwoArgFunction() {
     private var currentWorld: Int = 0
     private var currentLevel: Int = 0
@@ -506,7 +504,7 @@ entity.fields -- access custom field of the entity
                 layer.autoLayer?.map { tile -> toAttribute(layer.__gridSize, tile) } ?: emptyList()
             val attributes = attributesGrid + attributesAutoLayer
 
-            return DrawSprite.from(layer.__identifier, tileset, attributes)
+            return DrawSprite.from(resourceAccess, layer.__identifier, tileset, attributes)
         }
     }
 

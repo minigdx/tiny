@@ -5,12 +5,12 @@ import com.danielgergely.kgl.GL_DEPTH_BUFFER_BIT
 import com.danielgergely.kgl.GL_TRIANGLES
 import com.danielgergely.kgl.Kgl
 import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.engine.RenderOperation
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.render.NopRenderContext
 import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.WriteRender
+import com.github.minigdx.tiny.render.operations.RenderOperation
 import com.github.minigdx.tiny.render.shader.FragmentShader
 import com.github.minigdx.tiny.render.shader.ShaderProgram
 import com.github.minigdx.tiny.render.shader.VertexShader

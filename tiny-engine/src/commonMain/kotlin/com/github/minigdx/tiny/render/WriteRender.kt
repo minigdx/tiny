@@ -1,7 +1,7 @@
 package com.github.minigdx.tiny.render
 
-import com.github.minigdx.tiny.engine.RenderOperation
 import com.github.minigdx.tiny.platform.WindowManager
+import com.github.minigdx.tiny.render.operations.RenderOperation
 
 interface WriteRender {
     /**

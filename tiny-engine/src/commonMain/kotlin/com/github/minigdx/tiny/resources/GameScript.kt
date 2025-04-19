@@ -90,7 +90,7 @@ class GameScript(
             load(StringLib())
             load(CoroutineLib())
             load(StdLib(gameOptions, resourceAccess))
-            load(MapLib(this@GameScript.resourceAccess, gameOptions.spriteSize, gameOptions.colors()))
+            load(MapLib(this@GameScript.resourceAccess, gameOptions.spriteSize))
             load(GfxLib(this@GameScript.resourceAccess))
             load(CtrlLib(inputHandler, sprLib))
             load(SfxLib(this@GameScript.resourceAccess, playSound = !forValidation))

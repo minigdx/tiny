@@ -5,10 +5,10 @@ import com.github.mingdx.tiny.doc.TinyArgs
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
-import com.github.minigdx.tiny.engine.DrawSprite
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.graphic.PixelArray
+import com.github.minigdx.tiny.render.operations.DrawSprite
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
