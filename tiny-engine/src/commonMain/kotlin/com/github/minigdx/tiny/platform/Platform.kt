@@ -8,6 +8,7 @@ import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.render.RenderContext
+import com.github.minigdx.tiny.render.RenderFrame
 import com.github.minigdx.tiny.render.operations.RenderOperation
 import com.github.minigdx.tiny.sound.Sound
 import com.github.minigdx.tiny.sound.SoundManager
@@ -114,6 +115,8 @@ interface Platform {
         renderContext: RenderContext,
         ops: List<RenderOperation>,
     )
+
+    fun readRender(renderContext: RenderContext): RenderFrame
 
     /**
      * Draw the frame buffer on the screen.

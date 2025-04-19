@@ -1,7 +1,9 @@
 package com.github.minigdx.tiny.engine
 
+import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.file.VirtualFileSystem
+import com.github.minigdx.tiny.graphic.ColorPalette
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
@@ -12,6 +14,7 @@ import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.lua.toTinyException
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.render.RenderContext
+import com.github.minigdx.tiny.render.RenderFrame
 import com.github.minigdx.tiny.render.RenderUnit
 import com.github.minigdx.tiny.render.operations.ClearScreen
 import com.github.minigdx.tiny.render.operations.DrawSprite
@@ -494,6 +497,7 @@ class GameEngine(
     }
 
     override fun addOp(op: RenderOperation) {
+        renderFrame = null // invalid the previous render frame
         val last = ops.lastOrNull()
         if (op.mergeWith(last)) {
             return
@@ -552,6 +556,19 @@ class GameEngine(
             frameBuffer.clear()
         }
         ops.clear()
+    }
+
+    private var renderFrame: RenderFrame? = null
+
+    override fun readPixel(
+        x: Int,
+        y: Int,
+    ): ColorIndex {
+        if (renderFrame == null) {
+            render()
+            renderFrame = platform.readRender(renderContext)
+        }
+        return renderFrame?.getPixel(x, y) ?: ColorPalette.TRANSPARENT_INDEX
     }
 
     override fun end() {

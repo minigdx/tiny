@@ -12,6 +12,8 @@ class OpenGLFrame(
     private val buffer: ByteBuffer,
     private val gameOptions: GameOptions,
 ) : RenderFrame {
+    private val tmp = ByteArray(PixelFormat.RGBA)
+
     /**
      * Convert the actual Frame (with RGBA) into a Pixel Array of Color index.
      */
@@ -26,8 +28,7 @@ class OpenGLFrame(
         // the bottom line is the first line in the buffer
         for (x in 0 until gameOptions.width) {
             for (y in 0 until gameOptions.height) {
-                val i = x + y * gameOptions.width
-                buffer.position = i * PixelFormat.RGBA
+                buffer.position = (x + y * gameOptions.width) * PixelFormat.RGBA
 
                 readBytes(buffer, tmp)
 
@@ -44,17 +45,14 @@ class OpenGLFrame(
         x: Pixel,
         y: Pixel,
     ): ColorIndex {
-        buffer.position = (x + y * gameOptions.width) * PixelFormat.RGBA
+        val invertedY = (gameOptions.height - 1) - y
+        buffer.position = (x + invertedY * gameOptions.width) * PixelFormat.RGBA
         readBytes(buffer, tmp)
         val colorIndex = gameOptions.colors().getColorIndex(tmp)
         // Reset buffer position so it can be reused.
         buffer.position = 0
 
         return colorIndex
-    }
-
-    companion object {
-        private val tmp = ByteArray(PixelFormat.RGBA)
     }
 }
 

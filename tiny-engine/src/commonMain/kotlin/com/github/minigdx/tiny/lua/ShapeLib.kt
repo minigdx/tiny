@@ -7,6 +7,7 @@ import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
+import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaTable
@@ -72,7 +73,7 @@ private class Shape(private val resourceAccess: GameResourceAccess) {
         "Those shapes can be circle, rectangle, line or oval." +
         "All shapes can be draw filed or not filed.",
 )
-class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() {
+class ShapeLib(private val resourceAccess: GameResourceAccess, private val gameOptions: GameOptions) : TwoArgFunction() {
     private val shape = Shape(resourceAccess)
 
     override fun call(
@@ -622,7 +623,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
 
         private val rectf = rectf()
 
-        private val dither = GfxLib(resourceAccess).dither()
+        private val dither = GfxLib(resourceAccess, gameOptions).dither()
 
         @TinyCall("Draw a gradient using dithering, only from color c1 to color c2.")
         override fun invoke(

@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.engine
 
+import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.input.internal.PoolObject
 import com.github.minigdx.tiny.render.operations.RenderOperation
@@ -44,6 +45,14 @@ interface GameResourceAccess {
      * Frame buffer of the game engine.
      */
     val frameBuffer: FrameBuffer
+
+    /**
+     * Read the color pixel at the [x, y] coordinates.
+     */
+    fun readPixel(
+        x: Int,
+        y: Int,
+    ): ColorIndex
 
     /**
      * Access a sprite sheet by its index.

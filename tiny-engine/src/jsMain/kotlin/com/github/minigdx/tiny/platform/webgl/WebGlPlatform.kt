@@ -18,6 +18,7 @@ import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.render.RenderContext
+import com.github.minigdx.tiny.render.RenderFrame
 import com.github.minigdx.tiny.render.gl.OpenGLRender
 import com.github.minigdx.tiny.render.operations.RenderOperation
 import com.github.minigdx.tiny.sound.SoundManager
@@ -128,5 +129,9 @@ class WebGlPlatform(
         ops: List<RenderOperation>,
     ) {
         render.render(renderContext, ops)
+    }
+
+    override fun readRender(renderContext: RenderContext): RenderFrame {
+        return render.readRender(renderContext)
     }
 }

@@ -4,6 +4,7 @@ import com.github.mingdx.tiny.doc.TinyArg
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
+import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.render.operations.ClearScreen
@@ -16,12 +17,14 @@ import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.ThreeArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
+import kotlin.math.max
+import kotlin.math.min
 
 @TinyLib(
     "gfx",
     "Access to graphical API like updating the color palette or applying a dithering pattern.",
 )
-class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() {
+class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOptions: GameOptions) : TwoArgFunction() {
     override fun call(
         arg1: LuaValue,
         arg2: LuaValue,
@@ -56,7 +59,13 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
                 } else {
                     arg.checkColorIndex()
                 }
-            resourceAccess.addOp(ClearScreen(color, resourceAccess.frameBuffer))
+
+            val op =
+                resourceAccess.obtain(ClearScreen::class).also {
+                    it.color = color
+                    it.frameBuffer = resourceAccess.frameBuffer
+                }
+            resourceAccess.addOp(op)
             return NIL
         }
     }
@@ -69,14 +78,16 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
             @TinyArg("y")arg2: LuaValue,
             @TinyArg("color")arg3: LuaValue,
         ): LuaValue {
-            resourceAccess.addOp(
-                SetPixel(
-                    x = arg1.checkint(),
-                    y = arg2.checkint(),
-                    color = arg3.checkColorIndex(),
-                    frameBuffer = resourceAccess.frameBuffer,
-                ),
-            )
+            val op =
+                resourceAccess.obtain(SetPixel::class).also {
+                    it.x = arg1.checkint()
+                    it.y = arg2.checkint()
+                    it.color = arg3.checkColorIndex()
+                    it.frameBuffer = resourceAccess.frameBuffer
+                }
+
+            resourceAccess.addOp(op)
+
             return NIL
         }
     }
@@ -88,8 +99,10 @@ class GfxLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() 
             @TinyArg("x")arg1: LuaValue,
             @TinyArg("y")arg2: LuaValue,
         ): LuaValue {
-            // TODO: render buffered operation.
-            val index = resourceAccess.frameBuffer.pixel(arg1.checkint(), arg2.checkint())
+            val x = min(max(0, arg1.checkint()), gameOptions.width - 1)
+            val y = min(max(0, arg2.checkint()), gameOptions.height - 1)
+
+            val index = resourceAccess.readPixel(x, y)
             return valueOf(index)
         }
     }

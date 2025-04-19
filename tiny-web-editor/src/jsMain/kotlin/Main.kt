@@ -311,4 +311,6 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
     )
 
     override fun draw(renderContext: RenderContext) = delegate.draw(renderContext)
+
+    override fun readRender(renderContext: RenderContext) = delegate.readRender(renderContext)
 }
