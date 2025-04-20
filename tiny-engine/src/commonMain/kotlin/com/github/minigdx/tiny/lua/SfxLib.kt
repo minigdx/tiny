@@ -30,6 +30,7 @@ import com.github.minigdx.tiny.sound.Triangle2
 import com.github.minigdx.tiny.sound.TriangleWave
 import com.github.minigdx.tiny.sound.Vibrato
 import com.github.minigdx.tiny.sound.WaveGenerator
+import kotlinx.serialization.Serializable
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.OneArgFunction
@@ -39,6 +40,42 @@ import org.luaj.vm2.lib.ZeroArgFunction
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
+
+/**
+ *
+ * envelope(attack, delay, substain, release)
+ * instrument(List<Harmonie>, envelope)
+ *
+ * note (pitch, duration)
+ * bars (List<note>, instrument)
+ * track (List<bars>)
+ * sequence(List<track>)
+ * music(List<sequence)
+ *
+ *
+ * sfx.instrument("Piano").name = "Guitar" // rename the instrument Piano to Guitar.
+ * local instru = sfx.instrument(3) // set the current instrument
+ * sfx.instrument(3).attack = 0.2 // set the attack of the current instrument.
+ * instru.wave = 2
+ * sfx.note(C1, 3, 0.5).play() // play C1 during 3 seconds using the current instrument and half the volume;
+ *
+ * sfx.bars(2) // Load the bars number 2
+ *
+ * sfx.beat(5, C1, 3, 0.5) // Set the beat 5 with the note C1.
+ * sfx.bars(2).play()
+ * local seq = sfx.sequence(2)
+ * local track = seq.track(1)
+ * track.solo()
+ * track.play()
+ *
+ * sequence.play()
+ *
+ *
+ * sfx.music(1) // load another music
+ * sfx.save("toto") // save actual music
+ *
+ *
+ */
 
 @TinyLib(
     "sfx",
@@ -79,10 +116,97 @@ class SfxLib(
         ctrl.set("to_table", toTable())
         ctrl.set("to_score", toScore())
         ctrl.set("empty_score", emptyScore())
+
+        ctrl.set("instrument", instrument())
+
         ctrl.set("sfx", sfx())
         arg2.set("sfx", ctrl)
         arg2.get("package").get("loaded").set("sfx", ctrl)
         return ctrl
+    }
+
+    private var currentMusic: Music? = null
+
+    fun getCurrentMusic(): Music {
+        return currentMusic ?: Music().also { currentMusic = it }
+    }
+
+    @TinyFunction("Access instrument using its index or its name.")
+    inner class instrument : OneArgFunction() {
+        @TinyCall("Access instrument using its index or its name.")
+        override fun call(arg: LuaValue): LuaValue {
+            val music = getCurrentMusic()
+            val index =
+                if (arg.isint()) {
+                    arg.checkint()
+                } else {
+                    music.instruments
+                        .firstOrNull { inst -> inst.name == arg.checkjstring() }
+                        ?.index
+                }
+
+            index ?: return NIL
+            return music.instruments
+                .getOrNull(index)
+                ?.toLua() ?: NIL
+        }
+
+        fun Instrument.toLua(): LuaValue {
+            val obj = WrapperLuaTable()
+
+            obj.wrap("index") { valueOf(this.index) }
+            obj.wrap(
+                "name",
+                { this.name?.let { valueOf(it) } ?: NIL },
+                { this.name = it.optjstring(null) },
+            )
+            obj.wrap(
+                "wave",
+                { valueOf(this.wave.ordinal) },
+                {
+                    this.wave = if (it.isint()) {
+                        Instrument.WaveType.entries.getOrNull(it.checkint())
+                    } else {
+                        it.checkjstring()?.let { Instrument.WaveType.valueOf(it) }
+                    } ?: Instrument.WaveType.SINE
+                },
+            )
+            obj.wrap(
+                "attack",
+                { valueOf(this.attack.toDouble()) },
+                { this.attack = it.optdouble(0.0).toFloat() },
+            )
+            obj.wrap(
+                "decay",
+                { valueOf(this.decay.toDouble()) },
+                { this.decay = it.optdouble(0.0).toFloat() },
+            )
+            obj.wrap(
+                "sustain",
+                { valueOf(this.sustain.toDouble()) },
+                { this.sustain = it.optdouble(0.0).toFloat() },
+            )
+            obj.wrap(
+                "release",
+                { valueOf(this.release.toDouble()) },
+                { this.release = it.optdouble(0.0).toFloat() },
+            )
+            obj.function0("play") {
+                val bar =
+                    MusicalBar(this).also {
+                        var beat = 0
+                        it.setNote(beat++, Note.C3, 0.3f, 0.5f)
+                        it.setNote(beat++, Note.D3, 0.3f, 0.5f)
+                        it.setNote(beat++, Note.E3, 0.3f, 0.5f)
+                        it.setNote(beat++, Note.F3, 0.3f, 0.5f)
+                        it.setNote(beat++, Note.G3, 0.5f, 0.5f)
+                    }
+                bar.play()
+                NONE
+            }
+
+            return obj
+        }
     }
 
     abstract inner class WaveFunction : ThreeArgFunction() {
@@ -614,3 +738,117 @@ class SfxLib(
         private const val TINY_SFX_HEADER = "tiny-sfx"
     }
 }
+
+/**
+ * An instrument holds the specific of the sound generation
+ */
+@Serializable
+class Instrument(
+    /**
+     * Index of the instrument
+     */
+    val index: Int,
+    /**
+     * Name of the instrument
+     */
+    var name: String? = null,
+    /**
+     * Kind of wave assigned to this instrument
+     */
+    var wave: WaveType = WaveType.SINE,
+    /**
+     * Attack of the sound envelope
+     */
+    var attack: Float = 0F,
+    /**
+     * Decay of the sound envelope
+     */
+    var decay: Float = 0F,
+    /**
+     * Sustain of the sound envelope
+     */
+    var sustain: Float = 0F,
+    /**
+     * Release of the sound envelope
+     */
+    var release: Float = 0F,
+    /**
+     * Harmonics of the instruments (up to 7)
+     */
+    val harmonics: FloatArray = FloatArray(7),
+) {
+    enum class WaveType {
+        SINE,
+        SQUARE,
+    }
+}
+
+/**
+ * Note that behing played.
+ * It can't be played without an instrument, that will generate the sound for this note.
+ */
+@Serializable
+class MusicalNote(
+    var note: Note,
+    var duration: Seconds,
+    var volume: Float,
+)
+
+/**
+ * A musical bar is holding musical notes.
+ * A musical bar is holding 32 beats.
+ * A musical bar without an instrument will not be played.
+ *
+ * If the last note duration is longuer the remaining time,
+ * the note will be cut.
+ */
+@Serializable
+class MusicalBar(
+    var instrument: Instrument? = null,
+    val beats: Array<MusicalNote?> = arrayOfNulls(32),
+) {
+    fun setSilence(beat: Int) {
+        // Ignore operation out of the bar.
+        if (beat < 0 || beat >= beats.size) return
+        beats[beat] = null
+    }
+
+    fun setNote(
+        beat: Int,
+        note: Note,
+        duration: Seconds,
+        volume: Percent,
+    ) {
+        // Ignore operation out of the bar.
+        if (beat < 0 || beat >= beats.size) return
+
+        beats[beat] = MusicalNote(note, volume, duration)
+    }
+
+    fun play() {
+        println("PLAY BAR!!!")
+    }
+}
+
+@Serializable
+class MusicalSequence(
+    val tracks: Array<Track> = Array(4) { Track() },
+) {
+    /**
+     * A track is a sequence of musical bars.
+     */
+    @Serializable
+    class Track(
+        var mute: Boolean = false,
+        val bars: MutableList<MusicalBar> = mutableListOf(),
+    )
+}
+
+/**
+ *
+ */
+@Serializable
+class Music(
+    val instruments: Array<Instrument> = Array(8) { index -> Instrument(index) },
+    val sequences: MutableList<MusicalSequence> = mutableListOf(),
+)
