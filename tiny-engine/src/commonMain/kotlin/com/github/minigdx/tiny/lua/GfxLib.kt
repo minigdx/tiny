@@ -7,8 +7,7 @@ import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.graphic.PixelArray
-import com.github.minigdx.tiny.render.operations.ClearScreen
-import com.github.minigdx.tiny.render.operations.SetPixel
+import com.github.minigdx.tiny.render.operations.FrameBufferOperation
 import com.github.minigdx.tiny.resources.ResourceType
 import com.github.minigdx.tiny.resources.SpriteSheet
 import org.luaj.vm2.LuaTable
@@ -59,13 +58,8 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
                 } else {
                     arg.checkColorIndex()
                 }
-
-            val op =
-                resourceAccess.obtain(ClearScreen::class).also {
-                    it.color = color
-                    it.frameBuffer = resourceAccess.frameBuffer
-                }
-            resourceAccess.addOp(op)
+            resourceAccess.frameBuffer.clear(color)
+            resourceAccess.addOp(FrameBufferOperation)
             return NIL
         }
     }
@@ -78,16 +72,8 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
             @TinyArg("y")arg2: LuaValue,
             @TinyArg("color")arg3: LuaValue,
         ): LuaValue {
-            val op =
-                resourceAccess.obtain(SetPixel::class).also {
-                    it.x = arg1.checkint()
-                    it.y = arg2.checkint()
-                    it.color = arg3.checkColorIndex()
-                    it.frameBuffer = resourceAccess.frameBuffer
-                }
-
-            resourceAccess.addOp(op)
-
+            resourceAccess.frameBuffer.pixel(arg1.checkint(), arg2.checkint(), arg3.checkint())
+            resourceAccess.addOp(FrameBufferOperation)
             return NIL
         }
     }

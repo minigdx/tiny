@@ -9,6 +9,7 @@ import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
+import com.github.minigdx.tiny.render.operations.FrameBufferOperation
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
@@ -414,6 +415,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess, private val gameO
                     y += sy
                 }
             }
+            resourceAccess.addOp(FrameBufferOperation)
             return NONE
         }
 
@@ -475,6 +477,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess, private val gameO
                 }
                 x++
             }
+            resourceAccess.addOp(FrameBufferOperation)
             return NONE
         }
     }
@@ -529,7 +532,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess, private val gameO
                 val xx2 = topVertex.first + ((y - topVertex.second) * slope4).toInt()
                 resourceAccess.frameBuffer.fill(xx1, xx2, y, color)
             }
-
+            resourceAccess.addOp(FrameBufferOperation)
             return NONE
         }
     }
@@ -590,7 +593,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess, private val gameO
                     ),
                 ),
             )
-
+            resourceAccess.addOp(FrameBufferOperation)
             return NONE
         }
     }
@@ -674,6 +677,8 @@ class ShapeLib(private val resourceAccess: GameResourceAccess, private val gameO
                 }
             }
             dither.call(previous)
+
+            resourceAccess.addOp(FrameBufferOperation)
 
             return NIL
         }

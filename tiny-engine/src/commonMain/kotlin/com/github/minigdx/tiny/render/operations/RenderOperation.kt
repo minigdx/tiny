@@ -8,11 +8,6 @@ sealed interface RenderOperation {
     val target: RenderUnit
 
     /**
-     * Render the operation on the CPU, by updating the current frame.
-     */
-    fun executeCPU(): Unit = invalidTarget(RenderUnit.CPU)
-
-    /**
      * Render the operation on the GPU, by using a shader.
      */
     fun executeGPU(

@@ -13,10 +13,6 @@ data class SwapPalette(
 ) : RenderOperation {
     override val target = RenderUnit.BOTH
 
-    override fun executeCPU() {
-        frameBuffer.blender.pal(origin, destination)
-    }
-
     override fun executeGPU(
         context: RenderContext,
         renderUnit: OperationsRender,

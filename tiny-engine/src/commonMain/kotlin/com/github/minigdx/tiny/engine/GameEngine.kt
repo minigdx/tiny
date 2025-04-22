@@ -16,10 +16,8 @@ import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.RenderFrame
 import com.github.minigdx.tiny.render.RenderUnit
-import com.github.minigdx.tiny.render.operations.ClearScreen
 import com.github.minigdx.tiny.render.operations.DrawSprite
 import com.github.minigdx.tiny.render.operations.RenderOperation
-import com.github.minigdx.tiny.render.operations.SetPixel
 import com.github.minigdx.tiny.resources.GameLevel2
 import com.github.minigdx.tiny.resources.GameResource
 import com.github.minigdx.tiny.resources.GameScript
@@ -532,7 +530,6 @@ class GameEngine(
             // Let's execute it now.
             ops.forEach {
                 check(it.target.compatibleWith(RenderUnit.CPU)) { "Expected only ops than can be executed on CPU!" }
-                it.executeCPU()
             }
             ops.clear()
             // The framebuffer will be the next render operation
@@ -641,40 +638,12 @@ class OperationsObjectPool {
             }
         }
 
-    private val clearScreen =
-        object : PoolObjectPool<ClearScreen>(5) {
-            override fun new(): ClearScreen {
-                return ClearScreen()
-            }
-
-            override fun destroy(obj: ClearScreen) {
-                obj.frameBuffer = null
-                obj.color = 0
-            }
-        }
-
-    private val setPixel =
-        object : PoolObjectPool<SetPixel>(10) {
-            override fun new(): SetPixel {
-                return SetPixel()
-            }
-
-            override fun destroy(obj: SetPixel) {
-                obj.color = 0
-                obj.x = 0
-                obj.y = 0
-                obj.frameBuffer = null
-            }
-        }
-
     private fun <T : PoolObject<T>> getPool(type: KClass<T>): ObjectPool<T> {
         @Suppress("UNCHECKED_CAST")
         val pool: ObjectPool<T> =
             when (type) {
                 DrawSprite::class -> drawSprite as ObjectPool<T>
                 DrawSprite.DrawSpriteAttribute::class -> drawSpriteAttribute as ObjectPool<T>
-                ClearScreen::class -> clearScreen as ObjectPool<T>
-                SetPixel::class -> setPixel as ObjectPool<T>
                 else -> throw IllegalArgumentException("No pool found for type: $type")
             }
         return pool

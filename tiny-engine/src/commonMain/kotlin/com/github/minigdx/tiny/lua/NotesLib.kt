@@ -181,14 +181,14 @@ enum class Note(val frequency: Float, val index: Int) {
     ;
 
     companion object {
-        private val notesPerIndex = Note.values().distinctBy { it.index }.sortedBy { it.index }.toTypedArray()
+        private val notesPerIndex = entries.toTypedArray().distinctBy { it.index }.sortedBy { it.index }.toTypedArray()
 
         fun fromIndex(noteIndex: Int): Note {
             return notesPerIndex[noteIndex]
         }
 
         fun fromFrequency(frequency: Float): Note {
-            return Note.values().minBy { abs(it.frequency - frequency) }
+            return entries.toTypedArray().minBy { abs(it.frequency - frequency) }
         }
 
         fun fromFrequency(frequency: Int): Note = fromFrequency(frequency.toFloat())
@@ -207,7 +207,7 @@ class NotesLib : TwoArgFunction() {
     ): LuaValue {
         val keys = LuaTable()
 
-        Note.values().forEach { note ->
+        Note.entries.forEach { note ->
             keys[note.name] = valueOf(note.index)
         }
 
