@@ -4,7 +4,7 @@ function _init()
 
     prefix = {"b", "u", "i", "l", "d"," ", "w", "i", "t", "h", " "}
     txt = { "t", "i", "n", "y" }
-    waiting = 0
+    waiting = 3
 end
 
 function _update()
@@ -14,7 +14,7 @@ function _update()
     end
 
     if (waiting < 0) then
-       -- gfx.cls("#000000")
+        gfx.cls("#000000")
         tiny.exit(0) -- start the first script in the game script stack
     end
 end
@@ -43,14 +43,14 @@ function letter(x, l, index, move)
     end
 end
 function _draw()
-   -- gfx.cls("#000000")
+    gfx.cls("#000000")
 
     for index = 1, #prefix do
-    --    letter(2, prefix[index], index, false)
+        letter(2, prefix[index], index, false)
     end
 
     for index = 1, #txt do
-    --    letter(46, txt[index], index, true)
+        letter(46, txt[index], index, true)
     end
 
 
