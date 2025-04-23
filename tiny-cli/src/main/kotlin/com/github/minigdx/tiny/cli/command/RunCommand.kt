@@ -177,7 +177,7 @@ class RunCommand : CliktCommand(name = "run") {
                 }
 
                 is TinyException -> {
-                    echo("Error found line ${ex.lineNumber}:${ex.line}")
+                    echo("Error found in the script '${ex.name}' line ${ex.lineNumber}:${ex.line}.")
                 }
             }
             echo()

@@ -4,7 +4,7 @@ import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.input.internal.PoolObject
 import com.github.minigdx.tiny.render.operations.RenderOperation
-import com.github.minigdx.tiny.resources.GameLevel2
+import com.github.minigdx.tiny.resources.GameLevel
 import com.github.minigdx.tiny.resources.GameScript
 import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.resources.SpriteSheet
@@ -71,7 +71,7 @@ interface GameResourceAccess {
     /**
      * Access a level by its index.
      */
-    fun level(index: Int): GameLevel2?
+    fun level(index: Int): GameLevel?
 
     /**
      * Access sound by its index

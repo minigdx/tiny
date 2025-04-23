@@ -25,26 +25,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.json.Json
 
-class LdKtIntLayer(
-    val name: String,
-    val index: Int,
-    val x: Pixel,
-    val y: Pixel,
-    val width: Pixel,
-    val height: Pixel,
-    var ints: PixelArray = PixelArray(width, height),
-)
-
-class LdKtImageLayer(
-    val name: String,
-    val index: Int,
-    val x: Pixel,
-    val y: Pixel,
-    val width: Pixel,
-    val height: Pixel,
-    var pixels: PixelArray = PixelArray(width, height),
-)
-
 @OptIn(ExperimentalCoroutinesApi::class)
 class ResourceFactory(
     private val vfs: VirtualFileSystem,
@@ -71,13 +51,14 @@ class ResourceFactory(
     /**
      * Load LDTK files and put the tileset as map in it.
      */
-    fun gameLevel2(
+    fun gameLevel(
         index: Int,
         name: String,
-    ): Flow<GameLevel2> {
+    ): Flow<GameLevel> {
         suspend fun getTilesets(ldtk: Ldtk): Map<String, PixelArray> {
             return ldtk.levels.flatMap { level -> level.layerInstances }
                 .mapNotNull {
+                    // Collect all tileset
                     when (it) {
                         is Layer.AutoLayer -> it.__tilesetRelPath
                         is Layer.EntitiesLayer -> null
@@ -109,7 +90,7 @@ class ResourceFactory(
             }
             .map { world -> world to getTilesets(world) }
             .map { (world, tilesets) ->
-                GameLevel2(
+                GameLevel(
                     version++,
                     index,
                     name,
@@ -118,91 +99,6 @@ class ResourceFactory(
                     world,
                     tilesets,
                 )
-            }
-    }
-
-    fun gameLevel(
-        index: Int,
-        name: String,
-    ): Flow<GameLevel> {
-        var version = 0
-        return flowOf("$name/data.json")
-            .map { platform.createByteArrayStream(it) }
-            .flatMapMerge { filestream -> vfs.watch(filestream) }
-            .map { data ->
-                val levelData: LdtkLevel = json.decodeFromString(data.decodeToString())
-                levelData
-            }.onEach { level ->
-                logger.debug("RESOURCE_FACTORY") {
-                    "Loading level " + level.uniqueIdentifer + " with layers " + level.layers.joinToString(", ")
-                }
-            }.map { level ->
-                val layers = listOf("$name/_composite.png") + level.layers.map { layer -> "$name/$layer" }
-                val pngLayers =
-                    layers
-                        .mapIndexed { index, layer ->
-                            LdKtImageLayer(
-                                name = layer,
-                                index = index,
-                                x = level.x,
-                                y = level.y,
-                                width = level.width,
-                                height = level.height,
-                            )
-                        }.mapNotNull { layer ->
-                            val stream = platform.createImageStream(layer.name)
-                            if (stream.exists()) {
-                                val imageData = stream.read()
-                                val texture = convertToColorIndex(imageData.data, level.width, level.height)
-                                layer.apply {
-                                    pixels = texture
-                                }
-                            } else {
-                                null
-                            }
-                        }
-
-                val intLayers =
-                    layers
-                        .map { layer -> layer.replace(".png", ".csv") }
-                        .mapIndexedNotNull { index, layer ->
-                            val stream = platform.createByteArrayStream(layer)
-                            if (stream.exists()) {
-                                val data = stream.read()
-                                val lines =
-                                    data.decodeToString()
-                                        .lines()
-                                        .map { l -> l.split(",").filter { it.isNotBlank() } }
-                                        .filterNot { it.isEmpty() }
-                                val l =
-                                    LdKtIntLayer(
-                                        name = layer,
-                                        index = index,
-                                        x = level.x,
-                                        y = level.y,
-                                        width = lines.first().size,
-                                        height = lines.size,
-                                    )
-
-                                lines.forEachIndexed { y, columns ->
-                                    columns.forEachIndexed { x, i ->
-                                        l.ints.set(x, y, i.toInt())
-                                    }
-                                }
-                                l
-                            } else {
-                                null
-                            }
-                        }
-
-                GameLevel(version++, index, GAME_LEVEL, name, level.layers.size + 1, level).apply {
-                    pngLayers.forEach { layer ->
-                        imageLayers[layer.index] = layer
-                    }
-                    intLayers.forEach { layer ->
-                        this.intLayers[layer.index] = layer
-                    }
-                }.copy()
             }
     }
 

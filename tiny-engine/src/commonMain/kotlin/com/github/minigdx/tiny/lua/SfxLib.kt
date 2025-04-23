@@ -9,7 +9,10 @@ import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.sound.Envelope
+import com.github.minigdx.tiny.sound.Instrument
 import com.github.minigdx.tiny.sound.Modulation
+import com.github.minigdx.tiny.sound.Music
+import com.github.minigdx.tiny.sound.MusicalBar
 import com.github.minigdx.tiny.sound.Noise2
 import com.github.minigdx.tiny.sound.NoiseWave
 import com.github.minigdx.tiny.sound.Pattern2
@@ -30,7 +33,6 @@ import com.github.minigdx.tiny.sound.Triangle2
 import com.github.minigdx.tiny.sound.TriangleWave
 import com.github.minigdx.tiny.sound.Vibrato
 import com.github.minigdx.tiny.sound.WaveGenerator
-import kotlinx.serialization.Serializable
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.OneArgFunction
@@ -162,13 +164,11 @@ class SfxLib(
             )
             obj.wrap(
                 "wave",
-                { valueOf(this.wave.ordinal) },
+                { valueOf(this.wave.name) },
                 {
-                    this.wave = if (it.isint()) {
-                        Instrument.WaveType.entries.getOrNull(it.checkint())
-                    } else {
-                        it.checkjstring()?.let { Instrument.WaveType.valueOf(it) }
-                    } ?: Instrument.WaveType.SINE
+                    this.wave = it.checkjstring()
+                        ?.let { Instrument.WaveType.valueOf(it) }
+                        ?: Instrument.WaveType.SINE
                 },
             )
             obj.wrap(
@@ -191,6 +191,7 @@ class SfxLib(
                 { valueOf(this.release.toDouble()) },
                 { this.release = it.optdouble(0.0).toFloat() },
             )
+            /*
             obj.function0("play") {
                 val bar =
                     MusicalBar(this).also {
@@ -204,7 +205,7 @@ class SfxLib(
                 bar.play()
                 NONE
             }
-
+            */
             return obj
         }
     }
@@ -739,116 +740,3 @@ class SfxLib(
     }
 }
 
-/**
- * An instrument holds the specific of the sound generation
- */
-@Serializable
-class Instrument(
-    /**
-     * Index of the instrument
-     */
-    val index: Int,
-    /**
-     * Name of the instrument
-     */
-    var name: String? = null,
-    /**
-     * Kind of wave assigned to this instrument
-     */
-    var wave: WaveType = WaveType.SINE,
-    /**
-     * Attack of the sound envelope
-     */
-    var attack: Float = 0F,
-    /**
-     * Decay of the sound envelope
-     */
-    var decay: Float = 0F,
-    /**
-     * Sustain of the sound envelope
-     */
-    var sustain: Float = 0F,
-    /**
-     * Release of the sound envelope
-     */
-    var release: Float = 0F,
-    /**
-     * Harmonics of the instruments (up to 7)
-     */
-    val harmonics: FloatArray = FloatArray(7),
-) {
-    enum class WaveType {
-        SINE,
-        SQUARE,
-    }
-}
-
-/**
- * Note that behing played.
- * It can't be played without an instrument, that will generate the sound for this note.
- */
-@Serializable
-class MusicalNote(
-    var note: Note,
-    var duration: Seconds,
-    var volume: Float,
-)
-
-/**
- * A musical bar is holding musical notes.
- * A musical bar is holding 32 beats.
- * A musical bar without an instrument will not be played.
- *
- * If the last note duration is longuer the remaining time,
- * the note will be cut.
- */
-@Serializable
-class MusicalBar(
-    var instrument: Instrument? = null,
-    val beats: Array<MusicalNote?> = arrayOfNulls(32),
-) {
-    fun setSilence(beat: Int) {
-        // Ignore operation out of the bar.
-        if (beat < 0 || beat >= beats.size) return
-        beats[beat] = null
-    }
-
-    fun setNote(
-        beat: Int,
-        note: Note,
-        duration: Seconds,
-        volume: Percent,
-    ) {
-        // Ignore operation out of the bar.
-        if (beat < 0 || beat >= beats.size) return
-
-        beats[beat] = MusicalNote(note, volume, duration)
-    }
-
-    fun play() {
-        println("PLAY BAR!!!")
-    }
-}
-
-@Serializable
-class MusicalSequence(
-    val tracks: Array<Track> = Array(4) { Track() },
-) {
-    /**
-     * A track is a sequence of musical bars.
-     */
-    @Serializable
-    class Track(
-        var mute: Boolean = false,
-        val bars: MutableList<MusicalBar> = mutableListOf(),
-    )
-}
-
-/**
- *
- */
-@Serializable
-class Music(
-    val instruments: Array<Instrument> = Array(8) { index -> Instrument(index) },
-    val sequences: MutableList<MusicalSequence> = mutableListOf(),
-)

@@ -10,6 +10,9 @@ end
 
 local set_value = function(self, value)
     self.value = value
+    if(self.on_change) then
+        self:on_change()
+    end
     self:fire_on_update(value)
 end
 
@@ -91,7 +94,10 @@ local Knob = {
     width = 16,
     height = 16,
     enabled = true,
-    on_update = nil
+    listeners = {},
+    on_update = on_update,
+    fire_on_update = fire_on_update,
+    set_value = set_value,
 }
 
 
@@ -114,13 +120,34 @@ local MenuItem = {
 
 local factory = { }
 
-function inside_widget(w, x, y)
-    return w.x <= x and x <= w.x + w.width and w.y <= y and y <= w.y + w.height
+function inside_widget(w, x, y, offset)
+    local off = 0
+    if(offset) then
+        off = offset
+    end
+
+    return w.x - off <= x and
+            x <= w.x + w.width + off and
+            w.y - off <= y and
+            y <= w.y + w.height + off
 end
 
 factory.create_button = function(self, value)
     local result = new(Button, value)
-    result.help = result.customFields.Help
+    result.help = result.fields.Help
+    if(value.fields.Type == "SINE") then
+        result.overlay = { x=0, y=16 }
+    elseif(value.fields.Type == "NOISE") then
+        result.overlay = { x=16, y=16 }
+    elseif(value.fields.Type == "PULSE") then
+        result.overlay = { x=32, y=16 }
+    elseif(value.fields.Type == "TRIANGLE") then
+        result.overlay = { x=48, y=16 }
+    elseif(value.fields.Type == "SAW_TOOTH") then
+        result.overlay = { x=64, y=16 }
+    elseif(value.fields.Type == "SQUARE") then
+        result.overlay = { x=80, y=16 }
+    end
     return result
 end
 
@@ -139,6 +166,9 @@ Button._update = function(self)
         local touched = ctrl.touched(0)
         if touched then
             self:fire_on_update(self.status)
+            if(self.on_change) then
+                self:on_change()
+            end
         end
     else
         self.status = 0
@@ -149,13 +179,13 @@ end
 Button._draw = function(self)
     local background = 0
     if self.status > 0 then
-        background = 1
+        background = 16
     end
 
-    spr.draw(28 + background, self.x, self.y)
+    spr.sdraw(self.x, self.y, 0 + background, 0, self.width, self.height)
 
     if self.overlay ~= nil then
-        spr.draw(self.overlay, self.x, self.y)
+       spr.sdraw(self.x, self.y, self.overlay.x, self.overlay.y, self.width, self.height)
     end
 end
 
@@ -169,8 +199,8 @@ end
 
 factory.create_knob = function(self, value)
     local result = new(Knob, value)
-    result.label = result.customFields.Label
-    result.help = result.customFields.Help
+    result.label = result.fields.Label
+    result.help = result.fields.Help
     return result
 end
 
@@ -185,12 +215,20 @@ end
 Knob._draw = function(self)
     local angle = (1.8 * math.pi) * self.value + math.pi * 0.6
 
-    local target_x = math.cos(angle) * 3 + self.x + 4
-    local target_y = math.sin(angle) * 3 + self.y + 3
+    local target_x = math.cos(angle) * 8 + self.x + 8
+    local target_y = math.sin(angle) * 8 + self.y + 8
 
-    spr.draw(30, self.x, self.y)
-    shape.line(self.x + 4, self.y + 3, target_x, target_y, 9)
-    print(self.label, self.x - 1, self.y + 10)
+    spr.sdraw(self.x, self.y, 0, 64, 16, 16)
+    shape.line(self.x + 8, self.y + 8, target_x, target_y, 9)
+    print(self.label, self.x - 1, self.y + 18)
+
+    if self.is_hover or self.active_color then
+        local c = 9
+        if(self.active_color) then
+            c = self.active_color
+        end
+        shape.rect(self.x, self.y, self.width, self.height, c)
+    end
 end
 
 Knob._update = function(self)
@@ -204,12 +242,13 @@ Knob._update = function(self)
         end
         local touch = ctrl.touch()
 
+        self.active_color = 11
+
         local dst = self.y + 4 - touch.y
         local percent = math.max(math.min(1, dst / 32), -1)
-        self.value = math.min(math.max(0, self.start_value + percent), 1)
-        if self.on_update ~= nil then
-            self:on_update(self.value)
-        end
+        local value = math.min(math.max(0, self.start_value + percent), 1)
+        self:set_value(value)
+
     end
 
     local pos = ctrl.touch()
@@ -217,17 +256,21 @@ Knob._update = function(self)
         if self.on_hover ~= nil then
             self:on_hover()
         end
+        self.is_hover = true
+    else
+        self.is_hover = false
     end
 
-    if touching == nil then
-        self.start_value = nil
+        if touching == nil then
+            self.start_value = nil
+            self.active_color = nil
+        end
     end
-end
 
 factory.create_fader = function(self, value)
     local result = new(Fader, value)
-    result.help = result.customFields.Help
-    result.label = result.customFields.Label
+    result.help = result.fields.Help
+    result.label = result.fields.Label
     result.hitbox = {
         x = result.x,
         y = result.y,
@@ -277,7 +320,6 @@ function draw_counter(counter)
 end
 
 Envelop._update = function(self)
-
     self.decay = math.min(self.decay, 1 - self.attack)
     self.release = math.min(self.release, 1 - (self.decay + self.attack))
 
@@ -289,10 +331,6 @@ Envelop._update = function(self)
 
     self.release_start_x = self.x + self.width - self.release * self.width 
     self.release_start_y = self.y + self.height * (1 - self.sustain)
-
-    self.attack_fader.value = self.attack
-    self.decay_fader.value = self.decay
-    self.release_fader.value = self.release
 end
 
 Envelop._draw = function(self)
@@ -318,10 +356,47 @@ Envelop._draw = function(self)
     shape.rect(self.decay_end_x + (self.release_start_x - self.decay_end_x - width) * 0.5, self.y + (1 - self.sustain) * self.height - height * 0.5, width, height, 8)
 end
 
+Envelop.set_attack = function(self, widget)
+    self.attack_fader = widget
+    local on_value_update = function(nested, value)
+        self.attack = value
+    end
+    -- set the initial value on the widget
+    widget:on_update(on_value_update)
+end
+
+Envelop.set_decay = function(self, widget)
+    self.decay_fader = widget
+    local on_value_update = function(nested, value)
+        self.decay = value
+    end
+    -- set the initial value on the widget
+    widget:on_update(on_value_update)
+end
+
+Envelop.set_sustain = function(self, widget)
+    self.sustain_fader = widget
+    local on_value_update = function(nested, value)
+        self.sustain = value
+    end
+    -- set the initial value on the widget
+    widget:on_update(on_value_update)
+end
+
+Envelop.set_release = function(self, widget)
+    self.release_fader = widget
+    local on_value_update = function(nested, value)
+        self.release = value
+    end
+    -- set the initial value on the widget
+    widget:on_update(on_value_update)
+end
+
+
 factory.create_checkbox = function(self, data)
     local result = new(Checkbox, data)
-    result.help = result.customFields.Help
-    result.label = result.customFields.Label
+    result.help = result.fields.Help
+    result.label = result.fields.Label
     return result
 end
 
@@ -418,7 +493,7 @@ end
 factory.create_menu_item = function(self, data)
     local menu = new(MenuItem, data)
 
-    local item = data.customFields.Item
+    local item = data.fields.Item
     -- todo: move outside the widgets factory this configuration
     if item == "Wave" then
         menu.spr = 14
@@ -439,7 +514,7 @@ factory.create_menu_item = function(self, data)
         menu.spr = 13
     end
     menu.item = item
-    menu.help = data.customFields.Help
+    menu.help = data.fields.Help
 
     table.insert(menuItems, menu)
     return menu

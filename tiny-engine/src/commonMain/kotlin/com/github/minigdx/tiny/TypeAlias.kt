@@ -23,3 +23,8 @@ typealias Percent = Float
  * Frequency.
  */
 typealias Frequency = Int
+
+typealias Beats = Float
+
+// Beats Per Minute
+typealias BPM = Int

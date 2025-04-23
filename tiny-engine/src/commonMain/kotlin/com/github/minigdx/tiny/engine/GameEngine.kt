@@ -18,7 +18,7 @@ import com.github.minigdx.tiny.render.RenderFrame
 import com.github.minigdx.tiny.render.RenderUnit
 import com.github.minigdx.tiny.render.operations.DrawSprite
 import com.github.minigdx.tiny.render.operations.RenderOperation
-import com.github.minigdx.tiny.resources.GameLevel2
+import com.github.minigdx.tiny.resources.GameLevel
 import com.github.minigdx.tiny.resources.GameResource
 import com.github.minigdx.tiny.resources.GameScript
 import com.github.minigdx.tiny.resources.ResourceFactory
@@ -72,7 +72,7 @@ class GameEngine(
 
     private lateinit var scripts: Array<GameScript?>
     private lateinit var spriteSheets: Array<SpriteSheet?>
-    private lateinit var levels: Array<GameLevel2?>
+    private lateinit var levels: Array<GameLevel?>
     private lateinit var sounds: Array<Sound?>
 
     override var bootSpritesheet: SpriteSheet? = null
@@ -125,7 +125,7 @@ class GameEngine(
 
         val gameLevels =
             gameOptions.gameLevels.mapIndexed { index, level ->
-                resourceFactory.gameLevel2(index, level)
+                resourceFactory.gameLevel(index, level)
             }
         this.levels = Array(gameLevels.size) { null }
 
@@ -196,7 +196,7 @@ class GameEngine(
                     }
 
                     GAME_LEVEL -> {
-                        levels[resource.index] = resource as GameLevel2
+                        levels[resource.index] = resource as GameLevel
                     }
 
                     GAME_SOUND -> {
@@ -258,7 +258,7 @@ class GameEngine(
                     }
 
                     GAME_LEVEL -> {
-                        levels[resource.index] = resource as GameLevel2
+                        levels[resource.index] = resource as GameLevel
                         // Force the reloading of the script as level init might occur in the _init block.
                         scripts[current]?.reload = true
                     }
@@ -467,7 +467,7 @@ class GameEngine(
         }
     }
 
-    override fun level(index: Int): GameLevel2? {
+    override fun level(index: Int): GameLevel? {
         val protected = max(0, min(index, levels.size - 1))
         if (protected >= levels.size) return null
         return levels[protected]

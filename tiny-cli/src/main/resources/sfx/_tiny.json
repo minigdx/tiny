@@ -1,1 +1,45 @@
-{"version":"V1","name":"Tiny SFX Sequencer","resolution":{"width":192,"height":128},"sprites":{"width":8,"height":8},"zoom":4,"colors":["#000000","#1D2B53","#7E2553","#008751","#AB5236","#5F574F","#C2C3C7","#FFF1E8","#FF004D","#FFA300","#FFEC27","#00E436","#29ADFF","#83769C","#FF77A8","#FFCCAA"],"scripts":["test-game.lua","game.lua","mouse.lua","widgets.lua"],"spritesheets":["sfx.png"],"levels":["editor/simplified/Level_0","editor/simplified/Score","editor/simplified/Fx","editor/simplified/Music"],"hideMouseCursor":true}
+{
+  "version": "V1",
+  "name": "Tiny SFX Sequencer",
+  "resolution": {
+    "width": 384,
+    "height": 256
+  },
+  "sprites": {
+    "width": 8,
+    "height": 8
+  },
+  "zoom": 2,
+  "colors": [
+    "#000000",
+    "#1D2B53",
+    "#7E2553",
+    "#008751",
+    "#AB5236",
+    "#5F574F",
+    "#C2C3C7",
+    "#FFF1E8",
+    "#FF004D",
+    "#FFA300",
+    "#FFEC27",
+    "#00E436",
+    "#29ADFF",
+    "#83769C",
+    "#FF77A8",
+    "#FFCCAA"
+  ],
+  "scripts": [
+    "sfx-editor.lua",
+    "test-game.lua",
+    "game.lua",
+    "mouse.lua",
+    "widgets.lua"
+  ],
+  "spritesheets": [
+    "sfx.png"
+  ],
+  "levels": [
+    "editor.ldtk"
+  ],
+  "hideMouseCursor": true
+}

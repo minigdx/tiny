@@ -131,7 +131,7 @@ sealed interface Layer {
 
     val entityInstances: List<Entity>?
 
-    val autoLayer: List<Tile>?
+    val autoLayerTiles: List<Tile>?
 
     val gridTiles: List<Tile>?
 
@@ -167,7 +167,7 @@ sealed interface Layer {
         /**
          * Always null
          */
-        override val autoLayer: List<Tile>? = null,
+        override val autoLayerTiles: List<Tile>? = null,
         /**
          * Always null
          */
@@ -184,7 +184,7 @@ sealed interface Layer {
         override val pxOffsetX: Int,
         override val pxOffsetY: Int,
         override val seed: Long,
-        override val autoLayer: List<Tile>,
+        override val autoLayerTiles: List<Tile>,
         /**
          * The relative path to corresponding Tileset, if any.
          */
@@ -237,7 +237,7 @@ sealed interface Layer {
         /**
          * Always null
          */
-        override val autoLayer: List<Tile>? = null,
+        override val autoLayerTiles: List<Tile>? = null,
     ) : Layer
 
     @SerialName("Entities")
@@ -266,7 +266,7 @@ sealed interface Layer {
         /**
          * Always null
          */
-        override val autoLayer: List<Tile>? = null,
+        override val autoLayerTiles: List<Tile>? = null,
         /**
          * Always null
          */
@@ -473,13 +473,15 @@ object CustomFieldSerializer : KSerializer<CustomField> {
         return when (type) {
             "Int" -> valueElement?.jsonPrimitive?.content?.toIntOrNull()
             "Float" -> valueElement?.jsonPrimitive?.content?.toFloatOrNull()
-            "String", "Multilines", "Text", "FilePath", "Color", "Enum" -> valueElement?.jsonPrimitive?.content
+            "String", "Multilines", "Text", "FilePath", "Color" -> valueElement?.jsonPrimitive?.content
             "Bool" -> valueElement?.jsonPrimitive?.content?.toBooleanStrictOrNull()
             "Point" -> valueElement?.let { Json.decodeFromJsonElement(GridPoint.serializer(), it) }
             "Tile" -> valueElement?.let { Json.decodeFromJsonElement(TilesetRect.serializer(), it) }
             "EntityRef" -> valueElement?.let { Json.decodeFromJsonElement(EntityRef.serializer(), it) }
             else ->
-                if (type.startsWith("Array<")) {
+                if(type.startsWith("LocalEnum.")) {
+                    valueElement?.jsonPrimitive?.content
+                } else if (type.startsWith("Array<")) {
                     val nestedType = type.removePrefix("Array<").removeSuffix(">")
                     valueElement?.jsonArray?.map { nestedElement -> deserialize(nestedType, nestedElement) }
                 } else {

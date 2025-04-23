@@ -7,8 +7,7 @@ import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.render.operations.DrawSprite
-import com.github.minigdx.tiny.resources.GameLevel2
-import com.github.minigdx.tiny.resources.LdtkLevel
+import com.github.minigdx.tiny.resources.GameLevel
 import com.github.minigdx.tiny.resources.ldtk.CustomField
 import com.github.minigdx.tiny.resources.ldtk.Entity
 import com.github.minigdx.tiny.resources.ldtk.EntityRef
@@ -17,7 +16,6 @@ import com.github.minigdx.tiny.resources.ldtk.Layer
 import com.github.minigdx.tiny.resources.ldtk.Level
 import com.github.minigdx.tiny.resources.ldtk.Tile
 import com.github.minigdx.tiny.resources.ldtk.TilesetRect
-import kotlinx.serialization.json.JsonElement
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.LibFunction
@@ -81,17 +79,6 @@ class MapLib(
         return map
     }
 
-    inner class property(
-        val int: ((LdtkLevel) -> Int)? = null,
-        val str: ((LdtkLevel) -> String)? = null,
-        val json: ((LdtkLevel) -> JsonElement)? = null,
-    ) : ZeroArgFunction() {
-        override fun call(): LuaValue {
-            // FIXME: rework that.
-            val value = NIL
-            return value
-        }
-    }
 
     @TinyFunction("Set the current level to use.")
     inner class level : OneArgFunction() {
@@ -333,9 +320,9 @@ entity.fields -- access custom field of the entity
         }
 
         @TinyCall("Get all entities from the specific layer as a table, with an entry per type.")
-        override fun call(arg: LuaValue): LuaValue {
+        override fun call(a: LuaValue): LuaValue {
             val level = activeLevel() ?: return NONE
-            val index = layerIndex(arg) ?: return NONE
+            val index = layerIndex(a) ?: return NONE
             val layer = level.layerInstances[index]
             return cacheMe(layer.__identifier) {
                 getEntities(listOf(layer))
@@ -457,7 +444,7 @@ entity.fields -- access custom field of the entity
             if (!isActiveLayer(layerIndex)) {
                 return NIL
             }
-            val layer = activeLevel()?.layerInstances[layerIndex] ?: return NIL
+            val layer = activeLevel()?.layerInstances?.getOrNull(layerIndex) ?: return NIL
             // Not a drawable layer.
             if (layer.__tilesetRelPath == null) {
                 return NIL
@@ -494,14 +481,14 @@ entity.fields -- access custom field of the entity
         }
 
         fun toDrawSprite(
-            world: GameLevel2,
+            world: GameLevel,
             layer: Layer,
         ): List<DrawSprite> {
             val tileset = world.tilesset[layer.__tilesetRelPath!!]!!
 
             val attributesGrid = layer.gridTiles?.map { tile -> toAttribute(layer.__gridSize, tile) } ?: emptyList()
             val attributesAutoLayer =
-                layer.autoLayer?.map { tile -> toAttribute(layer.__gridSize, tile) } ?: emptyList()
+                layer.autoLayerTiles?.map { tile -> toAttribute(layer.__gridSize, tile) } ?: emptyList()
             val attributes = attributesGrid + attributesAutoLayer
 
             return DrawSprite.from(resourceAccess, layer.__identifier, tileset, attributes)
