@@ -60,12 +60,6 @@ class PicoAudioSoundMananger : SoundManager() {
         return SfxSound(buffer, this)
     }
 
-    override suspend fun createMidiSound(data: ByteArray): Sound {
-        val audio = js("var PicoAudio = require('picoaudio'); new PicoAudio.default()")
-        val smf = audio.parseSMF(data)
-        return PicoAudioSound(audio, smf)
-    }
-
     override fun playBuffer(
         buffer: FloatArray,
         numberOfSamples: Long,

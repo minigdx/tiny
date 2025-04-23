@@ -138,6 +138,12 @@ function _init()
         consume_on_update(button, { "status" }, state, { "instrument", "wave" }, waveToButton)
         table.insert(m.widgets, button)
     end
+
+    for h in all(entities["InstrumentName"]) do
+        local label = widgets:create_help(h)
+        consume_on_update(label, { "label" }, state, { "instrument", "name" })
+        table.insert(m.widgets, label)
+    end
 end
 
 function _update()
@@ -151,6 +157,10 @@ function _update()
         if (state.on_change) then
             state:on_change()
         end
+    end
+
+    if(ctrl.pressed(keys.enter)) then
+        state.instrument.play()
     end
 
     for w in all(m.widgets) do

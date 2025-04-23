@@ -1,10 +1,8 @@
 package com.github.minigdx.tiny.sound
 
 import com.github.minigdx.tiny.Beats
-import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.lua.Note
 import kotlinx.serialization.Serializable
-
 
 /**
  * Note that being played.

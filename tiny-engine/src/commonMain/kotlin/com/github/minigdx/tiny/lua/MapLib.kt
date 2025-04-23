@@ -79,7 +79,6 @@ class MapLib(
         return map
     }
 
-
     @TinyFunction("Set the current level to use.")
     inner class level : OneArgFunction() {
         @TinyCall("Return the index of the current level.")

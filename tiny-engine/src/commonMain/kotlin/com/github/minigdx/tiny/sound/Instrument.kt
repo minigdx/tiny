@@ -2,13 +2,11 @@ package com.github.minigdx.tiny.sound
 
 import com.github.minigdx.tiny.Percent
 import com.github.minigdx.tiny.Seconds
-import com.github.minigdx.tiny.lua.Note
 import kotlinx.serialization.Serializable
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.sin
 import kotlin.random.Random
-
 
 /**
  * An instrument holds the specific of the sound generation
@@ -22,7 +20,7 @@ class Instrument(
     /**
      * Name of the instrument
      */
-    var name: String? = null,
+    var name: String? = "Instrument $index",
     /**
      * Kind of wave assigned to this instrument
      */
@@ -54,9 +52,13 @@ class Instrument(
         TRIANGLE,
         SINE,
         NOISE,
-        SQUARE;
+        SQUARE,
+        ;
 
-        fun generate(harmonicFreq: Float, time: Float): Float {
+        fun generate(
+            harmonicFreq: Float,
+            time: Float,
+        ): Float {
             return when (this) {
                 TRIANGLE -> {
                     val angle: Float = sin(TWO_PI * harmonicFreq * time)

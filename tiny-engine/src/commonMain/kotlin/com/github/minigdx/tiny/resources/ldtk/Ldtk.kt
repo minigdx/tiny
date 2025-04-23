@@ -479,7 +479,7 @@ object CustomFieldSerializer : KSerializer<CustomField> {
             "Tile" -> valueElement?.let { Json.decodeFromJsonElement(TilesetRect.serializer(), it) }
             "EntityRef" -> valueElement?.let { Json.decodeFromJsonElement(EntityRef.serializer(), it) }
             else ->
-                if(type.startsWith("LocalEnum.")) {
+                if (type.startsWith("LocalEnum.")) {
                     valueElement?.jsonPrimitive?.content
                 } else if (type.startsWith("Array<")) {
                     val nestedType = type.removePrefix("Array<").removeSuffix(">")

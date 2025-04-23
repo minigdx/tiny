@@ -31,6 +31,7 @@ import com.github.minigdx.tiny.resources.ResourceType.GAME_SOUND
 import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
 import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.resources.SpriteSheet
+import com.github.minigdx.tiny.sound.MusicalBar
 import com.github.minigdx.tiny.sound.Song2
 import com.github.minigdx.tiny.sound.SoundManager
 import com.github.minigdx.tiny.sound.WaveGenerator
@@ -486,6 +487,10 @@ class GameEngine(
 
     override fun sfx(song: Song2) {
         this.song = song
+    }
+
+    override fun play(musicalBar: MusicalBar) {
+        soundManager.play(musicalBar)
     }
 
     override fun script(name: String): GameScript? {

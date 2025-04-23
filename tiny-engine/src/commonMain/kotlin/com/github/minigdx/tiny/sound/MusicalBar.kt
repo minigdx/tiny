@@ -1,11 +1,7 @@
 package com.github.minigdx.tiny.sound
 
 import com.github.minigdx.tiny.BPM
-import com.github.minigdx.tiny.Percent
-import com.github.minigdx.tiny.Seconds
-import com.github.minigdx.tiny.lua.Note
 import kotlinx.serialization.Serializable
-
 
 /**
  * A musical bar is holding musical notes.
@@ -23,7 +19,6 @@ class MusicalBar(
      */
     var tempo: BPM = 120,
 ) {
-
     val beats: MutableList<MusicalNote> = mutableListOf()
 
     val endBeat: Float

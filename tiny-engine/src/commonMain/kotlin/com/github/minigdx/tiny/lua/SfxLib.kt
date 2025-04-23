@@ -13,6 +13,7 @@ import com.github.minigdx.tiny.sound.Instrument
 import com.github.minigdx.tiny.sound.Modulation
 import com.github.minigdx.tiny.sound.Music
 import com.github.minigdx.tiny.sound.MusicalBar
+import com.github.minigdx.tiny.sound.MusicalNote
 import com.github.minigdx.tiny.sound.Noise2
 import com.github.minigdx.tiny.sound.NoiseWave
 import com.github.minigdx.tiny.sound.Pattern2
@@ -191,21 +192,37 @@ class SfxLib(
                 { valueOf(this.release.toDouble()) },
                 { this.release = it.optdouble(0.0).toFloat() },
             )
-            /*
+
             obj.function0("play") {
-                val bar =
-                    MusicalBar(this).also {
-                        var beat = 0
-                        it.setNote(beat++, Note.C3, 0.3f, 0.5f)
-                        it.setNote(beat++, Note.D3, 0.3f, 0.5f)
-                        it.setNote(beat++, Note.E3, 0.3f, 0.5f)
-                        it.setNote(beat++, Note.F3, 0.3f, 0.5f)
-                        it.setNote(beat++, Note.G3, 0.5f, 0.5f)
+                val softVolume = 0.3f
+                val hardVolume = 0.8f
+
+                val frereJacques =
+                    MusicalBar(
+                        this,
+                        tempo = 120,
+                    ).apply {
+                        setNotes(
+                            listOf(
+                                MusicalNote(Note.C3, 0f, 1f, softVolume),
+                                MusicalNote(Note.D3, 1f, 1f, softVolume),
+                                MusicalNote(Note.E3, 2f, 1f, hardVolume),
+                                MusicalNote(Note.C3, 3f, 1f, softVolume),
+                                MusicalNote(Note.C3, 4f, 1f, softVolume),
+                                MusicalNote(Note.D3, 5f, 1f, softVolume),
+                                MusicalNote(Note.E3, 6f, 1f, hardVolume),
+                                MusicalNote(Note.C3, 7f, 1f, softVolume),
+                                MusicalNote(Note.E3, 8f, 1f, softVolume),
+                                MusicalNote(Note.F3, 9f, 1f, softVolume),
+                                MusicalNote(Note.G3, 10f, 2f, hardVolume),
+                            ),
+                        )
                     }
-                bar.play()
+
+                resourceAccess.play(frereJacques)
                 NONE
             }
-            */
+
             return obj
         }
     }
@@ -739,4 +756,3 @@ class SfxLib(
         private const val TINY_SFX_HEADER = "tiny-sfx"
     }
 }
-

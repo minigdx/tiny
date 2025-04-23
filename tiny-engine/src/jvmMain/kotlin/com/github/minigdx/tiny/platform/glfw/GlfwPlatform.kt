@@ -24,6 +24,7 @@ import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.RenderFrame
 import com.github.minigdx.tiny.render.gl.OpenGLRender
 import com.github.minigdx.tiny.render.operations.RenderOperation
+import com.github.minigdx.tiny.sound.JavaSoundManager
 import com.github.minigdx.tiny.sound.SoundManager
 import com.github.minigdx.tiny.util.MutableFixedSizeList
 import com.squareup.gifencoder.FastGifEncoder
@@ -376,7 +377,7 @@ class GlfwPlatform(
     private lateinit var soundManager: SoundManager
 
     override fun initSoundManager(inputHandler: InputHandler): SoundManager {
-        return JavaMidiSoundManager().also {
+        return JavaSoundManager().also {
             soundManager = it
         }.also {
             it.initSoundManager(inputHandler)
