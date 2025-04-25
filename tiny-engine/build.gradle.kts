@@ -39,43 +39,56 @@ dependencies {
 
     this.jvmMainImplementation(libs.jvm.gifencoder)
 
-    jsMainImplementation("org.jetbrains.kotlin:kotlinx-atomicfu-runtime:2.1.20")
-        ?.because("https://youtrack.jetbrains.com/issue/KT-57235")
+    jsMainImplementation("org.jetbrains.kotlin:kotlinx-atomicfu-runtime:2.1.20")?.because("https://youtrack.jetbrains.com/issue/KT-57235")
 
     add("kspJvm", project(":tiny-doc-generator")) {
         because("KSP will generate the asciidoctor documentation of all Lua libs from Tiny.")
     }
 }
 
-// build.gradle.kts
+// Create the tiny engine javascript version as a Zip file
+val tinyEngineJsJar =
+    project.tasks.register(
+        "tinyEngineJsJar",
+        Jar::class.java,
+    ) {
+        from(tasks.getByName("jsBrowserDistribution"))
+        this.into("tiny-engine-js")
+        this.destinationDirectory.set(project.layout.buildDirectory.dir("tiny-distributions"))
 
-project.tasks.register("tinyEngineJsZip", Zip::class.java) {
-    from(tasks.getByName("jsBrowserDistribution"))
-    this.destinationDirectory.set(project.layout.buildDirectory.dir("tiny-distributions"))
-    this.into("tiny-engine-js")
-    group = "tiny"
-    description = "Build a zip containing all resources to run the Tiny engine in a web application."
-}
+        group = "tiny"
+        description = "Build a jar containing all resources to run the Tiny engine in a web application."
+    }
 
+val tinyResourcesZip =
+    project.tasks.register(
+        "tinyResourcesZip",
+        Zip::class.java,
+    ) {
+        from(tasks.getByName("jvmProcessResources"))
+        this.into("")
+        this.destinationDirectory.set(project.layout.buildDirectory.dir("tiny-distributions"))
+        this.archiveBaseName.set("tiny-resources")
+
+        group = "tiny"
+        description = "Build a zip containing resources from the Tiny Engine (_boot.lua, ...)."
+    }
+
+// Create the configuration that will contain the tiny engine javascript as artifact
 configurations.create("tinyWebEngine") {
     isCanBeResolved = false
     isCanBeConsumed = true
     attributes {
         attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class, "tiny-engine-js-browser-distribution"))
+        attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "jar")
     }
-    outgoing.artifact(tasks.getByName("tinyEngineJsZip"))
+    outgoing.artifact(tinyEngineJsJar)
 }
 
 // -- Asciidoctor artifact configuration
 configurations.create("tinyApiAsciidoctor") {
     isCanBeResolved = false
     isCanBeConsumed = true
-}
-
-artifacts {
-    add("tinyApiAsciidoctor", project.layout.buildDirectory.dir("generated/ksp/jvm/jvmMain/resources/tiny-api.adoc")) {
-        builtBy("kspKotlinJvm")
-    }
 }
 
 // -- LUA Stub artifact configuration
@@ -88,8 +101,32 @@ configurations.create("tinyApiLuaStub") {
     }
 }
 
+// -- resources file (_boot.lua, ...)
+configurations.create("tinyResources") {
+    isCanBeResolved = false
+    isCanBeConsumed = true
+
+    attributes {
+        attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class, "tiny-resources"))
+        attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "zip")
+    }
+}
+
 artifacts {
+    // Tiny Engine Javascript version.
+    add("tinyWebEngine", tinyEngineJsJar) {
+        builtBy(tinyEngineJsJar)
+    }
+    // API as Asciidoctor.
+    add("tinyApiAsciidoctor", project.layout.buildDirectory.dir("generated/ksp/jvm/jvmMain/resources/tiny-api.adoc")) {
+        builtBy("kspKotlinJvm")
+    }
+    // API as Lua stub.
     add("tinyApiLuaStub", project.layout.buildDirectory.dir("generated/ksp/jvm/jvmMain/resources/_tiny.stub.lua")) {
         builtBy("kspKotlinJvm")
+    }
+    // Tiny Resources
+    add("tinyResources", tinyResourcesZip) {
+        builtBy(tinyResourcesZip)
     }
 }

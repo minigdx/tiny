@@ -15,7 +15,7 @@ pluginManagement {
 }
 
 plugins {
-    id("com.gradle.enterprise") version ("3.19.2")
+    id("com.gradle.develocity") version ("4.0")
 }
 
 include("tiny-cli")
@@ -26,3 +26,12 @@ include("tiny-engine")
 include("tiny-repository-libs")
 include("tiny-sample")
 include("tiny-web-editor")
+
+develocity {
+    buildScan {
+        termsOfUseUrl.set("https://gradle.com/help/legal-terms-of-use")
+        termsOfUseAgree.set("yes")
+        // Publish only if build from Github Action.
+        publishing.onlyIf { System.getenv("CI") == "true" }
+    }
+}

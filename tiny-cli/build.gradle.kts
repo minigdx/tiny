@@ -1,5 +1,5 @@
-
 import java.io.Reader
+
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
@@ -8,17 +8,13 @@ plugins {
     application
 }
 
-val tinyEngineJsZip by configurations.creating {
+val externalDependencies by configurations.creating {
     isCanBeResolved = true
     isCanBeConsumed = false
-    attributes {
-        attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class, "tiny-engine-js-browser-distribution"))
-    }
-}
 
-val tinyApiluaStub by configurations.creating {
-    isCanBeConsumed = false
-    isCanBeResolved = true
+    attributes {
+        attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "jar")
+    }
 }
 
 dependencies {
@@ -38,30 +34,25 @@ dependencies {
     implementation(libs.bundles.jvm.ktor.server)
     implementation(libs.bundles.jvm.ktor.client)
 
-    add(tinyEngineJsZip.name, project(":tiny-engine"))?.because(
-        "Embed the JS engine in the CLI " +
-            "so it can be included when the game is exported.",
-    )
-
     add(
-        tinyApiluaStub.name,
+        externalDependencies.name,
         project(
             mapOf(
                 "path" to ":tiny-engine",
-                "configuration" to "tinyApiLuaStub",
+                "configuration" to "tinyWebEngine",
             ),
         ),
     )?.because(
-        "Embed the Lua API stub so it can be included when a new game is created.",
+        "Embed the JS engine in the CLI " +
+            "so it can be included when the game is exported.",
     )
 }
 
 application {
     mainClass.set("com.github.minigdx.tiny.cli.MainKt")
 
-    // Copy the JARs from the Kotlin MPP dependencies.
-    this.applicationDistribution.from(tinyEngineJsZip)
-    this.applicationDistribution.from(tinyApiluaStub)
+    // Add the external dependencies (Tiny Web engine, ...) in the client.
+    this.applicationDistribution.from(externalDependencies).into("lib")
 }
 
 // Update the start script to include jar from the Kotlin MPP dependencies
@@ -69,8 +60,7 @@ project.tasks.withType(CreateStartScripts::class.java).configureEach {
     this.classpath =
         project.tasks.getByName("jar").outputs.files
             .plus(project.configurations.getByName("runtimeClasspath"))
-            .plus(tinyEngineJsZip)
-            .plus(tinyApiluaStub)
+            .plus(externalDependencies)
 
     (this.unixStartScriptGenerator as TemplateBasedScriptGenerator).template =
         object : TextResource {
@@ -97,8 +87,6 @@ project.tasks.withType(CreateStartScripts::class.java).configureEach {
 project.tasks.withType(JavaExec::class.java).configureEach {
     val jar by tasks.existing
     val runtimeClasspath by configurations.existing
-    val tinyEngineJsZip by configurations.existing
-    val tinyApiluaStub by configurations.existing
 
-    classpath(jar, runtimeClasspath, tinyEngineJsZip, tinyApiluaStub)
+    classpath(jar, runtimeClasspath, externalDependencies)
 }
