@@ -21,22 +21,14 @@ val tinyApiluaStub by configurations.creating {
     isCanBeResolved = true
 }
 
-tasks.withType(Tar::class).configureEach {
-    duplicatesStrategy = DuplicatesStrategy.WARN
-}
-
-tasks.withType(Zip::class).configureEach {
-    duplicatesStrategy = DuplicatesStrategy.WARN
-}
-
 dependencies {
     implementation(libs.kotlin.serialization.json)
     implementation(libs.clikt)
 
     // Exception in thread "main" java.lang.NoClassDefFoundError: com/sun/jna/Platform
     // https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform
-    implementation("net.java.dev.jna:jna-platform:5.14.0")
-    implementation("com.fifesoft:rsyntaxtextarea:3.6.0")
+    implementation(libs.jna)
+    implementation(libs.rsyntax)
 
     implementation(project(":tiny-engine", "jvmRuntimeElements"))!!
         .because("Depends on the JVM Jar containing commons resources in the JAR.")
@@ -68,15 +60,8 @@ application {
     mainClass.set("com.github.minigdx.tiny.cli.MainKt")
 
     // Copy the JARs from the Kotlin MPP dependencies.
-    this.applicationDistribution.from(
-        project.configurations.getByName("runtimeClasspath"),
-    ) {
-        val jar by tasks.existing
-        this.from(jar)
-        this.from(tinyEngineJsZip)
-        this.from(tinyApiluaStub)
-        this.into("lib")
-    }
+    this.applicationDistribution.from(tinyEngineJsZip)
+    this.applicationDistribution.from(tinyApiluaStub)
 }
 
 // Update the start script to include jar from the Kotlin MPP dependencies
@@ -110,10 +95,10 @@ project.tasks.withType(CreateStartScripts::class.java).configureEach {
 // Make the application plugin start with the right classpath
 // See https://youtrack.jetbrains.com/issue/KT-50227/MPP-JVM-target-executable-application
 project.tasks.withType(JavaExec::class.java).configureEach {
-    val jvmJar by tasks.existing
-    val jvmRuntimeClasspath by configurations.existing
+    val jar by tasks.existing
+    val runtimeClasspath by configurations.existing
     val tinyEngineJsZip by configurations.existing
-    val tinyApiLuaStub by configurations.existing
+    val tinyApiluaStub by configurations.existing
 
-    classpath(jvmJar, jvmRuntimeClasspath, tinyEngineJsZip, tinyApiLuaStub)
+    classpath(jar, runtimeClasspath, tinyEngineJsZip, tinyApiluaStub)
 }
