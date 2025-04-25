@@ -206,22 +206,22 @@ class MapLib(
     inner class cflag : LibFunction() {
         @TinyCall("Get the flag from the tile at the coordinate cx,cy.")
         override fun call(
-            @TinyArg("cx") arg1: LuaValue,
-            @TinyArg("cy") arg2: LuaValue,
+            @TinyArg("cx") a: LuaValue,
+            @TinyArg("cy") b: LuaValue,
         ): LuaValue {
             val level = activeLevel() ?: return NIL
-            return getCell(level.layerInstances.asSequence(), arg1.checkint(), arg2.checkint())
+            return getCell(level.layerInstances.asSequence(), a.checkint(), b.checkint())
         }
 
         @TinyCall("Get the flag from the tile at the coordinate cx,cy from a specific layer.")
         override fun call(
-            @TinyArg("cx") arg1: LuaValue,
-            @TinyArg("cy") arg2: LuaValue,
-            @TinyArg("layer") arg3: LuaValue,
+            @TinyArg("cx") a: LuaValue,
+            @TinyArg("cy") b: LuaValue,
+            @TinyArg("layer") c: LuaValue,
         ): LuaValue {
             val level = activeLevel() ?: return NIL
-            val layer = layerIndex(arg3) ?: return NIL
-            return getCell(sequenceOf(level.layerInstances.get(layer)), arg1.checkint(), arg2.checkint())
+            val layer = layerIndex(c) ?: return NIL
+            return getCell(sequenceOf(level.layerInstances.get(layer)), a.checkint(), b.checkint())
         }
     }
 
@@ -229,15 +229,15 @@ class MapLib(
     inner class flag : LibFunction() {
         @TinyCall("Get the flag from the tile at the coordinate x,y.")
         override fun call(
-            @TinyArg("x") arg1: LuaValue,
-            @TinyArg("y") arg2: LuaValue,
+            @TinyArg("x") a: LuaValue,
+            @TinyArg("y") b: LuaValue,
         ): LuaValue {
             val level = activeLevel() ?: return NIL
 
             return getCell(
                 level.layerInstances.asSequence(),
-                arg1.checkint(),
-                arg2.checkint(),
+                a.checkint(),
+                b.checkint(),
             ) { layer, x, y ->
                 val cx = x / layer.__gridSize
                 val cy = y / layer.__gridSize
@@ -247,20 +247,20 @@ class MapLib(
 
         @TinyCall("Get the flag from the tile at the coordinate x,y from a specific layer.")
         override fun call(
-            @TinyArg("x") arg1: LuaValue,
-            @TinyArg("y") arg2: LuaValue,
-            @TinyArg("layer") arg3: LuaValue,
+            @TinyArg("x") a: LuaValue,
+            @TinyArg("y") b: LuaValue,
+            @TinyArg("layer") c: LuaValue,
         ): LuaValue {
             val level = activeLevel() ?: return NIL
-            val layer = layerIndex(arg3) ?: return NIL
+            val layer = layerIndex(c) ?: return NIL
             return getCell(
                 sequenceOf(level.layerInstances.get(layer)),
-                arg1.checkint(),
-                arg2.checkint(),
-            ) { layer, x, y ->
-                val cx = x / layer.__gridSize
-                val cy = y / layer.__gridSize
-                cx + cy * layer.__cWid
+                a.checkint(),
+                b.checkint(),
+            ) { l, x, y ->
+                val cx = x / l.__gridSize
+                val cy = y / l.__gridSize
+                cx + cy * l.__cWid
             }
         }
     }

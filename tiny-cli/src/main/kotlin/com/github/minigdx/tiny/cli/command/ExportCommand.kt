@@ -49,19 +49,26 @@ class GameExporter(private val withSourceMap: Boolean = false) {
 
         val exportedGame = ZipOutputStream(FileOutputStream(gameDirectory.resolve(archive)))
 
+        val exportedFile = mutableSetOf<String>()
         // Add all engine files into the zip
         ENGINE_FILES.forEach { name ->
             val content = ExportCommand::class.java.getResourceAsStream("/tiny-engine-js/$name")
             exportedGame.putNextEntry(ZipEntry(name))
             exportedGame.write(content!!.readAllBytes())
             exportedGame.closeEntry()
+
+            exportedFile += name
         }
 
         if (withSourceMap) {
             val content = ExportCommand::class.java.getResourceAsStream("/tiny-engine-js/tiny-engine.js.map")
-            exportedGame.putNextEntry(ZipEntry("tiny-engine.js.map"))
+            val name = "tiny-engine.js.map"
+
+            exportedGame.putNextEntry(ZipEntry(name))
             exportedGame.write(content!!.readAllBytes())
             exportedGame.closeEntry()
+
+            exportedFile += name
         }
 
         // Add all game specific file into the zip
@@ -69,39 +76,60 @@ class GameExporter(private val withSourceMap: Boolean = false) {
         exportedGame.write(configFile.readBytes())
         exportedGame.closeEntry()
 
+        exportedFile += "_tiny.json"
+
         when (gameParameters) {
             is GameParametersV1 -> {
-                (gameParameters.scripts + gameParameters.libraries.map { "$it.lua" }).forEach { name ->
-                    exportedGame.putNextEntry(ZipEntry(name))
-                    exportedGame.write(gameDirectory.resolve(name).readBytes())
-                    exportedGame.closeEntry()
-                }
-                gameParameters.spritesheets.forEach { name ->
-                    exportedGame.putNextEntry(ZipEntry(name))
-                    exportedGame.write(gameDirectory.resolve(name).readBytes())
-                    exportedGame.closeEntry()
-                }
-                gameParameters.sounds.forEach { name ->
-                    exportedGame.putNextEntry(ZipEntry(name))
-                    exportedGame.write(gameDirectory.resolve(name).readBytes())
-                    exportedGame.closeEntry()
-                }
-                gameParameters.levels.forEach { name ->
-                    exportedGame.putNextEntry(ZipEntry(name))
-                    exportedGame.write(gameDirectory.resolve(name).readBytes())
-                    exportedGame.closeEntry()
+                (gameParameters.scripts + gameParameters.libraries.map { "$it.lua" })
+                    .filterNot { exportedFile.contains(it) }
+                    .forEach { name ->
+                        exportedGame.putNextEntry(ZipEntry(name))
+                        exportedGame.write(gameDirectory.resolve(name).readBytes())
+                        exportedGame.closeEntry()
 
-                    val ldtk = Ldtk.read(gameDirectory.resolve(name).readText())
-                    ldtk.levels.flatMap { level -> level.layerInstances }
-                        .mapNotNull { it.__tilesetRelPath }
-                        .map { gameDirectory.resolve(it) }
-                        .toSet()
-                        .forEach { file ->
-                            exportedGame.putNextEntry(ZipEntry(file.relativeTo(gameDirectory).name))
-                            exportedGame.write(file.readBytes())
-                            exportedGame.closeEntry()
-                        }
-                }
+                        exportedFile += name
+                    }
+                gameParameters.spritesheets
+                    .filterNot { exportedFile.contains(it) }
+                    .forEach { name ->
+                        exportedGame.putNextEntry(ZipEntry(name))
+                        exportedGame.write(gameDirectory.resolve(name).readBytes())
+                        exportedGame.closeEntry()
+
+                        exportedFile += name
+                    }
+                gameParameters.sounds
+                    .filterNot { exportedFile.contains(it) }
+                    .forEach { name ->
+                        exportedGame.putNextEntry(ZipEntry(name))
+                        exportedGame.write(gameDirectory.resolve(name).readBytes())
+                        exportedGame.closeEntry()
+
+                        exportedFile += name
+                    }
+                gameParameters.levels
+                    .filterNot { exportedFile.contains(it) }
+                    .forEach { name ->
+                        exportedGame.putNextEntry(ZipEntry(name))
+                        exportedGame.write(gameDirectory.resolve(name).readBytes())
+                        exportedGame.closeEntry()
+
+                        exportedFile += name
+
+                        val ldtk = Ldtk.read(gameDirectory.resolve(name).readText())
+                        ldtk.levels.flatMap { level -> level.layerInstances }
+                            .mapNotNull { it.__tilesetRelPath }
+                            .map { gameDirectory.resolve(it) }
+                            .filterNot { file -> exportedFile.contains(file.relativeTo(gameDirectory).name) }
+                            .toSet()
+                            .forEach { file ->
+                                exportedGame.putNextEntry(ZipEntry(file.relativeTo(gameDirectory).name))
+                                exportedGame.write(file.readBytes())
+                                exportedGame.closeEntry()
+
+                                exportedFile += name
+                            }
+                    }
 
                 // Add index.html
                 val content = ExportCommand::class.java.getResourceAsStream("/templates/index.html")!!.readAllBytes()
@@ -160,7 +188,7 @@ class GameExporter(private val withSourceMap: Boolean = false) {
 
     companion object {
         val ENGINE_FILES =
-            listOf(
+            setOf(
                 "_boot.lua",
                 "_boot.png",
                 "_engine.lua",

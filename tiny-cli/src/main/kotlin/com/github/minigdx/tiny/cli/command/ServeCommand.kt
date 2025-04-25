@@ -78,8 +78,8 @@ class ServeCommand : CliktCommand(name = "serve") {
                                     ContentType.Image.PNG
                                 } else if (key.endsWith(".json")) {
                                     ContentType.Application.Json
-                                } else if (key.endsWith(".mid")) {
-                                    ContentType.Application.OctetStream
+                                } else if (key.endsWith(".ldtk")) {
+                                    ContentType.Application.Json
                                 } else {
                                     ContentType.Application.OctetStream
                                 }

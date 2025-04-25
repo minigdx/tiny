@@ -102,4 +102,12 @@ interface InputHandler {
      * @return: position of the current touch.
      */
     val currentTouch: Vector2
+
+    /**
+     * Register a callback to be called after the first input user interaction.
+     * Useful only for the JS platform to resume the audio context.
+     *
+     * See: https://developer.chrome.com/blog/autoplay?hl=fr#webaudio
+     */
+    fun onFirstUserInteraction(callback: () -> Unit) = Unit
 }

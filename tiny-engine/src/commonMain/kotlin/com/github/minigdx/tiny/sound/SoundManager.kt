@@ -231,11 +231,11 @@ fun convert(bar: MusicalBar): FloatArray {
             val time = (i.toFloat() / SAMPLE_RATE.toFloat())
             var sampleValue = 0.0f
 
-            instrument.harmonics.forEachIndexed { i, relativeAmplitude ->
-                val harmonicNumber = i + 1
+            instrument.harmonics.forEachIndexed { index, relativeAmplitude ->
+                val harmonicNumber = index + 1
                 val harmonicFreq = fundamentalFreq * harmonicNumber
 
-                sampleValue += relativeAmplitude * instrument.wave.generate(harmonicFreq, time)
+                sampleValue += relativeAmplitude * instrument.generate(harmonicFreq, time)
             }
 
             sampleValue *= envelopeFilter(i, numberOfSamples, instrument)
@@ -274,7 +274,7 @@ private fun envelopeFilter(
     val attackSamples = max(1f, instrument.attack * SAMPLE_RATE)
     val decaySamples = max(1f, instrument.decay * SAMPLE_RATE)
     val releaseSamples = max(1f, instrument.release * SAMPLE_RATE)
-    val sustainLevel = max(1f, min(instrument.sustain, 0f))
+    val sustainLevel = min(1f, max(instrument.sustain, 0f))
 
     val releaseStartSample = totalSamples - (instrument.release * SAMPLE_RATE)
     // Ensure that phases can't finish AFTER the release.

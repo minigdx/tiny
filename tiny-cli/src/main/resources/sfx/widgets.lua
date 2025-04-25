@@ -10,7 +10,7 @@ end
 
 local set_value = function(self, value)
     self.value = value
-    if(self.on_change) then
+    if (self.on_change) then
         self:on_change()
     end
     self:fire_on_update(value)
@@ -100,7 +100,6 @@ local Knob = {
     set_value = set_value,
 }
 
-
 local MenuItem = {
     _type = "MenuItem",
     spr = nil,
@@ -118,11 +117,15 @@ local MenuItem = {
     set_value = set_value,
 }
 
+local Keyboard = {
+
+}
+
 local factory = { }
 
 function inside_widget(w, x, y, offset)
     local off = 0
-    if(offset) then
+    if (offset) then
         off = offset
     end
 
@@ -135,18 +138,18 @@ end
 factory.create_button = function(self, value)
     local result = new(Button, value)
     result.help = result.fields.Help
-    if(value.fields.Type == "SINE") then
-        result.overlay = { x=0, y=16 }
-    elseif(value.fields.Type == "NOISE") then
-        result.overlay = { x=16, y=16 }
-    elseif(value.fields.Type == "PULSE") then
-        result.overlay = { x=32, y=16 }
-    elseif(value.fields.Type == "TRIANGLE") then
-        result.overlay = { x=48, y=16 }
-    elseif(value.fields.Type == "SAW_TOOTH") then
-        result.overlay = { x=64, y=16 }
-    elseif(value.fields.Type == "SQUARE") then
-        result.overlay = { x=80, y=16 }
+    if (value.fields.Type == "SINE") then
+        result.overlay = { x = 0, y = 16 }
+    elseif (value.fields.Type == "NOISE") then
+        result.overlay = { x = 16, y = 16 }
+    elseif (value.fields.Type == "PULSE") then
+        result.overlay = { x = 32, y = 16 }
+    elseif (value.fields.Type == "TRIANGLE") then
+        result.overlay = { x = 48, y = 16 }
+    elseif (value.fields.Type == "SAW_TOOTH") then
+        result.overlay = { x = 64, y = 16 }
+    elseif (value.fields.Type == "SQUARE") then
+        result.overlay = { x = 80, y = 16 }
     end
     return result
 end
@@ -157,7 +160,7 @@ Button._update = function(self)
     end
 
     local pos = ctrl.touch()
-    
+
     if inside_widget(self, pos.x, pos.y) then
         self.status = 1
         if self.on_hover ~= nil then
@@ -166,7 +169,7 @@ Button._update = function(self)
         local touched = ctrl.touched(0)
         if touched then
             self:fire_on_update(self.status)
-            if(self.on_change) then
+            if (self.on_change) then
                 self:on_change()
             end
         end
@@ -185,7 +188,7 @@ Button._draw = function(self)
     spr.sdraw(self.x, self.y, 0 + background, 0, self.width, self.height)
 
     if self.overlay ~= nil then
-       spr.sdraw(self.x, self.y, self.overlay.x, self.overlay.y, self.width, self.height)
+        spr.sdraw(self.x, self.y, self.overlay.x, self.overlay.y, self.width, self.height)
     end
 end
 
@@ -224,7 +227,7 @@ Knob._draw = function(self)
 
     if self.is_hover or self.active_color then
         local c = 9
-        if(self.active_color) then
+        if (self.active_color) then
             c = self.active_color
         end
         shape.rect(self.x, self.y, self.width, self.height, c)
@@ -261,11 +264,11 @@ Knob._update = function(self)
         self.is_hover = false
     end
 
-        if touching == nil then
-            self.start_value = nil
-            self.active_color = nil
-        end
+    if touching == nil then
+        self.start_value = nil
+        self.active_color = nil
     end
+end
 
 factory.create_fader = function(self, value)
     local result = new(Fader, value)
@@ -323,13 +326,13 @@ Envelop._update = function(self)
     self.decay = math.min(self.decay, 1 - self.attack)
     self.release = math.min(self.release, 1 - (self.decay + self.attack))
 
-    self.attack_end_x = self.x + self.attack * self.width 
+    self.attack_end_x = self.x + self.attack * self.width
     self.attack_end_y = self.y
 
-    self.decay_end_x = self.attack_end_x + self.decay * self.width 
+    self.decay_end_x = self.attack_end_x + self.decay * self.width
     self.decay_end_y = self.y + self.height * (1 - self.sustain)
 
-    self.release_start_x = self.x + self.width - self.release * self.width 
+    self.release_start_x = self.x + self.width - self.release * self.width
     self.release_start_y = self.y + self.height * (1 - self.sustain)
 end
 
@@ -392,7 +395,6 @@ Envelop.set_release = function(self, widget)
     widget:on_update(on_value_update)
 end
 
-
 factory.create_checkbox = function(self, data)
     local result = new(Checkbox, data)
     result.help = result.fields.Help
@@ -451,6 +453,54 @@ factory.create_help = function(self, data)
     return help
 end
 
+factory.create_keyboard = function(self, data)
+    local keyboard = new(Keyboard, data)
+    return keyboard
+end
+
+Keyboard._update = function(self)
+
+    local spr_x = 16
+    local spr_y = 112
+
+    local color_to_note = {
+        [16] = "C4",
+        [15] = "Cs4",
+        [14] = "D4",
+        [13] = "Ds4",
+        [12] = "E4",
+        [11] = "F4",
+        [10] = "Fs4",
+        [9] = "G4",
+        [7] = "Gs4",
+        [6] = "A4",
+        [5] = "As4",
+        [4] = "B4"
+    }
+    local pos = ctrl.touch()
+    if (ctrl.touched(0) and inside_widget(self, pos.x, pos.y)) then
+        local relative_x = pos.x - self.x
+        local relative_y = pos.y - self.y
+
+        local color = spr.pget(relative_x + spr_x, relative_y + spr_y)
+        local value = color_to_note[color]
+        if value then
+            self.value = value
+            if(self.on_change) then
+                self:on_change()
+            end
+        else
+            self.value = nil
+        end
+    else
+        self.value = nil
+    end
+end
+
+Keyboard._draw = function(self)
+    spr.sdraw(self.x, self.y, 16, 80, self.width, self.height)
+end
+
 local menuItems = {}
 
 MenuItem._update = function(self)
@@ -465,6 +515,9 @@ MenuItem._update = function(self)
         end
         if ctrl.touched(0) then
             self:fire_on_update(self.status)
+            if(self.on_change) then
+                self:on_change()
+            end
             if self.hold then
                 for i in all(menuItems) do
                     i.active = 0
@@ -484,7 +537,7 @@ MenuItem._draw = function(self)
     if self.spr ~= nil then
         spr.draw(self.spr + self.status * 128 + self.active * (128 + 32), self.x, self.y)
     end
-    
+
     if self.label ~= nil then
         print(self.value, self.x + 5, self.y + 2)
     end

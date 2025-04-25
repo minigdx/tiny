@@ -193,34 +193,40 @@ class SfxLib(
                 { this.release = it.optdouble(0.0).toFloat() },
             )
 
-            obj.function0("play") {
-                val softVolume = 0.3f
+            obj.function1("play") { noteAsString ->
                 val hardVolume = 0.8f
 
-                val frereJacques =
+                val oneNote =
                     MusicalBar(
                         this,
                         tempo = 120,
                     ).apply {
                         setNotes(
                             listOf(
-                                MusicalNote(Note.C3, 0f, 1f, softVolume),
-                                MusicalNote(Note.D3, 1f, 1f, softVolume),
-                                MusicalNote(Note.E3, 2f, 1f, hardVolume),
-                                MusicalNote(Note.C3, 3f, 1f, softVolume),
-                                MusicalNote(Note.C3, 4f, 1f, softVolume),
-                                MusicalNote(Note.D3, 5f, 1f, softVolume),
-                                MusicalNote(Note.E3, 6f, 1f, hardVolume),
-                                MusicalNote(Note.C3, 7f, 1f, softVolume),
-                                MusicalNote(Note.E3, 8f, 1f, softVolume),
-                                MusicalNote(Note.F3, 9f, 1f, softVolume),
-                                MusicalNote(Note.G3, 10f, 2f, hardVolume),
+                                MusicalNote(
+                                    note = Note.fromName(noteAsString.tojstring()),
+                                    beat = 0f,
+                                    duration = 1f,
+                                    volume = hardVolume,
+                                ),
                             ),
                         )
                     }
 
-                resourceAccess.play(frereJacques)
+                resourceAccess.play(oneNote)
                 NONE
+            }
+
+            obj.wrap("harmonics") {
+                WrapperLuaTable().apply {
+                    (0 until this@toLua.harmonics.size).forEach { index ->
+                        wrap(
+                            "${index + 1}",
+                            { valueOf(this@toLua.harmonics[index].toDouble()) },
+                            { this@toLua.harmonics[index] = it.tofloat() },
+                        )
+                    }
+                }
             }
 
             return obj

@@ -192,6 +192,10 @@ enum class Note(val frequency: Float, val index: Int) {
         }
 
         fun fromFrequency(frequency: Int): Note = fromFrequency(frequency.toFloat())
+
+        fun fromName(name: String): Note {
+            return Note.valueOf(name)
+        }
     }
 }
 

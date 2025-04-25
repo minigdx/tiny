@@ -63,6 +63,21 @@ local produce_to = function(source, spath, target, tpath, conv)
     end
 end
 
+local listen_to = function(source, spath, conv)
+    local old_on_change = source.on_change
+
+    source.on_change = function(self)
+        local value = get_nested_value(source, spath)
+        if conv then
+            conv(source, value)
+        end
+
+        if old_on_change then
+            old_on_change(self)
+        end
+    end
+end
+
 --- Get the latest value from the source.spath in the _update() loop
 --- and set in in target.tpath
 local consume_on_update = function(target, tpath, source, spath, conv)
@@ -88,6 +103,29 @@ function _init()
         local knob = widgets:create_knob(k)
         knob.on_hover = on_menu_item_hover
         table.insert(m.widgets, knob)
+
+        if knob.fields.Label == "Harm1" then
+            produce_to(knob, { "value" }, state, { "instrument", "harmonics", "1" })
+            produce_to(state, { "instrument", "harmonics", "1" }, knob, { "value" })
+        elseif knob.fields.Label == "Harm2" then
+            produce_to(knob, { "value" }, state, { "instrument", "harmonics", "2" })
+            produce_to(state, { "instrument", "harmonics", "2" }, knob, { "value" })
+        elseif knob.fields.Label == "Harm3" then
+            produce_to(knob, { "value" }, state, { "instrument", "harmonics", "3" })
+            produce_to(state, { "instrument", "harmonics", "3" }, knob, { "value" })
+        elseif knob.fields.Label == "Harm4" then
+            produce_to(knob, { "value" }, state, { "instrument", "harmonics", "4" })
+            produce_to(state, { "instrument", "harmonics", "4" }, knob, { "value" })
+        elseif knob.fields.Label == "Harm5" then
+            produce_to(knob, { "value" }, state, { "instrument", "harmonics", "5" })
+            produce_to(state, { "instrument", "harmonics", "5" }, knob, { "value" })
+        elseif knob.fields.Label == "Harm6" then
+            produce_to(knob, { "value" }, state, { "instrument", "harmonics", "6" })
+            produce_to(state, { "instrument", "harmonics", "6" }, knob, { "value" })
+        elseif knob.fields.Label == "Harm7" then
+            produce_to(knob, { "value" }, state, { "instrument", "harmonics", "7" })
+            produce_to(state, { "instrument", "harmonics", "7" }, knob, { "value" })
+        end
     end
 
     state.instrument = sfx.instrument(1)
@@ -144,6 +182,41 @@ function _init()
         consume_on_update(label, { "label" }, state, { "instrument", "name" })
         table.insert(m.widgets, label)
     end
+
+    local playNote = function(source, value)
+        state.instrument.play(value)
+    end
+
+    for k in all(entities["Keyboard"]) do
+        local label = widgets:create_keyboard(k)
+        listen_to(label, { "value" }, playNote)
+        table.insert(m.widgets, label)
+    end
+
+    for b in all(entities["MenuItem"]) do
+        local button = widgets:create_menu_item(b)
+        if(button.fields.Item == "Prev") then
+            listen_to(button, { "status" }, function(source, value)
+                state.instrument = sfx.instrument((state.instrument.index - 1 + 4) % 4)
+                if (state.on_change) then
+                    state:on_change()
+                end
+            end)
+        elseif button.fields.Item == "Next" then
+            listen_to(button, { "status" }, function(source, value)
+                state.instrument = sfx.instrument((state.instrument.index + 1) % 4)
+                if (state.on_change) then
+                    state:on_change()
+                end
+            end)
+        end
+        table.insert(m.widgets, button)
+    end
+
+    -- force setting correct values
+    if (state.on_change) then
+        state:on_change()
+    end
 end
 
 function _update()
@@ -157,10 +230,6 @@ function _update()
         if (state.on_change) then
             state:on_change()
         end
-    end
-
-    if(ctrl.pressed(keys.enter)) then
-        state.instrument.play()
     end
 
     for w in all(m.widgets) do

@@ -7,49 +7,59 @@ import com.github.minigdx.tiny.sound.SoundManager
 import org.khronos.webgl.Float32Array
 import org.khronos.webgl.set
 
-class PicoAudioSound(val audio: dynamic, val smf: dynamic) : Sound {
-    override fun play() {
-        audio.init()
-        audio.setData(smf)
-        audio.play()
-    }
-
-    override fun loop() {
-        audio.init()
-        audio.setData(smf)
-        audio.play(true)
-    }
-
-    override fun stop() {
-        audio.stop()
-    }
-}
-
 class SfxSound(
     private val buffer: Float32Array,
     private val picoAudioSoundMananger: PicoAudioSoundMananger,
 ) : Sound {
     private var currentSource: AudioBufferSourceNode? = null
 
-    override fun play() {
-        stop()
-        currentSource = picoAudioSoundMananger.playSfxBuffer(buffer)
-    }
+    override fun play() =
+        whenReady {
+            stop()
+            currentSource = picoAudioSoundMananger.playSfxBuffer(buffer)
+        }
 
-    override fun loop() {
-        currentSource = picoAudioSoundMananger.playSfxBuffer(buffer, loop = true)
-    }
+    override fun loop() =
+        whenReady {
+            currentSource = picoAudioSoundMananger.playSfxBuffer(buffer, loop = true)
+        }
 
-    override fun stop() {
-        currentSource?.stop()
+    override fun stop() =
+        whenReady {
+            currentSource?.stop()
+        }
+
+    private fun whenReady(callback: () -> Unit) {
+        if (!picoAudioSoundMananger.ready) {
+            return@whenReady
+        }
+        callback()
     }
 }
 
 class PicoAudioSoundMananger : SoundManager() {
     lateinit var audioContext: AudioContext
 
+    var ready: Boolean = false
+
     override fun initSoundManager(inputHandler: InputHandler) {
         audioContext = AudioContext()
+        audioContext.onstatechange = {
+            // See: https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/state#resuming_interrupted_play_states_in_ios_safari
+            // Resume the audio context if interrupted, only on iOS
+            if (audioContext.state != "running") {
+                audioContext.resume()
+            } else {
+                ready = false
+            }
+        }
+        if (audioContext.state != "running") {
+            inputHandler.onFirstUserInteraction {
+                audioContext.resume()
+            }
+        } else {
+            ready = true
+        }
     }
 
     override suspend fun createSfxSound(bytes: ByteArray): Sound {

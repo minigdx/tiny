@@ -62,5 +62,5 @@ val drum =
         decay = 0.1f,
         sustain = 0.9f,
         release = 0.05f,
-        harmonics = floatArrayOf(),
+        harmonics = floatArrayOf(1f),
     )

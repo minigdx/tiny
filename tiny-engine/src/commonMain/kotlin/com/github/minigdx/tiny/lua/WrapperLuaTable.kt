@@ -2,6 +2,7 @@ package com.github.minigdx.tiny.lua
 
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
+import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
 import kotlin.collections.get
 
@@ -42,6 +43,19 @@ class WrapperLuaTable : LuaTable() {
                 }
             }
         getters[name] = { zeroArgFunction }
+    }
+
+    fun function1(
+        name: String,
+        function: (value: LuaValue) -> LuaValue,
+    ) {
+        val oneArgFunction =
+            object : OneArgFunction() {
+                override fun call(arg: LuaValue): LuaValue {
+                    return function(arg)
+                }
+            }
+        getters[name] = { oneArgFunction }
     }
 
     override fun get(key: LuaValue): LuaValue {

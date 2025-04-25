@@ -51,6 +51,7 @@ class JsInputHandler(
     private var mousePosition: Vector2 = Vector2(0f, 0f)
 
     private fun mouseDown(event: Event) {
+        firstUserInteraction()
         event as MouseEvent
         val jsTouch = event.buttons
         flags.forEachIndexed { index, flag ->
@@ -122,6 +123,7 @@ class JsInputHandler(
     }
 
     private fun touchStart(event: Event) {
+        firstUserInteraction()
         event as TouchEvent
         (0 until event.targetTouches.length).forEach {
             val defaultTouch = TouchSignal.signal(it)
@@ -182,6 +184,7 @@ class JsInputHandler(
     }
 
     private fun keyDown(event: Event) {
+        firstUserInteraction()
         event as KeyboardEvent
         if (event.keyCode in (0..256)) {
             touchManager.onKeyPressed(event.keyCode)
@@ -189,6 +192,13 @@ class JsInputHandler(
 
         if (event.target == canvas) {
             event.preventDefault()
+        }
+    }
+
+    private fun firstUserInteraction() {
+        // See: https://developer.chrome.com/blog/autoplay?hl=fr#webaudio
+        firstUserInteractionCallback?.invoke()?.also {
+            firstUserInteractionCallback = null
         }
     }
 
@@ -235,5 +245,12 @@ class JsInputHandler(
 
     override fun reset() {
         touchManager.processReceivedEvent()
+    }
+
+    private var firstUserInteractionCallback: (() -> Unit)? = null
+
+    override fun onFirstUserInteraction(callback: () -> Unit) {
+        canvas.addEventListener("onClick", { callback() }, false)
+        // firstUserInteractionCallback = callback
     }
 }

@@ -11,6 +11,7 @@ external class AudioContext {
     val destination: AudioNode
     val baseLatency: Double // seconds, experimental
     val outputLatency: Double // seconds, experimental
+    val state: String // should be running or suspended
 
     fun close()
 
@@ -27,6 +28,10 @@ external class AudioContext {
     fun decodeAudioData(data: ArrayBuffer): Promise<AudioBuffer>
 
     fun createGain(): GainNode
+
+    fun resume()
+
+    var onstatechange: (() -> Unit)?
 }
 
 open external class AudioNode {
