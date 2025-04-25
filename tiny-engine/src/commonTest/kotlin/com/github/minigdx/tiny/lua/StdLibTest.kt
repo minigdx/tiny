@@ -6,13 +6,11 @@ import com.github.minigdx.tiny.graphic.ColorPalette
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.graphic.PixelFormat
-import com.github.minigdx.tiny.resources.GameLevel
-import com.github.minigdx.tiny.resources.GameScript
 import com.github.minigdx.tiny.resources.ResourceType
-import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.resources.SpriteSheet
-import com.github.minigdx.tiny.sound.Song2
-import com.github.minigdx.tiny.sound.WaveGenerator
+import dev.mokkery.answering.returns
+import dev.mokkery.every
+import dev.mokkery.mock
 import org.luaj.vm2.LuaValue.Companion.valueOf
 import org.luaj.vm2.LuaValue.Companion.varargsOf
 import kotlin.test.Test
@@ -21,37 +19,22 @@ import kotlin.test.assertEquals
 class StdLibTest {
     private val colors = listOf("#FFFFFF", "#000000")
 
-    private val mockResources =
-        object : GameResourceAccess {
-            override val bootSpritesheet: SpriteSheet =
-                SpriteSheet(
-                    0,
-                    0,
-                    "boot",
-                    ResourceType.BOOT_SPRITESHEET,
-                    PixelArray(1, 1, PixelFormat.INDEX),
-                    1,
-                    1,
-                )
-            override val frameBuffer: FrameBuffer = FrameBuffer(10, 10, ColorPalette(colors))
+    private val frameBuffer = FrameBuffer(10, 10, ColorPalette(colors))
+    private val spritesheet =
+        SpriteSheet(
+            version = 0,
+            index = 0,
+            name = "boot",
+            type = ResourceType.BOOT_SPRITESHEET,
+            pixels = PixelArray(1, 1, PixelFormat.INDEX),
+            width = 1,
+            height = 1,
+        )
 
-            override fun spritesheet(index: Int): SpriteSheet? = null
-
-            override fun spritesheet(name: String): Int? = null
-
-            override fun spritesheet(sheet: SpriteSheet) = Unit
-
-            override fun newSpritesheetIndex(): Int = 0
-
-            override fun level(index: Int): GameLevel? = null
-
-            override fun sound(index: Int): Sound? = null
-
-            override fun script(name: String): GameScript? = null
-
-            override fun note(wave: WaveGenerator) = Unit
-
-            override fun sfx(song: Song2) = Unit
+    private val gameResourceAccess =
+        mock<GameResourceAccess> {
+            every { frameBuffer } returns this@StdLibTest.frameBuffer
+            every { bootSpritesheet } returns spritesheet
         }
 
     private val gameOptions =
@@ -66,30 +49,30 @@ class StdLibTest {
 
     @Test
     fun it_print_text() {
-        mockResources.frameBuffer.clear(0)
-        mockResources.bootSpritesheet.pixels.set(0, 0, 1)
+        frameBuffer.clear(0)
+        spritesheet.pixels.set(0, 0, 1)
 
-        val print = StdLib(gameOptions, mockResources).print()
+        val print = StdLib(gameOptions, gameResourceAccess).print()
         // only a is an accepted letter as for the test, the bootspritesheet is too small
         print.invoke(varargsOf(arrayOf(valueOf("a"), valueOf(0), valueOf(0), valueOf(2))))
 
-        val grouped = mockResources.frameBuffer.colorIndexBuffer.pixels.toSet()
+        val grouped = frameBuffer.colorIndexBuffer.pixels.toSet()
 
-        // The buffer should contains two colors
+        // The buffer should contain two colors
         assertEquals(2, grouped.size)
     }
 
     @Test
     fun it_print_text_with_default_color() {
-        mockResources.frameBuffer.clear(0)
-        mockResources.bootSpritesheet.pixels.set(0, 0, 1)
+        frameBuffer.clear(0)
+        spritesheet.pixels.set(0, 0, 1)
 
-        val print = StdLib(gameOptions, mockResources).print()
+        val print = StdLib(gameOptions, gameResourceAccess).print()
         print.invoke(varargsOf(arrayOf(valueOf("a"), valueOf(0), valueOf(0))))
 
-        val grouped = mockResources.frameBuffer.colorIndexBuffer.pixels.toSet()
+        val grouped = frameBuffer.colorIndexBuffer.pixels.toSet()
 
-        // The buffer should contains two colors
+        // The buffer should contain two colors
         assertEquals(2, grouped.size)
     }
 }

@@ -2,6 +2,7 @@
 asciidoctorj = "3.3.2"
 clikt = "5.0.3"
 gifencoder = "0.10.1"
+jna = "5.14.0"
 kgl = "0.8.1"
 kotlin-coroutines = "1.10.2"
 kotlin-ksp = "2.1.20-1.0.32"
@@ -11,14 +12,15 @@ ktor = "3.1.2"
 luak = "1.1.0"
 lwjgl = "3.3.6"
 minigdx-developer = "1.4.1"
-mordant = "3.0.2"
+mokkery = "2.7.2"
+rsyntax = "3.6.0"
 slf4j = "2.0.7"
 
 
 [libraries]
 clikt = { module = "com.github.ajalt.clikt:clikt", version.ref = "clikt" }
-mordant = {module = "com.github.ajalt.mordant:mordant", version.ref = "mordant" }
-mordant-coroutines = {module = "com.github.ajalt.mordant:mordant-coroutines", version.ref = "mordant" }
+jna = {module="net.java.dev.jna:jna-platform", version.ref = "jna"}
+rsyntax = {module="com.fifesoft:rsyntaxtextarea", version.ref = "rsyntax"}
 
 kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
 kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization-json" }
@@ -68,4 +70,5 @@ minigdx-jvm = { id = "com.github.minigdx.gradle.plugin.developer.jvm" }
 minigdx-developer = { id = "com.github.minigdx.gradle.plugin.developer", version.ref = "minigdx-developer" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin-serialization" }
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "kotlin-ksp" }
+mokkery = { id = "dev.mokkery", version.ref = "mokkery"}
 

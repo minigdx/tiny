@@ -1966,11 +1966,6 @@ path-to-regexp@0.1.7:
   resolved "https://registry.yarnpkg.com/path-to-regexp/-/path-to-regexp-0.1.7.tgz#df604178005f522f15eb4490e7247a1bfaa67f8c"
   integrity sha512-5DFkuoqlv1uYQKxy8omFBeJPQcdoE07Kv2sferDCrAq1ohOU+MSDswDIbnx3YAM60qIOnYa53wBhXW0EbMonrQ==
 
-picoaudio@1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/picoaudio/-/picoaudio-1.1.2.tgz#d049af40598c003fa49c91960502ceb7ad1bbe80"
-  integrity sha512-5dRr4sTRIrSgOktrsAVKwJPCzUNaVXjXmKN6YbiuXcSfYtMKxk16XjDzzbFRVlkjHpWu7wAF+IOZHV+6xPYHkg==
-
 picocolors@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/picocolors/-/picocolors-1.0.0.tgz#cb5bdc74ff3f51892236eaf79d68bc44564ab81c"

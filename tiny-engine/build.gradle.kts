@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.minigdx.mpp)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kotlin.ksp)
+    alias(libs.plugins.mokkery)
 }
 
 dependencies {
@@ -38,8 +39,6 @@ dependencies {
 
     this.jvmMainImplementation(libs.jvm.gifencoder)
 
-    // See https://github.com/cagpie/PicoAudio.js
-    jsMainImplementation(npm("picoaudio", "1.1.2"))?.because("get midi over web audio API.")
     jsMainImplementation("org.jetbrains.kotlin:kotlinx-atomicfu-runtime:2.1.20")
         ?.because("https://youtrack.jetbrains.com/issue/KT-57235")
 
@@ -52,7 +51,7 @@ dependencies {
 
 project.tasks.register("tinyEngineJsZip", Zip::class.java) {
     from(tasks.getByName("jsBrowserDistribution"))
-    this.destinationDirectory.set(project.buildDir.resolve("tiny-distributions"))
+    this.destinationDirectory.set(project.layout.buildDirectory.dir("tiny-distributions"))
     this.into("tiny-engine-js")
     group = "tiny"
     description = "Build a zip containing all resources to run the Tiny engine in a web application."
@@ -74,7 +73,7 @@ configurations.create("tinyApiAsciidoctor") {
 }
 
 artifacts {
-    add("tinyApiAsciidoctor", project.buildDir.resolve("generated/ksp/jvm/jvmMain/resources/tiny-api.adoc")) {
+    add("tinyApiAsciidoctor", project.layout.buildDirectory.dir("generated/ksp/jvm/jvmMain/resources/tiny-api.adoc")) {
         builtBy("kspKotlinJvm")
     }
 }
@@ -90,7 +89,7 @@ configurations.create("tinyApiLuaStub") {
 }
 
 artifacts {
-    add("tinyApiLuaStub", project.buildDir.resolve("generated/ksp/jvm/jvmMain/resources/_tiny.stub.lua")) {
+    add("tinyApiLuaStub", project.layout.buildDirectory.dir("generated/ksp/jvm/jvmMain/resources/_tiny.stub.lua")) {
         builtBy("kspKotlinJvm")
     }
 }

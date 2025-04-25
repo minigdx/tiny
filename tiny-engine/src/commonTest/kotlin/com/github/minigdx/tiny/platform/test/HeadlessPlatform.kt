@@ -1,10 +1,13 @@
 package com.github.minigdx.tiny.platform.test
 
+import com.github.minigdx.tiny.ColorIndex
+import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.graphic.FrameBuffer
+import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.platform.ImageData
@@ -13,6 +16,8 @@ import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.render.NopRenderContext
 import com.github.minigdx.tiny.render.RenderContext
+import com.github.minigdx.tiny.render.RenderFrame
+import com.github.minigdx.tiny.render.operations.DrawSprite
 import com.github.minigdx.tiny.render.operations.RenderOperation
 import com.github.minigdx.tiny.sound.Sound
 import com.github.minigdx.tiny.sound.SoundManager
@@ -20,9 +25,12 @@ import com.github.minigdx.tiny.util.MutableFixedSizeList
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 
-class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map<String, Any>, frames: Int = 10) :
-    Platform {
-    val input = VirtualInputHandler()
+class HeadlessPlatform(
+    override val gameOptions: GameOptions,
+    private val resources: Map<String, Any>,
+    frames: Int = 10,
+) : Platform {
+    private val input = VirtualInputHandler()
 
     val frames: MutableFixedSizeList<FrameBuffer> = MutableFixedSizeList(frames)
 
@@ -61,16 +69,6 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
             override fun initSoundManager(inputHandler: InputHandler) = Unit
 
             override suspend fun createSfxSound(bytes: ByteArray): Sound {
-                return object : Sound {
-                    override fun play() = Unit
-
-                    override fun loop() = Unit
-
-                    override fun stop() = Unit
-                }
-            }
-
-            override suspend fun createMidiSound(data: ByteArray): Sound {
                 return object : Sound {
                     override fun play() = Unit
 
@@ -124,16 +122,51 @@ class HeadlessPlatform(override val gameOptions: GameOptions, val resources: Map
             override fun save(content: ByteArray) = Unit
         }
 
+    /**
+     * Render of GPU operation is not supported yet
+     */
     override fun render(
         renderContext: RenderContext,
         ops: List<RenderOperation>,
     ) {
-        TODO()
+        val pixels =
+            ops.firstOrNull { op -> (op as? DrawSprite)?.source?.name == "framebuffer" }
+                ?.let { drawSprite -> (drawSprite as DrawSprite).source?.pixels }
+
+        if (pixels != null) {
+            val frameBuffer = FrameBuffer(gameOptions.width, gameOptions.height, gameOptions.colors())
+            frameBuffer.copyFrom(pixels)
+            frames.add(frameBuffer)
+        }
     }
 
-    override fun draw(renderContext: RenderContext) {
-        TODO("Not yet implemented")
+    override fun readRender(renderContext: RenderContext): RenderFrame {
+        if (frames.isEmpty()) {
+            // Force to generate at least one frame.
+            draw(renderContext)
+        }
+        return FrameBufferFrame(frames.last())
     }
+
+    override fun draw(renderContext: RenderContext) = Unit
 
     fun saveAnimation(name: String) = toGif(name, frames)
+
+    class FrameBufferFrame(frameBuffer: FrameBuffer) : RenderFrame {
+        private val frameBuffer =
+            FrameBuffer(frameBuffer.width, frameBuffer.height, frameBuffer.gamePalette).apply {
+                this.fastCopyFrom(frameBuffer)
+            }
+
+        override fun copyInto(pixelArray: PixelArray) {
+            pixelArray.copyFrom(frameBuffer.colorIndexBuffer)
+        }
+
+        override fun getPixel(
+            x: Pixel,
+            y: Pixel,
+        ): ColorIndex {
+            return frameBuffer.pixel(x, y)
+        }
+    }
 }

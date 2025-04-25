@@ -24,7 +24,7 @@ val tinyWebEditor =
     tasks.register("tinyWebEditor", Zip::class) {
         group = "tiny"
         from(tasks.getByName("jsBrowserDistribution"))
-        this.destinationDirectory.set(project.buildDir.resolve("tiny-dist"))
+        this.destinationDirectory.set(project.layout.buildDirectory.dir("tiny-dist"))
         this.archiveVersion.set("")
     }
 
