@@ -114,6 +114,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess, private val gameO
                 resourceAccess.frameBuffer.pixel(x, i, color)
                 resourceAccess.frameBuffer.pixel(x + width - 1, i, color)
             }
+            resourceAccess.addOp(FrameBufferOperation)
             return NIL
         }
 
@@ -201,6 +202,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess, private val gameO
                     p += 2 * radiusY * radiusY * x - 2 * radiusX * radiusX * y + radiusX * radiusX
                 }
             }
+            resourceAccess.addOp(FrameBufferOperation)
             return NONE
         }
     }
@@ -273,6 +275,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess, private val gameO
                     p += 2 * radiusY * radiusY * x - 2 * radiusX * radiusX * y + radiusX * radiusX
                 }
             }
+            resourceAccess.addOp(FrameBufferOperation)
             return NIL
         }
     }
@@ -289,6 +292,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess, private val gameO
             for (j in y until y + height) {
                 resourceAccess.frameBuffer.fill(x, x + width, j, color)
             }
+            resourceAccess.addOp(FrameBufferOperation)
             return NIL
         }
 
@@ -357,6 +361,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess, private val gameO
                 }
                 x++
             }
+            resourceAccess.addOp(FrameBufferOperation)
             return NIL
         }
     }

@@ -106,6 +106,10 @@ data class Level(
     val worldX: Int,
     val worldY: Int,
     val layerInstances: List<Layer>,
+    /**
+     * 	An array of all custom fields and their values.
+     */
+    val fieldInstances: List<CustomField>,
 )
 
 @Serializable

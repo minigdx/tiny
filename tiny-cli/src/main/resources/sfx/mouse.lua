@@ -26,9 +26,14 @@ mouse._update = function(on_update, on_click, on_clicked)
     end
 end
 
-mouse._draw = function(color)
-    -- shape.circle(mouse.x, mouse.y, 2, color)
-    spr.draw(25, mouse.x, mouse.y)
+mouse._draw = function(override)
+    local index = 25
+    if(override) then
+        index = override
+    end
+    shape.rect(mouse.x, mouse.y, 8, 8, 3)
+    spr.draw(index, mouse.x, mouse.y)
+
 end
 
 return mouse

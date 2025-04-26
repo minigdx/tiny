@@ -121,6 +121,7 @@ class SfxLib(
         ctrl.set("empty_score", emptyScore())
 
         ctrl.set("instrument", instrument())
+        ctrl.set("bar", bar())
 
         ctrl.set("sfx", sfx())
         arg2.set("sfx", ctrl)
@@ -198,6 +199,7 @@ class SfxLib(
 
                 val oneNote =
                     MusicalBar(
+                        1,
                         this,
                         tempo = 120,
                     ).apply {
@@ -227,6 +229,53 @@ class SfxLib(
                         )
                     }
                 }
+            }
+
+            return obj
+        }
+    }
+
+    @TinyFunction("Access instrument using its index or its name.")
+    inner class bar : OneArgFunction() {
+        @TinyCall("Access instrument using its index or its name.")
+        override fun call(arg: LuaValue): LuaValue {
+            val music = getCurrentMusic()
+            val index = arg.checkint()
+            return music.musicalBars
+                .getOrNull(index)
+                ?.toLua() ?: NIL
+        }
+
+        fun MusicalBar.toLua(): LuaValue {
+            val obj = WrapperLuaTable()
+
+            obj.wrap(
+                "index",
+                { valueOf(this.index) },
+            )
+
+            obj.function1("set_note") { arg ->
+                val beat = arg["beat"].todouble().toFloat()
+                val note = Note.fromIndex(49 - arg["note"].toint())
+                val duration = arg["duration"].todouble().toFloat()
+
+                this.setNote(note, beat, duration)
+
+                NONE
+            }
+
+            obj.function1("remove_note") { arg ->
+                val beat = arg["beat"].todouble().toFloat()
+                val note = Note.fromIndex(49 - arg["note"].toint())
+
+                this.removeNote(note, beat)
+
+                NONE
+            }
+
+            obj.function0("play") {
+                resourceAccess.play(this)
+                NONE
             }
 
             return obj

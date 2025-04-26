@@ -80,22 +80,49 @@ class MapLib(
     }
 
     @TinyFunction("Set the current level to use.")
-    inner class level : OneArgFunction() {
+    inner class level : LibFunction() {
         @TinyCall("Return the index of the current level.")
         override fun call(): LuaValue {
-            return super.call()
+            return LuaValue.valueOf(currentLevel)
         }
 
         @TinyCall(
             "Set the current level to use. " +
-                "The level can be an index or the id defined by LDTK. " +
-                "Return the previous index level.",
+                "The level can be an index, the name or the id defined by LDTK. " +
+                "Return the previous index level or NIL if the new level is invalid.",
         )
         override fun call(
-            @TinyArg("level") arg: LuaValue,
+            @TinyArg("level") a: LuaValue,
         ): LuaValue {
-            // FIXME: rework
-            return NIL
+            // The parameter is an index. Let's check if the index is valid.
+            if (a.isint()) {
+                val index = a.checkint()
+                val world = resourceAccess.level(currentWorld) ?: return NIL
+                if (index in (0..world.ldtk.levels.size)) {
+                    val previous = valueOf(currentLevel)
+                    currentLevel = index
+                    return previous
+                } else {
+                    return NIL
+                }
+            } else {
+                val id = a.tojstring() // can be an identifier of an uuid
+                val world = resourceAccess.level(currentWorld) ?: return NIL
+                val index =
+                    world
+                        .ldtk
+                        .levels
+                        // Try to find the first level that match the id or the identifier
+                        .indexOfFirst { level -> level.iid == id || level.identifier == id }
+
+                if (index != -1) {
+                    val previous = valueOf(currentLevel)
+                    currentLevel = index
+                    return previous
+                } else {
+                    return NIL
+                }
+            }
         }
     }
 

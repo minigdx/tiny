@@ -97,7 +97,7 @@ local state = {
 }
 
 function _init()
-
+    map.level("InstrumentEditor")
     local entities = map.entities()
     for k in all(entities["Knob"]) do
         local knob = widgets:create_knob(k)
@@ -238,11 +238,10 @@ function _update()
 end
 
 function _draw()
-    gfx.cls()
     map.draw()
 
     for w in all(m.widgets) do
         w:_draw()
     end
-    mouse._draw(2)
+    mouse._draw()
 end
