@@ -1,8 +1,12 @@
 package com.github.minigdx.tiny.lua
 
+import com.github.mingdx.tiny.doc.TinyArg
+import com.github.mingdx.tiny.doc.TinyCall
+import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
+import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import kotlin.math.abs
 
@@ -215,8 +219,20 @@ class NotesLib : TwoArgFunction() {
             keys[note.name] = valueOf(note.index)
         }
 
+        keys["note"] = note()
+
         arg2["notes"] = keys
         arg2["package"]["loaded"]["notes"] = keys
         return keys
+    }
+
+    @TinyFunction("Get the name of a note regarding the note index (ie: C0 = 0, Cs0 = 1, ...)")
+    inner class note : OneArgFunction() {
+        @TinyCall("Get the name of a note regarding the note index (ie: C0 = 0, Cs0 = 1, ...)")
+        override fun call(
+            @TinyArg("note_index") arg: LuaValue,
+        ): LuaValue {
+            return valueOf(Note.fromIndex(arg.checkint()).name)
+        }
     }
 }

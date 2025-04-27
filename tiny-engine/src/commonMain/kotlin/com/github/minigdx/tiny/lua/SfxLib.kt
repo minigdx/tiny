@@ -254,6 +254,12 @@ class SfxLib(
                 { valueOf(this.index) },
             )
 
+            obj.wrap(
+                "bpm",
+                { valueOf(this.tempo) },
+                { this.tempo = it.checkint() },
+            )
+
             obj.function1("set_note") { arg ->
                 val beat = arg["beat"].todouble().toFloat()
                 val note = Note.fromIndex(49 - arg["note"].toint())
