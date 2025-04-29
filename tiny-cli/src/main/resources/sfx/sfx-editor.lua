@@ -92,8 +92,12 @@ function _init()
 
     for b in all(entities["Button"]) do
         local button = widgets:create_button(b)
-        wire.produce_to(button, { "status" }, state, { "instrument", "wave" }, buttonToWave)
-        wire.consume_on_update(button, { "status" }, state, { "instrument", "wave" }, waveToButton)
+        if (button.fields.Type == "SAVE") then
+
+        else
+            wire.produce_to(button, { "status" }, state, { "instrument", "wave" }, buttonToWave)
+            wire.consume_on_update(button, { "status" }, state, { "instrument", "wave" }, waveToButton)
+        end
         table.insert(m.widgets, button)
     end
 
@@ -115,7 +119,7 @@ function _init()
 
     for b in all(entities["MenuItem"]) do
         local button = widgets:create_menu_item(b)
-        if(button.fields.Item == "Prev") then
+        if (button.fields.Item == "Prev") then
             wire.listen_to(button, { "status" }, function(source, value)
                 state.instrument = sfx.instrument((state.instrument.index - 1 + 4) % 4)
                 if (state.on_change) then

@@ -150,6 +150,8 @@ factory.create_button = function(self, value)
         result.overlay = { x = 64, y = 16 }
     elseif (value.fields.Type == "SQUARE") then
         result.overlay = { x = 80, y = 16 }
+    elseif (value.fields.Type == "SAVE") then
+        result.overlay = { x = 48, y = 32 }
     end
     return result
 end

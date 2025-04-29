@@ -234,6 +234,16 @@ function _init()
         table.insert(w, button)
     end
 
+    for b in all(entities["Button"]) do
+        if (b.fields.Type == "SAVE") then
+            local button = widgets:create_button(b)
+            button.on_change = function(self)
+                sfx.save("test.sfx")
+            end
+            table.insert(w, button)
+        end
+    end
+
     state:on_change()
 end
 
