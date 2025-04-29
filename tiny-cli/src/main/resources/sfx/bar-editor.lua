@@ -1,5 +1,6 @@
 local widgets = require("widgets")
 local mouse = require("mouse")
+local wire = require("wire")
 
 function roundToHalf(num)
     local rounded_step = math.floor(num * 2)
@@ -39,6 +40,7 @@ local test = {}
 
 BarEditor._update = function(self)
     local p = ctrl.touch()
+    p = {x = p.x, y = p.y + 8}
     if inside_widget(self, p.x, p.y) then
         state.edit = true
     else
@@ -54,7 +56,7 @@ BarEditor._update = function(self)
     elseif inside_widget(self, p.x, p.y) and ctrl.touching(0) ~= nil and self.current_edit ~= nil then
         -- commit and create a new edit state
         local local_x = p.x - self.x
-        local local_y = p.y - self.y + 8
+        local local_y = p.y - self.y
 
         local value = {
             beat = roundToHalf((local_x) / 16.0),
@@ -76,7 +78,7 @@ BarEditor._update = function(self)
     elseif inside_widget(self, p.x, p.y) and ctrl.touched(0) ~= nil and self.current_edit == nil then
         -- create the edit state
         local local_x = p.x - self.x
-        local local_y = p.y - self.y + 8
+        local local_y = p.y - self.y
 
         self.current_edit = {
             beat = roundToHalf((local_x) / 16.0),
@@ -97,7 +99,7 @@ BarEditor._update = function(self)
         self.current_edit = nil
     elseif inside_widget(self, p.x, p.y) and ctrl.touching(1) ~= nil then
         local local_x = p.x - self.x
-        local local_y = p.y - self.y + 8
+        local local_y = p.y - self.y
 
         local value = {
             beat = roundToHalf((local_x) / 16.0),
@@ -116,6 +118,7 @@ BarEditor._update = function(self)
 end
 
 local sharp_notes = { [1] = true, [3] = true, [6] = true, [8] = true, [10] = true }
+
 BarEditor._draw = function(self)
 
     -- line notes
@@ -127,15 +130,10 @@ BarEditor._draw = function(self)
                 gfx.dither(0xA5A5)
                 shape.rectf(x + 1, y, self.width - 3, 4, 3)
                 gfx.dither()
-
-                print(notes.note(note + octave * 12), self.x - 32, y)
             elseif note == 4 or note == 11 then
                 gfx.dither(0x3333)
                 shape.line(x + 1, y, x + self.width - 3, y, 3)
                 gfx.dither()
-                print(notes.note(note + octave * 12), self.x - 16, y)
-            else
-                print(notes.note(note + octave * 12), self.x - 16, y -1)
             end
         end
     end
@@ -164,89 +162,9 @@ BarEditor._draw = function(self)
 
     -- border
     shape.rect(self.x, self.y, self.width, self.height, 4)
-
-
 end
 
 local w = {}
-
-
-local set_nested_value = function(target, path, value)
-    local current_table = target
-
-    for i = 1, #path - 1 do
-        local key = path[i]
-        current_table = current_table[key]
-    end
-
-    local final_key = path[#path]
-    current_table[final_key] = value
-end
-
-local get_nested_value = function(source, path)
-    local current_table = source
-
-    for i = 1, #path - 1 do
-        local key = path[i]
-        current_table = current_table[key]
-    end
-
-    local final_key = path[#path]
-    return current_table[final_key]
-end
-
-local produce_to = function(source, spath, target, tpath, conv)
-    local old_on_change = source.on_change
-
-    source.on_change = function(self)
-        local value = get_nested_value(source, spath)
-        if conv then
-            value = conv(source, target, value)
-        end
-        set_nested_value(target, tpath, value)
-        if old_on_change then
-            old_on_change(self)
-        end
-    end
-end
-
-local listen_to = function(source, spath, conv)
-    local old_on_change = source.on_change
-
-    source.on_change = function(self)
-        local value = get_nested_value(source, spath)
-        if conv then
-            conv(source, value)
-        end
-
-        if old_on_change then
-            old_on_change(self)
-        end
-    end
-end
-
-local find_widget = function(widgets_set, ref)
-    for wid in all(widgets_set) do
-        if wid.iid == ref.entityIid then
-            return wid
-        end
-    end
-end
-
-
---- Get the latest value from the source.spath in the _update() loop
---- and set in in target.tpath
-local consume_on_update = function(target, tpath, source, spath, conv)
-    local old_update = target._update
-    target._update = function(self)
-        local value = get_nested_value(source, spath)
-        if conv then
-            value = conv(source, target, value)
-        end
-        set_nested_value(self, tpath, value)
-        old_update(target)
-    end
-end
 
 function _init()
     w = {}
@@ -276,8 +194,8 @@ function _init()
         local knob = widgets:create_knob(k)
         table.insert(w, knob)
         if(knob.fields.Label == "BPM") then
-            produce_to(knob, { "value" }, state, { "current_bar", "bpm" }, to_bpm)
-            produce_to(state, { "current_bar", "bpm" }, knob, { "value" }, from_bpm)
+            wire.produce_to(knob, { "value" }, state, { "current_bar", "bpm" }, to_bpm)
+            wire.produce_to(state, { "current_bar", "bpm" }, knob, { "value" }, from_bpm)
 
         end
     end
@@ -289,20 +207,20 @@ function _init()
 
     for instrument_name in all(entities["InstrumentName"]) do
         local inst = widgets:create_help(instrument_name)
-        consume_on_update(inst, { "label" }, state, { "current_instrument", "name" })
+        wire.consume_on_update(inst, { "label" }, state, { "current_instrument", "name" })
         table.insert(w, inst)
 
 
-        local prev = find_widget(w, inst.fields.Prev)
-        listen_to(prev, { "status" }, function(source, value)
+        local prev = wire.find_widget(w, inst.fields.Prev)
+        wire.listen_to(prev, { "status" }, function(source, value)
             state.current_bar.instrument(state.current_bar.instrument() - 1)
             state.current_instrument = sfx.instrument(state.current_bar.instrument())
             if (state.on_change) then
                 state:on_change()
             end
         end)
-        local next = find_widget(w, inst.fields.Next)
-        listen_to(next, { "status" }, function(source, value)
+        local next = wire.find_widget(w, inst.fields.Next)
+        wire.listen_to(next, { "status" }, function(source, value)
             state.current_bar.instrument(state.current_bar.instrument() + 1)
             state.current_instrument = sfx.instrument(state.current_bar.instrument())
             if (state.on_change) then

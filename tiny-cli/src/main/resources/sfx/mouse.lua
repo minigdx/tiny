@@ -31,9 +31,7 @@ mouse._draw = function(override)
     if(override) then
         index = override
     end
-    shape.rect(mouse.x, mouse.y, 8, 8, 3)
     spr.draw(index, mouse.x, mouse.y)
-
 end
 
 return mouse
