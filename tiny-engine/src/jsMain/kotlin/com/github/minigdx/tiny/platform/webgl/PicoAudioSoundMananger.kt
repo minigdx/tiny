@@ -1,41 +1,10 @@
 package com.github.minigdx.tiny.platform.webgl
 
 import com.github.minigdx.tiny.input.InputHandler
-import com.github.minigdx.tiny.lua.SfxLib
 import com.github.minigdx.tiny.sound.Sound
 import com.github.minigdx.tiny.sound.SoundManager
 import org.khronos.webgl.Float32Array
 import org.khronos.webgl.set
-
-class SfxSound(
-    private val buffer: Float32Array,
-    private val picoAudioSoundMananger: PicoAudioSoundMananger,
-) : Sound {
-    private var currentSource: AudioBufferSourceNode? = null
-
-    override fun play() =
-        whenReady {
-            stop()
-            currentSource = picoAudioSoundMananger.playSfxBuffer(buffer)
-        }
-
-    override fun loop() =
-        whenReady {
-            currentSource = picoAudioSoundMananger.playSfxBuffer(buffer, loop = true)
-        }
-
-    override fun stop() =
-        whenReady {
-            currentSource?.stop()
-        }
-
-    private fun whenReady(callback: () -> Unit) {
-        if (!picoAudioSoundMananger.ready) {
-            return@whenReady
-        }
-        callback()
-    }
-}
 
 class PicoAudioSoundMananger : SoundManager() {
     lateinit var audioContext: AudioContext
@@ -63,11 +32,7 @@ class PicoAudioSoundMananger : SoundManager() {
     }
 
     override suspend fun createSfxSound(bytes: ByteArray): Sound {
-        val score = bytes.decodeToString()
-        val song = SfxLib.convertScoreToSong2(score)
-        val (buf, length) = createBufferFromSong(song)
-        val buffer = convertBuffer(buf, length)
-        return SfxSound(buffer, this)
+        TODO()
     }
 
     override fun playBuffer(
