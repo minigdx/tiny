@@ -166,7 +166,6 @@ function _init()
     end
 
     local buttonToWave = function(source, target, value)
-        debug.console("button to wave ", source.fields.Type)
         return source.fields.Type
     end
 

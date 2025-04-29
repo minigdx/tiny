@@ -265,8 +265,8 @@ class SfxLib(
 
     @TinyFunction(
         "Play a sound by it's index. " +
-                "The index of a sound is given by it's position in the sounds field from the `_tiny.json` file." +
-                "The first sound is at the index 0.",
+            "The index of a sound is given by it's position in the sounds field from the `_tiny.json` file." +
+            "The first sound is at the index 0.",
     )
     inner class play : OneArgFunction() {
         @TinyCall("Play the sound at the index 0.")

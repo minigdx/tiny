@@ -11,7 +11,10 @@ local State = {
     -- is the user can edit the current bar?
     edit = false,
     -- the current bar the user is editing
-    current_bar = nil
+    current_bar = nil,
+
+    -- the instrument of the current_bar
+    current_instrument = nil,
 }
 
 local state = new(State)
@@ -222,12 +225,36 @@ local listen_to = function(source, spath, conv)
     end
 end
 
+local find_widget = function(widgets_set, ref)
+    for wid in all(widgets_set) do
+        if wid.iid == ref.entityIid then
+            return wid
+        end
+    end
+end
+
+
+--- Get the latest value from the source.spath in the _update() loop
+--- and set in in target.tpath
+local consume_on_update = function(target, tpath, source, spath, conv)
+    local old_update = target._update
+    target._update = function(self)
+        local value = get_nested_value(source, spath)
+        if conv then
+            value = conv(source, target, value)
+        end
+        set_nested_value(self, tpath, value)
+        old_update(target)
+    end
+end
 
 function _init()
     w = {}
     test = {}
     state = new(State)
     state.current_bar = sfx.bar(0)
+    state.current_instrument = sfx.instrument(state.current_bar.instrument())
+
     map.level("BarEditor")
     local entities = map.entities()
 
@@ -257,22 +284,31 @@ function _init()
 
     for b in all(entities["MenuItem"]) do
         local button = widgets:create_menu_item(b)
-        if(button.fields.Item == "Prev") then
-            listen_to(button, { "status" }, function(source, value)
-                state.current_bar.instrument(state.current_bar.instrument() - 1)
-                if (state.on_change) then
-                    state:on_change()
-                end
-            end)
-        elseif button.fields.Item == "Next" then
-            listen_to(button, { "status" }, function(source, value)
-                state.current_bar.instrument(state.current_bar.instrument() + 1)
-                if (state.on_change) then
-                    state:on_change()
-                end
-            end)
-        end
         table.insert(w, button)
+    end
+
+    for instrument_name in all(entities["InstrumentName"]) do
+        local inst = widgets:create_help(instrument_name)
+        consume_on_update(inst, { "label" }, state, { "current_instrument", "name" })
+        table.insert(w, inst)
+
+
+        local prev = find_widget(w, inst.fields.Prev)
+        listen_to(prev, { "status" }, function(source, value)
+            state.current_bar.instrument(state.current_bar.instrument() - 1)
+            state.current_instrument = sfx.instrument(state.current_bar.instrument())
+            if (state.on_change) then
+                state:on_change()
+            end
+        end)
+        local next = find_widget(w, inst.fields.Next)
+        listen_to(next, { "status" }, function(source, value)
+            state.current_bar.instrument(state.current_bar.instrument() + 1)
+            state.current_instrument = sfx.instrument(state.current_bar.instrument())
+            if (state.on_change) then
+                state:on_change()
+            end
+        end)
     end
 
     for mode in all(entities["EditorMode"]) do
