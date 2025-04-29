@@ -8,7 +8,9 @@ function roundToHalf(num)
 end
 
 local State = {
+    -- is the user can edit the current bar?
     edit = false,
+    -- the current bar the user is editing
     current_bar = nil
 }
 
@@ -205,6 +207,22 @@ local produce_to = function(source, spath, target, tpath, conv)
     end
 end
 
+local listen_to = function(source, spath, conv)
+    local old_on_change = source.on_change
+
+    source.on_change = function(self)
+        local value = get_nested_value(source, spath)
+        if conv then
+            conv(source, value)
+        end
+
+        if old_on_change then
+            old_on_change(self)
+        end
+    end
+end
+
+
 function _init()
     w = {}
     test = {}
@@ -235,6 +253,26 @@ function _init()
             produce_to(state, { "current_bar", "bpm" }, knob, { "value" }, from_bpm)
 
         end
+    end
+
+    for b in all(entities["MenuItem"]) do
+        local button = widgets:create_menu_item(b)
+        if(button.fields.Item == "Prev") then
+            listen_to(button, { "status" }, function(source, value)
+                state.current_bar.instrument(state.current_bar.instrument() - 1)
+                if (state.on_change) then
+                    state:on_change()
+                end
+            end)
+        elseif button.fields.Item == "Next" then
+            listen_to(button, { "status" }, function(source, value)
+                state.current_bar.instrument(state.current_bar.instrument() + 1)
+                if (state.on_change) then
+                    state:on_change()
+                end
+            end)
+        end
+        table.insert(w, button)
     end
 
     for mode in all(entities["EditorMode"]) do

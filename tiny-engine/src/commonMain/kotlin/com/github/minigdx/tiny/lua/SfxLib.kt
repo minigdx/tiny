@@ -98,7 +98,7 @@ class SfxLib(
     inner class save : OneArgFunction() {
         @TinyCall("Save the actual music using the filename")
         override fun call(
-            @TinyArg("filename")arg: LuaValue,
+            @TinyArg("filename") arg: LuaValue,
         ): LuaValue {
             val music = getCurrentMusic()
             val content = Json.encodeToString(music)
@@ -112,16 +112,7 @@ class SfxLib(
         @TinyCall("Access instrument using its index or its name.")
         override fun call(arg: LuaValue): LuaValue {
             val music = getCurrentMusic()
-            val index =
-                if (arg.isint()) {
-                    arg.checkint()
-                } else {
-                    music.instruments
-                        .firstOrNull { inst -> inst.name == arg.checkjstring() }
-                        ?.index
-                }
-
-            index ?: return NIL
+            val index = arg.asInstrumentIndex(music) ?: return NIL
             return music.instruments
                 .getOrNull(index)
                 ?.toLua() ?: NIL
@@ -215,10 +206,10 @@ class SfxLib(
             val index = arg.checkint()
             return music.musicalBars
                 .getOrNull(index)
-                ?.toLua() ?: NIL
+                ?.toLua(music) ?: NIL
         }
 
-        fun MusicalBar.toLua(): LuaValue {
+        fun MusicalBar.toLua(music: Music): LuaValue {
             val obj = WrapperLuaTable()
 
             obj.wrap(
@@ -256,14 +247,26 @@ class SfxLib(
                 NONE
             }
 
+            obj.function1("instrument") { arg ->
+                if (arg.isnil()) {
+                    this.instrument?.let { valueOf(it.index) } ?: NIL
+                } else {
+                    // Set the instrument for the bar.
+                    val index = arg.asInstrumentIndex(music) ?: return@function1 NIL
+                    val instrument = music.instruments.getOrNull(index) ?: return@function1 NIL
+                    this.instrument = instrument
+                    NONE
+                }
+            }
+
             return obj
         }
     }
 
     @TinyFunction(
         "Play a sound by it's index. " +
-            "The index of a sound is given by it's position in the sounds field from the `_tiny.json` file." +
-            "The first sound is at the index 0.",
+                "The index of a sound is given by it's position in the sounds field from the `_tiny.json` file." +
+                "The first sound is at the index 0.",
     )
     inner class play : OneArgFunction() {
         @TinyCall("Play the sound at the index 0.")
@@ -329,6 +332,16 @@ class SfxLib(
             sound
         } else {
             null
+        }
+    }
+
+    private fun LuaValue.asInstrumentIndex(music: Music): Int? {
+        return if (this.isint()) {
+            this.checkint() % music.instruments.size
+        } else {
+            music.instruments
+                .firstOrNull { inst -> inst.name == this.checkjstring() }
+                ?.index
         }
     }
 }
