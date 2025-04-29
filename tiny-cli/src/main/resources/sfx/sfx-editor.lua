@@ -213,6 +213,11 @@ function _init()
         table.insert(m.widgets, button)
     end
 
+    for mode in all(entities["EditorMode"]) do
+        local button = widgets:create_mode_switch(mode)
+        table.insert(m.widgets, button)
+    end
+
     -- force setting correct values
     if (state.on_change) then
         state:on_change()

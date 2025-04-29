@@ -17,7 +17,7 @@ import org.luaj.vm2.lib.TwoArgFunction
         "the current time (`tiny.time`), delta time (`tiny.dt`) and " +
         "to switch to another script using `exit`.",
 )
-class TinyLib : TwoArgFunction() {
+class TinyLib(private val gameScript: List<String>) : TwoArgFunction() {
     private var time: Double = 0.0
     private var frame: Int = 0
     private val tiny = LuaTable()
@@ -61,7 +61,14 @@ class TinyLib : TwoArgFunction() {
         override fun call(
             @TinyArg("scriptIndex") arg: LuaValue,
         ): LuaValue {
-            throw Exit(arg.checkint())
+            if (arg.isint()) {
+                val index = arg.checkint() % gameScript.size
+                throw Exit(index)
+            } else {
+                val scriptName = arg.checkjstring()!!
+                val index = gameScript.indexOfFirst { it == scriptName } % gameScript.size
+                throw Exit(index)
+            }
         }
     }
 }

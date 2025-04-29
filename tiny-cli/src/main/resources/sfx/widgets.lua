@@ -154,6 +154,23 @@ factory.create_button = function(self, value)
     return result
 end
 
+factory.create_mode_switch = function(self, value)
+    local result = new(Button, value)
+    result.help = result.fields.Help
+    if (value.fields.EditorType == "InstrumentEditor") then
+        result.overlay = { x = 0, y = 9*16 }
+        result.on_change = function()
+            tiny.exit("sfx-editor.lua")
+        end
+    elseif (value.fields.EditorType == "MusicalBarEditor") then
+        result.overlay = { x = 16, y = 9*16 }
+        result.on_change = function()
+            tiny.exit("bar-editor.lua")
+        end
+    end
+    return result
+end
+
 Button._update = function(self)
     if self.status == 2 then
         return

@@ -237,6 +237,11 @@ function _init()
         end
     end
 
+    for mode in all(entities["EditorMode"]) do
+        local button = widgets:create_mode_switch(mode)
+        table.insert(w, button)
+    end
+
     state:on_change()
 end
 

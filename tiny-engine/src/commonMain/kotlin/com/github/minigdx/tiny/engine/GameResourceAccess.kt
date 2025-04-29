@@ -9,8 +9,6 @@ import com.github.minigdx.tiny.resources.GameScript
 import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.resources.SpriteSheet
 import com.github.minigdx.tiny.sound.MusicalBar
-import com.github.minigdx.tiny.sound.Song2
-import com.github.minigdx.tiny.sound.WaveGenerator
 import kotlin.reflect.KClass
 
 sealed interface DebugAction
@@ -80,16 +78,22 @@ interface GameResourceAccess {
     fun sound(index: Int): Sound?
 
     /**
-     * Play a note represented by a wave.
-     *
-     * All notes added in the same update loop will be played at the same time
-     * at the end of the update loop.
+     * Play a musical bar. Should only be used for tools
+     * as it will generating the sound on the fly
+     * (which can be CPU intensive during a game)
      */
-    fun note(wave: WaveGenerator)
-
-    fun sfx(song: Song2)
-
     fun play(musicalBar: MusicalBar)
+
+    /**
+     * Save the content into the file named `filename`.
+     * Might be a NO-OP on some platform (ie: web)
+     *
+     * Should only be used for tools (for now)
+     */
+    fun save(
+        filename: String,
+        content: String,
+    )
 
     /**
      * Find a script by its name.

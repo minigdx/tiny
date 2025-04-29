@@ -32,9 +32,7 @@ import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
 import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.resources.SpriteSheet
 import com.github.minigdx.tiny.sound.MusicalBar
-import com.github.minigdx.tiny.sound.Song2
 import com.github.minigdx.tiny.sound.SoundManager
-import com.github.minigdx.tiny.sound.WaveGenerator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.asFlow
@@ -66,15 +64,9 @@ class GameEngine(
 
     private val ops = mutableListOf<RenderOperation>()
 
-    private val notes = mutableListOf<WaveGenerator>()
-
-    private var song: Song2? = null
-    private var longuestDuration: Seconds = 0f
-
     private lateinit var scripts: Array<GameScript?>
     private lateinit var spriteSheets: Array<SpriteSheet?>
     private lateinit var levels: Array<GameLevel?>
-    private lateinit var sounds: Array<Sound?>
 
     override var bootSpritesheet: SpriteSheet? = null
         private set
@@ -130,18 +122,12 @@ class GameEngine(
             }
         this.levels = Array(gameLevels.size) { null }
 
-        val sounds =
-            gameOptions.sounds.mapIndexed { index, soundName ->
-                resourceFactory.soundEffect(index, soundName)
-            }
-        this.sounds = Array(sounds.size) { null }
-
         val resources =
             listOf(
                 resourceFactory.bootscript("_boot.lua", inputHandler, gameOptions),
                 resourceFactory.enginescript("_engine.lua", inputHandler, gameOptions),
                 resourceFactory.bootSpritesheet("_boot.png"),
-            ) + gameScripts + spriteSheets + gameLevels + sounds
+            ) + gameScripts + spriteSheets + gameLevels
 
         numberOfResources = resources.size
 
@@ -201,7 +187,7 @@ class GameEngine(
                     }
 
                     GAME_SOUND -> {
-                        sounds[resource.index] = resource as Sound
+                        TODO()
                     }
                 }
                 numberOfResources--
@@ -265,7 +251,7 @@ class GameEngine(
                     }
 
                     GAME_SOUND -> {
-                        sounds[resource.index] = resource as Sound
+                        TODO()
                     }
                 }
             }
@@ -296,8 +282,6 @@ class GameEngine(
                 }
             } else if (reload) {
                 clear()
-                // Stop all sounds to avoid annoying sound loop
-                sounds.forEach { s -> s?.stop() }
                 try {
                     val state = getState()
                     evaluate(customizeLuaGlobal)
@@ -310,13 +294,6 @@ class GameEngine(
                     popupError(ex.toTinyException(content.decodeToString()))
                 }
             }
-
-            soundManager.playNotes(notes, longuestDuration)
-            notes.clear()
-            longuestDuration = 0f
-
-            song?.run { soundManager.playSong(this) }
-            song = null
 
             // Fixed step simulation
             accumulator += delta
@@ -475,18 +452,7 @@ class GameEngine(
     }
 
     override fun sound(index: Int): Sound? {
-        val protected = max(0, min(index, sounds.size - 1))
-        if (protected >= sounds.size) return null
-        return sounds[protected]
-    }
-
-    override fun note(wave: WaveGenerator) {
-        longuestDuration = max(longuestDuration, wave.duration)
-        notes.add(wave)
-    }
-
-    override fun sfx(song: Song2) {
-        this.song = song
+        return null // TODO: rework to return Sound from Music
     }
 
     override fun play(musicalBar: MusicalBar) {
@@ -574,8 +540,14 @@ class GameEngine(
     }
 
     override fun end() {
-        sounds.forEach { it?.stop() }
         soundManager.destroy()
+    }
+
+    override fun save(
+        filename: String,
+        content: String,
+    ) {
+        platform.createLocalFile(filename).save(content.encodeToByteArray())
     }
 
     override fun <T : PoolObject<T>> obtain(type: KClass<T>): T {

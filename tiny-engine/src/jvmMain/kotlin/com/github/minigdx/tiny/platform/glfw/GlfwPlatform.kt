@@ -109,14 +109,13 @@ class GlfwPlatform(
         // Create the window
         val windowWidth = (gameOptions.width + gameOptions.gutter.first * 2) * gameOptions.zoom
         val windowHeight = (gameOptions.height + gameOptions.gutter.first * 2) * gameOptions.zoom
-        window =
-            GLFW.glfwCreateWindow(
-                windowWidth,
-                windowHeight,
-                "Tiny",
-                MemoryUtil.NULL,
-                MemoryUtil.NULL,
-            )
+        window = GLFW.glfwCreateWindow(
+            windowWidth,
+            windowHeight,
+            "Tiny",
+            MemoryUtil.NULL,
+            MemoryUtil.NULL,
+        )
         if (window == MemoryUtil.NULL) {
             throw IllegalStateException("Failed to create the GLFW window")
         }
