@@ -50,6 +50,41 @@ class GfxLibTest {
     }
 
     @Test
+    fun it_sets_the_dither_full_pattern() {
+        val dither = GfxLib(gameResourceAccess, gameOptions).dither()
+
+        /**
+         * 1000 -> 8
+         * 1100 -> 8 + 4 = 12 = C
+         * 0010 -> 2
+         * 0001 -> 1
+         *
+         * --> 8C21
+         */
+        dither.call(valueOf(0x8C21))
+
+        val result = Array<Byte>(4 * 4) { 0x01 }
+        for (x in 0 until 4) {
+            for (y in 0 until 4) {
+                val index = x + y * 4
+                val r = frameBuffer.blender.mix(byteArrayOf(result[index]), x, y, null)?.get(0) ?: 0
+                result[index] = r
+            }
+        }
+
+        val expected = Array<Byte>(4 * 4) { i ->
+            if (i == 0 || i == 4 || i == 5 || i == 10 || i == 15) {
+                0x01
+            } else {
+                0x00
+            }
+        }
+        result.forEachIndexed { index, value ->
+            assertEquals(value, expected[index])
+        }
+    }
+
+    @Test
     fun it_sets_the_dither_pattern_no_effect() {
         val dither = GfxLib(gameResourceAccess, gameOptions).dither()
 

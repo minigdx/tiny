@@ -47,14 +47,14 @@ sealed class ShaderParameter(val name: String) {
     abstract fun create(program: ShaderProgram<*, *>)
 
     class UniformInt(name: String) : ShaderParameter(name), Uniform {
+        private lateinit var program: ShaderProgram<*, *>
+
         override fun create(program: ShaderProgram<*, *>) {
             program.createUniform(name)
+            this.program = program
         }
 
-        fun apply(
-            program: ShaderProgram<*, *>,
-            vararg value: Int,
-        ) {
+        fun apply(vararg value: Int) {
             when (value.size) {
                 0 -> throw IllegalArgumentException("At least one int is expected")
                 1 -> program.uniform1i(program.getUniform(name), value[0])

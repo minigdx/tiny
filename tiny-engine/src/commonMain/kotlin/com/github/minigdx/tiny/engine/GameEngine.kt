@@ -592,6 +592,7 @@ class OperationsObjectPool {
 
             override fun destroy(obj: DrawSprite) {
                 obj.source = null
+                obj.dither = 0xFFFF
                 obj._attributes.forEach { attribute -> attribute.release() }
                 obj._attributes.clear()
             }

@@ -10,7 +10,7 @@ import kotlin.math.min
 class Blender(internal val gamePalette: ColorPalette) {
     internal var switch: Array<ColorIndex> = Array(gamePalette.size) { index -> index }
 
-    private var dithering: Int = 0xFFFF
+    internal var dithering: Int = 0xFFFF
 
     internal val hasDithering: Boolean
         get() {

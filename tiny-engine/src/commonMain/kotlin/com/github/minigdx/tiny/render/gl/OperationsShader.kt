@@ -133,6 +133,7 @@ class OperationsShader(
         }
 
         program.fragmentShader.paletteColors.applyRGBA(colorPaletteBuffer, 256, 256)
+        program.fragmentShader.uDither.apply(op.dither)
 
         program.vertexShader.uViewport.apply(
             gameOptions.width.toFloat(),
@@ -155,13 +156,18 @@ class OperationsShader(
         val aSpr = attributeVec2("a_spr")
         val uViewport = uniformVec2("u_viewport") // Size of the viewport; in pixel.
         val uSpritesheet = uniformVec2("u_spritesheet") // Size of the viewport; in pixel.
+
         val vUvs = varyingVec2("v_uvs")
+        val vPos = varyingVec2("v_pos")
     }
 
     class FShader : FragmentShader(FRAGMENT_SHADER) {
         val paletteColors = uniformSample2D("palette_colors")
         val spritesheet = uniformSample2D("spritesheet")
+        val uDither = uniformInt("u_dither")
+
         val vUvs = varyingVec2("v_uvs")
+        val vPos = varyingVec2("v_pos")
     }
 
     companion object {
@@ -185,17 +191,32 @@ class OperationsShader(
                 vec2 ndc_spr = a_spr / u_spritesheet;
                 v_uvs = ndc_spr;
                 
+                v_pos = a_pos;
             }
             """.trimIndent()
 
         //language=Glsl
         private val FRAGMENT_SHADER =
             """
+            int imod(int value, int limit) {
+                return value - limit * (value / limit);
+            }
+            
+            bool dither(int pattern, int x, int y) {
+                  int a = imod(x,  4);
+                  int b = imod(y, 4) * 4;
+                  int bitPosition = a + b;
+                  
+                  float powerOfTwo = pow(2.0, float(bitPosition));
+                  int bit = int(floor(mod(float(pattern) / powerOfTwo, 2.0)));
+                   
+                  return bit > 0;
+            }
             /**
             * Extract data from a "kind of" texture1D
             */
             vec4 readData(sampler2D txt, int index, int textureWidth, int textureHeight) {
-                int x = index - textureWidth * (index / textureWidth); // index % textureWidth
+                int x = imod(index, textureWidth); // index % textureWidth
                 int y =  index / textureWidth;
                 vec2 uv = vec2((float(x) + 0.5) / float(textureWidth), (float(y) + 0.5) / float(textureHeight));
                 return texture2D(txt, uv);
@@ -205,13 +226,17 @@ class OperationsShader(
             * Read a color from the colors texture.
             */
             vec4 readColor(int index) {
-                int icolor = index - 256 * (index / 256);
+                int icolor = imod(index, 256);
                 return readData(palette_colors, icolor, 255, 255);
             }
             
             void main() {
-                int index = int(texture2D(spritesheet, v_uvs).r * 255.0 + 0.5);
-                gl_FragColor = readColor(index);
+                if (dither(u_dither, int(v_pos.x), int(v_pos.y))) {
+                    int index = int(texture2D(spritesheet, v_uvs).r * 255.0 + 0.5);
+                    gl_FragColor = readColor(index);
+                } else {
+                    gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
+                }
             }
             """.trimIndent()
     }

@@ -177,7 +177,7 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
                     ),
             ) args: Varargs,
         ): Varargs {
-            val spritesheet = resourceAccess.spritesheet(currentSpritesheet) ?: return NONE
+            val spritesheet = resourceAccess.spritesheet(currentSpritesheet) ?: return NIL
 
             val x = args.arg(1).optint(0)
             val y = args.arg(2).optint(0)
@@ -188,13 +188,19 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
             val flipX = args.arg(7).optboolean(false)
             val flipY = args.arg(8).optboolean(false)
 
-            resourceAccess.frameBuffer.copyFrom(
-                spritesheet.pixels, x, y, sprX,
-                sprY,
-                sprWidth,
-                sprHeight,
-                flipX,
-                flipY,
+            resourceAccess.addOp(
+                DrawSprite(
+                    spritesheet,
+                    sourceX = sprX,
+                    sourceY = sprY,
+                    sourceWidth = sprWidth,
+                    sourceHeight = sprHeight,
+                    destinationX = x,
+                    destinationY = y,
+                    flipX = flipX,
+                    flipY = flipY,
+                    dither = resourceAccess.frameBuffer.blender.dithering,
+                ),
             )
 
             return NONE
@@ -234,19 +240,6 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
             val column = sprN % nbSpritePerRow
             val row = (sprN - column) / nbSpritePerRow
 
-            /*
-            resourceAccess.frameBuffer.copyFrom(
-                source = spritesheet.pixels,
-                dstX = x,
-                dstY = y,
-                sourceX = column * sw,
-                sourceY = row * sh,
-                width = sw,
-                height = sh,
-                reverseX = flipX,
-                reverseY = flipY,
-            )*/
-
             resourceAccess.addOp(
                 DrawSprite(
                     spritesheet,
@@ -258,10 +251,11 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
                     destinationY = y,
                     flipX = flipX,
                     flipY = flipY,
+                    dither = resourceAccess.frameBuffer.blender.dithering,
                 ),
             )
 
-            return NIL
+            return NONE
         }
     }
 }

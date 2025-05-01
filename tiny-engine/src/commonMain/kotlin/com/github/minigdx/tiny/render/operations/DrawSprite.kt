@@ -13,6 +13,8 @@ import com.github.minigdx.tiny.resources.SpriteSheet
 
 class DrawSprite(
     var source: SpriteSheet? = null,
+    // dither pattern
+    var dither: Int = 0xFFFF,
     attributes: List<DrawSpriteAttribute> = emptyList(),
     override var pool: ObjectPool<DrawSprite>? = null,
 ) : RenderOperation, PoolObject<DrawSprite> {
@@ -20,6 +22,7 @@ class DrawSprite(
 
     internal val _attributes = attributes.toMutableList()
 
+    // TODO: set the uv/vertex data directly to avoid iterating twice ?
     val attributes: List<DrawSpriteAttribute>
         get() = _attributes
 
@@ -33,8 +36,11 @@ class DrawSprite(
         destinationY: Pixel = 0,
         flipX: Boolean = false,
         flipY: Boolean = false,
+        // dither pattern
+        dither: Int = 0xFFFF,
     ) : this(
         source,
+        dither,
         listOf(
             DrawSpriteAttribute(
                 sourceX,
@@ -127,6 +133,7 @@ class DrawSprite(
                 val operation = resourceAccess.obtain(DrawSprite::class)
                 operation.source = spriteSheet
                 operation._attributes.addAll(chunk)
+                operation.dither = resourceAccess.frameBuffer.blender.dithering
                 operation
             }
         }
