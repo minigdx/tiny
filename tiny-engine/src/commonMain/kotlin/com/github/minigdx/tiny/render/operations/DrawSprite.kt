@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.render.operations
 
+import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.graphic.PixelArray
@@ -15,6 +16,7 @@ class DrawSprite(
     var source: SpriteSheet? = null,
     // dither pattern
     var dither: Int = 0xFFFF,
+    var pal: Array<ColorIndex> = emptyArray(),
     attributes: List<DrawSpriteAttribute> = emptyList(),
     override var pool: ObjectPool<DrawSprite>? = null,
 ) : RenderOperation, PoolObject<DrawSprite> {
@@ -38,9 +40,11 @@ class DrawSprite(
         flipY: Boolean = false,
         // dither pattern
         dither: Int = 0xFFFF,
+        pal: Array<ColorIndex> = emptyArray(),
     ) : this(
         source,
         dither,
+        pal,
         listOf(
             DrawSpriteAttribute(
                 sourceX,
@@ -134,6 +138,7 @@ class DrawSprite(
                 operation.source = spriteSheet
                 operation._attributes.addAll(chunk)
                 operation.dither = resourceAccess.frameBuffer.blender.dithering
+                operation.pal = resourceAccess.frameBuffer.blender.switch
                 operation
             }
         }

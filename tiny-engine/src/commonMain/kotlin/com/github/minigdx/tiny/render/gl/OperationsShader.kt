@@ -125,7 +125,12 @@ class OperationsShader(
         val colorPaletteBuffer = ByteArray(256 * 256 * PixelFormat.RGBA)
         var pos = 0
         for (index in 0 until 256) {
-            val color = colors.getRGBA(index)
+            val pal = if(op.pal.isNotEmpty()) {
+                op.pal[index % op.pal.size]
+            } else {
+                index
+            }
+            val color = colors.getRGBA(pal)
             colorPaletteBuffer[pos++] = color[0]
             colorPaletteBuffer[pos++] = color[1]
             colorPaletteBuffer[pos++] = color[2]
