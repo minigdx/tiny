@@ -125,7 +125,7 @@ class OperationsShader(
         val colorPaletteBuffer = ByteArray(256 * 256 * PixelFormat.RGBA)
         var pos = 0
         for (index in 0 until 256) {
-            val pal = if(op.pal.isNotEmpty()) {
+            val pal = if (op.pal.isNotEmpty()) {
                 op.pal[index % op.pal.size]
             } else {
                 index

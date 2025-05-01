@@ -62,7 +62,7 @@ class SfxCommand : CliktCommand(name = "sfx") {
                 val json = Json.encodeToString(Music())
                 filename.writeBytes(json.encodeToByteArray())
             }
-            WorkspaceLib.DEFAULT = listOf(JvmLocalFile(filename.name, workingDirectory = filename.parentFile))
+            WorkspaceLib.DEFAULT = listOf(JvmLocalFile(filename.name, workingDirectory = filename.absoluteFile.parentFile))
 
             val logger = StdOutLogger("tiny-cli")
             val vfs = CommonVirtualFileSystem()

@@ -116,8 +116,11 @@ class WebGlPlatform(
         return SoundDataSourceStream(name, soundManager, createByteArrayStream(name))
     }
 
-    override fun createLocalFile(name: String): LocalFile {
-        return JsLocalFile(name)
+    override fun createLocalFile(
+        name: String,
+        parentDirectory: String?,
+    ): LocalFile {
+        return JsLocalFile(name, parentDirectory?.let { "tiny-$parentDirectory" } ?: "tiny")
     }
 
     override fun draw(renderContext: RenderContext) {

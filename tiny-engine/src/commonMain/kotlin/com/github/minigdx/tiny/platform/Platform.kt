@@ -106,7 +106,10 @@ interface Platform {
      *
      * @param: name of the file, with the extension, if any.
      */
-    fun createLocalFile(name: String): LocalFile
+    fun createLocalFile(
+        name: String,
+        parentDirectory: String? = "data",
+    ): LocalFile
 
     /**
      * Render the operations into the frame buffer.

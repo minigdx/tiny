@@ -300,7 +300,14 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
 
     override fun createSoundStream(name: String): SourceStream<SoundData> = delegate.createSoundStream(name)
 
-    override fun createLocalFile(name: String): LocalFile = delegate.createLocalFile(name)
+    override fun createLocalFile(
+        name: String,
+        parentDirectory: String?,
+    ): LocalFile =
+        delegate.createLocalFile(
+            name = name,
+            parentDirectory = parentDirectory,
+        )
 
     override fun render(
         renderContext: RenderContext,

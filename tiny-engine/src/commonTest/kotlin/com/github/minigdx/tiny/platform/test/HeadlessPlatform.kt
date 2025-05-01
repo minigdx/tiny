@@ -112,7 +112,10 @@ class HeadlessPlatform(
         return ObjectStream(data)
     }
 
-    override fun createLocalFile(name: String): LocalFile =
+    override fun createLocalFile(
+        name: String,
+        parentDirectory: String?,
+    ): LocalFile =
         object : LocalFile {
             override val name: String = "name"
             override val extension: String = ""

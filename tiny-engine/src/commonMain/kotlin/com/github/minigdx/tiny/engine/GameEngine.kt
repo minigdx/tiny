@@ -547,7 +547,7 @@ class GameEngine(
         filename: String,
         content: String,
     ) {
-        platform.createLocalFile(filename).save(content.encodeToByteArray())
+        platform.createLocalFile(filename, null).save(content.encodeToByteArray())
     }
 
     override fun <T : PoolObject<T>> obtain(type: KClass<T>): T {
