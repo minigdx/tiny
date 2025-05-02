@@ -202,6 +202,7 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
                 dither = resourceAccess.frameBuffer.blender.dithering,
                 pal = resourceAccess.frameBuffer.blender.switch,
                 camera = resourceAccess.frameBuffer.camera,
+                clipper = resourceAccess.frameBuffer.clipper,
             )
             resourceAccess.addOp(op)
 
@@ -256,6 +257,7 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
                 dither = resourceAccess.frameBuffer.blender.dithering,
                 pal = resourceAccess.frameBuffer.blender.switch,
                 camera = resourceAccess.frameBuffer.camera,
+                clipper = resourceAccess.frameBuffer.clipper,
             )
             resourceAccess.addOp(op)
 

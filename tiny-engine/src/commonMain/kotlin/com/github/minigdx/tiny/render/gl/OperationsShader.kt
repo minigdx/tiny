@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.render.gl
 
+import com.danielgergely.kgl.GL_SCISSOR_TEST
 import com.danielgergely.kgl.GL_TRIANGLES
 import com.danielgergely.kgl.Kgl
 import com.github.minigdx.tiny.engine.GameOptions
@@ -35,11 +36,6 @@ class OperationsShader(
     ) {
         // Prepare to draw a list of operation, by preparing the shader and the viewport.
         program.use()
-        program.vertexShader.uViewport.apply(
-            gameOptions.width.toFloat(),
-            // Flip the vertical
-            gameOptions.height.toFloat() * -1,
-        )
         ops.forEach { op -> op.executeGPU(context, this) }
     }
 
@@ -141,9 +137,6 @@ class OperationsShader(
 
         program.fragmentShader.paletteColors.applyRGBA(colorPaletteBuffer, 256, 256)
         program.fragmentShader.uDither.apply(op.dither)
-        op.camera?.run {
-            program.vertexShader.uCamera.apply(this.x.toFloat(), this.y.toFloat())
-        } ?: program.vertexShader.uCamera.apply(0f, 0f)
 
         program.vertexShader.uViewport.apply(
             gameOptions.width.toFloat(),
@@ -151,12 +144,31 @@ class OperationsShader(
             gameOptions.height.toFloat() * -1,
         )
 
+        when (val camera = op.camera) {
+            null -> program.vertexShader.uCamera.apply(0f, 0f)
+            else -> program.vertexShader.uCamera.apply(camera.x.toFloat(), camera.y.toFloat())
+        }
+
+        op.clipper?.run {
+            gl.enable(GL_SCISSOR_TEST)
+            val width = this.right - this.left
+            val height = this.bottom - this.top
+            gl.scissor(
+                x = this.left,
+                y = gameOptions.height - this.top - height,
+                width = width,
+                height = height,
+            )
+        }
+
         // There is 2 components per vertex. So the number of vertex = number of components / 2
         val nbVertex = VERTEX_PER_SPRITE * op.attributes.size
 
         program.bind()
         program.drawArrays(GL_TRIANGLES, 0, nbVertex)
         program.unbind()
+
+        gl.disable(GL_SCISSOR_TEST)
 
         op.release()
     }

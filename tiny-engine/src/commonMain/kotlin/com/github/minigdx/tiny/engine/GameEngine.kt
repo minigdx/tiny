@@ -595,6 +595,7 @@ class OperationsObjectPool {
                 obj.dither = 0xFFFF
                 obj.pal = emptyArray()
                 obj.camera = null
+                obj.clipper = null
                 obj._attributes.forEach { attribute -> attribute.release() }
                 obj._attributes.clear()
             }
