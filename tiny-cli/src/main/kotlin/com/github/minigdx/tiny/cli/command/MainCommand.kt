@@ -12,7 +12,6 @@ class MainCommand : CliktCommand() {
             AddCommand(),
             ExportCommand(),
             ServeCommand(),
-            LibCommand(),
             PaletteCommand(),
             SfxCommand(),
         )

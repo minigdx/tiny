@@ -23,7 +23,6 @@ include("tiny-doc")
 include("tiny-doc-annotations")
 include("tiny-doc-generator")
 include("tiny-engine")
-include("tiny-repository-libs")
 include("tiny-sample")
 include("tiny-web-editor")
 

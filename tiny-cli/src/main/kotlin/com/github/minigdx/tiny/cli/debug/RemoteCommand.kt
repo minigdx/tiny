@@ -1,4 +1,4 @@
-package com.github.minigdx.tiny.cli.command
+package com.github.minigdx.tiny.cli.debug
 
 import kotlinx.serialization.Serializable
 
