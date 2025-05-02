@@ -25,10 +25,6 @@ class JavaSoundManager : SoundManager() {
         soundPort.start()
     }
 
-    override suspend fun createSfxSound(bytes: ByteArray): Sound {
-        TODO()
-    }
-
     override fun playBuffer(
         buffer: FloatArray,
         numberOfSamples: Long,

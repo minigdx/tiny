@@ -5,7 +5,6 @@ import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.engine.GameResourceAccess
-import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.sound.Instrument
 import com.github.minigdx.tiny.sound.Music
 import com.github.minigdx.tiny.sound.MusicalBar
@@ -28,12 +27,6 @@ import org.luaj.vm2.lib.TwoArgFunction
  * music(List<sequence)
  *
  *
- * sfx.instrument("Piano").name = "Guitar" // rename the instrument Piano to Guitar.
- * local instru = sfx.instrument(3) // set the current instrument
- * sfx.instrument(3).attack = 0.2 // set the attack of the current instrument.
- * instru.wave = 2
- * sfx.note(C1, 3, 0.5).play() // play C1 during 3 seconds using the current instrument and half the volume;
- *
  * sfx.bars(2) // Load the bars number 2
  *
  * sfx.beat(5, C1, 3, 0.5) // Set the beat 5 with the note C1.
@@ -45,7 +38,7 @@ import org.luaj.vm2.lib.TwoArgFunction
  *
  * sequence.play()
  *
- *
+ * sfx.play(2) // play the bar id 2 ?
  * sfx.music(1) // load another music
  * sfx.save("toto") // save actual music
  *
@@ -75,12 +68,11 @@ class SfxLib(
     ): LuaValue {
         val ctrl = LuaTable()
         ctrl.set("play", play())
-        ctrl.set("loop", loop())
-        ctrl.set("stop", stop())
 
         ctrl.set("instrument", instrument())
         ctrl.set("bar", bar())
 
+        ctrl.set("load", load())
         ctrl.set("save", save())
 
         arg2.set("sfx", ctrl)
@@ -89,6 +81,7 @@ class SfxLib(
     }
 
     private var currentMusic: Music? = null
+    private var currentSound: Int = 0
 
     fun getCurrentMusic(): Music {
         return currentMusic ?: Music().also { currentMusic = it }
@@ -104,6 +97,27 @@ class SfxLib(
             val content = Json.encodeToString(music)
             resourceAccess.save(arg.checkjstring()!!, content)
             return NONE
+        }
+    }
+
+    @TinyFunction("Load the actual SFX sound as the actual music.")
+    inner class load : OneArgFunction() {
+        @TinyCall("Load the actual SFX sound as the actual music using filename or its index")
+        override fun call(
+            @TinyArg("filename") arg: LuaValue,
+        ): LuaValue {
+            val sound = if (arg.isint()) {
+                resourceAccess.sound(arg.checkint())
+            } else {
+                resourceAccess.sound(arg.checkjstring()!!)
+            }
+            return if (sound == null) {
+                valueOf(currentSound)
+            } else {
+                val soundIndex = currentSound
+                currentMusic = sound.data.music
+                valueOf(soundIndex)
+            }
         }
     }
 
@@ -160,23 +174,22 @@ class SfxLib(
             obj.function1("play") { noteAsString ->
                 val hardVolume = 0.8f
 
-                val oneNote =
-                    MusicalBar(
-                        1,
-                        this,
-                        tempo = 120,
-                    ).apply {
-                        setNotes(
-                            listOf(
-                                MusicalNote(
-                                    note = Note.fromName(noteAsString.tojstring()),
-                                    beat = 0f,
-                                    duration = 1f,
-                                    volume = hardVolume,
-                                ),
+                val oneNote = MusicalBar(
+                    1,
+                    this,
+                    tempo = 120,
+                ).apply {
+                    setNotes(
+                        listOf(
+                            MusicalNote(
+                                note = Note.fromName(noteAsString.tojstring()),
+                                beat = 0f,
+                                duration = 1f,
+                                volume = hardVolume,
                             ),
-                        )
-                    }
+                        ),
+                    )
+                }
 
                 resourceAccess.play(oneNote)
                 NONE
@@ -264,9 +277,8 @@ class SfxLib(
     }
 
     @TinyFunction(
-        "Play a sound by it's index. " +
-            "The index of a sound is given by it's position in the sounds field from the `_tiny.json` file." +
-            "The first sound is at the index 0.",
+        "Play the bar by it's index of the current sound. " +
+            "The index of a bar of the current music.",
     )
     inner class play : OneArgFunction() {
         @TinyCall("Play the sound at the index 0.")
@@ -276,62 +288,25 @@ class SfxLib(
         override fun call(
             @TinyArg("sound") arg: LuaValue,
         ): LuaValue {
-            val index =
-                if (arg.isnumber()) {
-                    arg.checkint()
-                } else {
-                    0
-                }
-            canPlay(resourceAccess.sound(index))?.play()
-            return NIL
-        }
-    }
+            val bars = getCurrentMusic().musicalBars
+            if (bars.isEmpty()) return NIL
 
-    @TinyFunction("Play a sound and loop over it.")
-    inner class loop : OneArgFunction() {
-        @TinyCall("Play the sound at the index 0.")
-        override fun call(): LuaValue = super.call()
+            val index = if (arg.isnumber()) {
+                arg.checkint().coerceIn(0, bars.size - 1)
+            } else {
+                0
+            }
 
-        @TinyCall("Play the sound by it's index.")
-        override fun call(
-            @TinyArg("sound") arg: LuaValue,
-        ): LuaValue {
-            val index =
-                if (arg.isnumber()) {
-                    arg.checkint()
-                } else {
-                    0
-                }
-            canPlay(resourceAccess.sound(index))?.loop()
-            return NIL
-        }
-    }
+            if (playSound) {
+                val soundData = resourceAccess.sound(currentSound)?.data
+                val sfx = soundData?.musicalBars?.getOrNull(index) ?: return NIL
 
-    @TinyFunction("Stop a sound.")
-    inner class stop : OneArgFunction() {
-        @TinyCall("Stop the sound at the index 0.")
-        override fun call(): LuaValue = super.call()
+                soundData.soundManager.playBuffer(sfx, sfx.size.toLong())
 
-        @TinyCall("Stop the sound by it's index.")
-        override fun call(
-            @TinyArg("sound") arg: LuaValue,
-        ): LuaValue {
-            val index =
-                if (arg.isnumber()) {
-                    arg.checkint()
-                } else {
-                    0
-                }
-            canPlay(resourceAccess.sound(index))?.stop()
-            return NIL
-        }
-    }
-
-    private fun canPlay(sound: Sound?): Sound? {
-        return if (playSound) {
-            sound
-        } else {
-            null
+                return NONE
+            } else {
+                return NIL
+            }
         }
     }
 

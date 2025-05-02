@@ -23,7 +23,6 @@ import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.serialization.json.Json
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ResourceFactory(
@@ -32,8 +31,9 @@ class ResourceFactory(
     private val logger: Logger,
     private val colorPalette: ColorPalette,
 ) {
-    private val json = Json { ignoreUnknownKeys = true }
-
+    /**
+     * Load a SFX file and convert it into a Sound.
+     */
     fun soundEffect(
         index: Int,
         name: String,

@@ -107,7 +107,7 @@ class WebGlPlatform(
     private lateinit var soundManager: SoundManager
 
     override fun initSoundManager(inputHandler: InputHandler): SoundManager {
-        soundManager = PicoAudioSoundMananger()
+        soundManager = WebSoundMananger()
         soundManager.initSoundManager(inputHandler)
         return soundManager
     }

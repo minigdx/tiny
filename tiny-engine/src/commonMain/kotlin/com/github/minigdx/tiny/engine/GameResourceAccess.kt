@@ -78,6 +78,11 @@ interface GameResourceAccess {
     fun sound(index: Int): Sound?
 
     /**
+     * Access sound by its name
+     */
+    fun sound(name: String): Sound?
+
+    /**
      * Play a musical bar. Should only be used for tools
      * as it will generating the sound on the fly
      * (which can be CPU intensive during a game)

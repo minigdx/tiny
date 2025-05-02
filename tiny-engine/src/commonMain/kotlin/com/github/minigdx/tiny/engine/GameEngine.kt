@@ -67,6 +67,7 @@ class GameEngine(
     private lateinit var scripts: Array<GameScript?>
     private lateinit var spriteSheets: Array<SpriteSheet?>
     private lateinit var levels: Array<GameLevel?>
+    private lateinit var sounds: Array<Sound?>
 
     override var bootSpritesheet: SpriteSheet? = null
         private set
@@ -100,34 +101,40 @@ class GameEngine(
         inputManager = platform.initInputManager()
         soundManager = platform.initSoundManager(inputHandler)
 
-        resourceFactory = ResourceFactory(vfs, platform, logger, gameOptions.colors())
+        resourceFactory = ResourceFactory(
+            vfs = vfs,
+            platform = platform,
+            logger = logger,
+            colorPalette = gameOptions.colors(),
+        )
 
         val resourcesScope = CoroutineScope(platform.io())
 
-        val gameScripts =
-            gameOptions.gameScripts.mapIndexed { index, script ->
-                resourceFactory.gamescript(index + 1, script, inputHandler, gameOptions)
-            }
+        val gameScripts = gameOptions.gameScripts.mapIndexed { index, script ->
+            resourceFactory.gamescript(index + 1, script, inputHandler, gameOptions)
+        }
         this.scripts = Array(gameScripts.size + 1) { null }
 
-        val spriteSheets =
-            gameOptions.spriteSheets.mapIndexed { index, sheet ->
-                resourceFactory.gameSpritesheet(index, sheet)
-            }
+        val spriteSheets = gameOptions.spriteSheets.mapIndexed { index, sheet ->
+            resourceFactory.gameSpritesheet(index, sheet)
+        }
         this.spriteSheets = Array(spriteSheets.size) { null }
 
-        val gameLevels =
-            gameOptions.gameLevels.mapIndexed { index, level ->
-                resourceFactory.gameLevel(index, level)
-            }
+        val gameLevels = gameOptions.gameLevels.mapIndexed { index, level ->
+            resourceFactory.gameLevel(index, level)
+        }
         this.levels = Array(gameLevels.size) { null }
 
-        val resources =
-            listOf(
-                resourceFactory.bootscript("_boot.lua", inputHandler, gameOptions),
-                resourceFactory.enginescript("_engine.lua", inputHandler, gameOptions),
-                resourceFactory.bootSpritesheet("_boot.png"),
-            ) + gameScripts + spriteSheets + gameLevels
+        val sounds = gameOptions.sounds.mapIndexed { index, sound ->
+            resourceFactory.soundEffect(index, sound)
+        }
+        this.sounds = Array(sounds.size) { null }
+
+        val resources = listOf(
+            resourceFactory.bootscript("_boot.lua", inputHandler, gameOptions),
+            resourceFactory.enginescript("_engine.lua", inputHandler, gameOptions),
+            resourceFactory.bootSpritesheet("_boot.png"),
+        ) + gameScripts + spriteSheets + gameLevels + sounds
 
         numberOfResources = resources.size
 
@@ -187,7 +194,7 @@ class GameEngine(
                     }
 
                     GAME_SOUND -> {
-                        TODO()
+                        sounds[resource.index] = resource as Sound
                     }
                 }
                 numberOfResources--
@@ -251,7 +258,7 @@ class GameEngine(
                     }
 
                     GAME_SOUND -> {
-                        TODO()
+                        sounds[resource.index] = resource as Sound
                     }
                 }
             }
@@ -452,7 +459,15 @@ class GameEngine(
     }
 
     override fun sound(index: Int): Sound? {
-        return null // TODO: rework to return Sound from Music
+        return sounds.getOrNull(index.coerceIn(0, sounds.size - 1))
+    }
+
+    override fun sound(name: String): Sound? {
+        val index = sounds.indexOfFirst { it?.data?.name == name }
+            .takeIf { it >= 0 }
+            ?: return null
+
+        return sound(index)
     }
 
     override fun play(musicalBar: MusicalBar) {

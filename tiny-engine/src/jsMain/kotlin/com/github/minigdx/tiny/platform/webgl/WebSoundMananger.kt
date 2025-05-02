@@ -1,12 +1,11 @@
 package com.github.minigdx.tiny.platform.webgl
 
 import com.github.minigdx.tiny.input.InputHandler
-import com.github.minigdx.tiny.sound.Sound
 import com.github.minigdx.tiny.sound.SoundManager
 import org.khronos.webgl.Float32Array
 import org.khronos.webgl.set
 
-class PicoAudioSoundMananger : SoundManager() {
+class WebSoundMananger : SoundManager() {
     lateinit var audioContext: AudioContext
 
     var ready: Boolean = false
@@ -29,10 +28,6 @@ class PicoAudioSoundMananger : SoundManager() {
         } else {
             ready = true
         }
-    }
-
-    override suspend fun createSfxSound(bytes: ByteArray): Sound {
-        TODO()
     }
 
     override fun playBuffer(

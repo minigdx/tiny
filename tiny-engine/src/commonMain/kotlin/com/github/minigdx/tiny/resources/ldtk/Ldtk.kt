@@ -88,13 +88,12 @@ data class Ldtk(
 ) {
     companion object {
         fun read(content: String): Ldtk {
-            val json =
-                Json {
-                    allowStructuredMapKeys = true
-                    ignoreUnknownKeys = true
-                    classDiscriminator = "__type"
-                }
-            return json.decodeFromString(Ldtk.serializer(), content)
+            val json = Json {
+                allowStructuredMapKeys = true
+                ignoreUnknownKeys = true
+                classDiscriminator = "__type"
+            }
+            return json.decodeFromString(serializer(), content)
         }
     }
 }

@@ -1,7 +1,10 @@
 package com.github.minigdx.tiny.file
 
 import com.github.minigdx.tiny.platform.SoundData
+import com.github.minigdx.tiny.sound.Music
 import com.github.minigdx.tiny.sound.SoundManager
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 
 class SoundDataSourceStream(
     private val name: String,
@@ -13,9 +16,11 @@ class SoundDataSourceStream(
     override suspend fun read(): SoundData {
         val bytes = delegate.read()
 
-        val sound = soundManager.createSfxSound(bytes)
+        val music: Music = Json.decodeFromString(bytes.decodeToString())
 
-        return SoundData(name, sound)
+        val sounds = music.musicalBars.map { bar -> soundManager.convert(bar) }
+
+        return SoundData(name, soundManager, music, sounds)
     }
 
     override fun wasModified(): Boolean = delegate.wasModified()

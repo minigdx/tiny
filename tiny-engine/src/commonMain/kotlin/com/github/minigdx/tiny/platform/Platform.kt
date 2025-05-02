@@ -10,7 +10,7 @@ import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.RenderFrame
 import com.github.minigdx.tiny.render.operations.RenderOperation
-import com.github.minigdx.tiny.sound.Sound
+import com.github.minigdx.tiny.sound.Music
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.coroutines.CoroutineDispatcher
 
@@ -23,7 +23,18 @@ class ImageData(
     val height: Pixel,
 )
 
-class SoundData(val name: String, val sound: Sound)
+class SoundData(
+    // Name of the file.
+    val name: String,
+    // Sound manager to actually play the sound or the music.
+    val soundManager: SoundManager,
+    // Deserialized data of the file.
+    val music: Music,
+    // Ready to play musical bars. (sfx)
+    val musicalBars: List<FloatArray>,
+    // Ready to play musical sequences (music)
+    val musicalSequences: List<FloatArray> = emptyList(),
+)
 
 interface Platform {
     /**
