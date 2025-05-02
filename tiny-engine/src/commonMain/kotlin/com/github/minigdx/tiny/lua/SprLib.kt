@@ -188,20 +188,20 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
             val flipX = args.arg(7).optboolean(false)
             val flipY = args.arg(8).optboolean(false)
 
-            resourceAccess.addOp(
-                DrawSprite(
-                    spritesheet,
-                    sourceX = sprX,
-                    sourceY = sprY,
-                    sourceWidth = sprWidth,
-                    sourceHeight = sprHeight,
-                    destinationX = x,
-                    destinationY = y,
-                    flipX = flipX,
-                    flipY = flipY,
-                    dither = resourceAccess.frameBuffer.blender.dithering,
-                ),
+            val op = DrawSprite.from(
+                resourceAccess,
+                spritesheet,
+                sourceX = sprX,
+                sourceY = sprY,
+                sourceWidth = sprWidth,
+                sourceHeight = sprHeight,
+                destinationX = x,
+                destinationY = y,
+                flipX = flipX,
+                flipY = flipY,
+                dither = resourceAccess.frameBuffer.blender.dithering,
             )
+            resourceAccess.addOp(op)
 
             return NONE
         }
@@ -240,20 +240,20 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
             val column = sprN % nbSpritePerRow
             val row = (sprN - column) / nbSpritePerRow
 
-            resourceAccess.addOp(
-                DrawSprite(
-                    spritesheet,
-                    sourceX = column * sw,
-                    sourceY = row * sh,
-                    sourceWidth = sw,
-                    sourceHeight = sh,
-                    destinationX = x,
-                    destinationY = y,
-                    flipX = flipX,
-                    flipY = flipY,
-                    dither = resourceAccess.frameBuffer.blender.dithering,
-                ),
+            val op = DrawSprite.from(
+                resourceAccess,
+                spritesheet,
+                sourceX = column * sw,
+                sourceY = row * sh,
+                sourceWidth = sw,
+                sourceHeight = sh,
+                destinationX = x,
+                destinationY = y,
+                flipX = flipX,
+                flipY = flipY,
+                dither = resourceAccess.frameBuffer.blender.dithering,
             )
+            resourceAccess.addOp(op)
 
             return NONE
         }

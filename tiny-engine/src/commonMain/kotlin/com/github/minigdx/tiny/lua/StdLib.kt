@@ -7,6 +7,7 @@ import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
+import com.github.minigdx.tiny.render.operations.FrameBufferOperation
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
@@ -299,6 +300,8 @@ class StdLib(
                 }
                 currentX += space
             }
+
+            resourceAccess.addOp(FrameBufferOperation)
 
             return NONE
         }

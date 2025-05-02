@@ -504,15 +504,15 @@ class GameEngine(
             }
             ops.clear()
             // The framebuffer will be the next render operation
-            ops.add(
-                DrawSprite(
-                    source = frameBuffer.asSpriteSheet,
-                    sourceX = 0,
-                    sourceY = 0,
-                    sourceWidth = frameBuffer.width,
-                    sourceHeight = frameBuffer.height,
-                ),
+            val op = DrawSprite.from(
+                this,
+                frameBuffer.asSpriteSheet,
+                0,
+                0,
+                frameBuffer.width,
+                frameBuffer.height,
             )
+            ops.add(op)
         }
 
         // Render operations on the screen.

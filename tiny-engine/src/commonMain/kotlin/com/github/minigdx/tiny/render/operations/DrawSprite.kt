@@ -28,37 +28,6 @@ class DrawSprite(
     val attributes: List<DrawSpriteAttribute>
         get() = _attributes
 
-    constructor(
-        source: SpriteSheet,
-        sourceX: Pixel,
-        sourceY: Pixel,
-        sourceWidth: Pixel,
-        sourceHeight: Pixel,
-        destinationX: Pixel = 0,
-        destinationY: Pixel = 0,
-        flipX: Boolean = false,
-        flipY: Boolean = false,
-        // dither pattern
-        dither: Int = 0xFFFF,
-        pal: Array<ColorIndex> = emptyArray(),
-    ) : this(
-        source,
-        dither,
-        pal,
-        listOf(
-            DrawSpriteAttribute(
-                sourceX,
-                sourceY,
-                sourceWidth,
-                sourceHeight,
-                destinationX,
-                destinationY,
-                flipX,
-                flipY,
-            ),
-        ),
-    )
-
     override fun executeGPU(
         context: RenderContext,
         renderUnit: OperationsRender,
@@ -141,6 +110,41 @@ class DrawSprite(
                 operation.pal = resourceAccess.frameBuffer.blender.switch
                 operation
             }
+        }
+
+        fun from(
+            resourceAccess: GameResourceAccess,
+            source: SpriteSheet,
+            sourceX: Pixel,
+            sourceY: Pixel,
+            sourceWidth: Pixel,
+            sourceHeight: Pixel,
+            destinationX: Pixel = 0,
+            destinationY: Pixel = 0,
+            flipX: Boolean = false,
+            flipY: Boolean = false,
+            // dither pattern
+            dither: Int = 0xFFFF,
+            pal: Array<ColorIndex> = emptyArray(),
+        ): DrawSprite {
+            val operation = resourceAccess.obtain(DrawSprite::class).apply {
+                this.source = source
+                this.dither = dither
+                this.pal = pal
+                this._attributes.add(
+                    resourceAccess.obtain(DrawSpriteAttribute::class).apply {
+                        this.sourceX = sourceX
+                        this.sourceY = sourceY
+                        this.sourceWidth = sourceWidth
+                        this.sourceHeight = sourceHeight
+                        this.destinationX = destinationX
+                        this.destinationY = destinationY
+                        this.flipX = flipX
+                        this.flipY = flipY
+                    },
+                )
+            }
+            return operation
         }
     }
 

@@ -39,7 +39,7 @@ dependencies {
 }
 
 val unzipAsciidoctorResources =
-    tasks.maybeCreate("unzip-asciidoctorResources", Copy::class).also {  cp ->
+    tasks.maybeCreate("unzip-asciidoctorResources", Copy::class).also { cp ->
         asciidoctorResources.resolvedConfiguration.resolvedArtifacts.forEach {
             cp.from(zipTree(asciidoctorResources.incoming.artifacts.artifactFiles.files.first()))
         }
@@ -74,6 +74,6 @@ tasks.withType(AsciidoctorTask::class.java).configureEach {
         unzipAsciidoctorResources.dependsOn(":tiny-web-editor:tinyWebEditor"),
         copyAsciidoctorDependencies,
         copySample,
-        copyResources
+        copyResources,
     )
 }
