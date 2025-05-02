@@ -10,6 +10,7 @@ import com.github.minigdx.tiny.resources.ResourceType
 import com.github.minigdx.tiny.resources.SpriteSheet
 import dev.mokkery.answering.returns
 import dev.mokkery.every
+import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import org.luaj.vm2.LuaValue.Companion.valueOf
 import org.luaj.vm2.LuaValue.Companion.varargsOf
@@ -35,6 +36,7 @@ class StdLibTest {
         mock<GameResourceAccess> {
             every { frameBuffer } returns this@StdLibTest.frameBuffer
             every { bootSpritesheet } returns spritesheet
+            every { addOp(any()) } returns Unit
         }
 
     private val gameOptions =
@@ -53,7 +55,7 @@ class StdLibTest {
         spritesheet.pixels.set(0, 0, 1)
 
         val print = StdLib(gameOptions, gameResourceAccess).print()
-        // only a is an accepted letter as for the test, the bootspritesheet is too small
+        // only "a" is an accepted letter as for the test, the bootspritesheet is too small
         print.invoke(varargsOf(arrayOf(valueOf("a"), valueOf(0), valueOf(0), valueOf(2))))
 
         val grouped = frameBuffer.colorIndexBuffer.pixels.toSet()

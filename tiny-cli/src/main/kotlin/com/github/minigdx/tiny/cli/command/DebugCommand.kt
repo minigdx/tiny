@@ -10,6 +10,9 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.minigdx.tiny.cli.config.GameParameters
+import com.github.minigdx.tiny.cli.debug.DebugRemoteCommand
+import com.github.minigdx.tiny.cli.debug.Disconnect
+import com.github.minigdx.tiny.cli.debug.EngineRemoteCommand
 import com.github.minigdx.tiny.cli.ui.TinyDebuggerUI
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.WebSockets

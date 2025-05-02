@@ -11,7 +11,10 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.minigdx.tiny.cli.config.GameParameters
+import com.github.minigdx.tiny.cli.debug.DebugRemoteCommand
 import com.github.minigdx.tiny.cli.debug.DebuggerExecutionListener
+import com.github.minigdx.tiny.cli.debug.EngineRemoteCommand
+import com.github.minigdx.tiny.cli.debug.Reload
 import com.github.minigdx.tiny.engine.GameEngine
 import com.github.minigdx.tiny.engine.GameEngineListener
 import com.github.minigdx.tiny.engine.TinyException
