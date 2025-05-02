@@ -18,7 +18,7 @@ val asciidoctorDependencies by configurations.creating {
 
 dependencies {
     add(
-        "asciidoctorResources",
+        asciidoctorResources.name,
         project(
             mapOf(
                 "path" to ":tiny-web-editor",
@@ -28,7 +28,7 @@ dependencies {
     )
 
     add(
-        "asciidoctorDependencies",
+        asciidoctorDependencies.name,
         project(
             mapOf(
                 "path" to ":tiny-engine",
@@ -39,20 +39,20 @@ dependencies {
 }
 
 val unzipAsciidoctorResources =
-    tasks.register("unzip-asciidoctorResources", Copy::class) {
+    tasks.maybeCreate("unzip-asciidoctorResources", Copy::class).also {  cp ->
         asciidoctorResources.resolvedConfiguration.resolvedArtifacts.forEach {
-            from(zipTree(it.file))
+            cp.from(zipTree(asciidoctorResources.incoming.artifacts.artifactFiles.files.first()))
         }
-        into(project.layout.buildDirectory.get().asFile.resolve("docs/asciidoc"))
+        cp.into(project.layout.buildDirectory.get().asFile.resolve("docs/asciidoc"))
     }
 
 val copyAsciidoctorDependencies =
-    tasks.register("copy-asciidoctorDependencies", Copy::class) {
+    tasks.maybeCreate("copy-asciidoctorDependencies", Copy::class).also { cp ->
         asciidoctorDependencies.resolvedConfiguration.resolvedArtifacts.forEach {
-            from(it.file)
+            cp.from(it.file)
         }
         // I'm bit lazy, I copy the result stray in the source directory :grimace:
-        into(project.projectDir.resolve("src/docs/asciidoc/dependencies"))
+        cp.into(project.projectDir.resolve("src/docs/asciidoc/dependencies"))
     }
 
 val copySample =
@@ -70,5 +70,10 @@ val copyResources =
 tasks.withType(AsciidoctorTask::class.java).configureEach {
     this.baseDirFollowsSourceDir()
 
-    this.dependsOn(unzipAsciidoctorResources, copyAsciidoctorDependencies, copySample, copyResources)
+    this.dependsOn(
+        unzipAsciidoctorResources.dependsOn(":tiny-web-editor:tinyWebEditor"),
+        copyAsciidoctorDependencies,
+        copySample,
+        copyResources
+    )
 }
