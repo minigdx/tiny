@@ -1,6 +1,6 @@
 name: Build and tests on every commit
 # This workflow is triggered on pushes to the repository.
-on: [push]
+on: [ push ]
 
 jobs:
   build:
@@ -10,7 +10,7 @@ jobs:
       - name: Checkout the repo
         uses: actions/checkout@v3
       - name: Validate Gradle Wrapper
-        uses: gradle/wrapper-validation-action@v1
+        uses: gradle/actions/wrapper-validation@v4
       - name: Cache gradle
         uses: actions/cache@v3
         with:
@@ -29,7 +29,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: | 
+          files: |
             tiny-cli/build/distributions/tiny-cli-${{github.ref_name}}.zip
             tiny-cli/build/distributions/tiny-cli-${{github.ref_name}}.tar
       - name: Update documentation sample
