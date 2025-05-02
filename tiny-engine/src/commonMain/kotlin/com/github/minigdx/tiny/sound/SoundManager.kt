@@ -5,14 +5,6 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-interface Sound {
-    fun play()
-
-    fun loop()
-
-    fun stop()
-}
-
 abstract class SoundManager {
     abstract fun initSoundManager(inputHandler: InputHandler)
 
@@ -21,14 +13,14 @@ abstract class SoundManager {
     /**
      * @param buffer byte array representing the sound. Each sample is represented with a float from -1.0f to 1.0f
      */
-    abstract fun playBuffer(
+    abstract fun createSoundHandler(
         buffer: FloatArray,
         numberOfSamples: Long,
-    )
+    ): SoundHandler
 
-    fun play(bar: MusicalBar) {
+    fun createSoundHandler(bar: MusicalBar): SoundHandler {
         val buffer = convert(bar)
-        playBuffer(buffer, buffer.size.toLong())
+        return createSoundHandler(buffer, buffer.size.toLong())
     }
 
     /**

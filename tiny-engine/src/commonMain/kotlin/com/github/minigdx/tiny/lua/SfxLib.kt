@@ -9,6 +9,7 @@ import com.github.minigdx.tiny.sound.Instrument
 import com.github.minigdx.tiny.sound.Music
 import com.github.minigdx.tiny.sound.MusicalBar
 import com.github.minigdx.tiny.sound.MusicalNote
+import com.github.minigdx.tiny.sound.SoundHandler
 import kotlinx.serialization.json.Json
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
@@ -68,6 +69,8 @@ class SfxLib(
     ): LuaValue {
         val ctrl = LuaTable()
         ctrl.set("play", play())
+        ctrl.set("loop", loop())
+        ctrl.set("stop", stop())
 
         ctrl.set("instrument", instrument())
         ctrl.set("bar", bar())
@@ -80,8 +83,12 @@ class SfxLib(
         return ctrl
     }
 
+    private data class SoundKey(val soundIndex: Int, val barIndex: Int)
+
     private var currentMusic: Music? = null
     private var currentSound: Int = 0
+
+    private val handlers = mutableMapOf<SoundKey, SoundHandler>()
 
     fun getCurrentMusic(): Music {
         return currentMusic ?: Music().also { currentMusic = it }
@@ -301,12 +308,76 @@ class SfxLib(
                 val soundData = resourceAccess.sound(currentSound)?.data
                 val sfx = soundData?.musicalBars?.getOrNull(index) ?: return NIL
 
-                soundData.soundManager.playBuffer(sfx, sfx.size.toLong())
+                val handler = soundData.soundManager.createSoundHandler(sfx, sfx.size.toLong())
+                handlers[SoundKey(currentSound, index)] = handler
+                handler.play()
 
                 return NONE
             } else {
                 return NIL
             }
+        }
+    }
+
+    @TinyFunction(
+        "Loop the bar by it's index of the current sound. " +
+            "The index of a bar of the current music.",
+    )
+    inner class loop : OneArgFunction() {
+        @TinyCall("Loop the sound at the index 0.")
+        override fun call(): LuaValue = super.call()
+
+        @TinyCall("Loop the sound by it's index.")
+        override fun call(
+            @TinyArg("sound") arg: LuaValue,
+        ): LuaValue {
+            val bars = getCurrentMusic().musicalBars
+            if (bars.isEmpty()) return NIL
+
+            val index = if (arg.isnumber()) {
+                arg.checkint().coerceIn(0, bars.size - 1)
+            } else {
+                0
+            }
+
+            if (playSound) {
+                val soundData = resourceAccess.sound(currentSound)?.data
+                val sfx = soundData?.musicalBars?.getOrNull(index) ?: return NIL
+
+                val handler = soundData.soundManager.createSoundHandler(sfx, sfx.size.toLong())
+                handlers[SoundKey(currentSound, index)] = handler
+                handler.loop()
+
+                return NONE
+            } else {
+                return NIL
+            }
+        }
+    }
+
+    @TinyFunction(
+        "Stop the bar by it's index of the current sound. " +
+            "The index of a bar of the current music.",
+    )
+    inner class stop : OneArgFunction() {
+        @TinyCall("Stop the sound at the index 0.")
+        override fun call(): LuaValue = super.call()
+
+        @TinyCall("Stop the sound by it's index.")
+        override fun call(
+            @TinyArg("sound") arg: LuaValue,
+        ): LuaValue {
+            val bars = getCurrentMusic().musicalBars
+            if (bars.isEmpty()) return NIL
+
+            val index = if (arg.isnumber()) {
+                arg.checkint().coerceIn(0, bars.size - 1)
+            } else {
+                0
+            }
+
+            handlers[SoundKey(currentSound, index)]?.stop() ?: return NIL
+            return NONE
         }
     }
 

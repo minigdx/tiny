@@ -1,6 +1,7 @@
 package com.github.minigdx.tiny.platform.webgl
 
 import com.github.minigdx.tiny.input.InputHandler
+import com.github.minigdx.tiny.sound.SoundHandler
 import com.github.minigdx.tiny.sound.SoundManager
 import org.khronos.webgl.Float32Array
 import org.khronos.webgl.set
@@ -30,12 +31,12 @@ class WebSoundMananger : SoundManager() {
         }
     }
 
-    override fun playBuffer(
+    override fun createSoundHandler(
         buffer: FloatArray,
         numberOfSamples: Long,
-    ) {
+    ): SoundHandler {
         val result = convertBuffer(buffer, numberOfSamples)
-        playSfxBuffer(result)
+        return WebSoundHandler(result, this)
     }
 
     private fun convertBuffer(

@@ -19,7 +19,7 @@ import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.RenderFrame
 import com.github.minigdx.tiny.render.operations.DrawSprite
 import com.github.minigdx.tiny.render.operations.RenderOperation
-import com.github.minigdx.tiny.sound.Sound
+import com.github.minigdx.tiny.sound.SoundHandler
 import com.github.minigdx.tiny.sound.SoundManager
 import com.github.minigdx.tiny.util.MutableFixedSizeList
 import kotlinx.coroutines.CoroutineDispatcher
@@ -68,20 +68,23 @@ class HeadlessPlatform(
         return object : SoundManager() {
             override fun initSoundManager(inputHandler: InputHandler) = Unit
 
-            override suspend fun createSfxSound(bytes: ByteArray): Sound {
-                return object : Sound {
-                    override fun play() = Unit
-
-                    override fun loop() = Unit
-
-                    override fun stop() = Unit
-                }
-            }
-
-            override fun playBuffer(
+            override fun createSoundHandler(
                 buffer: FloatArray,
                 numberOfSamples: Long,
-            ) = Unit
+            ): SoundHandler =
+                object : SoundHandler {
+                    override fun play() {
+                        TODO("Not yet implemented")
+                    }
+
+                    override fun loop() {
+                        TODO("Not yet implemented")
+                    }
+
+                    override fun stop() {
+                        TODO("Not yet implemented")
+                    }
+                }
         }
     }
 

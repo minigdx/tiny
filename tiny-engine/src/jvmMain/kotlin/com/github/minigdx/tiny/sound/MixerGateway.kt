@@ -6,8 +6,6 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-class SoundEffect(val data: FloatArray, var position: Int = 0)
-
 class MixerGateway(var alive: Boolean = true, val queue: BlockingQueue<ByteArray>) : Thread() {
     val mixBuffer = FloatArray(CHUNK_SIZE)
 
@@ -17,28 +15,38 @@ class MixerGateway(var alive: Boolean = true, val queue: BlockingQueue<ByteArray
 
             if (sounds.isEmpty()) continue
 
-            sounds.forEach { sound ->
-                val lastIndex = min(sound.position + CHUNK_SIZE, sound.data.size)
-                var mixIndex = 0
-                (sound.position until lastIndex).forEach { i ->
-                    mixBuffer[mixIndex] = max(-1f, min(1f, (mixBuffer[mixIndex] + sound.data[i])))
-                    mixIndex++
+            sounds
+                .filter { !it.stop }
+                .forEach { sound ->
+                    val lastIndex = min(sound.position + CHUNK_SIZE, sound.data.size)
+                    var mixIndex = 0
+                    (sound.position until lastIndex).forEach { i ->
+                        mixBuffer[mixIndex] = max(-1f, min(1f, (mixBuffer[mixIndex] + sound.data[i])))
+                        mixIndex++
+                    }
+
+                    sound.position += CHUNK_SIZE
+                    if (sound.loop && sound.position >= sound.data.size) {
+                        sound.position = sound.position - sound.data.size
+                        // Copy the beginning of the sound in the remaining space of the chunk
+                        (0 until sound.position).forEach { i ->
+                            mixBuffer[mixIndex] = max(-1f, min(1f, (mixBuffer[mixIndex] + sound.data[i])))
+                            mixIndex++
+                        }
+                    }
                 }
 
-                sound.position += CHUNK_SIZE
-            }
-
-            sounds.removeIf { it.position >= it.data.size }
+            sounds.removeIf { it.position >= it.data.size || it.stop }
 
             queue.put(playSoundFromFloats(mixBuffer))
             sleep(((CHUNK_DURATION.toFloat() * 0.5f) * 1000f).toLong())
         }
     }
 
-    private val sounds = ConcurrentLinkedQueue<SoundEffect>()
+    private val sounds = ConcurrentLinkedQueue<JavaSoundHandler>()
 
-    fun add(data: FloatArray) {
-        sounds.add(SoundEffect(data))
+    fun add(sound: JavaSoundHandler) {
+        sounds.add(sound)
     }
 
     private fun playSoundFromFloats(floatAudioData: FloatArray): ByteArray {
