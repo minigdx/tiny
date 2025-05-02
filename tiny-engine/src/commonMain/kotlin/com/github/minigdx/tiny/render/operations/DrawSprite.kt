@@ -3,6 +3,7 @@ package com.github.minigdx.tiny.render.operations
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameResourceAccess
+import com.github.minigdx.tiny.graphic.Camera
 import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.input.internal.ObjectPool
 import com.github.minigdx.tiny.input.internal.PoolObject
@@ -17,6 +18,7 @@ class DrawSprite(
     // dither pattern
     var dither: Int = 0xFFFF,
     var pal: Array<ColorIndex> = emptyArray(),
+    var camera: Camera? = null,
     attributes: List<DrawSpriteAttribute> = emptyList(),
     override var pool: ObjectPool<DrawSprite>? = null,
 ) : RenderOperation, PoolObject<DrawSprite> {
@@ -108,6 +110,7 @@ class DrawSprite(
                 operation._attributes.addAll(chunk)
                 operation.dither = resourceAccess.frameBuffer.blender.dithering
                 operation.pal = resourceAccess.frameBuffer.blender.switch
+                operation.camera = resourceAccess.frameBuffer.camera
                 operation
             }
         }
@@ -126,11 +129,13 @@ class DrawSprite(
             // dither pattern
             dither: Int = 0xFFFF,
             pal: Array<ColorIndex> = emptyArray(),
+            camera: Camera? = null,
         ): DrawSprite {
             val operation = resourceAccess.obtain(DrawSprite::class).apply {
                 this.source = source
                 this.dither = dither
                 this.pal = pal
+                this.camera = camera
                 this._attributes.add(
                     resourceAccess.obtain(DrawSpriteAttribute::class).apply {
                         this.sourceX = sourceX

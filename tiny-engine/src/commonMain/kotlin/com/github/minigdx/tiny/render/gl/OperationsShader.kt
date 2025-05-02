@@ -120,14 +120,16 @@ class OperationsShader(
             source.height,
         )
 
-        // -- Configuration de l'uniforme palette_colors -- //
+        // -- Set the color palette -- //
         val colors = gameOptions.colors()
         val colorPaletteBuffer = ByteArray(256 * 256 * PixelFormat.RGBA)
         var pos = 0
         for (index in 0 until 256) {
             val pal = if (op.pal.isNotEmpty()) {
+                // Get the pal color
                 op.pal[index % op.pal.size]
             } else {
+                // Get the straight color
                 index
             }
             val color = colors.getRGBA(pal)
@@ -139,6 +141,9 @@ class OperationsShader(
 
         program.fragmentShader.paletteColors.applyRGBA(colorPaletteBuffer, 256, 256)
         program.fragmentShader.uDither.apply(op.dither)
+        op.camera?.run {
+            program.vertexShader.uCamera.apply(this.x.toFloat(), this.y.toFloat())
+        } ?: program.vertexShader.uCamera.apply(0f, 0f)
 
         program.vertexShader.uViewport.apply(
             gameOptions.width.toFloat(),
@@ -161,6 +166,7 @@ class OperationsShader(
         val aSpr = attributeVec2("a_spr")
         val uViewport = uniformVec2("u_viewport") // Size of the viewport; in pixel.
         val uSpritesheet = uniformVec2("u_spritesheet") // Size of the viewport; in pixel.
+        val uCamera = uniformVec2("u_camera") // Position of the camera (offset)
 
         val vUvs = varyingVec2("v_uvs")
         val vPos = varyingVec2("v_pos")
@@ -184,8 +190,9 @@ class OperationsShader(
         private val VERTEX_SHADER =
             """
             void main() {
+                vec2 final_pos = (a_pos - u_camera);
                 // Convert the pixel coordinates into NDC coordinates
-                vec2 ndc_pos = a_pos / u_viewport ;
+                vec2 ndc_pos = final_pos / u_viewport ;
                 // Move the origin to the left/up corner
                 vec2 origin_pos = vec2(-1.0, 1.0) + ndc_pos * 2.0;
                 
@@ -196,7 +203,7 @@ class OperationsShader(
                 vec2 ndc_spr = a_spr / u_spritesheet;
                 v_uvs = ndc_spr;
                 
-                v_pos = a_pos;
+                v_pos = final_pos;
             }
             """.trimIndent()
 
