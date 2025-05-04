@@ -7,7 +7,11 @@ import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.graphic.PixelArray
+import com.github.minigdx.tiny.render.operations.CameraOperation
+import com.github.minigdx.tiny.render.operations.ClipOperation
+import com.github.minigdx.tiny.render.operations.DitheringOperation
 import com.github.minigdx.tiny.render.operations.FrameBufferOperation
+import com.github.minigdx.tiny.render.operations.PaletteOperation
 import com.github.minigdx.tiny.resources.ResourceType
 import com.github.minigdx.tiny.resources.SpriteSheet
 import org.luaj.vm2.LuaTable
@@ -143,6 +147,7 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
     inner class pal : LibFunction() {
         @TinyCall("Reset all previous color changes.")
         override fun call(): LuaValue {
+            resourceAccess.addOp(PaletteOperation)
             resourceAccess.frameBuffer.blender.pal()
             return NONE
         }
@@ -152,6 +157,7 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
             a: LuaValue,
             b: LuaValue,
         ): LuaValue {
+            resourceAccess.addOp(PaletteOperation)
             resourceAccess.frameBuffer.blender.pal(a.checkint(), b.checkint())
             return NONE
         }
@@ -161,6 +167,7 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
     inner class camera : TwoArgFunction() {
         @TinyCall("Reset the game camera to it's default position (0,0).")
         override fun call(): LuaValue {
+            resourceAccess.addOp(CameraOperation)
             val previous = coordinates()
             resourceAccess.frameBuffer.camera.set(0, 0)
             return previous
@@ -171,6 +178,7 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
             @TinyArg("x") arg1: LuaValue,
             @TinyArg("y") arg2: LuaValue,
         ): LuaValue {
+            resourceAccess.addOp(CameraOperation)
             val previous = coordinates()
             resourceAccess.frameBuffer.camera.set(arg1.toint(), arg2.toint())
             return previous
@@ -195,6 +203,7 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
     inner class dither : LibFunction() {
         @TinyCall("Reset dithering pattern. The previous dithering pattern is returned.")
         override fun call(): LuaValue {
+            resourceAccess.addOp(DitheringOperation)
             return valueOf(resourceAccess.frameBuffer.blender.dither(0xFFFF))
         }
 
@@ -202,6 +211,7 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
         override fun call(
             @TinyArg("pattern", "Dither pattern. For example: 0xA5A5 or 0x3030") a: LuaValue,
         ): LuaValue {
+            resourceAccess.addOp(DitheringOperation)
             return valueOf(resourceAccess.frameBuffer.blender.dither(a.checkint()))
         }
     }
@@ -213,6 +223,7 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
     inner class clip : LibFunction() {
         @TinyCall("Reset the clip and draw on the fullscreen.")
         override fun call(): LuaValue {
+            resourceAccess.addOp(ClipOperation)
             resourceAccess.frameBuffer.clipper.reset()
             return NONE
         }
@@ -224,6 +235,7 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
             @TinyArg("width") c: LuaValue,
             @TinyArg("height") d: LuaValue,
         ): LuaValue {
+            resourceAccess.addOp(ClipOperation)
             resourceAccess.frameBuffer.clipper.set(a.checkint(), b.checkint(), c.checkint(), d.checkint())
             return NONE
         }

@@ -14,7 +14,6 @@
             <option value="$PROJECT_DIR$/tiny-doc-annotations" />
             <option value="$PROJECT_DIR$/tiny-doc-generator" />
             <option value="$PROJECT_DIR$/tiny-engine" />
-            <option value="$PROJECT_DIR$/tiny-repository-libs" />
             <option value="$PROJECT_DIR$/tiny-sample" />
             <option value="$PROJECT_DIR$/tiny-web-editor" />
           </set>

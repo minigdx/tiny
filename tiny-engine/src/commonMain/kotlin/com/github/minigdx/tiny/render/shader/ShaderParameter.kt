@@ -16,6 +16,7 @@ import com.danielgergely.kgl.GL_TEXTURE_MAG_FILTER
 import com.danielgergely.kgl.GL_TEXTURE_MIN_FILTER
 import com.danielgergely.kgl.GL_TEXTURE_WRAP_S
 import com.danielgergely.kgl.GL_TEXTURE_WRAP_T
+import com.danielgergely.kgl.GL_UNPACK_ALIGNMENT
 import com.danielgergely.kgl.GL_UNSIGNED_BYTE
 import com.danielgergely.kgl.GlBuffer
 import com.danielgergely.kgl.Texture
@@ -367,6 +368,7 @@ sealed class ShaderParameter(val name: String) {
         ) {
             program.bindTexture(GL_TEXTURE_2D, texture)
 
+            program.pixelStorei(GL_UNPACK_ALIGNMENT, 1)
             program.texImage2D(
                 GL_TEXTURE_2D,
                 0,
@@ -378,6 +380,7 @@ sealed class ShaderParameter(val name: String) {
                 GL_UNSIGNED_BYTE,
                 ByteBuffer(image),
             )
+            program.pixelStorei(GL_UNPACK_ALIGNMENT, 4)
 
             program.bindTexture(GL_TEXTURE_2D, null)
             ready = true

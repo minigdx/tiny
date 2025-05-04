@@ -6,6 +6,7 @@ import com.github.minigdx.tiny.graphic.ColorPalette
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import dev.mokkery.answering.returns
 import dev.mokkery.every
+import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import org.luaj.vm2.LuaValue.Companion.valueOf
 import kotlin.test.Test
@@ -17,6 +18,7 @@ class GfxLibTest {
     private val gameResourceAccess =
         mock<GameResourceAccess> {
             every { frameBuffer } returns this@GfxLibTest.frameBuffer
+            every { addOp(any()) } returns Unit
         }
 
     private val gameOptions = GameOptions(10, 10, listOf("#FFFFFF"), listOf("game.lua"), emptyList())

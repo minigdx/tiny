@@ -517,7 +517,12 @@ entity.fields -- access custom field of the entity
                 layer.autoLayerTiles?.map { tile -> toAttribute(layer.__gridSize, tile) } ?: emptyList()
             val attributes = attributesGrid + attributesAutoLayer
 
-            return DrawSprite.from(resourceAccess, layer.__identifier, tileset, attributes)
+            return DrawSprite.from(
+                resourceAccess = resourceAccess,
+                name = layer.__identifier,
+                tileset = tileset,
+                attributes = attributes,
+            )
         }
     }
 
