@@ -43,19 +43,16 @@ class AddCommand : CliktCommand(name = "add") {
                     // Add script
                     gameParameters = gameParameters.addScript(r)
                     "script"
-                } else if (r.endsWith("mid") || r.endsWith("midi") || r.endsWith("sfx")) {
+                } else if (r.endsWith("sfx")) {
                     // Add midi
                     gameParameters = gameParameters.addSound(r)
                     "sound"
+                } else if (r.endsWith("ldtk")) {
+                    // Add level
+                    gameParameters = gameParameters.addLevel(r)
+                    "level"
                 } else {
-                    val file = File(r)
-                    if (file.isDirectory && file.resolve("data.json").isFile) {
-                        // Add level
-                        gameParameters = gameParameters.addLevel(r)
-                        "level"
-                    } else {
-                        null
-                    }
+                    null
                 }
             if (type != null) {
                 echo("➕ $r added into your game as $type!")
