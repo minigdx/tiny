@@ -68,6 +68,7 @@ Want to create games like these? Dive into the docs and start building:
 [![Meiro De Maigo 2](./tiny-doc/src/docs/asciidoc/sample/meiro_de_maigo2.gif)](https://dwursteisen.itch.io/meiro-de)
 [![Freezming](./tiny-doc/src/docs/asciidoc/sample/freezming.gif)](https://dwursteisen.itch.io/freezming)
 [![Gravity Balls](./tiny-doc/src/docs/asciidoc/sample/gravity-balls.gif)](https://dwursteisen.itch.io/gravity-balls)
+[![Reflections](./tiny-doc/src/docs/asciidoc/sample/reflections.gif)](https://dwursteisen.itch.io/macro-jams-06-reflections)
 
 ---
 

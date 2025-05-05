@@ -46,7 +46,7 @@ class KspProcessor(
                 title = "Tiny API"
                 libs.forEach { lib ->
                     section(lib.name.ifBlank { "std" }, lib.description) {
-                        lib.variables.forEach { variable ->
+                        lib.variables.filterNot { it.hidden }.forEach { variable ->
                             val prefix =
                                 if (lib.name.isBlank()) {
                                     variable.name

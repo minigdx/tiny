@@ -10,6 +10,7 @@ image:sample/only_three_seconds.gif[link=https://dwursteisen.itch.io/one-light-f
 image:sample/meiro_de_maigo2.gif[link=https://dwursteisen.itch.io/meiro-de]
 image:sample/freezming.gif[link=https://dwursteisen.itch.io/freezming]
 image:sample/gravity-balls.gif[link=https://dwursteisen.itch.io/gravity-balls]
+image:sample/reflections.gif[link=https://dwursteisen.itch.io/macro-jams-06-reflections]
 
 
 TIP: Want your game to appear here? Create a post about it in https://github.com/minigdx/tiny/discussions/categories/show-and-tell[the Show and tell board] and share all information about it.

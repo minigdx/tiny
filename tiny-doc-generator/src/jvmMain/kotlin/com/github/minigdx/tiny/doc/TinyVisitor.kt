@@ -49,23 +49,22 @@ class TinyFunctionVisitor :
         val functions = classDeclaration.getAnnotationsByType(TinyFunction::class)
         if (functions.count() == 0) return data
 
-        val defaultName =
-            classDeclaration.accept(
-                object : KSDefaultVisitor<Unit, String>() {
-                    override fun defaultHandler(
-                        node: KSNode,
-                        data: Unit,
-                    ): String = ""
+        val defaultName = classDeclaration.accept(
+            object : KSDefaultVisitor<Unit, String>() {
+                override fun defaultHandler(
+                    node: KSNode,
+                    data: Unit,
+                ): String = ""
 
-                    override fun visitClassDeclaration(
-                        classDeclaration: KSClassDeclaration,
-                        data: Unit,
-                    ): String {
-                        return classDeclaration.simpleName.asString()
-                    }
-                },
-                Unit,
-            )
+                override fun visitClassDeclaration(
+                    classDeclaration: KSClassDeclaration,
+                    data: Unit,
+                ): String {
+                    return classDeclaration.simpleName.asString()
+                }
+            },
+            Unit,
+        )
 
         val result =
             functions.map { function ->
@@ -102,22 +101,20 @@ class TinyFunctionVisitor :
                             val multiArg = multiArgs.firstOrNull()
                             if (multiArg != null) {
                                 val documentation = multiArg.documentations
-                                val docs =
-                                    if (documentation.size < multiArg.names.size) {
-                                        documentation +
-                                            (0 until multiArg.names.size - documentation.size).map { "" }
-                                                .toTypedArray()
-                                    } else {
-                                        documentation
-                                    }
+                                val docs = if (documentation.size < multiArg.names.size) {
+                                    documentation +
+                                        (0 until multiArg.names.size - documentation.size).map { "" }
+                                            .toTypedArray()
+                                } else {
+                                    documentation
+                                }
 
-                                call.args +=
-                                    multiArg.names.map { n -> TinyArgDescriptor(n) }
-                                        .zip(docs) { ano, doc ->
-                                            ano.apply {
-                                                ano.description = doc
-                                            }
+                                call.args += multiArg.names.map { n -> TinyArgDescriptor(n) }
+                                    .zip(docs) { ano, doc ->
+                                        ano.apply {
+                                            ano.description = doc
                                         }
+                                    }
                             } else {
                                 val args = p.getAnnotationsByType(TinyArg::class)
                                 val arg = args.firstOrNull()?.name ?: p.name?.asString() ?: ""
@@ -170,15 +167,19 @@ class TinyLibVisitor : KSDefaultVisitor<TinyLibDescriptor, TinyLibDescriptor>() 
     ): TinyLibDescriptor {
         if (!classDeclaration.isAnnotationPresent(TinyLib::class)) return data
 
-        val functions =
-            classDeclaration.declarations.map { declaration ->
-                declaration.accept(TinyFunctionVisitor(), mutableListOf())
-            }.flatMap { functions -> functions }.filter { f -> f.name.isNotBlank() }
+        val functions = classDeclaration.declarations.map { declaration ->
+            declaration.accept(TinyFunctionVisitor(), mutableListOf())
+        }.flatMap { functions -> functions }.filter { f -> f.name.isNotBlank() }
 
-        val variables =
-            classDeclaration.getDeclaredFunctions()
-                .flatMap { f -> f.getAnnotationsByType(TinyVariable::class) }
-                .map { annotation -> TinyVariableDescriptor(annotation.name, annotation.description) }
+        val variables = classDeclaration.getDeclaredFunctions()
+            .flatMap { f -> f.getAnnotationsByType(TinyVariable::class) }
+            .map { annotation ->
+                TinyVariableDescriptor(
+                    name = annotation.name,
+                    description = annotation.description,
+                    hidden = annotation.hideInDocumentation,
+                )
+            }
 
         data.functions = functions.toList()
         data.variables = variables.toList()

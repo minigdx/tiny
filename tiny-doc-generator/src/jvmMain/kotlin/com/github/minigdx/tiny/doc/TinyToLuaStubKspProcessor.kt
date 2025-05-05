@@ -18,26 +18,23 @@ class TinyToLuaStubKspProcessor(
 
         val symbolsWithAnnotation = resolver.getSymbolsWithAnnotation(TinyLib::class.qualifiedName!!)
 
-        val sourceFiles =
-            symbolsWithAnnotation
-                .filterIsInstance<KSClassDeclaration>()
-                .mapNotNull { it.containingFile }
-                .toList()
-                .toTypedArray()
+        val sourceFiles = symbolsWithAnnotation
+            .filterIsInstance<KSClassDeclaration>()
+            .mapNotNull { it.containingFile }
+            .toList()
+            .toTypedArray()
 
-        val file =
-            env.codeGenerator.createNewFile(
-                Dependencies(true, *sourceFiles),
-                "/",
-                "_tiny.stub",
-                "lua",
-            )
+        val file = env.codeGenerator.createNewFile(
+            Dependencies(true, *sourceFiles),
+            "/",
+            "_tiny.stub",
+            "lua",
+        )
 
-        val libs =
-            symbolsWithAnnotation.map { s ->
-                val accept = s.accept(TinyLibVisitor(), TinyLibDescriptor())
-                accept
-            }
+        val libs = symbolsWithAnnotation.map { s ->
+            val accept = s.accept(TinyLibVisitor(), TinyLibDescriptor())
+            accept
+        }
 
         val result =
             stub(
@@ -54,6 +51,13 @@ class TinyToLuaStubKspProcessor(
                         name = it.name
                         description = it.description
 
+                        it.variables.forEach {
+                            variable {
+                                name = it.name
+                                description = it.description
+                                hidden = it.hidden
+                            }
+                        }
                         it.functions.forEach { function ->
                             function {
                                 namespace = it.name.takeIf { it.isNotBlank() }

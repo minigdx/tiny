@@ -90,4 +90,8 @@ annotation class TinyVariable(
      * Description of the variable
      */
     val description: String,
+    /**
+     * Should this be hidden in the asciidoctor?
+     */
+    val hideInDocumentation: Boolean = false,
 )
