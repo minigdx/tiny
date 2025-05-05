@@ -125,5 +125,7 @@ abstract class SoundManager {
     companion object {
         const val SAMPLE_RATE = 44100
         const val MASTER_VOLUME = 0.8f
+        const val PI = (kotlin.math.PI).toFloat()
+        const val TWO_PI = 2.0f * PI
     }
 }
