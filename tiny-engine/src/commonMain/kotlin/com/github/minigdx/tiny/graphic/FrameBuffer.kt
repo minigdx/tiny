@@ -129,10 +129,11 @@ class FrameBuffer(
         colorIndex: ColorIndex,
     ) {
         val cy = camera.cy(y)
+        if (cy !in clipper.top..clipper.bottom - 1) return
+
         val leftX = min(startX, endX)
         val rightX = max(startX, endX)
         // fill outside the screen?
-        if (cy !in clipper.top..clipper.bottom - 1) return
         val left = max(camera.cx(leftX), clipper.left)
         val right = min(camera.cx(rightX), clipper.right)
 
@@ -144,7 +145,10 @@ class FrameBuffer(
 
         // can't optimise if there is some dithering
         if (blender.hasDithering) {
-            (left..right).forEach { x ->
+            // pixel use the clipper and the camera.
+            // the coordinates need to be the non-translated one
+            // as it will be translated by pixel if needed.
+            (startX..endX).forEach { x ->
                 pixel(x, y, colorIndex)
             }
         } else {
