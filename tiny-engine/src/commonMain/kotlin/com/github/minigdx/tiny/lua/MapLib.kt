@@ -21,7 +21,6 @@ import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
-import org.luaj.vm2.lib.ZeroArgFunction
 import kotlin.math.floor
 
 /**
@@ -88,8 +87,8 @@ class MapLib(
 
         @TinyCall(
             "Set the current level to use. " +
-                "The level can be an index, the name or the id defined by LDTK. " +
-                "Return the previous index level or NIL if the new level is invalid.",
+                    "The level can be an index, the name or the id defined by LDTK. " +
+                    "Return the previous index level or NIL if the new level is invalid.",
         )
         override fun call(
             @TinyArg("level") a: LuaValue,
@@ -108,12 +107,11 @@ class MapLib(
             } else {
                 val id = a.tojstring() // can be an identifier of an uuid
                 val world = resourceAccess.level(currentWorld) ?: return NIL
-                val index =
-                    world
-                        .ldtk
-                        .levels
-                        // Try to find the first level that match the id or the identifier
-                        .indexOfFirst { level -> level.iid == id || level.identifier == id }
+                val index = world
+                    .ldtk
+                    .levels
+                    // Try to find the first level that match the id or the identifier
+                    .indexOfFirst { level -> level.iid == id || level.identifier == id }
 
                 if (index != -1) {
                     val previous = valueOf(currentLevel)
@@ -130,7 +128,7 @@ class MapLib(
     inner class layer : OneArgFunction() {
         @TinyCall(
             "Get the layer at the specified index or name from the actual level. " +
-                "The layer in the front is 0.",
+                    "The layer in the front is 0.",
         )
         override fun call(
             @TinyArg("layer_index") arg: LuaValue,
@@ -139,8 +137,8 @@ class MapLib(
 
             if (arg.isnil()) {
                 val activeLevel = level ?: return NIL
-                val layersAsLua =
-                    activeLevel.layerInstances.mapIndexed { index, layer -> layer.toLua(index, activeLevel) }
+                val layersAsLua = activeLevel.layerInstances
+                    .mapIndexed { index, layer -> layer.toLua(index, activeLevel) }
                 return LuaValue.listOf(layersAsLua.toTypedArray())
             }
 
@@ -155,19 +153,16 @@ class MapLib(
             layerIndex: Int,
             level: Level,
         ): LuaValue {
-            val result = LuaTable()
-            result["toggle"] =
-                object : ZeroArgFunction() {
-                    override fun call(): LuaValue {
-                        if (layersState.isEmpty()) {
-                            // All layers are active by default
-                            layersState = Array(level.layerInstances.size) { true }
-                        }
-                        val current = layersState[layerIndex]
-                        layersState[layerIndex] = current.not()
-                        return valueOf(current)
-                    }
+            val result = WrapperLuaTable()
+            result.function0("toggle") {
+                if (layersState.isEmpty()) {
+                    // All layers are active by default
+                    layersState = Array(level.layerInstances.size) { true }
                 }
+                val current = layersState[layerIndex]
+                layersState[layerIndex] = current.not()
+                valueOf(current)
+            }
             return result
         }
     }
@@ -201,8 +196,8 @@ class MapLib(
 
     @TinyFunction(
         "Convert screen coordinates x, y into map cell coordinates cx, cy.\n" +
-            "For example, coordinates of the player can be converted to cell coordinates to access the flag " +
-            "of the tile matching the player coordinates.",
+                "For example, coordinates of the player can be converted to cell coordinates to access the flag " +
+                "of the tile matching the player coordinates.",
     )
     inner class to : TwoArgFunction() {
         @TinyCall("Convert the coordinates into cell coordinates as a table [cx,cy].")
@@ -320,7 +315,7 @@ entity.fields -- access custom field of the entity
         ): LuaValue {
             val cache = cachedEntities[name]
             return if (
-                // Entities aren't cached yet
+            // Entities aren't cached yet
                 cache == null ||
                 // Any change occurs on the current level used.
                 currentWorldIndex != currentWorld ||
@@ -558,13 +553,13 @@ entity.fields -- access custom field of the entity
         cy: Int,
         index: (Layer, Int, Int) -> Int = { layer, a, b -> a + b * layer.__cWid },
     ): LuaValue {
-        val cell: Int =
-            layers.filter { layer -> layer.intGridCsv != null }
-                // Get the first cell != 0 in all IntLayers
-                .map { layer ->
-                    layer.intGridCsv!!.getOrElse(index(layer, cx, cy)) { 0 }
-                }.firstOrNull { cell -> cell != 0 }
-                ?: 0
+        val cell: Int = layers.filter { layer -> layer.intGridCsv != null }
+            // Get the first cell != 0 in all IntLayers
+            .map { layer ->
+                val cellIndex = index(layer, cx, cy)
+                layer.intGridCsv!!.getOrElse(cellIndex) { 0 }
+            }.firstOrNull { cell -> cell != 0 }
+            ?: 0
 
         if (cell == 0) return NIL
         return LuaValue.valueOf(cell)

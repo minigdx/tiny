@@ -123,6 +123,7 @@ class SfxLib(
             } else {
                 val soundIndex = currentSound
                 currentMusic = sound.data.music
+                currentSound = sound.index
                 valueOf(soundIndex)
             }
         }
