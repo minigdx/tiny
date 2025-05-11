@@ -1,17 +1,38 @@
 <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
 <style>
-    .tiny-container {
-        display: flex;
-        flex-wrap: wrap;
-    }
-
+    /** link to start the game **/
     .tiny-play {
         display: block;
     }
 
+    /** container of the game + editor **/
+    .tiny-container {
+        display: flex;
+        width: calc(100% + 256px);
+        margin-left: -128px;
+    }
+
+    /** game **/
     .tiny-canvas {
         border: 1px solid black;
         cursor: none;
+
+        flex: 1 1 auto;
+        max-height: 512px;
+        max-width: 512px;
+    }
+
+    /** code editor **/
+    .tiny-textarea {
+        flex: 2 1 auto;
+        display: block;
+        min-height: 512px;
+        border: 2px solid red;
+        padding-left: 48px;
+        counter-reset: line; /* reset the "line" counter */
+        width: 100%;
+        font-family: "Source Code Pro", monospace;
+        resize:none;
     }
 
     .tiny-textarea div {
@@ -27,15 +48,6 @@
         counter-increment: line;  /* increment the counter */
         position: absolute;
         right: calc(100% + 16px); /* add some space between this and the code line next to it */
-    }
-
-    .tiny-textarea {
-        padding-left: 48px;
-        counter-reset: line; /* reset the "line" counter */
-        height: 512px;
-        width: 100%;
-        font-family: "Source Code Pro", monospace;
-        resize:none;
     }
 
     .code_comment {

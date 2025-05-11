@@ -200,27 +200,15 @@ private fun createGame(
     levelPath: String?,
     rootPath: String,
 ) {
-    val canvas =
-        document.createElement("canvas").apply {
-            setAttribute("width", "512")
-            setAttribute("height", "512")
-            setAttribute("class", "tiny-canvas")
-            setAttribute("tabindex", "1")
-        }
-    container.appendChild(canvas)
-
     val textarea = (document.createElement("div") as HTMLDivElement).apply {
         setAttribute("id", "editor-$index")
         setAttribute("spellcheck", "false")
         setAttribute("class", "tiny-textarea")
         setAttribute("contenteditable", "true")
 
-        var pp = code
         innerHTML = highlight(code)
 
-
         oninput = { event ->
-            // FIXME: mettre un \n rajoute un BR.
             val pos = getCaretPosition(this)
             console.log("html", this.innerHTML)
             this.innerHTML = highlight(extractText(this))
@@ -231,8 +219,15 @@ private fun createGame(
     textarea.innerHTML = highlight(textarea.innerText)
     container.appendChild(textarea)
 
-    val link =
-        (document.createElement("a") as HTMLAnchorElement).apply {
+    val canvas = document.createElement("canvas").apply {
+        setAttribute("width", "512")
+        setAttribute("height", "512")
+        setAttribute("class", "tiny-canvas")
+        setAttribute("tabindex", "1")
+    }
+    container.appendChild(canvas)
+
+    val link = (document.createElement("a") as HTMLAnchorElement).apply {
             val b64 = Base64.encode(code.encodeToByteArray())
             id = "share-$index"
             href = "sandbox.html?game=$b64"

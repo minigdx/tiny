@@ -4,7 +4,7 @@
 :source-highlighter: rouge
 :favicon: ./sample/favicon.png
 
-= Tiny Sandbox 🧸
+= Tiny Playground 🧸
 
 Welcome to our sandbox page where you can try out `🧸 Tiny` online! `🧸 Tiny` is a lightweight game engine that allows you to create 2D games with ease.
 

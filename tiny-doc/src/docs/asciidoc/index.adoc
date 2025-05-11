@@ -25,9 +25,9 @@ With `🧸 Tiny`, you'll be able to get started right away and see your progress
 
 NOTE: The code source of this sample is available in the https://github.com/minigdx/tiny/tree/main/tiny-sample[Tiny git repository].
 
-== Tiny Sandbox
+== Tiny Playground
 
-You can try to create a game right away `🧸 Tiny` using link:sandbox.html?game=[the Sandbox] or you can just try it by updating examples available in this page.
+You can try to create a game right away `🧸 Tiny` using link:playground.html?game=[the Playground] or you can just try it by updating examples available in this page.
 
 == Tiny is open source
 
