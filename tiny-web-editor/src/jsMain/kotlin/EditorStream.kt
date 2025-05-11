@@ -42,7 +42,7 @@ class EditorStream(field: String) : SourceStream<ByteArray> {
     override suspend fun read(): ByteArray {
         val value = textarea?.innerText ?: ""
 
-        share?.href = "sandbox.html?game=" + window.btoa(value)
+        share?.href = "playground.html?game=" + window.btoa(value)
 
         return value.encodeToByteArray()
     }

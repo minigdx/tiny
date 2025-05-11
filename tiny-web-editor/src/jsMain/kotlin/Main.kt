@@ -38,29 +38,33 @@ fun main() {
 
     val url = URLSearchParams(window.location.search)
     val savedCode = url.get("game")
-    val decodedCode =
-        if (savedCode?.isNotBlank() == true) {
-            Base64.decode(savedCode.encodeToByteArray()).decodeToString()
-        } else {
-            null
-        }
+    val decodedCode = if (savedCode?.isNotBlank() == true) {
+        Base64.decode(savedCode.encodeToByteArray()).decodeToString()
+    } else {
+        null
+    }
 
     elts.forEachIndexed { index, game ->
         val code = game.textContent ?: ""
         val spritePath = game.getAttribute("sprite")
         val levelPath = game.getAttribute("level")
 
+        val toolbar = document.createElement("div") {
+            setAttribute("class", "tiny-toolbar")
+        }
+        game.before(toolbar)
+
         val link = document.createElement("a") {
             setAttribute("id", "link-editor-$index")
-            setAttribute("class", "tiny-play")
+            setAttribute("class", "tiny-play tiny-button")
             setAttribute("href", "#link-editor-$index")
         } as HTMLAnchorElement
-        game.before(link)
+        toolbar.appendChild(link)
 
         val playLink = document.createElement("div").apply {
             setAttribute("class", "tiny-container")
         }
-        link.after(playLink)
+        toolbar.after(playLink)
 
         val codeToUse = decodedCode ?: "-- Update the code to update the game!\n$code"
 
@@ -73,6 +77,20 @@ fun main() {
             }
             true
         }
+
+        val playground = (
+            document.createElement("a") {
+                setAttribute("class", "tiny-button tiny-button-right")
+                id = "share-$index"
+                textContent = "↗\uFE0F Playground"
+            } as HTMLAnchorElement
+        ).apply {
+            val b64 = Base64.encode(code.encodeToByteArray())
+            href = "playground.html?game=$b64"
+            target = "_blank"
+        }
+
+        toolbar.appendChild(playground)
 
         // There is a user code. Let's unfold the game.
         if (savedCode != null) {
@@ -227,15 +245,6 @@ private fun createGame(
     }
     container.appendChild(canvas)
 
-    val link = (document.createElement("a") as HTMLAnchorElement).apply {
-            val b64 = Base64.encode(code.encodeToByteArray())
-            id = "share-$index"
-            href = "sandbox.html?game=$b64"
-            textContent = "\uD83D\uDD17 Share this game!"
-        }
-
-    container.after(link)
-
     val logger = StdOutLogger("tiny-editor-$index")
 
     val gameOptions = GameOptions(
@@ -282,8 +291,7 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
 
     override fun initWindowManager(): WindowManager = delegate.initWindowManager()
 
-    override fun initRenderManager(windowManager: WindowManager): RenderContext =
-        delegate.initRenderManager(windowManager)
+    override fun initRenderManager(windowManager: WindowManager): RenderContext = delegate.initRenderManager(windowManager)
 
     override fun gameLoop(gameLoop: GameLoop) = delegate.gameLoop(gameLoop)
 

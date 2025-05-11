@@ -85,14 +85,14 @@ class MainTest {
     fun highlight_extra_line_return() {
         val elt = document.createElement("div") as HTMLDivElement
         elt.innerHTML = "<div></div>\n" +
-                "<div></div>" +
-                "<div><em class=\"code_number\">3</em></div>"
+            "<div></div>" +
+            "<div><em class=\"code_number\">3</em></div>"
         elt.innerHTML = highlight(extractText(elt))
 
         assertEquals(
             "<div><br></div>\n" +
-                    "<div><br></div>\n" +
-                    "<div><em class=\"code_number\">3</em></div>",
+                "<div><br></div>\n" +
+                "<div><em class=\"code_number\">3</em></div>",
             elt.innerHTML,
         )
     }
@@ -112,7 +112,6 @@ class MainTest {
 <div>function _draw()</div>
 <div></div>
 <div>end</div>"""
-
 
         val expected = """-- Update the code to update the game!
 
