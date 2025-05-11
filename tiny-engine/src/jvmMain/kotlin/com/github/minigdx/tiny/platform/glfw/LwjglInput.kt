@@ -26,7 +26,6 @@ import org.lwjgl.glfw.GLFWMouseButtonCallback
 import java.nio.DoubleBuffer
 
 class LwjglInput(private val projector: MouseProject) : InputHandler, InputManager {
-
     private val touchManager = TouchManager(UNKNOWN_KEY)
 
     private var window: Long = 0
@@ -52,7 +51,13 @@ class LwjglInput(private val projector: MouseProject) : InputHandler, InputManag
         glfwSetKeyCallback(
             windowAddress,
             object : GLFWKeyCallback() {
-                override fun invoke(window: Long, key: Int, scancode: Int, action: Int, mods: Int) {
+                override fun invoke(
+                    window: Long,
+                    key: Int,
+                    scancode: Int,
+                    action: Int,
+                    mods: Int,
+                ) {
                     if (action == GLFW_PRESS) {
                         keyDown(key)
                     } else if (action == GLFW_RELEASE) {
@@ -64,7 +69,10 @@ class LwjglInput(private val projector: MouseProject) : InputHandler, InputManag
         glfwSetCursorEnterCallback(
             windowAddress,
             object : GLFWCursorEnterCallback() {
-                override fun invoke(window: Long, entered: Boolean) {
+                override fun invoke(
+                    window: Long,
+                    entered: Boolean,
+                ) {
                     isMouseInsideWindow = entered
                 }
             },
@@ -73,13 +81,19 @@ class LwjglInput(private val projector: MouseProject) : InputHandler, InputManag
         glfwSetMouseButtonCallback(
             windowAddress,
             object : GLFWMouseButtonCallback() {
-                override fun invoke(window: Long, button: Int, action: Int, mods: Int) {
-                    val touchSignal = when (button) {
-                        GLFW_MOUSE_BUTTON_1 -> TouchSignal.TOUCH1
-                        GLFW_MOUSE_BUTTON_2 -> TouchSignal.TOUCH2
-                        GLFW_MOUSE_BUTTON_3 -> TouchSignal.TOUCH3
-                        else -> return
-                    }
+                override fun invoke(
+                    window: Long,
+                    button: Int,
+                    action: Int,
+                    mods: Int,
+                ) {
+                    val touchSignal =
+                        when (button) {
+                            GLFW_MOUSE_BUTTON_1 -> TouchSignal.TOUCH1
+                            GLFW_MOUSE_BUTTON_2 -> TouchSignal.TOUCH2
+                            GLFW_MOUSE_BUTTON_3 -> TouchSignal.TOUCH3
+                            else -> return
+                        }
                     glfwGetCursorPos(window, b1, b2)
                     val gamePosition = projector.project(b1[0].toFloat(), b2[0].toFloat())
 
@@ -122,17 +136,19 @@ class LwjglInput(private val projector: MouseProject) : InputHandler, InputManag
 
     override fun reset() = touchManager.processReceivedEvent()
 
-    override fun isKeyJustPressed(key: Key): Boolean = if (key == Key.ANY_KEY) {
-        touchManager.isAnyKeyJustPressed
-    } else {
-        touchManager.isKeyJustPressed(key.keyCode)
-    }
+    override fun isKeyJustPressed(key: Key): Boolean =
+        if (key == Key.ANY_KEY) {
+            touchManager.isAnyKeyJustPressed
+        } else {
+            touchManager.isKeyJustPressed(key.keyCode)
+        }
 
-    override fun isKeyPressed(key: Key): Boolean = if (key == Key.ANY_KEY) {
-        touchManager.isAnyKeyPressed
-    } else {
-        touchManager.isKeyPressed(key.keyCode)
-    }
+    override fun isKeyPressed(key: Key): Boolean =
+        if (key == Key.ANY_KEY) {
+            touchManager.isAnyKeyPressed
+        } else {
+            touchManager.isKeyPressed(key.keyCode)
+        }
 
     override fun isTouched(signal: TouchSignal): Vector2? = touchManager.isTouched(signal)
 

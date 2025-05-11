@@ -7,7 +7,9 @@ import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
+import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
+import com.github.minigdx.tiny.render.operations.FrameBufferOperation
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
@@ -17,7 +19,6 @@ import org.luaj.vm2.lib.TwoArgFunction
 import kotlin.math.abs
 
 private class Shape(private val resourceAccess: GameResourceAccess) {
-
     fun rectArgs(args: Varargs): List<Int>? {
         when (args.narg()) {
             // rect including color
@@ -73,11 +74,13 @@ private class Shape(private val resourceAccess: GameResourceAccess) {
         "Those shapes can be circle, rectangle, line or oval." +
         "All shapes can be draw filed or not filed.",
 )
-class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction() {
-
+class ShapeLib(private val resourceAccess: GameResourceAccess, private val gameOptions: GameOptions) : TwoArgFunction() {
     private val shape = Shape(resourceAccess)
 
-    override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
+    override fun call(
+        arg1: LuaValue,
+        arg2: LuaValue,
+    ): LuaValue {
         val shp = LuaTable()
         shp["line"] = line()
         shp["oval"] = oval()
@@ -98,7 +101,9 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
     @TinyFunction("Draw a rectangle.", example = SHAPE_RECTF_EXAMPLE)
     internal inner class rect : LibFunction() {
         @TinyCall("Draw a rectangle.")
-        override fun invoke(@TinyArgs(["x", "y", "width", "height", "color"]) args: Varargs): Varargs {
+        override fun invoke(
+            @TinyArgs(["x", "y", "width", "height", "color"]) args: Varargs,
+        ): Varargs {
             val (x, y, width, height, color) = shape.rectArgs(args) ?: return NIL
 
             for (i in x until x + width) {
@@ -109,11 +114,14 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
                 resourceAccess.frameBuffer.pixel(x, i, color)
                 resourceAccess.frameBuffer.pixel(x + width - 1, i, color)
             }
+            resourceAccess.addOp(FrameBufferOperation)
             return NIL
         }
 
         @TinyCall("Draw a rectangle.")
-        override fun call(@TinyArg("rect", "A rectangle {x, y, width, height, color}") a: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("rect", "A rectangle {x, y, width, height, color}") a: LuaValue,
+        ): LuaValue {
             return super.call(a)
         }
 
@@ -194,6 +202,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
                     p += 2 * radiusY * radiusY * x - 2 * radiusX * radiusX * y + radiusX * radiusX
                 }
             }
+            resourceAccess.addOp(FrameBufferOperation)
             return NONE
         }
     }
@@ -266,6 +275,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
                     p += 2 * radiusY * radiusY * x - 2 * radiusX * radiusX * y + radiusX * radiusX
                 }
             }
+            resourceAccess.addOp(FrameBufferOperation)
             return NIL
         }
     }
@@ -274,17 +284,22 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
     internal inner class rectf : LibFunction() {
         // cornerX: Int, cornerY: Int, width: Int, height: Int, color: Int
         @TinyCall("Draw a filled rectangle.")
-        override fun invoke(@TinyArgs(["x", "y", "width", "height", "color"]) args: Varargs): Varargs {
+        override fun invoke(
+            @TinyArgs(["x", "y", "width", "height", "color"]) args: Varargs,
+        ): Varargs {
             val (x, y, width, height, color) = shape.rectArgs(args) ?: return NIL
 
             for (j in y until y + height) {
                 resourceAccess.frameBuffer.fill(x, x + width, j, color)
             }
+            resourceAccess.addOp(FrameBufferOperation)
             return NIL
         }
 
         @TinyCall("Draw a filled rectangle.")
-        override fun call(@TinyArg("rect", "A rectangle {x, y, width, height, color}") a: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("rect", "A rectangle {x, y, width, height, color}") a: LuaValue,
+        ): LuaValue {
             return super.call(a)
         }
 
@@ -346,13 +361,13 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
                 }
                 x++
             }
+            resourceAccess.addOp(FrameBufferOperation)
             return NIL
         }
     }
 
     @TinyFunction("Draw a line.", example = SHAPE_LINE_EXAMPLE)
     internal inner class line : LibFunction() {
-
         @TinyCall("Draw a line.")
         override fun invoke(
             @TinyArgs(["x0", "y0", "x1", "y2", "color"])
@@ -364,17 +379,24 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
                 2 -> call(args.arg1(), args.arg(2))
                 3 -> call(args.arg1(), args.arg(2), args.arg(3))
                 4 -> call(args.arg1(), args.arg(2), args.arg(3), args.arg(4))
-                else -> draw(
-                    args.arg1().checkint(),
-                    args.arg(2).checkint(),
-                    args.arg(3).checkint(),
-                    args.arg(4).checkint(),
-                    args.arg(5).checkColorIndex(),
-                )
+                else ->
+                    draw(
+                        args.arg1().checkint(),
+                        args.arg(2).checkint(),
+                        args.arg(3).checkint(),
+                        args.arg(4).checkint(),
+                        args.arg(5).checkColorIndex(),
+                    )
             }
         }
 
-        private fun draw(x0: Pixel, y0: Pixel, x1: Pixel, y1: Pixel, color: ColorIndex): LuaValue {
+        private fun draw(
+            x0: Pixel,
+            y0: Pixel,
+            x1: Pixel,
+            y1: Pixel,
+            color: ColorIndex,
+        ): LuaValue {
             // (x1, y1), (x2, y2)
             val dx = abs(x1 - x0)
             val dy = abs(y1 - y0)
@@ -398,6 +420,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
                     y += sy
                 }
             }
+            resourceAccess.addOp(FrameBufferOperation)
             return NONE
         }
 
@@ -416,9 +439,12 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
 
     @TinyFunction("Draw a circle.", example = SHAPE_CIRCLEF_EXAMPLE)
     internal inner class circle : LibFunction() {
-
         @TinyCall("Draw a circle with the default color.")
-        override fun call(a: LuaValue, b: LuaValue, c: LuaValue): LuaValue {
+        override fun call(
+            a: LuaValue,
+            b: LuaValue,
+            c: LuaValue,
+        ): LuaValue {
             return call(a, b, c, valueOf("#FFFFFF"))
         }
 
@@ -456,6 +482,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
                 }
                 x++
             }
+            resourceAccess.addOp(FrameBufferOperation)
             return NONE
         }
     }
@@ -465,7 +492,6 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
         example = SHAPE_TRIANGLEF_EXAMPLE,
     )
     inner class trianglef : LibFunction() {
-
         @TinyCall("Draw a filled triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).")
         override fun invoke(
             @TinyArgs(["x1", "y1", "x2", "y2", "x3", "y3", "color"]) args: Varargs,
@@ -511,7 +537,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
                 val xx2 = topVertex.first + ((y - topVertex.second) * slope4).toInt()
                 resourceAccess.frameBuffer.fill(xx1, xx2, y, color)
             }
-
+            resourceAccess.addOp(FrameBufferOperation)
             return NONE
         }
     }
@@ -521,7 +547,6 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
         example = SHAPE_TRIANGLEF_EXAMPLE,
     )
     inner class triangle : LibFunction() {
-
         private val line = line()
 
         @TinyCall("Draw a triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).")
@@ -573,7 +598,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
                     ),
                 ),
             )
-
+            resourceAccess.addOp(FrameBufferOperation)
             return NONE
         }
     }
@@ -583,30 +608,30 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
         example = SHAPE_GRADIENT_EXAMPLE,
     )
     inner class gradient : LibFunction() {
-
-        private val dithering = listOf(
-            0x0000,
-            0x0001,
-            0x0401,
-            0x0405,
-            0x0505,
-            0x0525,
-            0x8525,
-            0x85A5,
-            0xA5A5,
-            0xA5A7,
-            0xADA7,
-            0xADAF,
-            0xAFAF,
-            0xAFBF,
-            0xEFBF,
-            0xEFFF,
-            0xFFFF,
-        ).map { v -> valueOf(v) }
+        private val dithering =
+            listOf(
+                0x0000,
+                0x0001,
+                0x0401,
+                0x0405,
+                0x0505,
+                0x0525,
+                0x8525,
+                0x85A5,
+                0xA5A5,
+                0xA5A7,
+                0xADA7,
+                0xADAF,
+                0xAFAF,
+                0xAFBF,
+                0xEFBF,
+                0xEFFF,
+                0xFFFF,
+            ).map { v -> valueOf(v) }
 
         private val rectf = rectf()
 
-        private val dither = GfxLib(resourceAccess).dither()
+        private val dither = GfxLib(resourceAccess, gameOptions).dither()
 
         @TinyCall("Draw a gradient using dithering, only from color c1 to color c2.")
         override fun invoke(
@@ -657,6 +682,8 @@ class ShapeLib(private val resourceAccess: GameResourceAccess) : TwoArgFunction(
                 }
             }
             dither.call(previous)
+
+            resourceAccess.addOp(FrameBufferOperation)
 
             return NIL
         }

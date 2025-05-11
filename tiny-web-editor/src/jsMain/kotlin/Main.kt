@@ -6,16 +6,16 @@ import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.forEachIndexed
 import com.github.minigdx.tiny.getRootPath
-import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.log.StdOutLogger
 import com.github.minigdx.tiny.platform.ImageData
 import com.github.minigdx.tiny.platform.Platform
-import com.github.minigdx.tiny.platform.RenderContext
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.webgl.WebGlPlatform
+import com.github.minigdx.tiny.render.RenderContext
+import com.github.minigdx.tiny.render.operations.RenderOperation
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.browser.document
 import kotlinx.browser.window
@@ -49,17 +49,22 @@ fun main() {
         val spritePath = game.getAttribute("sprite")
         val levelPath = game.getAttribute("level")
 
+        val toolbar = document.createElement("div") {
+            setAttribute("class", "tiny-toolbar")
+        }
+        game.before(toolbar)
+
         val link = document.createElement("a") {
             setAttribute("id", "link-editor-$index")
-            setAttribute("class", "tiny-play")
+            setAttribute("class", "tiny-play tiny-button")
             setAttribute("href", "#link-editor-$index")
         } as HTMLAnchorElement
-        game.before(link)
+        toolbar.appendChild(link)
 
         val playLink = document.createElement("div").apply {
             setAttribute("class", "tiny-container")
         }
-        link.after(playLink)
+        toolbar.after(playLink)
 
         val codeToUse = decodedCode ?: "-- Update the code to update the game!\n$code"
 
@@ -72,6 +77,20 @@ fun main() {
             }
             true
         }
+
+        val playground = (
+            document.createElement("a") {
+                setAttribute("class", "tiny-button tiny-button-right")
+                id = "share-$index"
+                textContent = "↗\uFE0F Playground"
+            } as HTMLAnchorElement
+        ).apply {
+            val b64 = Base64.encode(code.encodeToByteArray())
+            href = "playground.html?game=$b64"
+            target = "_blank"
+        }
+
+        toolbar.appendChild(playground)
 
         // There is a user code. Let's unfold the game.
         if (savedCode != null) {
@@ -94,7 +113,16 @@ fun getCaretPosition(el: Element): Int {
     val prefix = range.cloneRange()
     prefix.selectNodeContents(el)
     prefix.setEnd(range.endContainer, range.endOffset)
-    return prefix.toString().length
+
+    selection.removeAllRanges()
+    selection.addRange(prefix)
+
+    val length = selection.toString().length
+
+    selection.removeAllRanges()
+    selection.addRange(range)
+
+    return length
 }
 
 /**
@@ -116,7 +144,10 @@ fun getCaretPosition(el: Element): Int {
  *
  * This function is used to set the caret position after updating the content of the editor.
  */
-fun setCaret(pos: Int, parent: Node): Int {
+fun setCaret(
+    pos: Int,
+    parent: Node,
+): Int {
     var position = pos
     for (i in 0 until parent.childNodes.length) {
         val node = parent.childNodes.item(i)!!
@@ -152,7 +183,10 @@ fun setCaret(pos: Int, parent: Node): Int {
  */
 fun highlight(content: String): String {
     return content
-        .split("\n").map { "<div>${it.ifBlank { " " }}</div>" }.joinToString("\n")
+        // Create lines
+        .split("\n").map { "<div>$it</div>" }.joinToString("\n")
+        // Replace \n with <br /> to be selected correctly in the range
+        .replace("<div></div>", "<div><br /></div>")
         // String
         .replace(Regex("(\".*?\")"), "<strong class=\"code_string\">$1</strong>")
         // Comment
@@ -166,6 +200,15 @@ fun highlight(content: String): String {
         .replace(Regex("\\b(\\d+)"), "<em class=\"code_number\">$1</em>")
 }
 
+fun extractText(el: Element): String {
+    el.innerHTML = el.innerHTML
+        .replace("\n", "")
+        .replace("</div>", "</div>\n")
+        .trim()
+
+    return (el.textContent ?: "")
+}
+
 @OptIn(ExperimentalEncodingApi::class)
 private fun createGame(
     container: Element,
@@ -175,6 +218,25 @@ private fun createGame(
     levelPath: String?,
     rootPath: String,
 ) {
+    val textarea = (document.createElement("div") as HTMLDivElement).apply {
+        setAttribute("id", "editor-$index")
+        setAttribute("spellcheck", "false")
+        setAttribute("class", "tiny-textarea")
+        setAttribute("contenteditable", "true")
+
+        innerHTML = highlight(code)
+
+        oninput = { event ->
+            val pos = getCaretPosition(this)
+            console.log("html", this.innerHTML)
+            this.innerHTML = highlight(extractText(this))
+            console.log("html highlight", this.innerHTML)
+            setCaret(pos, this)
+        }
+    }
+    textarea.innerHTML = highlight(textarea.innerText)
+    container.appendChild(textarea)
+
     val canvas = document.createElement("canvas").apply {
         setAttribute("width", "512")
         setAttribute("height", "512")
@@ -183,56 +245,31 @@ private fun createGame(
     }
     container.appendChild(canvas)
 
-    val textarea = (document.createElement("div") as HTMLDivElement).apply {
-        setAttribute("id", "editor-$index")
-        setAttribute("spellcheck", "false")
-        setAttribute("class", "tiny-textarea")
-        setAttribute("contenteditable", "true")
-
-        innerHTML = code
-
-        onkeydown = { event ->
-            val pos = getCaretPosition(this)
-            this.innerHTML = highlight(this.innerText)
-            setCaret(pos, this)
-        }
-    }
-    textarea.innerHTML = highlight(textarea.innerText)
-    container.appendChild(textarea)
-
-    val link = (document.createElement("a") as HTMLAnchorElement).apply {
-        val b64 = Base64.encode(code.encodeToByteArray())
-        id = "share-$index"
-        href = "sandbox.html?game=$b64"
-        textContent = "\uD83D\uDD17 Share this game!"
-    }
-
-    container.after(link)
-
     val logger = StdOutLogger("tiny-editor-$index")
 
     val gameOptions = GameOptions(
         width = 256,
         height = 256,
         // https://lospec.com/palette-list/rgr-proto16
-        palette = listOf(
-            "#FFF9B3",
-            "#B9C5CC",
-            "#4774B3",
-            "#144B66",
-            "#8FB347",
-            "#2E994E",
-            "#F29066",
-            "#E65050",
-            "#707D7C",
-            "#293C40",
-            "#170B1A",
-            "#0A010D",
-            "#570932",
-            "#871E2E",
-            "#FFBF40",
-            "#CC1424",
-        ),
+        palette =
+            listOf(
+                "#FFF9B3",
+                "#B9C5CC",
+                "#4774B3",
+                "#144B66",
+                "#8FB347",
+                "#2E994E",
+                "#F29066",
+                "#E65050",
+                "#707D7C",
+                "#293C40",
+                "#170B1A",
+                "#0A010D",
+                "#570932",
+                "#871E2E",
+                "#FFBF40",
+                "#CC1424",
+            ),
         gameScripts = listOf("#editor-$index"),
         spriteSheets = spritePath?.let { listOf(it) } ?: emptyList(),
         gameLevels = levelPath?.let { listOf(it) } ?: emptyList(),
@@ -250,27 +287,28 @@ private fun createGame(
 }
 
 class EditorWebGlPlatform(val delegate: Platform) : Platform {
-
     override val gameOptions: GameOptions = delegate.gameOptions
+
     override fun initWindowManager(): WindowManager = delegate.initWindowManager()
 
-    override fun initRenderManager(windowManager: WindowManager): RenderContext =
-        delegate.initRenderManager(windowManager)
+    override fun initRenderManager(windowManager: WindowManager): RenderContext = delegate.initRenderManager(windowManager)
 
     override fun gameLoop(gameLoop: GameLoop) = delegate.gameLoop(gameLoop)
-
-    override fun draw(context: RenderContext, frameBuffer: FrameBuffer) = delegate.draw(context, frameBuffer)
 
     override fun endGameLoop() = delegate.endGameLoop()
 
     override fun initInputHandler(): InputHandler = delegate.initInputHandler()
 
     override fun initInputManager(): InputManager = delegate.initInputManager()
+
     override fun initSoundManager(inputHandler: InputHandler): SoundManager = delegate.initSoundManager(inputHandler)
 
     override fun io(): CoroutineDispatcher = delegate.io()
 
-    override fun createByteArrayStream(name: String, canUseJarPrefix: Boolean): SourceStream<ByteArray> {
+    override fun createByteArrayStream(
+        name: String,
+        canUseJarPrefix: Boolean,
+    ): SourceStream<ByteArray> {
         return if (name.startsWith("#")) {
             EditorStream(name)
         } else {
@@ -278,11 +316,34 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
         }
     }
 
-    override fun createImageStream(name: String, canUseJarPrefix: Boolean): SourceStream<ImageData> =
+    override fun createImageStream(
+        name: String,
+        canUseJarPrefix: Boolean,
+    ): SourceStream<ImageData> =
         delegate.createImageStream(
             name,
         )
 
     override fun createSoundStream(name: String): SourceStream<SoundData> = delegate.createSoundStream(name)
-    override fun createLocalFile(name: String): LocalFile = delegate.createLocalFile(name)
+
+    override fun createLocalFile(
+        name: String,
+        parentDirectory: String?,
+    ): LocalFile =
+        delegate.createLocalFile(
+            name = name,
+            parentDirectory = parentDirectory,
+        )
+
+    override fun render(
+        renderContext: RenderContext,
+        ops: List<RenderOperation>,
+    ) = delegate.render(
+        renderContext,
+        ops,
+    )
+
+    override fun draw(renderContext: RenderContext) = delegate.draw(renderContext)
+
+    override fun readRender(renderContext: RenderContext) = delegate.readRender(renderContext)
 }

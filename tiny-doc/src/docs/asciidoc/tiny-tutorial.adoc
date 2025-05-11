@@ -37,10 +37,12 @@ end
 
 function _update()
     -- Update game state
-    player1_pos.y = player1_pos.y - 4 * num(ctrl.pressing(keys.up))
-    player1_pos.y = player1_pos.y + 4 * num(ctrl.pressing(keys.down))
-    player2_pos.y = player2_pos.y - 4 * num(ctrl.pressing(keys.z))
-    player2_pos.y = player2_pos.y + 4 * num(ctrl.pressing(keys.s))
+    player1_pos.y = player1_pos.y - 4 * num(ctrl.pressing(keys.z)) --azerty keyboard
+    player1_pos.y = player1_pos.y - 4 * num(ctrl.pressing(keys.w)) -- qwerty keyboard
+    player1_pos.y = player1_pos.y + 4 * num(ctrl.pressing(keys.s))
+
+    player2_pos.y = player2_pos.y - 4 * num(ctrl.pressing(keys.up))
+    player2_pos.y = player2_pos.y + 4 * num(ctrl.pressing(keys.down))
 
     ball_pos.x = ball_pos.x + ball_velocity.x
     ball_pos.y = ball_pos.y + ball_velocity.y
@@ -105,10 +107,13 @@ end
 
 function _update()
     -- Update game state
-    player1_pos.y = player1_pos.y - 4 * num(ctrl.pressing(keys.up))
-    player1_pos.y = player1_pos.y + 4 * num(ctrl.pressing(keys.down))
-    player2_pos.y = player2_pos.y - 4 * num(ctrl.pressing(keys.z))
-    player2_pos.y = player2_pos.y + 4 * num(ctrl.pressing(keys.s))
+     -- Update game state
+    player1_pos.y = player1_pos.y - 4 * num(ctrl.pressing(keys.z)) --azerty keyboard
+    player1_pos.y = player1_pos.y - 4 * num(ctrl.pressing(keys.w)) -- qwerty keyboard
+    player1_pos.y = player1_pos.y + 4 * num(ctrl.pressing(keys.s))
+
+    player2_pos.y = player2_pos.y - 4 * num(ctrl.pressing(keys.up))
+    player2_pos.y = player2_pos.y + 4 * num(ctrl.pressing(keys.down))
 
     ball_pos.x = ball_pos.x + ball_velocity.x
     ball_pos.y = ball_pos.y + ball_velocity.y

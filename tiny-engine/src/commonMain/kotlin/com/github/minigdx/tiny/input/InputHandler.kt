@@ -1,7 +1,6 @@
 package com.github.minigdx.tiny.input
 
 interface InputHandler {
-
     /**
      * Is the [key] was pressed?
      *
@@ -37,7 +36,10 @@ interface InputHandler {
      */
     fun isNoneKeysPressed(vararg keys: Key): Boolean = keys.none { isKeyPressed(it) }
 
-    fun isCombinationPressed(key1: Key, key2: Key): Boolean {
+    fun isCombinationPressed(
+        key1: Key,
+        key2: Key,
+    ): Boolean {
         return (isKeyJustPressed(key1) && isKeyPressed(key2)) || (isKeyJustPressed(key2) && isKeyPressed(key1))
     }
 
@@ -100,4 +102,12 @@ interface InputHandler {
      * @return: position of the current touch.
      */
     val currentTouch: Vector2
+
+    /**
+     * Register a callback to be called after the first input user interaction.
+     * Useful only for the JS platform to resume the audio context.
+     *
+     * See: https://developer.chrome.com/blog/autoplay?hl=fr#webaudio
+     */
+    fun onFirstUserInteraction(callback: () -> Unit) = Unit
 }

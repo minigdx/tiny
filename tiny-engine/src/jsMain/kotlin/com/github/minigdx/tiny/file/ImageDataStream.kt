@@ -14,7 +14,6 @@ import org.w3c.xhr.XMLHttpRequestResponseType
 import kotlin.coroutines.suspendCoroutine
 
 class ImageDataStream(val url: String) : SourceStream<ImageData> {
-
     override suspend fun exists(): Boolean {
         return suspendCoroutine { continuation ->
             val jsonFile = XMLHttpRequest()

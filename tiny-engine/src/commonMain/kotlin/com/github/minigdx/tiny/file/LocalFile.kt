@@ -1,7 +1,6 @@
 package com.github.minigdx.tiny.file
 
 interface LocalFile {
-
     /**
      * Name of the file, without the extension
      */

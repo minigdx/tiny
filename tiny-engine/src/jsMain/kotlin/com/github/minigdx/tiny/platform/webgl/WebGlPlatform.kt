@@ -10,16 +10,17 @@ import com.github.minigdx.tiny.file.JsLocalFile
 import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SoundDataSourceStream
 import com.github.minigdx.tiny.file.SourceStream
-import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.ImageData
 import com.github.minigdx.tiny.platform.Platform
-import com.github.minigdx.tiny.platform.RenderContext
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
-import com.github.minigdx.tiny.render.GLRender
+import com.github.minigdx.tiny.render.RenderContext
+import com.github.minigdx.tiny.render.RenderFrame
+import com.github.minigdx.tiny.render.gl.OpenGLRender
+import com.github.minigdx.tiny.render.operations.RenderOperation
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineDispatcher
@@ -35,8 +36,7 @@ class WebGlPlatform(
     override val gameOptions: GameOptions,
     val rootUrl: String,
 ) : Platform {
-
-    private lateinit var render: GLRender
+    private lateinit var render: OpenGLRender
 
     private val jsInputHandler = JsInputHandler(canvas, gameOptions)
 
@@ -54,13 +54,14 @@ class WebGlPlatform(
     }
 
     override fun initRenderManager(windowManager: WindowManager): RenderContext {
-        val context = canvas.getContext("webgl2") as? WebGL2RenderingContext
-            ?: throw IllegalStateException(
-                "The canvas context is expected to be a webgl2 context. " +
-                    "WebGL2 doesn't seems to be supported by your browser. " +
-                    "Please update to a compatible browser to run the game in WebGL2.",
-            )
-        render = GLRender(KglJs(context), logger, gameOptions)
+        val context =
+            canvas.getContext("webgl2") as? WebGL2RenderingContext
+                ?: throw IllegalStateException(
+                    "The canvas context is expected to be a webgl2 context. " +
+                        "WebGL2 doesn't seems to be supported by your browser. " +
+                        "Please update to a compatible browser to run the game in WebGL2.",
+                )
+        render = OpenGLRender(KglJs(context), logger, gameOptions)
         return render.init(windowManager)
     }
 
@@ -79,11 +80,6 @@ class WebGlPlatform(
         }
     }
 
-    override fun draw(context: RenderContext, frameBuffer: FrameBuffer) {
-        val image = frameBuffer.generateBuffer()
-        render.draw(context, image, frameBuffer.width, frameBuffer.height)
-    }
-
     override fun endGameLoop() = Unit
 
     override fun initInputHandler(): InputHandler = jsInputHandler
@@ -94,18 +90,24 @@ class WebGlPlatform(
         return Dispatchers.Default
     }
 
-    override fun createByteArrayStream(name: String, canUseJarPrefix: Boolean): SourceStream<ByteArray> {
+    override fun createByteArrayStream(
+        name: String,
+        canUseJarPrefix: Boolean,
+    ): SourceStream<ByteArray> {
         return AjaxStream("$rootUrl/$name")
     }
 
-    override fun createImageStream(name: String, canUseJarPrefix: Boolean): SourceStream<ImageData> {
+    override fun createImageStream(
+        name: String,
+        canUseJarPrefix: Boolean,
+    ): SourceStream<ImageData> {
         return ImageDataStream("$rootUrl/$name")
     }
 
     private lateinit var soundManager: SoundManager
 
     override fun initSoundManager(inputHandler: InputHandler): SoundManager {
-        soundManager = PicoAudioSoundMananger()
+        soundManager = WebSoundMananger()
         soundManager.initSoundManager(inputHandler)
         return soundManager
     }
@@ -114,7 +116,25 @@ class WebGlPlatform(
         return SoundDataSourceStream(name, soundManager, createByteArrayStream(name))
     }
 
-    override fun createLocalFile(name: String): LocalFile {
-        return JsLocalFile(name)
+    override fun createLocalFile(
+        name: String,
+        parentDirectory: String?,
+    ): LocalFile {
+        return JsLocalFile(name, parentDirectory?.let { "tiny-$parentDirectory" } ?: "tiny")
+    }
+
+    override fun draw(renderContext: RenderContext) {
+        render.drawOnScreen(renderContext)
+    }
+
+    override fun render(
+        renderContext: RenderContext,
+        ops: List<RenderOperation>,
+    ) {
+        render.render(renderContext, ops)
+    }
+
+    override fun readRender(renderContext: RenderContext): RenderFrame {
+        return render.readRender(renderContext)
     }
 }

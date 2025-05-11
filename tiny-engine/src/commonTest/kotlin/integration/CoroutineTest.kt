@@ -5,7 +5,8 @@ import kotlin.test.Test
 
 class CoroutineTest {
     //language=Lua
-    val clsScript = """
+    val clsScript =
+        """
         local co = coroutine.create(function()
             gfx.cls(2)
             coroutine.yield()
@@ -17,14 +18,15 @@ class CoroutineTest {
         function _draw()
             coroutine.resume(co)
         end
-    """.trimIndent()
+        """.trimIndent()
 
     @Test
-    fun cls() = TestHelper.test("cls", clsScript) { platform ->
-        platform.advance()
+    fun cls() =
+        TestHelper.test("cls", clsScript) { platform ->
+            platform.advance()
 
-        TestHelper.assertEquals(
-            """
+            TestHelper.assertEquals(
+                """
 2222222222
 2222222222
 2222222222
@@ -36,13 +38,13 @@ class CoroutineTest {
 2222222222
 2222222222
 """,
-            platform.frames.last(),
-        )
+                platform.frames.last(),
+            )
 
-        platform.advance()
+            platform.advance()
 
-        TestHelper.assertEquals(
-            """
+            TestHelper.assertEquals(
+                """
 1111111111
 1111111111
 1111111111
@@ -54,7 +56,7 @@ class CoroutineTest {
 1111111111
 1111111111
 """,
-            platform.frames.last(),
-        )
-    }
+                platform.frames.last(),
+            )
+        }
 }

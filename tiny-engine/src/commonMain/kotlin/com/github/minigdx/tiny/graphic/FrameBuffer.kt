@@ -2,14 +2,15 @@ package com.github.minigdx.tiny.graphic
 
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
+import com.github.minigdx.tiny.resources.ResourceType
+import com.github.minigdx.tiny.resources.SpriteSheet
 import kotlin.math.max
 import kotlin.math.min
 
-class Blender(private val gamePalette: ColorPalette) {
+class Blender(internal val gamePalette: ColorPalette) {
+    internal var switch: Array<ColorIndex> = Array(gamePalette.size) { index -> index }
 
-    private var switch: Array<ColorIndex> = Array(gamePalette.size) { index -> index }
-
-    private var dithering: Int = 0xFFFF
+    internal var dithering: Int = 0xFFFF
 
     internal val hasDithering: Boolean
         get() {
@@ -26,11 +27,19 @@ class Blender(private val gamePalette: ColorPalette) {
         switch = Array(gamePalette.size) { index -> index }
     }
 
-    fun pal(source: ColorIndex, target: ColorIndex) {
+    fun pal(
+        source: ColorIndex,
+        target: ColorIndex,
+    ) {
         switch[gamePalette.check(source)] = gamePalette.check(target)
     }
 
-    fun mix(colors: ByteArray, x: Pixel, y: Pixel, transparency: Array<Int>?): ByteArray? {
+    fun mix(
+        colors: ByteArray,
+        x: Pixel,
+        y: Pixel,
+        transparency: Array<Int>?,
+    ): ByteArray? {
         fun dither(pattern: Int): Boolean {
             val a = x % 4
             val b = (y % 4) * 4
@@ -56,7 +65,10 @@ class Camera() {
     var y = 0
         internal set
 
-    fun set(x: Int, y: Int) {
+    fun set(
+        x: Int,
+        y: Int,
+    ) {
         this.x = x
         this.y = y
     }
@@ -75,7 +87,6 @@ class FrameBuffer(
     val height: Pixel,
     val gamePalette: ColorPalette,
 ) {
-
     internal val colorIndexBuffer: PixelArray = PixelArray(width, height, PixelFormat.INDEX)
 
     internal val clipper: Clipper = Clipper(width, height)
@@ -88,13 +99,20 @@ class FrameBuffer(
 
     private val transparency = arrayOf(0)
 
-    fun pixel(x: Pixel, y: Pixel): ColorIndex {
+    fun pixel(
+        x: Pixel,
+        y: Pixel,
+    ): ColorIndex {
         val cx = camera.cx(x)
         val cy = camera.cy(y)
         return colorIndexBuffer.getOne(cx, cy)
     }
 
-    fun pixel(x: Pixel, y: Pixel, colorIndex: ColorIndex) {
+    fun pixel(
+        x: Pixel,
+        y: Pixel,
+        colorIndex: ColorIndex,
+    ) {
         val cx = camera.cx(x)
         val cy = camera.cy(y)
         if (!clipper.isIn(cx, cy)) return
@@ -104,12 +122,18 @@ class FrameBuffer(
         colorIndexBuffer.set(cx, cy, index[0].toInt())
     }
 
-    fun fill(startX: Pixel, endX: Pixel, y: Pixel, colorIndex: ColorIndex) {
+    fun fill(
+        startX: Pixel,
+        endX: Pixel,
+        y: Pixel,
+        colorIndex: ColorIndex,
+    ) {
         val cy = camera.cy(y)
+        if (cy !in clipper.top..clipper.bottom - 1) return
+
         val leftX = min(startX, endX)
         val rightX = max(startX, endX)
         // fill outside the screen?
-        if (cy !in clipper.top..clipper.bottom - 1) return
         val left = max(camera.cx(leftX), clipper.left)
         val right = min(camera.cx(rightX), clipper.right)
 
@@ -121,7 +145,10 @@ class FrameBuffer(
 
         // can't optimise if there is some dithering
         if (blender.hasDithering) {
-            (left..right).forEach { x ->
+            // pixel use the clipper and the camera.
+            // the coordinates need to be the non-translated one
+            // as it will be translated by pixel if needed.
+            (startX..endX).forEach { x ->
                 pixel(x, y, colorIndex)
             }
         } else {
@@ -131,10 +158,12 @@ class FrameBuffer(
         }
     }
 
-    fun clear(clearIndx: Int) {
-        val clearIndex = gamePalette.check(clearIndx)
-        // colorIndexBuffer.reset(clearIndex, camera.x, camera.y, camera.x + width, camera.y + height)
-        colorIndexBuffer.reset(clearIndex)
+    /**
+     * Clear the framebuffer and set the same color on each pixel.
+     */
+    fun clear(clearIndex: ColorIndex = ColorPalette.TRANSPARENT_INDEX) {
+        val colorIndex = gamePalette.check(clearIndex)
+        colorIndexBuffer.reset(colorIndex)
     }
 
     fun copyFrom(
@@ -208,4 +237,33 @@ class FrameBuffer(
     fun generateBuffer(): ByteArray {
         return this.colorIndexBuffer.pixels
     }
+
+    /**
+     * Fast copy another frame buffer into this frame buffer.
+     * It's a raw copy of each element.
+     */
+    fun fastCopyFrom(frameBuffer: FrameBuffer) {
+        // Copying into itself. So there is nothing to do.
+        if (frameBuffer == this) {
+            return
+        }
+        frameBuffer.colorIndexBuffer.pixels.copyInto(
+            colorIndexBuffer.pixels,
+            0,
+            0,
+            colorIndexBuffer.size,
+        )
+    }
+
+    val asSpriteSheet =
+        SpriteSheet(
+            0,
+            0,
+            "framebuffer",
+            type = ResourceType.GAME_SPRITESHEET,
+            pixels = this.colorIndexBuffer,
+            width = this.width,
+            height = this.height,
+            reload = false,
+        )
 }

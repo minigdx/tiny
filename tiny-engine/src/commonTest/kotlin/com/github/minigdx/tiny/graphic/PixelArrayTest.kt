@@ -8,7 +8,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class PixelArrayTest {
-
     private val blender: (ByteArray, Pixel, Pixel) -> ByteArray = { c, _, _ ->
         c
     }

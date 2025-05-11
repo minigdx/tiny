@@ -36,34 +36,43 @@ class TinyToLuaStubKspProcessor(
             accept
         }
 
-        val result = stub(
-            """
-            -- DO NOT EDIT // DO NOT EDIT // DO NOT EDIT // DO NOT EDIT // DO NOT EDIT
-            -- Tiny stub lua file generated automatically
-            -- The file is used only to help Lua editors with autocomplete
-            -- 
-            -- An error, an issue? Please consult https://github.com/minigdx/tiny
-            """.trimIndent(),
-        ) {
-            libs.forEach {
-                lib {
-                    name = it.name
-                    description = it.description
+        val result =
+            stub(
+                """
+                -- DO NOT EDIT // DO NOT EDIT // DO NOT EDIT // DO NOT EDIT // DO NOT EDIT
+                -- Tiny stub lua file generated automatically
+                -- The file is used only to help Lua editors with autocomplete
+                -- 
+                -- An error, an issue? Please consult https://github.com/minigdx/tiny
+                """.trimIndent(),
+            ) {
+                libs.forEach {
+                    lib {
+                        name = it.name
+                        description = it.description
 
-                    it.functions.forEach { function ->
-                        function {
-                            namespace = it.name.takeIf { it.isNotBlank() }
-                            name = function.name
-                            description = function.description
+                        it.variables.forEach {
+                            variable {
+                                name = it.name
+                                description = it.description
+                                hidden = it.hidden
+                            }
+                        }
+                        it.functions.forEach { function ->
+                            function {
+                                namespace = it.name.takeIf { it.isNotBlank() }
+                                name = function.name
+                                description = function.description
 
-                            function.calls.forEach { call ->
-                                call {
-                                    description = call.description
-                                    call.args.forEach { arg ->
-                                        arg {
-                                            name = arg.name
-                                            type = "any"
-                                            description = arg.description
+                                function.calls.forEach { call ->
+                                    call {
+                                        description = call.description
+                                        call.args.forEach { arg ->
+                                            arg {
+                                                name = arg.name
+                                                type = "any"
+                                                description = arg.description
+                                            }
                                         }
                                     }
                                 }
@@ -72,7 +81,6 @@ class TinyToLuaStubKspProcessor(
                     }
                 }
             }
-        }
         file.write(result.generate().toByteArray(charset = Charsets.UTF_8))
 
         return emptyList()
@@ -80,9 +88,7 @@ class TinyToLuaStubKspProcessor(
 }
 
 class TinyToLuaStubKspProcessorProvider : SymbolProcessorProvider {
-    override fun create(
-        environment: SymbolProcessorEnvironment,
-    ): SymbolProcessor {
+    override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
         return TinyToLuaStubKspProcessor(environment)
     }
 }

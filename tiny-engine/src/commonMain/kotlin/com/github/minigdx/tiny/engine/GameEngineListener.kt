@@ -9,8 +9,10 @@ import com.github.minigdx.tiny.resources.GameScript
  * It's also useful to be notified when the game engine reload a script.
  */
 interface GameEngineListener {
-
-    fun switchScript(before: GameScript?, after: GameScript?)
+    fun switchScript(
+        before: GameScript?,
+        after: GameScript?,
+    )
 
     fun reload(gameScript: GameScript?)
 }

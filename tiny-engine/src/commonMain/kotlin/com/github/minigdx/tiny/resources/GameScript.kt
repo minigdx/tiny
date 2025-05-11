@@ -53,7 +53,6 @@ class GameScript(
     val logger: Logger,
     override val type: ResourceType,
 ) : GameResource {
-
     var exited: Int = -1
     var evaluated: Boolean = false
 
@@ -71,7 +70,7 @@ class GameScript(
 
     var globals: Globals? = null
 
-    private val tinyLib: TinyLib = TinyLib()
+    private val tinyLib: TinyLib = TinyLib(gameOptions.gameScripts)
 
     internal val testResults = mutableListOf<TestResult>()
 
@@ -80,37 +79,38 @@ class GameScript(
     private fun createLuaGlobals(
         customizeLuaGlobal: GameResourceAccess.(Globals) -> Unit,
         forValidation: Boolean = false,
-    ): Globals = Globals().apply {
-        val sprLib = SprLib(this@GameScript.gameOptions, this@GameScript.resourceAccess)
+    ): Globals =
+        Globals().apply {
+            val sprLib = SprLib(this@GameScript.gameOptions, this@GameScript.resourceAccess)
 
-        load(TinyBaseLib(this@GameScript.resourceAccess))
-        load(PackageLib())
-        load(Bit32Lib())
-        load(TableLib())
-        load(StringLib())
-        load(CoroutineLib())
-        load(StdLib(gameOptions, resourceAccess))
-        load(MapLib(this@GameScript.resourceAccess, gameOptions.spriteSize, gameOptions.colors()))
-        load(GfxLib(this@GameScript.resourceAccess))
-        load(CtrlLib(inputHandler, sprLib))
-        load(SfxLib(this@GameScript.resourceAccess, playSound = !forValidation))
-        load(ShapeLib(this@GameScript.resourceAccess))
-        load(DebugLib(this@GameScript.resourceAccess, this@GameScript.logger))
-        load(KeysLib())
-        load(MathLib())
-        load(Vec2Lib())
-        load(tinyLib)
-        load(sprLib)
-        load(JuiceLib())
-        load(NotesLib())
-        load(WorkspaceLib(platform = platform))
-        load(TestLib(this@GameScript))
+            load(TinyBaseLib(this@GameScript.resourceAccess))
+            load(PackageLib())
+            load(Bit32Lib())
+            load(TableLib())
+            load(StringLib())
+            load(CoroutineLib())
+            load(StdLib(gameOptions, resourceAccess))
+            load(MapLib(this@GameScript.resourceAccess, gameOptions.spriteSize))
+            load(GfxLib(this@GameScript.resourceAccess, gameOptions))
+            load(CtrlLib(inputHandler, sprLib))
+            load(SfxLib(this@GameScript.resourceAccess, playSound = !forValidation))
+            load(ShapeLib(this@GameScript.resourceAccess, gameOptions))
+            load(DebugLib(this@GameScript.resourceAccess, this@GameScript.logger))
+            load(KeysLib())
+            load(MathLib())
+            load(Vec2Lib())
+            load(tinyLib)
+            load(sprLib)
+            load(JuiceLib())
+            load(NotesLib())
+            load(WorkspaceLib(platform = platform))
+            load(TestLib(this@GameScript))
 
-        this@GameScript.resourceAccess.customizeLuaGlobal(this)
+            this@GameScript.resourceAccess.customizeLuaGlobal(this)
 
-        LoadState.install(this)
-        LuaC.install(this)
-    }
+            LoadState.install(this)
+            LuaC.install(this)
+        }
 
     suspend fun isValid(customizeLuaGlobal: GameResourceAccess.(Globals) -> Unit): Boolean {
         with(createLuaGlobals(customizeLuaGlobal, forValidation = true)) {
@@ -170,7 +170,10 @@ class GameScript(
         }
     }
 
-    internal suspend fun invoke(name: String, vararg args: LuaValue) {
+    internal suspend fun invoke(
+        name: String,
+        vararg args: LuaValue,
+    ) {
         val path = name.split(".")
         val head = path.first()
         val tail = path.drop(1)

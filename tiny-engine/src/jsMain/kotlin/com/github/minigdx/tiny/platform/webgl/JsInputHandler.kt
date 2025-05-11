@@ -22,7 +22,6 @@ class JsInputHandler(
     private val canvas: HTMLCanvasElement,
     private val projector: MouseProject,
 ) : InputHandler, InputManager {
-
     init {
         canvas.addEventListener("keydown", ::keyDown, false)
         canvas.addEventListener("keyup", ::keyUp, false)
@@ -40,17 +39,19 @@ class JsInputHandler(
     private val flagMouse2: Short = 0x10
     private val flagMouse3: Short = 0x100
     private val flags = arrayOf(flagMouse1, flagMouse2, flagMouse3)
-    private val touchSignals = arrayListOf(
-        TOUCH1,
-        TOUCH2,
-        TOUCH3,
-    )
+    private val touchSignals =
+        arrayListOf(
+            TOUCH1,
+            TOUCH2,
+            TOUCH3,
+        )
     private val touchManager = TouchManager(UNKNOWN_KEY)
 
     private var isMouseInsideCanvas: Boolean = false
     private var mousePosition: Vector2 = Vector2(0f, 0f)
 
     private fun mouseDown(event: Event) {
+        firstUserInteraction()
         event as MouseEvent
         val jsTouch = event.buttons
         flags.forEachIndexed { index, flag ->
@@ -122,6 +123,7 @@ class JsInputHandler(
     }
 
     private fun touchStart(event: Event) {
+        firstUserInteraction()
         event as TouchEvent
         (0 until event.targetTouches.length).forEach {
             val defaultTouch = TouchSignal.signal(it)
@@ -182,6 +184,7 @@ class JsInputHandler(
     }
 
     private fun keyDown(event: Event) {
+        firstUserInteraction()
         event as KeyboardEvent
         if (event.keyCode in (0..256)) {
             touchManager.onKeyPressed(event.keyCode)
@@ -189,6 +192,13 @@ class JsInputHandler(
 
         if (event.target == canvas) {
             event.preventDefault()
+        }
+    }
+
+    private fun firstUserInteraction() {
+        // See: https://developer.chrome.com/blog/autoplay?hl=fr#webaudio
+        firstUserInteractionCallback?.invoke()?.also {
+            firstUserInteractionCallback = null
         }
     }
 
@@ -202,17 +212,19 @@ class JsInputHandler(
         }
     }
 
-    override fun isKeyJustPressed(key: Key): Boolean = if (key == Key.ANY_KEY) {
-        touchManager.isAnyKeyJustPressed
-    } else {
-        touchManager.isKeyJustPressed(key.keyCode)
-    }
+    override fun isKeyJustPressed(key: Key): Boolean =
+        if (key == Key.ANY_KEY) {
+            touchManager.isAnyKeyJustPressed
+        } else {
+            touchManager.isKeyJustPressed(key.keyCode)
+        }
 
-    override fun isKeyPressed(key: Key): Boolean = if (key == Key.ANY_KEY) {
-        touchManager.isAnyKeyPressed
-    } else {
-        touchManager.isKeyPressed(key.keyCode)
-    }
+    override fun isKeyPressed(key: Key): Boolean =
+        if (key == Key.ANY_KEY) {
+            touchManager.isAnyKeyPressed
+        } else {
+            touchManager.isKeyPressed(key.keyCode)
+        }
 
     override fun isTouched(signal: TouchSignal): Vector2? = touchManager.isTouched(signal)
 
@@ -233,5 +245,12 @@ class JsInputHandler(
 
     override fun reset() {
         touchManager.processReceivedEvent()
+    }
+
+    private var firstUserInteractionCallback: (() -> Unit)? = null
+
+    override fun onFirstUserInteraction(callback: () -> Unit) {
+        canvas.addEventListener("onClick", { callback() }, false)
+        // firstUserInteractionCallback = callback
     }
 }

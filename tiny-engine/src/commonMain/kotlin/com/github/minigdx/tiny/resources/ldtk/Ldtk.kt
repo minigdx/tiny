@@ -1,8 +1,20 @@
 package com.github.minigdx.tiny.resources.ldtk
 
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.buildClassSerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
 /**
  * Unique Instance Identifier (IID)
@@ -70,6 +82,7 @@ enum class WorldLayout {
 
 @Serializable
 data class Ldtk(
+    val iid: StrIID,
     val worldLayout: WorldLayout,
     val levels: List<Level>,
 ) {
@@ -80,7 +93,7 @@ data class Ldtk(
                 ignoreUnknownKeys = true
                 classDiscriminator = "__type"
             }
-            return json.decodeFromString(Ldtk.serializer(), content)
+            return json.decodeFromString(serializer(), content)
         }
     }
 }
@@ -92,11 +105,14 @@ data class Level(
     val worldX: Int,
     val worldY: Int,
     val layerInstances: List<Layer>,
+    /**
+     * 	An array of all custom fields and their values.
+     */
+    val fieldInstances: List<CustomField>,
 )
 
 @Serializable
 sealed interface Layer {
-
     val __identifier: String
     val __cWid: GridInt
     val __cHei: GridInt
@@ -109,6 +125,18 @@ sealed interface Layer {
     val pxOffsetY: Int
 
     val seed: Long
+
+    val __tilesetRelPath: String?
+
+    val overrideTilesetUid: Int?
+
+    val intGridCsv: List<Int>?
+
+    val entityInstances: List<Entity>?
+
+    val autoLayerTiles: List<Tile>?
+
+    val gridTiles: List<Tile>?
 
     @SerialName("IntGrid")
     @Serializable
@@ -126,7 +154,27 @@ sealed interface Layer {
          * 0 means "empty cell" and IntGrid values start at 1.
          * The array size is __cWid x __cHei cells.
          */
-        val intGridCsv: List<Int>,
+        override val intGridCsv: List<Int>,
+        /**
+         * Always null
+         */
+        override val overrideTilesetUid: Int? = null,
+        /**
+         * Always null
+         */
+        override val entityInstances: List<Entity>? = null,
+        /**
+         * Always null
+         */
+        override val __tilesetRelPath: String? = null,
+        /**
+         * Always null
+         */
+        override val autoLayerTiles: List<Tile>? = null,
+        /**
+         * Always null
+         */
+        override val gridTiles: List<Tile>? = null,
     ) : Layer
 
     @SerialName("AutoLayer")
@@ -139,7 +187,27 @@ sealed interface Layer {
         override val pxOffsetX: Int,
         override val pxOffsetY: Int,
         override val seed: Long,
-        val autoLayer: List<Tile>,
+        override val autoLayerTiles: List<Tile>,
+        /**
+         * The relative path to corresponding Tileset, if any.
+         */
+        override val __tilesetRelPath: String,
+        /**
+         * Always null
+         */
+        override val overrideTilesetUid: Int? = null,
+        /**
+         * Always null
+         */
+        override val intGridCsv: List<Int>? = null,
+        /**
+         * Always null
+         */
+        override val entityInstances: List<Entity>? = null,
+        /**
+         * Always null
+         */
+        override val gridTiles: List<Tile>? = null,
     ) : Layer
 
     @SerialName("Tiles")
@@ -152,7 +220,27 @@ sealed interface Layer {
         override val pxOffsetX: Int,
         override val pxOffsetY: Int,
         override val seed: Long,
-        val gridTiles: List<Tile>,
+        override val gridTiles: List<Tile>,
+        /**
+         * The relative path to corresponding Tileset, if any.
+         */
+        override val __tilesetRelPath: String,
+        /**
+         * This layer can use another tileset by overriding the tileset UID here.
+         */
+        override val overrideTilesetUid: Int? = null,
+        /**
+         * Always null
+         */
+        override val intGridCsv: List<Int>? = null,
+        /**
+         * Always null
+         */
+        override val entityInstances: List<Entity>? = null,
+        /**
+         * Always null
+         */
+        override val autoLayerTiles: List<Tile>? = null,
     ) : Layer
 
     @SerialName("Entities")
@@ -165,7 +253,27 @@ sealed interface Layer {
         override val pxOffsetX: Int,
         override val pxOffsetY: Int,
         override val seed: Long,
-        val entityInstances: List<Entity>,
+        override val entityInstances: List<Entity>,
+        /**
+         * Always null
+         */
+        override val intGridCsv: List<Int>? = null,
+        /**
+         * Always null
+         */
+        override val __tilesetRelPath: String? = null,
+        /**
+         * Always null
+         */
+        override val overrideTilesetUid: Int? = null,
+        /**
+         * Always null
+         */
+        override val autoLayerTiles: List<Tile>? = null,
+        /**
+         * Always null
+         */
+        override val gridTiles: List<Tile>? = null,
     ) : Layer
 }
 
@@ -185,17 +293,14 @@ data class Tile(
      * Examples: f=0 (no flip), f=1 (X flip only), f=2 (Y flip only), f=3 (both flips)
      */
     val f: Int,
-
     /**
      * Pixel coordinates of the tile in the layer ([x,y] format). Don't forget optional layer offsets, if they exist!
      */
     val px: PixelCoord,
-
     /**
      * Pixel coordinates of the tile in the tileset ([x,y] format)
      */
     val src: PixelCoord,
-
     /**
      * The Tile ID in the corresponding tileset.
      */
@@ -208,7 +313,13 @@ data class Entity(
      * Grid-based coordinates ([x,y] format)
      */
     val __grid: GridCoord,
+    /**
+     * Entity definition identifier (The type of the entity)
+     */
     val __identifier: String,
+    /**
+     * Pivot coordinates ([x,y] format, values are from 0 to 1) of the Entity
+     */
     val __pivot: List<Float>,
     /**
      * X world coordinate in pixels. Only available in GridVania or Free world layouts.
@@ -237,12 +348,152 @@ data class Entity(
     val px: PixelCoord,
 )
 
-@Serializable
+@Serializable(with = CustomFieldSerializer::class)
 data class CustomField(
+    /**
+     * Field definition identifier
+     */
     val __identifier: String,
     /**
      * Type of the field, such as Int, Float, String, Enum(my_enum_name), Bool, etc.
      * NOTE: if you enable the advanced option Use Multilines type, you will have "Multilines" instead of "String" when relevant.
      */
     val __type: String,
+    /**
+     * Actual value of the field instance. The value type varies, depending on __type:
+     * - For classic types (ie. Integer, Float, Boolean, String, Text and FilePath), you just get the actual value with the expected type.
+     * - For Color, the value is an hexadecimal string using "#rrggbb" format.
+     * - For Enum, the value is a String representing the selected enum value.
+     * - For Point, the value is a GridPoint object.
+     * - For Tile, the value is a TilesetRect object.
+     * - For EntityRef, the value is an EntityReferenceInfos object.
+     *
+     * If the field is an array, then this __value will also be a JSON array.
+     */
+    val __value: Any?,
 )
+
+@Serializable
+data class EntityRef(
+    /**
+     * IID of the refered EntityInstance
+     */
+    val entityIid: StrIID,
+    /**
+     * 	IID of the LayerInstance containing the refered EntityInstance
+     */
+    val layerIid: StrIID,
+    /**
+     * IID of the Level containing the refered EntityInstance
+     */
+    val levelIid: StrIID,
+    /**
+     * IID of the World containing the refered EntityInstance
+     */
+    val worldIid: StrIID,
+)
+
+/**
+ * This object represents a custom sub rectangle in a Tileset image.
+ * @see https://ldtk.io/json/#ldtk-TilesetRect
+ */
+@Serializable
+data class TilesetRect(
+    /**
+     * Height in pixels
+     */
+    val h: PixelInt,
+    /**
+     * 	UID of the tileset
+     */
+    val tilesetUid: Int,
+    /**
+     * Width in pixels
+     */
+    val w: PixelInt,
+    /**
+     * 	X pixels coordinate of the top-left corner in the Tileset image
+     */
+    val x: PixelInt,
+    /**
+     * Y pixels coordinate of the top-left corner in the Tileset image
+     */
+    val y: PixelInt,
+)
+
+/**
+ * This object is just a grid-based coordinate used in Field values.
+ * @see: https://ldtk.io/json/#ldtk-GridPoint
+ */
+@Serializable
+data class GridPoint(
+    /**
+     * X grid-based coordinate
+     */
+    val cx: GridInt,
+    /**
+     * 	Y grid-based coordinate
+     */
+    val cy: GridInt,
+)
+
+object CustomFieldSerializer : KSerializer<CustomField> {
+    override val descriptor: SerialDescriptor =
+        buildClassSerialDescriptor("CustomField") {
+            element("__type", PrimitiveSerialDescriptor("__type", PrimitiveKind.STRING))
+            element("__value", JsonElement.serializer().descriptor) // On manipule un JsonElement en interne
+        }
+
+    override fun serialize(
+        encoder: Encoder,
+        value: CustomField,
+    ) = throw UnsupportedOperationException(
+        "LdTk file is not supposed to be serialized. " +
+            "If you need to update it, Use LdTk instead: https://ldtk.io/",
+    )
+
+    override fun deserialize(decoder: Decoder): CustomField {
+        val jsonElement = JsonElement.serializer().deserialize(decoder)
+        val jsonObject = jsonElement.jsonObject
+        val identifier = jsonObject["__identifier"]?.jsonPrimitive?.content!!
+        val type = jsonObject["__type"]?.jsonPrimitive?.content!!
+        val valueElement = jsonObject["__value"]
+
+        return CustomField(
+            identifier,
+            type,
+            deserialize(type, valueElement),
+        )
+    }
+
+    private fun deserialize(
+        type: String,
+        valueElement: JsonElement?,
+    ): Any? {
+        if (valueElement is JsonNull) {
+            return null
+        }
+        return when (type) {
+            "Int" -> valueElement?.jsonPrimitive?.content?.toIntOrNull()
+            "Float" -> valueElement?.jsonPrimitive?.content?.toFloatOrNull()
+            "String", "Multilines", "Text", "FilePath", "Color" -> valueElement?.jsonPrimitive?.content
+            "Bool" -> valueElement?.jsonPrimitive?.content?.toBooleanStrictOrNull()
+            "Point" -> valueElement?.let { Json.decodeFromJsonElement(GridPoint.serializer(), it) }
+            "Tile" -> valueElement?.let { Json.decodeFromJsonElement(TilesetRect.serializer(), it) }
+            "EntityRef" -> valueElement?.let { Json.decodeFromJsonElement(EntityRef.serializer(), it) }
+            else ->
+                if (type.startsWith("LocalEnum.")) {
+                    valueElement?.jsonPrimitive?.content
+                } else if (type.startsWith("Array<")) {
+                    val nestedType = type.removePrefix("Array<").removeSuffix(">")
+                    valueElement?.jsonArray?.map { nestedElement -> deserialize(nestedType, nestedElement) }
+                } else {
+                    throw IllegalArgumentException(
+                        "$type is not supported. " +
+                            "Is the type describe exist in LdTK ? (https://ldtk.io/json/#ldtk-FieldInstanceJson) " +
+                            "If yes, please fill an issue to support it in Tiny (https://github.com/minigdx/tiny/issues).",
+                    )
+                }
+        }
+    }
+}

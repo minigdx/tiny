@@ -1,23 +1,93 @@
 <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
 <style>
+    /** link to start the game **/
+    .tiny-button-right {
+        margin-left: auto;
+    }
+
+    .tiny-button {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 16px;
+
+        background-color: #007bff;
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 0.9em;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+
+        font-family: "Source Code Pro", monospace;
+
+        transition: background-color 0.2s ease-in-out, transform 0.1s ease; /* Transition douce pour les effets */
+
+    }
+
+    .tiny-button,
+    .tiny-button:link, /* Pour s'assurer que même non visité, il a le bon style */
+    .tiny-button:visited { /* Pour s'assurer que les liens visités gardent la couleur souhaitée */
+        color: white; /* Couleur du texte pour l'état normal, lien et visité */
+        text-decoration: none; /* Maintenir la suppression du soulignement */
+    }
+
+    .tiny-button:hover,
+    .tiny-button:focus { /* :focus pour l'accessibilité clavier */
+        background-color: #0056b3; /* Couleur de fond un peu plus foncée au survol/focus */
+        color: white;              /* Assure que la couleur du texte reste blanche */
+        outline: none;             /* Supprime l'outline par défaut sur :focus si vous le souhaitez,
+                                  mais pour l'accessibilité, il est mieux de le styliser :
+                                  par ex. box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5); */
+    }
+
+    .tiny-toolbar {
+        width: calc(100% + 256px);
+        min-height: 48px;
+        padding: 4px;
+        border-radius: 8px;
+        border: 1px solid #9EC6DF;
+        margin-left: -128px;
+        margin-bottom: 2px;
+        display: flex;
+        align-items: center;
+    }
+
+    /** container of the game + editor **/
     .tiny-container {
         display: flex;
-        flex-wrap: wrap;
+        width: calc(100% + 256px);
+        margin-left: -128px;
     }
 
-    .tiny-play {
-        display: block;
-    }
-
+    /** game **/
     .tiny-canvas {
         border: 1px solid black;
         cursor: none;
+
+        flex: 1 1 auto;
+        max-height: 512px;
+        max-width: 512px;
+    }
+
+    /** code editor **/
+    .tiny-textarea {
+        flex: 2 1 auto;
+        display: block;
+        min-height: 512px;
+        padding-left: 48px;
+        counter-reset: line; /* reset the "line" counter */
+        width: 100%;
+        font-family: "Source Code Pro", monospace;
+        resize:none;
     }
 
     .tiny-textarea div {
         display: block;
         position: relative;
         white-space: pre-wrap;
+        min-height: 1em;
     }
 
     .tiny-textarea div::before {
@@ -26,15 +96,6 @@
         counter-increment: line;  /* increment the counter */
         position: absolute;
         right: calc(100% + 16px); /* add some space between this and the code line next to it */
-    }
-
-    .tiny-textarea {
-        padding-left: 48px;
-        counter-reset: line; /* reset the "line" counter */
-        height: 512px;
-        width: 100%;
-        font-family: "Source Code Pro", monospace;
-        resize:none;
     }
 
     .code_comment {
@@ -51,5 +112,7 @@
 
     .no-resize {
         resize:none;
+        border: none;
+        overflow: hidden;
     }
 </style>

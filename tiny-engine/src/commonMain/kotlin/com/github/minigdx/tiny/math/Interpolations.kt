@@ -9,11 +9,17 @@ import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-fun pow(x: Float, y: Float) = x.pow(y)
+fun pow(
+    x: Float,
+    y: Float,
+) = x.pow(y)
 
 interface Interpolation {
-
-    fun interpolate(a: Float, b: Float, percent: Percent): Float {
+    fun interpolate(
+        a: Float,
+        b: Float,
+        percent: Percent,
+    ): Float {
         return a + (b - a) * interpolate(percent)
     }
 
@@ -23,7 +29,6 @@ interface Interpolation {
 }
 
 private class PowInterpolation(private val power: Int) : Interpolation {
-
     override fun interpolate(percent: Percent): Float {
         return if (percent <= 0.5f) {
             pow(
@@ -42,7 +47,6 @@ private class PowInterpolation(private val power: Int) : Interpolation {
 }
 
 private class PowInInterpolation(private val power: Int) : Interpolation {
-
     override fun interpolate(percent: Percent): Float {
         return pow(percent, power.toFloat())
     }
@@ -51,7 +55,6 @@ private class PowInInterpolation(private val power: Int) : Interpolation {
 }
 
 private class PowOutInterpolation(private val power: Int) : Interpolation {
-
     override fun interpolate(percent: Percent): Float {
         return pow(percent - 1, power.toFloat()) * (if (power % 2 == 0) -1 else 1) + 1
     }
@@ -60,7 +63,6 @@ private class PowOutInterpolation(private val power: Int) : Interpolation {
 }
 
 private class SineInterpolation : Interpolation {
-
     override fun interpolate(percent: Percent): Float {
         return (1 - cos(percent * PI.toFloat())) / 2
     }
@@ -69,7 +71,6 @@ private class SineInterpolation : Interpolation {
 }
 
 private class SineInInterpolation : Interpolation {
-
     override fun interpolate(percent: Percent): Float {
         return 1.0f - cos(percent * HALF_PI)
     }
@@ -78,7 +79,6 @@ private class SineInInterpolation : Interpolation {
 }
 
 private class SineOutInterpolation : Interpolation {
-
     override fun interpolate(percent: Percent): Float {
         return sin(percent * HALF_PI)
     }
@@ -87,7 +87,6 @@ private class SineOutInterpolation : Interpolation {
 }
 
 private class CircleInterpolation : Interpolation {
-
     override fun interpolate(percent: Percent): Float {
         var a = percent
         if (a <= 0.5f) {
@@ -103,7 +102,6 @@ private class CircleInterpolation : Interpolation {
 }
 
 private class CircleInInterpolation : Interpolation {
-
     override fun interpolate(percent: Percent): Float {
         return 1 - sqrt(1 - percent * percent)
     }
@@ -112,7 +110,6 @@ private class CircleInInterpolation : Interpolation {
 }
 
 private class CircleOutInterpolation : Interpolation {
-
     override fun interpolate(percent: Percent): Float {
         var a = percent
         a--
@@ -128,7 +125,6 @@ private open class ElasticInterpolation(
     bounces: Int,
     protected val scale: Float,
 ) : Interpolation {
-
     protected val bounces: Float = bounces * PI.toFloat() * if (bounces % 2 == 0) 1f else -1f
 
     override fun interpolate(percent: Percent): Float {
@@ -147,6 +143,7 @@ private open class ElasticInterpolation(
             (power * (a - 1)),
         ) * sin(a * bounces) * scale / 2
     }
+
     override fun toString(): String = "elastic"
 }
 
@@ -156,7 +153,6 @@ private class ElasticInInterpolation(
     bounces: Int,
     scale: Float,
 ) : ElasticInterpolation(value, power, bounces, scale) {
-
     override fun interpolate(percent: Percent): Float {
         return if (percent >= 0.99f) 1f else pow(value, power * (percent - 1)) * sin(percent * bounces) * scale
     }
@@ -170,7 +166,6 @@ private class ElasticOutInterpolation(
     bounces: Int,
     scale: Float,
 ) : ElasticInterpolation(value, power, bounces, scale) {
-
     override fun interpolate(percent: Percent): Float {
         var a = percent
         if (a == 0f) return 0f
@@ -182,7 +177,6 @@ private class ElasticOutInterpolation(
 }
 
 private class LinearInterpolation : Interpolation {
-
     override fun interpolate(percent: Percent): Float {
         return percent
     }
@@ -191,7 +185,6 @@ private class LinearInterpolation : Interpolation {
 }
 
 private open class ExpInterpolation(val value: Float, val power: Float) : Interpolation {
-
     val min: Float = pow(value, -power)
     val scale: Float = 1f / (1f - min)
 
@@ -207,7 +200,6 @@ private open class ExpInterpolation(val value: Float, val power: Float) : Interp
 }
 
 private class ExpInInterpolation(value: Float, power: Float) : ExpInterpolation(value, power) {
-
     override fun interpolate(percent: Percent): Float {
         return (pow(value, (power * (percent - 1f))) - min) * scale
     }
@@ -216,7 +208,6 @@ private class ExpInInterpolation(value: Float, power: Float) : ExpInterpolation(
 }
 
 private class ExpOutInterpolation(value: Float, power: Float) : ExpInterpolation(value, power) {
-
     override fun interpolate(percent: Percent): Float {
         return 1f - (pow(value, (-power * percent)) - min) * scale
     }
@@ -225,7 +216,6 @@ private class ExpOutInterpolation(value: Float, power: Float) : ExpInterpolation
 }
 
 private class Bounce(bounces: Int) : BounceOut(bounces) {
-
     private fun out(a: Float): Float {
         val test: Float = a + widths.get(0) / 2
         return if (test < widths.get(0)) test / (widths.get(0) / 2) - 1 else super.interpolate(a)
@@ -239,7 +229,6 @@ private class Bounce(bounces: Int) : BounceOut(bounces) {
 }
 
 private open class BounceOut(bounces: Int) : Interpolation {
-
     val widths: FloatArray
     val heights: FloatArray
 
@@ -314,7 +303,6 @@ private open class BounceOut(bounces: Int) : Interpolation {
 }
 
 private class BounceIn(bounces: Int) : BounceOut(bounces) {
-
     override fun interpolate(percent: Percent): Float {
         return 1f - super.interpolate(1f - percent)
     }
@@ -323,7 +311,6 @@ private class BounceIn(bounces: Int) : BounceOut(bounces) {
 }
 
 private class SwingInterpolation(scale: Float) : Interpolation {
-
     private val scale: Float
 
     init {
@@ -345,7 +332,6 @@ private class SwingInterpolation(scale: Float) : Interpolation {
 }
 
 private class SwingOutInterpolation(private val scale: Float) : Interpolation {
-
     override fun interpolate(percent: Percent): Float {
         var a = percent
         a--
@@ -356,7 +342,6 @@ private class SwingOutInterpolation(private val scale: Float) : Interpolation {
 }
 
 private class SwingInInterpolation(private val scale: Float) : Interpolation {
-
     override fun interpolate(percent: Percent): Float {
         return percent * percent * ((scale + 1) * percent - scale)
     }
@@ -365,7 +350,6 @@ private class SwingInInterpolation(private val scale: Float) : Interpolation {
 }
 
 object Interpolations {
-
     internal const val HALF_PI: Float = (PI * 0.5f).toFloat()
 
     val pow2: Interpolation = PowInterpolation(2)
@@ -413,32 +397,35 @@ object Interpolations {
 
     val linear: Interpolation = LinearInterpolation()
 
-    val all = listOf(
-        pow2, pow3, pow4, pow5,
-        powIn2, powIn3, powIn4, powIn5,
-        powOut2, powOut3, powOut4, powOut5,
+    val all =
+        listOf(
+            pow2, pow3, pow4, pow5,
+            powIn2, powIn3, powIn4, powIn5,
+            powOut2, powOut3, powOut4, powOut5,
+            sin, sinIn, sinOut,
+            circle, circleIn, circleOut,
+            elastic, elasticIn, elasticOut,
+            swing, swingIn, swingOut,
+            bounce, bounceIn, bounceOut,
+            exp10, exp10In, exp10Out,
+            exp5, exp5In, exp5Out,
+            linear,
+        )
 
-        sin, sinIn, sinOut,
-
-        circle, circleIn, circleOut,
-
-        elastic, elasticIn, elasticOut,
-
-        swing, swingIn, swingOut,
-
-        bounce, bounceIn, bounceOut,
-
-        exp10, exp10In, exp10Out,
-        exp5, exp5In, exp5Out,
-
-        linear,
-    )
-
-    fun lerp(target: Float, current: Float, step: Float = 0.9f): Float {
+    fun lerp(
+        target: Float,
+        current: Float,
+        step: Float = 0.9f,
+    ): Float {
         return target + step * (current - target)
     }
 
-    fun lerp(target: Float, current: Float, step: Float = 0.9f, deltaTime: Seconds): Float {
+    fun lerp(
+        target: Float,
+        current: Float,
+        step: Float = 0.9f,
+        deltaTime: Seconds,
+    ): Float {
         return lerp(target, current, 1 - step.pow(deltaTime))
     }
 }

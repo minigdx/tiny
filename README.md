@@ -1,32 +1,64 @@
+
 # 🧸 Tiny Game Engine
 
-🧸 Tiny is a lightweight, multiplatform game engine that allows developers to create games using the scripting language Lua. It is designed for creating small, short games, making it ideal for game jams and quick game development.
+> 🎮 Tiny is a lightweight, cross-platform game engine powered by Lua — perfect for small games, game jams, and rapid prototyping.
 
 ![Breakout created with Tiny Game Engine](./images/breakout.gif)
 
-## Features
+[![GitHub release](https://img.shields.io/github/v/release/minigdx/tiny)](https://github.com/minigdx/tiny/releases)
+[![License: MIT](https://img.shields.io/github/license/minigdx/tiny)](https://github.com/minigdx/tiny/blob/main/LICENSE)
 
-- Multiplatform: Tiny can be used on both desktop and web platforms.
-- Scripting with Lua: The engine allows developers to use Lua scripting language to create their games.
-- Hot Reload: The engine supports hot reload, making it easy for developers to quickly make changes and see the results immediately.
-- Simple and Lightweight: The engine is designed to be simple and lightweight, making it ideal for small and short games.
+---
 
-## Download
+## ✨ Features
 
-- Latest version can be downloaded on [the release page](https://github.com/minigdx/tiny/releases).
+- 🖥️ & 🌐 **Multiplatform** – Runs on desktop and web
+- ✍️ **Lua scripting** – Simple, flexible, and fast
+- 🔄 **Hot reload** – Instantly see your code changes
+- 🪶 **Lightweight** – No bloat, just the essentials for small games
 
-## Documentation
+---
 
-The Tiny game engine comes with extensive documentation that covers everything from installing the engine to creating games. The documentation is available on the [GitHub website](https://minigdx.github.io/tiny/).
+## 🚀 Getting Started
 
-A presentation about the technologies used behind 🧸 Tiny was also given during the conference [DroidKaigi 2024 @ 東京 Tokyo](https://2024.droidkaigi.jp/en/timetable/683368/). You can check [the slides](https://speakerdeck.com/dwursteisen/crafting-cross-platform-adventures-building-a-game-engine-with-kotlin-multiplatform), or you also [watch the session](https://www.youtube.com/watch?v=4_i_Xp96IMM).
+Create your first game with just a few lines of Lua:
 
-[![Crafting Cross-Platform Adventures: Building a Game Engine with Kotlin Multiplatform @ DroidKaigi 2024 - 東京 Tokyo](tiny-doc/src/docs/asciidoc/sample/droidkaigi-tiny-export.gif)](https://speakerdeck.com/dwursteisen/crafting-cross-platform-adventures-building-a-game-engine-with-kotlin-multiplatform
-)
+```lua
+function _draw()
+    -- draw a rectangle at {x: 10, y: 10} with the size {width: 100, height: 50} 
+    shape.rectf(10, 10, 100, 50)
+end
+```
 
-## Games
+➡️ Read the [Getting Started Guide](https://minigdx.github.io/tiny/) to set up the engine and start creating!
 
-Want to build a game like those? Read the documentation above ⬆️ and start to build your own!
+---
+
+## 📦 Download
+
+Get the latest version from the [Releases Page](https://github.com/minigdx/tiny/releases).
+
+---
+
+## 📚 Documentation
+
+Full documentation is available on the [Tiny website](https://minigdx.github.io/tiny/), including:
+
+- Engine setup
+- Lua API reference
+- Examples and tutorials
+
+🗣️ A behind-the-scenes presentation was given at [DroidKaigi 2024 – Tokyo](https://2024.droidkaigi.jp/en/timetable/683368/):
+- 📽️ [Watch the session on YouTube](https://www.youtube.com/watch?v=4_i_Xp96IMM)
+- 📑 [View the slides](https://speakerdeck.com/dwursteisen/crafting-cross-platform-adventures-building-a-game-engine-with-kotlin-multiplatform)
+
+[![Crafting Cross-Platform Adventures](tiny-doc/src/docs/asciidoc/sample/droidkaigi-tiny-export.gif)](https://speakerdeck.com/dwursteisen/crafting-cross-platform-adventures-building-a-game-engine-with-kotlin-multiplatform)
+
+---
+
+## 🎮 Games Made With Tiny
+
+Want to create games like these? Dive into the docs and start building:
 
 [![Camping](./tiny-doc/src/docs/asciidoc/sample/camping.gif)](https://dwursteisen.itch.io/trijam-camping)
 [![Type It](./tiny-doc/src/docs/asciidoc/sample/level-up.gif)](https://dwursteisen.itch.io/trijam-220-type-it)
@@ -36,11 +68,20 @@ Want to build a game like those? Read the documentation above ⬆️ and start t
 [![Meiro De Maigo 2](./tiny-doc/src/docs/asciidoc/sample/meiro_de_maigo2.gif)](https://dwursteisen.itch.io/meiro-de)
 [![Freezming](./tiny-doc/src/docs/asciidoc/sample/freezming.gif)](https://dwursteisen.itch.io/freezming)
 [![Gravity Balls](./tiny-doc/src/docs/asciidoc/sample/gravity-balls.gif)](https://dwursteisen.itch.io/gravity-balls)
+[![Reflections](./tiny-doc/src/docs/asciidoc/sample/reflections.gif)](https://dwursteisen.itch.io/macro-jams-06-reflections)
 
-## Community
+---
 
-Tiny has a growing community of developers who use the engine to create games. You can join the community on social media platforms like Twitter, itch.io and Reddit.
+## 📄 License
 
-## License
+🧸 Tiny is open-source software licensed under the [MIT License](https://github.com/minigdx/tiny/blob/main/LICENSE).
 
-The Tiny game engine is open source software, released under the MIT license. You can use it for both commercial and non-commercial projects.
+Use it freely in personal, jam, or commercial projects.
+
+---
+
+## 🛠️ Tech Overview
+
+| Core           | Scripting | Platforms       | License |
+|----------------|-----------|------------------|---------|
+| Kotlin Multiplatform | Lua       | Desktop, Web      | MIT     |

@@ -6,7 +6,6 @@ class JsLocalFile(
     val filename: String,
     val localStoragePrefix: String = "tiny",
 ) : LocalFile {
-
     override val name: String
     override val extension: String
 

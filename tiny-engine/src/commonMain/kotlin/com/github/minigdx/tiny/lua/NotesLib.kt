@@ -1,8 +1,12 @@
 package com.github.minigdx.tiny.lua
 
+import com.github.mingdx.tiny.doc.TinyArg
+import com.github.mingdx.tiny.doc.TinyCall
+import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
+import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import kotlin.math.abs
 
@@ -181,17 +185,21 @@ enum class Note(val frequency: Float, val index: Int) {
     ;
 
     companion object {
-        private val notesPerIndex = Note.values().distinctBy { it.index }.sortedBy { it.index }.toTypedArray()
+        private val notesPerIndex = entries.toTypedArray().distinctBy { it.index }.sortedBy { it.index }.toTypedArray()
 
         fun fromIndex(noteIndex: Int): Note {
             return notesPerIndex[noteIndex]
         }
 
         fun fromFrequency(frequency: Float): Note {
-            return Note.values().minBy { abs(it.frequency - frequency) }
+            return entries.toTypedArray().minBy { abs(it.frequency - frequency) }
         }
 
         fun fromFrequency(frequency: Int): Note = fromFrequency(frequency.toFloat())
+
+        fun fromName(name: String): Note {
+            return Note.valueOf(name)
+        }
     }
 }
 
@@ -201,16 +209,30 @@ enum class Note(val frequency: Float, val index: Int) {
         "Please note that bemols are the note with b (ie: Gb2) while sharps are the note with s (ie: As3).",
 )
 class NotesLib : TwoArgFunction() {
-
-    override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
+    override fun call(
+        arg1: LuaValue,
+        arg2: LuaValue,
+    ): LuaValue {
         val keys = LuaTable()
 
-        Note.values().forEach { note ->
+        Note.entries.forEach { note ->
             keys[note.name] = valueOf(note.index)
         }
+
+        keys["note"] = note()
 
         arg2["notes"] = keys
         arg2["package"]["loaded"]["notes"] = keys
         return keys
+    }
+
+    @TinyFunction("Get the name of a note regarding the note index (ie: C0 = 0, Cs0 = 1, ...)")
+    inner class note : OneArgFunction() {
+        @TinyCall("Get the name of a note regarding the note index (ie: C0 = 0, Cs0 = 1, ...)")
+        override fun call(
+            @TinyArg("note_index") arg: LuaValue,
+        ): LuaValue {
+            return valueOf(Note.fromIndex(arg.checkint()).name)
+        }
     }
 }

@@ -3,10 +3,14 @@ package com.github.minigdx.tiny.doc
 @DslMarker
 annotation class LuaStubDslMarker
 
-fun stub(description: String, block: LuaStubDocument.() -> Unit): LuaStubDocument {
-    val doc = LuaStubDocument().apply {
-        this.description = description
-    }
+fun stub(
+    description: String,
+    block: LuaStubDocument.() -> Unit,
+): LuaStubDocument {
+    val doc =
+        LuaStubDocument().apply {
+            this.description = description
+        }
     block(doc)
     return doc
 }
@@ -40,11 +44,19 @@ class LuaStubLib {
     var name: String = ""
     var description: String = ""
     var functions: List<LuaStubFunction> = emptyList()
+    var variables: List<LuaStubVariable> = emptyList()
 
     fun function(block: LuaStubFunction.() -> Unit) {
         val func = LuaStubFunction()
         func.block()
         functions += func
+    }
+
+    fun variable(block: LuaStubVariable.() -> Unit) {
+        val variable = LuaStubVariable()
+        variable.block()
+        variable.namespace = name
+        variables += variable
     }
 
     fun generate(): String {
@@ -54,12 +66,31 @@ class LuaStubLib {
                 appendLine("$name = {}")
             }
 
+            variables.forEach {
+                append(it.generate())
+            }
+
             functions.forEach {
                 append(it.generate())
             }
             appendLine()
         }
     }
+}
+
+@LuaStubDslMarker
+class LuaStubVariable {
+    fun generate(): String {
+        return buildString {
+            appendLine(comment(description))
+            appendLine("$namespace.$name = any")
+        }
+    }
+
+    var namespace: String? = null
+    var name: String = ""
+    var description: String = ""
+    var hidden: Boolean = false
 }
 
 @LuaStubDslMarker
@@ -119,6 +150,9 @@ class LuaStubArg {
     }
 }
 
-private fun comment(content: String, headline: String = "---"): String {
+private fun comment(
+    content: String,
+    headline: String = "---",
+): String {
     return content.split("\n").joinToString("\n") { line -> "$headline $line" }
 }

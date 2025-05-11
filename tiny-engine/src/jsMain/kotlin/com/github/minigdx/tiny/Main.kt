@@ -36,7 +36,10 @@ fun main() {
     setupGames(rootPath, tinyGameTag)
 }
 
-fun setupGames(rootPath: String, tinyGameTag: HTMLCollection) {
+fun setupGames(
+    rootPath: String,
+    tinyGameTag: HTMLCollection,
+) {
     if (tinyGameTag.length == 0) {
         throw IllegalArgumentException(
             "No <tiny-game> has been found in the current page. " +
@@ -75,21 +78,25 @@ fun setupGames(rootPath: String, tinyGameTag: HTMLCollection) {
         val sprWidth = game.getAttribute("spritew")?.toInt() ?: 16
         val sprHeight = game.getAttribute("spriteh")?.toInt() ?: 16
 
-        val scripts = game.getElementsByTagName("tiny-script").map { script ->
-            script.getAttribute("name")
-        }.filterNotNull()
+        val scripts =
+            game.getElementsByTagName("tiny-script").map { script ->
+                script.getAttribute("name")
+            }.filterNotNull()
 
-        val levels = game.getElementsByTagName("tiny-level").map { level ->
-            level.getAttribute("name")
-        }.filterNotNull()
+        val levels =
+            game.getElementsByTagName("tiny-level").map { level ->
+                level.getAttribute("name")
+            }.filterNotNull()
 
-        val sounds = game.getElementsByTagName("tiny-sound").map { level ->
-            level.getAttribute("name")
-        }.filterNotNull()
+        val sounds =
+            game.getElementsByTagName("tiny-sound").map { level ->
+                level.getAttribute("name")
+            }.filterNotNull()
 
-        val spritesheets = game.getElementsByTagName("tiny-spritesheet").map { spritesheet ->
-            spritesheet.getAttribute("name")
-        }.filterNotNull()
+        val spritesheets =
+            game.getElementsByTagName("tiny-spritesheet").map { spritesheet ->
+                spritesheet.getAttribute("name")
+            }.filterNotNull()
 
         val colors =
             game.getElementsByTagName("tiny-colors")[0]?.getAttribute("name")?.split(",")?.toList() ?: emptyList()
@@ -102,28 +109,30 @@ fun setupGames(rootPath: String, tinyGameTag: HTMLCollection) {
         }
         game.appendChild(canvas)
 
-        WorkspaceLib.DEFAULT = (0 until localStorage.length).mapNotNull { index ->
-            val key = localStorage.key(index)
-            if (key != null && key.startsWith("tiny")) {
-                JsLocalFile(key.replaceFirst("tiny-", ""))
-            } else {
-                null
+        WorkspaceLib.DEFAULT =
+            (0 until localStorage.length).mapNotNull { index ->
+                val key = localStorage.key(index)
+                if (key != null && key.startsWith("tiny")) {
+                    JsLocalFile(key.replaceFirst("tiny-", ""))
+                } else {
+                    null
+                }
             }
-        }
 
-        val gameOptions = GameOptions(
-            width = gameWidth,
-            height = gameHeight,
-            palette = colors.ifEmpty { listOf("#FFFFFF", "#000000") },
-            gameScripts = scripts,
-            spriteSheets = spritesheets,
-            gameLevels = levels,
-            sounds = sounds,
-            zoom = gameZoom,
-            gutter = 0 to 0,
-            spriteSize = sprWidth to sprHeight,
-            hideMouseCursor = hideMouse,
-        )
+        val gameOptions =
+            GameOptions(
+                width = gameWidth,
+                height = gameHeight,
+                palette = colors.ifEmpty { listOf("#FFFFFF", "#000000") },
+                gameScripts = scripts,
+                spriteSheets = spritesheets,
+                gameLevels = levels,
+                sounds = sounds,
+                zoom = gameZoom,
+                gutter = 0 to 0,
+                spriteSize = sprWidth to sprHeight,
+                hideMouseCursor = hideMouse,
+            )
 
         val logger = StdOutLogger("game-$index")
         logger.debug("TINY-JS") { "Boot the game using the URL '$rootPath'." }

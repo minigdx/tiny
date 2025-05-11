@@ -1,7 +1,10 @@
 package com.github.minigdx.tiny.input
 
 enum class TouchSignal {
-    TOUCH1, TOUCH2, TOUCH3;
+    TOUCH1,
+    TOUCH2,
+    TOUCH3,
+    ;
 
     companion object {
         fun signal(index: Int): TouchSignal? {

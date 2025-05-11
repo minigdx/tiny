@@ -6,19 +6,19 @@ import com.danielgergely.kgl.GL_SHADING_LANGUAGE_VERSION
 import com.danielgergely.kgl.GL_VENDOR
 import com.danielgergely.kgl.GL_VERSION
 import com.danielgergely.kgl.KglLwjgl
-import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameOptions
+import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.log.Logger
-import com.github.minigdx.tiny.platform.RenderContext
 import com.github.minigdx.tiny.platform.WindowManager
+import com.github.minigdx.tiny.render.gl.OpenGLRender
+import com.github.minigdx.tiny.render.operations.RenderOperation
 import org.lwjgl.opengl.GL33
 
 class LwjglGLRender(
     private val logger: Logger,
     private val gameOptions: GameOptions,
-    private val gl: GLRender = GLRender(KglLwjgl, logger, gameOptions),
+    private val gl: OpenGLRender = OpenGLRender(KglLwjgl, logger, gameOptions),
 ) : Render {
-
     override fun init(windowManager: WindowManager): RenderContext {
         logger.info("GLFW") { "GL_VENDOR:                \t" + GL33.glGetString(GL_VENDOR) }
         logger.info("GLFW") { "GL_VERSION:               \t" + GL33.glGetString(GL_VERSION) }
@@ -28,10 +28,14 @@ class LwjglGLRender(
         return gl.init(windowManager)
     }
 
-    override fun draw(
+    override fun drawOnScreen(context: RenderContext) = gl.drawOnScreen(context)
+
+    override fun render(
         context: RenderContext,
-        image: ByteArray,
-        width: Pixel,
-        height: Pixel,
-    ) = gl.draw(context, image, width, height)
+        ops: List<RenderOperation>,
+    ) = gl.render(context, ops)
+
+    override fun readRender(context: RenderContext): RenderFrame = gl.readRender(context)
+
+    override fun readRenderAsFrameBuffer(context: RenderContext): PixelArray = gl.readRenderAsFrameBuffer(context)
 }

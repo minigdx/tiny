@@ -5,10 +5,12 @@ import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SourceStream
-import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
-import com.github.minigdx.tiny.sound.Sound
+import com.github.minigdx.tiny.render.RenderContext
+import com.github.minigdx.tiny.render.RenderFrame
+import com.github.minigdx.tiny.render.operations.RenderOperation
+import com.github.minigdx.tiny.sound.Music
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.coroutines.CoroutineDispatcher
 
@@ -20,7 +22,19 @@ class ImageData(
     // Height of the Image
     val height: Pixel,
 )
-class SoundData(val name: String, val sound: Sound)
+
+class SoundData(
+    // Name of the file.
+    val name: String,
+    // Sound manager to actually play the sound or the music.
+    val soundManager: SoundManager,
+    // Deserialized data of the file.
+    val music: Music,
+    // Ready to play musical bars. (sfx)
+    val musicalBars: List<FloatArray>,
+    // Ready to play musical sequences (music)
+    val musicalSequences: List<FloatArray> = emptyList(),
+)
 
 interface Platform {
     /**
@@ -44,11 +58,6 @@ interface Platform {
     fun gameLoop(gameLoop: GameLoop)
 
     /**
-     * Draw the image on the screen
-     */
-    fun draw(context: RenderContext, frameBuffer: FrameBuffer)
-
-    /**
      * Save the last 30 seconds of the game.
      */
     fun record() = Unit
@@ -68,6 +77,7 @@ interface Platform {
      * Initialise the input manager.
      */
     fun initInputHandler(): InputHandler
+
     fun initInputManager(): InputManager
 
     /**
@@ -84,12 +94,18 @@ interface Platform {
      * Create a SourceStream from the name of the resource.
      * Regarding the platform, the name can be adjusted.
      */
-    fun createByteArrayStream(name: String, canUseJarPrefix: Boolean = true): SourceStream<ByteArray>
+    fun createByteArrayStream(
+        name: String,
+        canUseJarPrefix: Boolean = true,
+    ): SourceStream<ByteArray>
 
     /**
      * Create a SourceStream from an image from uncompressed data.
      */
-    fun createImageStream(name: String, canUseJarPrefix: Boolean = true): SourceStream<ImageData>
+    fun createImageStream(
+        name: String,
+        canUseJarPrefix: Boolean = true,
+    ): SourceStream<ImageData>
 
     /**
      * Create a SourceStream from a midi file.
@@ -101,5 +117,23 @@ interface Platform {
      *
      * @param: name of the file, with the extension, if any.
      */
-    fun createLocalFile(name: String): LocalFile
+    fun createLocalFile(
+        name: String,
+        parentDirectory: String? = "data",
+    ): LocalFile
+
+    /**
+     * Render the operations into the frame buffer.
+     */
+    fun render(
+        renderContext: RenderContext,
+        ops: List<RenderOperation>,
+    )
+
+    fun readRender(renderContext: RenderContext): RenderFrame
+
+    /**
+     * Draw the frame buffer on the screen.
+     */
+    fun draw(renderContext: RenderContext)
 }

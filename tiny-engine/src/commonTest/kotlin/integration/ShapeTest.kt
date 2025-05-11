@@ -5,21 +5,22 @@ import com.github.minigdx.tiny.platform.test.TestHelper.test
 import kotlin.test.Test
 
 class ShapeTest {
-
     //language=Lua
-    private val circlefScript = """
+    private val circlefScript =
+        """
         function _draw()
            gfx.cls(1)
            shape.circlef(5, 5, 3, 2)
          end
-    """.trimIndent()
+        """.trimIndent()
 
     @Test
-    fun circlef() = test("circlef", circlefScript) { platform ->
-        platform.advance()
+    fun circlef() =
+        test("circlef", circlefScript) { platform ->
+            platform.advance()
 
-        TestHelper.assertEquals(
-            """
+            TestHelper.assertEquals(
+                """
 1111111111
 1111111111
 1111222111
@@ -31,24 +32,26 @@ class ShapeTest {
 1111222111
 1111111111
 """,
-            platform.frames.last(),
-        )
-    }
+                platform.frames.last(),
+            )
+        }
 
     //language=Lua
-    private val trianglefScript = """
-       function _draw()
-           gfx.cls(1)
-           shape.trianglef(0, 0, 0, 10, 10, 0, 2)
-       end 
-    """.trimIndent()
+    private val trianglefScript =
+        """
+        function _draw()
+            gfx.cls(1)
+            shape.trianglef(0, 0, 0, 10, 10, 0, 2)
+        end 
+        """.trimIndent()
 
     @Test
-    fun trianglef() = test("trianglef", trianglefScript) { platform ->
-        platform.advance()
+    fun trianglef() =
+        test("trianglef", trianglefScript) { platform ->
+            platform.advance()
 
-        TestHelper.assertEquals(
-            """
+            TestHelper.assertEquals(
+                """
 2222222222
 2222222221
 2222222211
@@ -60,24 +63,26 @@ class ShapeTest {
 2211111111
 2111111111
 """,
-            platform.frames.last(),
-        )
-    }
+                platform.frames.last(),
+            )
+        }
 
     //language=Lua
-    private val rectfScript = """
-       function _draw()
-           gfx.cls(1)
-           shape.rectf(0, 0, 5, 10, 2)
-       end 
-    """.trimIndent()
+    private val rectfScript =
+        """
+        function _draw()
+            gfx.cls(1)
+            shape.rectf(0, 0, 5, 10, 2)
+        end 
+        """.trimIndent()
 
     @Test
-    fun rectf() = test("rectf", rectfScript) { platform ->
-        platform.advance()
+    fun rectf() =
+        test("rectf", rectfScript) { platform ->
+            platform.advance()
 
-        TestHelper.assertEquals(
-            """
+            TestHelper.assertEquals(
+                """
 2222211111
 2222211111
 2222211111
@@ -89,24 +94,26 @@ class ShapeTest {
 2222211111
 2222211111
 """,
-            platform.frames.last(),
-        )
-    }
+                platform.frames.last(),
+            )
+        }
 
     //language=Lua
-    private val gradientScript = """
-       function _draw()
-           gfx.cls(1)
-           shape.gradient(0, 0, 5, 10, 2, 3)
-       end 
-    """.trimIndent()
+    private val gradientScript =
+        """
+        function _draw()
+            gfx.cls(1)
+            shape.gradient(0, 0, 5, 10, 2, 3)
+        end 
+        """.trimIndent()
 
     @Test
-    fun gradient() = test("gradient", gradientScript) { platform ->
-        platform.advance()
+    fun gradient() =
+        test("gradient", gradientScript) { platform ->
+            platform.advance()
 
-        TestHelper.assertEquals(
-            """
+            TestHelper.assertEquals(
+                """
 2222211111
 2322231111
 2232211111
@@ -118,7 +125,7 @@ class ShapeTest {
 3332331111
 3333311111
 """,
-            platform.frames.last(),
-        )
-    }
+                platform.frames.last(),
+            )
+        }
 }

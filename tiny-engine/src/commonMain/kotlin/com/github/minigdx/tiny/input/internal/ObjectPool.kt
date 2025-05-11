@@ -1,7 +1,12 @@
 package com.github.minigdx.tiny.input.internal
 
-abstract class ObjectPool<T>(private val size: Int) {
+interface PoolObject<T> {
+    var pool: ObjectPool<T>?
 
+    fun release()
+}
+
+abstract class ObjectPool<T>(private val size: Int) {
     private val pool = mutableListOf<T>()
 
     @Suppress("UNCHECKED_CAST")

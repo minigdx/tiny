@@ -21,7 +21,6 @@ data class GameOptions(
     val hideMouseCursor: Boolean = false,
     val runTests: Boolean = false,
 ) : MouseProject {
-
     init {
         require(width > 0) { "The width needs to be a positive number." }
         require(height > 0) { "The height needs to be a positive number." }
@@ -30,11 +29,16 @@ data class GameOptions(
         require(zoom > 0) { "The zoom needs to be a positive non null value." }
     }
 
+    private val colorPalette: ColorPalette = ColorPalette(palette)
+
     fun colors(): ColorPalette {
-        return ColorPalette(palette)
+        return colorPalette
     }
 
-    override fun project(x: Float, y: Float): Vector2? {
+    override fun project(
+        x: Float,
+        y: Float,
+    ): Vector2? {
         val left = gutter.first * zoom
         val right = (gutter.first + width) * zoom
 
@@ -49,5 +53,15 @@ data class GameOptions(
         val xx = x / zoom - gutter.first
         val yy = y / zoom - gutter.second
         return Vector2(xx, yy)
+    }
+
+    override fun unproject(
+        x: Pixel,
+        y: Pixel,
+    ): Vector2 {
+        val xx = (x + gutter.first) * zoom
+        val yy = (y + gutter.second) * zoom
+
+        return Vector2(xx.toFloat(), yy.toFloat())
     }
 }

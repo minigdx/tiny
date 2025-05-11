@@ -7,7 +7,6 @@ annotation class TinyLib(
      * Name of the Library.
      */
     val name: String = "",
-
     /**
      * Description of the Library.
      */
@@ -32,12 +31,10 @@ annotation class TinyFunction(
      * This code will be injected in the web documentation.
      */
     val example: String = "",
-
     /**
      * Expected sprite path associated to the example.
      */
     val spritePath: String = "",
-
     /**
      * Expected level path associated to the example.
      */
@@ -93,4 +90,8 @@ annotation class TinyVariable(
      * Description of the variable
      */
     val description: String,
+    /**
+     * Should this be hidden in the asciidoctor?
+     */
+    val hideInDocumentation: Boolean = false,
 )

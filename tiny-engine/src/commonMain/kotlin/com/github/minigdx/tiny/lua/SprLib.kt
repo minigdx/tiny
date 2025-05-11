@@ -8,6 +8,7 @@ import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.graphic.PixelArray
+import com.github.minigdx.tiny.render.operations.DrawSprite
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
@@ -18,10 +19,12 @@ import org.luaj.vm2.lib.TwoArgFunction
 
 @TinyLib("spr", "Sprite API to draw or update sprites.")
 class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAccess) : TwoArgFunction() {
-
     private var currentSpritesheet: Int = 0
 
-    override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
+    override fun call(
+        arg1: LuaValue,
+        arg2: LuaValue,
+    ): LuaValue {
         val sprTable = LuaTable()
         sprTable["sdraw"] = sdraw()
         sprTable["draw"] = draw()
@@ -40,7 +43,10 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
     )
     private inner class pget : TwoArgFunction() {
         @TinyCall("get the color index at the coordinate (x,y) from the current spritesheet.")
-        override fun call(@TinyArg("x") arg1: LuaValue, @TinyArg("y") arg2: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("x") arg1: LuaValue,
+            @TinyArg("y") arg2: LuaValue,
+        ): LuaValue {
             val pixelArray = resourceAccess.spritesheet(currentSpritesheet)?.pixels ?: return NIL
 
             val x = arg1.checkint()
@@ -56,7 +62,11 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
         }
     }
 
-    private fun isInPixelArray(pixelArray: PixelArray, x: Int, y: Int): Boolean {
+    private fun isInPixelArray(
+        pixelArray: PixelArray,
+        x: Int,
+        y: Int,
+    ): Boolean {
         return x in 0 until pixelArray.width && y in 0 until pixelArray.height
     }
 
@@ -92,20 +102,22 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
         example = SPR_SHEET_EXAMPLE,
     )
     internal inner class sheet : OneArgFunction() {
-
         @TinyCall("Switch to the first spritesheet")
         override fun call(): LuaValue = super.call()
 
         @TinyCall("Switch to the N spritesheet")
-        override fun call(@TinyArg("spritesheetN") arg: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("spritesheetN") arg: LuaValue,
+        ): LuaValue {
             val previousSpriteSheet = currentSpritesheet
-            currentSpritesheet = if (arg.isnil()) {
-                0
-            } else if (arg.isstring()) {
-                resourceAccess.spritesheet(arg.tojstring()) ?: 0
-            } else {
-                arg.checkint()
-            }
+            currentSpritesheet =
+                if (arg.isnil()) {
+                    0
+                } else if (arg.isstring()) {
+                    resourceAccess.spritesheet(arg.tojstring()) ?: 0
+                } else {
+                    arg.checkint()
+                }
             return valueOf(previousSpriteSheet)
         }
     }
@@ -122,7 +134,10 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
         }
 
         @TinyCall("Draw the full spritesheet at coordinate (x, y)")
-        override fun call(@TinyArg("x") a: LuaValue, @TinyArg("y") b: LuaValue): LuaValue {
+        override fun call(
+            @TinyArg("x") a: LuaValue,
+            @TinyArg("y") b: LuaValue,
+        ): LuaValue {
             return invoke(varargsOf(arrayOf(a, b, NIL, NIL, NIL, NIL, NIL, NIL))).arg1()
         }
 
@@ -149,19 +164,20 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
                     "flipX",
                     "flipY",
                 ),
-                documentations = arrayOf(
-                    "screen x coordinate to draw the sprite (default 0)",
-                    "screen y coordinate to draw the sprite (default 0)",
-                    "x coordinate from the spritesheet (default 0)",
-                    "y coordinate from the spritesheet (default 0)",
-                    "width of the spritesheet to copy (default width of the spritesheet)",
-                    "height of the spritesheet to copy (default height of the spritesheet)",
-                    "flip on the x axis (default: false)",
-                    "flip on the y axis (default: false)",
-                ),
+                documentations =
+                    arrayOf(
+                        "screen x coordinate to draw the sprite (default 0)",
+                        "screen y coordinate to draw the sprite (default 0)",
+                        "x coordinate from the spritesheet (default 0)",
+                        "y coordinate from the spritesheet (default 0)",
+                        "width of the spritesheet to copy (default width of the spritesheet)",
+                        "height of the spritesheet to copy (default height of the spritesheet)",
+                        "flip on the x axis (default: false)",
+                        "flip on the y axis (default: false)",
+                    ),
             ) args: Varargs,
         ): Varargs {
-            val spritesheet = resourceAccess.spritesheet(currentSpritesheet) ?: return NONE
+            val spritesheet = resourceAccess.spritesheet(currentSpritesheet) ?: return NIL
 
             val x = args.arg(1).optint(0)
             val y = args.arg(2).optint(0)
@@ -172,14 +188,23 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
             val flipX = args.arg(7).optboolean(false)
             val flipY = args.arg(8).optboolean(false)
 
-            resourceAccess.frameBuffer.copyFrom(
-                spritesheet.pixels, x, y, sprX,
-                sprY,
-                sprWidth,
-                sprHeight,
-                flipX,
-                flipY,
+            val op = DrawSprite.from(
+                resourceAccess,
+                spritesheet,
+                sourceX = sprX,
+                sourceY = sprY,
+                sourceWidth = sprWidth,
+                sourceHeight = sprHeight,
+                destinationX = x,
+                destinationY = y,
+                flipX = flipX,
+                flipY = flipY,
+                dither = resourceAccess.frameBuffer.blender.dithering,
+                pal = resourceAccess.frameBuffer.blender.switch,
+                camera = resourceAccess.frameBuffer.camera,
+                clipper = resourceAccess.frameBuffer.clipper,
             )
+            resourceAccess.addOp(op)
 
             return NONE
         }
@@ -187,7 +212,6 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
 
     @TinyFunction("Draw a sprite.", example = SPR_DRAW_EXAMPLE, spritePath = "resources/tiny-town.png")
     internal inner class draw : LibFunction() {
-
         @TinyCall("Draw a sprite at the default coordinate (0, 0).")
         override fun call(
             @TinyArg("sprN") a: LuaValue,
@@ -201,7 +225,9 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
         ): LuaValue = super.call(a, b, c)
 
         @TinyCall("Draw a sprite and allow flip on x or y axis.")
-        override fun invoke(@TinyArgs(["sprN", "x", "y", "flipX", "flipY"]) args: Varargs): Varargs {
+        override fun invoke(
+            @TinyArgs(["sprN", "x", "y", "flipX", "flipY"]) args: Varargs,
+        ): Varargs {
             if (args.narg() < 1) return NIL
             val sprN = args.arg(1).checkint()
             val x = args.arg(2).optint(0)
@@ -216,19 +242,26 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
 
             val column = sprN % nbSpritePerRow
             val row = (sprN - column) / nbSpritePerRow
-            resourceAccess.frameBuffer.copyFrom(
-                source = spritesheet.pixels,
-                dstX = x,
-                dstY = y,
+
+            val op = DrawSprite.from(
+                resourceAccess,
+                spritesheet,
                 sourceX = column * sw,
                 sourceY = row * sh,
-                width = sw,
-                height = sh,
-                reverseX = flipX,
-                reverseY = flipY,
+                sourceWidth = sw,
+                sourceHeight = sh,
+                destinationX = x,
+                destinationY = y,
+                flipX = flipX,
+                flipY = flipY,
+                dither = resourceAccess.frameBuffer.blender.dithering,
+                pal = resourceAccess.frameBuffer.blender.switch,
+                camera = resourceAccess.frameBuffer.camera,
+                clipper = resourceAccess.frameBuffer.clipper,
             )
+            resourceAccess.addOp(op)
 
-            return NIL
+            return NONE
         }
     }
 }

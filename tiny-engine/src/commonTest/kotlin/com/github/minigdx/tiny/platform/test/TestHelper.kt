@@ -12,34 +12,50 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlin.test.assertEquals
 
-expect fun toGif(name: String, animation: List<FrameBuffer>)
+expect fun toGif(
+    name: String,
+    animation: List<FrameBuffer>,
+)
 
 object TestHelper {
-
-    fun assertEquals(expected: String, current: FrameBuffer) {
+    fun assertEquals(
+        expected: String,
+        current: FrameBuffer,
+    ) {
         assertEquals(expected.trim(), current.colorIndexBuffer.toString().trim())
     }
 
-    fun test(name: String, script: String, block: suspend (platform: HeadlessPlatform) -> Unit) {
+    fun test(
+        name: String,
+        script: String,
+        block: suspend (platform: HeadlessPlatform) -> Unit,
+    ) {
         test(name, script, 10 to 10, block)
     }
 
     val testScope = CoroutineScope(Dispatchers.Unconfined)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun test(name: String, script: String, size: Pair<Int, Int>, block: suspend (platform: HeadlessPlatform) -> Unit) {
-        val colors = listOf(
-            "#000000",
-            "#FFFFFF",
-            "#FF0000",
-        )
+    fun test(
+        name: String,
+        script: String,
+        size: Pair<Int, Int>,
+        block: suspend (platform: HeadlessPlatform) -> Unit,
+    ) {
+        val colors =
+            listOf(
+                "#000000",
+                "#FFFFFF",
+                "#FF0000",
+            )
 
-        val resources = mapOf(
-            "game.lua" to script,
-            "_boot.lua" to "tiny.exit(0)",
-            "_engine.lua" to "",
-            "_boot.png" to ImageData(ByteArray(0), 0, 0),
-        )
+        val resources =
+            mapOf(
+                "game.lua" to script,
+                "_boot.lua" to "tiny.exit(0)",
+                "_engine.lua" to "",
+                "_boot.png" to ImageData(ByteArray(0), 0, 0),
+            )
 
         val (w, h) = size
         val gameOptions = GameOptions(w, h, colors, listOf("game.lua"), emptyList())
@@ -50,12 +66,12 @@ object TestHelper {
             platform = platform,
             vfs = CommonVirtualFileSystem(),
             logger = StdOutLogger("test"),
-
         ).main()
 
-        val result = CoroutineScope(Dispatchers.Unconfined).async {
-            block(platform)
-        }
+        val result =
+            CoroutineScope(Dispatchers.Unconfined).async {
+                block(platform)
+            }
 
         platform.saveAnimation(name)
 

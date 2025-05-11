@@ -29,4 +29,5 @@ class TinyLibDescriptor(
 class TinyVariableDescriptor(
     var name: String = "",
     var description: String = "",
+    var hidden: Boolean = false,
 )

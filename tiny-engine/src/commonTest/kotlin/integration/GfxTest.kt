@@ -6,19 +6,20 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class GfxTest {
-
-    val clsScript = """
-            function _draw()
-                gfx.cls(2)
-            end
-    """.trimIndent()
+    val clsScript =
+        """
+        function _draw()
+            gfx.cls(2)
+        end
+        """.trimIndent()
 
     @Test
-    fun cls() = test("cls", clsScript) { platform ->
-        platform.advance()
+    fun cls() =
+        test("cls", clsScript) { platform ->
+            platform.advance()
 
-        assertEquals(
-            """
+            assertEquals(
+                """
 2222222222
 2222222222
 2222222222
@@ -30,7 +31,7 @@ class GfxTest {
 2222222222
 2222222222
 """,
-            platform.frames.last(),
-        )
-    }
+                platform.frames.last(),
+            )
+        }
 }

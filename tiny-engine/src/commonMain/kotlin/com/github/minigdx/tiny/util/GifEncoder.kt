@@ -16,6 +16,7 @@ class GifEncoder(
         writeBackgroundColorIndex(output)
         writePixelAspectRatio(output)
     }
+
     internal fun writeHeader(output: TargetStream<ByteArray>) {
         output.write("GIF89a".encodeToByteArray())
     }
