@@ -50,18 +50,16 @@ fun main() {
         val spritePath = game.getAttribute("sprite")
         val levelPath = game.getAttribute("level")
 
-        val link =
-            document.createElement("a") {
-                setAttribute("id", "link-editor-$index")
-                setAttribute("class", "tiny-play")
-                setAttribute("href", "#link-editor-$index")
-            } as HTMLAnchorElement
+        val link = document.createElement("a") {
+            setAttribute("id", "link-editor-$index")
+            setAttribute("class", "tiny-play")
+            setAttribute("href", "#link-editor-$index")
+        } as HTMLAnchorElement
         game.before(link)
 
-        val playLink =
-            document.createElement("div").apply {
-                setAttribute("class", "tiny-container")
-            }
+        val playLink = document.createElement("div").apply {
+            setAttribute("class", "tiny-container")
+        }
         link.after(playLink)
 
         val codeToUse = decodedCode ?: "-- Update the code to update the game!\n$code"
@@ -97,7 +95,16 @@ fun getCaretPosition(el: Element): Int {
     val prefix = range.cloneRange()
     prefix.selectNodeContents(el)
     prefix.setEnd(range.endContainer, range.endOffset)
-    return prefix.toString().length
+
+    selection.removeAllRanges()
+    selection.addRange(prefix)
+
+    val length = selection.toString().length
+
+    selection.removeAllRanges()
+    selection.addRange(range)
+
+    return length
 }
 
 /**
@@ -158,7 +165,10 @@ fun setCaret(
  */
 fun highlight(content: String): String {
     return content
-        .split("\n").map { "<div>${it.ifBlank { " " }}</div>" }.joinToString("\n")
+        // Create lines
+        .split("\n").map { "<div>$it</div>" }.joinToString("\n")
+        // Replace \n with <br /> to be selected correctly in the range
+        .replace("<div></div>", "<div><br /></div>")
         // String
         .replace(Regex("(\".*?\")"), "<strong class=\"code_string\">$1</strong>")
         // Comment
@@ -170,6 +180,15 @@ fun highlight(content: String): String {
         )
         // Numbers
         .replace(Regex("\\b(\\d+)"), "<em class=\"code_number\">$1</em>")
+}
+
+fun extractText(el: Element): String {
+    el.innerHTML = el.innerHTML
+        .replace("\n", "")
+        .replace("</div>", "</div>\n")
+        .trim()
+
+    return (el.textContent ?: "")
 }
 
 @OptIn(ExperimentalEncodingApi::class)
@@ -190,21 +209,25 @@ private fun createGame(
         }
     container.appendChild(canvas)
 
-    val textarea =
-        (document.createElement("div") as HTMLDivElement).apply {
-            setAttribute("id", "editor-$index")
-            setAttribute("spellcheck", "false")
-            setAttribute("class", "tiny-textarea")
-            setAttribute("contenteditable", "true")
+    val textarea = (document.createElement("div") as HTMLDivElement).apply {
+        setAttribute("id", "editor-$index")
+        setAttribute("spellcheck", "false")
+        setAttribute("class", "tiny-textarea")
+        setAttribute("contenteditable", "true")
 
-            innerHTML = code
+        var pp = code
+        innerHTML = highlight(code)
 
-            onkeydown = { event ->
-                val pos = getCaretPosition(this)
-                this.innerHTML = highlight(this.innerText)
-                setCaret(pos, this)
-            }
+
+        oninput = { event ->
+            // FIXME: mettre un \n rajoute un BR.
+            val pos = getCaretPosition(this)
+            console.log("html", this.innerHTML)
+            this.innerHTML = highlight(extractText(this))
+            console.log("html highlight", this.innerHTML)
+            setCaret(pos, this)
         }
+    }
     textarea.innerHTML = highlight(textarea.innerText)
     container.appendChild(textarea)
 
@@ -220,37 +243,36 @@ private fun createGame(
 
     val logger = StdOutLogger("tiny-editor-$index")
 
-    val gameOptions =
-        GameOptions(
-            width = 256,
-            height = 256,
-            // https://lospec.com/palette-list/rgr-proto16
-            palette =
-                listOf(
-                    "#FFF9B3",
-                    "#B9C5CC",
-                    "#4774B3",
-                    "#144B66",
-                    "#8FB347",
-                    "#2E994E",
-                    "#F29066",
-                    "#E65050",
-                    "#707D7C",
-                    "#293C40",
-                    "#170B1A",
-                    "#0A010D",
-                    "#570932",
-                    "#871E2E",
-                    "#FFBF40",
-                    "#CC1424",
-                ),
-            gameScripts = listOf("#editor-$index"),
-            spriteSheets = spritePath?.let { listOf(it) } ?: emptyList(),
-            gameLevels = levelPath?.let { listOf(it) } ?: emptyList(),
-            zoom = 2,
-            gutter = 0 to 0,
-            spriteSize = 16 to 16,
-        )
+    val gameOptions = GameOptions(
+        width = 256,
+        height = 256,
+        // https://lospec.com/palette-list/rgr-proto16
+        palette =
+            listOf(
+                "#FFF9B3",
+                "#B9C5CC",
+                "#4774B3",
+                "#144B66",
+                "#8FB347",
+                "#2E994E",
+                "#F29066",
+                "#E65050",
+                "#707D7C",
+                "#293C40",
+                "#170B1A",
+                "#0A010D",
+                "#570932",
+                "#871E2E",
+                "#FFBF40",
+                "#CC1424",
+            ),
+        gameScripts = listOf("#editor-$index"),
+        spriteSheets = spritePath?.let { listOf(it) } ?: emptyList(),
+        gameLevels = levelPath?.let { listOf(it) } ?: emptyList(),
+        zoom = 2,
+        gutter = 0 to 0,
+        spriteSize = 16 to 16,
+    )
 
     GameEngine(
         gameOptions = gameOptions,
@@ -265,7 +287,8 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
 
     override fun initWindowManager(): WindowManager = delegate.initWindowManager()
 
-    override fun initRenderManager(windowManager: WindowManager): RenderContext = delegate.initRenderManager(windowManager)
+    override fun initRenderManager(windowManager: WindowManager): RenderContext =
+        delegate.initRenderManager(windowManager)
 
     override fun gameLoop(gameLoop: GameLoop) = delegate.gameLoop(gameLoop)
 
