@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.10">
 <link rel="icon" type="image/png" href="./sample/favicon.png">
-<title>Tiny Sandbox 🧸</title>
+<title>Tiny Playground 🧸</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /* Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -441,24 +441,94 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <body class="article">
 <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
 <style>
+    /** link to start the game **/
+    .tiny-button-right {
+        margin-left: auto;
+    }
+
+    .tiny-button {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 16px;
+
+        background-color: #007bff;
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 0.9em;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+
+        font-family: "Source Code Pro", monospace;
+
+        transition: background-color 0.2s ease-in-out, transform 0.1s ease; /* Transition douce pour les effets */
+
+    }
+
+    .tiny-button,
+    .tiny-button:link, /* Pour s'assurer que même non visité, il a le bon style */
+    .tiny-button:visited { /* Pour s'assurer que les liens visités gardent la couleur souhaitée */
+        color: white; /* Couleur du texte pour l'état normal, lien et visité */
+        text-decoration: none; /* Maintenir la suppression du soulignement */
+    }
+
+    .tiny-button:hover,
+    .tiny-button:focus { /* :focus pour l'accessibilité clavier */
+        background-color: #0056b3; /* Couleur de fond un peu plus foncée au survol/focus */
+        color: white;              /* Assure que la couleur du texte reste blanche */
+        outline: none;             /* Supprime l'outline par défaut sur :focus si vous le souhaitez,
+                                  mais pour l'accessibilité, il est mieux de le styliser :
+                                  par ex. box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5); */
+    }
+
+    .tiny-toolbar {
+        width: calc(100% + 256px);
+        min-height: 48px;
+        padding: 4px;
+        border-radius: 8px;
+        border: 1px solid #9EC6DF;
+        margin-left: -128px;
+        margin-bottom: 2px;
+        display: flex;
+        align-items: center;
+    }
+
+    /** container of the game + editor **/
     .tiny-container {
         display: flex;
-        flex-wrap: wrap;
+        width: calc(100% + 256px);
+        margin-left: -128px;
     }
 
-    .tiny-play {
-        display: block;
-    }
-
+    /** game **/
     .tiny-canvas {
         border: 1px solid black;
         cursor: none;
+
+        flex: 1 1 auto;
+        max-height: 512px;
+        max-width: 512px;
+    }
+
+    /** code editor **/
+    .tiny-textarea {
+        flex: 2 1 auto;
+        display: block;
+        min-height: 512px;
+        padding-left: 48px;
+        counter-reset: line; /* reset the "line" counter */
+        width: 100%;
+        font-family: "Source Code Pro", monospace;
+        resize:none;
     }
 
     .tiny-textarea div {
         display: block;
         position: relative;
         white-space: pre-wrap;
+        min-height: 1em;
     }
 
     .tiny-textarea div::before {
@@ -467,15 +537,6 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
         counter-increment: line;  /* increment the counter */
         position: absolute;
         right: calc(100% + 16px); /* add some space between this and the code line next to it */
-    }
-
-    .tiny-textarea {
-        padding-left: 48px;
-        counter-reset: line; /* reset the "line" counter */
-        height: 512px;
-        width: 100%;
-        font-family: "Source Code Pro", monospace;
-        resize:none;
     }
 
     .code_comment {
@@ -492,28 +553,30 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 
     .no-resize {
         resize:none;
+        border: none;
+        overflow: hidden;
     }
 </style>
 <div id="header">
-<h1>Tiny Sandbox 🧸</h1>
+<h1>Tiny Playground 🧸</h1>
 <div class="details">
-<span id="revnumber">version 1.3.3-alpha</span>
+<span id="revnumber">version 1.4.0-alpha</span>
 </div>
 </div>
 <div id="content">
 <div id="preamble">
 <div class="sectionbody">
-<div class="paragraph">
-<p>Welcome to our sandbox page where you can try out <code>🧸 Tiny</code> online! <code>🧸 Tiny</code> is a lightweight game engine that allows you to create 2D games with ease.</p>
-</div>
-<div class="paragraph">
-<p>With our sandbox page, you can experiment with the engine&#8217;s features and get a feel for how it works.</p>
-</div>
-<div class="paragraph">
-<p>Whether you&#8217;re a seasoned game developer or just starting out, our sandbox page is the perfect place to test out <code>🧸 Tiny</code> and see what it can do. So come on in, play around, and let your creativity run wild!</p>
-</div>
-<div class="paragraph">
-<p>Need help? <a href="index.html">Check out the documentation</a>!</p>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Need help? <a href="index.html">Check out the documentation</a>!
+</td>
+</tr>
+</table>
 </div>
 <tiny-editor style="display: none;" sprite="resources/tiny-dungeon.png">
 function _init()
@@ -539,22 +602,22 @@ end
 <p>Every examples from <a href="index.html">the documentation</a> can be tweaked in this sandbox.</p>
 </li>
 <li>
-<p><a href="https://minigdx.github.io/tiny/sandbox.html?game=CiAgCmZ1bmN0aW9uIF9kcmF3KCkKICAgIGdmeC5jbHMoKQoKICAgIHByaW50KCJSZWN0YW5nbGUgbGltaXQiLCA2NCwgNjQgLSA1KQogICAgLS0gZHJhdyB0aGUgYm9yZGVyIGxpbWl0LgogICAgZ2Z4LmRpdGhlcigweEE1QTUpCiAgICBzaGFwZS5yZWN0KDY0LCA2NCwgMjU2IC0gMTI4LCAyNTYgLSAxMjgsIDIpCiAgICBnZnguZGl0aGVyKCkKCiAgICAtLSBkcmF3IHRoZSBtb3VzZSBwb3NpdGlvbi4KICAgIGxvY2FsIHBvcyA9IGN0cmwudG91Y2goKQogICAgc2hhcGUubGluZShwb3MueCAtIDIsIHBvcy55LCBwb3MueCArIDIsIHBvcy55LCAzKQogICAgc2hhcGUubGluZShwb3MueCwgcG9zLnkgLSAyLCBwb3MueCwgcG9zLnkgKyAyLCAzKQoKICAgIC0tIGRyYXcgdGhlIHJlY3RhbmdsZSB0aGF0IGlzIHN0YXlpbmcgd2l0aGluIHRoZSBib3JkZXIgbGltaXQuCiAgICBsb2NhbCB4ID0gbWF0aC5jbGFtcCg2NCwgcG9zLnggLSA0LCAyNTYgLSA2NCAtIDkpCiAgICBsb2NhbCB5ID0gbWF0aC5jbGFtcCg2NCwgcG9zLnkgLSA0LCAyNTYgLSA2NCAtIDkpCiAgICBzaGFwZS5yZWN0KHgsIHksIDksIDksIDgpCmVuZAo=">Tracking the player mouse</a></p>
+<p><a href="playground.html?game=CiAgCmZ1bmN0aW9uIF9kcmF3KCkKICAgIGdmeC5jbHMoKQoKICAgIHByaW50KCJSZWN0YW5nbGUgbGltaXQiLCA2NCwgNjQgLSA1KQogICAgLS0gZHJhdyB0aGUgYm9yZGVyIGxpbWl0LgogICAgZ2Z4LmRpdGhlcigweEE1QTUpCiAgICBzaGFwZS5yZWN0KDY0LCA2NCwgMjU2IC0gMTI4LCAyNTYgLSAxMjgsIDIpCiAgICBnZnguZGl0aGVyKCkKCiAgICAtLSBkcmF3IHRoZSBtb3VzZSBwb3NpdGlvbi4KICAgIGxvY2FsIHBvcyA9IGN0cmwudG91Y2goKQogICAgc2hhcGUubGluZShwb3MueCAtIDIsIHBvcy55LCBwb3MueCArIDIsIHBvcy55LCAzKQogICAgc2hhcGUubGluZShwb3MueCwgcG9zLnkgLSAyLCBwb3MueCwgcG9zLnkgKyAyLCAzKQoKICAgIC0tIGRyYXcgdGhlIHJlY3RhbmdsZSB0aGF0IGlzIHN0YXlpbmcgd2l0aGluIHRoZSBib3JkZXIgbGltaXQuCiAgICBsb2NhbCB4ID0gbWF0aC5jbGFtcCg2NCwgcG9zLnggLSA0LCAyNTYgLSA2NCAtIDkpCiAgICBsb2NhbCB5ID0gbWF0aC5jbGFtcCg2NCwgcG9zLnkgLSA0LCAyNTYgLSA2NCAtIDkpCiAgICBzaGFwZS5yZWN0KHgsIHksIDksIDksIDgpCmVuZAo=">Tracking the player mouse</a></p>
 </li>
 <li>
-<p><a href="https://minigdx.github.io/tiny/sandbox.html?game=ZnVuY3Rpb24gX2luaXQoKQogICAgbGV0dGVycyA9IHsiaCIsICJlIiwgImwiLCAibCIsICJvIiwgIiAiLCAidCIsICJpIiwgIm4iLCAieSIsICIhIn0KICAgIHN0YXJ0eCA9ICgyNTYgLSAoI2xldHRlcnMgKiA1KSkgKiAwLjUKZW5kCgpmdW5jdGlvbiBfZHJhdygpCiAgICBnZnguY2xzKCkKICAgIGZvciBpLCBsIGluIGlwYWlycyhsZXR0ZXJzKSBkbwogICAgICAgIHByaW50KAogICAgICAgICAgICBsLCAtLSBsZXR0ZXIgdG8gcHJpbnQKICAgICAgICAgICAgc3RhcnR4ICsgaSAqIDUsIC0tIHggcG9zaXRpb24gcmVnYXJkaW5nIHRoZSBsZXR0ZXIgaW5kZXguCiAgICAgICAgICAgIDEyOCArIG1hdGguY29zKHRpbnkudCAqIDMgKyBpKSAqIDgsIC0tIHkgcG9zaXRpb24gcmVnYXJkaW5nIHRoZSB0aW1lIGVsYXBzZWQgYW5kIHRoZSBsZXR0ZXIgaW5kZXggCiAgICAgICAgICAgIG1hdGguY2VpbCh0aW55LmZyYW1lICogMC4yIC0gaSkgLS0gY29sb3Igb2YgdGhlIGxldHRlciByZWdhcmRpbmcgdGhlIGluZGV4CiAgICAgICAgKQogICAgZW5kCmVuZA==">Waving letters</a></p>
+<p><a href="playground.html?game=ZnVuY3Rpb24gX2luaXQoKQogICAgbGV0dGVycyA9IHsiaCIsICJlIiwgImwiLCAibCIsICJvIiwgIiAiLCAidCIsICJpIiwgIm4iLCAieSIsICIhIn0KICAgIHN0YXJ0eCA9ICgyNTYgLSAoI2xldHRlcnMgKiA1KSkgKiAwLjUKZW5kCgpmdW5jdGlvbiBfZHJhdygpCiAgICBnZnguY2xzKCkKICAgIGZvciBpLCBsIGluIGlwYWlycyhsZXR0ZXJzKSBkbwogICAgICAgIHByaW50KAogICAgICAgICAgICBsLCAtLSBsZXR0ZXIgdG8gcHJpbnQKICAgICAgICAgICAgc3RhcnR4ICsgaSAqIDUsIC0tIHggcG9zaXRpb24gcmVnYXJkaW5nIHRoZSBsZXR0ZXIgaW5kZXguCiAgICAgICAgICAgIDEyOCArIG1hdGguY29zKHRpbnkudCAqIDMgKyBpKSAqIDgsIC0tIHkgcG9zaXRpb24gcmVnYXJkaW5nIHRoZSB0aW1lIGVsYXBzZWQgYW5kIHRoZSBsZXR0ZXIgaW5kZXggCiAgICAgICAgICAgIG1hdGguY2VpbCh0aW55LmZyYW1lICogMC4yIC0gaSkgLS0gY29sb3Igb2YgdGhlIGxldHRlciByZWdhcmRpbmcgdGhlIGluZGV4CiAgICAgICAgKQogICAgZW5kCmVuZA==">Waving letters</a></p>
 </li>
 <li>
-<p><a href="https://minigdx.github.io/tiny/sandbox.html?game=LS0gRnVuY3Rpb24gdG8gY2hlY2sgY29sbGlzaW9uIGJldHdlZW4gdHdvIHJlY3RhbmdsZXMKZnVuY3Rpb24gY2hlY2tDb2xsaXNpb24ocmVjdDEsIHJlY3QyKQogICAgcmV0dXJuIHJlY3QxLnggPCByZWN0Mi54ICsgcmVjdDIud2lkdGggYW5kCiAgICAgICAgICAgcmVjdDEueCArIHJlY3QxLndpZHRoID4gcmVjdDIueCBhbmQKICAgICAgICAgICByZWN0MS55IDwgcmVjdDIueSArIHJlY3QyLmhlaWdodCBhbmQKICAgICAgICAgICByZWN0MS55ICsgcmVjdDEuaGVpZ2h0ID4gcmVjdDIueQplbmQKCi0tIEZ1bmN0aW9uIHRvIHJlc29sdmUgY29sbGlzaW9uIGFuZCBzbGlkZQpmdW5jdGlvbiBjb2xsaWRlQW5kU2xpZGUob2JqZWN0LCBvYnN0YWNsZSkKICAgIGlmIGNoZWNrQ29sbGlzaW9uKG9iamVjdCwgb2JzdGFjbGUpIHRoZW4KICAgICAgICBsb2NhbCBvdmVybGFwWCA9IG1hdGgubWluKG9iamVjdC54ICsgb2JqZWN0LndpZHRoLCBvYnN0YWNsZS54ICsgb2JzdGFjbGUud2lkdGgpIC0gbWF0aC5tYXgob2JqZWN0LngsIG9ic3RhY2xlLngpCiAgICAgICAgbG9jYWwgb3ZlcmxhcFkgPSBtYXRoLm1pbihvYmplY3QueSArIG9iamVjdC5oZWlnaHQsIG9ic3RhY2xlLnkgKyBvYnN0YWNsZS5oZWlnaHQpIC0gbWF0aC5tYXgob2JqZWN0LnksIG9ic3RhY2xlLnkpCgogICAgICAgIGlmIG92ZXJsYXBYIDwgb3ZlcmxhcFkgdGhlbgogICAgICAgICAgICBpZiBvYmplY3QueCA8IG9ic3RhY2xlLnggdGhlbgogICAgICAgICAgICAgICAgb2JqZWN0LnggPSBvYmplY3QueCAtIG92ZXJsYXBYCiAgICAgICAgICAgIGVsc2UKICAgICAgICAgICAgICAgIG9iamVjdC54ID0gb2JqZWN0LnggKyBvdmVybGFwWAogICAgICAgICAgICBlbmQKICAgICAgICBlbHNlCiAgICAgICAgICAgIGlmIG9iamVjdC55IDwgb2JzdGFjbGUueSB0aGVuCiAgICAgICAgICAgICAgICBvYmplY3QueSA9IG9iamVjdC55IC0gb3ZlcmxhcFkKICAgICAgICAgICAgZWxzZQogICAgICAgICAgICAgICAgb2JqZWN0LnkgPSBvYmplY3QueSArIG92ZXJsYXBZCiAgICAgICAgICAgIGVuZAogICAgICAgIGVuZAogICAgZW5kCmVuZAoKcGxheWVyID0ge3ggPSA1MCwgeSA9IDUwLCB3aWR0aCA9IDIwLCBoZWlnaHQgPSAyMH0Kb2JzdGFjbGVzID0gewogICB7eCA9IDYwLCB5ID0gNDAsIHdpZHRoID0gMzAsIGhlaWdodCA9IDMwfSwKICB7eCA9IDY1LCB5ID0gNjAsIHdpZHRoID0gNDAsIGhlaWdodCA9IDMwfQp9CgpmdW5jdGlvbiBfdXBkYXRlKCkKICAgIGlmKGN0cmwucHJlc3Npbmcoa2V5cy5sZWZ0KSkgdGhlbgogICAgICAgICBwbGF5ZXIueCA9IHBsYXllci54IC0gMQogICAgZWxzZWlmIChjdHJsLnByZXNzaW5nKGtleXMucmlnaHQpKSB0aGVuCiAgICAgICAgIHBsYXllci54ID0gcGxheWVyLnggKyAxCiAgICBlbmQKCiAgICBpZihjdHJsLnByZXNzaW5nKGtleXMudXApKSB0aGVuCiAgICAgICAgIHBsYXllci55ID0gcGxheWVyLnkgLSAxCiAgICBlbHNlaWYgKGN0cmwucHJlc3Npbmcoa2V5cy5kb3duKSkgdGhlbgogICAgICAgICBwbGF5ZXIueSA9IHBsYXllci55ICsgMQogICAgZW5kCgogICAgZm9yIG9ic3RhY2xlIGluIGFsbChvYnN0YWNsZXMpIGRvCiAgICAgICBjb2xsaWRlQW5kU2xpZGUocGxheWVyLCBvYnN0YWNsZSkKICAgIGVuZAplbmQKCgpmdW5jdGlvbiBfZHJhdygpCiAgICBnZnguY2xzKCkKICAgIGZvciBvYnN0YWNsZSBpbiBhbGwob2JzdGFjbGVzKSBkbwogICAgICAgIHNoYXBlLnJlY3Qob2JzdGFjbGUueCwgb2JzdGFjbGUueSwgb2JzdGFjbGUud2lkdGgsIG9ic3RhY2xlLmhlaWdodCwgOSkKICAgIGVuZAoKICAgIHNoYXBlLnJlY3QocGxheWVyLngsIHBsYXllci55LCBwbGF5ZXIud2lkdGgsIHBsYXllci5oZWlnaHQsIDgpCmVuZA==">AABB Collision</a></p>
+<p><a href="playground.html?game=LS0gRnVuY3Rpb24gdG8gY2hlY2sgY29sbGlzaW9uIGJldHdlZW4gdHdvIHJlY3RhbmdsZXMKZnVuY3Rpb24gY2hlY2tDb2xsaXNpb24ocmVjdDEsIHJlY3QyKQogICAgcmV0dXJuIHJlY3QxLnggPCByZWN0Mi54ICsgcmVjdDIud2lkdGggYW5kCiAgICAgICAgICAgcmVjdDEueCArIHJlY3QxLndpZHRoID4gcmVjdDIueCBhbmQKICAgICAgICAgICByZWN0MS55IDwgcmVjdDIueSArIHJlY3QyLmhlaWdodCBhbmQKICAgICAgICAgICByZWN0MS55ICsgcmVjdDEuaGVpZ2h0ID4gcmVjdDIueQplbmQKCi0tIEZ1bmN0aW9uIHRvIHJlc29sdmUgY29sbGlzaW9uIGFuZCBzbGlkZQpmdW5jdGlvbiBjb2xsaWRlQW5kU2xpZGUob2JqZWN0LCBvYnN0YWNsZSkKICAgIGlmIGNoZWNrQ29sbGlzaW9uKG9iamVjdCwgb2JzdGFjbGUpIHRoZW4KICAgICAgICBsb2NhbCBvdmVybGFwWCA9IG1hdGgubWluKG9iamVjdC54ICsgb2JqZWN0LndpZHRoLCBvYnN0YWNsZS54ICsgb2JzdGFjbGUud2lkdGgpIC0gbWF0aC5tYXgob2JqZWN0LngsIG9ic3RhY2xlLngpCiAgICAgICAgbG9jYWwgb3ZlcmxhcFkgPSBtYXRoLm1pbihvYmplY3QueSArIG9iamVjdC5oZWlnaHQsIG9ic3RhY2xlLnkgKyBvYnN0YWNsZS5oZWlnaHQpIC0gbWF0aC5tYXgob2JqZWN0LnksIG9ic3RhY2xlLnkpCgogICAgICAgIGlmIG92ZXJsYXBYIDwgb3ZlcmxhcFkgdGhlbgogICAgICAgICAgICBpZiBvYmplY3QueCA8IG9ic3RhY2xlLnggdGhlbgogICAgICAgICAgICAgICAgb2JqZWN0LnggPSBvYmplY3QueCAtIG92ZXJsYXBYCiAgICAgICAgICAgIGVsc2UKICAgICAgICAgICAgICAgIG9iamVjdC54ID0gb2JqZWN0LnggKyBvdmVybGFwWAogICAgICAgICAgICBlbmQKICAgICAgICBlbHNlCiAgICAgICAgICAgIGlmIG9iamVjdC55IDwgb2JzdGFjbGUueSB0aGVuCiAgICAgICAgICAgICAgICBvYmplY3QueSA9IG9iamVjdC55IC0gb3ZlcmxhcFkKICAgICAgICAgICAgZWxzZQogICAgICAgICAgICAgICAgb2JqZWN0LnkgPSBvYmplY3QueSArIG92ZXJsYXBZCiAgICAgICAgICAgIGVuZAogICAgICAgIGVuZAogICAgZW5kCmVuZAoKcGxheWVyID0ge3ggPSA1MCwgeSA9IDUwLCB3aWR0aCA9IDIwLCBoZWlnaHQgPSAyMH0Kb2JzdGFjbGVzID0gewogICB7eCA9IDYwLCB5ID0gNDAsIHdpZHRoID0gMzAsIGhlaWdodCA9IDMwfSwKICB7eCA9IDY1LCB5ID0gNjAsIHdpZHRoID0gNDAsIGhlaWdodCA9IDMwfQp9CgpmdW5jdGlvbiBfdXBkYXRlKCkKICAgIGlmKGN0cmwucHJlc3Npbmcoa2V5cy5sZWZ0KSkgdGhlbgogICAgICAgICBwbGF5ZXIueCA9IHBsYXllci54IC0gMQogICAgZWxzZWlmIChjdHJsLnByZXNzaW5nKGtleXMucmlnaHQpKSB0aGVuCiAgICAgICAgIHBsYXllci54ID0gcGxheWVyLnggKyAxCiAgICBlbmQKCiAgICBpZihjdHJsLnByZXNzaW5nKGtleXMudXApKSB0aGVuCiAgICAgICAgIHBsYXllci55ID0gcGxheWVyLnkgLSAxCiAgICBlbHNlaWYgKGN0cmwucHJlc3Npbmcoa2V5cy5kb3duKSkgdGhlbgogICAgICAgICBwbGF5ZXIueSA9IHBsYXllci55ICsgMQogICAgZW5kCgogICAgZm9yIG9ic3RhY2xlIGluIGFsbChvYnN0YWNsZXMpIGRvCiAgICAgICBjb2xsaWRlQW5kU2xpZGUocGxheWVyLCBvYnN0YWNsZSkKICAgIGVuZAplbmQKCgpmdW5jdGlvbiBfZHJhdygpCiAgICBnZnguY2xzKCkKICAgIGZvciBvYnN0YWNsZSBpbiBhbGwob2JzdGFjbGVzKSBkbwogICAgICAgIHNoYXBlLnJlY3Qob2JzdGFjbGUueCwgb2JzdGFjbGUueSwgb2JzdGFjbGUud2lkdGgsIG9ic3RhY2xlLmhlaWdodCwgOSkKICAgIGVuZAoKICAgIHNoYXBlLnJlY3QocGxheWVyLngsIHBsYXllci55LCBwbGF5ZXIud2lkdGgsIHBsYXllci5oZWlnaHQsIDgpCmVuZA==">AABB Collision</a></p>
 </li>
 <li>
-<p><a href="https://minigdx.github.io/tiny/sandbox.html?game=LS0gVXBkYXRlIHRoZSBjb2RlIHRvIHVwZGF0ZSB0aGUgZ2FtZSEKbG9jYWwgUGxheWVyID0gewogICB4ID0gMTI4IC0gMTYsCiAgIHkgPSAxMjggLSAxNiwKfQpmdW5jdGlvbiBfaW5pdCgpCiAgcGxheWVyID0gbmV3KFBsYXllcikKZW5kCgpmdW5jdGlvbiBfdXBkYXRlKCkKICBpZiBjdHJsLnByZXNzaW5nKGtleXMubGVmdCkgdGhlbgogICAgIHBsYXllci54ID0gbWF0aC5tYXgoMCwgcGxheWVyLnggLSAxKQogIGVsc2VpZiBjdHJsLnByZXNzaW5nKGtleXMucmlnaHQpIHRoZW4KICAgICAgcGxheWVyLnggPSBtYXRoLm1pbigyNDAsIHBsYXllci54ICsgMSkKICBlbmQKCmlmIGN0cmwucHJlc3Npbmcoa2V5cy51cCkgdGhlbgogICAgIHBsYXllci55ID0gbWF0aC5tYXgoMCwgcGxheWVyLnkgLSAxKQogIGVsc2VpZiBjdHJsLnByZXNzaW5nKGtleXMuZG93bikgdGhlbgogICAgICBwbGF5ZXIueSA9IG1hdGgubWluKDI0MCwgcGxheWVyLnkgKyAxKQogIGVuZAplbmQKCmZ1bmN0aW9uIF9kcmF3KCkKICAgZ2Z4LmNscygpCgogICBzaGFwZS5ncmFkaWVudCgwLCAwLCAyNTYsIDI1NiwgMywgNCkKCiAgIHNwci5kcmF3KDk2LCBwbGF5ZXIueCwgcGxheWVyLnkpCiAgIAplbmQK">Control sprite move</a></p>
+<p><a href="playground.html?game=LS0gVXBkYXRlIHRoZSBjb2RlIHRvIHVwZGF0ZSB0aGUgZ2FtZSEKbG9jYWwgUGxheWVyID0gewogICB4ID0gMTI4IC0gMTYsCiAgIHkgPSAxMjggLSAxNiwKfQpmdW5jdGlvbiBfaW5pdCgpCiAgcGxheWVyID0gbmV3KFBsYXllcikKZW5kCgpmdW5jdGlvbiBfdXBkYXRlKCkKICBpZiBjdHJsLnByZXNzaW5nKGtleXMubGVmdCkgdGhlbgogICAgIHBsYXllci54ID0gbWF0aC5tYXgoMCwgcGxheWVyLnggLSAxKQogIGVsc2VpZiBjdHJsLnByZXNzaW5nKGtleXMucmlnaHQpIHRoZW4KICAgICAgcGxheWVyLnggPSBtYXRoLm1pbigyNDAsIHBsYXllci54ICsgMSkKICBlbmQKCmlmIGN0cmwucHJlc3Npbmcoa2V5cy51cCkgdGhlbgogICAgIHBsYXllci55ID0gbWF0aC5tYXgoMCwgcGxheWVyLnkgLSAxKQogIGVsc2VpZiBjdHJsLnByZXNzaW5nKGtleXMuZG93bikgdGhlbgogICAgICBwbGF5ZXIueSA9IG1hdGgubWluKDI0MCwgcGxheWVyLnkgKyAxKQogIGVuZAplbmQKCmZ1bmN0aW9uIF9kcmF3KCkKICAgZ2Z4LmNscygpCgogICBzaGFwZS5ncmFkaWVudCgwLCAwLCAyNTYsIDI1NiwgMywgNCkKCiAgIHNwci5kcmF3KDk2LCBwbGF5ZXIueCwgcGxheWVyLnkpCiAgIAplbmQK">Control sprite move</a></p>
 </li>
 <li>
-<p><a href="https://minigdx.github.io/tiny/sandbox.html?game=bG9jYWwgUGxheWVyID0gewogIHggPSAxMjggLSAxNiwKICB5ID0gMTI4IC0gMTYsCiAgZHggPSAwLAogIGR5ID0gMAp9CiAgCmZ1bmN0aW9uIF9pbml0KCkKICAgbG9jYWwgc2VlZCA9IG1hdGgucm5kKCkKICAgcGxheWVyID0gbmV3KFBsYXllciwgewogICAgICAgZHggPSBtYXRoLmNvcyhzZWVkKSAqIDMsIAogICAgICAgZHkgPSBtYXRoLnNpbihzZWVkKSAqIDMKICAgfSkKZW5kCgpmdW5jdGlvbiBfdXBkYXRlKCkKICAgaWYgY3RybC5wcmVzc2VkKGtleXMuc3BhY2UpIHRoZW4KICAgICBfaW5pdCgpCiAgIGVuZAogICBwbGF5ZXIueCA9IHBsYXllci54ICsgcGxheWVyLmR4CiAgIHBsYXllci55ID0gcGxheWVyLnkgKyBwbGF5ZXIuZHkKICAgaWYgcGxheWVyLnggPiAyNDAgb3IgcGxheWVyLnggPCAwIHRoZW4KICAgICAgcGxheWVyLmR4ID0gcGxheWVyLmR4ICogLTEKICAgZW5kCiAgIGlmIHBsYXllci55ID4gMjQwIG9yIHBsYXllci55IDwgMCB0aGVuCiAgICAgIHBsYXllci5keSA9IHBsYXllci5keSAqIC0xCiAgIGVuZAogICBwbGF5ZXIueCA9IG1hdGgubWF4KDAsIG1hdGgubWluKHBsYXllci54LCAyNDApKQogICBwbGF5ZXIueSA9IG1hdGgubWF4KDAsIG1hdGgubWluKHBsYXllci55LCAyNDApKQplbmQKCmZ1bmN0aW9uIF9kcmF3KCkKICBnZnguY2xzKCkKICBzcHIuZHJhdygxMjAsIHBsYXllci54LCBwbGF5ZXIueSkKZW5kCg==">Bouncing Bat</a></p>
+<p><a href="playground.html?game=bG9jYWwgUGxheWVyID0gewogIHggPSAxMjggLSAxNiwKICB5ID0gMTI4IC0gMTYsCiAgZHggPSAwLAogIGR5ID0gMAp9CiAgCmZ1bmN0aW9uIF9pbml0KCkKICAgbG9jYWwgc2VlZCA9IG1hdGgucm5kKCkKICAgcGxheWVyID0gbmV3KFBsYXllciwgewogICAgICAgZHggPSBtYXRoLmNvcyhzZWVkKSAqIDMsIAogICAgICAgZHkgPSBtYXRoLnNpbihzZWVkKSAqIDMKICAgfSkKZW5kCgpmdW5jdGlvbiBfdXBkYXRlKCkKICAgaWYgY3RybC5wcmVzc2VkKGtleXMuc3BhY2UpIHRoZW4KICAgICBfaW5pdCgpCiAgIGVuZAogICBwbGF5ZXIueCA9IHBsYXllci54ICsgcGxheWVyLmR4CiAgIHBsYXllci55ID0gcGxheWVyLnkgKyBwbGF5ZXIuZHkKICAgaWYgcGxheWVyLnggPiAyNDAgb3IgcGxheWVyLnggPCAwIHRoZW4KICAgICAgcGxheWVyLmR4ID0gcGxheWVyLmR4ICogLTEKICAgZW5kCiAgIGlmIHBsYXllci55ID4gMjQwIG9yIHBsYXllci55IDwgMCB0aGVuCiAgICAgIHBsYXllci5keSA9IHBsYXllci5keSAqIC0xCiAgIGVuZAogICBwbGF5ZXIueCA9IG1hdGgubWF4KDAsIG1hdGgubWluKHBsYXllci54LCAyNDApKQogICBwbGF5ZXIueSA9IG1hdGgubWF4KDAsIG1hdGgubWluKHBsYXllci55LCAyNDApKQplbmQKCmZ1bmN0aW9uIF9kcmF3KCkKICBnZnguY2xzKCkKICBzcHIuZHJhdygxMjAsIHBsYXllci54LCBwbGF5ZXIueSkKZW5kCg==">Bouncing Bat</a></p>
 </li>
 <li>
-<p><a href="https://minigdx.github.io/tiny/sandbox.html?game=ZnVuY3Rpb24gX2RyYXcoKQogICAgZ2Z4LmNscygxKQoKICAgIGdmeC5kaXRoZXIoMHgwMDAxKQogICAgbG9jYWwgeCA9IG1hdGgucGVybGluKDAuMSwgMC4yLCB0aW55LmZyYW1lIC8gMTAwKQogICAgbG9jYWwgeSA9IG1hdGgucGVybGluKDAuNCwgMC41LCB0aW55LmZyYW1lIC8gMTAwKQogICAgc2hhcGUuY2lyY2xlZih4ICogMjU2LCB5ICogMjU2LCA2NCwgNykKCiAgICBsb2NhbCB4ID0gbWF0aC5wZXJsaW4oMC45LCAwLjcsIHRpbnkuZnJhbWUgLyAxMDApCiAgICBsb2NhbCB5ID0gbWF0aC5wZXJsaW4oMC4zLCAwLjEsIHRpbnkuZnJhbWUgLyAxMDApCiAgICBzaGFwZS5jaXJjbGVmKHggKiAyNTYsIHkgKiAyNTYsIDMyLCA3KQoKICAgIGxvY2FsIHggPSBtYXRoLnBlcmxpbigwLjMsIDAuMSwgdGlueS5mcmFtZSAvIDEwMCkKICAgIGxvY2FsIHkgPSBtYXRoLnBlcmxpbigwLjIsIDAuNCwgdGlueS5mcmFtZSAvIDEwMCkKICAgIHNoYXBlLmNpcmNsZWYoeCAqIDI1NiwgeSAqIDI1NiwgNTYsIDcpCgogICAgZ2Z4LmRpdGhlcigpCgogICAgZm9yIHh4ID0gNjQsIDI1NiAtIDY0LCA0IGRvCiAgICAgICAgbG9jYWwgYWRqdXN0ID0gbWF0aC5wZXJsaW4oeHggLyA2NCwgMC4xLCB0aW55LmZyYW1lIC8gNTApCiAgICAgICAgc2hhcGUuY2lyY2xlZih4eCAtIDEsIDEyNiArIGFkanVzdCAqIDgsIDgsIDcpCiAgICAgICAgc2hhcGUuY2lyY2xlZih4eCArIDEsIDEyNiArIGFkanVzdCAqIDgsIDgsIDcpCiAgICAgICAgc2hhcGUuY2lyY2xlZih4eCwgMSArIDEyNiArIGFkanVzdCAqIDgsIDgsIDcpCiAgICAgICAgc2hhcGUuY2lyY2xlZih4eCwgLTEgKyAxMjYgKyBhZGp1c3QgKiA4LCA4LCA3KQogICAgZW5kCgogICAgZm9yIHh4ID0gNjQsIDI1NiAtIDY0LCA0IGRvCiAgICAgICAgbG9jYWwgYWRqdXN0ID0gbWF0aC5wZXJsaW4oeHggLyA2NCwgMC4xLCB0aW55LmZyYW1lIC8gNTApCiAgICAgICAgc2hhcGUuY2lyY2xlZih4eCwgMTI2ICsgYWRqdXN0ICogOCwgOCwgMSkgICAgCiAgICBlbmQKCiAgICBsb2NhbCB0eHQgPSAiaGVsbG8gd29ybGQgIgogICAgbG9jYWwgbGV0dGVyID0gMQogICAgZm9yIHh4ID0gNjQsIDI1NiAtIDY0LCA0IGRvCiAgICAgICAgbG9jYWwgYWRqdXN0ID0gbWF0aC5wZXJsaW4oeHggLyA2NCwgMC4xLCB0aW55LmZyYW1lIC8gNTApCiAgICAgICAgcHJpbnQoc3RyaW5nLnN1Yih0eHQsIGxldHRlciwgbGV0dGVyKSwgMSArIHh4LCAxMjQgKyBhZGp1c3QgKiA4LCA3KQogICAgICAgIHByaW50KHN0cmluZy5zdWIodHh0LCBsZXR0ZXIsIGxldHRlciksIC0xICsgeHgsIDEyNCArIGFkanVzdCAqIDgsIDcpCiAgICAgICAgcHJpbnQoc3RyaW5nLnN1Yih0eHQsIGxldHRlciwgbGV0dGVyKSwgeHgsIDEgKyAxMjQgKyBhZGp1c3QgKiA4LCA3KQogICAgICAgIHByaW50KHN0cmluZy5zdWIodHh0LCBsZXR0ZXIsIGxldHRlciksIHh4LCAtMSArIDEyNCArIGFkanVzdCAqIDgsIDcpCgogICAgICAgIHByaW50KHN0cmluZy5zdWIodHh0LCBsZXR0ZXIsIGxldHRlciksIHh4LCAxMjQgKyBhZGp1c3QgKiA4LCAxKQoKICAgICAgICBsZXR0ZXIgPSBtYXRoLm1heCgxLCAobGV0dGVyICsgMSkgJSAoI3R4dCArIDEpKQogICAgZW5kCmVuZAoK">Perlin and dither</a></p>
+<p><a href="playground.html?game=ZnVuY3Rpb24gX2RyYXcoKQogICAgZ2Z4LmNscygxKQoKICAgIGdmeC5kaXRoZXIoMHgwMDAxKQogICAgbG9jYWwgeCA9IG1hdGgucGVybGluKDAuMSwgMC4yLCB0aW55LmZyYW1lIC8gMTAwKQogICAgbG9jYWwgeSA9IG1hdGgucGVybGluKDAuNCwgMC41LCB0aW55LmZyYW1lIC8gMTAwKQogICAgc2hhcGUuY2lyY2xlZih4ICogMjU2LCB5ICogMjU2LCA2NCwgNykKCiAgICBsb2NhbCB4ID0gbWF0aC5wZXJsaW4oMC45LCAwLjcsIHRpbnkuZnJhbWUgLyAxMDApCiAgICBsb2NhbCB5ID0gbWF0aC5wZXJsaW4oMC4zLCAwLjEsIHRpbnkuZnJhbWUgLyAxMDApCiAgICBzaGFwZS5jaXJjbGVmKHggKiAyNTYsIHkgKiAyNTYsIDMyLCA3KQoKICAgIGxvY2FsIHggPSBtYXRoLnBlcmxpbigwLjMsIDAuMSwgdGlueS5mcmFtZSAvIDEwMCkKICAgIGxvY2FsIHkgPSBtYXRoLnBlcmxpbigwLjIsIDAuNCwgdGlueS5mcmFtZSAvIDEwMCkKICAgIHNoYXBlLmNpcmNsZWYoeCAqIDI1NiwgeSAqIDI1NiwgNTYsIDcpCgogICAgZ2Z4LmRpdGhlcigpCgogICAgZm9yIHh4ID0gNjQsIDI1NiAtIDY0LCA0IGRvCiAgICAgICAgbG9jYWwgYWRqdXN0ID0gbWF0aC5wZXJsaW4oeHggLyA2NCwgMC4xLCB0aW55LmZyYW1lIC8gNTApCiAgICAgICAgc2hhcGUuY2lyY2xlZih4eCAtIDEsIDEyNiArIGFkanVzdCAqIDgsIDgsIDcpCiAgICAgICAgc2hhcGUuY2lyY2xlZih4eCArIDEsIDEyNiArIGFkanVzdCAqIDgsIDgsIDcpCiAgICAgICAgc2hhcGUuY2lyY2xlZih4eCwgMSArIDEyNiArIGFkanVzdCAqIDgsIDgsIDcpCiAgICAgICAgc2hhcGUuY2lyY2xlZih4eCwgLTEgKyAxMjYgKyBhZGp1c3QgKiA4LCA4LCA3KQogICAgZW5kCgogICAgZm9yIHh4ID0gNjQsIDI1NiAtIDY0LCA0IGRvCiAgICAgICAgbG9jYWwgYWRqdXN0ID0gbWF0aC5wZXJsaW4oeHggLyA2NCwgMC4xLCB0aW55LmZyYW1lIC8gNTApCiAgICAgICAgc2hhcGUuY2lyY2xlZih4eCwgMTI2ICsgYWRqdXN0ICogOCwgOCwgMSkgICAgCiAgICBlbmQKCiAgICBsb2NhbCB0eHQgPSAiaGVsbG8gd29ybGQgIgogICAgbG9jYWwgbGV0dGVyID0gMQogICAgZm9yIHh4ID0gNjQsIDI1NiAtIDY0LCA0IGRvCiAgICAgICAgbG9jYWwgYWRqdXN0ID0gbWF0aC5wZXJsaW4oeHggLyA2NCwgMC4xLCB0aW55LmZyYW1lIC8gNTApCiAgICAgICAgcHJpbnQoc3RyaW5nLnN1Yih0eHQsIGxldHRlciwgbGV0dGVyKSwgMSArIHh4LCAxMjQgKyBhZGp1c3QgKiA4LCA3KQogICAgICAgIHByaW50KHN0cmluZy5zdWIodHh0LCBsZXR0ZXIsIGxldHRlciksIC0xICsgeHgsIDEyNCArIGFkanVzdCAqIDgsIDcpCiAgICAgICAgcHJpbnQoc3RyaW5nLnN1Yih0eHQsIGxldHRlciwgbGV0dGVyKSwgeHgsIDEgKyAxMjQgKyBhZGp1c3QgKiA4LCA3KQogICAgICAgIHByaW50KHN0cmluZy5zdWIodHh0LCBsZXR0ZXIsIGxldHRlciksIHh4LCAtMSArIDEyNCArIGFkanVzdCAqIDgsIDcpCgogICAgICAgIHByaW50KHN0cmluZy5zdWIodHh0LCBsZXR0ZXIsIGxldHRlciksIHh4LCAxMjQgKyBhZGp1c3QgKiA4LCAxKQoKICAgICAgICBsZXR0ZXIgPSBtYXRoLm1heCgxLCAobGV0dGVyICsgMSkgJSAoI3R4dCArIDEpKQogICAgZW5kCmVuZAoK">Perlin and dither</a></p>
 </li>
 </ul>
 </div>
@@ -563,8 +626,8 @@ end
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 1.3.3-alpha<br>
-Last updated 2024-05-19 08:07:09 UTC
+Version 1.4.0-alpha<br>
+Last updated 2025-05-11 15:24:56 UTC
 </div>
 </div>
 <script src="tiny-web-editor.js"></script>

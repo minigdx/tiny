@@ -3259,19 +3259,7 @@ end
 <div class="sect2">
 <h3 id="_map">map</h3>
 <div class="paragraph">
-<p>Map API to accessing maps data configured in a game. Map can be created using LDTk ( <a href="https://ldtk.io/" class="bare">https://ldtk.io/</a> ).</p>
-</div>
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Warning</div>
-</td>
-<td class="content">
-Projects need to be exported using <a href="https://ldtk.io/docs/game-dev/super-simple-export/">'Super simple export'</a>. Also, Int layers <em>need</em> to have an Auto Layer tileset otherwise, they will not be known by the engine.
-</td>
-</tr>
-</table>
+<p>Access map created with LDTk ( <a href="https://ldtk.io/" class="bare">https://ldtk.io/</a> ).</p>
 </div>
 <div class="sect3">
 <h4 id="_map_level">map.level()</h4>
@@ -3281,19 +3269,19 @@ Projects need to be exported using <a href="https://ldtk.io/docs/game-dev/super-
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-lua" data-lang="lua">map.level() -- Return the index of the current level.
-map.level(level) -- Set the current level to use. The level can be an index or the id defined by LDTK. Return the previous index level.</code></pre>
+map.level(level) -- Set the current level to use. The level can be an index, the name or the id defined by LDTK. Return the previous index level or NIL if the new level is invalid.</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
 <h4 id="_map_layer">map.layer()</h4>
 <div class="paragraph">
-<p>Set the current layer to draw.</p>
+<p>Get the list of layers from the actual level.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">map.layer(layer_index) -- Set the current index layer to draw. Return the previous layer index.
-map.layer() -- Reset the current layer to draw to the first available layer (index 0).</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">map.layer(layer_index) -- Get the layer at the specified index or name from the actual level. The layer in the front is 0.
+map.layer() -- Get the list of layers from the actual level.</code></pre>
 </div>
 </div>
 </div>
@@ -3323,14 +3311,26 @@ map.to(coordinates) -- Convert the coordinates from a table [x,y] into cell coor
 </div>
 </div>
 <div class="sect3">
-<h4 id="_map_flag">map.flag()</h4>
+<h4 id="_map_cflag">map.cflag()</h4>
 <div class="paragraph">
-<p>Get the flag from a tile.</p>
+<p>Get the flag from a tile, using cell coordinates.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">map.flag(cx, cy) -- Get the flag from the tile at the coordinate cx,cy.
-map.flag(cell) -- Get the flag from the tile at the coordinate table [cx,cy].</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">map.cflag(cx, cy) -- Get the flag from the tile at the coordinate cx,cy.
+map.cflag(cx, cy, layer) -- Get the flag from the tile at the coordinate cx,cy from a specific layer.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_map_flag">map.flag()</h4>
+<div class="paragraph">
+<p>Get the flag from a tile, using screen coordinates.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">map.flag(x, y) -- Get the flag from the tile at the coordinate x,y.
+map.flag(x, y, layer) -- Get the flag from the tile at the coordinate x,y from a specific layer.</code></pre>
 </div>
 </div>
 </div>
@@ -3341,11 +3341,19 @@ map.flag(cell) -- Get the flag from the tile at the coordinate table [cx,cy].</c
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>local players = map.entities["player"]
-local entity = players[1] -- get the first player
-shape.rectf(entity.x, entity.y, entity.width, entity.height, 8) -- display an entity using a rectangle
+<pre class="highlight"><code>local entities = map.entities()
+local players = entities["Player"]
+for entity in all(players) do
+    shape.rectf(entity.x, entity.y, entity.width, entity.height, 8) -- display an entity using a rectangle
+end
 [...]
-entity.customFields -- access custom field of the entity</code></pre>
+entity.fields -- access custom field of the entity</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">map.entities() -- Get all entities from all entities layer as a table, with an entry per type.
+map.entities(a) -- Get all entities from the specific layer as a table, with an entry per type.</code></pre>
 </div>
 </div>
 </div>
@@ -3356,47 +3364,10 @@ entity.customFields -- access custom field of the entity</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">map.draw() -- Draw the default layer on the screen.
-map.draw(x, y) -- Draw the default layer on the screen at the x/y coordinates.
-map.draw(x, y, mx, my) -- Draw the default layer on the screen at the x/y coordinates starting the mx/my coordinates from the map.
-map.draw(x, y, mx, my, width, height) -- Draw the default layer on the screen at the x/y coordinates starting the mx/my coordinates from the map using the size width/height.
-map.draw(layer) -- Draw the layer on the screen by it's index.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">map.draw() -- Draw all active layers on the screen.
+map.draw(index) -- Draw the layer with the name or the index on the screen.</code></pre>
 </div>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">layer</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">index of the layer</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">mx</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">x map coordinate</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">my</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">y map coordinate</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">x screen coordinate</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">y</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">y screen coordinate</p></td>
-</tr>
-</tbody>
-</table>
 </div>
 </div>
 <div class="sect2">
@@ -3701,30 +3672,25 @@ end
 <div class="paragraph">
 <p>List all notes from C0 to B8. Please note that bemols are the note with b (ie: Gb2) while sharps are the note with s (ie: As3).</p>
 </div>
+<div class="sect3">
+<h4 id="_notes_note">notes.note()</h4>
+<div class="paragraph">
+<p>Get the name of a note regarding the note index (ie: C0 = 0, Cs0 = 1, &#8230;&#8203;)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">notes.note(note_index) -- Get the name of a note regarding the note index (ie: C0 = 0, Cs0 = 1, ...)</code></pre>
+</div>
+</div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_sfx">sfx</h3>
 <div class="paragraph">
 <p>Sound API to play/loop/stop a sound.
-A sound can be an SFX sound, generated using the tiny-cli sfx command or a MIDI file.
-Please note that a SFX sound will produce the same sound whatever platform and whatever computer
-as the sound is generated.</p>
-</div>
-<div class="paragraph">
-<p>A MIDI sound will depend of the MIDI synthesizer available on the machine.</p>
-</div>
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Warning</div>
-</td>
-<td class="content">
-Because of browser behaviour, a sound can <strong>only</strong> be played only after the first
-user interaction.
-</td>
-</tr>
-</table>
+A sound can be created using the sound editor, using the command line <code>tiny-cli sfx &lt;filename&gt;</code>.
+WARNING: Because of browser behaviour, a sound can <strong>only</strong> be played only after the first
+user interaction.</p>
 </div>
 <div class="paragraph">
 <p>Avoid to start a music or a sound at the beginning of the game.
@@ -3732,315 +3698,53 @@ Before it, force the player to hit a key or click by adding an interactive menu
 or by starting the sound as soon as the player is moving.</p>
 </div>
 <div class="sect3">
-<h4 id="_sfx_sine">sfx.sine()</h4>
+<h4 id="_sfx_save">sfx.save()</h4>
 <div class="paragraph">
-<p>Generate and play a sine wave sound.</p>
+<p>Save the actual music using the filename.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">sfx.sine(note, duration, volume) -- Generate and play a sound using one note.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">sfx.save(filename) -- Save the actual music using the filename</code></pre>
 </div>
 </div>
-<tiny-editor style="display: none;"  >
-
-local waves = {
-    { name = "sine", fun = sfx.sine, note = notes.C6 },
-    { name = "pulse", fun = sfx.pulse, note = notes.C6 },
-    { name = "triangle", fun = sfx.triangle, note = notes.C6 },
-    { name = "noise", fun = sfx.noise, note = notes.C8 },
-    { name = "sawtooth", fun = sfx.sawtooth, note = notes.C6 },
-    { name = "square", fun = sfx.square, note = notes.C6 },
-}
-
-local index = 1
-
-function new_index(index, tableSize)
-     return ((index - 1) % tableSize) + 1
-end
-
-function _update()
-    if ctrl.pressed(keys.left) then
-        index =new_index(index - 1, #waves)
-    elseif ctrl.pressed(keys.right) then
-        index = new_index(index + 1, #waves)
-    end
-
-    if ctrl.pressed(keys.space) then
-        waves[index].fun( waves[index].note)
-    end
-end
-
-function _draw()
-    gfx.cls()
-    local str = "<<-- "..waves[index].name .. " -->>"
-    print(str, 128 - math.floor(#str * 4 * 0.5), 128 )
-
-
-    local space = "(hit space to play a note)"
-    print(space, 128 - math.floor(#space * 4 * 0.5), 142)
-end
-
-</tiny-editor>
 </div>
 <div class="sect3">
-<h4 id="_sfx_sawtooth">sfx.sawtooth()</h4>
+<h4 id="_sfx_load">sfx.load()</h4>
 <div class="paragraph">
-<p>Generate and play a sawtooth wave sound.</p>
+<p>Load the actual SFX sound as the actual music.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">sfx.sawtooth(note, duration, volume) -- Generate and play a sound using one note.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">sfx.load(filename) -- Load the actual SFX sound as the actual music using filename or its index</code></pre>
 </div>
 </div>
-<tiny-editor style="display: none;"  >
-
-local waves = {
-    { name = "sine", fun = sfx.sine, note = notes.C6 },
-    { name = "pulse", fun = sfx.pulse, note = notes.C6 },
-    { name = "triangle", fun = sfx.triangle, note = notes.C6 },
-    { name = "noise", fun = sfx.noise, note = notes.C8 },
-    { name = "sawtooth", fun = sfx.sawtooth, note = notes.C6 },
-    { name = "square", fun = sfx.square, note = notes.C6 },
-}
-
-local index = 1
-
-function new_index(index, tableSize)
-     return ((index - 1) % tableSize) + 1
-end
-
-function _update()
-    if ctrl.pressed(keys.left) then
-        index =new_index(index - 1, #waves)
-    elseif ctrl.pressed(keys.right) then
-        index = new_index(index + 1, #waves)
-    end
-
-    if ctrl.pressed(keys.space) then
-        waves[index].fun( waves[index].note)
-    end
-end
-
-function _draw()
-    gfx.cls()
-    local str = "<<-- "..waves[index].name .. " -->>"
-    print(str, 128 - math.floor(#str * 4 * 0.5), 128 )
-
-
-    local space = "(hit space to play a note)"
-    print(space, 128 - math.floor(#space * 4 * 0.5), 142)
-end
-
-</tiny-editor>
 </div>
 <div class="sect3">
-<h4 id="_sfx_square">sfx.square()</h4>
+<h4 id="_sfx_instrument">sfx.instrument()</h4>
 <div class="paragraph">
-<p>Generate and play a square wave sound.</p>
+<p>Access instrument using its index or its name.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">sfx.square(note, duration, volume) -- Generate and play a sound using one note.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">sfx.instrument(arg) -- Access instrument using its index or its name.</code></pre>
 </div>
 </div>
-<tiny-editor style="display: none;"  >
-
-local waves = {
-    { name = "sine", fun = sfx.sine, note = notes.C6 },
-    { name = "pulse", fun = sfx.pulse, note = notes.C6 },
-    { name = "triangle", fun = sfx.triangle, note = notes.C6 },
-    { name = "noise", fun = sfx.noise, note = notes.C8 },
-    { name = "sawtooth", fun = sfx.sawtooth, note = notes.C6 },
-    { name = "square", fun = sfx.square, note = notes.C6 },
-}
-
-local index = 1
-
-function new_index(index, tableSize)
-     return ((index - 1) % tableSize) + 1
-end
-
-function _update()
-    if ctrl.pressed(keys.left) then
-        index =new_index(index - 1, #waves)
-    elseif ctrl.pressed(keys.right) then
-        index = new_index(index + 1, #waves)
-    end
-
-    if ctrl.pressed(keys.space) then
-        waves[index].fun( waves[index].note)
-    end
-end
-
-function _draw()
-    gfx.cls()
-    local str = "<<-- "..waves[index].name .. " -->>"
-    print(str, 128 - math.floor(#str * 4 * 0.5), 128 )
-
-
-    local space = "(hit space to play a note)"
-    print(space, 128 - math.floor(#space * 4 * 0.5), 142)
-end
-
-</tiny-editor>
 </div>
 <div class="sect3">
-<h4 id="_sfx_triangle">sfx.triangle()</h4>
+<h4 id="_sfx_bar">sfx.bar()</h4>
 <div class="paragraph">
-<p>Generate and play a triangle wave sound.</p>
+<p>Access instrument using its index or its name.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">sfx.triangle(note, duration, volume) -- Generate and play a sound using one note.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">sfx.bar(arg) -- Access instrument using its index or its name.</code></pre>
 </div>
 </div>
-<tiny-editor style="display: none;"  >
-
-local waves = {
-    { name = "sine", fun = sfx.sine, note = notes.C6 },
-    { name = "pulse", fun = sfx.pulse, note = notes.C6 },
-    { name = "triangle", fun = sfx.triangle, note = notes.C6 },
-    { name = "noise", fun = sfx.noise, note = notes.C8 },
-    { name = "sawtooth", fun = sfx.sawtooth, note = notes.C6 },
-    { name = "square", fun = sfx.square, note = notes.C6 },
-}
-
-local index = 1
-
-function new_index(index, tableSize)
-     return ((index - 1) % tableSize) + 1
-end
-
-function _update()
-    if ctrl.pressed(keys.left) then
-        index =new_index(index - 1, #waves)
-    elseif ctrl.pressed(keys.right) then
-        index = new_index(index + 1, #waves)
-    end
-
-    if ctrl.pressed(keys.space) then
-        waves[index].fun( waves[index].note)
-    end
-end
-
-function _draw()
-    gfx.cls()
-    local str = "<<-- "..waves[index].name .. " -->>"
-    print(str, 128 - math.floor(#str * 4 * 0.5), 128 )
-
-
-    local space = "(hit space to play a note)"
-    print(space, 128 - math.floor(#space * 4 * 0.5), 142)
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_sfx_noise">sfx.noise()</h4>
-<div class="paragraph">
-<p>Generate and play a noise wave sound.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">sfx.noise(note, duration, volume) -- Generate and play a sound using one note.</code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-local waves = {
-    { name = "sine", fun = sfx.sine, note = notes.C6 },
-    { name = "pulse", fun = sfx.pulse, note = notes.C6 },
-    { name = "triangle", fun = sfx.triangle, note = notes.C6 },
-    { name = "noise", fun = sfx.noise, note = notes.C8 },
-    { name = "sawtooth", fun = sfx.sawtooth, note = notes.C6 },
-    { name = "square", fun = sfx.square, note = notes.C6 },
-}
-
-local index = 1
-
-function new_index(index, tableSize)
-     return ((index - 1) % tableSize) + 1
-end
-
-function _update()
-    if ctrl.pressed(keys.left) then
-        index =new_index(index - 1, #waves)
-    elseif ctrl.pressed(keys.right) then
-        index = new_index(index + 1, #waves)
-    end
-
-    if ctrl.pressed(keys.space) then
-        waves[index].fun( waves[index].note)
-    end
-end
-
-function _draw()
-    gfx.cls()
-    local str = "<<-- "..waves[index].name .. " -->>"
-    print(str, 128 - math.floor(#str * 4 * 0.5), 128 )
-
-
-    local space = "(hit space to play a note)"
-    print(space, 128 - math.floor(#space * 4 * 0.5), 142)
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_sfx_pulse">sfx.pulse()</h4>
-<div class="paragraph">
-<p>Generate and play a pulse wave sound.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">sfx.pulse(note, duration, volume) -- Generate and play a sound using one note.</code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-local waves = {
-    { name = "sine", fun = sfx.sine, note = notes.C6 },
-    { name = "pulse", fun = sfx.pulse, note = notes.C6 },
-    { name = "triangle", fun = sfx.triangle, note = notes.C6 },
-    { name = "noise", fun = sfx.noise, note = notes.C8 },
-    { name = "sawtooth", fun = sfx.sawtooth, note = notes.C6 },
-    { name = "square", fun = sfx.square, note = notes.C6 },
-}
-
-local index = 1
-
-function new_index(index, tableSize)
-     return ((index - 1) % tableSize) + 1
-end
-
-function _update()
-    if ctrl.pressed(keys.left) then
-        index =new_index(index - 1, #waves)
-    elseif ctrl.pressed(keys.right) then
-        index = new_index(index + 1, #waves)
-    end
-
-    if ctrl.pressed(keys.space) then
-        waves[index].fun( waves[index].note)
-    end
-end
-
-function _draw()
-    gfx.cls()
-    local str = "<<-- "..waves[index].name .. " -->>"
-    print(str, 128 - math.floor(#str * 4 * 0.5), 128 )
-
-
-    local space = "(hit space to play a note)"
-    print(space, 128 - math.floor(#space * 4 * 0.5), 142)
-end
-
-</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_sfx_play">sfx.play()</h4>
 <div class="paragraph">
-<p>Play a sound by it&#8217;s index. The index of a sound is given by it&#8217;s position in the sounds field from the <code>_tiny.json</code> file.The first sound is at the index 0.</p>
+<p>Play the bar by it&#8217;s index of the current sound. The index of a bar of the current music.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -4052,19 +3756,19 @@ sfx.play(sound) -- Play the sound by it's index.</code></pre>
 <div class="sect3">
 <h4 id="_sfx_loop">sfx.loop()</h4>
 <div class="paragraph">
-<p>Play a sound and loop over it.</p>
+<p>Loop the bar by it&#8217;s index of the current sound. The index of a bar of the current music.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">sfx.loop() -- Play the sound at the index 0.
-sfx.loop(sound) -- Play the sound by it's index.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">sfx.loop() -- Loop the sound at the index 0.
+sfx.loop(sound) -- Loop the sound by it's index.</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
 <h4 id="_sfx_stop">sfx.stop()</h4>
 <div class="paragraph">
-<p>Stop a sound.</p>
+<p>Stop the bar by it&#8217;s index of the current sound. The index of a bar of the current music.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -5401,8 +5105,8 @@ ws.list(extension) -- List all files available in the workspace and filter by th
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 1.3.3-alpha<br>
-Last updated 2024-05-19 08:10:36 UTC
+Version 1.4.0-alpha<br>
+Last updated 2025-05-11 15:26:03 UTC
 </div>
 </div>
 </body>

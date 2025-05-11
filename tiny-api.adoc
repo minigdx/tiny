@@ -1,0 +1,4064 @@
+== Tiny API
+
+=== ctrl
+
+Access to controllers like touch/mouse events or accessing which key is pressed by the user.
+
+==== ctrl.touch()
+
+Get coordinates of the current touch/mouse. If the mouse/touch is out-of the screen, the coordinates will be the last mouse position/touch. The function return those coordinates as a table {x, y}. A sprite can be draw directly on the mouse position by passing the sprite number. 
+
+```lua
+ctrl.touch() -- Get the mouse coordinates.
+ctrl.touch(sprN) -- Get the mouse coordinate and draw a sprite on those coordinates.
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+  gfx.cls(2)
+  p = ctrl.touch()
+  print("coordinates: "..p.x .. "x"..p.y, 1, 1, 4)
+  shape.rectf(p.x, p.y, 5,5, p.x + p.y)
+end
+
+</tiny-editor>
+++++
+
+
+==== ctrl.pressed()
+
+Return true if the key was pressed during the last frame. If you need to check that the key is still pressed, see `ctrl.pressing` instead.
+
+```lua
+ctrl.pressed(key) -- Is the key was pressed?
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+local percent_a = 1
+local percent_b = 1
+
+function _update()
+    percent_a = math.min(percent_a + 0.05, 1)
+    percent_b = math.min(percent_b + 0.05, 1)
+
+    if ctrl.pressed(keys.space) then
+        percent_a = 0
+    end
+    
+    if ctrl.pressing(keys.space) then
+        percent_b = 0
+    end
+
+    local offset_a = juice.powIn2(0, 8, percent_a)
+    local offset_b = juice.powIn2(0, 8, percent_b)
+
+    gfx.cls()
+    shape.rectf(64, 128 - 16, 32, 32, 7)
+    shape.rectf(64, 128 - 32 + offset_a, 32, 32, 8)
+
+    shape.rectf(32 + 128, 128 - 16, 32, 32, 7)
+    shape.rectf(32 + 128, 128 - 32 + offset_b, 32, 32, 8)
+
+    print("pressed", 64, 128 + 32)
+    print("pressing", 32 + 128, 128 + 32)
+end
+
+</tiny-editor>
+++++
+
+
+==== ctrl.pressing()
+
+Return true if the key is still pressed. 
+
+```lua
+ctrl.pressing(key) -- Is the key is still pressed?
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+local percent_a = 1
+local percent_b = 1
+
+function _update()
+    percent_a = math.min(percent_a + 0.05, 1)
+    percent_b = math.min(percent_b + 0.05, 1)
+
+    if ctrl.pressed(keys.space) then
+        percent_a = 0
+    end
+    
+    if ctrl.pressing(keys.space) then
+        percent_b = 0
+    end
+
+    local offset_a = juice.powIn2(0, 8, percent_a)
+    local offset_b = juice.powIn2(0, 8, percent_b)
+
+    gfx.cls()
+    shape.rectf(64, 128 - 16, 32, 32, 7)
+    shape.rectf(64, 128 - 32 + offset_a, 32, 32, 8)
+
+    shape.rectf(32 + 128, 128 - 16, 32, 32, 7)
+    shape.rectf(32 + 128, 128 - 32 + offset_b, 32, 32, 8)
+
+    print("pressed", 64, 128 + 32)
+    print("pressing", 32 + 128, 128 + 32)
+end
+
+</tiny-editor>
+++++
+
+
+==== ctrl.touched()
+
+Return the position of the touch (as `{x, y}`)if the screen was touched or the mouse button was pressed during the last frame. `nil` otherwise.
+The touch can be : 
+
+- 0: left click or one finger
+- 1: right click or two fingers
+- 2: middle click or three fingers
+
+If you need to check that the touch/mouse button is still active, see `ctrl.touching` instead.
+
+```lua
+ctrl.touched(touch) -- Is the screen was touched or mouse button was pressed?
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+local circles = {}
+
+function _update()
+    local pos = ctrl.touched(0)
+    if pos ~= nil then
+        table.insert(circles, pos)
+    end
+end
+
+function _draw()
+    gfx.cls()
+    local p = ctrl.touch()
+    shape.circlef(p.x, p.y, 4, 8)
+    for pos in all(circles) do 
+        shape.circlef(pos.x, pos.y, 4, 9)
+        print("("..pos.x .. ", "..pos.y..")", pos.x + 3, pos.y + 3)
+    end
+end
+
+</tiny-editor>
+++++
+
+
+==== ctrl.touching()
+
+Return the position of the touch (as `{x, y}`)if the screen is still touched or the mouse button is still pressed. `nil` otherwise.
+The touch can be : 
+
+- 0: left click or one finger
+- 1: right click or two fingers
+- 2: middle click or three fingers
+
+
+
+```lua
+ctrl.touching(touch) -- Is the screen is still touched or mouse button is still pressed?
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+    local p = ctrl.touch()
+    shape.circlef(p.x, p.y, 4, 8)
+
+    local start = ctrl.touching(0)
+    if start ~= nil then
+        local pos = ctrl.touch()
+        shape.line(start.x, start.y, pos.x, pos.y, 1)
+        print("("..start.x .. ", "..start.y..")", start.x, start.y)
+        print("("..pos.x .. ", "..pos.y..")", pos.x, pos.y)
+    end
+end
+
+</tiny-editor>
+++++
+
+
+
+=== debug
+
+Helpers to debug your game by drawing or printing information on screen.
+
+==== debug.enabled()
+
+Enable or disable debug feature.
+
+```lua
+debug.enabled(enabled) -- Enable or disable debug by passing true to enable, false to disable.
+debug.enabled() -- Return true if debug is enabled. False otherwise.
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _init()
+   switch = true
+end
+
+function _update()
+    local pos = ctrl.touch()
+
+    debug.rect(pos.x, pos.y, 16, 16)
+
+    if ctrl.touched(0) then
+       switch = not switch
+    
+       debug.enabled(switch)
+    end   
+
+    debug.log("debug ".. tostring(switch))
+end
+  
+function _draw()
+    gfx.cls()
+    -- draw the mouse position.
+    local pos = ctrl.touch()
+
+    shape.line(pos.x - 2, pos.y, pos.x + 2, pos.y, 3)
+    shape.line(pos.x, pos.y - 2, pos.x, pos.y + 2, 3) 
+
+    if switch then
+      print("debug enabled", 10, 40)
+    else
+     print("debug disabled", 10, 40)
+    end
+end
+
+</tiny-editor>
+++++
+
+
+==== debug.table()
+
+Display a table.
+
+```lua
+debug.table(table) -- Display a table.
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _update()
+    local pos = ctrl.touch()
+
+    debug.table(pos)
+    debug.log("frame "..tiny.frame)
+    debug.console("hello from the console")
+end
+  
+function _draw()
+    gfx.cls()
+    -- draw the mouse position.
+    local pos = ctrl.touch()
+
+    shape.line(pos.x - 2, pos.y, pos.x + 2, pos.y, 3)
+    shape.line(pos.x, pos.y - 2, pos.x, pos.y + 2, 3) 
+end
+
+</tiny-editor>
+++++
+
+
+==== debug.log()
+
+Log a message on the screen.
+
+```lua
+debug.log(str) -- Log a message on the screen.
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _update()
+    local pos = ctrl.touch()
+
+    debug.table(pos)
+    debug.log("frame "..tiny.frame)
+    debug.console("hello from the console")
+end
+  
+function _draw()
+    gfx.cls()
+    -- draw the mouse position.
+    local pos = ctrl.touch()
+
+    shape.line(pos.x - 2, pos.y, pos.x + 2, pos.y, 3)
+    shape.line(pos.x, pos.y - 2, pos.x, pos.y + 2, 3) 
+end
+
+</tiny-editor>
+++++
+
+
+==== debug.console()
+
+Log a message into the console.
+
+```lua
+debug.console(str) -- Log a message into the console.
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _update()
+    local pos = ctrl.touch()
+
+    debug.table(pos)
+    debug.log("frame "..tiny.frame)
+    debug.console("hello from the console")
+end
+  
+function _draw()
+    gfx.cls()
+    -- draw the mouse position.
+    local pos = ctrl.touch()
+
+    shape.line(pos.x - 2, pos.y, pos.x + 2, pos.y, 3)
+    shape.line(pos.x, pos.y - 2, pos.x, pos.y + 2, 3) 
+end
+
+</tiny-editor>
+++++
+
+
+==== debug.rect()
+
+Draw a rectangle on the screen
+
+```lua
+debug.rect(x, y, width, height, color) -- Draw a debug rectangle.
+debug.rect(rect) -- Draw a debug rectangle.
+debug.rect(rect, color) -- Draw a debug rectangle using a rectangle and a color.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|rect |A rectangle {x, y, width, height, color}
+|rect |A rectangle {x, y, width, height}      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _init()
+   switch = true
+end
+
+function _update()
+    local pos = ctrl.touch()
+
+    debug.rect(pos.x, pos.y, 16, 16)
+
+    if ctrl.touched(0) then
+       switch = not switch
+    
+       debug.enabled(switch)
+    end   
+
+    debug.log("debug ".. tostring(switch))
+end
+  
+function _draw()
+    gfx.cls()
+    -- draw the mouse position.
+    local pos = ctrl.touch()
+
+    shape.line(pos.x - 2, pos.y, pos.x + 2, pos.y, 3)
+    shape.line(pos.x, pos.y - 2, pos.x, pos.y + 2, 3) 
+
+    if switch then
+      print("debug enabled", 10, 40)
+    else
+     print("debug disabled", 10, 40)
+    end
+end
+
+</tiny-editor>
+++++
+
+
+==== debug.point()
+
+Draw a point on the screen
+
+```lua
+debug.point(x, y, color) -- Draw a debug point.
+debug.point(point) -- Draw a debug point.
+debug.point(point, color) -- Draw a debug point.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|point |A point {x, y, color}
+|point |A point {x, y}      
+|===
+
+
+==== debug.line()
+
+Draw a point on the screen
+
+```lua
+debug.line(x1, y1, x2, y2, color) -- Draw a debug line.
+debug.line(v1, v2) -- Draw a debug line.
+debug.line(v1, v2, color) -- Draw a debug line.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|v1 |A point {x, y}
+|v1 |A point {x, y}
+|v2 |A point {x, y}
+|v2 |A point {x, y}      
+|===
+
+
+
+=== gfx
+
+Access to graphical API like updating the color palette or applying a dithering pattern.
+
+==== gfx.cls()
+
+clear the screen
+
+```lua
+gfx.cls() -- Clear the screen with a default color.
+gfx.cls(color) -- Clear the screen with a color.
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    if ctrl.pressed(keys.space) then
+       gfx.cls()
+    end
+
+    print("Press space to clear the screen") 
+    local pos = ctrl.touch()
+    shape.circlef(pos.x, pos.y, 4, math.rnd())
+end
+</tiny-editor>
+++++
+
+
+==== gfx.pset()
+
+Set the color index at the coordinate (x,y).
+
+```lua
+gfx.pset(x, y, color) -- set the color index at the coordinate (x,y).
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+   local pos = ctrl.touching(0)
+   if pos ~= nil then
+      -- set the pixel with the color 9 when the mouse is pressed
+      local p = ctrl.touch()
+      gfx.pset(p.x, p.y, 9)
+   end
+end
+</tiny-editor>
+++++
+
+
+==== gfx.pget()
+
+Get the color index at the coordinate (x,y).
+
+```lua
+gfx.pget(x, y) -- get the color index at the coordinate (x,y).
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+   gfx.cls()
+   local index = 0
+   for x=0, 240, 16 do
+     for y=0, 240, 16 do
+        shape.rectf(x, y, 16, 16, index)
+        index = index + 1
+     end
+   end
+
+   local pos = ctrl.touch()
+   local color = gfx.pget(pos.x, pos.y)
+   if color ~= nil then 
+     shape.rectf(0, 0, 80, 6, 13)
+     print("color index: "..color)
+   end
+
+
+   shape.circlef(pos.x - 2, pos.y - 2, 4, 0)
+end
+</tiny-editor>
+++++
+
+
+==== gfx.to_sheet()
+
+Transform the current frame buffer into a spritesheeet. 
+
+- If the index of the spritesheet already exist, the spritesheet will be replaced
+- If the index of the spritesheet doesn't exist, a new spritesheet at this index will be created
+- If the index of the spritesheet is negative, a new spritesheet will be created at the last positive index.
+
+
+```lua
+gfx.to_sheet(sheet) -- Copy the current frame buffer to an new or existing sheet index.
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls(1)
+    -- draw a transparent circle (like a hole)
+    shape.circlef(64, 128, 20, 0)
+    -- keep the result as spritesheet 0
+    gfx.to_sheet(0)
+
+    gfx.cls(1)
+    -- draw some circles
+    shape.circlef(64, 108, 20, 8)
+    shape.circlef(44, 128, 20, 9)
+    shape.circlef(64, 148, 20, 10)
+    shape.circlef(84, 128, 20, 11)
+
+    -- draw over the circles
+    -- the mask generated before.
+    spr.sheet(0)
+    spr.sdraw()
+end
+</tiny-editor>
+++++
+
+
+==== gfx.pal()
+
+Change a color from the palette to another color.
+
+```lua
+gfx.pal() -- Reset all previous color changes.
+gfx.pal(a, b) -- Replace the color a for the color b.
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+    print("example", 10, 10, 2) -- print using the color index 2
+    gfx.pal(2, 3) -- switch the text color to another color
+    print("example", 10, 20, 2) -- print using the color index 2
+    gfx.pal() -- reset the palette
+    print("example", 10, 30, 2) -- print using the color index 2
+end
+
+</tiny-editor>
+++++
+
+
+==== gfx.camera()
+
+Move the game camera.
+
+```lua
+gfx.camera() -- Reset the game camera to it's default position (0,0).
+gfx.camera(x, y) -- Set game camera to the position x, y.
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+local x = 0
+local y = 0
+
+function _update()
+    if ctrl.pressing(keys.left) then
+        x = x - 0.5
+    elseif ctrl.pressing(keys.right) then
+        x = x + 0.5
+    end
+
+    if ctrl.pressing(keys.up) then
+        y = y - 0.5
+    elseif ctrl.pressing(keys.down) then
+        y = y + 0.5
+    end
+    gfx.camera(math.floor(x), math.floor(y))
+end
+
+function _draw()
+    gfx.cls(2)
+    for x = 0 - 64, 256 + 64, 16 do
+        for y = 0 - 64, 256 + 64, 16 do
+            shape.line(x - 2, y, x + 2, y, 9)
+            shape.line(x, y - 2, x, y + 2, 9)
+        end
+    end
+    print("camera: ("..x..", "..y..")", 6, 6)
+    
+    shape.rect(0, 0, 256, 256, 1)
+end
+</tiny-editor>
+++++
+
+
+==== gfx.dither()
+
+Apply a dithering pattern on every new draw call. The pattern is using the bits value of a 2 octet value. The first bits is the one on the far left and represent the pixel of the top left of a 4x4 matrix. The last bit is the pixel from the bottom right of this matrix.
+
+```lua
+gfx.dither() -- Reset dithering pattern. The previous dithering pattern is returned.
+gfx.dither(pattern) -- Apply dithering pattern. The previous dithering pattern is returned.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|pattern |Dither pattern. For example: 0xA5A5 or 0x3030      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+    gfx.dither()
+    shape.circlef(30, 30, 30, 2)
+    gfx.dither(0xA5A5) -- set a dithering pattern
+    shape.circlef(50, 50, 30, 3)
+    gfx.dither(0x0842) -- set another dithering pattern
+    shape.circlef(70, 70, 30, 2)
+end
+
+</tiny-editor>
+++++
+
+
+==== gfx.clip()
+
+Clip the draw surface (ie: limit the drawing area).
+
+```lua
+gfx.clip() -- Reset the clip and draw on the fullscreen.
+gfx.clip(x, y, width, height) -- Clip and limit the drawing area.
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _init()
+  c = {}
+  for i=1,100 do
+    table.insert(c, {x=math.rnd(256), y=math.rnd(256), c = math.rnd(1,12)})
+end
+
+end
+function _draw()
+  gfx.cls()
+  local pos = ctrl.touch()
+  -- set a clip area to crop circles
+  gfx.clip(pos.x - 20, pos.y - 20, 40, 40)
+  for circle in all(c) do
+    shape.circlef(circle.x, circle.y, 10, circle.c)
+  end
+end
+
+</tiny-editor>
+++++
+
+
+
+=== juice
+
+Easing functions to 'juice' a game. Interpolation to juice your game.
+All interpolations available: 
+
+- pow2, pow3, pow4, pow5,
+- powIn2, powIn3, powIn4, powIn5,
+- powOut2, powOut3, powOut4, powOut5,
+- sine, sineIn, sineOut,
+- circle, circleIn, circleOut,
+- elastic, elasticIn, elasticOut,
+- swing, swingIn, swingOut,
+- bounce, bounceIn, bounceOut,
+- exp10, expIn10, expOut10,
+- exp5, expIn5, expOut5,
+- linear 
+
+==== juice.pow2()
+
+
+
+```lua
+juice.pow2(progress) -- Give a percentage (progress) of the interpolation
+juice.pow2(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.pow2(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.pow2(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "pow2"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.pow3()
+
+
+
+```lua
+juice.pow3(progress) -- Give a percentage (progress) of the interpolation
+juice.pow3(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.pow3(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.pow3(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "pow3"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.pow4()
+
+
+
+```lua
+juice.pow4(progress) -- Give a percentage (progress) of the interpolation
+juice.pow4(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.pow4(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.pow4(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "pow4"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.pow5()
+
+
+
+```lua
+juice.pow5(progress) -- Give a percentage (progress) of the interpolation
+juice.pow5(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.pow5(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.pow5(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "pow5"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.powIn2()
+
+
+
+```lua
+juice.powIn2(progress) -- Give a percentage (progress) of the interpolation
+juice.powIn2(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.powIn2(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.powIn2(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "powIn2"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.powIn3()
+
+
+
+```lua
+juice.powIn3(progress) -- Give a percentage (progress) of the interpolation
+juice.powIn3(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.powIn3(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.powIn3(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "powIn3"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.powIn4()
+
+
+
+```lua
+juice.powIn4(progress) -- Give a percentage (progress) of the interpolation
+juice.powIn4(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.powIn4(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.powIn4(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "powIn4"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.powIn5()
+
+
+
+```lua
+juice.powIn5(progress) -- Give a percentage (progress) of the interpolation
+juice.powIn5(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.powIn5(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.powIn5(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "powIn5"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.powOut2()
+
+
+
+```lua
+juice.powOut2(progress) -- Give a percentage (progress) of the interpolation
+juice.powOut2(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.powOut2(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.powOut2(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "powOut2"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.powOut3()
+
+
+
+```lua
+juice.powOut3(progress) -- Give a percentage (progress) of the interpolation
+juice.powOut3(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.powOut3(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.powOut3(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "powOut3"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.powOut4()
+
+
+
+```lua
+juice.powOut4(progress) -- Give a percentage (progress) of the interpolation
+juice.powOut4(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.powOut4(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.powOut4(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "powOut4"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.powOut5()
+
+
+
+```lua
+juice.powOut5(progress) -- Give a percentage (progress) of the interpolation
+juice.powOut5(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.powOut5(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.powOut5(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "powOut5"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.sine()
+
+
+
+```lua
+juice.sine(progress) -- Give a percentage (progress) of the interpolation
+juice.sine(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.sine(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.sine(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "sine"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.sineIn()
+
+
+
+```lua
+juice.sineIn(progress) -- Give a percentage (progress) of the interpolation
+juice.sineIn(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.sineIn(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.sineIn(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "sineIn"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.sineOut()
+
+
+
+```lua
+juice.sineOut(progress) -- Give a percentage (progress) of the interpolation
+juice.sineOut(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.sineOut(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.sineOut(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "sineOut"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.circle()
+
+
+
+```lua
+juice.circle(progress) -- Give a percentage (progress) of the interpolation
+juice.circle(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.circle(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.circle(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "circle"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.circleIn()
+
+
+
+```lua
+juice.circleIn(progress) -- Give a percentage (progress) of the interpolation
+juice.circleIn(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.circleIn(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.circleIn(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "circleIn"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.circleOut()
+
+
+
+```lua
+juice.circleOut(progress) -- Give a percentage (progress) of the interpolation
+juice.circleOut(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.circleOut(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.circleOut(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "circleOut"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.elastic()
+
+
+
+```lua
+juice.elastic(progress) -- Give a percentage (progress) of the interpolation
+juice.elastic(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.elastic(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.elastic(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "elastic"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.elasticIn()
+
+
+
+```lua
+juice.elasticIn(progress) -- Give a percentage (progress) of the interpolation
+juice.elasticIn(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.elasticIn(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.elasticIn(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "elasticIn"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.elasticOut()
+
+
+
+```lua
+juice.elasticOut(progress) -- Give a percentage (progress) of the interpolation
+juice.elasticOut(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.elasticOut(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.elasticOut(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "elasticOut"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.swing()
+
+
+
+```lua
+juice.swing(progress) -- Give a percentage (progress) of the interpolation
+juice.swing(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.swing(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.swing(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "swing"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.swingIn()
+
+
+
+```lua
+juice.swingIn(progress) -- Give a percentage (progress) of the interpolation
+juice.swingIn(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.swingIn(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.swingIn(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "swingIn"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.swingOut()
+
+
+
+```lua
+juice.swingOut(progress) -- Give a percentage (progress) of the interpolation
+juice.swingOut(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.swingOut(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.swingOut(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "swingOut"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.bounce()
+
+
+
+```lua
+juice.bounce(progress) -- Give a percentage (progress) of the interpolation
+juice.bounce(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.bounce(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.bounce(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "bounce"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.bounceIn()
+
+
+
+```lua
+juice.bounceIn(progress) -- Give a percentage (progress) of the interpolation
+juice.bounceIn(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.bounceIn(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.bounceIn(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "bounceIn"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.bounceOut()
+
+
+
+```lua
+juice.bounceOut(progress) -- Give a percentage (progress) of the interpolation
+juice.bounceOut(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.bounceOut(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.bounceOut(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "bounceOut"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.exp10()
+
+
+
+```lua
+juice.exp10(progress) -- Give a percentage (progress) of the interpolation
+juice.exp10(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.exp10(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.exp10(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "exp10"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.expIn10()
+
+
+
+```lua
+juice.expIn10(progress) -- Give a percentage (progress) of the interpolation
+juice.expIn10(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.expIn10(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.expIn10(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "expIn10"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.expOut10()
+
+
+
+```lua
+juice.expOut10(progress) -- Give a percentage (progress) of the interpolation
+juice.expOut10(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.expOut10(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.expOut10(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "expOut10"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.exp5()
+
+
+
+```lua
+juice.exp5(progress) -- Give a percentage (progress) of the interpolation
+juice.exp5(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.exp5(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.exp5(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "exp5"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.expIn5()
+
+
+
+```lua
+juice.expIn5(progress) -- Give a percentage (progress) of the interpolation
+juice.expIn5(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.expIn5(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.expIn5(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "expIn5"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.expOut5()
+
+
+
+```lua
+juice.expOut5(progress) -- Give a percentage (progress) of the interpolation
+juice.expOut5(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.expOut5(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.expOut5(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "expOut5"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== juice.linear()
+
+
+
+```lua
+juice.linear(progress) -- Give a percentage (progress) of the interpolation
+juice.linear(start, end, progress) -- Interpolate the value given a start and an end value.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|progress |Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+    
+    for x = 0, width, 2 do
+        local y = juice.linear(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.linear(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "linear"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+++++
+
+
+
+=== keys
+
+List of the available keys. To be used with ctrl.
+
+- `keys.up`, `keys.down`, `keys.left`, `keys.right` for directions.
+- `keys.a` to `keys.z` and `keys.0` to `keys.9` for letters and numbers.
+- `keys.space` and `keys.enter` for other keys.
+
+
+
+=== map
+
+Access map created with LDTk ( https://ldtk.io/ ).
+
+==== map.level()
+
+Set the current level to use.
+
+```lua
+map.level() -- Return the index of the current level.
+map.level(level) -- Set the current level to use. The level can be an index, the name or the id defined by LDTK. Return the previous index level or NIL if the new level is invalid.
+```
+
+
+==== map.layer()
+
+Get the list of layers from the actual level.
+
+```lua
+map.layer(layer_index) -- Get the layer at the specified index or name from the actual level. The layer in the front is 0.
+map.layer() -- Get the list of layers from the actual level.
+```
+
+
+==== map.from()
+
+Convert cell coordinates cx, cy into map screen coordinates x, y.
+
+```lua
+map.from(arg1, arg2) -- Convert the cell coordinates into coordinates as a table [x,y].
+map.from(cell) -- Convert the cell coordinates from a table [cx,cy] into screen coordinates as a table [x,y].
+```
+
+
+==== map.to()
+
+Convert screen coordinates x, y into map cell coordinates cx, cy.
+For example, coordinates of the player can be converted to cell coordinates to access the flag of the tile matching the player coordinates.
+
+```lua
+map.to(x, y) -- Convert the coordinates into cell coordinates as a table [cx,cy].
+map.to(coordinates) -- Convert the coordinates from a table [x,y] into cell coordinates as a table [cx,cy].
+```
+
+
+==== map.cflag()
+
+Get the flag from a tile, using cell coordinates.
+
+```lua
+map.cflag(cx, cy) -- Get the flag from the tile at the coordinate cx,cy.
+map.cflag(cx, cy, layer) -- Get the flag from the tile at the coordinate cx,cy from a specific layer.
+```
+
+
+==== map.flag()
+
+Get the flag from a tile, using screen coordinates.
+
+```lua
+map.flag(x, y) -- Get the flag from the tile at the coordinate x,y.
+map.flag(x, y, layer) -- Get the flag from the tile at the coordinate x,y from a specific layer.
+```
+
+
+==== map.entities()
+
+Table with all entities by type (ie: `map.entities["player"]`).
+            
+```
+local entities = map.entities()
+local players = entities["Player"]
+for entity in all(players) do 
+    shape.rectf(entity.x, entity.y, entity.width, entity.height, 8) -- display an entity using a rectangle
+end
+[...]
+entity.fields -- access custom field of the entity
+```
+        
+
+```lua
+map.entities() -- Get all entities from all entities layer as a table, with an entry per type.
+map.entities(a) -- Get all entities from the specific layer as a table, with an entry per type.
+```
+
+
+==== map.draw()
+
+Draw map tiles on the screen.
+
+```lua
+map.draw() -- Draw all active layers on the screen.
+map.draw(index) -- Draw the layer with the name or the index on the screen.
+```
+
+
+
+=== math
+
+Math functions. Please note that standard Lua math methods are also available.
+
+==== math.pi
+
+value of pi (~3.14)
+
+++++
+<tiny-editor style="display: none;"  >
+function _update()
+    gfx.cls()
+    print(math.pi, 10, 10) -- value of pi (~3.14)
+end
+</tiny-editor>
+++++
+
+
+==== math.huge
+
+positive infinity value.
+
+++++
+<tiny-editor style="display: none;"  >
+function _update()
+    gfx.cls()
+    print(math.huge, 10, 10) -- positive infinity value.
+end
+</tiny-editor>
+++++
+
+
+==== math.sign()
+
+Return the sign of the number: -1 if negative. 1 otherwise.
+
+```lua
+math.sign(number) -- Return the sign of the number.
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+    local cos = math.cos(tiny.t)
+    print("cos: "..cos)
+    print("sign: "..math.sign(cos), 0, 8)
+
+    shape.line(128, 128, 128 + cos * 128, 128, 9)
+end
+
+</tiny-editor>
+++++
+
+
+==== math.clamp()
+
+Clamp the value between 2 values.
+
+```lua
+math.clamp(a, value, b) -- Clamp the value between a and b. If a is greater than b, then b will be returned.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|a |The minimum value.
+|b |The maximum value.
+|value |The value to be clamped.      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+    
+    local pos = ctrl.touch()
+
+    local x = math.clamp(60, pos.x, 256 - 60)
+    
+    gfx.dither(0xA5A5)
+    shape.line(64, 129, 256 - 60, 129, 9)
+    gfx.dither()
+    shape.rect(60, 128, 4, 4, 9)
+    shape.rect(256 - 60, 128, 4, 4, 9)
+    shape.circlef(pos.x, pos.y, 2, 9)
+    shape.circle(x, 129, 2, 8)
+end
+
+</tiny-editor>
+++++
+
+
+==== math.dst()
+
+Compute the distance between two points.
+
+```lua
+math.dst(x1, y1, x2, y2) -- Distance between (x1, y1) and (x2, y2).
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+    
+    local pos = ctrl.touch()
+    shape.line(pos.x, pos.y, 128, 128, 3)
+    shape.circlef(128, 128, 2, 9)
+    shape.circlef(pos.x, pos.y, 2, 9)
+
+    -- midle of the line
+    local x = (pos.x - 128) * 0.5
+    local y = (pos.y - 128) * 0.5
+    
+    -- display dst
+    local dst = math.dst(128, 128, pos.x, pos.y)
+    print("dst: "..dst, 128 + x, 128 + y)
+end
+
+</tiny-editor>
+++++
+
+
+==== math.dst2()
+
+Compute the distance between two points not squared. Use this method to know if an coordinate is closer than another.
+
+```lua
+math.dst2(x1, y1, x2, y2) -- Distance not squared between (x1, y1) and (x2, y2).
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+local a = {
+    x = 10 + math.rnd(236),
+    y = 10 + math.rnd(236)
+}
+
+local b = {
+    x = 10 + math.rnd(236),
+    y = 10 + math.rnd(236)
+}
+
+function _draw()
+    gfx.cls()
+    
+    local pos = ctrl.touch()
+
+    if math.dst2(pos.x, pos.y, a.x, a.y) > math.dst2(pos.x, pos.y, b.x, b.y) then
+        -- b is closer
+        shape.line(pos.x, pos.y, b.x, b.y, 3)
+    else
+        -- a is closer
+        shape.line(pos.x, pos.y, a.x, a.y, 3)
+    end
+    shape.circlef(a.x, a.y, 2, 9)
+    shape.circlef(b.x, b.y, 2, 9)
+    shape.circlef(pos.x, pos.y, 2, 9)
+end
+
+</tiny-editor>
+++++
+
+
+==== math.rnd()
+
+Generate random values
+
+```lua
+math.rnd() -- Generate a random int (negative or positive value)
+math.rnd(until) -- Generate a random value between 1 until the argument. If a table is passed, it'll return a random element of the table.
+math.rnd(a, b) -- Generate a random value between a and b.
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+local value = {}
+function _update()
+    table.insert(value, math.rnd(126))
+
+    if(#value > 50) then
+        table.remove(value, #value)
+    end
+end
+
+function _draw()
+    gfx.cls()
+    local y = 0
+    for v in all(value) do
+        print("rnd: "..v, 4, y)
+        y = y + 6
+    end
+end
+
+</tiny-editor>
+++++
+
+
+==== math.roverlap()
+
+Check if two (r)ectangles overlaps.
+
+```lua
+math.roverlap(rect1, rect2) -- Check if the rectangle rect1 overlaps with the rectangle rect2.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|rect1 |Rectangle as a table {x, y, with, height}.
+|rect2 |Rectangle as a table {x, y, with, height}.      
+|===
+
+
+==== math.perlin()
+
+Perlin noise. The random generated value is between 0.0 and 1.0.
+
+```lua
+math.perlin(x, y, z) -- Generate a random value regarding the parameters x,y and z.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|x |A value between 0.0 and 1.0.
+|y |A value between 0.0 and 1.0.
+|z |A value between 0.0 and 1.0.      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls(8)
+
+    gfx.dither(0x0001)
+    local x = math.perlin(0.1, 0.2, tiny.frame / 100)
+    local y = math.perlin(0.4, 0.5, tiny.frame / 100)
+    shape.circlef(x * 256, y * 256, 64, 7)
+end
+
+</tiny-editor>
+++++
+
+
+
+=== notes
+
+List all notes from C0 to B8. Please note that bemols are the note with b (ie: Gb2) while sharps are the note with s (ie: As3).
+
+==== notes.note()
+
+Get the name of a note regarding the note index (ie: C0 = 0, Cs0 = 1, ...)
+
+```lua
+notes.note(note_index) -- Get the name of a note regarding the note index (ie: C0 = 0, Cs0 = 1, ...)
+```
+
+
+
+=== sfx
+
+Sound API to play/loop/stop a sound.
+A sound can be created using the sound editor, using the command line `tiny-cli sfx <filename>`.
+WARNING: Because of browser behaviour, a sound can *only* be played only after the first 
+user interaction. 
+
+Avoid to start a music or a sound at the beginning of the game.
+Before it, force the player to hit a key or click by adding an interactive menu 
+or by starting the sound as soon as the player is moving.
+
+
+==== sfx.save()
+
+Save the actual music using the filename.
+
+```lua
+sfx.save(filename) -- Save the actual music using the filename
+```
+
+
+==== sfx.load()
+
+Load the actual SFX sound as the actual music.
+
+```lua
+sfx.load(filename) -- Load the actual SFX sound as the actual music using filename or its index
+```
+
+
+==== sfx.instrument()
+
+Access instrument using its index or its name.
+
+```lua
+sfx.instrument(arg) -- Access instrument using its index or its name.
+```
+
+
+==== sfx.bar()
+
+Access instrument using its index or its name.
+
+```lua
+sfx.bar(arg) -- Access instrument using its index or its name.
+```
+
+
+==== sfx.play()
+
+Play the bar by it's index of the current sound. The index of a bar of the current music.
+
+```lua
+sfx.play() -- Play the sound at the index 0.
+sfx.play(sound) -- Play the sound by it's index.
+```
+
+
+==== sfx.loop()
+
+Loop the bar by it's index of the current sound. The index of a bar of the current music.
+
+```lua
+sfx.loop() -- Loop the sound at the index 0.
+sfx.loop(sound) -- Loop the sound by it's index.
+```
+
+
+==== sfx.stop()
+
+Stop the bar by it's index of the current sound. The index of a bar of the current music.
+
+```lua
+sfx.stop() -- Stop the sound at the index 0.
+sfx.stop(sound) -- Stop the sound by it's index.
+```
+
+
+
+=== shape
+
+Shape API to draw...shapes. Those shapes can be circle, rectangle, line or oval.All shapes can be draw filed or not filed.
+
+==== shape.rect()
+
+Draw a rectangle.
+
+```lua
+shape.rect(x, y, width, height, color) -- Draw a rectangle.
+shape.rect(rect) -- Draw a rectangle.
+shape.rect(rect, color) -- Draw a rectangle using a rectangle and a color.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|rect |A rectangle {x, y, width, height, color}
+|rect |A rectangle {x, y, width, height}      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+  gfx.cls()
+
+  -- filled rectangle
+  print("filled rectangle", 20, 10)
+  shape.rectf(20, 20, 20, 20, 4)
+  shape.rectf(30, 30, 20, 20, 5)
+  shape.rectf(40, 40, 20, 20, 6)
+
+  print("non filled rectangle", 20, 65)
+  -- non filled rectangle
+  shape.rect(50, 70, 20, 20, 7)
+  shape.rect(60, 80, 20, 20, 8)
+  shape.rect(70, 90, 20, 20, 9)
+
+  print("rectangle with different width", 20, 115)
+  shape.rect(20, 120, 30, 20, 10)
+  shape.rect(20, 140, 40, 20, 12)
+  shape.rect(20, 160, 60, 20, 13)
+
+end
+
+</tiny-editor>
+++++
+
+
+==== shape.oval()
+
+Draw an oval.
+
+```lua
+shape.oval(centerX, centerY, radiusX, radiusY) -- Draw an oval using the default color.
+shape.oval(centerX, centerY, radiusX, radiusY, color) -- Draw an oval using the specified color.
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+
+    local pos = ctrl.touch()
+    local w = math.max(0, pos.x)
+    local h = math.max(0, pos.y)
+   
+    shape.ovalf(w, h, w, h, 5)
+    shape.oval(256 - w, 256 - h, w, h, 1)
+    
+
+    print("size w: "..w.." h: "..h)
+end
+
+</tiny-editor>
+++++
+
+
+==== shape.ovalf()
+
+Draw an oval filled.
+
+```lua
+shape.ovalf(centerX, centerY, radiusX, radiusY) -- Draw a filled oval using the default color.
+shape.ovalf(centerX, centerY, radiusX, radiusY, color) -- Draw a filled oval using the specified color.
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+
+    local pos = ctrl.touch()
+    local w = math.max(0, pos.x)
+    local h = math.max(0, pos.y)
+   
+    shape.ovalf(w, h, w, h, 5)
+    shape.oval(256 - w, 256 - h, w, h, 1)
+    
+
+    print("size w: "..w.." h: "..h)
+end
+
+</tiny-editor>
+++++
+
+
+==== shape.rectf()
+
+Draw a filled rectangle.
+
+```lua
+shape.rectf(x, y, width, height, color) -- Draw a filled rectangle.
+shape.rectf(rect) -- Draw a filled rectangle.
+shape.rectf(rect, color) -- Draw a filled rectangle using a rectangle and a color.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|rect |A rectangle {x, y, width, height, color}
+|rect |A rectangle {x, y, width, height}      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+  gfx.cls()
+
+  -- filled rectangle
+  print("filled rectangle", 20, 10)
+  shape.rectf(20, 20, 20, 20, 4)
+  shape.rectf(30, 30, 20, 20, 5)
+  shape.rectf(40, 40, 20, 20, 6)
+
+  print("non filled rectangle", 20, 65)
+  -- non filled rectangle
+  shape.rect(50, 70, 20, 20, 7)
+  shape.rect(60, 80, 20, 20, 8)
+  shape.rect(70, 90, 20, 20, 9)
+
+  print("rectangle with different width", 20, 115)
+  shape.rect(20, 120, 30, 20, 10)
+  shape.rect(20, 140, 40, 20, 12)
+  shape.rect(20, 160, 60, 20, 13)
+
+end
+
+</tiny-editor>
+++++
+
+
+==== shape.circlef()
+
+Draw a filled circle.
+
+```lua
+shape.circlef(centerX, centerY, radius, color) -- Draw a circle at the coordinate (centerX, centerY) with the radius and the color.
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+
+    -- filled circle
+    shape.circlef(20, 20, 20, 4)
+    shape.circlef(30, 30, 20, 5)
+    shape.circlef(40, 40, 20, 6)
+    print("filled circle", 20, 10)
+
+    -- non filled circle
+    shape.circle(50, 70, 10, 7)
+    shape.circle(60, 80, 10, 8)
+    shape.circle(70, 90, 10, 9)
+    print("non filled circle", 20, 65)
+
+    shape.circle(80, 120, 15, 10)
+    shape.circle(80, 140, 20, 16)
+    shape.circle(80, 160, 30, 14)
+    print("circle with different radius", 20, 115)
+
+end
+
+</tiny-editor>
+++++
+
+
+==== shape.line()
+
+Draw a line.
+
+```lua
+shape.line(x0, y0, x1, y2, color) -- Draw a line.
+shape.line(x0, y0, x1, y1) -- Draw a line with a default color.
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+  gfx.cls()
+  
+  local i =0
+  for x =16, 240, 16 do
+    for y =16, 240, 16 do
+      shape.line(x, y, 256 - x, 256 - y, i)
+      i = i + 1
+    end
+  end
+end
+
+</tiny-editor>
+++++
+
+
+==== shape.circle()
+
+Draw a circle.
+
+```lua
+shape.circle(a, b, c) -- Draw a circle with the default color.
+shape.circle(centerX, centerY, radius, color) -- Draw a circle.
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+
+    -- filled circle
+    shape.circlef(20, 20, 20, 4)
+    shape.circlef(30, 30, 20, 5)
+    shape.circlef(40, 40, 20, 6)
+    print("filled circle", 20, 10)
+
+    -- non filled circle
+    shape.circle(50, 70, 10, 7)
+    shape.circle(60, 80, 10, 8)
+    shape.circle(70, 90, 10, 9)
+    print("non filled circle", 20, 65)
+
+    shape.circle(80, 120, 15, 10)
+    shape.circle(80, 140, 20, 16)
+    shape.circle(80, 160, 30, 14)
+    print("circle with different radius", 20, 115)
+
+end
+
+</tiny-editor>
+++++
+
+
+==== shape.trianglef()
+
+Draw a filled triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3) and color.
+
+```lua
+shape.trianglef(x1, y1, x2, y2, x3, y3, color) -- Draw a filled triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function tri(f, fill)
+  local x1 = 128 + math.cos(f) * 64
+  local y1 = 128 + math.sin(f) * 64
+
+  local x2 = 128 + math.cos(f + math.pi * 1/3) * 64
+  local y2 = 128 + math.sin(f + math.pi * 1/3) * 64
+
+  local x3 = 128 + math.cos(f+ math.pi * 2/3) * 64
+  local y3 = 128 + math.sin(f +math.pi * 2/3) * 64
+
+  if fill then
+    shape.trianglef(x3, y3, x2, y2, x1, y1, 8)
+  else
+    shape.triangle(x1, y1, x2, y2, x3, y3, 8)
+  end
+end
+
+function _draw()
+  gfx.cls()
+  local f = tiny.frame * 0.01
+
+  tri(f, false)
+  tri(f*2, true)
+end
+
+</tiny-editor>
+++++
+
+
+==== shape.triangle()
+
+Draw a triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3) and color.
+
+```lua
+shape.triangle(x1, y1, x2, y2, x3, y3, color) -- Draw a triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function tri(f, fill)
+  local x1 = 128 + math.cos(f) * 64
+  local y1 = 128 + math.sin(f) * 64
+
+  local x2 = 128 + math.cos(f + math.pi * 1/3) * 64
+  local y2 = 128 + math.sin(f + math.pi * 1/3) * 64
+
+  local x3 = 128 + math.cos(f+ math.pi * 2/3) * 64
+  local y3 = 128 + math.sin(f +math.pi * 2/3) * 64
+
+  if fill then
+    shape.trianglef(x3, y3, x2, y2, x1, y1, 8)
+  else
+    shape.triangle(x1, y1, x2, y2, x3, y3, 8)
+  end
+end
+
+function _draw()
+  gfx.cls()
+  local f = tiny.frame * 0.01
+
+  tri(f, false)
+  tri(f*2, true)
+end
+
+</tiny-editor>
+++++
+
+
+==== shape.gradient()
+
+Draw a gradient using dithering, only from color c1 to color c2.
+
+```lua
+shape.gradient(x, y, width, height, color1, color2, is_horizontal) -- Draw a gradient using dithering, only from color c1 to color c2.
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    
+ local c1 = 2
+ local c2 = 3   
+
+    gfx.cls(c1)
+    shape.rectf(0, 256 - 16, 256, 16, c2)
+    for x=0,240,16 do
+        shape.gradient(x, 16 * math.cos(2 * 3.14 * (x / 256) + tiny.t * 2), 16, 256, c1, c2, false)
+    end
+      
+end
+
+</tiny-editor>
+++++
+
+
+
+=== spr
+
+Sprite API to draw or update sprites.
+
+==== spr.pget()
+
+Get the color index at the coordinate (x,y) from the current spritesheet.
+
+```lua
+spr.pget(x, y) -- get the color index at the coordinate (x,y) from the current spritesheet.
+```
+
+++++
+<tiny-editor style="display: none;" sprite="resources/tiny-town.png" >
+
+function _draw()
+    local pos = ctrl.touch()
+    
+    gfx.cls()
+    
+    spr.sdraw()
+    shape.circlef(pos.x - 4, pos.y - 4, 8, 3)
+    local color = spr.pget(pos.x, pos.y)
+    if(color ~= nil) then
+        print("index color: "..color, 7, 0)
+        shape.rectf(0, 0, 6, 6, color)
+        shape.circlef(pos.x - 4, pos.y - 4, 6, color)
+    end
+end
+
+</tiny-editor>
+++++
+
+
+==== spr.pset()
+
+Set the color index at the coordinate (x,y) in the current spritesheet.
+
+```lua
+spr.pset(x, y, color) -- Set the color index at the coordinate (x,y) in the current spritesheet.
+```
+
+++++
+<tiny-editor style="display: none;" sprite="resources/tiny-dungeon.png" >
+
+function _draw()
+    local pos = ctrl.touch()
+
+    local touching = ctrl.touching(0)
+    gfx.cls()
+
+   spr.sdraw()
+
+   if touching ~= nil then
+      spr.pset(pos.x, pos.y, 9)
+   end
+   print("click to alter", 45, 96)
+   shape.circle(64 + 8, 128 + 8, 32, 1)
+   shape.circlef(128 + 8, 128 + 8, 32, 1)
+   spr.draw(100, 128, 128)
+
+   shape.circlef(pos.x, pos.y, 2, 3)
+end
+
+
+</tiny-editor>
+++++
+
+
+==== spr.sheet()
+
+Switch to another spritesheet. The index of the spritesheet is given by it's position in the spritesheets field from the `_tiny.json` file.The first spritesheet is at the index 0. It retuns the previous spritesheet. The spritesheet can also be referenced by its filename.
+
+```lua
+spr.sheet() -- Switch to the first spritesheet
+spr.sheet(spritesheetN) -- Switch to the N spritesheet
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+local current = 0
+function _update()
+    local x = math.perlin((tiny.frame % 100) / 100, (tiny.frame % 100) / 100, (tiny.frame % 100) / 100)
+    local y = math.perlin((tiny.frame  * 0.5 % 100) / 100, (tiny.frame % 100) / 100, (tiny.frame * 0.5 % 100) / 100)
+
+    gfx.cls()
+    shape.circlef(x * 256, y * 256, 10, 8)
+    gfx.to_sheet("circle.png")
+    
+    gfx.cls()
+    shape.rectf(x * 256, y * 256, 20, 20, 8)
+    gfx.to_sheet("rect.png")
+
+    if ctrl.pressed(keys.space) then
+        current = (current + 1) % 2
+    end
+end
+
+function _draw()
+    if current == 0 then
+        spr.sheet("circle.png")
+    else
+        spr.sheet("rect.png")
+    end
+    spr.sdraw()
+end
+
+</tiny-editor>
+++++
+
+
+==== spr.sdraw()
+
+S(uper) Draw a fragment from the spritesheet.
+
+```lua
+spr.sdraw() -- Draw the full spritesheet at default coordinate (0, 0)
+spr.sdraw(x, y) -- Draw the full spritesheet at coordinate (x, y)
+spr.sdraw(x, y, sprX, sprY) -- Draw the full spritesheet at coordinate (x, y) from the sprite (sprX, sprY)
+spr.sdraw(x, y, sprX, sprY, width, height, flipX, flipY) -- Draw a fragment from the spritesheet at the coordinate (x, y) from the sprite (sprX, sprY) with the width and height.
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|flipX |flip on the x axis (default: false)
+|flipY |flip on the y axis (default: false)
+|height |height of the spritesheet to copy (default height of the spritesheet)
+|sprX |x coordinate from the spritesheet (default 0)
+|sprY |y coordinate from the spritesheet (default 0)
+|width |width of the spritesheet to copy (default width of the spritesheet)
+|x |screen x coordinate to draw the sprite (default 0)
+|y |screen y coordinate to draw the sprite (default 0)      
+|===
+
+++++
+<tiny-editor style="display: none;" sprite="resources/tiny-town.png" >
+
+function _draw()
+    local pos = ctrl.touch()
+    
+    gfx.cls()
+    
+    spr.sdraw()
+    shape.circlef(pos.x - 4, pos.y - 4, 8, 3)
+    local color = spr.pget(pos.x, pos.y)
+    if(color ~= nil) then
+        print("index color: "..color, 7, 0)
+        shape.rectf(0, 0, 6, 6, color)
+        shape.circlef(pos.x - 4, pos.y - 4, 6, color)
+    end
+end
+
+</tiny-editor>
+++++
+
+
+==== spr.draw()
+
+Draw a sprite.
+
+```lua
+spr.draw(sprN) -- Draw a sprite at the default coordinate (0, 0).
+spr.draw(sprN, x, y) -- Draw a sprite.
+spr.draw(sprN, x, y, flipX, flipY) -- Draw a sprite and allow flip on x or y axis.
+```
+
+++++
+<tiny-editor style="display: none;" sprite="resources/tiny-town.png" >
+
+function _init()
+  id = 1
+end
+
+function _draw()
+    if ctrl.pressed(keys.left) then
+      id = id - 1
+    elseif ctrl.pressed(keys.right) then
+      id = id + 1
+    end
+
+    gfx.cls()
+    print("sprite index "..id.. " (press left or right to change)", 50, 112)
+    spr.draw(id, 120, 120)
+end
+
+</tiny-editor>
+++++
+
+
+
+=== std
+
+Standard library.
+
+==== new()
+
+Create new instance of a class by creating a new table and setting the metatable. It allow to create kind of Object Oriented Programming.
+
+ 
+
+```lua
+new(class) -- Create new instance of class.
+new(class, default) -- Create new instance of class using default values.
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+local Player = {
+    x = 128,
+    y = 128,
+    color = 8
+}
+
+function Player:draw()
+    shape.rectf(self.x, self.y, 10, 10, self.color)
+end
+
+function _init()
+    -- create a new player
+    player = new(Player)
+    -- create a new player with default vaules
+    player2 = new(Player, {x = 200, y = 200, color = 9})
+end
+
+function _draw()
+    gfx.cls()
+    player:draw() -- call the draw method on the player instance.
+    player2:draw() -- call the draw method on the player2 instance.
+end
+
+</tiny-editor>
+++++
+
+
+==== merge()
+
+Add *all key/value* from the table `source` to the table `dest`.
+
+```lua
+merge(source, dest) -- Merge source into dest.
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+    local src = {x = 1, y = 2, z = 3}
+    local dst = {a = 4, b = 5}
+    local result = merge(src, dst)
+    debug.table(result)
+end
+
+</tiny-editor>
+++++
+
+
+==== append()
+
+Append *all values* from the table `source` to the table `dest`.
+
+```lua
+append(source, dest) -- Copy source into dest.
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+    local src = {1, 2, 3}
+    local dst = {4, 5}
+    local result = append(src, dst)
+    debug.table(result)
+end
+
+</tiny-editor>
+++++
+
+
+==== all()
+
+Iterate over values of a table.
+
+- If you want to iterate over keys, use `pairs(table)`.
+ - If you want to iterate over index, use `ipairs(table)`.
+ - If you want to iterate in reverse, use `rpairs(table)`.
+
+
+```lua
+all(table) -- Iterate over the values of the table
+```
+
+
+==== rpairs()
+
+Iterate over values of a table in reverse order. The iterator return an index and the value. The method is useful to remove elements from a table while iterating on it.
+
+```lua
+rpairs(table) -- Iterate over the values of the table
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+    local data = {
+        { name = "riri" },
+        { name = "fifi" },
+        { name = "loulou" }
+    }
+
+    local y = 0
+    for index, key in rpairs(data) do
+        print(index .. " - " .. key.name, 10, y)
+        y = y + 10
+    end
+end
+
+</tiny-editor>
+++++
+
+
+==== print()
+
+Print on the screen a string.
+
+```lua
+print(str) -- print on the screen a string at (0,0) with a default color.
+print(str, x, y) -- print on the screen a string with a default color.
+print(str, x, y, color) -- print on the screen a string with a specific color.
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+    -- every character is a sprite 4x4 pixels.
+    print("hello")
+    print("world", 10, 10)
+    print("how", 10, 20, 4)
+    print("are", 26, 20, 5)
+    print("you", 42, 20, 6)
+    print("...", 58, 20, math.rnd(10))
+end
+
+</tiny-editor>
+++++
+
+
+
+=== test
+
+Test method utilities used when tests are run. See link:#_the_tiny_cli_run_command[Run command]
+
+==== test.eq()
+
+Assert that `expected` and `actual` are equals
+
+```lua
+test.eq(expected, actual) -- Assert that `expected` and `actual` are equals
+```
+
+
+==== test.neq()
+
+Assert that `expected` and `actual` are __not__ equals
+
+```lua
+test.neq(expected, actual) -- Assert that `expected` and `actual` are not equals
+```
+
+
+==== test.t()
+
+Assert that `actual` is true
+
+```lua
+test.t(actual) -- Assert that `actual` is true
+```
+
+
+==== test.t()
+
+Assert that `actual` is false
+
+```lua
+test.t(actual) -- Assert that `actual` is false
+```
+
+
+==== test.create()
+
+Create a new `test` named `name`
+
+```lua
+test.create(name, test) -- Create a new `test` named `name`
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|name |The name of the test
+|test |The test: it has to be a function      
+|===
+
+
+
+=== tiny
+
+Tiny Lib which offer offer the current frame (`tiny.frame`), the current time (`tiny.time`), delta time (`tiny.dt`) and to switch to another script using `exit`.
+
+==== tiny.dt
+
+Delta time between two frame. As Tiny is a fixed frame engine, it's always equal to 1/60
+
+++++
+<tiny-editor style="display: none;"  >
+function _update()
+    gfx.cls()
+    print(tiny.dt, 10, 10) -- Delta time between two frame. As Tiny is a fixed frame engine, it's always equal to 1/60
+end
+</tiny-editor>
+++++
+
+
+==== tiny.t
+
+Time elapsed since the start of the game.
+
+++++
+<tiny-editor style="display: none;"  >
+function _update()
+    gfx.cls()
+    print(tiny.t, 10, 10) -- Time elapsed since the start of the game.
+end
+</tiny-editor>
+++++
+
+
+==== tiny.frame
+
+Number of frames elapsed since the start of the game.
+
+++++
+<tiny-editor style="display: none;"  >
+function _update()
+    gfx.cls()
+    print(tiny.frame, 10, 10) -- Number of frames elapsed since the start of the game.
+end
+</tiny-editor>
+++++
+
+
+==== tiny.exit()
+
+Exit the actual script to switch to another one. The next script to use is identified by it's index. The index of the script is the index of it in the list of scripts from the `_tiny.json` file.The first script is at the index 0.
+
+```lua
+tiny.exit(scriptIndex) -- Exit the actual script to switch to another one.
+```
+
+
+
+=== vec2
+
+Vector2 manipulation library.
+
+==== vec2.create()
+
+Create a vector 2 as a table { x, y }.
+
+```lua
+vec2.create(x, y) -- Create a vector 2 as a table { x, y }.
+vec2.create(vec2) -- Create a vector 2 as a table { x, y } using another vector 2.
+```
+
+
+==== vec2.add()
+
+Add vector2 to another vector2
+
+```lua
+vec2.add(v1, v2) -- Add a vector 2 {x, y} to another vector 2 {x, y}
+vec2.add(x1, y1, x2, y2) -- Add a destructured vector 2 to another destructured vector 2
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|v1 |vector 2 as a table {x, y}
+|v2 |vector 2 as a table {x, y}      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _init()
+    gfx.camera(-128, -128)
+
+    local v1 = vec2.create(32, 38)
+    local v2 = vec2.create(20, 2)
+
+    gfx.cls()
+    print("v1", 2, 15, 10)
+    shape.line(0, 0, v1.x, v1.y, 10)
+    print("v2", 23, 3, 9)
+    shape.line(0, 0, v2.x, v2.y, 9)
+
+    local v3 = vec2.add(v1, v2)
+
+    print("v1 + v2", 30, 15, 11)
+    gfx.dither(0xAAAA)
+    shape.line(0, 0, v3.x, v3.y, 11)
+    gfx.dither()
+end
+
+</tiny-editor>
+++++
+
+
+==== vec2.sub()
+
+Subtract another vector from another vector
+
+```lua
+vec2.sub(v1, v2) -- Subtract a vector 2 {x, y} from another vector 2 {x, y}
+vec2.sub(x1, y1, x2, y2) -- Subtract a destructured vector 2 from another destructured vector 2
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|v1 |vector 2 as a table {x, y}
+|v2 |vector 2 as a table {x, y}      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _init()
+    gfx.camera(-128, -128)
+
+    local v1 = vec2.create(32, 38)
+    local v2 = vec2.create(20, 2)
+
+    gfx.cls()
+    print("v1", 18, 15, 10)
+    shape.line(0, 0, v1.x, v1.y, 10)
+    print("v2", 23, 3, 9)
+    shape.line(0, 0, v2.x, v2.y, 9)
+
+    local v3 = vec2.sub(v1, v2)
+
+    print("v1 - v2", 0, 40, 11)
+    gfx.dither(0xAAAA)
+    shape.line(0, 0, v3.x, v3.y, 11)
+    gfx.dither()
+end
+
+</tiny-editor>
+++++
+
+
+==== vec2.dot()
+
+Dot product between two vectors
+
+```lua
+vec2.dot(v1, v2) -- Dot product between a vector 2 {x, y} and another vector 2 {x, y}
+vec2.dot(x1, y1, x2, y2) -- Dot product between a destructured vector 2 and another destructured vector 2
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|v1 |vector 2 as a table {x, y}
+|v2 |vector 2 as a table {x, y}      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _init()
+    angle = 0
+end
+function _update()
+
+    if ctrl.pressing(keys.space) then
+        angle = angle + 0.1
+    end
+
+    gfx.camera(-128, -128)
+
+    local v1 = vec2.create(1, 0)
+    local v2 = vec2.create(math.cos(angle), math.sin(angle))
+    local dot = vec2.dot(v1, v2)
+    
+    local scl = vec2.scl(v1, dot)
+    
+    gfx.cls()
+    
+    local scaledv1 = vec2.scl(v1, 64)
+    local scaledv2 = vec2.scl(v2, 64)
+    local scaledv3 = vec2.scl(scl, 64)
+
+    print("v1", 18, 5, 10)
+    shape.line(0, 0, scaledv1.x, scaledv1.y, 10)
+    print("v2", scaledv2.x + 5, scaledv2.y + 5, 11)
+    shape.line(0, 0, scaledv2.x, scaledv2.y, 11)
+    
+    print("dot", scaledv3.x, 5, 9)
+    shape.line(0, 0, scaledv3.x, scaledv3.y, 9)
+end    
+
+</tiny-editor>
+++++
+
+
+==== vec2.mag()
+
+Calculate the magnitude (length) of a vector
+
+```lua
+vec2.mag(x, y) -- Calculate the magnitude (length) of a vector 2 {x, y}
+vec2.mag(v1) -- Calculate the magnitude (length) of a vector 2 {x, y}
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|v1 |vector 2 as a table {x, y}      
+|===
+
+
+==== vec2.nor()
+
+Normalize a vector
+
+```lua
+vec2.nor(x, y) -- Normalize a vector 2 {x, y}
+vec2.nor(v1) -- Normalize a vector 2 {x, y}
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|v1 |vector 2 as a table {x, y}      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _update()
+    gfx.cls()
+
+    local v0 = vec2.create(43, 64)
+    local v1 = vec2.nor(v0)
+    
+    
+    print("vector     x: " .. v0.x .. " y: " .. v0.y)
+    print("normalized x: " .. v1.x .. " y: " .. v1.y, 0, 8)
+end 
+
+</tiny-editor>
+++++
+
+
+==== vec2.crs()
+
+Cross product
+
+```lua
+vec2.crs(v1, v2) -- Cross product between a vector 2 {x, y} and another vector 2 {x, y}
+vec2.crs(x1, y1, x2, y2) -- Cross product between a destructured vector 2 and another destructured vector 2
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|v1 |vector 2 as a table {x, y}
+|v2 |vector 2 as a table {x, y}      
+|===
+
+
+==== vec2.scl()
+
+Scale a vector
+
+```lua
+vec2.scl(x, y, scl) -- Scale a vector 2 {x, y} using the factor scl
+vec2.scl(v1, scl) -- Scale a vector 2 {x, y} using the factor scl
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|v1 |vector 2 as a table {x, y}      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _init()
+    gfx.camera(-128, -128)
+
+    local v1 = vec2.create(32, 38)
+    local v2 = vec2.scl(v1, 2)
+
+    gfx.cls()
+    print("v1 scaled", 8, 60, 11)
+    gfx.dither(0xAAAA)
+    shape.line(0, 0, v2.x, v2.y, 11)
+    gfx.dither()
+    print("v1", 18, 15, 10)
+    shape.line(0, 0, v1.x, v1.y, 10)
+end
+
+</tiny-editor>
+++++
+
+
+
+=== ws
+
+Workspace manipulation library. It allows you to save/load/download files
+
+==== ws.save()
+
+Save the content into a local file, on desktop or in the local storage on the web platform.
+
+```lua
+ws.save(name, content) -- Save the content into the file name.
+```
+
+
+==== ws.load()
+
+Load and get the content of the file name
+
+```lua
+ws.load(name) -- Load and get the content of the file name
+```
+
+
+==== ws.create()
+
+Create a local file. The name is generated so the name is unique.
+
+```lua
+ws.create(prefix, extension) -- Create a local file with the prefix and the extension. The name of the file created.
+```
+
+
+==== ws.list()
+
+List all files available in the workspace.
+
+```lua
+ws.list() -- List all files available in the workspace.
+ws.list(extension) -- List all files available in the workspace and filter by the file extension.
+```
+
+
+

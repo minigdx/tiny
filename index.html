@@ -677,24 +677,94 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <body class="article toc2 toc-left">
 <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
 <style>
+    /** link to start the game **/
+    .tiny-button-right {
+        margin-left: auto;
+    }
+
+    .tiny-button {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 16px;
+
+        background-color: #007bff;
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 0.9em;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+
+        font-family: "Source Code Pro", monospace;
+
+        transition: background-color 0.2s ease-in-out, transform 0.1s ease; /* Transition douce pour les effets */
+
+    }
+
+    .tiny-button,
+    .tiny-button:link, /* Pour s'assurer que même non visité, il a le bon style */
+    .tiny-button:visited { /* Pour s'assurer que les liens visités gardent la couleur souhaitée */
+        color: white; /* Couleur du texte pour l'état normal, lien et visité */
+        text-decoration: none; /* Maintenir la suppression du soulignement */
+    }
+
+    .tiny-button:hover,
+    .tiny-button:focus { /* :focus pour l'accessibilité clavier */
+        background-color: #0056b3; /* Couleur de fond un peu plus foncée au survol/focus */
+        color: white;              /* Assure que la couleur du texte reste blanche */
+        outline: none;             /* Supprime l'outline par défaut sur :focus si vous le souhaitez,
+                                  mais pour l'accessibilité, il est mieux de le styliser :
+                                  par ex. box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5); */
+    }
+
+    .tiny-toolbar {
+        width: calc(100% + 256px);
+        min-height: 48px;
+        padding: 4px;
+        border-radius: 8px;
+        border: 1px solid #9EC6DF;
+        margin-left: -128px;
+        margin-bottom: 2px;
+        display: flex;
+        align-items: center;
+    }
+
+    /** container of the game + editor **/
     .tiny-container {
         display: flex;
-        flex-wrap: wrap;
+        width: calc(100% + 256px);
+        margin-left: -128px;
     }
 
-    .tiny-play {
-        display: block;
-    }
-
+    /** game **/
     .tiny-canvas {
         border: 1px solid black;
         cursor: none;
+
+        flex: 1 1 auto;
+        max-height: 512px;
+        max-width: 512px;
+    }
+
+    /** code editor **/
+    .tiny-textarea {
+        flex: 2 1 auto;
+        display: block;
+        min-height: 512px;
+        padding-left: 48px;
+        counter-reset: line; /* reset the "line" counter */
+        width: 100%;
+        font-family: "Source Code Pro", monospace;
+        resize:none;
     }
 
     .tiny-textarea div {
         display: block;
         position: relative;
         white-space: pre-wrap;
+        min-height: 1em;
     }
 
     .tiny-textarea div::before {
@@ -703,15 +773,6 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
         counter-increment: line;  /* increment the counter */
         position: absolute;
         right: calc(100% + 16px); /* add some space between this and the code line next to it */
-    }
-
-    .tiny-textarea {
-        padding-left: 48px;
-        counter-reset: line; /* reset the "line" counter */
-        height: 512px;
-        width: 100%;
-        font-family: "Source Code Pro", monospace;
-        resize:none;
     }
 
     .code_comment {
@@ -728,18 +789,20 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 
     .no-resize {
         resize:none;
+        border: none;
+        overflow: hidden;
     }
 </style>
 <div id="header">
 <h1>Tiny 🧸</h1>
 <div class="details">
-<span id="revnumber">version 1.3.3-alpha</span>
+<span id="revnumber">version 1.4.0-alpha</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
 <li><a href="#_tiny_engine">Tiny Engine</a></li>
-<li><a href="#_tiny_sandbox">Tiny Sandbox</a></li>
+<li><a href="#_tiny_playground">Tiny Playground</a></li>
 <li><a href="#_tiny_is_open_source">Tiny is open source</a></li>
 <li><a href="#_tiny_install">Tiny Install</a></li>
 <li><a href="#_tiny_tutorial">Tiny Tutorial</a>
@@ -773,14 +836,19 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <li><a href="#_editing_the_tiny_json_file">Editing the <code>_tiny.json</code> File</a></li>
 </ul>
 </li>
-<li><a href="#_the_tiny_cli_palette_command">the <code>tiny-cli palette</code> command</a>
+<li><a href="#_the_tiny_cli_debug_command">The <code>tiny-cli debug</code> command</a>
 <ul class="sectlevel3">
 <li><a href="#_usage_4">Usage</a></li>
 </ul>
 </li>
-<li><a href="#_the_tiny_cli_export_command">The <code>tiny-cli export</code> command</a>
+<li><a href="#_the_tiny_cli_palette_command">the <code>tiny-cli palette</code> command</a>
 <ul class="sectlevel3">
 <li><a href="#_usage_5">Usage</a></li>
+</ul>
+</li>
+<li><a href="#_the_tiny_cli_export_command">The <code>tiny-cli export</code> command</a>
+<ul class="sectlevel3">
+<li><a href="#_usage_6">Usage</a></li>
 <li><a href="#_exporting_a_game">Exporting a Game</a></li>
 </ul>
 </li>
@@ -791,19 +859,12 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <li><a href="#_options">Options</a></li>
 </ul>
 </li>
-<li><a href="#_usage_6">Usage</a></li>
+<li><a href="#_usage_7">Usage</a></li>
 </ul>
 </li>
 <li><a href="#_the_tiny_cli_sfx_command">the <code>tiny-cli sfx</code> command</a>
 <ul class="sectlevel3">
-<li><a href="#_usage_7">Usage</a></li>
-</ul>
-</li>
-<li><a href="#_the_tiny_cli_lib_command">the <code>tiny-cli lib</code> command</a>
-<ul class="sectlevel3">
 <li><a href="#_usage_8">Usage</a></li>
-<li><a href="#_library_repository">Library Repository</a></li>
-<li><a href="#_examples">Examples</a></li>
 </ul>
 </li>
 </ul>
@@ -887,6 +948,7 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <li><a href="#_map_layer">map.layer()</a></li>
 <li><a href="#_map_from">map.from()</a></li>
 <li><a href="#_map_to">map.to()</a></li>
+<li><a href="#_map_cflag">map.cflag()</a></li>
 <li><a href="#_map_flag">map.flag()</a></li>
 <li><a href="#_map_entities">map.entities()</a></li>
 <li><a href="#_map_draw">map.draw()</a></li>
@@ -905,15 +967,17 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <li><a href="#_math_perlin">math.perlin()</a></li>
 </ul>
 </li>
-<li><a href="#_notes">notes</a></li>
+<li><a href="#_notes">notes</a>
+<ul class="sectlevel3">
+<li><a href="#_notes_note">notes.note()</a></li>
+</ul>
+</li>
 <li><a href="#_sfx">sfx</a>
 <ul class="sectlevel3">
-<li><a href="#_sfx_sine">sfx.sine()</a></li>
-<li><a href="#_sfx_sawtooth">sfx.sawtooth()</a></li>
-<li><a href="#_sfx_square">sfx.square()</a></li>
-<li><a href="#_sfx_triangle">sfx.triangle()</a></li>
-<li><a href="#_sfx_noise">sfx.noise()</a></li>
-<li><a href="#_sfx_pulse">sfx.pulse()</a></li>
+<li><a href="#_sfx_save">sfx.save()</a></li>
+<li><a href="#_sfx_load">sfx.load()</a></li>
+<li><a href="#_sfx_instrument">sfx.instrument()</a></li>
+<li><a href="#_sfx_bar">sfx.bar()</a></li>
 <li><a href="#_sfx_play">sfx.play()</a></li>
 <li><a href="#_sfx_loop">sfx.loop()</a></li>
 <li><a href="#_sfx_stop">sfx.stop()</a></li>
@@ -1020,7 +1084,7 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 </div>
 </blockquote>
 </div>
-<iframe class="no-resize" title="Breakout example" width="536" height="536" src="sample/index.html"></iframe>
+<iframe class="no-resize" title="Breakout example" width="516" height="516" src="sample/index.html"></iframe>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -1036,10 +1100,10 @@ The code source of this sample is available in the <a href="https://github.com/m
 </div>
 </div>
 <div class="sect1">
-<h2 id="_tiny_sandbox">Tiny Sandbox</h2>
+<h2 id="_tiny_playground">Tiny Playground</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>You can try to create a game right away <code>🧸 Tiny</code> using <a href="sandbox.html?game=">the Sandbox</a> or you can just try it by updating examples available in this page.</p>
+<p>You can try to create a game right away <code>🧸 Tiny</code> using <a href="playground.html?game=">the Playground</a> or you can just try it by updating examples available in this page.</p>
 </div>
 </div>
 </div>
@@ -1051,6 +1115,12 @@ The code source of this sample is available in the <a href="https://github.com/m
 </div>
 <div class="paragraph">
 <p>Contributions from the community are welcome, and can help to improve the overall functionality and usability of the game engine!</p>
+</div>
+<div class="paragraph">
+<p>A presentation about the technologies used behind 🧸 Tiny was also given during the conference <a href="https://2024.droidkaigi.jp/en/timetable/683368/">DroidKaigi 2024 @ 東京 Tokyo</a>. You can check <a href="https://speakerdeck.com/dwursteisen/crafting-cross-platform-adventures-building-a-game-engine-with-kotlin-multiplatform">the slides</a>, or you also <a href="https://www.youtube.com/watch?v=4_i_Xp96IMM">watch the session</a>.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="sample/droidkaigi-tiny-export.gif" alt="https://speakerdeck.com/dwursteisen/crafting-cross-platform-adventures-building-a-game-engine-with-kotlin-multiplatform"></span></p>
 </div>
 <div class="admonitionblock tip">
 <table>
@@ -1143,10 +1213,12 @@ Once installed, you can run and develop games in no time!</p>
 
 <span class="k">function</span> <span class="nf">_update</span><span class="p">()</span>
     <span class="c1">-- Update game state</span>
-    <span class="n">player1_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">player1_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">num</span><span class="p">(</span><span class="n">ctrl</span><span class="p">.</span><span class="n">pressing</span><span class="p">(</span><span class="n">keys</span><span class="p">.</span><span class="n">up</span><span class="p">))</span>
-    <span class="n">player1_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">player1_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">num</span><span class="p">(</span><span class="n">ctrl</span><span class="p">.</span><span class="n">pressing</span><span class="p">(</span><span class="n">keys</span><span class="p">.</span><span class="n">down</span><span class="p">))</span>
-    <span class="n">player2_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">player2_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">num</span><span class="p">(</span><span class="n">ctrl</span><span class="p">.</span><span class="n">pressing</span><span class="p">(</span><span class="n">keys</span><span class="p">.</span><span class="n">z</span><span class="p">))</span>
-    <span class="n">player2_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">player2_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">num</span><span class="p">(</span><span class="n">ctrl</span><span class="p">.</span><span class="n">pressing</span><span class="p">(</span><span class="n">keys</span><span class="p">.</span><span class="n">s</span><span class="p">))</span>
+    <span class="n">player1_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">player1_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">num</span><span class="p">(</span><span class="n">ctrl</span><span class="p">.</span><span class="n">pressing</span><span class="p">(</span><span class="n">keys</span><span class="p">.</span><span class="n">z</span><span class="p">))</span> <span class="c1">--azerty keyboard</span>
+    <span class="n">player1_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">player1_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">num</span><span class="p">(</span><span class="n">ctrl</span><span class="p">.</span><span class="n">pressing</span><span class="p">(</span><span class="n">keys</span><span class="p">.</span><span class="n">w</span><span class="p">))</span> <span class="c1">-- qwerty keyboard</span>
+    <span class="n">player1_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">player1_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">num</span><span class="p">(</span><span class="n">ctrl</span><span class="p">.</span><span class="n">pressing</span><span class="p">(</span><span class="n">keys</span><span class="p">.</span><span class="n">s</span><span class="p">))</span>
+
+    <span class="n">player2_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">player2_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">num</span><span class="p">(</span><span class="n">ctrl</span><span class="p">.</span><span class="n">pressing</span><span class="p">(</span><span class="n">keys</span><span class="p">.</span><span class="n">up</span><span class="p">))</span>
+    <span class="n">player2_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">player2_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">num</span><span class="p">(</span><span class="n">ctrl</span><span class="p">.</span><span class="n">pressing</span><span class="p">(</span><span class="n">keys</span><span class="p">.</span><span class="n">down</span><span class="p">))</span>
 
     <span class="n">ball_pos</span><span class="p">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">ball_pos</span><span class="p">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">ball_velocity</span><span class="p">.</span><span class="n">x</span>
     <span class="n">ball_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">ball_pos</span><span class="p">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">ball_velocity</span><span class="p">.</span><span class="n">y</span>
@@ -1215,10 +1287,13 @@ end
 
 function _update()
     -- Update game state
-    player1_pos.y = player1_pos.y - 4 * num(ctrl.pressing(keys.up))
-    player1_pos.y = player1_pos.y + 4 * num(ctrl.pressing(keys.down))
-    player2_pos.y = player2_pos.y - 4 * num(ctrl.pressing(keys.z))
-    player2_pos.y = player2_pos.y + 4 * num(ctrl.pressing(keys.s))
+     -- Update game state
+    player1_pos.y = player1_pos.y - 4 * num(ctrl.pressing(keys.z)) --azerty keyboard
+    player1_pos.y = player1_pos.y - 4 * num(ctrl.pressing(keys.w)) -- qwerty keyboard
+    player1_pos.y = player1_pos.y + 4 * num(ctrl.pressing(keys.s))
+
+    player2_pos.y = player2_pos.y - 4 * num(ctrl.pressing(keys.up))
+    player2_pos.y = player2_pos.y + 4 * num(ctrl.pressing(keys.down))
 
     ball_pos.x = ball_pos.x + ball_velocity.x
     ball_pos.y = ball_pos.y + ball_velocity.y
@@ -1272,7 +1347,8 @@ end
 <span class="image"><a class="image" href="https://dwursteisen.itch.io/one-light-for-three-seconds"><img src="sample/only_three_seconds.gif" alt="only three seconds"></a></span>
 <span class="image"><a class="image" href="https://dwursteisen.itch.io/meiro-de"><img src="sample/meiro_de_maigo2.gif" alt="meiro de maigo2"></a></span>
 <span class="image"><a class="image" href="https://dwursteisen.itch.io/freezming"><img src="sample/freezming.gif" alt="freezming"></a></span>
-<span class="image"><a class="image" href="https://dwursteisen.itch.io/gravity-balls"><img src="sample/gravity-balls.gif" alt="gravity balls"></a></span></p>
+<span class="image"><a class="image" href="https://dwursteisen.itch.io/gravity-balls"><img src="sample/gravity-balls.gif" alt="gravity balls"></a></span>
+<span class="image"><a class="image" href="https://dwursteisen.itch.io/macro-jams-06-reflections"><img src="sample/reflections.gif" alt="reflections"></a></span></p>
 </div>
 <div class="admonitionblock tip">
 <table>
@@ -1299,6 +1375,9 @@ Want your game to appear here? Create a post about it in <a href="https://github
 </div>
 <div class="paragraph">
 <p>The Tiny CLI also includes a powerful development server that allows you to preview your game in real-time as you develop it. Simply run the tiny command and start to update your game.</p>
+</div>
+<div class="paragraph">
+<p>The Tiny CLI includes the <code>tuny-cli debug</code> command, which starts a debugging tool. Connect it to your running game to set breakpoints and examine variables. As with typical debuggers, you can resume execution or step through your code line by line.</p>
 </div>
 <div class="paragraph">
 <p>When you&#8217;re ready to share your game with the world, the Tiny CLI makes it easy to export your game for web browsers. You can use the <code>tiny-cli export</code> command to generate a distributable version of your game that can be published on the web. You can also try the <code>export</code> result by using the command <code>tiny-cli serve</code>.</p>
@@ -1388,18 +1467,6 @@ With the <code>tiny-cli create</code> command, you can quickly and easily create
 <h3 id="_the_tiny_cli_run_command">The <code>tiny-cli run</code> command</h3>
 <div class="paragraph">
 <p>The <code>tiny-cli run</code> command is a command line tool for running and testing your tiny game. This command takes only one parameter: the path to the directory containing your game&#8217;s assets and <code>_tiny.json</code> file.</p>
-</div>
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
-</td>
-<td class="content">
-If the command is run on Mac OS and some JRE/JDK, the command might not work as it requires to use the JVM option <code>-XstartOnFirstThread</code>. In such case, instead of <code>tiny-cli</code>, use <code>tiny-cli-mac</code> which add this option.
-</td>
-</tr>
-</table>
 </div>
 <div class="sect3">
 <h4 id="_usage_2">Usage</h4>
@@ -1517,12 +1584,38 @@ Note that the added resource is not automatically copied to your game&#8217;s fo
 </div>
 </div>
 <div class="sect2">
+<h3 id="_the_tiny_cli_debug_command">The <code>tiny-cli debug</code> command</h3>
+<div class="paragraph">
+<p>The <code>tiny-cli debug</code> command is a debug tool to debug the current game.</p>
+</div>
+<div class="sect3">
+<h4 id="_usage_4">Usage</h4>
+<div class="paragraph">
+<p>To use the <code>tiny-cli debug</code> command, simply open your terminal and type the following command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>tiny-cli debug &lt;game folder&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>where <code>&lt;game folder&gt;</code> is the path to the directory containing your game&#8217;s assets and <code>_tiny.json</code> file.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="sample/tiny-cli-debug.png" alt="tiny cli debug"></span></p>
+</div>
+<div class="paragraph">
+<p>Clicking in the editor&#8217;s gutter adds a breakpoint, indicated by a red flag. When execution reaches a breakpoint, it pauses the execution, displaying variables within that context. Use the buttons above the variable display to resume execution or step through code line by line.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
 <h3 id="_the_tiny_cli_palette_command">the <code>tiny-cli palette</code> command</h3>
 <div class="paragraph">
 <p>The tiny-cli lib command is used extract a color palette from an image to use it in your <code>🧸 Tiny</code> game. This command provides an easy way to use colors from an image as your game&#8217;s palette color.</p>
 </div>
 <div class="sect3">
-<h4 id="_usage_4">Usage</h4>
+<h4 id="_usage_5">Usage</h4>
 <div class="paragraph">
 <p>To use the <code>tiny-cli palette</code> command, follow the syntax:</p>
 </div>
@@ -1580,7 +1673,7 @@ Only colors that are not already in your game&#8217;s palette will be appended, 
 <p>The <code>tiny-cli export</code> command is a tool for exporting your tiny game to a zip file, which includes all the assets needed to run the game in a browser. This command makes it easy to distribute your game and share it with others.</p>
 </div>
 <div class="sect3">
-<h4 id="_usage_5">Usage</h4>
+<h4 id="_usage_6">Usage</h4>
 <div class="paragraph">
 <p>To use the <code>tiny-cli export</code> command, simply open your terminal and type the following command:</p>
 </div>
@@ -1658,7 +1751,7 @@ Only colors that are not already in your game&#8217;s palette will be appended, 
 </div>
 </div>
 <div class="sect3">
-<h4 id="_usage_6">Usage</h4>
+<h4 id="_usage_7">Usage</h4>
 <div class="paragraph">
 <p>To run the tiny serve command, you can use the following examples:</p>
 </div>
@@ -1710,7 +1803,7 @@ The tiny serve command is intended for local testing only and should not be used
 <p><span class="image"><img src="sample/tiny-cli-sfx0.gif" alt="tiny cli sfx0"></span></p>
 </div>
 <div class="sect3">
-<h4 id="_usage_7">Usage</h4>
+<h4 id="_usage_8">Usage</h4>
 <div class="paragraph">
 <p>To use the <code>tiny-cli sfx</code> command, follow the syntax:</p>
 </div>
@@ -1729,66 +1822,6 @@ The tiny serve command is intended for local testing only and should not be used
 </div>
 <div class="paragraph">
 <p>The editor will be run with all SFX sounds from your game loaded.</p>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_the_tiny_cli_lib_command">the <code>tiny-cli lib</code> command</h3>
-<div class="paragraph">
-<p>The tiny-cli lib command is used to download and add Lua libraries to your <code>🧸 Tiny</code> game. This command provides an easy way to enhance the functionality of your game by incorporating libraries.</p>
-</div>
-<div class="sect3">
-<h4 id="_usage_8">Usage</h4>
-<div class="paragraph">
-<p>To use the <code>tiny-cli lib</code> command, follow the syntax:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="shell">tiny-cli lib &lt;library_name&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Replace &lt;library_name&gt; with the name of the library you want to download and add to your game.</p>
-</div>
-<div class="paragraph">
-<p>For example, to download and add the particles library to your game, you would run the following command:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="shell">tiny-cli lib particles</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This command will download the particles library and add it to your game.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_library_repository">Library Repository</h4>
-<div class="paragraph">
-<p>The libraries are downloaded from the following URL:</p>
-</div>
-<div class="paragraph">
-<p><a href="https://github.com/minigdx/tiny/tree/main/tiny-repository-libs" class="bare">https://github.com/minigdx/tiny/tree/main/tiny-repository-libs</a></p>
-</div>
-<div class="paragraph">
-<p>This repository contains a collection of Lua libraries that can be used with Tiny games. Each library is maintained separately and provides additional features and functionality to enhance your game development process.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_examples">Examples</h4>
-<div class="paragraph">
-<p>Here are a few examples to illustrate how to use the <code>tiny-cli lib</code> command:</p>
-</div>
-<div class="paragraph">
-<p>Download and add the particles library to your game:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="shell">tiny-cli lib particles</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This command will download the particles library from the repository and add it to your game.</p>
 </div>
 </div>
 </div>
@@ -4613,19 +4646,7 @@ end
 <div class="sect2">
 <h3 id="_map">map</h3>
 <div class="paragraph">
-<p>Map API to accessing maps data configured in a game. Map can be created using LDTk ( <a href="https://ldtk.io/" class="bare">https://ldtk.io/</a> ).</p>
-</div>
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
-</td>
-<td class="content">
-Projects need to be exported using <a href="https://ldtk.io/docs/game-dev/super-simple-export/">'Super simple export'</a>. Also, Int layers <em>need</em> to have an Auto Layer tileset otherwise, they will not be known by the engine.
-</td>
-</tr>
-</table>
+<p>Access map created with LDTk ( <a href="https://ldtk.io/" class="bare">https://ldtk.io/</a> ).</p>
 </div>
 <div class="sect3">
 <h4 id="_map_level">map.level()</h4>
@@ -4635,19 +4656,19 @@ Projects need to be exported using <a href="https://ldtk.io/docs/game-dev/super-
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">map</span><span class="p">.</span><span class="n">level</span><span class="p">()</span> <span class="c1">-- Return the index of the current level.</span>
-<span class="n">map</span><span class="p">.</span><span class="n">level</span><span class="p">(</span><span class="n">level</span><span class="p">)</span> <span class="c1">-- Set the current level to use. The level can be an index or the id defined by LDTK. Return the previous index level.</span></code></pre>
+<span class="n">map</span><span class="p">.</span><span class="n">level</span><span class="p">(</span><span class="n">level</span><span class="p">)</span> <span class="c1">-- Set the current level to use. The level can be an index, the name or the id defined by LDTK. Return the previous index level or NIL if the new level is invalid.</span></code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
 <h4 id="_map_layer">map.layer()</h4>
 <div class="paragraph">
-<p>Set the current layer to draw.</p>
+<p>Get the list of layers from the actual level.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">map</span><span class="p">.</span><span class="n">layer</span><span class="p">(</span><span class="n">layer_index</span><span class="p">)</span> <span class="c1">-- Set the current index layer to draw. Return the previous layer index.</span>
-<span class="n">map</span><span class="p">.</span><span class="n">layer</span><span class="p">()</span> <span class="c1">-- Reset the current layer to draw to the first available layer (index 0).</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">map</span><span class="p">.</span><span class="n">layer</span><span class="p">(</span><span class="n">layer_index</span><span class="p">)</span> <span class="c1">-- Get the layer at the specified index or name from the actual level. The layer in the front is 0.</span>
+<span class="n">map</span><span class="p">.</span><span class="n">layer</span><span class="p">()</span> <span class="c1">-- Get the list of layers from the actual level.</span></code></pre>
 </div>
 </div>
 </div>
@@ -4677,14 +4698,26 @@ For example, coordinates of the player can be converted to cell coordinates to a
 </div>
 </div>
 <div class="sect3">
-<h4 id="_map_flag">map.flag()</h4>
+<h4 id="_map_cflag">map.cflag()</h4>
 <div class="paragraph">
-<p>Get the flag from a tile.</p>
+<p>Get the flag from a tile, using cell coordinates.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">map</span><span class="p">.</span><span class="n">flag</span><span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">)</span> <span class="c1">-- Get the flag from the tile at the coordinate cx,cy.</span>
-<span class="n">map</span><span class="p">.</span><span class="n">flag</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span> <span class="c1">-- Get the flag from the tile at the coordinate table [cx,cy].</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">map</span><span class="p">.</span><span class="n">cflag</span><span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">)</span> <span class="c1">-- Get the flag from the tile at the coordinate cx,cy.</span>
+<span class="n">map</span><span class="p">.</span><span class="n">cflag</span><span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">layer</span><span class="p">)</span> <span class="c1">-- Get the flag from the tile at the coordinate cx,cy from a specific layer.</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_map_flag">map.flag()</h4>
+<div class="paragraph">
+<p>Get the flag from a tile, using screen coordinates.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">map</span><span class="p">.</span><span class="n">flag</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- Get the flag from the tile at the coordinate x,y.</span>
+<span class="n">map</span><span class="p">.</span><span class="n">flag</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">layer</span><span class="p">)</span> <span class="c1">-- Get the flag from the tile at the coordinate x,y from a specific layer.</span></code></pre>
 </div>
 </div>
 </div>
@@ -4695,11 +4728,19 @@ For example, coordinates of the player can be converted to cell coordinates to a
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code>local players = map.entities["player"]
-local entity = players[1] -- get the first player
-shape.rectf(entity.x, entity.y, entity.width, entity.height, 8) -- display an entity using a rectangle
+<pre class="rouge highlight"><code>local entities = map.entities()
+local players = entities["Player"]
+for entity in all(players) do
+    shape.rectf(entity.x, entity.y, entity.width, entity.height, 8) -- display an entity using a rectangle
+end
 [...]
-entity.customFields -- access custom field of the entity</code></pre>
+entity.fields -- access custom field of the entity</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">map</span><span class="p">.</span><span class="n">entities</span><span class="p">()</span> <span class="c1">-- Get all entities from all entities layer as a table, with an entry per type.</span>
+<span class="n">map</span><span class="p">.</span><span class="n">entities</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="c1">-- Get all entities from the specific layer as a table, with an entry per type.</span></code></pre>
 </div>
 </div>
 </div>
@@ -4710,47 +4751,10 @@ entity.customFields -- access custom field of the entity</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">map</span><span class="p">.</span><span class="n">draw</span><span class="p">()</span> <span class="c1">-- Draw the default layer on the screen.</span>
-<span class="n">map</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- Draw the default layer on the screen at the x/y coordinates.</span>
-<span class="n">map</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">mx</span><span class="p">,</span> <span class="n">my</span><span class="p">)</span> <span class="c1">-- Draw the default layer on the screen at the x/y coordinates starting the mx/my coordinates from the map.</span>
-<span class="n">map</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">mx</span><span class="p">,</span> <span class="n">my</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span> <span class="c1">-- Draw the default layer on the screen at the x/y coordinates starting the mx/my coordinates from the map using the size width/height.</span>
-<span class="n">map</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span> <span class="c1">-- Draw the layer on the screen by it's index.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">map</span><span class="p">.</span><span class="n">draw</span><span class="p">()</span> <span class="c1">-- Draw all active layers on the screen.</span>
+<span class="n">map</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="c1">-- Draw the layer with the name or the index on the screen.</span></code></pre>
 </div>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">layer</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">index of the layer</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">mx</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">x map coordinate</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">my</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">y map coordinate</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">x screen coordinate</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">y</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">y screen coordinate</p></td>
-</tr>
-</tbody>
-</table>
 </div>
 </div>
 <div class="sect2">
@@ -5055,30 +5059,25 @@ end
 <div class="paragraph">
 <p>List all notes from C0 to B8. Please note that bemols are the note with b (ie: Gb2) while sharps are the note with s (ie: As3).</p>
 </div>
+<div class="sect3">
+<h4 id="_notes_note">notes.note()</h4>
+<div class="paragraph">
+<p>Get the name of a note regarding the note index (ie: C0 = 0, Cs0 = 1, &#8230;&#8203;)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">notes</span><span class="p">.</span><span class="n">note</span><span class="p">(</span><span class="n">note_index</span><span class="p">)</span> <span class="c1">-- Get the name of a note regarding the note index (ie: C0 = 0, Cs0 = 1, ...)</span></code></pre>
+</div>
+</div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_sfx">sfx</h3>
 <div class="paragraph">
 <p>Sound API to play/loop/stop a sound.
-A sound can be an SFX sound, generated using the tiny-cli sfx command or a MIDI file.
-Please note that a SFX sound will produce the same sound whatever platform and whatever computer
-as the sound is generated.</p>
-</div>
-<div class="paragraph">
-<p>A MIDI sound will depend of the MIDI synthesizer available on the machine.</p>
-</div>
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
-</td>
-<td class="content">
-Because of browser behaviour, a sound can <strong>only</strong> be played only after the first
-user interaction.
-</td>
-</tr>
-</table>
+A sound can be created using the sound editor, using the command line <code>tiny-cli sfx &lt;filename&gt;</code>.
+WARNING: Because of browser behaviour, a sound can <strong>only</strong> be played only after the first
+user interaction.</p>
 </div>
 <div class="paragraph">
 <p>Avoid to start a music or a sound at the beginning of the game.
@@ -5086,315 +5085,53 @@ Before it, force the player to hit a key or click by adding an interactive menu
 or by starting the sound as soon as the player is moving.</p>
 </div>
 <div class="sect3">
-<h4 id="_sfx_sine">sfx.sine()</h4>
+<h4 id="_sfx_save">sfx.save()</h4>
 <div class="paragraph">
-<p>Generate and play a sine wave sound.</p>
+<p>Save the actual music using the filename.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">sfx</span><span class="p">.</span><span class="n">sine</span><span class="p">(</span><span class="n">note</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">volume</span><span class="p">)</span> <span class="c1">-- Generate and play a sound using one note.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">sfx</span><span class="p">.</span><span class="n">save</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="c1">-- Save the actual music using the filename</span></code></pre>
 </div>
 </div>
-<tiny-editor style="display: none;"  >
-
-local waves = {
-    { name = "sine", fun = sfx.sine, note = notes.C6 },
-    { name = "pulse", fun = sfx.pulse, note = notes.C6 },
-    { name = "triangle", fun = sfx.triangle, note = notes.C6 },
-    { name = "noise", fun = sfx.noise, note = notes.C8 },
-    { name = "sawtooth", fun = sfx.sawtooth, note = notes.C6 },
-    { name = "square", fun = sfx.square, note = notes.C6 },
-}
-
-local index = 1
-
-function new_index(index, tableSize)
-     return ((index - 1) % tableSize) + 1
-end
-
-function _update()
-    if ctrl.pressed(keys.left) then
-        index =new_index(index - 1, #waves)
-    elseif ctrl.pressed(keys.right) then
-        index = new_index(index + 1, #waves)
-    end
-
-    if ctrl.pressed(keys.space) then
-        waves[index].fun( waves[index].note)
-    end
-end
-
-function _draw()
-    gfx.cls()
-    local str = "<<-- "..waves[index].name .. " -->>"
-    print(str, 128 - math.floor(#str * 4 * 0.5), 128 )
-
-
-    local space = "(hit space to play a note)"
-    print(space, 128 - math.floor(#space * 4 * 0.5), 142)
-end
-
-</tiny-editor>
 </div>
 <div class="sect3">
-<h4 id="_sfx_sawtooth">sfx.sawtooth()</h4>
+<h4 id="_sfx_load">sfx.load()</h4>
 <div class="paragraph">
-<p>Generate and play a sawtooth wave sound.</p>
+<p>Load the actual SFX sound as the actual music.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">sfx</span><span class="p">.</span><span class="n">sawtooth</span><span class="p">(</span><span class="n">note</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">volume</span><span class="p">)</span> <span class="c1">-- Generate and play a sound using one note.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">sfx</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="c1">-- Load the actual SFX sound as the actual music using filename or its index</span></code></pre>
 </div>
 </div>
-<tiny-editor style="display: none;"  >
-
-local waves = {
-    { name = "sine", fun = sfx.sine, note = notes.C6 },
-    { name = "pulse", fun = sfx.pulse, note = notes.C6 },
-    { name = "triangle", fun = sfx.triangle, note = notes.C6 },
-    { name = "noise", fun = sfx.noise, note = notes.C8 },
-    { name = "sawtooth", fun = sfx.sawtooth, note = notes.C6 },
-    { name = "square", fun = sfx.square, note = notes.C6 },
-}
-
-local index = 1
-
-function new_index(index, tableSize)
-     return ((index - 1) % tableSize) + 1
-end
-
-function _update()
-    if ctrl.pressed(keys.left) then
-        index =new_index(index - 1, #waves)
-    elseif ctrl.pressed(keys.right) then
-        index = new_index(index + 1, #waves)
-    end
-
-    if ctrl.pressed(keys.space) then
-        waves[index].fun( waves[index].note)
-    end
-end
-
-function _draw()
-    gfx.cls()
-    local str = "<<-- "..waves[index].name .. " -->>"
-    print(str, 128 - math.floor(#str * 4 * 0.5), 128 )
-
-
-    local space = "(hit space to play a note)"
-    print(space, 128 - math.floor(#space * 4 * 0.5), 142)
-end
-
-</tiny-editor>
 </div>
 <div class="sect3">
-<h4 id="_sfx_square">sfx.square()</h4>
+<h4 id="_sfx_instrument">sfx.instrument()</h4>
 <div class="paragraph">
-<p>Generate and play a square wave sound.</p>
+<p>Access instrument using its index or its name.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">sfx</span><span class="p">.</span><span class="n">square</span><span class="p">(</span><span class="n">note</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">volume</span><span class="p">)</span> <span class="c1">-- Generate and play a sound using one note.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">sfx</span><span class="p">.</span><span class="n">instrument</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="c1">-- Access instrument using its index or its name.</span></code></pre>
 </div>
 </div>
-<tiny-editor style="display: none;"  >
-
-local waves = {
-    { name = "sine", fun = sfx.sine, note = notes.C6 },
-    { name = "pulse", fun = sfx.pulse, note = notes.C6 },
-    { name = "triangle", fun = sfx.triangle, note = notes.C6 },
-    { name = "noise", fun = sfx.noise, note = notes.C8 },
-    { name = "sawtooth", fun = sfx.sawtooth, note = notes.C6 },
-    { name = "square", fun = sfx.square, note = notes.C6 },
-}
-
-local index = 1
-
-function new_index(index, tableSize)
-     return ((index - 1) % tableSize) + 1
-end
-
-function _update()
-    if ctrl.pressed(keys.left) then
-        index =new_index(index - 1, #waves)
-    elseif ctrl.pressed(keys.right) then
-        index = new_index(index + 1, #waves)
-    end
-
-    if ctrl.pressed(keys.space) then
-        waves[index].fun( waves[index].note)
-    end
-end
-
-function _draw()
-    gfx.cls()
-    local str = "<<-- "..waves[index].name .. " -->>"
-    print(str, 128 - math.floor(#str * 4 * 0.5), 128 )
-
-
-    local space = "(hit space to play a note)"
-    print(space, 128 - math.floor(#space * 4 * 0.5), 142)
-end
-
-</tiny-editor>
 </div>
 <div class="sect3">
-<h4 id="_sfx_triangle">sfx.triangle()</h4>
+<h4 id="_sfx_bar">sfx.bar()</h4>
 <div class="paragraph">
-<p>Generate and play a triangle wave sound.</p>
+<p>Access instrument using its index or its name.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">sfx</span><span class="p">.</span><span class="n">triangle</span><span class="p">(</span><span class="n">note</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">volume</span><span class="p">)</span> <span class="c1">-- Generate and play a sound using one note.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">sfx</span><span class="p">.</span><span class="n">bar</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="c1">-- Access instrument using its index or its name.</span></code></pre>
 </div>
 </div>
-<tiny-editor style="display: none;"  >
-
-local waves = {
-    { name = "sine", fun = sfx.sine, note = notes.C6 },
-    { name = "pulse", fun = sfx.pulse, note = notes.C6 },
-    { name = "triangle", fun = sfx.triangle, note = notes.C6 },
-    { name = "noise", fun = sfx.noise, note = notes.C8 },
-    { name = "sawtooth", fun = sfx.sawtooth, note = notes.C6 },
-    { name = "square", fun = sfx.square, note = notes.C6 },
-}
-
-local index = 1
-
-function new_index(index, tableSize)
-     return ((index - 1) % tableSize) + 1
-end
-
-function _update()
-    if ctrl.pressed(keys.left) then
-        index =new_index(index - 1, #waves)
-    elseif ctrl.pressed(keys.right) then
-        index = new_index(index + 1, #waves)
-    end
-
-    if ctrl.pressed(keys.space) then
-        waves[index].fun( waves[index].note)
-    end
-end
-
-function _draw()
-    gfx.cls()
-    local str = "<<-- "..waves[index].name .. " -->>"
-    print(str, 128 - math.floor(#str * 4 * 0.5), 128 )
-
-
-    local space = "(hit space to play a note)"
-    print(space, 128 - math.floor(#space * 4 * 0.5), 142)
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_sfx_noise">sfx.noise()</h4>
-<div class="paragraph">
-<p>Generate and play a noise wave sound.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">sfx</span><span class="p">.</span><span class="n">noise</span><span class="p">(</span><span class="n">note</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">volume</span><span class="p">)</span> <span class="c1">-- Generate and play a sound using one note.</span></code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-local waves = {
-    { name = "sine", fun = sfx.sine, note = notes.C6 },
-    { name = "pulse", fun = sfx.pulse, note = notes.C6 },
-    { name = "triangle", fun = sfx.triangle, note = notes.C6 },
-    { name = "noise", fun = sfx.noise, note = notes.C8 },
-    { name = "sawtooth", fun = sfx.sawtooth, note = notes.C6 },
-    { name = "square", fun = sfx.square, note = notes.C6 },
-}
-
-local index = 1
-
-function new_index(index, tableSize)
-     return ((index - 1) % tableSize) + 1
-end
-
-function _update()
-    if ctrl.pressed(keys.left) then
-        index =new_index(index - 1, #waves)
-    elseif ctrl.pressed(keys.right) then
-        index = new_index(index + 1, #waves)
-    end
-
-    if ctrl.pressed(keys.space) then
-        waves[index].fun( waves[index].note)
-    end
-end
-
-function _draw()
-    gfx.cls()
-    local str = "<<-- "..waves[index].name .. " -->>"
-    print(str, 128 - math.floor(#str * 4 * 0.5), 128 )
-
-
-    local space = "(hit space to play a note)"
-    print(space, 128 - math.floor(#space * 4 * 0.5), 142)
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_sfx_pulse">sfx.pulse()</h4>
-<div class="paragraph">
-<p>Generate and play a pulse wave sound.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">sfx</span><span class="p">.</span><span class="n">pulse</span><span class="p">(</span><span class="n">note</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">volume</span><span class="p">)</span> <span class="c1">-- Generate and play a sound using one note.</span></code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-local waves = {
-    { name = "sine", fun = sfx.sine, note = notes.C6 },
-    { name = "pulse", fun = sfx.pulse, note = notes.C6 },
-    { name = "triangle", fun = sfx.triangle, note = notes.C6 },
-    { name = "noise", fun = sfx.noise, note = notes.C8 },
-    { name = "sawtooth", fun = sfx.sawtooth, note = notes.C6 },
-    { name = "square", fun = sfx.square, note = notes.C6 },
-}
-
-local index = 1
-
-function new_index(index, tableSize)
-     return ((index - 1) % tableSize) + 1
-end
-
-function _update()
-    if ctrl.pressed(keys.left) then
-        index =new_index(index - 1, #waves)
-    elseif ctrl.pressed(keys.right) then
-        index = new_index(index + 1, #waves)
-    end
-
-    if ctrl.pressed(keys.space) then
-        waves[index].fun( waves[index].note)
-    end
-end
-
-function _draw()
-    gfx.cls()
-    local str = "<<-- "..waves[index].name .. " -->>"
-    print(str, 128 - math.floor(#str * 4 * 0.5), 128 )
-
-
-    local space = "(hit space to play a note)"
-    print(space, 128 - math.floor(#space * 4 * 0.5), 142)
-end
-
-</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_sfx_play">sfx.play()</h4>
 <div class="paragraph">
-<p>Play a sound by it&#8217;s index. The index of a sound is given by it&#8217;s position in the sounds field from the <code>_tiny.json</code> file.The first sound is at the index 0.</p>
+<p>Play the bar by it&#8217;s index of the current sound. The index of a bar of the current music.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -5406,19 +5143,19 @@ end
 <div class="sect3">
 <h4 id="_sfx_loop">sfx.loop()</h4>
 <div class="paragraph">
-<p>Play a sound and loop over it.</p>
+<p>Loop the bar by it&#8217;s index of the current sound. The index of a bar of the current music.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">sfx</span><span class="p">.</span><span class="n">loop</span><span class="p">()</span> <span class="c1">-- Play the sound at the index 0.</span>
-<span class="n">sfx</span><span class="p">.</span><span class="n">loop</span><span class="p">(</span><span class="n">sound</span><span class="p">)</span> <span class="c1">-- Play the sound by it's index.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">sfx</span><span class="p">.</span><span class="n">loop</span><span class="p">()</span> <span class="c1">-- Loop the sound at the index 0.</span>
+<span class="n">sfx</span><span class="p">.</span><span class="n">loop</span><span class="p">(</span><span class="n">sound</span><span class="p">)</span> <span class="c1">-- Loop the sound by it's index.</span></code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
 <h4 id="_sfx_stop">sfx.stop()</h4>
 <div class="paragraph">
-<p>Stop a sound.</p>
+<p>Stop the bar by it&#8217;s index of the current sound. The index of a bar of the current music.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -6805,8 +6542,8 @@ Support us by crediting Kenney or www.kenney.nl (this is not mandatory)</pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 1.3.3-alpha<br>
-Last updated 2024-05-19 08:07:09 UTC
+Version 1.4.0-alpha<br>
+Last updated 2025-05-11 15:24:56 UTC
 </div>
 </div>
 <style>

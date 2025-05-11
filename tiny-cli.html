@@ -453,6 +453,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <p>The Tiny CLI also includes a powerful development server that allows you to preview your game in real-time as you develop it. Simply run the tiny command and start to update your game.</p>
 </div>
 <div class="paragraph">
+<p>The Tiny CLI includes the <code>tuny-cli debug</code> command, which starts a debugging tool. Connect it to your running game to set breakpoints and examine variables. As with typical debuggers, you can resume execution or step through your code line by line.</p>
+</div>
+<div class="paragraph">
 <p>When you&#8217;re ready to share your game with the world, the Tiny CLI makes it easy to export your game for web browsers. You can use the <code>tiny-cli export</code> command to generate a distributable version of your game that can be published on the web. You can also try the <code>export</code> result by using the command <code>tiny-cli serve</code>.</p>
 </div>
 <div class="paragraph">
@@ -540,18 +543,6 @@ With the <code>tiny-cli create</code> command, you can quickly and easily create
 <h3 id="_the_tiny_cli_run_command">The <code>tiny-cli run</code> command</h3>
 <div class="paragraph">
 <p>The <code>tiny-cli run</code> command is a command line tool for running and testing your tiny game. This command takes only one parameter: the path to the directory containing your game&#8217;s assets and <code>_tiny.json</code> file.</p>
-</div>
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Warning</div>
-</td>
-<td class="content">
-If the command is run on Mac OS and some JRE/JDK, the command might not work as it requires to use the JVM option <code>-XstartOnFirstThread</code>. In such case, instead of <code>tiny-cli</code>, use <code>tiny-cli-mac</code> which add this option.
-</td>
-</tr>
-</table>
 </div>
 <div class="sect3">
 <h4 id="_usage_2">Usage</h4>
@@ -669,12 +660,38 @@ Note that the added resource is not automatically copied to your game&#8217;s fo
 </div>
 </div>
 <div class="sect2">
+<h3 id="_the_tiny_cli_debug_command">The <code>tiny-cli debug</code> command</h3>
+<div class="paragraph">
+<p>The <code>tiny-cli debug</code> command is a debug tool to debug the current game.</p>
+</div>
+<div class="sect3">
+<h4 id="_usage_4">Usage</h4>
+<div class="paragraph">
+<p>To use the <code>tiny-cli debug</code> command, simply open your terminal and type the following command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>tiny-cli debug &lt;game folder&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>where <code>&lt;game folder&gt;</code> is the path to the directory containing your game&#8217;s assets and <code>_tiny.json</code> file.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="sample/tiny-cli-debug.png" alt="tiny cli debug"></span></p>
+</div>
+<div class="paragraph">
+<p>Clicking in the editor&#8217;s gutter adds a breakpoint, indicated by a red flag. When execution reaches a breakpoint, it pauses the execution, displaying variables within that context. Use the buttons above the variable display to resume execution or step through code line by line.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
 <h3 id="_the_tiny_cli_palette_command">the <code>tiny-cli palette</code> command</h3>
 <div class="paragraph">
 <p>The tiny-cli lib command is used extract a color palette from an image to use it in your <code>🧸 Tiny</code> game. This command provides an easy way to use colors from an image as your game&#8217;s palette color.</p>
 </div>
 <div class="sect3">
-<h4 id="_usage_4">Usage</h4>
+<h4 id="_usage_5">Usage</h4>
 <div class="paragraph">
 <p>To use the <code>tiny-cli palette</code> command, follow the syntax:</p>
 </div>
@@ -732,7 +749,7 @@ Only colors that are not already in your game&#8217;s palette will be appended, 
 <p>The <code>tiny-cli export</code> command is a tool for exporting your tiny game to a zip file, which includes all the assets needed to run the game in a browser. This command makes it easy to distribute your game and share it with others.</p>
 </div>
 <div class="sect3">
-<h4 id="_usage_5">Usage</h4>
+<h4 id="_usage_6">Usage</h4>
 <div class="paragraph">
 <p>To use the <code>tiny-cli export</code> command, simply open your terminal and type the following command:</p>
 </div>
@@ -810,7 +827,7 @@ Only colors that are not already in your game&#8217;s palette will be appended, 
 </div>
 </div>
 <div class="sect3">
-<h4 id="_usage_6">Usage</h4>
+<h4 id="_usage_7">Usage</h4>
 <div class="paragraph">
 <p>To run the tiny serve command, you can use the following examples:</p>
 </div>
@@ -862,7 +879,7 @@ The tiny serve command is intended for local testing only and should not be used
 <p><span class="image"><img src="sample/tiny-cli-sfx0.gif" alt="tiny cli sfx0"></span></p>
 </div>
 <div class="sect3">
-<h4 id="_usage_7">Usage</h4>
+<h4 id="_usage_8">Usage</h4>
 <div class="paragraph">
 <p>To use the <code>tiny-cli sfx</code> command, follow the syntax:</p>
 </div>
@@ -884,73 +901,13 @@ The tiny serve command is intended for local testing only and should not be used
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_the_tiny_cli_lib_command">the <code>tiny-cli lib</code> command</h3>
-<div class="paragraph">
-<p>The tiny-cli lib command is used to download and add Lua libraries to your <code>🧸 Tiny</code> game. This command provides an easy way to enhance the functionality of your game by incorporating libraries.</p>
-</div>
-<div class="sect3">
-<h4 id="_usage_8">Usage</h4>
-<div class="paragraph">
-<p>To use the <code>tiny-cli lib</code> command, follow the syntax:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-shell" data-lang="shell">tiny-cli lib &lt;library_name&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Replace &lt;library_name&gt; with the name of the library you want to download and add to your game.</p>
-</div>
-<div class="paragraph">
-<p>For example, to download and add the particles library to your game, you would run the following command:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-shell" data-lang="shell">tiny-cli lib particles</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This command will download the particles library and add it to your game.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_library_repository">Library Repository</h4>
-<div class="paragraph">
-<p>The libraries are downloaded from the following URL:</p>
-</div>
-<div class="paragraph">
-<p><a href="https://github.com/minigdx/tiny/tree/main/tiny-repository-libs" class="bare">https://github.com/minigdx/tiny/tree/main/tiny-repository-libs</a></p>
-</div>
-<div class="paragraph">
-<p>This repository contains a collection of Lua libraries that can be used with Tiny games. Each library is maintained separately and provides additional features and functionality to enhance your game development process.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_examples">Examples</h4>
-<div class="paragraph">
-<p>Here are a few examples to illustrate how to use the <code>tiny-cli lib</code> command:</p>
-</div>
-<div class="paragraph">
-<p>Download and add the particles library to your game:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-shell" data-lang="shell">tiny-cli lib particles</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This command will download the particles library from the repository and add it to your game.</p>
-</div>
-</div>
-</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 1.3.3-alpha<br>
-Last updated 2024-05-19 08:07:09 UTC
+Version 1.4.0-alpha<br>
+Last updated 2025-05-11 15:24:56 UTC
 </div>
 </div>
 </body>
