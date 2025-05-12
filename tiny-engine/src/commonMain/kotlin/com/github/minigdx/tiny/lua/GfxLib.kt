@@ -6,7 +6,6 @@ import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
-import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.render.operations.CameraOperation
 import com.github.minigdx.tiny.render.operations.ClipOperation
 import com.github.minigdx.tiny.render.operations.DitheringOperation
@@ -72,9 +71,9 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
     internal inner class pset : ThreeArgFunction() {
         @TinyCall("set the color index at the coordinate (x,y).")
         override fun call(
-            @TinyArg("x")arg1: LuaValue,
-            @TinyArg("y")arg2: LuaValue,
-            @TinyArg("color")arg3: LuaValue,
+            @TinyArg("x") arg1: LuaValue,
+            @TinyArg("y") arg2: LuaValue,
+            @TinyArg("color") arg3: LuaValue,
         ): LuaValue {
             resourceAccess.frameBuffer.pixel(arg1.checkint(), arg2.checkint(), arg3.checkint())
             resourceAccess.addOp(FrameBufferOperation)
@@ -86,8 +85,8 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
     internal inner class pget : TwoArgFunction() {
         @TinyCall("get the color index at the coordinate (x,y).")
         override fun call(
-            @TinyArg("x")arg1: LuaValue,
-            @TinyArg("y")arg2: LuaValue,
+            @TinyArg("x") arg1: LuaValue,
+            @TinyArg("y") arg2: LuaValue,
         ): LuaValue {
             val x = min(max(0, arg1.checkint()), gameOptions.width - 1)
             val y = min(max(0, arg2.checkint()), gameOptions.height - 1)
@@ -111,30 +110,25 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
         override fun call(
             @TinyArg("sheet") arg: LuaValue,
         ): LuaValue {
-            val frameBuffer = resourceAccess.frameBuffer
-            val copy =
-                PixelArray(frameBuffer.width, frameBuffer.height).apply {
-                    copyFrom(frameBuffer.colorIndexBuffer) { index, _, _ -> index }
-                }
+            val (index, name) = if (arg.isstring()) {
+                val index = resourceAccess.spritesheet(arg.tojstring()) ?: resourceAccess.newSpritesheetIndex()
+                index to arg.tojstring()
+            } else {
+                val spriteSheet = resourceAccess.spritesheet(arg.checkint())
+                arg.toint() to (spriteSheet?.name ?: "frame_buffer_${arg.toint()}")
+            }
 
-            val (index, name) =
-                if (arg.isstring()) {
-                    val index = resourceAccess.spritesheet(arg.tojstring()) ?: resourceAccess.newSpritesheetIndex()
-                    index to arg.tojstring()
-                } else {
-                    val spriteSheet = resourceAccess.spritesheet(arg.checkint())
-                    arg.toint() to (spriteSheet?.name ?: "frame_buffer_${arg.toint()}")
-                }
-            val sheet =
-                SpriteSheet(
-                    0,
-                    index,
-                    name,
-                    ResourceType.GAME_SPRITESHEET,
-                    copy,
-                    copy.width,
-                    copy.height,
-                )
+            val frameBuffer = resourceAccess.readFrame()
+            val sheet = SpriteSheet(
+                0,
+                index,
+                name,
+                ResourceType.GAME_SPRITESHEET,
+                frameBuffer.colorIndexBuffer,
+                frameBuffer.width,
+                frameBuffer.height,
+            )
+
             resourceAccess.spritesheet(sheet)
             return arg
         }

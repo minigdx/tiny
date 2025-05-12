@@ -130,6 +130,9 @@ interface Platform {
         ops: List<RenderOperation>,
     )
 
+    /**
+     * Read the full rendered screen into a frame.
+     */
     fun readRender(renderContext: RenderContext): RenderFrame
 
     /**

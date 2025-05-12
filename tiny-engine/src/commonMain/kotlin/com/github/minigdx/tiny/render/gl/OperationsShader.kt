@@ -128,6 +128,7 @@ class OperationsShader(
                 // Get the straight color
                 index
             }
+
             val color = colors.getRGBA(pal)
             colorPaletteBuffer[pos++] = color[0]
             colorPaletteBuffer[pos++] = color[1]

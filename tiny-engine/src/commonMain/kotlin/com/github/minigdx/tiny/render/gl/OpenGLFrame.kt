@@ -7,6 +7,7 @@ import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.graphic.PixelFormat
 import com.github.minigdx.tiny.render.RenderFrame
+import kotlin.math.max
 
 class OpenGLFrame(
     private val buffer: ByteBuffer,
@@ -28,12 +29,12 @@ class OpenGLFrame(
         // the bottom line is the first line in the buffer
         for (x in 0 until gameOptions.width) {
             for (y in 0 until gameOptions.height) {
-                buffer.position = (x + y * gameOptions.width) * PixelFormat.RGBA
+                buffer.position = (x + (max(0, gameOptions.height - 1 - y)) * gameOptions.width) * PixelFormat.RGBA
 
                 readBytes(buffer, tmp)
 
                 val colorIndex = gameOptions.colors().getColorIndex(tmp)
-                pixelArray.set(x, (gameOptions.height - 1) - y, colorIndex)
+                pixelArray.set(x, y, colorIndex)
             }
         }
 

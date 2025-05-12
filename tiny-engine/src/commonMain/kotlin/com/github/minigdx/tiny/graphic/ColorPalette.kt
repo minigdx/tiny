@@ -189,6 +189,6 @@ class ColorPalette(colors: List<HexColor>) {
 
     companion object {
         private val TRANSPARENT = byteArrayOf(0, 0, 0, 0)
-        val TRANSPARENT_INDEX = 0
+        const val TRANSPARENT_INDEX = 0
     }
 }

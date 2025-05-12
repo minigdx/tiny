@@ -28,7 +28,6 @@
     "#FF77A8",
     "#FFCCAA"
   ],
-  "sounds": ["test.mid"],
   "scripts": [
     "pong.lua"
   ],

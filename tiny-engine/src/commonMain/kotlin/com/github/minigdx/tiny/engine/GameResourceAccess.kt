@@ -55,6 +55,11 @@ interface GameResourceAccess {
     ): ColorIndex
 
     /**
+     * Read the full screen
+     */
+    fun readFrame(): FrameBuffer
+
+    /**
      * Access a sprite sheet by its index.
      */
     fun spritesheet(index: Int): SpriteSheet?
