@@ -305,6 +305,8 @@ function Ball:valid_move()
     return self.y > 256
 end
 
+local player = nil
+
 function _init()
     transition = new(GameOut)
 
@@ -315,13 +317,10 @@ function _init()
         cooldown = 0
     }
 
-    dt = 1 / 60
-    longueurCode = 100
-    longueurSegment = 10
-    numSegments = longueurCode / longueurSegment
-    gravite = 29.8
-    rigidite = 1 -- 0.8
-    amortissement = 0.9
+    player = new(Player)
+    for y=216,248,8 do
+        player:createPaddle(y)
+    end
 
     raquettes = {
         create_raquette(216),

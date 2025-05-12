@@ -506,7 +506,7 @@ class GameEngine(
     }
 
     /**
-     * Will render the actual operations on the screen.
+     * Will render the actual operations in the frame buffer
      */
     fun render() {
         val last = ops.lastOrNull() ?: return
@@ -531,7 +531,7 @@ class GameEngine(
             ops.add(op)
         }
 
-        // Render operations on the screen.
+        // Render operations in the GPU frame buffer
         platform.render(renderContext, ops)
 
         // The framebuffer has been rendered.
@@ -553,6 +553,16 @@ class GameEngine(
             renderFrame = platform.readRender(renderContext)
         }
         return renderFrame?.getPixel(x, y) ?: ColorPalette.TRANSPARENT_INDEX
+    }
+
+    override fun readFrame(): FrameBuffer {
+        if (renderFrame == null) {
+            render()
+            renderFrame = platform.readRender(renderContext)
+        }
+        val copy = FrameBuffer(frameBuffer.width, frameBuffer.height, frameBuffer.gamePalette)
+        renderFrame?.copyInto(copy.colorIndexBuffer)
+        return copy
     }
 
     override fun end() {

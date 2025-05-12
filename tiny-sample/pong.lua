@@ -1,15 +1,22 @@
+player = nil
+bricks = {}
+balls = {}
+
 -- TRANSITIONS --
 local Nope = {
     update = function()
+        debug.console("Nope")
     end,
     draw = function()
+
     end
 }
 
 local GameOut = {
     radius = 0,
     speed = 5,
-    start = false
+    start = false,
+    y = 0
 }
 
 local EndOut = {
@@ -20,7 +27,7 @@ local EndOut = {
     t = 0
 }
 
-function EndOut:update()
+EndOut.update = function(self)
     self.t = self.t + 1 / 60
     self.radius = juice.powIn5(self.start_radius, self.target_radius, self.t / self.duration)
 
@@ -33,7 +40,7 @@ function EndOut:update()
     end
 end
 
-function EndOut:draw()
+EndOut.draw = function(self)
     gfx.cls(1)
     shape.circlef(256 * 0.5, 212, self.radius, 0)
     spr.sheet(0)
@@ -50,8 +57,8 @@ local EndIn = {
     t = 0
 }
 
-function EndIn:update()
-    self.t = self.t + 1 / 60
+EndIn.update = function(self)
+    self.t = self.t + tiny.dt
     self.radius = juice.powOut5(self.start_radius, self.target_radius, self.t / self.duration)
 
     if (self.radius <= 40) then
@@ -59,38 +66,38 @@ function EndIn:update()
     end
 end
 
-function EndIn:draw()
+EndIn.draw = function(self)
     gfx.cls(1)
 
     shape.circlef(256 * 0.5, 212, self.radius, 0)
     gfx.to_sheet(2)
 end
 
-function GameOut:update()
+GameOut.update = function(self)
     if (self.start) then
         self.radius = self.radius + self.speed
 
         if (self.radius > 300) then
             transition = new(Nope)
         end
+        self.y = juice.powIn2(self.y, -200, self.radius / 500)
     end
 end
 
-function GameOut:draw()
-    gfx.cls(0)
+GameOut.draw = function(self)
+    local y = self.y
+
     spr.sheet(0)
     -- title
-    spr.sdraw(0, 100, 0, 208, 256, 3 * 16)
+    spr.sdraw(0, 100 + y, 0, 208, 256, 3 * 16)
     -- space
-    spr.sdraw(80, 150, 0, 128, 3 * 16, 16)
+    spr.sdraw(80, 150 + y, 0, 128, 3 * 16, 16)
     -- left and right
-    spr.sdraw(88, 150 + 16, 4 * 16, 128, 16, 16)
-    spr.sdraw(88 + 16, 150 + 16, 3 * 16, 128, 16, 16)
-    print("launch the ball", 80 + 3 * 16, 154, 2)
-    print("move the paddle", 80 + 3 * 16, 154 + 16, 2)
+    spr.sdraw(88, 150 + 16 + y, 4 * 16, 128, 16, 16)
+    spr.sdraw(88 + 16, 150 + 16 + y, 3 * 16, 128, 16, 16)
+    print("launch the ball", 80 + 3 * 16, 154 + y, 2)
+    print("move the paddle", 80 + 3 * 16, 154 + 16 + y, 2)
 
-    shape.circlef(256 * 0.5, 212, self.radius, 0)
-    gfx.to_sheet(2)
 end
 
 -- PARTICLES --
@@ -103,7 +110,7 @@ local Particle = {
     color = 1
 }
 
-function Particle:update()
+Particle.update = function(self)
     self.x = self.x + self.dir.x
     self.y = self.y + self.dir.y
     self.radius = self.radius + self.dir.r
@@ -111,7 +118,7 @@ function Particle:update()
     return self.ttl < 0
 end
 
-function Particle:draw()
+Particle.draw = function(self)
     shape.circlef(self.x, self.y, self.radius, self.color)
 end
 
@@ -131,7 +138,7 @@ local Brick = {
     progress = 0,
 }
 
-function Brick:update()
+Brick.update = function(self)
     self.progress = self.progress + 1 / 20
     self.y = juice.pow2(self.start_y - 20, self.start_y, math.min(1.0, self.progress))
 
@@ -194,8 +201,8 @@ local Ball = {
     accept_move_y = true,
 }
 
-function Ball:reset()
-    local r = raquettes[1]
+Ball.reset = function(self)
+    local r = player
 
     self.x = r.x + r.width * 0.5 - 7 * 0.5
     self.y = r.y - 7
@@ -209,7 +216,7 @@ function Ball:reset()
     return self
 end
 
-function Ball:update()
+Ball.update = function(self)
     self.accept_move_x = true
     self.accept_move_y = true
 
@@ -219,7 +226,7 @@ function Ball:update()
     end
 
     if self.glue_to then
-        local r = raquettes[1]
+        local r = player
         self.new_x = r.x + r.width * 0.5 - 7 * 0.5
         self.new_y = r.y - 7
 
@@ -256,19 +263,16 @@ function Ball:update()
         end
 
         -- hit paddles ?
-        if self.new_y >= raquettes[1].y then
-            for r in all(raquettes) do
-                -- raquette collision
-                local collision = check_collision(
-                        { x = r.x, y = r.y, width = 32, height = 8 },
-                        { x = self.new_x, y = self.new_y, width = self.width, height = self.height }
-                )
-                if collision then
-                    self.speed.y = -self.speed.y
-                    self.accept_move_y = false
-                end
-
+        if self.new_y >= player.y then
+            local collision = check_collision(
+                    { x = player.x, y = player.y, width = 32, height = 8 },
+                    { x = self.new_x, y = self.new_y, width = self.width, height = self.height }
+            )
+            if collision then
+                self.speed.y = -self.speed.y
+                self.accept_move_y = false
             end
+
         end
 
         table.insert(particles, new(Particle, {
@@ -282,7 +286,7 @@ function Ball:update()
     end
 end
 
-function Ball:valid_move()
+Ball.valid_move = function(self)
     if self.accept_move_x then
         self.x = self.new_x
     end
@@ -305,6 +309,72 @@ function Ball:valid_move()
     return self.y > 256
 end
 
+local Paddle = {
+    x = 0,
+    y = 0,
+    height = 8,
+    width = 24
+}
+local Player = {
+    x = 128 - 16,
+    y = 216,
+    width = 24,
+    height = 8,
+    color = 8,
+    speed = 6,
+    direction = 1,
+    paddles = {}
+}
+
+Player.createPaddle = function(self, y)
+    table.insert(self.paddles, new(Paddle, { x = self.x, y = y }))
+end
+
+Player.update = function(self)
+    local touching = ctrl.touching(0)
+    local touch = ctrl.touch()
+    local mleft = touching and touch.x < (self.x + self.width * 0.5)
+    local mright = touching and touch.x >= (self.x + self.width * 0.5)
+
+    if ctrl.pressing(keys.left) or mleft then
+        self.x = math.max(0, self.x - self.speed)
+        self.direction = 0
+    elseif ctrl.pressing(keys.right) or mright then
+        self.x = math.min(self.x + self.speed, 256 - self.width)
+        self.direction = 1
+    end
+    self.y = 216
+
+    self.paddles[1].x = self.x
+    self.paddles[1].y = self.y
+
+    self.paddles[2].x = self.x
+
+    for i = 3, #self.paddles do
+        local prev = self.paddles[i - 1]
+        local current = self.paddles[i]
+
+        current.x = juice.linear(current.x, prev.x, 0.2)
+    end
+end
+
+Player.draw = function(self)
+    -- head
+    shape.rectf(player.x + player.width, player.y + 3, 1, player.height - 3, 2)
+    spr.sdraw(player.x, player.y, 0, 32, player.width, player.height, player.direction == 1)
+
+    for i = 2, (#self.paddles - 1) do
+        local current = self.paddles[i]
+        local next = self.paddles[i + 1]
+
+        for h = 0, current.height do
+            local x = juice.pow2(current.x, next.x, h / current.height)
+            local y = current.y + h
+            spr.sdraw(x, y, 0, 32 + (i - 1) * 8 + h, current.width, 1)
+        end
+    end
+end
+
 function _init()
     transition = new(GameOut)
 
@@ -315,24 +385,10 @@ function _init()
         cooldown = 0
     }
 
-    dt = 1 / 60
-    longueurCode = 100
-    longueurSegment = 10
-    numSegments = longueurCode / longueurSegment
-    gravite = 29.8
-    rigidite = 1 -- 0.8
-    amortissement = 0.9
-
-    raquettes = {
-        create_raquette(216),
-        create_raquette(224),
-        create_raquette(232),
-        create_raquette(240),
-        create_raquette(248),
-        create_raquette(256),
-    }
-
-    local r = raquettes[1]
+    player = new(Player)
+    for y = 216, 248, 8 do
+        player:createPaddle(y)
+    end
 
     balls = {
         new(Ball):reset()
@@ -354,82 +410,6 @@ function _init()
     particles = {}
 end
 
--- FIXME: replace with class and use the term paddle
-function create_raquette(y)
-    return {
-        x = 128 - 16, -- center the raquette
-        y = y,
-        prevX = 128 - 16,
-        prevY = y,
-        width = 24,
-        height = 8,
-        color = 8,
-        speed = 6,
-        direction = 1,
-    }
-end
-
-function update_raquette(raquette)
-    local touching = ctrl.touching(0)
-    local touch = ctrl.touch()
-    local mleft = touching and touch.x < (raquette.x + raquette.width * 0.5)
-    local mright = touching and touch.x >= (raquette.x + raquette.width * 0.5)
-
-    if ctrl.pressing(keys.left) or mleft then
-        raquette.x = math.max(0, raquette.x - raquette.speed)
-        raquette.direction = 0
-    elseif ctrl.pressing(keys.right) or mright then
-        raquette.x = math.min(raquette.x + raquette.speed, 256 - raquette.width)
-        raquette.direction = 1
-    end
-    raquette.y = 216
-end
-
-function update_raquettes()
-    update_raquette(raquettes[1])
-
-    for i = 2, #raquettes do
-        local segment = raquettes[i]
-        local segmentPrecedent = raquettes[i - 1]
-
-        segment.y = segment.y + gravite * dt
-
-        -- integration de verlet
-        local vx = segment.x - segment.prevX
-        local vy = segment.y - segment.prevY
-
-        segment.prevX = segment.x
-        segment.prevY = segment.y
-
-        segment.x = segment.x + vx * amortissement
-        segment.y = segment.y + vy * amortissement
-
-        -- contraintes
-        local dx = segment.x - segmentPrecedent.x
-        local dy = segment.y - segmentPrecedent.y
-
-        local distance = math.sqrt(dx * dx + dy * dy)
-        local difference = longueurSegment - distance
-        local pourcentage = difference / distance / 2
-
-        local decalageX = dx * pourcentage * rigidite
-        local decalageY = dy * pourcentage * rigidite
-
-        segment.x = segment.x + decalageX
-        segment.y = segment.y + decalageY
-
-        segmentPrecedent.x = segmentPrecedent.x - decalageX
-        segmentPrecedent.y = segmentPrecedent.y - decalageY
-    end
-
-    for i = 2, #raquettes - 1 do
-        local segment = raquettes[i]
-        local segmentNext = raquettes[i + 1]
-
-        segment.height = math.abs(segment.y - segmentNext.y)
-
-    end
-end
 function check_collision(rect1, rect2)
     local rect1Right = rect1.x + rect1.width
     local rect1Bottom = rect1.y + rect1.height
@@ -469,7 +449,7 @@ function _update()
 
     transition:update()
 
-    update_raquettes()
+    player:update()
 
     for index, b in rpairs(balls) do
         b:update()
@@ -497,8 +477,6 @@ function _update()
 end
 
 function _draw()
-    transition:draw()
-
     -- game
     gfx.cls(13)
     spr.sheet()
@@ -514,6 +492,7 @@ function _draw()
         p:draw()
     end
 
+    transition:draw()
     for b in all(balls) do
         if b.glue_to then
             local x = math.sign(b.speed.x) * 8
@@ -526,19 +505,7 @@ function _draw()
         spr.sdraw(b.x, b.y, 0, 16, 8, 8)
     end
 
-    for i = 1, #raquettes - 1 do
-        local r = raquettes[i]
-        local next_r = raquettes[i + 1]
+    player:draw()
 
-        -- todo: add arms??
-        if i == 1 then
-            shape.rectf(r.x + r.width, r.y + 3, 1, r.height - 3, 2)
-            spr.sdraw(r.x, r.y, 0, 32, r.width, r.height, r.direction == 1)
-        else
-            shape.rectf(r.x, r.y, r.width, math.ceil(r.height), 10)
-        end
-    end
 
-    spr.sheet(2)
-    spr.sdraw()
 end
