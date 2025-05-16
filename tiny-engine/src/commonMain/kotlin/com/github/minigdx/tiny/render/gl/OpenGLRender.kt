@@ -1,7 +1,6 @@
 package com.github.minigdx.tiny.render.gl
 
 import com.danielgergely.kgl.ByteBuffer
-import com.danielgergely.kgl.GL_BLEND
 import com.danielgergely.kgl.GL_COLOR_ATTACHMENT0
 import com.danielgergely.kgl.GL_COLOR_BUFFER_BIT
 import com.danielgergely.kgl.GL_DEPTH24_STENCIL8
@@ -55,7 +54,10 @@ class OpenGLRender(
         // Framebuffer of the size of the screen
         val fboBuffer = ByteBuffer(gameOptions.width * gameOptions.height * PixelFormat.RGBA)
 
-        gl.enable(GL_BLEND)
+        // Attach stencil buffer to the framebuffer.
+        val stencilBuffer = gl.createRenderbuffer()
+        gl.bindRenderbuffer(GL_RENDERBUFFER, stencilBuffer)
+        gl.renderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, gameOptions.width, gameOptions.height)
 
         // Attach stencil buffer to the framebuffer.
         val stencilBuffer = gl.createRenderbuffer()

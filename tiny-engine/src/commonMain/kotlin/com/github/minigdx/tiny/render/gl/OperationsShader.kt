@@ -1,6 +1,16 @@
 package com.github.minigdx.tiny.render.gl
 
 import com.danielgergely.kgl.GL_ALWAYS
+import com.danielgergely.kgl.GL_BLEND
+import com.danielgergely.kgl.GL_DEPTH_TEST
+import com.danielgergely.kgl.GL_EQUAL
+import com.danielgergely.kgl.GL_KEEP
+import com.danielgergely.kgl.GL_NOTEQUAL
+import com.danielgergely.kgl.GL_ONE
+import com.danielgergely.kgl.GL_ONE_MINUS_SRC_ALPHA
+import com.danielgergely.kgl.GL_REPLACE
+import com.danielgergely.kgl.GL_ALWAYS
+import com.danielgergely.kgl.GL_BLEND
 import com.danielgergely.kgl.GL_DEPTH_TEST
 import com.danielgergely.kgl.GL_EQUAL
 import com.danielgergely.kgl.GL_KEEP
@@ -194,11 +204,13 @@ class OperationsShader(
     ) {
         when (op.mode) {
             DrawingMode.DEFAULT -> {
+                gl.enable(GL_BLEND)
                 gl.disable(GL_STENCIL_TEST)
                 gl.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
                 gl.colorMask(true, true, true, true)
             }
             DrawingMode.ALPHA_BLEND -> {
+                gl.enable(GL_BLEND)
                 gl.disable(GL_STENCIL_TEST)
                 gl.blendFuncSeparate(GL_ZERO, GL_ONE, GL_ZERO, GL_ONE_MINUS_SRC_ALPHA)
                 gl.colorMask(true, true, true, true)
@@ -216,6 +228,8 @@ class OperationsShader(
                 gl.stencilFunc(GL_EQUAL, 1, 0xFF)
                 gl.stencilMask(0x00)
                 gl.stencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
+                gl.enable(GL_BLEND)
+                gl.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
                 gl.colorMask(true, true, true, true)
             }
             DrawingMode.STENCIL_NOT_TEST -> {
@@ -223,6 +237,8 @@ class OperationsShader(
                 gl.stencilFunc(GL_NOTEQUAL, 1, 0xFF)
                 gl.stencilMask(0x00)
                 gl.stencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
+                gl.enable(GL_BLEND)
+                gl.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
                 gl.colorMask(true, true, true, true)
             }
         }
