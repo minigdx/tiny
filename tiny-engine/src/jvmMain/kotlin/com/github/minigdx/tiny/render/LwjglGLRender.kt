@@ -38,4 +38,11 @@ class LwjglGLRender(
     override fun readRender(context: RenderContext): RenderFrame = gl.readRender(context)
 
     override fun readRenderAsFrameBuffer(context: RenderContext): PixelArray = gl.readRenderAsFrameBuffer(context)
+
+    override fun executeOffScreen(
+        context: RenderContext,
+        block: () -> Unit,
+    ): RenderFrame {
+        return gl.executeOffScreen(context, block)
+    }
 }

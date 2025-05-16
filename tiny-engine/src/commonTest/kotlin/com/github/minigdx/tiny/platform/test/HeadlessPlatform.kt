@@ -156,6 +156,19 @@ class HeadlessPlatform(
 
     override fun draw(renderContext: RenderContext) = Unit
 
+    override fun executeOffScreen(
+        renderContext: RenderContext,
+        block: () -> Unit,
+    ): RenderFrame {
+        draw(renderContext)
+        // Render the frame
+        block.invoke()
+        val frame = FrameBufferFrame(frames.last())
+        // Drop the rendered frame
+        frames.removeLast()
+        return frame
+    }
+
     fun saveAnimation(name: String) = toGif(name, frames)
 
     class FrameBufferFrame(frameBuffer: FrameBuffer) : RenderFrame {

@@ -59,6 +59,8 @@ interface GameResourceAccess {
      */
     fun readFrame(): FrameBuffer
 
+    fun renderAsBuffer(block: () -> Unit): FrameBuffer
+
     /**
      * Access a sprite sheet by its index.
      */

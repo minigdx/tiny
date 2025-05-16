@@ -131,8 +131,6 @@ class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = Pix
         }
     }
 
-    // operator fun iterator(): Iterator<Int> = pixels.iterator()
-
     fun fill(
         startX: Int,
         endX: Int,

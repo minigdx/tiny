@@ -15,6 +15,7 @@ import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.webgl.WebGlPlatform
 import com.github.minigdx.tiny.render.RenderContext
+import com.github.minigdx.tiny.render.RenderFrame
 import com.github.minigdx.tiny.render.operations.RenderOperation
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.browser.document
@@ -344,6 +345,13 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
     )
 
     override fun draw(renderContext: RenderContext) = delegate.draw(renderContext)
+
+    override fun executeOffScreen(
+        renderContext: RenderContext,
+        block: () -> Unit,
+    ): RenderFrame {
+        return delegate.executeOffScreen(renderContext, block)
+    }
 
     override fun readRender(renderContext: RenderContext) = delegate.readRender(renderContext)
 }

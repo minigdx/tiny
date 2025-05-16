@@ -497,6 +497,20 @@ class GameEngine(
         }
     }
 
+    override fun renderAsBuffer(block: () -> Unit): FrameBuffer {
+        // Render on the screen to clean up render states.
+        render()
+
+        val renderFrame = platform.executeOffScreen(renderContext) {
+            block.invoke()
+            render()
+        }
+
+        val buffer = FrameBuffer(gameOptions.width, gameOptions.height, gameOptions.colors())
+        renderFrame.copyInto(buffer.colorIndexBuffer)
+        return buffer
+    }
+
     /**
      * Will render the remaining operations on the screen.
      */
