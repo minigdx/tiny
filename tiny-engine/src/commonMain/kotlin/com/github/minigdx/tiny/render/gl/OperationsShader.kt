@@ -9,15 +9,6 @@ import com.danielgergely.kgl.GL_NOTEQUAL
 import com.danielgergely.kgl.GL_ONE
 import com.danielgergely.kgl.GL_ONE_MINUS_SRC_ALPHA
 import com.danielgergely.kgl.GL_REPLACE
-import com.danielgergely.kgl.GL_ALWAYS
-import com.danielgergely.kgl.GL_BLEND
-import com.danielgergely.kgl.GL_DEPTH_TEST
-import com.danielgergely.kgl.GL_EQUAL
-import com.danielgergely.kgl.GL_KEEP
-import com.danielgergely.kgl.GL_NOTEQUAL
-import com.danielgergely.kgl.GL_ONE
-import com.danielgergely.kgl.GL_ONE_MINUS_SRC_ALPHA
-import com.danielgergely.kgl.GL_REPLACE
 import com.danielgergely.kgl.GL_SCISSOR_TEST
 import com.danielgergely.kgl.GL_SRC_ALPHA
 import com.danielgergely.kgl.GL_STENCIL_BUFFER_BIT

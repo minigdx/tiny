@@ -59,11 +59,6 @@ class OpenGLRender(
         gl.bindRenderbuffer(GL_RENDERBUFFER, stencilBuffer)
         gl.renderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, gameOptions.width, gameOptions.height)
 
-        // Attach stencil buffer to the framebuffer.
-        val stencilBuffer = gl.createRenderbuffer()
-        gl.bindRenderbuffer(GL_RENDERBUFFER, stencilBuffer)
-        gl.renderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, gameOptions.width, gameOptions.height)
-
         val fbo = gl.createFramebuffer()
         gl.bindFramebuffer(GL_FRAMEBUFFER, fbo)
 

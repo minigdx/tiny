@@ -1,5 +1,6 @@
 local wire = {}
 
+--- Set value to an dictionary by traversing the path
 wire.set_nested_value = function(target, path, value)
     local current_table = target
 
@@ -12,6 +13,7 @@ wire.set_nested_value = function(target, path, value)
     current_table[final_key] = value
 end
 
+--- Get value from an dictionary by traversing the path
 wire.get_nested_value = function(source, path)
     local current_table = source
 
@@ -24,6 +26,9 @@ wire.get_nested_value = function(source, path)
     return current_table[final_key]
 end
 
+
+-- change a value is update from source, set it to target. The value can be converted using conv.
+-- It's the responsibility from the source to call source.on_change to propagate the change.
 wire.produce_to = function(source, spath, target, tpath, conv)
     local old_on_change = source.on_change
 
@@ -39,6 +44,8 @@ wire.produce_to = function(source, spath, target, tpath, conv)
     end
 end
 
+-- call conv when the source value is changed.
+-- It's the responsibility from the source to call source.on_change to propagate the change.
 wire.listen_to = function(source, spath, conv)
     local old_on_change = source.on_change
 
