@@ -5,7 +5,7 @@ balls = {}
 -- TRANSITIONS --
 local Nope = {
     update = function()
-        debug.console("Nope")
+
     end,
     draw = function()
 

@@ -20,6 +20,7 @@ import com.danielgergely.kgl.GL_ONE_MINUS_SRC_ALPHA
 import com.danielgergely.kgl.GL_REPLACE
 import com.danielgergely.kgl.GL_SCISSOR_TEST
 import com.danielgergely.kgl.GL_SRC_ALPHA
+import com.danielgergely.kgl.GL_STENCIL_BUFFER_BIT
 import com.danielgergely.kgl.GL_STENCIL_TEST
 import com.danielgergely.kgl.GL_TRIANGLES
 import com.danielgergely.kgl.GL_ZERO
@@ -216,6 +217,8 @@ class OperationsShader(
                 gl.colorMask(true, true, true, true)
             }
             DrawingMode.STENCIL_WRITE -> {
+                gl.clearStencil(0)
+                gl.clear(GL_STENCIL_BUFFER_BIT)
                 gl.enable(GL_STENCIL_TEST)
                 gl.stencilOp(GL_KEEP, GL_KEEP, GL_REPLACE)
                 gl.stencilFunc(GL_ALWAYS, 1, 0xFF)
