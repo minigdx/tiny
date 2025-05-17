@@ -210,22 +210,27 @@ class OperationsShader(
                 gl.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
                 gl.colorMask(true, true, true, true)
             }
+
             DrawingMode.ALPHA_BLEND -> {
                 gl.enable(GL_BLEND)
                 gl.disable(GL_STENCIL_TEST)
                 gl.blendFuncSeparate(GL_ZERO, GL_ONE, GL_ZERO, GL_ONE_MINUS_SRC_ALPHA)
                 gl.colorMask(true, true, true, true)
             }
+
             DrawingMode.STENCIL_WRITE -> {
+                gl.enable(GL_STENCIL_TEST)
+
+                gl.stencilMask(0xFF)
                 gl.clearStencil(0)
                 gl.clear(GL_STENCIL_BUFFER_BIT)
-                gl.enable(GL_STENCIL_TEST)
+
                 gl.stencilOp(GL_KEEP, GL_KEEP, GL_REPLACE)
                 gl.stencilFunc(GL_ALWAYS, 1, 0xFF)
-                gl.stencilMask(0xFF)
                 // Don't write the actual sprite in the color buffer
                 gl.colorMask(false, false, false, false)
             }
+
             DrawingMode.STENCIL_TEST -> {
                 gl.enable(GL_STENCIL_TEST)
                 gl.stencilFunc(GL_EQUAL, 1, 0xFF)
@@ -235,6 +240,7 @@ class OperationsShader(
                 gl.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
                 gl.colorMask(true, true, true, true)
             }
+
             DrawingMode.STENCIL_NOT_TEST -> {
                 gl.enable(GL_STENCIL_TEST)
                 gl.stencilFunc(GL_NOTEQUAL, 1, 0xFF)
