@@ -32,15 +32,71 @@ function inside_widget(w, x, y, offset)
             y <= w.y + w.height + off
 end
 
-local BarEditor = {
-
+local CursorEditor = {
+    editor = nil,
+    beat = 0,
+    note = 0,
+    step_x = 8, -- adjust regarding the size of half of a bit on screen,
 }
 
-local test = {}
+CursorEditor._update = function(self)
+    if (ctrl.pressed(keys.left)) then
+        self.beat = self.beat - 1
+    elseif (ctrl.pressed(keys.right)) then
+        self.beat = self.beat + 1
+    end
+    self.beat = math.clamp(0, self.beat, 32)
+end
+
+CursorEditor._draw = function(self)
+    local x = self.editor.x + self.beat * self.step_x
+    local y = self.editor.y - 4
+    -- right
+    spr.sdraw(x, y, 248, 44, 4, 4)
+    -- left
+    spr.sdraw(x - 4, y, 248, 44, 4, 4, true)
+end
+
+local BarEditor = {
+    -- position of the keys (y only)
+    keys_y = {
+        { y = 0, h = 15 },
+        { y = 10, h = 11 },
+        { y = 16, h = 13 },
+        { y = 24, h = 10 },
+        { y = 29, h = 13 },
+        { y = 37, h = 11 },
+        { y = 43, h = 13 },
+        { y = 56, h = 13 },
+        { y = 65, h = 11 },
+        { y = 70, h = 13 },
+        { y = 78, h = 10 },
+        { y = 83, h = 13 },
+        { y = 96, h = 13 },
+        { y = 104, h = 11 },
+        { y = 110, h = 13 },
+        { y = 118, h = 10 },
+        { y = 124, h = 12 },
+        { y = 131, h = 11 },
+        { y = 137, h = 13 },
+        { y = 150, h = 13 },
+        { y = 158, h = 11 },
+        { y = 164, h = 13 },
+        { y = 172, h = 10 },
+        { y = 178, h = 13 },
+    },
+
+    octave = 0,
+    note = 0,
+}
+
+BarEditor._init = function(self)
+
+end
 
 BarEditor._update = function(self)
     local p = ctrl.touch()
-    p = {x = p.x, y = p.y + 8}
+    p = { x = p.x, y = p.y + 8 }
     if inside_widget(self, p.x, p.y) then
         state.edit = true
     else
@@ -56,11 +112,10 @@ BarEditor._update = function(self)
     elseif inside_widget(self, p.x, p.y) and ctrl.touching(0) ~= nil and self.current_edit ~= nil then
         -- commit and create a new edit state
         local local_x = p.x - self.x
-        local local_y = p.y - self.y
 
         local value = {
             beat = roundToHalf((local_x) / 16.0),
-            note = math.floor(local_y / 4),
+            note = self.note,
             duration = 0.5
         }
 
@@ -71,18 +126,17 @@ BarEditor._update = function(self)
 
             self.current_edit = {
                 beat = roundToHalf((local_x) / 16.0),
-                note = math.floor(local_y / 4),
+                note = self.note,
                 duration = 0.5
             }
         end
     elseif inside_widget(self, p.x, p.y) and ctrl.touched(0) ~= nil and self.current_edit == nil then
         -- create the edit state
         local local_x = p.x - self.x
-        local local_y = p.y - self.y
 
         self.current_edit = {
             beat = roundToHalf((local_x) / 16.0),
-            note = math.floor(local_y / 4),
+            note = self.note,
             duration = 0.5
         }
     elseif ctrl.touched(0) == nil and self.current_edit ~= nil then
@@ -92,7 +146,6 @@ BarEditor._update = function(self)
             beat = self.current_edit.beat,
             note = self.current_edit.note
         }
-        table.insert(test, value)
 
         state.current_bar.set_note(value)
 
@@ -103,65 +156,88 @@ BarEditor._update = function(self)
 
         local value = {
             beat = roundToHalf((local_x) / 16.0),
-            note = math.floor(local_y / 4),
+            note = self.note,
         }
 
-        for index, t in rpairs(test) do
-            if t.beat <= value.beat and value.beat <= t.beat + t.duration then
-                if t.note == value.note then
-                    table.remove(test, index)
-                end
-            end
-        end
         state.current_bar.remove_note(value)
+    end
+
+    -- get the current note regarding the y position.
+    -- the note is computed fro the color of the color virtual keyboard
+    local y = math.clamp(0, p.y - self.y, 192)
+    local color = spr.pget(164, 64 + y)
+
+    local color_to_note = {
+        [16] = "C",
+        [15] = "Cs",
+        [14] = "D",
+        [13] = "Ds",
+        [12] = "E",
+        [11] = "F",
+        [10] = "Fs",
+        [9] = "G",
+        [7] = "Gs",
+        [6] = "A",
+        [5] = "As",
+        [4] = "B"
+    }
+
+    local octave = (y <= 97 and self.octave + 1) or self.octave
+    local note = color_to_note[color]
+    if note then
+        self.note = note .. octave
     end
 end
 
-local sharp_notes = { [1] = true, [3] = true, [6] = true, [8] = true, [10] = true }
-
 BarEditor._draw = function(self)
-
-    -- line notes
-    for octave = 0, 3 do
-        for note = 0, 11 do
-            local x = self.x
-            local y = (self.y + self.height) - (octave * 4 * 12) - note * 4 - 1 - 4
-            if sharp_notes[note] then
-                gfx.dither(0xA5A5)
-                shape.rectf(x + 1, y, self.width - 3, 4, 3)
-                gfx.dither()
-            elseif note == 4 or note == 11 then
-                gfx.dither(0x3333)
-                shape.line(x + 1, y, x + self.width - 3, y, 3)
-                gfx.dither()
-            end
-        end
-    end
     -- line beats
-    for x = self.x, self.x + self.width, 16 do
+    for x = self.x, self.x + self.width, 15 do
         shape.line(x, self.y, x, self.y + self.height, 3)
     end
 
-    for t in all(test) do
+    for note in all(state.current_bar.notes()) do
+        local i = (note.notei) % 25
+
+        local keys = self.keys_y[1 + #self.keys_y - i]
+        local y = keys.y
+        local h = keys.h
+
         shape.rectf(
-                self.x + t.beat * 16, self.y + t.note * 4,
-                t.duration * 16, 4,
+                self.x + note.beat * 16, self.y + y,
+                note.duration * 16, h,
                 9
         )
     end
 
     if self.current_edit then
         local t = self.current_edit
+        debug.console(t.note)
+        local note = state.current_bar.note_data(t.note)
+        local i = (note.notei) % 25
+        local keys = self.keys_y[1 + #self.keys_y - i]
+
+        local y = keys.y
+        local h = keys.h
+
         shape.rect(
-                self.x + t.beat * 16, self.y + t.note * 4,
-                t.duration * 16, 4,
+                self.x + t.beat * 16, self.y + y,
+                t.duration * 16, h,
                 8
         )
-        --
     end
 
     -- border
     shape.rect(self.x, self.y, self.width, self.height, 4)
+
+    spr.sdraw(self.x - 3 * 8, self.y, 136, 64, 3 * 8, self.height)
+
+    gfx.pal(2, 8)
+    local p = ctrl.touch()
+    local x = math.clamp(self.x, p.x, self.x + self.width)
+    spr.sdraw(x - 8, self.y, 232, 64, 3 * 8, self.height)
+    gfx.pal()
+
+    print(self.note, self.x - 10, self.y - 8)
 end
 
 local w = {}
@@ -178,7 +254,12 @@ function _init()
 
     for b in all(entities["BarEditor"]) do
         local editor = new(BarEditor, b)
+        local cursor = new(CursorEditor)
+        cursor.editor = editor
+
+        editor:_init()
         table.insert(w, editor)
+        table.insert(w, cursor)
     end
 
     local to_bpm = function(source, target, value)
@@ -193,7 +274,7 @@ function _init()
     for k in all(entities["Knob"]) do
         local knob = widgets:create_knob(k)
         table.insert(w, knob)
-        if(knob.fields.Label == "BPM") then
+        if (knob.fields.Label == "BPM") then
             wire.produce_to(knob, { "value" }, state, { "current_bar", "bpm" }, to_bpm)
             wire.produce_to(state, { "current_bar", "bpm" }, knob, { "value" }, from_bpm)
 
@@ -209,7 +290,6 @@ function _init()
         local inst = widgets:create_help(instrument_name)
         wire.consume_on_update(inst, { "label" }, state, { "current_instrument", "name" })
         table.insert(w, inst)
-
 
         local prev = wire.find_widget(w, inst.fields.Prev)
         wire.listen_to(prev, { "status" }, function(source, value)

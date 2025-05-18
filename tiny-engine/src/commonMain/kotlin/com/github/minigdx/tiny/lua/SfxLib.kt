@@ -246,7 +246,7 @@ class SfxLib(
 
             obj.function1("set_note") { arg ->
                 val beat = arg["beat"].todouble().toFloat()
-                val note = Note.fromIndex(49 - arg["note"].toint())
+                val note = Note.fromName(arg["note"].tojstring())
                 val duration = arg["duration"].todouble().toFloat()
 
                 this.setNote(note, beat, duration)
@@ -256,11 +256,35 @@ class SfxLib(
 
             obj.function1("remove_note") { arg ->
                 val beat = arg["beat"].todouble().toFloat()
-                val note = Note.fromIndex(49 - arg["note"].toint())
+                val note = Note.fromName(arg["note"].tojstring())
 
                 this.removeNote(note, beat)
 
                 NONE
+            }
+
+            obj.function1("note_data") { arg ->
+                val note = Note.fromName(arg.tojstring())
+
+                LuaTable().apply {
+                    this.set("note", valueOf(note.name))
+                    this.set("notei", valueOf(note.index))
+                }
+            }
+
+            obj.function0("notes") {
+                val result = LuaTable()
+                this.beats.map {
+                    LuaTable().apply {
+                        this.set("note", it.note?.name?.let { valueOf(it) } ?: NIL)
+                        this.set("notei", it.note?.index?.let { valueOf(it) } ?: NIL)
+                        this.set("beat", valueOf(it.beat.toDouble()))
+                        this.set("duration", valueOf(it.duration.toDouble()))
+                    }
+                }.forEachIndexed { index, value ->
+                    result.insert(index + 1, value)
+                }
+                result
             }
 
             obj.function0("play") {
