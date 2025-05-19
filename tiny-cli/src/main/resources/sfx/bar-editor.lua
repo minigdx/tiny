@@ -37,6 +37,8 @@ local CursorEditor = {
     beat = 0,
     note = 0,
     step_x = 8, -- adjust regarding the size of half of a bit on screen,
+    time = 0,
+    play = false,
 }
 
 CursorEditor._update = function(self)
@@ -45,6 +47,23 @@ CursorEditor._update = function(self)
     elseif (ctrl.pressed(keys.right)) then
         self.beat = self.beat + 1
     end
+
+    if ctrl.pressed(keys.space) then
+        self.beat = 0
+        self.play = not self.play
+        self.time = 0
+    end
+
+    if self.play then
+        self.time = self.time + tiny.dt
+        self.beat = self.time * (state.current_bar.bpm / 60) * 2
+
+        if (self.beat >= 32) then
+            self.play = false
+            self.beat = 0
+        end
+    end
+
     self.beat = math.clamp(0, self.beat, 32)
 end
 
@@ -60,30 +79,30 @@ end
 local BarEditor = {
     -- position of the keys (y only)
     keys_y = {
-        { y = 0, h = 15 },
-        { y = 10, h = 11 },
-        { y = 16, h = 13 },
-        { y = 24, h = 10 },
-        { y = 29, h = 13 },
-        { y = 37, h = 11 },
-        { y = 43, h = 13 },
-        { y = 56, h = 13 },
-        { y = 65, h = 11 },
-        { y = 70, h = 13 },
-        { y = 78, h = 10 },
-        { y = 83, h = 13 },
-        { y = 96, h = 13 },
-        { y = 104, h = 11 },
-        { y = 110, h = 13 },
-        { y = 118, h = 10 },
-        { y = 124, h = 12 },
-        { y = 131, h = 11 },
-        { y = 137, h = 13 },
-        { y = 150, h = 13 },
-        { y = 158, h = 11 },
-        { y = 164, h = 13 },
-        { y = 172, h = 10 },
-        { y = 178, h = 13 },
+        { y = 0, h = 8 },
+        { y = 9, h = 8 },
+        { y = 17, h = 8 },
+        { y = 25, h = 8 },
+        { y = 33, h = 8 },
+        { y = 41, h = 8 },
+        { y = 49, h = 8 },
+        { y = 57, h = 8 },
+        { y = 65, h = 8 },
+        { y = 73, h = 8 },
+        { y = 81, h = 8 },
+        { y = 89, h = 8 },
+        { y = 97, h = 8 },
+        { y = 105, h = 8 },
+        { y = 113, h = 8 },
+        { y = 121, h = 8 },
+        { y = 129, h = 8 },
+        { y = 137, h = 8 },
+        { y = 145, h = 8 },
+        { y = 153, h = 8 },
+        { y = 161, h = 8 },
+        { y = 169, h = 8 },
+        { y = 177, h = 8 },
+        { y = 185, h = 8 },
     },
 
     octave = 0,
