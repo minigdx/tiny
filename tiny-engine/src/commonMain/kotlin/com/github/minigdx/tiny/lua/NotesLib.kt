@@ -184,6 +184,13 @@ enum class Note(val frequency: Float, val index: Int) {
     B8(7902.13f, OCTAVE_8 + 12),
     ;
 
+    val octave: Int
+        get() {
+            val note = (index - 1) % OCTAVE_1
+            val octave = (index - 1 - note) / OCTAVE_1
+            return octave
+        }
+
     companion object {
         private val notesPerIndex = entries.toTypedArray().distinctBy { it.index }.sortedBy { it.index }.toTypedArray()
 

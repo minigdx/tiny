@@ -269,6 +269,7 @@ class SfxLib(
                 LuaTable().apply {
                     this.set("note", valueOf(note.name))
                     this.set("notei", valueOf(note.index))
+                    this.set("octave", valueOf(note.octave))
                 }
             }
 
@@ -278,6 +279,7 @@ class SfxLib(
                     LuaTable().apply {
                         this.set("note", it.note?.name?.let { valueOf(it) } ?: NIL)
                         this.set("notei", it.note?.index?.let { valueOf(it) } ?: NIL)
+                        this.set("octave", it.note?.octave?.let { valueOf(it) } ?: NIL)
                         this.set("beat", valueOf(it.beat.toDouble()))
                         this.set("duration", valueOf(it.duration.toDouble()))
                     }

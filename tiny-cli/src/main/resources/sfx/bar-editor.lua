@@ -52,6 +52,10 @@ CursorEditor._update = function(self)
         self.beat = 0
         self.play = not self.play
         self.time = 0
+
+        if self.play then
+            state.current_bar.play()
+        end
     end
 
     if self.play then
@@ -105,8 +109,12 @@ local BarEditor = {
         { y = 185, h = 8 },
     },
 
-    octave = 0,
+    octave = 4,
     note = 0,
+    hitbox_octaves = {
+        { x = -16, y = -8, width = 8, height = 8 },
+        { x = -16, y = 0, width = 8, height = 8 },
+    }
 }
 
 BarEditor._init = function(self)
@@ -115,6 +123,21 @@ end
 
 BarEditor._update = function(self)
     local p = ctrl.touch()
+
+    -- octave management
+    -- (as the octave buttons is using the default mouse, the mouse position needs to be checked without the offset)
+    local up = self.hitbox_octaves[1]
+    local down = self.hitbox_octaves[2]
+    if ctrl.touched(0) then
+        if inside_widget({ x = self.x + up.x, y = self.y + up.y, width = up.width, height = up.height }, p.x, p.y) then
+            self.octave = self.octave + 1
+        elseif inside_widget({ x = self.x + down.x, y = self.y + self.height + down.y, width = down.width, height = down.height }, p.x, p.y) then
+            self.octave = self.octave - 1
+        end
+
+        self.octave = math.clamp(0, self.octave, 8)
+    end
+
     p = { x = p.x, y = p.y + 8 }
     if inside_widget(self, p.x, p.y) then
         state.edit = true
@@ -171,7 +194,6 @@ BarEditor._update = function(self)
         self.current_edit = nil
     elseif inside_widget(self, p.x, p.y) and ctrl.touching(1) ~= nil then
         local local_x = p.x - self.x
-        local local_y = p.y - self.y
 
         local value = {
             beat = roundToHalf((local_x) / 16.0),
@@ -215,24 +237,30 @@ BarEditor._draw = function(self)
     end
 
     for note in all(state.current_bar.notes()) do
-        local i = (note.notei) % 25
 
-        local keys = self.keys_y[1 + #self.keys_y - i]
-        local y = keys.y
-        local h = keys.h
+        local i = note.notei - self.octave * 12
 
-        shape.rectf(
-                self.x + note.beat * 16, self.y + y,
-                note.duration * 16, h,
-                9
-        )
+        if self.octave <= note.octave and note.octave < self.octave + 2 then
+            local keys = self.keys_y[1 + #self.keys_y - i]
+            if not keys then
+                debug.console("i -> ", i, " index -> ", 1 + #self.keys_y - i, " notei ", note.notei)
+            end
+            local y = keys.y
+            local h = keys.h
+
+            shape.rectf(
+                    self.x + note.beat * 16, self.y + y,
+                    note.duration * 16, h,
+                    9
+            )
+        end
     end
 
     if self.current_edit then
         local t = self.current_edit
-        debug.console(t.note)
+
         local note = state.current_bar.note_data(t.note)
-        local i = (note.notei) % 25
+        local i = note.notei - self.octave * 12
         local keys = self.keys_y[1 + #self.keys_y - i]
 
         local y = keys.y
@@ -248,7 +276,14 @@ BarEditor._draw = function(self)
     -- border
     shape.rect(self.x, self.y, self.width, self.height, 4)
 
+    -- keyboard
     spr.sdraw(self.x - 3 * 8, self.y, 136, 64, 3 * 8, self.height)
+    -- octave up
+    local up = self.hitbox_octaves[1]
+    spr.sdraw(self.x + up.x, self.y + up.y, 240, 40, up.width, up.height)
+    -- octave down
+    local down = self.hitbox_octaves[2]
+    spr.sdraw(self.x + down.x, self.y + self.height + down.y, 240, 40, down.width, down.height, false, true)
 
     gfx.pal(2, 8)
     local p = ctrl.touch()
@@ -256,7 +291,7 @@ BarEditor._draw = function(self)
     spr.sdraw(x - 8, self.y, 232, 64, 3 * 8, self.height)
     gfx.pal()
 
-    print(self.note, self.x - 10, self.y - 8)
+    print(self.note, x, self.y - 8)
 end
 
 local w = {}
@@ -265,7 +300,10 @@ function _init()
     w = {}
     test = {}
     state = new(State)
+    sfx.load(0) -- Load the sound file before init everything
+
     state.current_bar = sfx.bar(0)
+    debug.console(state.current_bar)
     state.current_instrument = sfx.instrument(state.current_bar.instrument())
 
     map.level("BarEditor")
@@ -354,10 +392,6 @@ function _update()
 
     for widget in all(w) do
         widget:_update()
-    end
-
-    if ctrl.pressed(keys.space) then
-        state.current_bar.play()
     end
 end
 

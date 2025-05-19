@@ -43,5 +43,8 @@
   "levels": [
     "editor.ldtk"
   ],
+  "sounds": [
+    "test.sfx"
+  ],
   "hideMouseCursor": true
 }
