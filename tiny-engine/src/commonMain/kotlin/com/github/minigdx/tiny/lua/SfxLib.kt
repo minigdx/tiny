@@ -10,6 +10,7 @@ import com.github.minigdx.tiny.sound.Music
 import com.github.minigdx.tiny.sound.MusicalBar
 import com.github.minigdx.tiny.sound.MusicalNote
 import com.github.minigdx.tiny.sound.SoundHandler
+import com.github.minigdx.tiny.sound.Sweep
 import kotlinx.serialization.json.Json
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
@@ -178,6 +179,25 @@ class SfxLib(
                 { valueOf(this.release.toDouble()) },
                 { this.release = it.optdouble(0.0).toFloat() },
             )
+            obj.wrap("sweep") {
+                val sweep = WrapperLuaTable()
+                sweep.wrap(
+                    "active",
+                    { valueOf(this.modulations[0].active) },
+                    { this.modulations[0].active = it.optboolean(false) },
+                )
+                sweep.wrap(
+                    "acceleration",
+                    { valueOf((this.modulations[0] as Sweep).acceleration.toDouble()) },
+                    { (this.modulations[0] as Sweep).acceleration = it.optdouble(0.0).toFloat() },
+                )
+                sweep.wrap(
+                    "frequency",
+                    { valueOf((this.modulations[0] as Sweep).sweep.toDouble()) },
+                    { (this.modulations[0] as Sweep).sweep = it.optdouble(0.0).toFloat() },
+                )
+                sweep
+            }
 
             obj.function1("play") { noteAsString ->
                 val hardVolume = 0.8f

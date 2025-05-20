@@ -27,7 +27,7 @@ wire.get_nested_value = function(source, path)
 end
 
 
--- change a value is update from source, set it to target. The value can be converted using conv.
+-- change a value updated from source, set it to target. The value can be converted using conv.
 -- It's the responsibility from the source to call source.on_change to propagate the change.
 wire.produce_to = function(source, spath, target, tpath, conv)
     local old_on_change = source.on_change

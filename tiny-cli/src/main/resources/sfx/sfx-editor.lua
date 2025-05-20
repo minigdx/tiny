@@ -142,6 +142,31 @@ function _init()
         table.insert(m.widgets, button)
     end
 
+    for mode in all(entities["Checkbox"]) do
+        local button = widgets:create_checkbox(mode)
+        table.insert(m.widgets, button)
+    end
+
+    for effect in all(entities["Sweep"]) do
+        local active = wire.find_widget(m.widgets, effect.fields.Enabled)
+        local acceleration = wire.find_widget(m.widgets, effect.fields.Acceleration)
+        local sweep = wire.find_widget(m.widgets, effect.fields.Sweep)
+
+        wire.produce_to(active, { "value" }, state, { "instrument", "sweep", "active" })
+        wire.consume_on_update(active, { "value" }, state, { "instrument", "sweep", "active" })
+
+        wire.produce_to(acceleration, { "value" }, state, { "instrument", "sweep", "acceleration" })
+        wire.consume_on_update(acceleration, { "value" }, state, { "instrument", "sweep", "acceleration" })
+
+        wire.produce_to(sweep, { "value" }, state, { "instrument", "sweep", "frequency" }, function(source, target, value)
+            return juice.pow2(200, 2000, value)
+        end)
+        wire.consume_on_update(sweep, { "value" }, state, { "instrument", "sweep", "frequency" }, function(source, target, value)
+            return (value - 200) / (2000 - 200)
+        end)
+
+    end
+
     -- force setting correct values
     if (state.on_change) then
         state:on_change()

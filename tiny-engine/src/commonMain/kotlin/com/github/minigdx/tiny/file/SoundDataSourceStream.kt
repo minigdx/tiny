@@ -16,7 +16,8 @@ class SoundDataSourceStream(
     override suspend fun read(): SoundData {
         val bytes = delegate.read()
 
-        val music: Music = Json.decodeFromString(bytes.decodeToString())
+        val json = Json { ignoreUnknownKeys = true }
+        val music: Music = json.decodeFromString(bytes.decodeToString())
 
         val sounds = music.musicalBars.map { bar -> soundManager.convert(bar) }
 
