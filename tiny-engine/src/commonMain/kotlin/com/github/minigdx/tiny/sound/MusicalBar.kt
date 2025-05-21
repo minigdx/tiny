@@ -2,9 +2,9 @@ package com.github.minigdx.tiny.sound
 
 import com.github.minigdx.tiny.BPM
 import com.github.minigdx.tiny.Beats
+import com.github.minigdx.tiny.Percent
 import com.github.minigdx.tiny.lua.Note
 import kotlinx.serialization.Serializable
-import kotlin.math.min
 
 /**
  * A musical bar is holding musical notes.
@@ -25,8 +25,15 @@ class MusicalBar(
 ) {
     val beats: MutableList<MusicalNote> = mutableListOf()
 
-    val endBeat: Float
-        get() = min(MAX_BEATS_PER_BAR, beats.maxBy { it.endBeat }.endBeat)
+    private fun notesOnTheBeat(
+        beat: Beats,
+        duration: Beats,
+    ): List<MusicalNote> {
+        return beats
+            .filter { note1 ->
+                note1.beat < beat + duration && note1.beat + note1.duration > beat
+            }
+    }
 
     /**
      * Set all notes of the musical bar.
@@ -44,13 +51,13 @@ class MusicalBar(
         note: Note,
         beat: Beats,
         duration: Beats,
+        uniqueOnBeat: Boolean = false,
     ) {
-        val volume = 1f // TODO: change
+        val volume = 1f
 
         // Remove notes that are during this new note
-        val toRemoveBeats =
-            beats.filter { n -> n.note == note }
-                .filter { n -> n.beat in beat..beat + duration }
+        val toRemoveBeats = notesOnTheBeat(beat, duration)
+            .filter { n -> uniqueOnBeat || n.note == note }
         beats.removeAll(toRemoveBeats)
 
         // Save the new note
@@ -65,11 +72,21 @@ class MusicalBar(
         note: Note,
         beat: Beats,
     ) {
-        val toBeRemoved =
-            beats.filter { n -> n.note == note }
-                .filter { n -> beat in n.beat..(n.beat + n.duration) }
+        val toBeRemoved = notesOnTheBeat(beat, 0.5f)
+            .filter { n -> n.note == note }
+            .filter { n -> beat in n.beat..(n.beat + n.duration) }
 
         beats.removeAll(toBeRemoved)
+    }
+
+    fun setVolume(
+        beat: Beats,
+        volume: Percent,
+    ) {
+        val notes = notesOnTheBeat(beat, 0.5f)
+        notes.forEach { n ->
+            n.volume = volume
+        }
     }
 
     companion object {

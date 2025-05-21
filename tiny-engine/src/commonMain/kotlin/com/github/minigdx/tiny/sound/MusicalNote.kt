@@ -1,6 +1,7 @@
 package com.github.minigdx.tiny.sound
 
 import com.github.minigdx.tiny.Beats
+import com.github.minigdx.tiny.Percent
 import com.github.minigdx.tiny.lua.Note
 import kotlinx.serialization.Serializable
 
@@ -24,7 +25,7 @@ class MusicalNote(
      * How many beats this note will last.
      */
     var duration: Beats,
-    var volume: Float,
+    var volume: Percent,
 ) {
     val endBeat: Float
         get() = beat + duration

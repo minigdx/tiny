@@ -63,6 +63,78 @@
       "lastOutput": 0.06498258,
       "lastFrequencyUsed": 146.83,
       "cachedAlpha": 0.020702422
+    },
+    {
+      "index": 4,
+      "name": "clarinet",
+      "wave": "TRIANGLE",
+      "attack": 0.01,
+      "decay": 0.1,
+      "sustain": 0.8,
+      "release": 0.5,
+      "harmonics": [
+        1.1,
+        0.3,
+        0.031,
+        0.039,
+        0.345,
+        0.29,
+        0.0119
+      ]
+    },
+    {
+      "index": 5,
+      "name": "clarinet",
+      "wave": "TRIANGLE",
+      "attack": 0.01,
+      "decay": 0.1,
+      "sustain": 0.8,
+      "release": 0.5,
+      "harmonics": [
+        1.1,
+        0.3,
+        0.031,
+        0.039,
+        0.345,
+        0.29,
+        0.0119
+      ]
+    },
+    {
+      "index": 6,
+      "name": "clarinet",
+      "wave": "TRIANGLE",
+      "attack": 0.01,
+      "decay": 0.1,
+      "sustain": 0.8,
+      "release": 0.5,
+      "harmonics": [
+        1.1,
+        0.3,
+        0.031,
+        0.039,
+        0.345,
+        0.29,
+        0.0119
+      ]
+    },
+    {
+      "index": 7,
+      "name": "clarinet",
+      "wave": "TRIANGLE",
+      "attack": 0.01,
+      "decay": 0.1,
+      "sustain": 0.8,
+      "release": 0.5,
+      "harmonics": [
+        1.1,
+        0.3,
+        0.031,
+        0.039,
+        0.345,
+        0.29,
+        0.0119
+      ]
     }
   ],
   "musicalBars": [

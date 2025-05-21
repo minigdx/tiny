@@ -32,6 +32,61 @@ function inside_widget(w, x, y, offset)
             y <= w.y + w.height + off
 end
 
+local InstrumentName = {
+    index = 0
+}
+
+InstrumentName._update = function(self)
+
+end
+
+InstrumentName._draw = function(self)
+    local x, y = 0, 160
+    local ox = (self.index % 4) * 16
+    local oy = math.floor(self.index / 4) * 16
+    spr.sdraw(self.x, self.y, x + ox, y + oy, 16, 16)
+end
+
+local VolumeEditor = {
+
+}
+
+VolumeEditor._update = function(self)
+    local p = ctrl.touch()
+    if ctrl.touching(0) and inside_widget(self, p.x, p.y) then
+        local local_x = p.x - self.x
+        local local_y = p.y - self.y
+        local beat = roundToHalf((local_x) / 16.0)
+
+        if local_y > self.height - 8 then
+            state.current_bar.set_volume(beat, 0)
+        else
+            local volume = math.clamp(0, 1.0 - (local_y / (self.height - 8)), 1.0)
+            state.current_bar.set_volume(beat, volume)
+        end
+
+    end
+end
+
+VolumeEditor._draw = function(self)
+    local low = self.y + self.height - 8
+
+    for note in all(state.current_bar.notes()) do
+        local volume = note.volume * (self.height - 8)
+        for nx = self.x + note.beat * 16, self.x + (note.duration + note.beat) * 16, 8 do
+            shape.rectf(
+                    nx + 1, low - volume,
+                    8 - 2, volume,
+                    9
+            )
+        end
+
+    end
+
+    shape.line(self.x, low, self.x + self.width - 1, low, 9)
+    shape.rect(self.x, self.y, self.width, self.height, 9)
+end
+
 local CursorEditor = {
     editor = nil,
     beat = 0,
@@ -156,14 +211,17 @@ BarEditor._update = function(self)
         local local_x = p.x - self.x
 
         local value = {
-            beat = roundToHalf((local_x) / 16.0),
+            beat = self.current_edit.beat,
             note = self.note,
-            duration = 0.5
+            duration = 0.5,
+            unique = true
         }
 
-        if (self.current_edit.beat ~= value.beat) then
-            table.insert(test, value)
+        local current_beat = roundToHalf((local_x) / 16.0)
+        debug.console("beat -> ", value.beat, " current beat -> ", current_beat)
+        if (self.current_edit.beat ~= current_beat) then
 
+            debug.console("set_note", value)
             state.current_bar.set_note(value)
 
             self.current_edit = {
@@ -186,8 +244,11 @@ BarEditor._update = function(self)
         local value = {
             duration = self.current_edit.duration,
             beat = self.current_edit.beat,
-            note = self.current_edit.note
+            note = self.current_edit.note,
+            unique = true
         }
+
+        debug.console("set_note", value)
 
         state.current_bar.set_note(value)
 
@@ -223,7 +284,7 @@ BarEditor._update = function(self)
         [4] = "B"
     }
 
-    local octave = (y <= 97 and self.octave + 1) or self.octave
+    local octave = (y <= 95 and self.octave + 1) or self.octave
     local note = color_to_note[color]
     if note then
         self.note = note .. octave
@@ -242,9 +303,6 @@ BarEditor._draw = function(self)
 
         if self.octave <= note.octave and note.octave < self.octave + 2 then
             local keys = self.keys_y[1 + #self.keys_y - i]
-            if not keys then
-                debug.console("i -> ", i, " index -> ", 1 + #self.keys_y - i, " notei ", note.notei)
-            end
             local y = keys.y
             local h = keys.h
 
@@ -274,7 +332,7 @@ BarEditor._draw = function(self)
     end
 
     -- border
-    shape.rect(self.x, self.y, self.width, self.height, 4)
+    shape.rect(self.x, self.y, self.width, self.height + 1, 4)
 
     -- keyboard
     spr.sdraw(self.x - 3 * 8, self.y, 136, 64, 3 * 8, self.height)
@@ -285,11 +343,8 @@ BarEditor._draw = function(self)
     local down = self.hitbox_octaves[2]
     spr.sdraw(self.x + down.x, self.y + self.height + down.y, 240, 40, down.width, down.height, false, true)
 
-    gfx.pal(2, 8)
     local p = ctrl.touch()
     local x = math.clamp(self.x, p.x, self.x + self.width)
-    spr.sdraw(x - 8, self.y, 232, 64, 3 * 8, self.height)
-    gfx.pal()
 
     print(self.note, x, self.y - 8)
 end
@@ -344,11 +399,11 @@ function _init()
     end
 
     for instrument_name in all(entities["InstrumentName"]) do
-        local inst = widgets:create_help(instrument_name)
-        wire.consume_on_update(inst, { "label" }, state, { "current_instrument", "name" })
-        table.insert(w, inst)
+        local label = new(InstrumentName, instrument_name)
+        wire.consume_on_update(label, { "index" }, state, { "current_instrument", "index" })
+        table.insert(w, label)
 
-        local prev = wire.find_widget(w, inst.fields.Prev)
+        local prev = wire.find_widget(w, label.fields.Prev)
         wire.listen_to(prev, { "status" }, function(source, value)
             state.current_bar.instrument(state.current_bar.instrument() - 1)
             state.current_instrument = sfx.instrument(state.current_bar.instrument())
@@ -356,7 +411,7 @@ function _init()
                 state:on_change()
             end
         end)
-        local next = wire.find_widget(w, inst.fields.Next)
+        local next = wire.find_widget(w, label.fields.Next)
         wire.listen_to(next, { "status" }, function(source, value)
             state.current_bar.instrument(state.current_bar.instrument() + 1)
             state.current_instrument = sfx.instrument(state.current_bar.instrument())
@@ -368,6 +423,11 @@ function _init()
 
     for mode in all(entities["EditorMode"]) do
         local button = widgets:create_mode_switch(mode)
+        table.insert(w, button)
+    end
+
+    for mode in all(entities["VolumeEditor"]) do
+        local button = new(VolumeEditor, mode)
         table.insert(w, button)
     end
 

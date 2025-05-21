@@ -13,6 +13,10 @@ class Music(
             violon,
             obos,
             drum,
+            custom1,
+            custom2,
+            custom3,
+            custom4,
         ),
     val musicalBars: List<MusicalBar> = Array(32) { MusicalBar(it + 1, clarinet) }.toList(),
     val sequences: MutableList<MusicalSequence> = mutableListOf(),
@@ -64,4 +68,52 @@ val drum =
         sustain = 0.9f,
         release = 0.05f,
         harmonics = floatArrayOf(1f),
+    )
+
+val custom1 =
+    Instrument(
+        index = 4,
+        name = "custom1",
+        wave = Instrument.WaveType.PULSE,
+        attack = 0.1f,
+        decay = 0.1f,
+        sustain = 0.9f,
+        release = 0.05f,
+        harmonics = floatArrayOf(1f, 0.05f, 0.01f),
+    )
+
+val custom2 =
+    Instrument(
+        index = 5,
+        name = "custom2",
+        wave = Instrument.WaveType.SAW_TOOTH,
+        attack = 0.1f,
+        decay = 0.1f,
+        sustain = 0.9f,
+        release = 0.05f,
+        harmonics = floatArrayOf(1f, 0.05f, 0.01f),
+    )
+
+val custom3 =
+    Instrument(
+        index = 6,
+        name = "custom3",
+        wave = Instrument.WaveType.TRIANGLE,
+        attack = 0.1f,
+        decay = 0.1f,
+        sustain = 0.9f,
+        release = 0.05f,
+        harmonics = floatArrayOf(1f, 0.05f, 0.01f),
+    )
+
+val custom4 =
+    Instrument(
+        index = 7,
+        name = "custom4",
+        wave = Instrument.WaveType.SQUARE,
+        attack = 0.1f,
+        decay = 0.1f,
+        sustain = 0.9f,
+        release = 0.05f,
+        harmonics = floatArrayOf(1f, 0.05f, 0.01f),
     )

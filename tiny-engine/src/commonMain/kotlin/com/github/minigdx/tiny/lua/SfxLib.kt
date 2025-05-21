@@ -264,12 +264,18 @@ class SfxLib(
                 { this.tempo = it.checkint() },
             )
 
+            obj.function2("set_volume") { beat, volume ->
+                this.setVolume(beat.tofloat(), volume.tofloat())
+                NONE
+            }
+
             obj.function1("set_note") { arg ->
                 val beat = arg["beat"].todouble().toFloat()
                 val note = Note.fromName(arg["note"].tojstring())
                 val duration = arg["duration"].todouble().toFloat()
+                val uniqueOnBeat = arg["unique"].optboolean(false)
 
-                this.setNote(note, beat, duration)
+                this.setNote(note, beat, duration, uniqueOnBeat)
 
                 NONE
             }
@@ -300,6 +306,7 @@ class SfxLib(
                         this.set("note", it.note?.name?.let { valueOf(it) } ?: NIL)
                         this.set("notei", it.note?.index?.let { valueOf(it) } ?: NIL)
                         this.set("octave", it.note?.octave?.let { valueOf(it) } ?: NIL)
+                        this.set("volume", valueOf(it.volume.toDouble()))
                         this.set("beat", valueOf(it.beat.toDouble()))
                         this.set("duration", valueOf(it.duration.toDouble()))
                     }

@@ -13,6 +13,21 @@ local on_menu_item_hover = function(self)
     -- TODO: afficher le label quelque part.
 end
 
+local InstrumentName = {
+    index = 0
+}
+
+InstrumentName._update = function(self)
+
+end
+
+InstrumentName._draw = function(self)
+    local x,y = 0,160
+    local ox = (self.index % 4) * 16
+    local oy = math.floor(self.index / 4) * 16
+    spr.sdraw(self.x, self.y, x + ox, y + oy, 16, 16)
+end
+
 local state = {
     instrument = nil
 }
@@ -102,8 +117,8 @@ function _init()
     end
 
     for h in all(entities["InstrumentName"]) do
-        local label = widgets:create_help(h)
-        wire.consume_on_update(label, { "label" }, state, { "instrument", "name" })
+        local label = new(InstrumentName, h)
+        wire.consume_on_update(label, { "index" }, state, { "instrument", "index" })
         table.insert(m.widgets, label)
     end
 
@@ -121,14 +136,15 @@ function _init()
         local button = widgets:create_menu_item(b)
         if (button.fields.Item == "Prev") then
             wire.listen_to(button, { "status" }, function(source, value)
-                state.instrument = sfx.instrument((state.instrument.index - 1 + 4) % 4)
+                state.instrument = sfx.instrument((state.instrument.index - 1 + 8) % 8)
                 if (state.on_change) then
                     state:on_change()
                 end
             end)
         elseif button.fields.Item == "Next" then
             wire.listen_to(button, { "status" }, function(source, value)
-                state.instrument = sfx.instrument((state.instrument.index + 1) % 4)
+                state.instrument = sfx.instrument((state.instrument.index + 1) % 8)
+                debug.console(state.instrument.index)
                 if (state.on_change) then
                     state:on_change()
                 end
