@@ -4,9 +4,11 @@ import com.github.minigdx.tiny.Frequency
 import com.github.minigdx.tiny.Percent
 import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.sound.SoundManager.Companion.TWO_PI
+import kotlinx.serialization.Serializable
 import kotlin.math.sin
 
-interface Modulation {
+@Serializable
+sealed interface Modulation {
     /**
      * Is the Modulation Effect active?
      */
@@ -22,6 +24,7 @@ interface Modulation {
  *
  * Change the frequency over time.
  */
+@Serializable
 class Sweep(
     var sweep: Frequency,
     var acceleration: Percent,
@@ -41,6 +44,7 @@ class Sweep(
     }
 }
 
+@Serializable
 class Vibrato(
     var vibratoFrequency: Frequency,
     var depth: Percent,
