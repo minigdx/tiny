@@ -57,11 +57,10 @@ class CtrlLib(
         ): LuaValue {
             val pos = inputHandler.currentTouch
 
-            val coordinates =
-                LuaTable().apply {
-                    this.set("x", pos.x.toInt())
-                    this.set("y", pos.y.toInt())
-                }
+            val coordinates = LuaTable().apply {
+                this.set("x", pos.x.toInt())
+                this.set("y", pos.y.toInt())
+            }
 
             // return the coordinates
             return if (arg.isnil()) {

@@ -18,7 +18,9 @@ class Music(
             custom3,
             custom4,
         ),
-    val musicalBars: List<MusicalBar> = Array(32) { MusicalBar(it + 1, clarinet) }.toList(),
+    val musicalBars: List<MusicalBar> = Array(32) {
+        MusicalBar(it + 1, clarinet, clarinet.index)
+    }.toList(),
     val sequences: MutableList<MusicalSequence> = mutableListOf(),
 )
 

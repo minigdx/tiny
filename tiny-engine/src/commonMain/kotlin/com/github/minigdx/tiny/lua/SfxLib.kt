@@ -329,6 +329,7 @@ class SfxLib(
                     val index = arg.asInstrumentIndex(music) ?: return@function1 NIL
                     val instrument = music.instruments.getOrNull(index) ?: return@function1 NIL
                     this.instrument = instrument
+                    this.instrumentIndex = instrument.index
                     NONE
                 }
             }

@@ -183,6 +183,7 @@ function _init()
 
     end
 
+    sfx.load(0)
     -- force setting correct values
     if (state.on_change) then
         state:on_change()

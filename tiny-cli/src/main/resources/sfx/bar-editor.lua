@@ -293,7 +293,7 @@ end
 
 BarEditor._draw = function(self)
     -- line beats
-    for x = self.x, self.x + self.width, 15 do
+    for x = self.x, self.x + self.width, 16 do
         shape.line(x, self.y, x, self.y + self.height, 3)
     end
 

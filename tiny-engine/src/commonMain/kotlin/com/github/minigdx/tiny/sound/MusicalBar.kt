@@ -5,6 +5,7 @@ import com.github.minigdx.tiny.Beats
 import com.github.minigdx.tiny.Percent
 import com.github.minigdx.tiny.lua.Note
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 /**
  * A musical bar is holding musical notes.
@@ -17,7 +18,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 class MusicalBar(
     var index: Int = 1,
-    var instrument: Instrument? = null,
+    @Transient var instrument: Instrument? = null,
+    /**
+     * Index of the instrument. Used for the serialization and deserialization.
+     */
+    var instrumentIndex: Int = -1,
     /**
      * If part of a Sequence, this BPM will be controlled by the Sequence.
      */
