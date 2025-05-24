@@ -32,6 +32,54 @@ function inside_widget(w, x, y, offset)
             y <= w.y + w.height + off
 end
 
+local SfxMatrix = {
+    hover_index = nil,
+    value = nil
+}
+
+SfxMatrix._update = function(self)
+    local p = ctrl.touch()
+
+    local cell_width = self.width / 4
+
+    if inside_widget(self, p.x, p.y) then
+        local x = p.x - self.x
+        local y = p.y - self.y
+
+        local index = math.floor(x / cell_width) + math.floor((y / cell_width)) * 4
+
+        self.hover_index = index
+    else
+        self.hover_index = nil
+    end
+
+    if (self.hover_index and ctrl.touched(0)) then
+        self.value = self.hover_index
+        if (self.on_change) then
+            self:on_change()
+        end
+    end
+end
+
+SfxMatrix._draw = function(self)
+    local index = 0
+
+    for y = self.y, self.y + self.height - 16, 16 do
+        for x = self.x, self.x + self.width - 16, 16 do
+
+            if (self.value == index) then
+                shape.rectf(x, y, 16, 16, 3)
+            elseif (self.hover_index == index) then
+                shape.rect(x, y, 16, 16, 3)
+            else
+                shape.rect(x, y, 16, 16, 4)
+            end
+            print(index, x + 2, y + 2)
+            index = index + 1
+        end
+    end
+end
+
 local InstrumentName = {
     index = 0
 }
@@ -355,10 +403,8 @@ function _init()
     w = {}
     test = {}
     state = new(State)
-    sfx.load(0) -- Load the sound file before init everything
 
     state.current_bar = sfx.bar(0)
-    debug.console(state.current_bar)
     state.current_instrument = sfx.instrument(state.current_bar.instrument())
 
     map.level("BarEditor")
@@ -439,6 +485,19 @@ function _init()
             end
             table.insert(w, button)
         end
+    end
+
+    for b in all(entities["SfxMatrix"]) do
+        local button = new(SfxMatrix, b)
+
+        wire.consume_on_update(button, { "value" }, state, { "current_bar", "index" })
+        wire.listen_to(button, { "value" }, function(source, value)
+            state.current_bar = sfx.bar(value)
+            if (state.on_change) then
+                state:on_change()
+            end
+        end)
+        table.insert(w, button)
     end
 
     state:on_change()

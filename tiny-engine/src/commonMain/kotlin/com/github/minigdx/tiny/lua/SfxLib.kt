@@ -92,7 +92,7 @@ class SfxLib(
     private val handlers = mutableMapOf<SoundKey, SoundHandler>()
 
     fun getCurrentMusic(): Music {
-        return currentMusic ?: Music().also { currentMusic = it }
+        return currentMusic ?: (resourceAccess.sound(0)?.data?.music ?: Music()).also { currentMusic = it }
     }
 
     @TinyFunction("Save the actual music using the filename.")
@@ -239,9 +239,9 @@ class SfxLib(
         }
     }
 
-    @TinyFunction("Access instrument using its index or its name.")
+    @TinyFunction("Access sfx using its index or its name.")
     inner class bar : OneArgFunction() {
-        @TinyCall("Access instrument using its index or its name.")
+        @TinyCall("Access sfx using its index or its name.")
         override fun call(arg: LuaValue): LuaValue {
             val music = getCurrentMusic()
             val index = arg.checkint()

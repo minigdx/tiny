@@ -144,7 +144,6 @@ function _init()
         elseif button.fields.Item == "Next" then
             wire.listen_to(button, { "status" }, function(source, value)
                 state.instrument = sfx.instrument((state.instrument.index + 1) % 8)
-                debug.console(state.instrument.index)
                 if (state.on_change) then
                     state:on_change()
                 end
@@ -183,7 +182,6 @@ function _init()
 
     end
 
-    sfx.load(0)
     -- force setting correct values
     if (state.on_change) then
         state:on_change()

@@ -93,8 +93,4 @@ class MusicalBar(
             n.volume = volume
         }
     }
-
-    companion object {
-        const val MAX_BEATS_PER_BAR = 32f
-    }
 }
