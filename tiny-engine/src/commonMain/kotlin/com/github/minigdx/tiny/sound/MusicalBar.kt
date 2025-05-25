@@ -24,7 +24,7 @@ class MusicalBar(
      */
     var instrumentIndex: Int = -1,
     /**
-     * If part of a Sequence, this BPM will be controlled by the Sequence.
+     * BPM (Beats Per Minute) of the bar.
      */
     var tempo: BPM = 120,
 ) {

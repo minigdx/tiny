@@ -1,5 +1,7 @@
 package com.github.minigdx.tiny.sound
 
+import com.github.minigdx.tiny.BPM
+import com.github.minigdx.tiny.Percent
 import com.github.minigdx.tiny.input.InputHandler
 import kotlin.math.max
 import kotlin.math.min
@@ -27,15 +29,47 @@ abstract class SoundManager {
      * Convert the MusicBar into a playable sound.
      */
     fun convert(bar: MusicalBar): FloatArray {
-        val instrument = bar.instrument
-        if (instrument == null) return floatArrayOf()
-        if (bar.beats.isEmpty()) return floatArrayOf()
+        return convert(
+            defaultInstrument = bar.instrument,
+            beats = bar.beats,
+            tempo = bar.tempo,
+        )
+    }
 
-        val secondsPerBeat = 60f / bar.tempo
+    fun convert(sequence: MusicalSequence): FloatArray {
+        val tracks = sequence.tracks.map { track ->
+            convert(
+                defaultInstrument = track.instrument,
+                beats = track.beats,
+                tempo = sequence.tempo,
+                volume = track.volume,
+            )
+        }
+
+        val resultSize = tracks.map { it.size }.max()
+        val result = FloatArray(resultSize) { 0f }
+
+        result.indices.forEach { index ->
+            result[index] = tracks.mapNotNull { it.getOrNull(index) }.sum()
+        }
+        return result
+    }
+
+    private fun convert(
+        defaultInstrument: Instrument?,
+        beats: MutableList<MusicalNote>,
+        tempo: BPM,
+        volume: Percent = 1f,
+    ): FloatArray {
+        if (defaultInstrument == null) return floatArrayOf()
+        if (beats.isEmpty()) return floatArrayOf()
+
+        val secondsPerBeat = 60f / tempo
 
         var result = floatArrayOf()
 
-        for (b in bar.beats) {
+        for (b in beats) {
+            val instrument = b.instrument ?: defaultInstrument
             // Duration of the note added to the duration of the release.
             val noteDurationInSeconds = (b.duration * secondsPerBeat) + instrument.release
             val numberOfSamples = (noteDurationInSeconds * SAMPLE_RATE).roundToInt()

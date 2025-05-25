@@ -4,6 +4,7 @@ import com.github.minigdx.tiny.Beats
 import com.github.minigdx.tiny.Percent
 import com.github.minigdx.tiny.lua.Note
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 /**
  * Note that being played.
@@ -25,11 +26,17 @@ class MusicalNote(
      * How many beats this note will last.
      */
     var duration: Beats,
+    /**
+     * Volume of this note
+     */
     var volume: Percent,
-) {
-    val endBeat: Float
-        get() = beat + duration
-
-    val isSilence: Boolean
-        get() = note == null || volume == 0f
-}
+    /**
+     * Index of the override instrument.
+     */
+    var instrumentIndex: Int? = null,
+    /**
+     * Override instrument.
+     */
+    @Transient
+    var instrument: Instrument? = null,
+)
