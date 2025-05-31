@@ -32,6 +32,7 @@ import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
 import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.resources.SpriteSheet
 import com.github.minigdx.tiny.sound.MusicalBar
+import com.github.minigdx.tiny.sound.MusicalSequence
 import com.github.minigdx.tiny.sound.SoundHandler
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.coroutines.CoroutineScope
@@ -473,6 +474,14 @@ class GameEngine(
 
     override fun play(musicalBar: MusicalBar): SoundHandler {
         return soundManager.createSoundHandler(musicalBar).also { it.play() }
+    }
+
+    override fun play(musicalSequence: MusicalSequence): SoundHandler {
+        return soundManager.createSoundHandler(musicalSequence).also { it.play() }
+    }
+
+    override fun play(track: MusicalSequence.Track): SoundHandler {
+        return soundManager.createSoundHandler(track).also { it.play() }
     }
 
     override fun script(name: String): GameScript? {

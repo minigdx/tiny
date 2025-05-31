@@ -192,6 +192,8 @@ enum class Note(val frequency: Frequency, val index: Int) {
             return octave
         }
 
+    val note: String = name.dropLast(1)
+
     companion object {
         private val notesPerIndex = entries.toTypedArray().distinctBy { it.index }.sortedBy { it.index }.toTypedArray()
 

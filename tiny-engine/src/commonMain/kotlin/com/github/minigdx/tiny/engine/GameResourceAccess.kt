@@ -9,6 +9,7 @@ import com.github.minigdx.tiny.resources.GameScript
 import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.resources.SpriteSheet
 import com.github.minigdx.tiny.sound.MusicalBar
+import com.github.minigdx.tiny.sound.MusicalSequence
 import com.github.minigdx.tiny.sound.SoundHandler
 import kotlin.reflect.KClass
 
@@ -96,6 +97,13 @@ interface GameResourceAccess {
      * (which can be CPU intensive during a game)
      */
     fun play(musicalBar: MusicalBar): SoundHandler
+
+    /**
+     * Play a musical sequence.
+     */
+    fun play(musicalSequence: MusicalSequence): SoundHandler
+
+    fun play(track: MusicalSequence.Track): SoundHandler
 
     /**
      * Save the content into the file named `filename`.

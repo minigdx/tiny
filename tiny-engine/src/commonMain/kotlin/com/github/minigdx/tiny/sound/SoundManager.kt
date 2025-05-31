@@ -25,6 +25,18 @@ abstract class SoundManager {
         return createSoundHandler(buffer, buffer.size.toLong())
     }
 
+    fun createSoundHandler(bar: MusicalSequence): SoundHandler {
+        val buffer = convert(bar)
+        return createSoundHandler(buffer, buffer.size.toLong())
+    }
+
+    fun createSoundHandler(bar: MusicalSequence.Track): SoundHandler {
+        // TODO: pass tempo
+        val sequence = MusicalSequence(tracks = arrayOf(bar))
+        val buffer = convert(sequence)
+        return createSoundHandler(buffer, buffer.size.toLong())
+    }
+
     /**
      * Convert the MusicBar into a playable sound.
      */

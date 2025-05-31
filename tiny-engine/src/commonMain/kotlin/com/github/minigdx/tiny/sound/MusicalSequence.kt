@@ -12,10 +12,17 @@ class MusicalSequence(
 ) {
     @Serializable
     class Track(
+        val index: Int = 0,
         var mute: Boolean = false,
         var instrumentIndex: Int? = null,
         @Transient var instrument: Instrument? = null,
         val beats: MutableList<MusicalNote> = mutableListOf(),
         val volume: Percent = 1f,
-    )
+    ) {
+        init {
+            (0..32).forEach { i ->
+                beats.add(MusicalNote(null, i.toFloat(), 1f, 0f))
+            }
+        }
+    }
 }

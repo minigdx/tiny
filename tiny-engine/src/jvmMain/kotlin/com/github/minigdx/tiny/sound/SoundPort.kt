@@ -6,7 +6,7 @@ import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.DataLine
 import javax.sound.sampled.SourceDataLine
 
-class SoundPort(var alive: Boolean = true, val queue: BlockingQueue<ByteArray>) : Thread() {
+class SoundPort(var alive: Boolean = true, val queue: BlockingQueue<ByteArray>) : Thread("sound-port") {
     override fun run() {
         val format = AudioFormat(SAMPLE_RATE.toFloat(), BITS_PER_SAMPLE, CHANNELS, IS_SIGNED, IS_BIG_ENDIAN)
         val info = DataLine.Info(SourceDataLine::class.java, format)

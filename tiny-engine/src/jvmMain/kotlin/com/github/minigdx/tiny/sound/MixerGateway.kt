@@ -6,7 +6,7 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-class MixerGateway(var alive: Boolean = true, val queue: BlockingQueue<ByteArray>) : Thread() {
+class MixerGateway(var alive: Boolean = true, val queue: BlockingQueue<ByteArray>) : Thread("mixer-gateway") {
     val mixBuffer = FloatArray(CHUNK_SIZE)
 
     override fun run() {

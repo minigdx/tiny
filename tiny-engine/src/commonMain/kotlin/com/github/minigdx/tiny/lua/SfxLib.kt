@@ -9,6 +9,7 @@ import com.github.minigdx.tiny.sound.Instrument
 import com.github.minigdx.tiny.sound.Music
 import com.github.minigdx.tiny.sound.MusicalBar
 import com.github.minigdx.tiny.sound.MusicalNote
+import com.github.minigdx.tiny.sound.MusicalSequence
 import com.github.minigdx.tiny.sound.SoundHandler
 import com.github.minigdx.tiny.sound.Sweep
 import kotlinx.serialization.json.Json
@@ -73,8 +74,15 @@ class SfxLib(
         ctrl.set("loop", loop())
         ctrl.set("stop", stop())
 
+        // TODO: a music is looping by default?
+        //       play(true) for loop instead?
+        // TODO: mplay: play music by it's index
+        //       mloop ?
+        //       mstop ?
+
         ctrl.set("instrument", instrument())
         ctrl.set("bar", bar())
+        ctrl.set("track", track())
 
         ctrl.set("load", load())
         ctrl.set("save", save())
@@ -88,6 +96,7 @@ class SfxLib(
 
     private var currentMusic: Music? = null
     private var currentSound: Int = 0
+    private var currentSequence: Int = 0
 
     private val handlers = mutableMapOf<SoundKey, SoundHandler>()
 
@@ -127,6 +136,80 @@ class SfxLib(
                 currentSound = sound.index
                 valueOf(soundIndex)
             }
+        }
+    }
+
+    @TinyFunction("Access track using its index or its name.")
+    inner class track : OneArgFunction() {
+        private fun getTrack(
+            music: Music,
+            index: Int,
+        ): MusicalSequence.Track? {
+            return music.sequences
+                .getOrNull(currentSequence)
+                ?.tracks
+                ?.getOrNull(index)
+        }
+
+        @TinyCall("Access instrument using its index or its name.")
+        override fun call(arg: LuaValue): LuaValue {
+            val music = getCurrentMusic()
+            val index = arg.asTrackIndex(music) ?: return NIL
+            return getTrack(music, index)
+                ?.toLua()
+                ?: NIL
+        }
+
+        fun MusicalSequence.Track.toLua(): LuaValue {
+            val obj = WrapperLuaTable()
+
+            obj.function1("play") {
+                resourceAccess.play(this)
+                NONE
+            }
+
+            obj.wrap("beats") {
+                val result = LuaTable()
+                this.beats.map { b ->
+                    val note = b.note
+                    WrapperLuaTable().apply {
+                        this.wrap("note") {
+                            note?.note?.let { valueOf(it) } ?: NIL
+                        }
+                        this.wrap(
+                            "notei",
+                            { note?.index?.let { valueOf(it) } ?: NIL },
+                            { arg ->
+                                b.note = if (arg.isnil()) {
+                                    Note.C0
+                                } else {
+                                    Note.fromIndex(arg.checkint().coerceIn(Note.C0.index..Note.B8.index) - 1)
+                                }
+                            },
+                        )
+                        this.wrap(
+                            "octave",
+                            {
+                                note?.octave?.let { valueOf(it) } ?: NIL
+                            },
+                            { arg ->
+                                b.note = if (arg.isnil()) {
+                                    Note.C0
+                                } else {
+                                    Note.fromName(note?.note + arg.checkint().coerceIn(0, 8))
+                                }
+                            },
+                        )
+                        this.wrap("volume") {
+                            valueOf(b.volume.toDouble())
+                        }
+                    }
+                }.forEachIndexed { index, value ->
+                    result.insert(index + 1, value)
+                }
+                result
+            }
+            return obj
         }
     }
 
@@ -444,5 +527,9 @@ class SfxLib(
                 .firstOrNull { inst -> inst.name == this.checkjstring() }
                 ?.index
         }
+    }
+
+    private fun LuaValue.asTrackIndex(music: Music): Int? {
+        return this.checkint() % music.sequences[currentSequence].tracks.size
     }
 }
