@@ -136,6 +136,12 @@ end
 TrackEditor._draw = function(self)
     print("N  O  VV  M  I", self.x + 2, self.y - 8)
     local offset = self.beat_offset
+
+    -- todo: introduce offset if the user is going down in the list
+    for i=1,20 do
+        local y = (i - offset) * 10 + (self.y + 3)
+        print(string.format("%02x", i), self.x - 10, y)
+    end
     for i, beat in ipairs(self.track.beats) do
         if i >= offset and i < offset + 20 then
             local y = (i - offset) * 10 + (self.y + 3)
