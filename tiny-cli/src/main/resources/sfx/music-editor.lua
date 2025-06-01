@@ -60,11 +60,9 @@ Cursor._move_cursor = function(self)
 
     if self.editor then
         easeKeys(keys.down, function()
-            debug.console("AA")
             self.track:change(self.beati + 1, self.fields[self.fieldi].name, -1)
         end)
         easeKeys(keys.up, function()
-            debug.console("VV")
             self.track:change(self.beati + 1, self.fields[self.fieldi].name, 1)
         end)
     else
@@ -74,13 +72,14 @@ Cursor._move_cursor = function(self)
         easeKeys(keys.up, function()
             self.beati = math.floor(self.beati) - 1
         end)
-        easeKeys(keys.left, function()
-            self.fieldi = math.floor(self.fieldi) - 1
-        end)
-        easeKeys(keys.right, function()
-            self.fieldi = math.floor(self.fieldi) + 1
-        end)
     end
+
+    easeKeys(keys.left, function()
+        self.fieldi = math.floor(self.fieldi) - 1
+    end)
+    easeKeys(keys.right, function()
+        self.fieldi = math.floor(self.fieldi) + 1
+    end)
 
     -- switch tracks
     if (self.fieldi > #self.fields) then
@@ -127,8 +126,7 @@ local TrackEditor = {
 }
 
 TrackEditor.change = function(self, beat, name, inc)
-    debug.console("before", self.track.beats[beat][name], " set ", (self.track.beats[beat][name] or 0) + inc, " inc-> ", inc) --
-   self.track.beats[beat][name] = (self.track.beats[beat][name] or 0) + inc
+    self.track.beats[beat][name] = (self.track.beats[beat][name] or 0) + inc
 end
 
 TrackEditor._update = function(self)
@@ -136,18 +134,22 @@ TrackEditor._update = function(self)
 end
 
 TrackEditor._draw = function(self)
-    print("N   O VV  M  I", self.x, self.y - 8)
+    print("N  O  VV  M  I", self.x + 2, self.y - 8)
     local offset = self.beat_offset
     for i, beat in ipairs(self.track.beats) do
         if i >= offset and i < offset + 20 then
             local y = (i - offset) * 10 + (self.y + 3)
             if (beat.note == nil) then
-                print(".  .  .   .  .", self.x + 2, y)
+                print(".. .  ..  .  .", self.x + 2, y)
             else
+                local note = beat.note
+                if (#note == 1) then
+                    note = note.." "
+                end
                 print(
-                        string.format("%-2s", beat.note) .. " " ..
-                                beat.octave .. "  " ..
-                                string.format("%02x", beat.volume * 255) ..
+                       note ..
+                                " " .. beat.octave ..
+                                "  " .. string.format("%02x", beat.volume) ..
                                 "  R  0&", self.x + 2, y
                 )
             end
@@ -202,7 +204,7 @@ function _update()
     end)
 
     if (ctrl.pressed(keys.space)) then
-        -- TODO: play the music
+        sfx.music(0)
     end
 
     for w in all(m.widgets) do

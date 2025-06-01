@@ -80,6 +80,8 @@ class SfxLib(
         //       mloop ?
         //       mstop ?
 
+        ctrl.set("music", music())
+
         ctrl.set("instrument", instrument())
         ctrl.set("bar", bar())
         ctrl.set("track", track())
@@ -136,6 +138,16 @@ class SfxLib(
                 currentSound = sound.index
                 valueOf(soundIndex)
             }
+        }
+    }
+
+    inner class music() : OneArgFunction() {
+        override fun call(arg: LuaValue): LuaValue {
+            val music = getCurrentMusic()
+            val index = arg.checkint().coerceIn(0, music.sequences.size)
+            val sequence = music.sequences.getOrNull(index) ?: return NIL
+            resourceAccess.play(sequence)
+            return NONE
         }
     }
 
@@ -200,9 +212,20 @@ class SfxLib(
                                 }
                             },
                         )
-                        this.wrap("volume") {
-                            valueOf(b.volume.toDouble())
-                        }
+                        this.wrap(
+                            "volume",
+                            {
+                                valueOf(b.volume.toDouble() * 255.0)
+                            },
+                            { b.volume = it.tofloat().coerceIn(0f, 255f) / 255f },
+                        )
+                        this.wrap(
+                            "mode",
+                            {
+                                valueOf(if (b.isOffNote) 1 else 0)
+                            },
+                            { b.isOffNote = it.checkint() == 1 },
+                        )
                     }
                 }.forEachIndexed { index, value ->
                     result.insert(index + 1, value)

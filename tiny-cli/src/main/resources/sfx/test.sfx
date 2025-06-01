@@ -345,8 +345,10 @@
   ],
   "sequences": [
     {
+      "index": 0,
       "tracks": [
         {
+          "instrumentIndex": 0,
           "beats": [
             {
               "note": null,
@@ -549,6 +551,8 @@
           ]
         },
         {
+          "index": 1,
+          "instrumentIndex": 1,
           "beats": [
             {
               "note": null,
@@ -751,6 +755,8 @@
           ]
         },
         {
+          "index": 2,
+          "instrumentIndex": 3,
           "beats": [
             {
               "note": null,
@@ -953,6 +959,8 @@
           ]
         },
         {
+          "index": 3,
+          "instrumentIndex": 0,
           "beats": [
             {
               "note": null,
@@ -1157,8 +1165,10 @@
       ]
     },
     {
+      "index": 1,
       "tracks": [
         {
+          "instrumentIndex": 0,
           "beats": [
             {
               "note": null,
@@ -1361,6 +1371,8 @@
           ]
         },
         {
+          "index": 1,
+          "instrumentIndex": 0,
           "beats": [
             {
               "note": null,
@@ -1563,6 +1575,8 @@
           ]
         },
         {
+          "index": 2,
+          "instrumentIndex": 0,
           "beats": [
             {
               "note": null,
@@ -1765,6 +1779,8 @@
           ]
         },
         {
+          "index": 3,
+          "instrumentIndex": 0,
           "beats": [
             {
               "note": null,
@@ -1969,8 +1985,10 @@
       ]
     },
     {
+      "index": 2,
       "tracks": [
         {
+          "instrumentIndex": 0,
           "beats": [
             {
               "note": null,
@@ -2173,6 +2191,8 @@
           ]
         },
         {
+          "index": 1,
+          "instrumentIndex": 0,
           "beats": [
             {
               "note": null,
@@ -2375,6 +2395,8 @@
           ]
         },
         {
+          "index": 2,
+          "instrumentIndex": 0,
           "beats": [
             {
               "note": null,
@@ -2577,6 +2599,8 @@
           ]
         },
         {
+          "index": 3,
+          "instrumentIndex": 0,
           "beats": [
             {
               "note": null,
@@ -2781,8 +2805,10 @@
       ]
     },
     {
+      "index": 3,
       "tracks": [
         {
+          "instrumentIndex": 0,
           "beats": [
             {
               "note": null,
@@ -2985,6 +3011,8 @@
           ]
         },
         {
+          "index": 1,
+          "instrumentIndex": 0,
           "beats": [
             {
               "note": null,
@@ -3187,6 +3215,8 @@
           ]
         },
         {
+          "index": 2,
+          "instrumentIndex": 0,
           "beats": [
             {
               "note": null,
@@ -3389,6 +3419,8 @@
           ]
         },
         {
+          "index": 3,
+          "instrumentIndex": 0,
           "beats": [
             {
               "note": null,
@@ -3593,8 +3625,10 @@
       ]
     },
     {
+      "index": 4,
       "tracks": [
         {
+          "instrumentIndex": 0,
           "beats": [
             {
               "note": null,
@@ -3797,6 +3831,8 @@
           ]
         },
         {
+          "index": 1,
+          "instrumentIndex": 0,
           "beats": [
             {
               "note": null,
@@ -3999,6 +4035,8 @@
           ]
         },
         {
+          "index": 2,
+          "instrumentIndex": 0,
           "beats": [
             {
               "note": null,
@@ -4201,6 +4239,8 @@
           ]
         },
         {
+          "index": 3,
+          "instrumentIndex": 0,
           "beats": [
             {
               "note": null,
@@ -4405,8 +4445,10 @@
       ]
     },
     {
+      "index": 5,
       "tracks": [
         {
+          "instrumentIndex": 0,
           "beats": [
             {
               "note": null,
@@ -4609,6 +4651,8 @@
           ]
         },
         {
+          "index": 1,
+          "instrumentIndex": 0,
           "beats": [
             {
               "note": null,
@@ -4811,6 +4855,8 @@
           ]
         },
         {
+          "index": 2,
+          "instrumentIndex": 0,
           "beats": [
             {
               "note": null,
@@ -5013,6 +5059,8 @@
           ]
         },
         {
+          "index": 3,
+          "instrumentIndex": 0,
           "beats": [
             {
               "note": null,
@@ -5217,8 +5265,10 @@
       ]
     },
     {
+      "index": 6,
       "tracks": [
         {
+          "instrumentIndex": 0,
           "beats": [
             {
               "note": null,
@@ -5421,6 +5471,8 @@
           ]
         },
         {
+          "index": 1,
+          "instrumentIndex": 0,
           "beats": [
             {
               "note": null,
@@ -5623,6 +5675,8 @@
           ]
         },
         {
+          "index": 2,
+          "instrumentIndex": 0,
           "beats": [
             {
               "note": null,
@@ -5825,6 +5879,8 @@
           ]
         },
         {
+          "index": 3,
+          "instrumentIndex": 0,
           "beats": [
             {
               "note": null,
@@ -6029,8 +6085,10 @@
       ]
     },
     {
+      "index": 7,
       "tracks": [
         {
+          "instrumentIndex": 0,
           "beats": [
             {
               "note": null,
@@ -6233,6 +6291,8 @@
           ]
         },
         {
+          "index": 1,
+          "instrumentIndex": 0,
           "beats": [
             {
               "note": null,
@@ -6435,6 +6495,8 @@
           ]
         },
         {
+          "index": 2,
+          "instrumentIndex": 0,
           "beats": [
             {
               "note": null,
@@ -6637,6 +6699,8 @@
           ]
         },
         {
+          "index": 3,
+          "instrumentIndex": 0,
           "beats": [
             {
               "note": null,

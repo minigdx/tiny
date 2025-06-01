@@ -11,7 +11,7 @@ import kotlinx.serialization.Transient
  * It can't be played without an instrument, that will generate the sound for this note.
  */
 @Serializable
-class MusicalNote(
+data class MusicalNote(
     /**
      * The note played.
      * if null, this is a silence. The volume will be 0f also.
@@ -39,4 +39,12 @@ class MusicalNote(
      */
     @Transient
     var instrument: Instrument? = null,
+    /**
+     * Inside a track, is the next note will be a repeat of this note?
+     */
+    var isRepeating: Boolean = false,
+    /**
+     * Inside a track, stop the sound on this note.
+     */
+    var isOffNote: Boolean = false,
 )

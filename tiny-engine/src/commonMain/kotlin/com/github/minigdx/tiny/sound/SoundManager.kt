@@ -32,7 +32,7 @@ abstract class SoundManager {
 
     fun createSoundHandler(bar: MusicalSequence.Track): SoundHandler {
         // TODO: pass tempo
-        val sequence = MusicalSequence(tracks = arrayOf(bar))
+        val sequence = MusicalSequence(tracks = arrayOf(bar), index = 0)
         val buffer = convert(sequence)
         return createSoundHandler(buffer, buffer.size.toLong())
     }
@@ -50,9 +50,26 @@ abstract class SoundManager {
 
     fun convert(sequence: MusicalSequence): FloatArray {
         val tracks = sequence.tracks.map { track ->
+            // Convert notes from track to note for sounds.
+            var current = track.beats.first().copy()
+            val beats = mutableListOf(current)
+            track.beats.drop(1).forEach { beat ->
+                if (beat.note == null && current.isRepeating) {
+                    current = current.copy(duration = 1f)
+                    beats.add(current)
+                } else if (beat.note == null && !current.isRepeating) {
+                    current.duration += 0.5f
+                } else if (beat.isOffNote) {
+                    current = beat.copy(volume = 0f, duration = 1f)
+                    beats.add(current)
+                } else {
+                    current = beat.copy()
+                    beats.add(current)
+                }
+            }
             convert(
                 defaultInstrument = track.instrument,
-                beats = track.beats,
+                beats = beats,
                 tempo = sequence.tempo,
                 volume = track.volume,
             )

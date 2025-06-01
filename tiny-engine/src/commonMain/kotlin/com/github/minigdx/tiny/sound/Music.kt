@@ -22,7 +22,7 @@ class Music(
         MusicalBar(it, clarinet, clarinet.index)
     },
     val sequences: Array<MusicalSequence> = Array(8) {
-        MusicalSequence()
+        MusicalSequence(it)
     },
 )
 
