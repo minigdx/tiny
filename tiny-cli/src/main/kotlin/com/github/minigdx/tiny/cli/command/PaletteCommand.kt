@@ -81,10 +81,10 @@ class PaletteCommand : CliktCommand(name = "palette") {
         }
 
         val replacedColors = if (append) {
-                gameOptions.palette + extractedColors
-            } else {
-                extractedColors
-            }
+            gameOptions.palette + extractedColors
+        } else {
+            extractedColors
+        }
 
         val sortedColors = replacedColors.sortedBy { brightness(it) }
         gameParameters.setPalette(sortedColors).write(tiny)

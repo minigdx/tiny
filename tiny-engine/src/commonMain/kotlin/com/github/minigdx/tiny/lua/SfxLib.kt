@@ -190,7 +190,7 @@ class SfxLib(
                         }
                         this.wrap(
                             "notei",
-                            { 
+                            {
                                 when {
                                     b.isOffNote -> valueOf(-1) // Special value for note off
                                     note?.index != null -> valueOf(note.index)
@@ -254,7 +254,7 @@ class SfxLib(
                                 b.instrumentIndex = if (arg.isnil()) {
                                     null
                                 } else {
-                                    if(arg.checkint() < 0) {
+                                    if (arg.checkint() < 0) {
                                         null
                                     } else {
                                         arg.checkint().coerceIn(0, 7)

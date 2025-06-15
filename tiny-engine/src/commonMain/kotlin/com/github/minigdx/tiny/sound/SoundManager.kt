@@ -65,13 +65,13 @@ abstract class SoundManager {
                 } else if (beat.note == null && !current.isRepeating) {
                     // Extending the previous note
                     current.duration += 1f
-                }  else {
+                } else {
                     // New note!
                     current = beat.copy()
                     beats.add(current)
                 }
             }
-            
+
             convert(
                 defaultInstrument = track.instrument,
                 beats = beats,
@@ -81,7 +81,7 @@ abstract class SoundManager {
         }
 
         if (tracks.isEmpty()) return floatArrayOf()
-        
+
         val resultSize = tracks.maxOf { it.size }
         val result = FloatArray(resultSize) { 0f }
         val activeTrackCount = tracks.size.toFloat()
