@@ -49,24 +49,29 @@ abstract class SoundManager {
     }
 
     fun convert(sequence: MusicalSequence): FloatArray {
-        val tracks = sequence.tracks.map { track ->
+        val tracks = sequence.tracks.filter { !it.mute && it.instrument != null }.map { track ->
             // Convert notes from track to note for sounds.
             var current = track.beats.first().copy()
             val beats = mutableListOf(current)
             track.beats.drop(1).forEach { beat ->
-                if (beat.note == null && current.isRepeating) {
+                // Set the Note Off
+                if (beat.isOffNote) {
+                    current = beat.copy(volume = 0f, duration = 1f)
+                    beats.add(current)
+                } else if (beat.note == null && current.isRepeating) {
+                    // Repeating the previous note
                     current = current.copy(duration = 1f)
                     beats.add(current)
                 } else if (beat.note == null && !current.isRepeating) {
-                    current.duration += 0.5f
-                } else if (beat.isOffNote) {
-                    current = beat.copy(volume = 0f, duration = 1f)
-                    beats.add(current)
-                } else {
+                    // Extending the previous note
+                    current.duration += 1f
+                }  else {
+                    // New note!
                     current = beat.copy()
                     beats.add(current)
                 }
             }
+            
             convert(
                 defaultInstrument = track.instrument,
                 beats = beats,
@@ -75,11 +80,16 @@ abstract class SoundManager {
             )
         }
 
-        val resultSize = tracks.map { it.size }.max()
+        if (tracks.isEmpty()) return floatArrayOf()
+        
+        val resultSize = tracks.maxOf { it.size }
         val result = FloatArray(resultSize) { 0f }
+        val activeTrackCount = tracks.size.toFloat()
 
+        // Mix tracks with proper normalization to prevent clipping
         result.indices.forEach { index ->
-            result[index] = tracks.mapNotNull { it.getOrNull(index) }.sum()
+            val mixedSample = tracks.mapNotNull { it.getOrNull(index) }.sum() / activeTrackCount
+            result[index] = max(-1f, min(1f, mixedSample))
         }
         return result
     }
@@ -122,7 +132,7 @@ abstract class SoundManager {
                 }
 
                 sampleValue *= envelopeFilter(i, numberOfSamples, instrument)
-                sampleValue *= normalizationFactor * b.volume
+                sampleValue *= normalizationFactor * b.volume * volume
                 sampleValue *= MASTER_VOLUME
 
                 buffer[i] = max(-1.0f, min(1.0f, sampleValue))
@@ -162,7 +172,7 @@ abstract class SoundManager {
         val releaseStartSample = totalSamples - (instrument.release * SAMPLE_RATE)
         // Ensure that phases can't finish AFTER the release.
         val attackEndSample = min(attackSamples, releaseStartSample)
-        val decayEndSample = min(attackEndSample + decaySamples, releaseSamples)
+        val decayEndSample = min(attackEndSample + decaySamples, releaseStartSample)
 
         // FIXME: le changement de niveau sonore pourrait ne pas être linéaire. (cf juice)
         val multiplier =

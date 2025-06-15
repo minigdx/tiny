@@ -190,12 +190,32 @@ class SfxLib(
                         }
                         this.wrap(
                             "notei",
-                            { note?.index?.let { valueOf(it) } ?: NIL },
+                            { 
+                                when {
+                                    b.isOffNote -> valueOf(-1) // Special value for note off
+                                    b.isRepeating -> NIL // nil for repeating notes
+                                    note?.index != null -> valueOf(note.index)
+                                    else -> NIL
+                                }
+                            },
                             { arg ->
-                                b.note = if (arg.isnil()) {
-                                    Note.C0
-                                } else {
-                                    Note.fromIndex(arg.checkint().coerceIn(Note.C0.index..Note.B8.index) - 1)
+                                when {
+                                    arg.isnil() -> {
+                                        // Set to repeat previous note (null)
+                                        b.note = null
+                                        b.isOffNote = false
+                                    }
+                                    arg.checkint() == -1 -> {
+                                        // Set to note off (silence)
+                                        b.note = null
+                                        b.isOffNote = true
+                                    }
+                                    else -> {
+                                        // Set to specific note
+                                        val noteIndex = arg.checkint()
+                                        b.note = Note.fromIndex(noteIndex.coerceIn(Note.C0.index..Note.B8.index) - 1)
+                                        b.isOffNote = false
+                                    }
                                 }
                             },
                         )
@@ -205,10 +225,10 @@ class SfxLib(
                                 note?.octave?.let { valueOf(it) } ?: NIL
                             },
                             { arg ->
-                                b.note = if (arg.isnil()) {
-                                    Note.C0
+                                b.note = if (arg.isnil() || note == null) {
+                                    Note.C5
                                 } else {
-                                    Note.fromName(note?.note + arg.checkint().coerceIn(0, 8))
+                                    Note.fromName(note.note + arg.checkint().coerceIn(0, 8))
                                 }
                             },
                         )

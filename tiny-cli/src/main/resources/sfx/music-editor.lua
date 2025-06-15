@@ -60,11 +60,52 @@ Cursor._move_cursor = function(self)
 
     if self.editor then
         easeKeys(keys.down, function()
-            self.track:change(self.beati + 1, self.fields[self.fieldi].name, -1)
+            if self.fields[self.fieldi].name == "notei" then
+                -- Special handling for note field
+                local beat = self.track.track.beats[self.beati + 1]
+                local current_notei = beat.notei or 0
+                
+                if current_notei == 1 then  -- C0 (lowest note)
+                    -- Set to repeat previous note (null)
+                    beat.notei = nil
+                elseif beat.notei == nil then
+                    -- Set to note off (silence)
+                    beat.notei = -1
+                else
+                    -- Normal decrement
+                    self.track:change(self.beati + 1, self.fields[self.fieldi].name, -1)
+                end
+            else
+                -- Normal field handling
+                self.track:change(self.beati + 1, self.fields[self.fieldi].name, -1)
+            end
         end)
         easeKeys(keys.up, function()
-            self.track:change(self.beati + 1, self.fields[self.fieldi].name, 1)
+            if self.fields[self.fieldi].name == "notei" then
+                -- Special handling for note field
+                local beat = self.track.track.beats[self.beati + 1]
+                
+                if beat.notei == -1 then  -- Note off (silence)
+                    -- Set to repeat previous note (null)
+                    beat.notei = nil
+                elseif beat.notei == nil then
+                    -- Set to C0 (first note)
+                    beat.notei = 1
+                else
+                    -- Normal increment
+                    self.track:change(self.beati + 1, self.fields[self.fieldi].name, 1)
+                end
+            else
+                -- Normal field handling
+                self.track:change(self.beati + 1, self.fields[self.fieldi].name, 1)
+            end
         end)
+        
+        -- Handle delete key to set note to null (repeat previous)
+        if ctrl.pressed(keys.delete) and self.fields[self.fieldi].name == "notei" then
+            local beat = self.track.track.beats[self.beati + 1]
+            beat.notei = nil
+        end
     else
         easeKeys(keys.down, function()
             self.beati = math.floor(self.beati) + 1
@@ -145,9 +186,19 @@ TrackEditor._draw = function(self)
     for i, beat in ipairs(self.track.beats) do
         if i >= offset and i < offset + 20 then
             local y = (i - offset) * 10 + (self.y + 3)
-            if (beat.note == nil) then
+            
+            -- Check note state
+            if beat.notei == nil then
+                -- Repeat previous note (null)
+                print("-- .  ..  .  .", self.x + 2, y)
+            elseif beat.notei == -1 then
+                -- Note off (silence)
+                print("== .  ..  .  .", self.x + 2, y)
+            elseif beat.note == nil then
+                -- Empty beat
                 print(".. .  ..  .  .", self.x + 2, y)
             else
+                -- Normal note
                 local note = beat.note
                 if (#note == 1) then
                     note = note.." "
