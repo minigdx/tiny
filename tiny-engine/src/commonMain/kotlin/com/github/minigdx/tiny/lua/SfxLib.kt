@@ -245,6 +245,23 @@ class SfxLib(
                             },
                             { b.isRepeating = it.checkint() >= 1 },
                         )
+                        this.wrap(
+                            "instrument",
+                            {
+                                b.instrumentIndex?.let { valueOf(it) } ?: NIL
+                            },
+                            { arg ->
+                                b.instrumentIndex = if (arg.isnil()) {
+                                    null
+                                } else {
+                                    if(arg.checkint() < 0) {
+                                        null
+                                    } else {
+                                        arg.checkint().coerceIn(0, 7)
+                                    }
+                                }
+                            },
+                        )
                     }
                 }.forEachIndexed { index, value ->
                     result.insert(index + 1, value)

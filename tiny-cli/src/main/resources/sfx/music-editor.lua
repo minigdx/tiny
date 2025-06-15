@@ -203,18 +203,23 @@ TrackEditor._draw = function(self)
                 if (#note == 1) then
                     note = note.." "
                 end
-                local mode = nil
+                local mode
                 if beat.mode >= 1 then
                     mode = "R"
                 else
                     mode = "L"
+                end
+                
+                local instrument = beat.instrument or "."
+                if instrument ~= "." then
+                    instrument = string.format("%01x", instrument)
                 end
 
                 print(
                        note ..
                                 " " .. beat.octave ..
                                 "  " .. string.format("%02x", beat.volume) ..
-                                "  " .. mode .. "  0&", self.x + 2, y
+                                "  " .. mode .. "  " .. instrument, self.x + 2, y
                 )
             end
 
