@@ -193,7 +193,6 @@ class SfxLib(
                             { 
                                 when {
                                     b.isOffNote -> valueOf(-1) // Special value for note off
-                                    b.isRepeating -> NIL // nil for repeating notes
                                     note?.index != null -> valueOf(note.index)
                                     else -> NIL
                                 }
@@ -242,9 +241,9 @@ class SfxLib(
                         this.wrap(
                             "mode",
                             {
-                                valueOf(if (b.isOffNote) 1 else 0)
+                                if (b.isRepeating) valueOf(1) else valueOf(0)
                             },
-                            { b.isOffNote = it.checkint() == 1 },
+                            { b.isRepeating = it.checkint() >= 1 },
                         )
                     }
                 }.forEachIndexed { index, value ->

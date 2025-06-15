@@ -60,7 +60,7 @@ abstract class SoundManager {
                     beats.add(current)
                 } else if (beat.note == null && current.isRepeating) {
                     // Repeating the previous note
-                    current = current.copy(duration = 1f)
+                    current = current.copy(beat = beat.beat, duration = 1f, isRepeating = true)
                     beats.add(current)
                 } else if (beat.note == null && !current.isRepeating) {
                     // Extending the previous note
