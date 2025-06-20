@@ -103,6 +103,9 @@ interface GameResourceAccess {
      */
     fun play(musicalSequence: MusicalSequence): SoundHandler
 
+    /**
+     * Play a track
+     */
     fun play(track: MusicalSequence.Track): SoundHandler
 
     /**
@@ -144,4 +147,6 @@ interface GameResourceAccess {
         operation: T,
         type: KClass<T>,
     )
+
+    fun exportAsSound(sequence: MusicalSequence)
 }

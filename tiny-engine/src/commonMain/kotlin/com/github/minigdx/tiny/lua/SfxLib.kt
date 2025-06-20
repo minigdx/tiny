@@ -17,6 +17,7 @@ import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
+import org.luaj.vm2.lib.ZeroArgFunction
 
 /**
  *
@@ -89,6 +90,8 @@ class SfxLib(
         ctrl.set("load", load())
         ctrl.set("save", save())
 
+        ctrl.set("export", export())
+
         arg2.set("sfx", ctrl)
         arg2.get("package").get("loaded").set("sfx", ctrl)
         return ctrl
@@ -104,6 +107,16 @@ class SfxLib(
 
     fun getCurrentMusic(): Music {
         return currentMusic ?: (resourceAccess.sound(0)?.data?.music ?: Music()).also { currentMusic = it }
+    }
+
+    inner class export : ZeroArgFunction() {
+        override fun call(): LuaValue {
+            val music = getCurrentMusic()
+            val sequence = music.sequences.getOrNull(currentSequence)
+            sequence?.run { resourceAccess.exportAsSound(sequence) }
+
+            return NIL
+        }
     }
 
     @TinyFunction("Save the actual music using the filename.")
@@ -179,6 +192,12 @@ class SfxLib(
                 resourceAccess.play(this)
                 NONE
             }
+
+            obj.wrap(
+                "volume",
+                { valueOf(this.volume.toDouble()) },
+                { this.volume = it.optdouble(0.0).toFloat() },
+            )
 
             obj.wrap("beats") {
                 val result = LuaTable()

@@ -64,8 +64,9 @@ Cursor._move_cursor = function(self)
                 -- Special handling for note field
                 local beat = self.track.track.beats[self.beati + 1]
                 local current_notei = beat.notei or 0
-                
-                if current_notei == 1 then  -- C0 (lowest note)
+
+                if current_notei == 1 then
+                    -- C0 (lowest note)
                     -- Set to repeat previous note (null)
                     beat.notei = nil
                 elseif beat.notei == nil then
@@ -84,8 +85,9 @@ Cursor._move_cursor = function(self)
             if self.fields[self.fieldi].name == "notei" then
                 -- Special handling for note field
                 local beat = self.track.track.beats[self.beati + 1]
-                
-                if beat.notei == -1 then  -- Note off (silence)
+
+                if beat.notei == -1 then
+                    -- Note off (silence)
                     -- Set to repeat previous note (null)
                     beat.notei = nil
                 elseif beat.notei == nil then
@@ -100,7 +102,7 @@ Cursor._move_cursor = function(self)
                 self.track:change(self.beati + 1, self.fields[self.fieldi].name, 1)
             end
         end)
-        
+
         -- Handle delete key to set note to null (repeat previous)
         if ctrl.pressed(keys.delete) and self.fields[self.fieldi].name == "notei" then
             local beat = self.track.track.beats[self.beati + 1]
@@ -179,14 +181,14 @@ TrackEditor._draw = function(self)
     local offset = self.beat_offset
 
     -- todo: introduce offset if the user is going down in the list
-    for i=1,20 do
+    for i = 1, 20 do
         local y = (i - offset) * 10 + (self.y + 3)
         print(string.format("%02x", i), self.x - 10, y)
     end
     for i, beat in ipairs(self.track.beats) do
         if i >= offset and i < offset + 20 then
             local y = (i - offset) * 10 + (self.y + 3)
-            
+
             -- Check note state
             if beat.notei == nil then
                 -- Repeat previous note (null)
@@ -201,7 +203,7 @@ TrackEditor._draw = function(self)
                 -- Normal note
                 local note = beat.note
                 if (#note == 1) then
-                    note = note.." "
+                    note = note .. " "
                 end
                 local mode
                 if beat.mode >= 1 then
@@ -209,14 +211,14 @@ TrackEditor._draw = function(self)
                 else
                     mode = "L"
                 end
-                
+
                 local instrument = beat.instrument or "."
                 if instrument ~= "." then
                     instrument = string.format("%01x", instrument)
                 end
 
                 print(
-                       note ..
+                        note ..
                                 " " .. beat.octave ..
                                 "  " .. string.format("%02x", beat.volume) ..
                                 "  " .. mode .. "  " .. instrument, self.x + 2, y
@@ -241,11 +243,37 @@ function _init()
         table.insert(m.widgets, button)
     end
 
+    for k in all(entities["Knob"]) do
+        local knob = widgets:create_knob(k)
+        -- knob.on_hover = on_menu_item_hover
+        table.insert(m.widgets, knob)
+
+        if knob.fields.Label == "BPM" then
+
+        end
+    end
+
+    for c in all(entities["Button"]) do
+        local button = widgets:create_button(c)
+
+        if button.fields.Type == "SINE" then
+            button.on_change = function()
+                sfx.export()
+            end
+        end
+        table.insert(m.widgets, button)
+    end
+
     local tracks = {}
     for mode in all(entities["TrackEditor"]) do
         local track = new(TrackEditor, mode)
+        local volume = wire.find_widget(m.widgets, track.fields.Volume)
 
         track.track = sfx.track(track.fields.Track)
+
+        wire.produce_to(volume, { "value" }, track, { "track", "volume" })
+        wire.consume_on_update(volume, { "value" }, track, { "track", "volume" })
+
         table.insert(m.widgets, track)
         table.insert(tracks, track)
     end
@@ -266,6 +294,8 @@ function _draw()
     mouse._draw()
 end
 
+local mhandler = nil
+
 function _update()
     mouse._update(function()
     end, function()
@@ -273,7 +303,11 @@ function _update()
     end)
 
     if (ctrl.pressed(keys.space)) then
-        sfx.music(0)
+        if mhandler then
+            mhandler.stop()
+        end
+
+        mhandler = sfx.music(0)
     end
 
     for w in all(m.widgets) do

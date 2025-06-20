@@ -484,6 +484,10 @@ class GameEngine(
         return soundManager.createSoundHandler(track).also { it.play() }
     }
 
+    override fun exportAsSound(sequence: MusicalSequence) {
+        soundManager.exportAsSound(sequence)
+    }
+
     override fun script(name: String): GameScript? {
         return scripts
             .drop(1) // drop the _boot.lua

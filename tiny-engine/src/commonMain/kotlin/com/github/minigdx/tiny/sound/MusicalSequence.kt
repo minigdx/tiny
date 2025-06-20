@@ -18,7 +18,7 @@ class MusicalSequence(
         var mute: Boolean = false,
         @Transient var instrument: Instrument? = null,
         val beats: MutableList<MusicalNote> = mutableListOf(),
-        val volume: Percent = 1f,
+        var volume: Percent = 1f,
     ) {
         init {
             (0..32).forEach { i ->

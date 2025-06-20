@@ -25,8 +25,8 @@ abstract class SoundManager {
         return createSoundHandler(buffer, buffer.size.toLong())
     }
 
-    fun createSoundHandler(bar: MusicalSequence): SoundHandler {
-        val buffer = convert(bar)
+    fun createSoundHandler(sequence: MusicalSequence): SoundHandler {
+        val buffer = convert(sequence)
         return createSoundHandler(buffer, buffer.size.toLong())
     }
 
@@ -124,16 +124,19 @@ abstract class SoundManager {
                 val time = (i.toFloat() / SAMPLE_RATE.toFloat())
                 var sampleValue = 0.0f
 
-                instrument.harmonics.forEachIndexed { index, relativeAmplitude ->
-                    val harmonicNumber = index + 1
-                    val harmonicFreq = fundamentalFreq * harmonicNumber
+                // Only generate sound if there is a note
+                if (b.note != null) {
+                    instrument.harmonics.forEachIndexed { index, relativeAmplitude ->
+                        val harmonicNumber = index + 1
+                        val harmonicFreq = fundamentalFreq * harmonicNumber
 
-                    sampleValue += relativeAmplitude * instrument.generate(harmonicFreq, time)
+                        sampleValue += relativeAmplitude * instrument.generate(harmonicFreq, time)
+                    }
+
+                    sampleValue *= envelopeFilter(i, numberOfSamples, instrument)
+                    sampleValue *= normalizationFactor * b.volume * volume
+                    sampleValue *= MASTER_VOLUME
                 }
-
-                sampleValue *= envelopeFilter(i, numberOfSamples, instrument)
-                sampleValue *= normalizationFactor * b.volume * volume
-                sampleValue *= MASTER_VOLUME
 
                 buffer[i] = max(-1.0f, min(1.0f, sampleValue))
             }
@@ -194,6 +197,8 @@ abstract class SoundManager {
 
         return max(0.0f, min(1.0f, multiplier))
     }
+
+    open fun exportAsSound(sequence: MusicalSequence) = Unit
 
     companion object {
         const val SAMPLE_RATE = 44100
