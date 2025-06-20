@@ -84,14 +84,53 @@ abstract class SoundManager {
 
         val resultSize = tracks.maxOf { it.size }
         val result = FloatArray(resultSize) { 0f }
-        val activeTrackCount = tracks.size.toFloat()
 
-        // Mix tracks with proper normalization to prevent clipping
+        // Calculate RMS values for each track to properly scale them during mixing
+        val trackRmsValues = tracks.map { calculateRms(it) }
+        val totalRms = trackRmsValues.sum()
+
+        // Mix tracks with RMS-based scaling to prevent saturation
         result.indices.forEach { index ->
-            val mixedSample = tracks.mapNotNull { it.getOrNull(index) }.sum() / activeTrackCount
+            var mixedSample = 0f
+
+            // If total RMS is significant, use it for scaling
+            if (totalRms > 0.001f) {
+                tracks.forEachIndexed { trackIndex, track ->
+                    val sample = track.getOrNull(index) ?: 0f
+                    // Scale each sample based on its track's contribution to the total RMS
+                    val scaleFactor = if (trackRmsValues[trackIndex] > 0.001f) {
+                        // Normalize by the track's RMS value relative to the total RMS
+                        1f / (trackRmsValues.size * (trackRmsValues[trackIndex] / totalRms))
+                    } else {
+                        1f
+                    }
+                    mixedSample += sample * scaleFactor
+                }
+            } else {
+                // Fallback to simple averaging if RMS values are too small
+                mixedSample = tracks.mapNotNull { it.getOrNull(index) }.sum() / tracks.size.toFloat()
+            }
+
+            // Ensure the final sample is within the valid range
             result[index] = max(-1f, min(1f, mixedSample))
         }
         return result
+    }
+
+    /**
+     * Calculates the Root Mean Square (RMS) value of an audio buffer.
+     * RMS is a measure of the average power of the signal and provides a better
+     * representation of perceived loudness than simple averaging.
+     */
+    private fun calculateRms(buffer: FloatArray): Float {
+        if (buffer.isEmpty()) return 0f
+
+        var sumOfSquares = 0f
+        for (sample in buffer) {
+            sumOfSquares += sample * sample
+        }
+
+        return kotlin.math.sqrt(sumOfSquares / buffer.size)
     }
 
     private fun convert(
