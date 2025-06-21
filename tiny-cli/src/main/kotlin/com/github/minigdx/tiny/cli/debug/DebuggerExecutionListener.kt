@@ -1,5 +1,7 @@
 package com.github.minigdx.tiny.cli.debug
 
+import com.github.minigdx.tiny.cli.debug.LuaValue.Dictionary
+import com.github.minigdx.tiny.cli.debug.LuaValue.Primitive
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -93,29 +95,33 @@ class DebuggerExecutionListener(
     }
 
     /**
-     * Format a LuaValue to a human-readable String.
+     * Format a LuaValue to a structured representation.
      */
     private fun formatValue(
         arg: LuaValue,
         recursiveSecurity: MutableSet<Int> = mutableSetOf(),
-    ): String =
+    ): com.github.minigdx.tiny.cli.debug.LuaValue =
         if (arg.istable()) {
             val table = arg as LuaTable
             if (recursiveSecurity.contains(table.hashCode())) {
-                "table[<${table.hashCode()}>]"
+                Primitive("table[<${table.hashCode()}>]")
             } else {
                 recursiveSecurity.add(table.hashCode())
                 val keys = table.keys()
-                val str =
-                    keys.joinToString(" ") {
-                        it.optjstring("nil") + ":" + formatValue(table[it], recursiveSecurity)
-                    }
-                "table[$str]"
+                val entries = mutableMapOf<String, com.github.minigdx.tiny.cli.debug.LuaValue>()
+
+                keys.forEach { key ->
+                    val keyStr = key.optjstring("nil") ?: "nil"
+                    entries[keyStr] = formatValue(table[key], recursiveSecurity)
+                }
+
+                Dictionary(entries)
             }
         } else if (arg.isfunction()) {
-            "function(" + (0 until arg.narg()).joinToString(", ") { "arg" } + ")"
+            val funcStr = "function(" + (0 until arg.narg()).joinToString(", ") { "arg" } + ")"
+            Primitive(funcStr)
         } else {
-            arg.toString()
+            Primitive(arg.toString())
         }
 
     override suspend fun onCall(
@@ -192,7 +198,7 @@ class DebuggerExecutionListener(
 
                 upValues.zip(upValuesDesc) { value, name ->
                     val upValueName = name.name?.tojstring() ?: ""
-                    val upValueValue = value?.value ?: LuaValue.NIL
+                    val upValueValue = value?.value ?: org.luaj.vm2.LuaValue.NIL
                     upValueName to upValueValue
                 }
                     // Skip the _ENV upvalue

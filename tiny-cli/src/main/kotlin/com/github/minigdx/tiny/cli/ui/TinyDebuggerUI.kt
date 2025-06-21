@@ -5,6 +5,7 @@ import com.github.minigdx.tiny.cli.debug.BreakpointHit
 import com.github.minigdx.tiny.cli.debug.DebugRemoteCommand
 import com.github.minigdx.tiny.cli.debug.Disconnect
 import com.github.minigdx.tiny.cli.debug.EngineRemoteCommand
+import com.github.minigdx.tiny.cli.debug.LuaValue
 import com.github.minigdx.tiny.cli.debug.Reload
 import com.github.minigdx.tiny.cli.debug.ResumeExecution
 import com.github.minigdx.tiny.cli.debug.ToggleBreakpoint
@@ -32,19 +33,24 @@ import java.awt.event.MouseListener
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
+import javax.swing.Box
 import javax.swing.BoxLayout
 import javax.swing.Icon
 import javax.swing.ImageIcon
 import javax.swing.JButton
 import javax.swing.JFrame
+import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JTabbedPane
 import javax.swing.JTable
+import javax.swing.JTree
 import javax.swing.SwingUtilities
 import javax.swing.table.DefaultTableModel
 import javax.swing.text.BadLocationException
 import javax.swing.text.DefaultHighlighter
+import javax.swing.tree.DefaultMutableTreeNode
+import javax.swing.tree.DefaultTreeModel
 
 /**
  * [TinyDebuggerUI] is the main class of the debugger.
@@ -69,10 +75,38 @@ class TinyDebuggerUI(
 ) : JFrame("\uD83E\uDDF8 Tiny Debugger") {
     private val tabbedPane = JTabbedPane()
 
-    private val tableModel = DefaultTableModel(arrayOf("Name", "Value"), 0)
-    private val table = JTable(tableModel)
+    // Custom table model to store variable values
+    private val tableModel = object : DefaultTableModel(arrayOf("Name", "Value"), 0) {
+        override fun isCellEditable(row: Int, column: Int): Boolean {
+            // Make all cells non-editable
+            return false
+        }
+    }
+    private val table = JTable(tableModel).apply {
+        setDefaultRenderer(Object::class.java, VariableCellRenderer())
+
+        // Add a mouse listener to handle clicks on dictionary cells
+        addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(e: MouseEvent) {
+                val row = rowAtPoint(e.point)
+                val column = columnAtPoint(e.point)
+
+                if (row >= 0 && column == 1) {  // Only for the value column
+                    val name = getValueAt(row, 0) as String
+                    val luaValue = variableValues[name]
+
+                    if (luaValue is LuaValue.Dictionary) {
+                        showDictionaryDialog(name, luaValue)
+                    }
+                }
+            }
+        })
+    }
 
     private val textAreas: MutableMap<String, RSyntaxTextArea> = mutableMapOf()
+
+    // Store variable values for rendering
+    private val variableValues: MutableMap<String, LuaValue> = mutableMapOf()
 
     private val io = CoroutineScope(Dispatchers.IO)
 
@@ -121,14 +155,17 @@ class TinyDebuggerUI(
                             textArea?.highlightLine(command.line, LIGHT_RED)
 
                             tableModel.rowCount = 0
+                            variableValues.clear()
+
                             command.locals.forEach { (name, value) ->
-                                tableModel.addRow(arrayOf(name, value))
+                                addValueToTable(name, value)
                             }
                             command.upValues.forEach { (name, value) ->
-                                tableModel.addRow(arrayOf(name, value))
+                                addValueToTable(name, value)
                             }
                         }
                     }
+
                     is Reload ->
                         SwingUtilities.invokeLater {
                             val textArea = textAreas[command.script]!!
@@ -327,15 +364,139 @@ class TinyDebuggerUI(
                     // Create new pixel value: (alpha << 24) | (red << 16) | (green << 8) | blue
                     val newPixelARGB =
                         (originalAlpha shl 24) or
-                            (targetColor.red shl 16) or
-                            (targetColor.green shl 8) or
-                            targetColor.blue
+                                (targetColor.red shl 16) or
+                                (targetColor.green shl 8) or
+                                targetColor.blue
                     newImage.setRGB(x, y, newPixelARGB)
                 }
             }
         }
 
         return newImage
+    }
+
+    /**
+     * Custom cell renderer that can display either text or a tree structure for dictionaries.
+     */
+    private inner class VariableCellRenderer : javax.swing.table.DefaultTableCellRenderer() {
+        override fun getTableCellRendererComponent(
+            table: JTable,
+            value: Any?,
+            isSelected: Boolean,
+            hasFocus: Boolean,
+            row: Int,
+            column: Int,
+        ): Component {
+            if (column == 0) {
+                return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column)
+            }
+
+            val name = table.getValueAt(row, 0) as String
+            val luaValue = variableValues[name]
+
+            return when (luaValue) {
+                is LuaValue.Dictionary -> {
+                    // Create a panel with a button and label
+                    val panel = JPanel().apply {
+                        layout = BoxLayout(this, BoxLayout.X_AXIS)
+                        background = if (isSelected) table.selectionBackground else table.background
+                    }
+
+                    // Add the button with a mouse listener instead of action listener
+                    val button = JButton("+").apply {
+                        val dimension = Dimension(16, 16)
+                        preferredSize = dimension
+                        minimumSize = dimension
+                        maximumSize = dimension
+                        isFocusable = false  // Prevent focus which can interfere with events
+                        isRequestFocusEnabled = false
+                    }
+
+                    // Add a mouse listener to handle clicks
+                    button.addMouseListener(object : MouseAdapter() {
+                        override fun mouseClicked(e: MouseEvent) {
+                            showDictionaryDialog(name, luaValue)
+                        }
+                    })
+
+                    panel.add(button)
+                    panel.add(JLabel("Dictionary (${luaValue.entries.size} entries)"))
+                    panel.add(Box.createHorizontalGlue())
+
+                    panel
+                }
+
+                is LuaValue.Primitive -> {
+                    super.getTableCellRendererComponent(table, luaValue.value, isSelected, hasFocus, row, column)
+                }
+
+                null -> {
+                    super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column)
+                }
+            }
+        }
+    }
+
+    /**
+     * Shows a dialog with a tree view of a dictionary.
+     */
+    private fun showDictionaryDialog(name: String, dictionary: LuaValue.Dictionary) {
+        // Use JDialog instead of JFrame to make it modal
+        val dialog = javax.swing.JDialog(this, "Dictionary: $name", true)
+        dialog.size = Dimension(400, 300)
+        dialog.layout = BorderLayout()
+        dialog.defaultCloseOperation = javax.swing.WindowConstants.DISPOSE_ON_CLOSE
+
+        val root = DefaultMutableTreeNode(name)
+        populateTreeNode(root, dictionary)
+
+        val tree = JTree(DefaultTreeModel(root))
+        tree.isRootVisible = true
+        tree.showsRootHandles = true
+
+        // Add a close button at the bottom
+        val closeButton = JButton("Close")
+        closeButton.addActionListener { dialog.dispose() }
+
+        val buttonPanel = JPanel()
+        buttonPanel.add(closeButton)
+
+        dialog.add(JScrollPane(tree), BorderLayout.CENTER)
+        dialog.add(buttonPanel, BorderLayout.SOUTH)
+
+        // Center the dialog on the parent window
+        dialog.setLocationRelativeTo(this)
+
+        // Make the dialog visible
+        dialog.isVisible = true
+    }
+
+    /**
+     * Recursively populates a tree node with the entries from a dictionary.
+     */
+    private fun populateTreeNode(node: DefaultMutableTreeNode, dictionary: LuaValue.Dictionary) {
+        dictionary.entries.forEach { (key, value) ->
+            when (value) {
+                is LuaValue.Primitive -> {
+                    val childNode = DefaultMutableTreeNode("$key: ${value.value}")
+                    node.add(childNode)
+                }
+
+                is LuaValue.Dictionary -> {
+                    val childNode = DefaultMutableTreeNode(key)
+                    node.add(childNode)
+                    populateTreeNode(childNode, value)
+                }
+            }
+        }
+    }
+
+    /**
+     * Adds a value to the table, handling both primitive values and dictionaries.
+     */
+    private fun addValueToTable(name: String, value: LuaValue) {
+        variableValues[name] = value
+        tableModel.addRow(arrayOf(name, ""))
     }
 
     companion object {

@@ -51,11 +51,12 @@ object Disconnect : DebugRemoteCommand
  * @param script the name of the script where the breakpoint is.
  * @param line the line number of the breakpoint.
  * @param locals the local variables at the breakpoint.
+ * @param upValues the upvalues at the breakpoint.
  */
 @Serializable
 data class BreakpointHit(
     val script: String,
     val line: Int,
-    val locals: Map<String, String>,
-    val upValues: Map<String, String>,
+    val locals: Map<String, LuaValue>,
+    val upValues: Map<String, LuaValue>,
 ) : EngineRemoteCommand
