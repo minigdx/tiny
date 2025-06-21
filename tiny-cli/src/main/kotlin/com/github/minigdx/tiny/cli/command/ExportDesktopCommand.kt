@@ -303,7 +303,16 @@ class ExportDesktopCommand : CliktCommand(name = "export-desktop") {
                     CLASSPATH="${'$'}CLASSPATH:${'$'}jar"
                 fi
             done
-            java -cp "${'$'}CLASSPATH" com.github.minigdx.tiny.cli.MainKt run "${'$'}DIR/game"
+            
+            # Initialize the variable as empty
+            MACOS_SPECIFIC_ARGS=""
+            
+            # Condition 1: OS must be macOS
+            if [ `uname -s` = "Darwin" ]; then
+                MACOS_SPECIFIC_ARGS="-XstartOnFirstThread"
+            fi
+
+            java ${'$'}MACOS_SPECIFIC_ARGS -cp "${'$'}CLASSPATH" com.github.minigdx.tiny.cli.MainKt run "${'$'}DIR/game"
             """.trimIndent(),
         )
         scriptFile.setExecutable(true)
