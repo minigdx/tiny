@@ -24,14 +24,14 @@ class ExportDesktopCommand : CliktCommand(name = "export-desktop") {
 
     val outputDirectory by option("-o", "--output", help = "Output directory for the exported application")
         .file(canBeDir = true, canBeFile = false)
-        .default(File("export-desktop"))
+        .default(File("exported-game"))
 
     val platform by option("-p", "--platform", help = "Target platform")
         .choice("windows", "linux", "mac", "current")
         .default("current")
 
     val includeJdk by option("--include-jdk", help = "Include JDK in the package (requires jpackage)")
-        .flag(default = true)
+        .flag("--exclude-jdk", default = true)
 
     val appName by option("-n", "--name", help = "Application name (defaults to game name)")
 
@@ -99,7 +99,7 @@ class ExportDesktopCommand : CliktCommand(name = "export-desktop") {
         val tempDir = Files.createTempDirectory("tiny-export").toFile()
         val appJarFile = File(tempDir, "$appName.jar")
 
-        createLauncherJar(gameDir, appJarFile)
+        createLauncherJar(gameDir, outputDir, appJarFile)
 
         val jpackageCommand = mutableListOf(
             "jpackage",
@@ -143,7 +143,7 @@ class ExportDesktopCommand : CliktCommand(name = "export-desktop") {
         echo("\uD83D\uDCE6 Creating portable JAR launcher...")
 
         val jarFile = File(outputDir, "$appName.jar")
-        createLauncherJar(gameDir, jarFile)
+        createLauncherJar(gameDir, outputDir, jarFile)
 
         val launcherScript = if (detectCurrentPlatform() == "windows") {
             createWindowsBatchLauncher(outputDir, appName)
@@ -157,6 +157,7 @@ class ExportDesktopCommand : CliktCommand(name = "export-desktop") {
 
     private fun createLauncherJar(
         gameDir: File,
+        excludedDir: File,
         outputJar: File,
     ) {
         val cliJar = locateCliJar()
@@ -169,9 +170,85 @@ class ExportDesktopCommand : CliktCommand(name = "export-desktop") {
 
         Files.copy(cliJar.toPath(), outputJar.toPath(), StandardCopyOption.REPLACE_EXISTING)
 
+        // Copy all dependencies to the output directory
+        val dependencies = getDependencies()
+        echo("\uD83D\uDCE6 Copying ${dependencies.size} dependencies...")
+
+        // Get the canonical path of the excluded directory for reliable comparison
+        val excludedDirPath = excludedDir.canonicalPath
+
+        for (dependency in dependencies) {
+            val dependencyFile = File(dependency)
+            // Get the canonical path of the dependency file
+            val dependencyFilePath = dependencyFile.canonicalPath
+
+            if (
+                !dependencyFilePath.startsWith(excludedDirPath) &&
+                dependencyFile.exists() && dependencyFile.isFile && dependencyFile.name.endsWith(".jar")
+                ) {
+                val targetFile = File(outputJar.parent, dependencyFile.name)
+                echo("  - Copying ${dependencyFile.name}")
+                Files.copy(dependencyFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
+            }
+        }
+
         val gameResourcesDir = File(outputJar.parent, "game")
         gameResourcesDir.mkdirs()
-        gameDir.copyRecursively(gameResourcesDir, overwrite = true)
+        copyRecursivelyExcluding(gameDir, gameResourcesDir, excludedDir)
+    }
+
+    /**
+     * Recursively copies files and directories from source to target,
+     * excluding any files or directories located within the excludedDir.
+     */
+    private fun copyRecursivelyExcluding(
+        source: File,
+        target: File,
+        excludedDir: File
+    ) {
+        // Get the canonical path of the excluded directory for reliable comparison
+        val excludedDirPath = excludedDir.canonicalPath
+
+        // Ensure the target directory exists
+        target.mkdirs()
+
+        // Iterate through the contents of the source directory
+        source.listFiles()?.forEach { sourceFile ->
+            // Get the canonical path of the current source file/directory
+            val sourceFilePath = sourceFile.canonicalPath
+
+            // Check if the current source file/directory is inside the excluded directory
+            if (sourceFilePath.startsWith(excludedDirPath)) {
+                echo("  - Skipping excluded game resource: ${sourceFile.relativeTo(source).path}") // Use relative path for better message
+                return@forEach // Skip this file/directory
+            }
+
+            // Construct the target file/directory path
+            val targetFile = File(target, sourceFile.name)
+
+            if (sourceFile.isDirectory) {
+                // If it's a directory, recursively copy it
+                copyRecursivelyExcluding(sourceFile, targetFile, excludedDir)
+            } else {
+                // If it's a file, copy it
+                try {
+                    Files.copy(sourceFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
+                    echo("  - Copying game resource: ${sourceFile.relativeTo(source).path}") // Use relative path for better message
+                } catch (e: Exception) {
+                    echo("\uD83D\uDE2D Error copying game resource ${sourceFile.relativeTo(source).path}: ${e.message}")
+                    // Decide how to handle errors - maybe continue or throw?
+                    // For now, just log and continue.
+                }
+            }
+        }
+    }
+
+    private fun getDependencies(): List<String> {
+        val classPath = System.getProperty("java.class.path")
+        return classPath.split(File.pathSeparator)
+            .filter { it.endsWith(".jar") }
+            .filter { !it.contains("tiny-cli") } // Exclude the CLI jar as it's already copied
+            .distinct()
     }
 
     private fun locateCliJar(): File? {
@@ -199,7 +276,12 @@ class ExportDesktopCommand : CliktCommand(name = "export-desktop") {
         scriptFile.writeText(
             """
             @echo off
-            java -jar "%~dp0\$appName.jar" run "%~dp0\game"
+            setlocal EnableDelayedExpansion
+            set CLASSPATH="%~dp0\$appName.jar"
+            for %%i in ("%~dp0\*.jar") do (
+                if NOT "%%~nxi"=="$appName.jar" set CLASSPATH=!CLASSPATH!;%%i
+            )
+            java -cp !CLASSPATH! com.github.minigdx.tiny.cli.MainKt run "%~dp0\game"
             """.trimIndent(),
         )
         return scriptFile
@@ -214,7 +296,13 @@ class ExportDesktopCommand : CliktCommand(name = "export-desktop") {
             """
             #!/bin/bash
             DIR="${'$'}( cd "${'$'}( dirname "${'$'}{BASH_SOURCE[0]}" )" && pwd )"
-            java -jar "${'$'}DIR/$appName.jar" run "${'$'}DIR/game"
+            CLASSPATH="${'$'}DIR/$appName.jar"
+            for jar in "${'$'}DIR"/*.jar; do
+                if [ "${'$'}jar" != "${'$'}DIR/$appName.jar" ]; then
+                    CLASSPATH="${'$'}CLASSPATH:${'$'}jar"
+                fi
+            done
+            java -cp "${'$'}CLASSPATH" com.github.minigdx.tiny.cli.MainKt run "${'$'}DIR/game"
             """.trimIndent(),
         )
         scriptFile.setExecutable(true)
