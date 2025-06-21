@@ -11,6 +11,7 @@ class MainCommand : CliktCommand() {
             DebugCommand(),
             AddCommand(),
             ExportCommand(),
+            ExportDesktopCommand(),
             ServeCommand(),
             PaletteCommand(),
             SfxCommand(),
