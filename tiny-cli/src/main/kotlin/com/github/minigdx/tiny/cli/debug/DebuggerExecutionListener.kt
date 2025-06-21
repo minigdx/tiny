@@ -82,7 +82,7 @@ class DebuggerExecutionListener(
             BreakpointInfo(
                 script = executionPoint.scriptName,
                 line = executionPoint.line,
-                enabled = breakpoint.enabled
+                enabled = breakpoint.enabled,
             )
         }
 
@@ -97,7 +97,10 @@ class DebuggerExecutionListener(
         }
     }
 
-    private suspend fun sendBreakpointHit(scriptName: String, line: Int) {
+    private suspend fun sendBreakpointHit(
+        scriptName: String,
+        line: Int,
+    ) {
         val frames = callstack(globals.running).getCallFrames()
 
         val upValues =

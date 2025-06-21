@@ -186,7 +186,7 @@ class ExportDesktopCommand : CliktCommand(name = "export-desktop") {
                 }
             }
         }
-        
+
         // If not running from JAR, CLI is not properly installed
         return null
     }

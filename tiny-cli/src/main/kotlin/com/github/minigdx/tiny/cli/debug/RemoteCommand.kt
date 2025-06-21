@@ -74,7 +74,7 @@ data class BreakpointHit(
  */
 @Serializable
 data class CurrentBreakpoints(
-    val breakpoints: List<BreakpointInfo>
+    val breakpoints: List<BreakpointInfo>,
 ) : EngineRemoteCommand
 
 /**
@@ -88,5 +88,5 @@ data class CurrentBreakpoints(
 data class BreakpointInfo(
     val script: String,
     val line: Int,
-    val enabled: Boolean
+    val enabled: Boolean,
 )

@@ -79,7 +79,10 @@ class TinyDebuggerUI(
 
     // Custom table model to store variable values
     private val tableModel = object : DefaultTableModel(arrayOf("Name", "Value"), 0) {
-        override fun isCellEditable(row: Int, column: Int): Boolean {
+        override fun isCellEditable(
+            row: Int,
+            column: Int,
+        ): Boolean {
             // Make all cells non-editable
             return false
         }
@@ -93,7 +96,7 @@ class TinyDebuggerUI(
                 val row = rowAtPoint(e.point)
                 val column = columnAtPoint(e.point)
 
-                if (row >= 0 && column == 1) {  // Only for the value column
+                if (row >= 0 && column == 1) { // Only for the value column
                     val name = getValueAt(row, 0) as String
                     val luaValue = variableValues[name]
 
@@ -390,9 +393,9 @@ class TinyDebuggerUI(
                     // Create new pixel value: (alpha << 24) | (red << 16) | (green << 8) | blue
                     val newPixelARGB =
                         (originalAlpha shl 24) or
-                                (targetColor.red shl 16) or
-                                (targetColor.green shl 8) or
-                                targetColor.blue
+                            (targetColor.red shl 16) or
+                            (targetColor.green shl 8) or
+                            targetColor.blue
                     newImage.setRGB(x, y, newPixelARGB)
                 }
             }
@@ -434,7 +437,7 @@ class TinyDebuggerUI(
                         preferredSize = dimension
                         minimumSize = dimension
                         maximumSize = dimension
-                        isFocusable = false  // Prevent focus which can interfere with events
+                        isFocusable = false // Prevent focus which can interfere with events
                         isRequestFocusEnabled = false
                     }
 
@@ -466,7 +469,10 @@ class TinyDebuggerUI(
     /**
      * Shows a dialog with a tree view of a dictionary.
      */
-    private fun showDictionaryDialog(name: String, dictionary: LuaValue.Dictionary) {
+    private fun showDictionaryDialog(
+        name: String,
+        dictionary: LuaValue.Dictionary,
+    ) {
         // Use JDialog instead of JFrame to make it modal
         val dialog = javax.swing.JDialog(this, "Dictionary: $name", true)
         dialog.size = Dimension(400, 300)
@@ -500,7 +506,10 @@ class TinyDebuggerUI(
     /**
      * Recursively populates a tree node with the entries from a dictionary.
      */
-    private fun populateTreeNode(node: DefaultMutableTreeNode, dictionary: LuaValue.Dictionary) {
+    private fun populateTreeNode(
+        node: DefaultMutableTreeNode,
+        dictionary: LuaValue.Dictionary,
+    ) {
         dictionary.entries.forEach { (key, value) ->
             when (value) {
                 is LuaValue.Primitive -> {
@@ -520,7 +529,10 @@ class TinyDebuggerUI(
     /**
      * Adds a value to the table, handling both primitive values and dictionaries.
      */
-    private fun addValueToTable(name: String, value: LuaValue) {
+    private fun addValueToTable(
+        name: String,
+        value: LuaValue,
+    ) {
         variableValues[name] = value
         tableModel.addRow(arrayOf(name, ""))
     }
