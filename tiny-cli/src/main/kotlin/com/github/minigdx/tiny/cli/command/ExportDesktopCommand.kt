@@ -14,7 +14,6 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import java.io.File
 import java.io.FileInputStream
-import java.net.URLClassLoader
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
@@ -113,16 +112,65 @@ class ExportDesktopCommand : CliktCommand(name = "export-desktop") {
             "--main-class", "com.github.minigdx.tiny.cli.MainKt",
         )
 
-        if (platform == "mac") {
-            jpackageCommand.addAll(listOf("--mac-package-name", appName))
-        }
+        // Add platform-specific arguments for game location
+        when (platform) {
+            "mac" -> {
+                // For macOS, the application is installed in /Applications/[AppName].app/
+                // The executable is in Contents/MacOS/ and we want to access the game directory in Contents/Resources/game
+                jpackageCommand.addAll(
+                    listOf(
+                        "--arguments",
+                        "run",
+                        "--arguments",
+                        "../app/game",
+                    ),
+                )
 
-        if (platform == "windows") {
-            jpackageCommand.addAll(listOf("--win-dir-chooser", "--win-menu", "--win-shortcut"))
-        }
+                // Add macOS-specific options
+                jpackageCommand.addAll(listOf("--mac-package-name", appName))
 
-        if (platform == "linux") {
-            jpackageCommand.addAll(listOf("--linux-shortcut"))
+                // Add macOS-specific JVM options
+                jpackageCommand.addAll(listOf("--java-options", "-XstartOnFirstThread"))
+            }
+            "windows" -> {
+                // For Windows, use a relative path from the executable location
+                jpackageCommand.addAll(
+                    listOf(
+                        "--arguments",
+                        "run",
+                        "--arguments",
+                        "game",
+                    ),
+                )
+
+                // Add Windows-specific options
+                jpackageCommand.addAll(listOf("--win-dir-chooser", "--win-menu", "--win-shortcut"))
+            }
+            "linux" -> {
+                // For Linux, use a relative path from the executable location
+                jpackageCommand.addAll(
+                    listOf(
+                        "--arguments",
+                        "run",
+                        "--arguments",
+                        "game",
+                    ),
+                )
+
+                // Add Linux-specific options
+                jpackageCommand.addAll(listOf("--linux-shortcut"))
+            }
+            else -> {
+                // Default case
+                jpackageCommand.addAll(
+                    listOf(
+                        "--arguments",
+                        "run",
+                        "--arguments",
+                        "game",
+                    ),
+                )
+            }
         }
 
         echo("\uD83D\uDCBB Running jpackage for $platform...")
@@ -186,7 +234,7 @@ class ExportDesktopCommand : CliktCommand(name = "export-desktop") {
             if (
                 !dependencyFilePath.startsWith(excludedDirPath) &&
                 dependencyFile.exists() && dependencyFile.isFile && dependencyFile.name.endsWith(".jar")
-                ) {
+            ) {
                 val targetFile = File(outputJar.parent, dependencyFile.name)
                 echo("  - Copying ${dependencyFile.name}")
                 Files.copy(dependencyFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
@@ -205,7 +253,7 @@ class ExportDesktopCommand : CliktCommand(name = "export-desktop") {
     private fun copyRecursivelyExcluding(
         source: File,
         target: File,
-        excludedDir: File
+        excludedDir: File,
     ) {
         // Get the canonical path of the excluded directory for reliable comparison
         val excludedDirPath = excludedDir.canonicalPath
@@ -303,10 +351,10 @@ class ExportDesktopCommand : CliktCommand(name = "export-desktop") {
                     CLASSPATH="${'$'}CLASSPATH:${'$'}jar"
                 fi
             done
-            
+
             # Initialize the variable as empty
             MACOS_SPECIFIC_ARGS=""
-            
+
             # Condition 1: OS must be macOS
             if [ `uname -s` = "Darwin" ]; then
                 MACOS_SPECIFIC_ARGS="-XstartOnFirstThread"
