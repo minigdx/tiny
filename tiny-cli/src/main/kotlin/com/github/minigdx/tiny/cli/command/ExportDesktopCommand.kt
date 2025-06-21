@@ -14,6 +14,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import java.io.File
 import java.io.FileInputStream
+import java.net.URLClassLoader
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
@@ -245,9 +246,9 @@ class ExportDesktopCommand : CliktCommand(name = "export-desktop") {
 
     private fun getDependencies(): List<String> {
         val classPath = System.getProperty("java.class.path")
-        return classPath.split(File.pathSeparator)
+        return classPath.split(":")
             .filter { it.endsWith(".jar") }
-            .filter { !it.contains("tiny-cli") } // Exclude the CLI jar as it's already copied
+            .filter { !it.contains("tiny-cli-") } // Exclude the CLI jar as it's already copied
             .distinct()
     }
 
