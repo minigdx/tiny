@@ -173,7 +173,6 @@ class RunCommand : CliktCommand(name = "run") {
                     "If so, please report it.",
             )
             when (ex) {
-                // FIXME: catch TinyException?
                 is LuaError -> {
                     val (nb, line) = ex.errorLine() ?: (null to null)
                     echo("Error found line $nb:$line")

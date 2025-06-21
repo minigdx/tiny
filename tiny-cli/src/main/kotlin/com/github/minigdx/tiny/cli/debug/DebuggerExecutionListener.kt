@@ -60,6 +60,7 @@ class DebuggerExecutionListener(
                     is ToggleBreakpoint -> toggleBreakpoint(debugRemoteCommand)
                     is ResumeExecution -> resumeExecution(debugRemoteCommand)
                     Disconnect -> disconnect()
+                    RequestBreakpoints -> sendCurrentBreakpoints()
                 }
             }
         }
@@ -74,6 +75,62 @@ class DebuggerExecutionListener(
     private fun disconnect() {
         breakpoints = emptyMap()
         blocker.unblock()
+    }
+
+    private suspend fun sendCurrentBreakpoints() {
+        val breakpointInfoList = breakpoints.map { (executionPoint, breakpoint) ->
+            BreakpointInfo(
+                script = executionPoint.scriptName,
+                line = executionPoint.line,
+                enabled = breakpoint.enabled
+            )
+        }
+
+        engineCommandSender.send(CurrentBreakpoints(breakpointInfoList))
+
+        // If a breakpoint is currently hit, send a BreakpointHit to restore the state
+        // Check if we're at a valid line in a script (indicating a breakpoint hit)
+        val scriptName = currentExecutionPoint.script
+        val line = currentExecutionPoint.line
+        if (line > 0 && scriptName.isNotEmpty()) {
+            sendBreakpointHit(scriptName, line)
+        }
+    }
+
+    private suspend fun sendBreakpointHit(scriptName: String, line: Int) {
+        val frames = callstack(globals.running).getCallFrames()
+
+        val upValues =
+            frames.flatMap { frame ->
+                val upValues = (frame.f as? LuaClosure)?.upValues ?: emptyArray()
+                val upValuesDesc = (frame.f as? LuaClosure)?.p?.upvalues ?: emptyArray()
+
+                upValues.zip(upValuesDesc) { value, name ->
+                    val upValueName = name.name?.tojstring() ?: ""
+                    val upValueValue = value?.value ?: LuaValue.NIL
+                    upValueName to upValueValue
+                }
+                    // Skip the _ENV upvalue
+                    .filterNot { (name, _) -> name == "_ENV" }
+            }.toMap()
+                .mapValues { (_, value) -> formatValue(value) }
+
+        val locals =
+            frames.flatMap {
+                it.getLocals()
+            }.associate {
+                // name to value
+                it.arg(1).tojstring() to formatValue(it.arg(2))
+            }
+
+        engineCommandSender.send(
+            BreakpointHit(
+                script = scriptName,
+                line = line,
+                locals = locals,
+                upValues = upValues,
+            ),
+        )
     }
 
     private fun toggleBreakpoint(debugRemoteCommand: ToggleBreakpoint) {
@@ -189,39 +246,7 @@ class DebuggerExecutionListener(
         scriptName: String,
         line: Int,
     ) {
-        val frames = callstack(globals.running).getCallFrames()
-
-        val upValues =
-            frames.flatMap { frame ->
-                val upValues = (frame.f as? LuaClosure)?.upValues ?: emptyArray()
-                val upValuesDesc = (frame.f as? LuaClosure)?.p?.upvalues ?: emptyArray()
-
-                upValues.zip(upValuesDesc) { value, name ->
-                    val upValueName = name.name?.tojstring() ?: ""
-                    val upValueValue = value?.value ?: org.luaj.vm2.LuaValue.NIL
-                    upValueName to upValueValue
-                }
-                    // Skip the _ENV upvalue
-                    .filterNot { (name, _) -> name == "_ENV" }
-            }.toMap()
-                .mapValues { (_, value) -> formatValue(value) }
-
-        val locals =
-            frames.flatMap {
-                it.getLocals()
-            }.associate {
-                // name to value
-                it.arg(1).tojstring() to formatValue(it.arg(2))
-            }
-
-        engineCommandSender.send(
-            BreakpointHit(
-                script = scriptName,
-                line = line,
-                locals = locals,
-                upValues = upValues,
-            ),
-        )
+        sendBreakpointHit(scriptName, line)
         blocker.block()
     }
 

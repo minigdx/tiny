@@ -2,11 +2,13 @@ package com.github.minigdx.tiny.cli.ui
 
 import com.github.minigdx.tiny.cli.config.GameParameters
 import com.github.minigdx.tiny.cli.debug.BreakpointHit
+import com.github.minigdx.tiny.cli.debug.CurrentBreakpoints
 import com.github.minigdx.tiny.cli.debug.DebugRemoteCommand
 import com.github.minigdx.tiny.cli.debug.Disconnect
 import com.github.minigdx.tiny.cli.debug.EngineRemoteCommand
 import com.github.minigdx.tiny.cli.debug.LuaValue
 import com.github.minigdx.tiny.cli.debug.Reload
+import com.github.minigdx.tiny.cli.debug.RequestBreakpoints
 import com.github.minigdx.tiny.cli.debug.ResumeExecution
 import com.github.minigdx.tiny.cli.debug.ToggleBreakpoint
 import kotlinx.coroutines.CoroutineScope
@@ -144,6 +146,11 @@ class TinyDebuggerUI(
                 scriptsContent.forEach { (scriptName, scriptContent) ->
                     addScriptTab(scriptName, scriptContent, breakpointIcon)
                 }
+
+                // Request current breakpoints from the game engine
+                io.launch {
+                    debugCommandSender.send(RequestBreakpoints)
+                }
             }
 
             for (command in engineCommandReceiver) {
@@ -162,6 +169,25 @@ class TinyDebuggerUI(
                             }
                             command.upValues.forEach { (name, value) ->
                                 addValueToTable(name, value)
+                            }
+                        }
+                    }
+
+                    is CurrentBreakpoints -> {
+                        SwingUtilities.invokeLater {
+                            // Clear existing breakpoints in the UI
+                            textAreas.values.forEach { textArea ->
+                                val gutter = (textArea.parent.parent as? RTextScrollPane)?.gutter
+                                gutter?.removeAllTrackingIcons()
+                            }
+
+                            // Add received breakpoints to the UI
+                            command.breakpoints.forEach { breakpointInfo ->
+                                val textArea = textAreas[breakpointInfo.script]
+                                if (textArea != null && breakpointInfo.enabled) {
+                                    val gutter = (textArea.parent.parent as? RTextScrollPane)?.gutter
+                                    gutter?.toggleBookmark(breakpointInfo.line - 1)
+                                }
                             }
                         }
                     }

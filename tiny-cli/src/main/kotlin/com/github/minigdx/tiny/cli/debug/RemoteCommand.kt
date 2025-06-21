@@ -46,6 +46,12 @@ data class ResumeExecution(val advanceByStep: Boolean = false) : DebugRemoteComm
 object Disconnect : DebugRemoteCommand
 
 /**
+ * Request current breakpoints from the game engine.
+ */
+@Serializable
+object RequestBreakpoints : DebugRemoteCommand
+
+/**
  * A breakpoint has been hit in the game engine.
  *
  * @param script the name of the script where the breakpoint is.
@@ -60,3 +66,27 @@ data class BreakpointHit(
     val locals: Map<String, LuaValue>,
     val upValues: Map<String, LuaValue>,
 ) : EngineRemoteCommand
+
+/**
+ * Current breakpoints in the game engine.
+ *
+ * @param breakpoints the list of current breakpoints.
+ */
+@Serializable
+data class CurrentBreakpoints(
+    val breakpoints: List<BreakpointInfo>
+) : EngineRemoteCommand
+
+/**
+ * Information about a breakpoint.
+ *
+ * @param script the name of the script where the breakpoint is.
+ * @param line the line number of the breakpoint.
+ * @param enabled true if the breakpoint is enabled, false otherwise.
+ */
+@Serializable
+data class BreakpointInfo(
+    val script: String,
+    val line: Int,
+    val enabled: Boolean
+)
