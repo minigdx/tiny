@@ -122,7 +122,7 @@ class ExportDesktopCommand : CliktCommand(name = "export-desktop") {
                         "--arguments",
                         "run",
                         "--arguments",
-                        "../app/game",
+                        "--mac-from-jpackage",
                     ),
                 )
 
