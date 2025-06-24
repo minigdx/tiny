@@ -1,7 +1,7 @@
-== Licences
+== Licenses
 
-This documentation is using assets from https://www.kenney.nl.
-Please find below the licences regarding those assets.
+This documentation uses assets from https://www.kenney.nl.
+Below are the licenses for these assets.
 
 - https://www.kenney.nl/assets/tiny-town[Tiny Town (1.0)]
 - https://www.kenney.nl/assets/tiny-battle[Tiny Battle (1.0)]

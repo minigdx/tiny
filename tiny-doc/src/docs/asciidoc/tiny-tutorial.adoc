@@ -107,7 +107,6 @@ end
 
 function _update()
     -- Update game state
-     -- Update game state
     player1_pos.y = player1_pos.y - 4 * num(ctrl.pressing(keys.z)) --azerty keyboard
     player1_pos.y = player1_pos.y - 4 * num(ctrl.pressing(keys.w)) -- qwerty keyboard
     player1_pos.y = player1_pos.y + 4 * num(ctrl.pressing(keys.s))

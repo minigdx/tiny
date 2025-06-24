@@ -9,11 +9,11 @@
 
 = Tiny 🧸
 
-Welcome to the documentation for `🧸 Tiny`, the virtual console that offers an easy and efficient way to build games and other applications with its Lua programming support, hot reloading, and 256-color maximum.
+Welcome to the documentation for `🧸 Tiny`, a virtual console that makes building games and applications simple and fun! With Lua programming support, hot reloading, and a 256-color palette, you'll have everything you need to bring your ideas to life.
 
 == Tiny Engine
 
-Despite its modest capabilities, `🧸 Tiny` is designed to help you create and test your ideas quickly and effectively. Not only can you run your games on your desktop computer, but you can also export them for the web, making it easy to share your creations with others.
+`🧸 Tiny` is designed to help you create and test your ideas quickly and effectively. You can run your games on your desktop computer and export them for the web, making it easy to share your creations with others.
 
 With `🧸 Tiny`, you'll be able to get started right away and see your progress in real-time, thanks to its hot reloading feature. This documentation will guide you through the setup and usage of `🧸 Tiny` as well as provide you with helpful tips and tricks to make the most out of this powerful tool.
 
@@ -27,7 +27,7 @@ NOTE: The code source of this sample is available in the https://github.com/mini
 
 == Tiny Playground
 
-You can try to create a game right away `🧸 Tiny` using link:playground.html?game=[the Playground] or you can just try it by updating examples available in this page.
+You can try creating a game right away with `🧸 Tiny` using link:playground.html?game=[the Playground], or you can experiment by updating the examples available on this page.
 
 == Tiny is open source
 
@@ -40,7 +40,7 @@ A presentation about the technologies used behind 🧸 Tiny was also given durin
 image:sample/droidkaigi-tiny-export.gif[https://speakerdeck.com/dwursteisen/crafting-cross-platform-adventures-building-a-game-engine-with-kotlin-multiplatform
 ]
 
-TIP: You can improve this documentation by updating https://github.com/minigdx/tiny/tree/main/tiny-doc/src/docs/asciidoc[the code of this documentation]
+TIP: Want to help make this documentation even better? Feel free to contribute by updating https://github.com/minigdx/tiny/tree/main/tiny-doc/src/docs/asciidoc[the documentation source code]!
 
 include::tiny-install.adoc[]
 

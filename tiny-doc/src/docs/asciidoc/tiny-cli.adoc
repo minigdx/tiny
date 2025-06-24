@@ -1,12 +1,12 @@
 == Tiny CLI
 
-Introducing the Tiny CLI, a powerful command-line interface that allows you to easily create, run, develop, and export games using the Tiny 2D game engine. With the Tiny CLI, you can quickly and easily create a new game project, add assets, and start developing your game in no time.
+The Tiny CLI is a powerful command-line interface that makes it easy to create, run, develop, and export games using the Tiny 2D game engine. With the Tiny CLI, you can quickly create new game projects, add assets, and start developing your games right away.
 
 To get started, simply install the Tiny CLI on your system and create a new project using the `tiny-cli create` command. This will generate a new project directory with all the necessary files and folder structure to start building your game. You can then add assets to your game using the `tiny-cli add` command, which allows you to import images, audio files, and other resources into your project.
 
-The Tiny CLI also includes a powerful development server that allows you to preview your game in real-time as you develop it. Simply run the tiny command and start to update your game.
+The Tiny CLI also includes a powerful development server that allows you to preview your game in real-time as you develop it. Simply run the `tiny-cli` command to start developing and updating your game.
 
-The Tiny CLI includes the `tuny-cli debug` command, which starts a debugging tool. Connect it to your running game to set breakpoints and examine variables. As with typical debuggers, you can resume execution or step through your code line by line.
+The Tiny CLI includes the `tiny-cli debug` command, which starts a debugging tool. Connect it to your running game to set breakpoints and examine variables. As with typical debuggers, you can resume execution or step through your code line by line.
 
 When you're ready to share your game with the world, the Tiny CLI makes it easy to export your game for web browsers. You can use the `tiny-cli export` command to generate a distributable version of your game that can be published on the web. You can also try the `export` result by using the command `tiny-cli serve`.
 
@@ -141,7 +141,7 @@ Clicking in the editor's gutter adds a breakpoint, indicated by a red flag. When
 
 === the `tiny-cli palette` command
 
-The tiny-cli lib command is used extract a color palette from an image to use it in your `🧸 Tiny` game. This command provides an easy way to use colors from an image as your game's palette color.
+The tiny-cli palette command is used to extract a color palette from an image to use it in your `🧸 Tiny` game. This command provides an easy way to use colors from an image as your game's palette color.
 
 ==== Usage
 
@@ -155,9 +155,9 @@ For example:
 [source,shell]
 tiny-cli palette my_palette.png
 
-This command will replace your game palette with the palette extract from the file.
+This command will replace your game palette with the palette extracted from the file.
 
-You might want to check before which palette will be extract from the image using the flag `--print`:
+You might want to check beforehand which palette will be extracted from the image using the flag `--print`:
 
 [source,shell]
 tiny-cli palette --print my_palette.png
@@ -207,7 +207,7 @@ With the `tiny-cli export` command, you can easily export your tiny game and sha
 
 === the `tiny-cli serve` command
 
-The tiny serve command is used to launch a local web server that allows you to test a game that has been exported using the tiny export command. This is useful for testing and debugging a game locally before publishing it online.
+The `tiny-cli serve` command is used to launch a local web server that allows you to test a game that has been exported using the `tiny-cli export` command. This is useful for testing and debugging a game locally before publishing it online.
 
 ==== Syntax
 
@@ -248,7 +248,7 @@ NOTE: The tiny serve command is intended for local testing only and should not b
 
 === the `tiny-cli sfx` command
 
-The tiny-cli sfx command is used to start a SFX edtor to generate sound to use in your `🧸 Tiny` game.
+The tiny-cli sfx command is used to start a SFX editor to generate sound to use in your `🧸 Tiny` game.
 
 https://dwursteisen.itch.io/tiny-sfx-editor[This SFX editor can be tried online] on itch.io.
 
