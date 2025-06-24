@@ -6,6 +6,8 @@
 
 = Tiny Playground 🧸
 
+Welcome to the Tiny Playground! This is your interactive sandbox where you can experiment with `🧸 Tiny` right in your browser. Try out the examples below, modify the code, and see your changes in real-time. It's the perfect place to learn and explore what's possible with Tiny!
+
 TIP: Need help? xref:index.adoc[Check out the documentation]!
 
 ++++
