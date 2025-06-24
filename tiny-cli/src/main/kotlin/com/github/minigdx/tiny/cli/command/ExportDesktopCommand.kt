@@ -38,6 +38,9 @@ class ExportDesktopCommand : CliktCommand(name = "export-desktop") {
     val appVersion by option("-v", "--version", help = "Application version")
         .default("1.0.0")
 
+    val debug by option("--debug", help = "Debug the game")
+        .flag(default = false)
+
     override fun help(context: Context) = "Export your game as a standalone desktop application."
 
     override fun run() {
@@ -61,9 +64,20 @@ class ExportDesktopCommand : CliktCommand(name = "export-desktop") {
         outputDirectory.mkdirs()
 
         if (includeJdk) {
-            createStandaloneAppWithJdk(gameDirectory, outputDirectory, finalAppName, appVersion, targetPlatform)
+            createStandaloneAppWithJdk(
+                gameDir = gameDirectory,
+                outputDir = outputDirectory,
+                appName = finalAppName,
+                appVersion = appVersion,
+                platform = targetPlatform,
+                debug = debug
+            )
         } else {
-            createPortableJarLauncher(gameDirectory, outputDirectory, finalAppName)
+            createPortableJarLauncher(
+                gameDir = gameDirectory,
+                outputDir = outputDirectory,
+                appName = finalAppName,
+            )
         }
 
         echo("\uD83C\uDF89 Congratulations! Your desktop application has been exported to $outputDirectory")
@@ -93,6 +107,7 @@ class ExportDesktopCommand : CliktCommand(name = "export-desktop") {
         appName: String,
         appVersion: String,
         platform: String,
+        debug: Boolean = false,
     ) {
         echo("\uD83D\uDCE6 Creating standalone application with bundled JDK...")
 
@@ -174,6 +189,9 @@ class ExportDesktopCommand : CliktCommand(name = "export-desktop") {
         }
 
         echo("\uD83D\uDCBB Running jpackage for $platform...")
+        if(debug) {
+            echo("\uD83D\uDCBB Command: " + jpackageCommand.joinToString(" "))
+        }
         val process = ProcessBuilder(jpackageCommand).inheritIO().start()
         val exitCode = process.waitFor()
 
@@ -181,7 +199,9 @@ class ExportDesktopCommand : CliktCommand(name = "export-desktop") {
             echo("\uD83D\uDE31 jpackage failed with exit code $exitCode")
         }
 
-        tempDir.deleteRecursively()
+        if(!debug) {
+            tempDir.deleteRecursively()
+        }
     }
 
     private fun createPortableJarLauncher(
@@ -371,7 +391,7 @@ class ExportDesktopCommand : CliktCommand(name = "export-desktop") {
         return when (platform) {
             "windows" -> "exe"
             "mac" -> "dmg"
-            "linux" -> "deb"
+            "linux" -> "pkg"
             else -> "app-image"
         }
     }
