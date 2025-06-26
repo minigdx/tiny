@@ -29,9 +29,10 @@ data class Reload(val script: String) : EngineRemoteCommand
  * @param script the name of the script where the breakpoint is.
  * @param line the line number of the breakpoint.
  * @param enabled true if the breakpoint is enabled, false otherwise.
+ * @param condition optional Lua condition that must evaluate to true for the breakpoint to trigger.
  */
 @Serializable
-data class ToggleBreakpoint(val script: String, val line: Int, val enabled: Boolean) : DebugRemoteCommand
+data class ToggleBreakpoint(val script: String, val line: Int, val enabled: Boolean, val condition: String? = null) : DebugRemoteCommand
 
 /**
  * Resume game execution.
@@ -83,10 +84,12 @@ data class CurrentBreakpoints(
  * @param script the name of the script where the breakpoint is.
  * @param line the line number of the breakpoint.
  * @param enabled true if the breakpoint is enabled, false otherwise.
+ * @param condition optional Lua condition that must evaluate to true for the breakpoint to trigger.
  */
 @Serializable
 data class BreakpointInfo(
     val script: String,
     val line: Int,
     val enabled: Boolean,
+    val condition: String? = null,
 )

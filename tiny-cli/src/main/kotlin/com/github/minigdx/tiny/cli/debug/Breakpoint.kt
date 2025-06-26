@@ -13,6 +13,12 @@ class Breakpoint(
      * Is the breakpoint temporary? (ie: when hit, will be deactivated)
      */
     var temporary: Boolean = false,
+    /**
+     * Optional condition for conditional breakpoints.
+     * If null or empty, the breakpoint is unconditional.
+     * If set, contains Lua code that must evaluate to true for the breakpoint to trigger.
+     */
+    var condition: String? = null,
 ) {
     fun hit(other: Breakpoint): Boolean {
         return enabled &&

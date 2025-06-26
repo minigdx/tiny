@@ -83,6 +83,7 @@ class DebuggerExecutionListener(
                 script = executionPoint.scriptName,
                 line = executionPoint.line,
                 enabled = breakpoint.enabled,
+                condition = breakpoint.condition,
             )
         }
 
@@ -147,10 +148,12 @@ class DebuggerExecutionListener(
                         script = debugRemoteCommand.script,
                         line = debugRemoteCommand.line,
                         enabled = debugRemoteCommand.enabled,
+                        condition = debugRemoteCommand.condition,
                     )
             breakpoints = breakpoints + entry
         } else {
             storedBreakpoint.enabled = debugRemoteCommand.enabled
+            storedBreakpoint.condition = debugRemoteCommand.condition
         }
     }
 
@@ -240,9 +243,141 @@ class DebuggerExecutionListener(
 
         breakpoints.values.forEach { breakpoint ->
             if (currentExecutionPoint.hit(breakpoint)) {
-                pauseExecution(breakpoint.script, breakpoint.line)
+                if (shouldBreakOnCondition(breakpoint)) {
+                    pauseExecution(breakpoint.script, breakpoint.line)
+                }
             }
         }
+    }
+
+    /**
+     * Determines whether execution should break based on the breakpoint condition.
+     * Returns true if there's no condition or if the condition evaluates to true.
+     */
+    private suspend fun shouldBreakOnCondition(breakpoint: Breakpoint): Boolean {
+        val condition = breakpoint.condition
+        if (condition.isNullOrEmpty()) {
+            return true // No condition, break normally
+        }
+
+        return try {
+            evaluateCondition(condition, breakpoint.script, breakpoint.line)
+        } catch (e: Exception) {
+            // On error, don't break but send error message to UI
+            sendConditionError(breakpoint.script, breakpoint.line, e.message ?: "Unknown error")
+            false
+        }
+    }
+
+    /**
+     * Evaluates a Lua condition in the current execution context.
+     */
+    private fun evaluateCondition(
+        condition: String,
+        scriptName: String,
+        line: Int,
+    ): Boolean {
+        val frames = callstack(globals.running).getCallFrames()
+
+        // Collect upvalues
+        val upValues = frames.flatMap { frame ->
+            val upValues = (frame.f as? LuaClosure)?.upValues ?: emptyArray()
+            val upValuesDesc = (frame.f as? LuaClosure)?.p?.upvalues ?: emptyArray()
+
+            upValues.zip(upValuesDesc) { value, name ->
+                val upValueName = name.name?.tojstring() ?: ""
+                val upValueValue = value?.value ?: LuaValue.NIL
+                upValueName to upValueValue
+            }
+                .filterNot { (name, _) -> name == "_ENV" || name.isEmpty() }
+        }.toMap()
+
+        // Collect locals
+        val locals = frames.flatMap {
+            it.getLocals()
+        }.associate {
+            it.arg(1).tojstring() to it.arg(2)
+        }
+
+        // Create evaluation script
+        val script = buildString {
+            // Declare locals
+            locals.forEach { (name, value) ->
+                appendLine("local $name = ${luaValueToString(value)}")
+            }
+
+            // Declare upvalues
+            upValues.forEach { (name, value) ->
+                if (!locals.containsKey(name)) {
+                    appendLine("local $name = ${luaValueToString(value)}")
+                }
+            }
+
+            // Evaluate condition
+            appendLine("return ($condition)")
+        }
+
+        // Execute the script
+        val result = globals.load(script).call()
+        return result.toboolean()
+    }
+
+    /**
+     * Converts a LuaValue to its string representation for script generation.
+     */
+    private fun luaValueToString(
+        value: LuaValue,
+        recursiveLock: MutableSet<LuaValue> = mutableSetOf(),
+    ): String {
+        if (recursiveLock.contains(value)) {
+            return "nil" // avoid circle dependencies
+        }
+        recursiveLock.add(value)
+
+        return when {
+            value.isnil() -> "nil"
+            value.isboolean() -> value.toboolean().toString()
+            value.isnumber() -> value.todouble().toString()
+            value.isstring() -> "\"${value.tojstring().replace("\"", "\\\"")}\""
+            value.istable() -> {
+                val table = value as LuaTable
+                val entries = mutableListOf<String>()
+                val keys = table.keys()
+                keys.forEach { key ->
+                    val keyStr = if (key.isstring()) "\"${key.tojstring()}\"" else key.toString()
+                    val valueStr = luaValueToString(table[key])
+                    entries.add("[$keyStr] = $valueStr")
+                }
+                "{${entries.joinToString(", ")}}"
+            }
+            else -> "nil" // For functions and other complex types
+        }
+    }
+
+    /**
+     * Sends a condition error message to the UI.
+     */
+    private suspend fun sendConditionError(
+        scriptName: String,
+        line: Int,
+        errorMessage: String,
+    ) {
+        // For now, we'll add this as a comment in the locals
+        // This could be enhanced to send a specific error command to the UI
+        val errorComment = "[CONDITION ERROR] $errorMessage"
+
+        // Send a breakpoint hit with the error in the locals
+        val currentLocals = mutableMapOf<String, com.github.minigdx.tiny.cli.debug.LuaValue>()
+        currentLocals["[DEBUG_CONDITION_ERROR]"] = Primitive(errorComment)
+
+        engineCommandSender.send(
+            BreakpointHit(
+                script = scriptName,
+                line = line,
+                locals = currentLocals,
+                upValues = emptyMap(),
+            ),
+        )
     }
 
     private suspend fun pauseExecution(
