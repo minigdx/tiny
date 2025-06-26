@@ -8,11 +8,6 @@ import com.google.devtools.ksp.processing.SymbolProcessorProvider
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
-import com.google.devtools.ksp.symbol.KSPropertyDeclaration
-import com.google.devtools.ksp.symbol.KSValueArgument
-import com.google.devtools.ksp.symbol.KSCallableReference
-import com.google.devtools.ksp.symbol.KSType
-import com.google.devtools.ksp.getAllSuperTypes
 
 class CliKspProcessor(
     val env: SymbolProcessorEnvironment,
@@ -20,7 +15,6 @@ class CliKspProcessor(
     override fun process(resolver: Resolver): List<KSAnnotated> {
         // Skip last KSP round. Everything should be done in one round
         resolver.getNewFiles().firstOrNull() ?: return emptyList()
-
 
         // Find all classes that extend CliktCommand
         val cliktCommandClasses = resolver
@@ -56,7 +50,7 @@ class CliKspProcessor(
                 className = classDecl.simpleName.asString(),
                 description = extractHelpDescription(classDecl),
                 arguments = extractArguments(classDecl),
-                options = extractOptions(classDecl)
+                options = extractOptions(classDecl),
             )
         }.sortedBy { it.name }
 
@@ -141,8 +135,8 @@ class CliKspProcessor(
         val helpFunction = classDecl.declarations
             .filterIsInstance<KSFunctionDeclaration>()
             .find { func ->
-                func.simpleName.asString() == "help" && 
-                func.parentDeclaration == classDecl // Only methods declared in this class
+                func.simpleName.asString() == "help" &&
+                    func.parentDeclaration == classDecl // Only methods declared in this class
             }
 
         helpFunction?.let { func ->
@@ -228,7 +222,6 @@ class CliKspProcessor(
 
         return options
     }
-
 }
 
 data class CliCommandDescriptor(
@@ -236,12 +229,12 @@ data class CliCommandDescriptor(
     val className: String,
     val description: String?,
     val arguments: List<CliParameterDescriptor>,
-    val options: List<CliParameterDescriptor>
+    val options: List<CliParameterDescriptor>,
 )
 
 data class CliParameterDescriptor(
     val name: String,
-    val description: String?
+    val description: String?,
 )
 
 class CliKspProcessorProvider : SymbolProcessorProvider {
