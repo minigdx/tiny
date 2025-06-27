@@ -11,6 +11,7 @@ import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.ThreeArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import kotlin.math.abs
+import kotlin.math.atan2
 import kotlin.math.floor
 import kotlin.math.sqrt
 import kotlin.random.Random
@@ -30,6 +31,7 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
         math["dst"] = dst()
         math["dst2"] = dst2()
         math["sign"] = sign()
+        math["atan2"] = atan2()
         math["roverlap"] = roverlap()
         math["perlin"] = perlin(Random.nextLong())
         return math
@@ -46,6 +48,24 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
             } else {
                 MINUS_ONE
             }
+        }
+    }
+
+    @TinyFunction(
+        "Calculate the angle in radians between the positive x-axis and the point (x, y).",
+    )
+    internal inner class atan2 : TwoArgFunction() {
+        @TinyCall("Calculate the angle for the point (x, y). Please note the argument order: y then x.")
+        override fun call(
+            @TinyArg("y") arg1: LuaValue,
+            @TinyArg("x") arg2: LuaValue,
+        ): LuaValue {
+            val y = arg1.todouble()
+            val x = arg2.todouble()
+
+            val result = atan2(y, x)
+
+            return valueOf(result)
         }
     }
 
