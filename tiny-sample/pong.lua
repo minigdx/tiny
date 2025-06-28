@@ -370,7 +370,7 @@ Player.draw = function(self)
         for h = 0, current.height do
             local x = juice.pow2(current.x, next.x, h / current.height)
             local y = current.y + h
-            spr.sdraw(x, y, 0, 32 + (i - 1) * 8 + h, current.width, 1)
+            spr.sdraw(x, y, 0, 32 + (i - 1) * 8 + h, current.width + 1, 1)
         end
     end
 end
@@ -386,7 +386,7 @@ function _init()
     }
 
     player = new(Player)
-    for y = 216, 248, 8 do
+    for y = 216, 256, 8 do
         player:createPaddle(y)
     end
 
