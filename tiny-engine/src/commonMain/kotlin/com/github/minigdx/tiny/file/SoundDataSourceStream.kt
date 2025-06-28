@@ -16,7 +16,16 @@ class SoundDataSourceStream(
     override suspend fun read(): SoundData {
         val bytes = delegate.read()
 
-        val music: Music = Json.decodeFromString(bytes.decodeToString())
+        val json = Json { ignoreUnknownKeys = true }
+        val music: Music = json.decodeFromString(bytes.decodeToString())
+        music.musicalBars.forEach { musicBar ->
+            musicBar.instrument = music.instruments[musicBar.instrumentIndex]
+        }
+        music.sequences.forEach { sequence ->
+            sequence.tracks.forEach { track ->
+                track.instrument = music.instruments[track.instrumentIndex]
+            }
+        }
 
         val sounds = music.musicalBars.map { bar -> soundManager.convert(bar) }
 

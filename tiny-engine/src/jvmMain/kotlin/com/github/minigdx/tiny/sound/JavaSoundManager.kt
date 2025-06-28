@@ -40,6 +40,11 @@ class JavaSoundManager : SoundManager() {
         mixer.alive = false
     }
 
+    override fun exportAsSound(sequence: MusicalSequence) {
+        val data = convert(sequence)
+        exportToWavFile("export.wav", data)
+    }
+
     fun exportToWavFile(
         filePath: String,
         floatAudioData: FloatArray,

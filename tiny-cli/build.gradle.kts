@@ -5,6 +5,7 @@ import java.io.Reader
 plugins {
     alias(libs.plugins.minigdx.jvm)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.kotlin.ksp)
     application
 }
 
@@ -46,6 +47,10 @@ dependencies {
         "Embed the JS engine in the CLI " +
             "so it can be included when the game is exported.",
     )
+
+    add("ksp", project(":tiny-doc-generator")) {
+        because("KSP will generate the asciidoctor documentation of all Lua libs from Tiny.")
+    }
 }
 
 application {

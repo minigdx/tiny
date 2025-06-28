@@ -13,6 +13,21 @@ local on_menu_item_hover = function(self)
     -- TODO: afficher le label quelque part.
 end
 
+local InstrumentName = {
+    index = 0
+}
+
+InstrumentName._update = function(self)
+
+end
+
+InstrumentName._draw = function(self)
+    local x,y = 0,160
+    local ox = (self.index % 4) * 16
+    local oy = math.floor(self.index / 4) * 16
+    spr.sdraw(self.x, self.y, x + ox, y + oy, 16, 16)
+end
+
 local state = {
     instrument = nil
 }
@@ -102,8 +117,8 @@ function _init()
     end
 
     for h in all(entities["InstrumentName"]) do
-        local label = widgets:create_help(h)
-        wire.consume_on_update(label, { "label" }, state, { "instrument", "name" })
+        local label = new(InstrumentName, h)
+        wire.consume_on_update(label, { "index" }, state, { "instrument", "index" })
         table.insert(m.widgets, label)
     end
 
@@ -121,14 +136,14 @@ function _init()
         local button = widgets:create_menu_item(b)
         if (button.fields.Item == "Prev") then
             wire.listen_to(button, { "status" }, function(source, value)
-                state.instrument = sfx.instrument((state.instrument.index - 1 + 4) % 4)
+                state.instrument = sfx.instrument((state.instrument.index - 1 + 8) % 8)
                 if (state.on_change) then
                     state:on_change()
                 end
             end)
         elseif button.fields.Item == "Next" then
             wire.listen_to(button, { "status" }, function(source, value)
-                state.instrument = sfx.instrument((state.instrument.index + 1) % 4)
+                state.instrument = sfx.instrument((state.instrument.index + 1) % 8)
                 if (state.on_change) then
                     state:on_change()
                 end
@@ -140,6 +155,31 @@ function _init()
     for mode in all(entities["EditorMode"]) do
         local button = widgets:create_mode_switch(mode)
         table.insert(m.widgets, button)
+    end
+
+    for mode in all(entities["Checkbox"]) do
+        local button = widgets:create_checkbox(mode)
+        table.insert(m.widgets, button)
+    end
+
+    for effect in all(entities["Sweep"]) do
+        local active = wire.find_widget(m.widgets, effect.fields.Enabled)
+        local acceleration = wire.find_widget(m.widgets, effect.fields.Acceleration)
+        local sweep = wire.find_widget(m.widgets, effect.fields.Sweep)
+
+        wire.produce_to(active, { "value" }, state, { "instrument", "sweep", "active" })
+        wire.consume_on_update(active, { "value" }, state, { "instrument", "sweep", "active" })
+
+        wire.produce_to(acceleration, { "value" }, state, { "instrument", "sweep", "acceleration" })
+        wire.consume_on_update(acceleration, { "value" }, state, { "instrument", "sweep", "acceleration" })
+
+        wire.produce_to(sweep, { "value" }, state, { "instrument", "sweep", "frequency" }, function(source, target, value)
+            return juice.pow2(200, 2000, value)
+        end)
+        wire.consume_on_update(sweep, { "value" }, state, { "instrument", "sweep", "frequency" }, function(source, target, value)
+            return (value - 200) / (2000 - 200)
+        end)
+
     end
 
     -- force setting correct values

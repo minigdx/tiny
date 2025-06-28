@@ -9,9 +9,7 @@ import com.github.minigdx.tiny.cli.config.GameParameters
 import com.github.minigdx.tiny.engine.GameEngine
 import com.github.minigdx.tiny.engine.TinyException
 import com.github.minigdx.tiny.file.CommonVirtualFileSystem
-import com.github.minigdx.tiny.file.JvmLocalFile
 import com.github.minigdx.tiny.log.StdOutLogger
-import com.github.minigdx.tiny.lua.WorkspaceLib
 import com.github.minigdx.tiny.lua.errorLine
 import com.github.minigdx.tiny.platform.glfw.GlfwPlatform
 import com.github.minigdx.tiny.render.LwjglGLRender
@@ -58,15 +56,16 @@ class SfxCommand : CliktCommand(name = "sfx") {
             }
             val commandParameters = GameParameters.JSON.decodeFromStream<GameParameters>(configFile)
 
-            if (filename.exists()) {
+            if (!filename.exists()) {
                 val json = Json.encodeToString(Music())
                 filename.writeBytes(json.encodeToByteArray())
             }
-            WorkspaceLib.DEFAULT = listOf(JvmLocalFile(filename.name, workingDirectory = filename.absoluteFile.parentFile))
 
             val logger = StdOutLogger("tiny-cli")
             val vfs = CommonVirtualFileSystem()
             val commandOptions = commandParameters.toGameOptions()
+                .copy(sounds = listOf(filename.name))
+
             val gameEngine = GameEngine(
                 gameOptions = commandOptions,
                 platform = GlfwPlatform(

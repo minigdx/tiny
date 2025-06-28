@@ -1,15 +1,17 @@
 package com.github.minigdx.tiny.sound
 
 import com.github.minigdx.tiny.Beats
+import com.github.minigdx.tiny.Percent
 import com.github.minigdx.tiny.lua.Note
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 /**
  * Note that being played.
  * It can't be played without an instrument, that will generate the sound for this note.
  */
 @Serializable
-class MusicalNote(
+data class MusicalNote(
     /**
      * The note played.
      * if null, this is a silence. The volume will be 0f also.
@@ -24,11 +26,25 @@ class MusicalNote(
      * How many beats this note will last.
      */
     var duration: Beats,
-    var volume: Float,
-) {
-    val endBeat: Float
-        get() = beat + duration
-
-    val isSilence: Boolean
-        get() = note == null || volume == 0f
-}
+    /**
+     * Volume of this note
+     */
+    var volume: Percent,
+    /**
+     * Index of the override instrument.
+     */
+    var instrumentIndex: Int? = null,
+    /**
+     * Override instrument.
+     */
+    @Transient
+    var instrument: Instrument? = null,
+    /**
+     * Inside a track, is the next note will be a repeat of this note?
+     */
+    var isRepeating: Boolean = false,
+    /**
+     * Inside a track, stop the sound on this note.
+     */
+    var isOffNote: Boolean = false,
+)

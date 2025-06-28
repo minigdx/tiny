@@ -57,11 +57,10 @@ class CtrlLib(
         ): LuaValue {
             val pos = inputHandler.currentTouch
 
-            val coordinates =
-                LuaTable().apply {
-                    this.set("x", pos.x.toInt())
-                    this.set("y", pos.y.toInt())
-                }
+            val coordinates = LuaTable().apply {
+                this.set("x", pos.x.toInt())
+                this.set("y", pos.y.toInt())
+            }
 
             // return the coordinates
             return if (arg.isnil()) {
@@ -82,11 +81,12 @@ class CtrlLib(
         example = CTRL_PRESSING_EXAMPLE,
     )
     inner class pressed : OneArgFunction() {
+        private val values = Key.entries.toTypedArray()
+
         @TinyCall("Is the key was pressed?")
         override fun call(
             @TinyArg("key") arg: LuaValue,
         ): LuaValue {
-            val values = Key.values()
             val int = arg.checkint()
             if (int >= values.size || int < 0) return BFALSE
 

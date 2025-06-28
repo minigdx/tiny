@@ -215,6 +215,13 @@ class GlfwPlatform(
         lastDraw = imageCopy
     }
 
+    override fun executeOffScreen(
+        renderContext: RenderContext,
+        block: () -> Unit,
+    ): RenderFrame {
+        return render.executeOffScreen(renderContext, block)
+    }
+
     override fun render(
         renderContext: RenderContext,
         ops: List<RenderOperation>,

@@ -1,11 +1,25 @@
 package com.github.minigdx.tiny.render.gl
 
+import com.danielgergely.kgl.GL_ALWAYS
+import com.danielgergely.kgl.GL_BLEND
+import com.danielgergely.kgl.GL_DEPTH_TEST
+import com.danielgergely.kgl.GL_EQUAL
+import com.danielgergely.kgl.GL_KEEP
+import com.danielgergely.kgl.GL_NOTEQUAL
+import com.danielgergely.kgl.GL_ONE
+import com.danielgergely.kgl.GL_ONE_MINUS_SRC_ALPHA
+import com.danielgergely.kgl.GL_REPLACE
 import com.danielgergely.kgl.GL_SCISSOR_TEST
+import com.danielgergely.kgl.GL_SRC_ALPHA
+import com.danielgergely.kgl.GL_STENCIL_BUFFER_BIT
+import com.danielgergely.kgl.GL_STENCIL_TEST
 import com.danielgergely.kgl.GL_TRIANGLES
+import com.danielgergely.kgl.GL_ZERO
 import com.danielgergely.kgl.Kgl
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.graphic.PixelFormat
 import com.github.minigdx.tiny.log.Logger
+import com.github.minigdx.tiny.platform.DrawingMode
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.render.NopRenderContext
 import com.github.minigdx.tiny.render.OperationsRender
@@ -13,6 +27,7 @@ import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.WriteRender
 import com.github.minigdx.tiny.render.operations.DrawSprite
 import com.github.minigdx.tiny.render.operations.DrawSprite.Companion.MAX_SPRITE_PER_COMMAND
+import com.github.minigdx.tiny.render.operations.DrawingModeOperation
 import com.github.minigdx.tiny.render.operations.RenderOperation
 import com.github.minigdx.tiny.render.shader.FragmentShader
 import com.github.minigdx.tiny.render.shader.ShaderProgram
@@ -36,6 +51,7 @@ class OperationsShader(
     ) {
         // Prepare to draw a list of operation, by preparing the shader and the viewport.
         program.use()
+        program.disable(GL_DEPTH_TEST)
         ops.forEach { op -> op.executeGPU(context, this) }
     }
 
@@ -174,6 +190,60 @@ class OperationsShader(
         op.release()
     }
 
+    override fun setDrawingMode(
+        context: RenderContext,
+        op: DrawingModeOperation,
+    ) {
+        when (op.mode) {
+            DrawingMode.DEFAULT -> {
+                gl.enable(GL_BLEND)
+                gl.disable(GL_STENCIL_TEST)
+                gl.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+                gl.colorMask(true, true, true, true)
+            }
+
+            DrawingMode.ALPHA_BLEND -> {
+                gl.enable(GL_BLEND)
+                gl.disable(GL_STENCIL_TEST)
+                gl.blendFuncSeparate(GL_ZERO, GL_ONE, GL_ZERO, GL_ONE_MINUS_SRC_ALPHA)
+                gl.colorMask(true, true, true, true)
+            }
+
+            DrawingMode.STENCIL_WRITE -> {
+                gl.enable(GL_STENCIL_TEST)
+
+                gl.stencilMask(0xFF)
+                gl.clearStencil(0)
+                gl.clear(GL_STENCIL_BUFFER_BIT)
+
+                gl.stencilOp(GL_KEEP, GL_KEEP, GL_REPLACE)
+                gl.stencilFunc(GL_ALWAYS, 1, 0xFF)
+                // Don't write the actual sprite in the color buffer
+                gl.colorMask(false, false, false, false)
+            }
+
+            DrawingMode.STENCIL_TEST -> {
+                gl.enable(GL_STENCIL_TEST)
+                gl.stencilFunc(GL_EQUAL, 1, 0xFF)
+                gl.stencilMask(0x00)
+                gl.stencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
+                gl.enable(GL_BLEND)
+                gl.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+                gl.colorMask(true, true, true, true)
+            }
+
+            DrawingMode.STENCIL_NOT_TEST -> {
+                gl.enable(GL_STENCIL_TEST)
+                gl.stencilFunc(GL_NOTEQUAL, 1, 0xFF)
+                gl.stencilMask(0x00)
+                gl.stencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
+                gl.enable(GL_BLEND)
+                gl.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+                gl.colorMask(true, true, true, true)
+            }
+        }
+    }
+
     class VShader : VertexShader(VERTEX_SHADER) {
         val aPos = attributeVec2("a_pos") // position of the sprite in the viewport
         val aSpr = attributeVec2("a_spr")
@@ -258,9 +328,14 @@ class OperationsShader(
             void main() {
                 if (dither(u_dither, int(v_pos.x), int(v_pos.y))) {
                     int index = int(texture2D(spritesheet, v_uvs).r * 255.0 + 0.5);
-                    gl_FragColor = readColor(index);
+                    vec4 color = readColor(index);
+                    if(color.a <= 0.1) {
+                        discard;
+                    } else {
+                        gl_FragColor = color; 
+                    }
                 } else {
-                    gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
+                    discard;
                 }
             }
             """.trimIndent()

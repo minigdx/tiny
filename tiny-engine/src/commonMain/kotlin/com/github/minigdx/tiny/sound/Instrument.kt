@@ -2,6 +2,7 @@ package com.github.minigdx.tiny.sound
 
 import com.github.minigdx.tiny.Percent
 import com.github.minigdx.tiny.Seconds
+import com.github.minigdx.tiny.lua.Note
 import com.github.minigdx.tiny.sound.Instrument.WaveType.NOISE
 import com.github.minigdx.tiny.sound.Instrument.WaveType.PULSE
 import com.github.minigdx.tiny.sound.Instrument.WaveType.SAW_TOOTH
@@ -10,6 +11,7 @@ import com.github.minigdx.tiny.sound.Instrument.WaveType.SQUARE
 import com.github.minigdx.tiny.sound.Instrument.WaveType.TRIANGLE
 import com.github.minigdx.tiny.sound.SoundManager.Companion.SAMPLE_RATE
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.exp
@@ -54,6 +56,14 @@ class Instrument(
      * Harmonics of the instruments (up to 7)
      */
     val harmonics: FloatArray = FloatArray(NUMBER_OF_HARMONICS),
+    /**
+     * Modulation effects.
+     * Will be applied in the order configured.
+     */
+    val modulations: List<Modulation> = listOf(
+        Sweep(Note.A5.frequency, 1f),
+        Vibrato(0f, 0f),
+    ),
 ) {
     enum class WaveType {
         SAW_TOOTH,
@@ -65,14 +75,23 @@ class Instrument(
     }
 
     // Last output generated. Used by the [NOISE] wave type
+    @Transient
     private var lastOutput: Float = 0.0f
+
+    @Transient
     private var lastFrequencyUsed: Float = 0.0f
+
+    @Transient
     private var cachedAlpha: Float = 0.0f
 
     fun generate(
-        harmonicFreq: Float,
+        freq: Float,
         time: Float,
     ): Float {
+        // Apply modulation to the base frequency
+        val harmonicFreq = modulations.filter { it.active }
+            .fold(freq) { acc, modulation -> modulation.apply(time, acc) }
+
         return when (this.wave) {
             TRIANGLE -> {
                 val angle: Float = sin(TWO_PI * harmonicFreq * time)

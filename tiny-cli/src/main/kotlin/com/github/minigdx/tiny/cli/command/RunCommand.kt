@@ -56,6 +56,12 @@ class RunCommand : CliktCommand(name = "run") {
         .int()
         .default(8081)
 
+    val macFromJpackage by option(
+        help = "Find the game directory inside the Game MacOS App Bundle instead",
+        hidden = true,
+    )
+        .flag()
+
     override fun help(context: Context) = "Run your game."
 
     private fun isOracleOrOpenJDK(): Boolean {
@@ -68,11 +74,31 @@ class RunCommand : CliktCommand(name = "run") {
         return os.contains("mac") || os.contains("darwin")
     }
 
+    private fun getClassLocationDirectory(): File {
+        val classLocation = RunCommand::class.java.protectionDomain.codeSource.location.toURI().path
+        val classLocationFile = File(classLocation)
+        val classLocationDir = if (classLocationFile.isFile) classLocationFile.parentFile else classLocationFile
+
+        echo("\uD83D\uDC1F === Class location: $classLocation ===")
+        echo("\uD83D\uDC1F === Class location directory: ${classLocationDir.absolutePath} ===")
+
+        return classLocationDir
+    }
+
     @OptIn(ExperimentalTime::class)
     override fun run() {
         if (isMacOS() && isOracleOrOpenJDK()) {
             echo("\uD83D\uDEA7 === The Tiny CLI on Mac with require a special option.")
             echo("\uD83D\uDEA7 === If the application crash ➡ use the command 'tiny-cli-mac' instead.")
+        }
+
+        val effectiveGameDirectory = if (macFromJpackage) {
+            val classLocationDir = getClassLocationDirectory()
+            echo("\uD83D\uDC1F === Using class location directory instead of game directory due to mac-from-jpackage flag ===")
+            classLocationDir.resolve("game")
+        } else {
+            echo("\uD83D\uDC1F === Using provided game directory: ${gameDirectory.absolutePath} ===")
+            gameDirectory
         }
 
         echo("\uD83D\uDC1B === Running the game using debugger on the port '$debug' ===")
@@ -108,9 +134,9 @@ class RunCommand : CliktCommand(name = "run") {
         }.start()
 
         try {
-            val configFile = gameDirectory.resolve("_tiny.json")
+            val configFile = effectiveGameDirectory.resolve("_tiny.json")
             if (!configFile.exists()) {
-                echo("\uD83D\uDE2D No _tiny.json found! Can't run the game without.")
+                echo("\uD83D\uDE2D No _tiny.json found in ${effectiveGameDirectory.absolutePath}! Can't run the game without.")
                 throw Abort()
             }
             val gameParameters = GameParameters.read(configFile)
@@ -127,7 +153,7 @@ class RunCommand : CliktCommand(name = "run") {
             val gameEngine =
                 GameEngine(
                     gameOptions = gameOption,
-                    platform = GlfwPlatform(gameOption, logger, vfs, gameDirectory, LwjglGLRender(logger, gameOption)),
+                    platform = GlfwPlatform(gameOption, logger, vfs, effectiveGameDirectory, LwjglGLRender(logger, gameOption)),
                     vfs = vfs,
                     logger = logger,
                     listener =
@@ -161,9 +187,13 @@ class RunCommand : CliktCommand(name = "run") {
                 },
             )
 
-            val data = File("data")
+            val data = effectiveGameDirectory.resolve("data")
+            echo("\uD83D\uDC1F === Looking for data directory at: ${data.absolutePath} ===")
             if (data.exists() && data.isDirectory) {
+                echo("\uD83D\uDC1F === Data directory found with ${data.listFiles()?.size ?: 0} files ===")
                 WorkspaceLib.DEFAULT = data.listFiles()?.map { JvmLocalFile(it.name, data) } ?: emptyList()
+            } else {
+                echo("\uD83D\uDC1F === Data directory not found at: ${data.absolutePath} ===")
             }
             gameEngine.main()
         } catch (ex: Exception) {
@@ -173,7 +203,6 @@ class RunCommand : CliktCommand(name = "run") {
                     "If so, please report it.",
             )
             when (ex) {
-                // FIXME: catch TinyException?
                 is LuaError -> {
                     val (nb, line) = ex.errorLine() ?: (null to null)
                     echo("Error found line $nb:$line")

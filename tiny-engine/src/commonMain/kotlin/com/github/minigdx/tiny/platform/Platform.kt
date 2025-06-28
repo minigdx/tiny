@@ -139,4 +139,13 @@ interface Platform {
      * Draw the frame buffer on the screen.
      */
     fun draw(renderContext: RenderContext)
+
+    /**
+     * Execute the block using an off-screen buffer.
+     * All drawing operation will use this off-screen buffer instead
+     */
+    fun executeOffScreen(
+        renderContext: RenderContext,
+        block: () -> Unit,
+    ): RenderFrame
 }

@@ -6,9 +6,11 @@ import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
+import com.github.minigdx.tiny.platform.DrawingMode
 import com.github.minigdx.tiny.render.operations.CameraOperation
 import com.github.minigdx.tiny.render.operations.ClipOperation
 import com.github.minigdx.tiny.render.operations.DitheringOperation
+import com.github.minigdx.tiny.render.operations.DrawingModeOperation
 import com.github.minigdx.tiny.render.operations.FrameBufferOperation
 import com.github.minigdx.tiny.render.operations.PaletteOperation
 import com.github.minigdx.tiny.resources.ResourceType
@@ -40,10 +42,57 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
         func["pset"] = pset()
         func["pget"] = pget()
         func["cls"] = cls()
+        func["draw_mode"] = drawMode()
 
         arg2["gfx"] = func
         arg2["package"]["loaded"]["gfx"] = func
         return func
+    }
+
+    @TinyFunction(
+        """Switch to another draw mode.
+        |- 0: default. 
+        |- 1: drawing with transparent (ie: can erase part of the screen)
+        |- 2: drawing a stencil that will be use with the next mode
+        |- 3: drawing using a stencil test (ie: drawing only in the stencil) 
+        |- 4: drawing using a stencil test (ie: drawing everywhere except in the stencil) 
+    """,
+    )
+    internal inner class drawMode : LibFunction() {
+        private var current: Int = 0
+
+        private val modes = arrayOf(
+            DrawingMode.DEFAULT,
+            DrawingMode.ALPHA_BLEND,
+            DrawingMode.STENCIL_WRITE,
+            DrawingMode.STENCIL_TEST,
+            DrawingMode.STENCIL_NOT_TEST,
+        )
+
+        @TinyCall("Return the actual mode. Switch back to the default mode.")
+        override fun call(): LuaValue {
+            return valueOf(current).also {
+                current = 0
+                resourceAccess.addOp(DrawingModeOperation(modes[current]))
+            }
+        }
+
+        @TinyCall("Switch to another draw mode. Return the previous mode.")
+        override fun call(
+            @TinyArg("mode") a: LuaValue,
+        ): LuaValue {
+            val before = current
+            val index = a.checkint()
+            // Invalid index
+            if (index !in (0 until modes.size)) {
+                return NIL
+            }
+            current = index
+            val f = modes[current]
+            resourceAccess.addOp(DrawingModeOperation(f))
+
+            return valueOf(before)
+        }
     }
 
     @TinyFunction("clear the screen", example = GFX_CLS_EXAMPLE)
@@ -105,18 +154,12 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
         "to_sheet",
         example = GFX_TO_SHEET_EXAMPLE,
     )
-    inner class toSheet : OneArgFunction() {
+    inner class toSheet : LibFunction() {
         @TinyCall("Copy the current frame buffer to an new or existing sheet index.")
         override fun call(
-            @TinyArg("sheet") arg: LuaValue,
+            @TinyArg("sheet") a: LuaValue,
         ): LuaValue {
-            val (index, name) = if (arg.isstring()) {
-                val index = resourceAccess.spritesheet(arg.tojstring()) ?: resourceAccess.newSpritesheetIndex()
-                index to arg.tojstring()
-            } else {
-                val spriteSheet = resourceAccess.spritesheet(arg.checkint())
-                arg.toint() to (spriteSheet?.name ?: "frame_buffer_${arg.toint()}")
-            }
+            val (index, name) = getIndexAndName(a)
 
             val frameBuffer = resourceAccess.readFrame()
             val sheet = SpriteSheet(
@@ -130,7 +173,43 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
             )
 
             resourceAccess.spritesheet(sheet)
-            return arg
+            return valueOf(index)
+        }
+
+        @TinyCall(
+            "Create a blank spritesheet. " +
+                "Execute the operation from the closure on the blank spritesheet and " +
+                "copy it to an new or existing sheet index.",
+        )
+        override fun call(
+            @TinyArg("sheet") a: LuaValue,
+            @TinyArg("closure") b: LuaValue,
+        ): LuaValue {
+            val (index, name) = getIndexAndName(a)
+            val closure = b.checkclosure() ?: return call(a)
+
+            val frameBuffer = resourceAccess.renderAsBuffer { closure.invoke() }
+            val sheet = SpriteSheet(
+                0,
+                index,
+                name,
+                ResourceType.GAME_SPRITESHEET,
+                frameBuffer.colorIndexBuffer,
+                frameBuffer.width,
+                frameBuffer.height,
+            )
+            resourceAccess.spritesheet(sheet)
+            return valueOf(index)
+        }
+
+        private fun getIndexAndName(arg: LuaValue): Pair<Int, String> {
+            return if (arg.isstring()) {
+                val index = resourceAccess.spritesheet(arg.tojstring()) ?: resourceAccess.newSpritesheetIndex()
+                index to arg.tojstring()
+            } else {
+                val spriteSheet = resourceAccess.spritesheet(arg.checkint())
+                arg.toint() to (spriteSheet?.name ?: "frame_buffer_${arg.toint()}")
+            }
         }
     }
 

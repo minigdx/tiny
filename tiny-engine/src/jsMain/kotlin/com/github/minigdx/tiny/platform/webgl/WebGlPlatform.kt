@@ -134,6 +134,13 @@ class WebGlPlatform(
         render.render(renderContext, ops)
     }
 
+    override fun executeOffScreen(
+        renderContext: RenderContext,
+        block: () -> Unit,
+    ): RenderFrame {
+        return render.executeOffScreen(renderContext, block)
+    }
+
     override fun readRender(renderContext: RenderContext): RenderFrame {
         return render.readRender(renderContext)
     }

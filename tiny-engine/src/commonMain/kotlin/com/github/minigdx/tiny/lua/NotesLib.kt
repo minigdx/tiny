@@ -4,6 +4,7 @@ import com.github.mingdx.tiny.doc.TinyArg
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
+import com.github.minigdx.tiny.Frequency
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.OneArgFunction
@@ -20,7 +21,7 @@ private const val OCTAVE_6 = OCTAVE_5 + 12
 private const val OCTAVE_7 = OCTAVE_6 + 12
 private const val OCTAVE_8 = OCTAVE_7 + 12
 
-enum class Note(val frequency: Float, val index: Int) {
+enum class Note(val frequency: Frequency, val index: Int) {
     C0(16.35f, OCTAVE_0 + 1),
     Cs0(17.32f, OCTAVE_0 + 2),
     Db0(17.32f, OCTAVE_0 + 2),
@@ -183,6 +184,15 @@ enum class Note(val frequency: Float, val index: Int) {
     Bb8(7458.62f, OCTAVE_8 + 11),
     B8(7902.13f, OCTAVE_8 + 12),
     ;
+
+    val octave: Int
+        get() {
+            val note = (index - 1) % OCTAVE_1
+            val octave = (index - 1 - note) / OCTAVE_1
+            return octave
+        }
+
+    val note: String = name.dropLast(1)
 
     companion object {
         private val notesPerIndex = entries.toTypedArray().distinctBy { it.index }.sortedBy { it.index }.toTypedArray()

@@ -80,14 +80,34 @@ class PaletteCommand : CliktCommand(name = "palette") {
             return
         }
 
-        val replacedColors =
-            if (append) {
-                gameOptions.palette + extractedColors
-            } else {
-                extractedColors
-            }
+        val replacedColors = if (append) {
+            gameOptions.palette + extractedColors
+        } else {
+            extractedColors
+        }
 
-        gameParameters.setPalette(replacedColors).write(tiny)
+        val sortedColors = replacedColors.sortedBy { brightness(it) }
+        gameParameters.setPalette(sortedColors).write(tiny)
         echo("\uD83C\uDFA8 Game has been updated with the new color palette (with ${replacedColors.size} colors)")
+    }
+
+    private fun brightness(hexColor: String): Float {
+        // Remove the '#' prefix
+        val colorWithoutHash = hexColor.removePrefix("#")
+
+        // Parse R, G, B components from the hex string
+        // Use 16 as the radix for hexadecimal parsing
+        val r = colorWithoutHash.substring(0, 2).toInt(16)
+        val g = colorWithoutHash.substring(2, 4).toInt(16)
+        val b = colorWithoutHash.substring(4, 6).toInt(16)
+
+        // Calculate brightness. A common formula for perceived brightness (luminance) is:
+        // 0.299*R + 0.587*G + 0.114*B
+        // The components R, G, B are already in the range [0, 255].
+        val brightness = 0.299f * r + 0.587f * g + 0.114f * b
+
+        // The sortedByDescending function will use this brightness value
+        // to order the colors from highest brightness to lowest.
+        return brightness
     }
 }

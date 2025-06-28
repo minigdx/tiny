@@ -32,6 +32,7 @@ import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
 import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.resources.SpriteSheet
 import com.github.minigdx.tiny.sound.MusicalBar
+import com.github.minigdx.tiny.sound.MusicalSequence
 import com.github.minigdx.tiny.sound.SoundHandler
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.coroutines.CoroutineScope
@@ -475,6 +476,18 @@ class GameEngine(
         return soundManager.createSoundHandler(musicalBar).also { it.play() }
     }
 
+    override fun play(musicalSequence: MusicalSequence): SoundHandler {
+        return soundManager.createSoundHandler(musicalSequence).also { it.play() }
+    }
+
+    override fun play(track: MusicalSequence.Track): SoundHandler {
+        return soundManager.createSoundHandler(track).also { it.play() }
+    }
+
+    override fun exportAsSound(sequence: MusicalSequence) {
+        soundManager.exportAsSound(sequence)
+    }
+
     override fun script(name: String): GameScript? {
         return scripts
             .drop(1) // drop the _boot.lua
@@ -495,6 +508,20 @@ class GameEngine(
             render()
             ops.add(op)
         }
+    }
+
+    override fun renderAsBuffer(block: () -> Unit): FrameBuffer {
+        // Render on the screen to clean up render states.
+        render()
+
+        val renderFrame = platform.executeOffScreen(renderContext) {
+            block.invoke()
+            render()
+        }
+
+        val buffer = FrameBuffer(gameOptions.width, gameOptions.height, gameOptions.colors())
+        renderFrame.copyInto(buffer.colorIndexBuffer)
+        return buffer
     }
 
     /**

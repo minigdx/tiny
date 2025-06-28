@@ -1,5 +1,7 @@
 package com.github.minigdx.tiny.cli.debug
 
+import com.github.minigdx.tiny.cli.debug.LuaValue.Dictionary
+import com.github.minigdx.tiny.cli.debug.LuaValue.Primitive
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -58,6 +60,7 @@ class DebuggerExecutionListener(
                     is ToggleBreakpoint -> toggleBreakpoint(debugRemoteCommand)
                     is ResumeExecution -> resumeExecution(debugRemoteCommand)
                     Disconnect -> disconnect()
+                    RequestBreakpoints -> sendCurrentBreakpoints()
                 }
             }
         }
@@ -74,6 +77,66 @@ class DebuggerExecutionListener(
         blocker.unblock()
     }
 
+    private suspend fun sendCurrentBreakpoints() {
+        val breakpointInfoList = breakpoints.map { (executionPoint, breakpoint) ->
+            BreakpointInfo(
+                script = executionPoint.scriptName,
+                line = executionPoint.line,
+                enabled = breakpoint.enabled,
+                condition = breakpoint.condition,
+            )
+        }
+
+        engineCommandSender.send(CurrentBreakpoints(breakpointInfoList))
+
+        // If a breakpoint is currently hit, send a BreakpointHit to restore the state
+        // Check if we're at a valid line in a script (indicating a breakpoint hit)
+        val scriptName = currentExecutionPoint.script
+        val line = currentExecutionPoint.line
+        if (line > 0 && scriptName.isNotEmpty()) {
+            sendBreakpointHit(scriptName, line)
+        }
+    }
+
+    private suspend fun sendBreakpointHit(
+        scriptName: String,
+        line: Int,
+    ) {
+        val frames = callstack(globals.running).getCallFrames()
+
+        val upValues =
+            frames.flatMap { frame ->
+                val upValues = (frame.f as? LuaClosure)?.upValues ?: emptyArray()
+                val upValuesDesc = (frame.f as? LuaClosure)?.p?.upvalues ?: emptyArray()
+
+                upValues.zip(upValuesDesc) { value, name ->
+                    val upValueName = name.name?.tojstring() ?: ""
+                    val upValueValue = value?.value ?: LuaValue.NIL
+                    upValueName to upValueValue
+                }
+                    // Skip the _ENV upvalue
+                    .filterNot { (name, _) -> name == "_ENV" }
+            }.toMap()
+                .mapValues { (_, value) -> formatValue(value) }
+
+        val locals =
+            frames.flatMap {
+                it.getLocals()
+            }.associate {
+                // name to value
+                it.arg(1).tojstring() to formatValue(it.arg(2))
+            }
+
+        engineCommandSender.send(
+            BreakpointHit(
+                script = scriptName,
+                line = line,
+                locals = locals,
+                upValues = upValues,
+            ),
+        )
+    }
+
     private fun toggleBreakpoint(debugRemoteCommand: ToggleBreakpoint) {
         val executionPoint = ExecutionPoint(debugRemoteCommand.script, debugRemoteCommand.line)
         val storedBreakpoint = breakpoints[executionPoint]
@@ -85,37 +148,43 @@ class DebuggerExecutionListener(
                         script = debugRemoteCommand.script,
                         line = debugRemoteCommand.line,
                         enabled = debugRemoteCommand.enabled,
+                        condition = debugRemoteCommand.condition,
                     )
             breakpoints = breakpoints + entry
         } else {
             storedBreakpoint.enabled = debugRemoteCommand.enabled
+            storedBreakpoint.condition = debugRemoteCommand.condition
         }
     }
 
     /**
-     * Format a LuaValue to a human-readable String.
+     * Format a LuaValue to a structured representation.
      */
     private fun formatValue(
         arg: LuaValue,
         recursiveSecurity: MutableSet<Int> = mutableSetOf(),
-    ): String =
+    ): com.github.minigdx.tiny.cli.debug.LuaValue =
         if (arg.istable()) {
             val table = arg as LuaTable
             if (recursiveSecurity.contains(table.hashCode())) {
-                "table[<${table.hashCode()}>]"
+                Primitive("table[<${table.hashCode()}>]")
             } else {
                 recursiveSecurity.add(table.hashCode())
                 val keys = table.keys()
-                val str =
-                    keys.joinToString(" ") {
-                        it.optjstring("nil") + ":" + formatValue(table[it], recursiveSecurity)
-                    }
-                "table[$str]"
+                val entries = mutableMapOf<String, com.github.minigdx.tiny.cli.debug.LuaValue>()
+
+                keys.forEach { key ->
+                    val keyStr = key.optjstring("nil") ?: "nil"
+                    entries[keyStr] = formatValue(table[key], recursiveSecurity)
+                }
+
+                Dictionary(entries)
             }
         } else if (arg.isfunction()) {
-            "function(" + (0 until arg.narg()).joinToString(", ") { "arg" } + ")"
+            val funcStr = "function(" + (0 until arg.narg()).joinToString(", ") { "arg" } + ")"
+            Primitive(funcStr)
         } else {
-            arg.toString()
+            Primitive(arg.toString())
         }
 
     override suspend fun onCall(
@@ -174,48 +243,148 @@ class DebuggerExecutionListener(
 
         breakpoints.values.forEach { breakpoint ->
             if (currentExecutionPoint.hit(breakpoint)) {
-                pauseExecution(breakpoint.script, breakpoint.line)
+                if (shouldBreakOnCondition(breakpoint)) {
+                    pauseExecution(breakpoint.script, breakpoint.line)
+                }
             }
         }
+    }
+
+    /**
+     * Determines whether execution should break based on the breakpoint condition.
+     * Returns true if there's no condition or if the condition evaluates to true.
+     */
+    private suspend fun shouldBreakOnCondition(breakpoint: Breakpoint): Boolean {
+        val condition = breakpoint.condition
+        if (condition.isNullOrEmpty()) {
+            return true // No condition, break normally
+        }
+
+        return try {
+            evaluateCondition(condition, breakpoint.script, breakpoint.line)
+        } catch (e: Exception) {
+            // On error, don't break but send error message to UI
+            sendConditionError(breakpoint.script, breakpoint.line, e.message ?: "Unknown error")
+            false
+        }
+    }
+
+    /**
+     * Evaluates a Lua condition in the current execution context.
+     */
+    private fun evaluateCondition(
+        condition: String,
+        scriptName: String,
+        line: Int,
+    ): Boolean {
+        val frames = callstack(globals.running).getCallFrames()
+
+        // Collect upvalues
+        val upValues = frames.flatMap { frame ->
+            val upValues = (frame.f as? LuaClosure)?.upValues ?: emptyArray()
+            val upValuesDesc = (frame.f as? LuaClosure)?.p?.upvalues ?: emptyArray()
+
+            upValues.zip(upValuesDesc) { value, name ->
+                val upValueName = name.name?.tojstring() ?: ""
+                val upValueValue = value?.value ?: LuaValue.NIL
+                upValueName to upValueValue
+            }
+                .filterNot { (name, _) -> name == "_ENV" || name.isEmpty() }
+        }.toMap()
+
+        // Collect locals
+        val locals = frames.flatMap {
+            it.getLocals()
+        }.associate {
+            it.arg(1).tojstring() to it.arg(2)
+        }
+
+        // Create evaluation script
+        val script = buildString {
+            // Declare locals
+            locals.forEach { (name, value) ->
+                appendLine("local $name = ${luaValueToString(value)}")
+            }
+
+            // Declare upvalues
+            upValues.forEach { (name, value) ->
+                if (!locals.containsKey(name)) {
+                    appendLine("local $name = ${luaValueToString(value)}")
+                }
+            }
+
+            // Evaluate condition
+            appendLine("return ($condition)")
+        }
+
+        // Execute the script
+        val result = globals.load(script).call()
+        return result.toboolean()
+    }
+
+    /**
+     * Converts a LuaValue to its string representation for script generation.
+     */
+    private fun luaValueToString(
+        value: LuaValue,
+        recursiveLock: MutableSet<LuaValue> = mutableSetOf(),
+    ): String {
+        if (recursiveLock.contains(value)) {
+            return "nil" // avoid circle dependencies
+        }
+        recursiveLock.add(value)
+
+        return when {
+            value.isnil() -> "nil"
+            value.isboolean() -> value.toboolean().toString()
+            value.isnumber() -> value.todouble().toString()
+            value.isstring() -> "\"${value.tojstring().replace("\"", "\\\"")}\""
+            value.istable() -> {
+                val table = value as LuaTable
+                val entries = mutableListOf<String>()
+                val keys = table.keys()
+                keys.forEach { key ->
+                    val keyStr = if (key.isstring()) "\"${key.tojstring()}\"" else key.toString()
+                    val valueStr = luaValueToString(table[key])
+                    entries.add("[$keyStr] = $valueStr")
+                }
+                "{${entries.joinToString(", ")}}"
+            }
+            else -> "nil" // For functions and other complex types
+        }
+    }
+
+    /**
+     * Sends a condition error message to the UI.
+     */
+    private suspend fun sendConditionError(
+        scriptName: String,
+        line: Int,
+        errorMessage: String,
+    ) {
+        // For now, we'll add this as a comment in the locals
+        // This could be enhanced to send a specific error command to the UI
+        val errorComment = "[CONDITION ERROR] $errorMessage"
+
+        // Send a breakpoint hit with the error in the locals
+        val currentLocals = mutableMapOf<String, com.github.minigdx.tiny.cli.debug.LuaValue>()
+        currentLocals["[DEBUG_CONDITION_ERROR]"] = Primitive(errorComment)
+
+        engineCommandSender.send(
+            BreakpointHit(
+                script = scriptName,
+                line = line,
+                locals = currentLocals,
+                upValues = emptyMap(),
+            ),
+        )
     }
 
     private suspend fun pauseExecution(
         scriptName: String,
         line: Int,
     ) {
-        val frames = callstack(globals.running).getCallFrames()
-
-        val upValues =
-            frames.flatMap { frame ->
-                val upValues = (frame.f as? LuaClosure)?.upValues ?: emptyArray()
-                val upValuesDesc = (frame.f as? LuaClosure)?.p?.upvalues ?: emptyArray()
-
-                upValues.zip(upValuesDesc) { value, name ->
-                    val upValueName = name.name?.tojstring() ?: ""
-                    val upValueValue = value?.value ?: LuaValue.NIL
-                    upValueName to upValueValue
-                }
-                    // Skip the _ENV upvalue
-                    .filterNot { (name, _) -> name == "_ENV" }
-            }.toMap()
-                .mapValues { (_, value) -> formatValue(value) }
-
-        val locals =
-            frames.flatMap {
-                it.getLocals()
-            }.associate {
-                // name to value
-                it.arg(1).tojstring() to formatValue(it.arg(2))
-            }
-
-        engineCommandSender.send(
-            BreakpointHit(
-                script = scriptName,
-                line = line,
-                locals = locals,
-                upValues = upValues,
-            ),
-        )
+        sendBreakpointHit(scriptName, line)
         blocker.block()
     }
 

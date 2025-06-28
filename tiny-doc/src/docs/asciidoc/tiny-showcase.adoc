@@ -1,6 +1,8 @@
 == Tiny Showcase
 
-Here are a fews examples of game created using `🧸 Tiny`.
+Get inspired by what's possible with `🧸 Tiny`! This showcase features amazing games created by our community, demonstrating the versatility and creative potential of the Tiny game engine.
+
+Here are a few examples of games created using `🧸 Tiny`.
 
 image:sample/camping.gif[link=https://dwursteisen.itch.io/trijam-camping]
 image:sample/level-up.gif[link=https://dwursteisen.itch.io/trijam-220-type-it]

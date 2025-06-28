@@ -1,14 +1,17 @@
 package com.github.minigdx.tiny.render.gl
 
 import com.danielgergely.kgl.ByteBuffer
-import com.danielgergely.kgl.GL_BLEND
 import com.danielgergely.kgl.GL_COLOR_ATTACHMENT0
+import com.danielgergely.kgl.GL_COLOR_BUFFER_BIT
+import com.danielgergely.kgl.GL_DEPTH24_STENCIL8
+import com.danielgergely.kgl.GL_DEPTH_BUFFER_BIT
 import com.danielgergely.kgl.GL_FRAMEBUFFER
 import com.danielgergely.kgl.GL_FRAMEBUFFER_COMPLETE
 import com.danielgergely.kgl.GL_NEAREST
-import com.danielgergely.kgl.GL_ONE_MINUS_SRC_ALPHA
+import com.danielgergely.kgl.GL_RENDERBUFFER
 import com.danielgergely.kgl.GL_RGBA
-import com.danielgergely.kgl.GL_SRC_ALPHA
+import com.danielgergely.kgl.GL_STENCIL_ATTACHMENT
+import com.danielgergely.kgl.GL_STENCIL_BUFFER_BIT
 import com.danielgergely.kgl.GL_TEXTURE_2D
 import com.danielgergely.kgl.GL_TEXTURE_MAG_FILTER
 import com.danielgergely.kgl.GL_TEXTURE_MIN_FILTER
@@ -36,13 +39,30 @@ class OpenGLRender(
         operationsShader.init(windowManager)
         framebufferShader.init(windowManager)
 
+        val onscreen = createNewFrameBuffer()
+        val offscreen = createNewFrameBuffer()
+
+        return OpenGLRenderContext(
+            windowManager = windowManager,
+            currentFrameBuffer = onscreen,
+            onscreenFrameBuffer = onscreen,
+            offscreenFrameBuffer = offscreen,
+        )
+    }
+
+    private fun createNewFrameBuffer(): FrameBufferContext {
         // Framebuffer of the size of the screen
         val fboBuffer = ByteBuffer(gameOptions.width * gameOptions.height * PixelFormat.RGBA)
 
-        gl.enable(GL_BLEND)
+        // Attach stencil buffer to the framebuffer.
+        val stencilBuffer = gl.createRenderbuffer()
+        gl.bindRenderbuffer(GL_RENDERBUFFER, stencilBuffer)
+        gl.renderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, gameOptions.width, gameOptions.height)
 
         val fbo = gl.createFramebuffer()
         gl.bindFramebuffer(GL_FRAMEBUFFER, fbo)
+
+        gl.framebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, stencilBuffer)
 
         // Prepare the texture used for the FBO
         val fboTexture = gl.createTexture()
@@ -68,13 +88,7 @@ class OpenGLRender(
         }
         gl.bindTexture(GL_TEXTURE_2D, null)
         gl.bindFramebuffer(GL_FRAMEBUFFER, null)
-
-        return OpenGLRenderContext(
-            windowManager = windowManager,
-            fbo = fbo,
-            fboBuffer = fboBuffer,
-            fboTexture = fboTexture,
-        )
+        return FrameBufferContext(fbo, fboBuffer, fboTexture)
     }
 
     override fun render(
@@ -86,7 +100,6 @@ class OpenGLRender(
         gl.bindFramebuffer(GL_FRAMEBUFFER, context.fbo)
 
         gl.viewport(0, 0, gameOptions.width, gameOptions.height)
-        gl.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
         operationsShader.render(context, ops)
 
@@ -130,5 +143,26 @@ class OpenGLRender(
         )
 
         framebufferShader.drawOnScreen(context)
+    }
+
+    override fun executeOffScreen(
+        context: RenderContext,
+        block: () -> Unit,
+    ): RenderFrame {
+        context as OpenGLRenderContext
+        context.useOffscreen()
+        gl.bindFramebuffer(GL_FRAMEBUFFER, context.fbo)
+
+        gl.clearColor(0f, 0f, 0f, 0f)
+        gl.clear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT or GL_STENCIL_BUFFER_BIT)
+
+        gl.bindFramebuffer(GL_FRAMEBUFFER, null)
+
+        block()
+        val frame = readRender(context)
+
+        context.useOnscreen()
+
+        return frame
     }
 }

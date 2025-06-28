@@ -22,7 +22,7 @@ typealias Percent = Float
 /**
  * Frequency.
  */
-typealias Frequency = Int
+typealias Frequency = Float
 
 typealias Beats = Float
 
