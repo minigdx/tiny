@@ -73,6 +73,16 @@ debug.line = function() end
 
 --- Access to graphical API like updating the color palette or applying a dithering pattern.
 gfx = {}
+--- Switch to another draw mode.
+---         |- 0: default. 
+---         |- 1: drawing with transparent (ie: can erase part of the screen)
+---         |- 2: drawing a stencil that will be use with the next mode
+---         |- 3: drawing using a stencil test (ie: drawing only in the stencil) 
+---         |- 4: drawing using a stencil test (ie: drawing everywhere except in the stencil) 
+---     
+--- @overload fun(): any -- Return the actual mode. Switch back to the default mode.
+--- @overload fun(mode: any): any -- Switch to another draw mode. Return the previous mode.
+gfx.drawMode = function() end
 --- clear the screen
 --- @overload fun(): any -- Clear the screen with a default color.
 --- @overload fun(color: any): any -- Clear the screen with a color.
@@ -90,6 +100,7 @@ gfx.pget = function() end
 --- - If the index of the spritesheet is negative, a new spritesheet will be created at the last positive index.
 --- 
 --- @overload fun(sheet: any): any -- Copy the current frame buffer to an new or existing sheet index.
+--- @overload fun(sheet: any, closure: any): any -- Create a blank spritesheet. Execute the operation from the closure on the blank spritesheet and copy it to an new or existing sheet index.
 gfx.to_sheet = function() end
 --- Change a color from the palette to another color.
 --- @overload fun(): any -- Reset all previous color changes.
@@ -339,6 +350,8 @@ keys.shift = any
 keys.ctrl = any
 --- the key alt down
 keys.alt = any
+--- the key delete
+keys.delete = any
 
 
 --- Access map created with LDTk ( https://ldtk.io/ ).
@@ -398,6 +411,9 @@ math.huge = any
 --- Return the sign of the number: -1 if negative. 1 otherwise.
 --- @overload fun(number: any): any -- Return the sign of the number.
 math.sign = function() end
+--- Calculate the angle in radians between the positive x-axis and the point (x, y).
+--- @overload fun(y: any, x: any): any -- Calculate the angle for the point (x, y). Please note the argument order: y then x.
+math.atan2 = function() end
 --- Clamp the value between 2 values.
 --- @overload fun(a: any, value: any, b: any): any -- Clamp the value between a and b. If a is greater than b, then b will be returned.
 math.clamp = function() end
@@ -443,11 +459,14 @@ sfx.save = function() end
 --- Load the actual SFX sound as the actual music.
 --- @overload fun(filename: any): any -- Load the actual SFX sound as the actual music using filename or its index
 sfx.load = function() end
+--- Access track using its index or its name.
+--- @overload fun(arg: any): any -- Access instrument using its index or its name.
+sfx.track = function() end
 --- Access instrument using its index or its name.
 --- @overload fun(arg: any): any -- Access instrument using its index or its name.
 sfx.instrument = function() end
---- Access instrument using its index or its name.
---- @overload fun(arg: any): any -- Access instrument using its index or its name.
+--- Access sfx using its index or its name.
+--- @overload fun(arg: any): any -- Access sfx using its index or its name.
 sfx.bar = function() end
 --- Play the bar by it's index of the current sound. The index of a bar of the current music.
 --- @overload fun(): any -- Play the sound at the index 0.

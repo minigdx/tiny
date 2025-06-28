@@ -445,6 +445,22 @@ debug.line(v1, v2, color) -- Draw a debug line.
 
 Access to graphical API like updating the color palette or applying a dithering pattern.
 
+==== gfx.drawMode()
+
+Switch to another draw mode.
+        |- 0: default. 
+        |- 1: drawing with transparent (ie: can erase part of the screen)
+        |- 2: drawing a stencil that will be use with the next mode
+        |- 3: drawing using a stencil test (ie: drawing only in the stencil) 
+        |- 4: drawing using a stencil test (ie: drawing everywhere except in the stencil) 
+    
+
+```lua
+gfx.drawMode() -- Return the actual mode. Switch back to the default mode.
+gfx.drawMode(mode) -- Switch to another draw mode. Return the previous mode.
+```
+
+
 ==== gfx.cls()
 
 clear the screen
@@ -539,6 +555,7 @@ Transform the current frame buffer into a spritesheeet.
 
 ```lua
 gfx.to_sheet(sheet) -- Copy the current frame buffer to an new or existing sheet index.
+gfx.to_sheet(sheet, closure) -- Create a blank spritesheet. Execute the operation from the closure on the blank spritesheet and copy it to an new or existing sheet index.
 ```
 
 ++++
@@ -2620,6 +2637,15 @@ end
 ++++
 
 
+==== math.atan2()
+
+Calculate the angle in radians between the positive x-axis and the point (x, y).
+
+```lua
+math.atan2(y, x) -- Calculate the angle for the point (x, y). Please note the argument order: y then x.
+```
+
+
 ==== math.clamp()
 
 Clamp the value between 2 values.
@@ -2864,6 +2890,15 @@ sfx.load(filename) -- Load the actual SFX sound as the actual music using filena
 ```
 
 
+==== sfx.track()
+
+Access track using its index or its name.
+
+```lua
+sfx.track(arg) -- Access instrument using its index or its name.
+```
+
+
 ==== sfx.instrument()
 
 Access instrument using its index or its name.
@@ -2875,10 +2910,10 @@ sfx.instrument(arg) -- Access instrument using its index or its name.
 
 ==== sfx.bar()
 
-Access instrument using its index or its name.
+Access sfx using its index or its name.
 
 ```lua
-sfx.bar(arg) -- Access instrument using its index or its name.
+sfx.bar(arg) -- Access sfx using its index or its name.
 ```
 
 

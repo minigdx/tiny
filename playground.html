@@ -484,12 +484,11 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
     }
 
     .tiny-toolbar {
-        width: calc(100% + 256px);
+        width: calc(100%);
         min-height: 48px;
         padding: 4px;
         border-radius: 8px;
         border: 1px solid #9EC6DF;
-        margin-left: -128px;
         margin-bottom: 2px;
         display: flex;
         align-items: center;
@@ -498,8 +497,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
     /** container of the game + editor **/
     .tiny-container {
         display: flex;
-        width: calc(100% + 256px);
-        margin-left: -128px;
+        width: calc(100%);
     }
 
     /** game **/
@@ -560,12 +558,15 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="header">
 <h1>Tiny Playground 🧸</h1>
 <div class="details">
-<span id="revnumber">version 1.4.0-alpha1</span>
+<span id="revnumber">version 1.4.0-alpha2</span>
 </div>
 </div>
 <div id="content">
 <div id="preamble">
 <div class="sectionbody">
+<div class="paragraph">
+<p>Welcome to the Tiny Playground! This is your interactive sandbox where you can experiment with <code>🧸 Tiny</code> right in your browser. Try out the examples below, modify the code, and see your changes in real-time. It&#8217;s the perfect place to learn and explore what&#8217;s possible with Tiny!</p>
+</div>
 <div class="admonitionblock tip">
 <table>
 <tr>
@@ -599,7 +600,7 @@ end
 <div class="ulist">
 <ul>
 <li>
-<p>Every examples from <a href="index.html">the documentation</a> can be tweaked in this sandbox.</p>
+<p>All examples from <a href="index.html">the documentation</a> can be tweaked in this sandbox.</p>
 </li>
 <li>
 <p><a href="playground.html?game=CiAgCmZ1bmN0aW9uIF9kcmF3KCkKICAgIGdmeC5jbHMoKQoKICAgIHByaW50KCJSZWN0YW5nbGUgbGltaXQiLCA2NCwgNjQgLSA1KQogICAgLS0gZHJhdyB0aGUgYm9yZGVyIGxpbWl0LgogICAgZ2Z4LmRpdGhlcigweEE1QTUpCiAgICBzaGFwZS5yZWN0KDY0LCA2NCwgMjU2IC0gMTI4LCAyNTYgLSAxMjgsIDIpCiAgICBnZnguZGl0aGVyKCkKCiAgICAtLSBkcmF3IHRoZSBtb3VzZSBwb3NpdGlvbi4KICAgIGxvY2FsIHBvcyA9IGN0cmwudG91Y2goKQogICAgc2hhcGUubGluZShwb3MueCAtIDIsIHBvcy55LCBwb3MueCArIDIsIHBvcy55LCAzKQogICAgc2hhcGUubGluZShwb3MueCwgcG9zLnkgLSAyLCBwb3MueCwgcG9zLnkgKyAyLCAzKQoKICAgIC0tIGRyYXcgdGhlIHJlY3RhbmdsZSB0aGF0IGlzIHN0YXlpbmcgd2l0aGluIHRoZSBib3JkZXIgbGltaXQuCiAgICBsb2NhbCB4ID0gbWF0aC5jbGFtcCg2NCwgcG9zLnggLSA0LCAyNTYgLSA2NCAtIDkpCiAgICBsb2NhbCB5ID0gbWF0aC5jbGFtcCg2NCwgcG9zLnkgLSA0LCAyNTYgLSA2NCAtIDkpCiAgICBzaGFwZS5yZWN0KHgsIHksIDksIDksIDgpCmVuZAo=">Tracking the player mouse</a></p>
@@ -626,8 +627,8 @@ end
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 1.4.0-alpha1<br>
-Last updated 2025-05-12 11:20:22 UTC
+Version 1.4.0-alpha2<br>
+Last updated 2025-06-28 22:11:30 UTC
 </div>
 </div>
 <script src="tiny-web-editor.js"></script>

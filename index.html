@@ -306,7 +306,10 @@ kbd kbd:last-child { margin-right: 0; }
 
 p a > code:hover { color: #444444; }
 
-#header, #content, #footnotes, #footer { width: 100%; margin-left: auto; margin-right: auto; margin-top: 0; margin-bottom: 0; max-width: 62.5em; *zoom: 1; position: relative; padding-left: 0.9375em; padding-right: 0.9375em; }
+#header, #content, #footnotes, #footer { width: 100%;
+  margin: 0 auto;
+  max-width: 84em;
+  *zoom: 1; position: relative; padding-left: 0.9375em; padding-right: 0.9375em; }
 #header:before, #header:after, #content:before, #content:after, #footnotes:before, #footnotes:after, #footer:before, #footer:after { content: " "; display: table; }
 #header:after, #content:after, #footnotes:after, #footer:after { clear: both; }
 
@@ -720,12 +723,11 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
     }
 
     .tiny-toolbar {
-        width: calc(100% + 256px);
+        width: calc(100%);
         min-height: 48px;
         padding: 4px;
         border-radius: 8px;
         border: 1px solid #9EC6DF;
-        margin-left: -128px;
         margin-bottom: 2px;
         display: flex;
         align-items: center;
@@ -734,8 +736,7 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
     /** container of the game + editor **/
     .tiny-container {
         display: flex;
-        width: calc(100% + 256px);
-        margin-left: -128px;
+        width: calc(100%);
     }
 
     /** game **/
@@ -796,7 +797,7 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <div id="header">
 <h1>Tiny 🧸</h1>
 <div class="details">
-<span id="revnumber">version 1.4.0-alpha1</span>
+<span id="revnumber">version 1.4.0-alpha2</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -893,6 +894,7 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 </li>
 <li><a href="#_gfx">gfx</a>
 <ul class="sectlevel3">
+<li><a href="#_gfx_drawmode">gfx.drawMode()</a></li>
 <li><a href="#_gfx_cls">gfx.cls()</a></li>
 <li><a href="#_gfx_pset">gfx.pset()</a></li>
 <li><a href="#_gfx_pget">gfx.pget()</a></li>
@@ -959,6 +961,7 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <li><a href="#_math_pi">math.pi</a></li>
 <li><a href="#_math_huge">math.huge</a></li>
 <li><a href="#_math_sign">math.sign()</a></li>
+<li><a href="#_math_atan2">math.atan2()</a></li>
 <li><a href="#_math_clamp">math.clamp()</a></li>
 <li><a href="#_math_dst">math.dst()</a></li>
 <li><a href="#_math_dst2">math.dst2()</a></li>
@@ -976,6 +979,7 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <ul class="sectlevel3">
 <li><a href="#_sfx_save">sfx.save()</a></li>
 <li><a href="#_sfx_load">sfx.load()</a></li>
+<li><a href="#_sfx_track">sfx.track()</a></li>
 <li><a href="#_sfx_instrument">sfx.instrument()</a></li>
 <li><a href="#_sfx_bar">sfx.bar()</a></li>
 <li><a href="#_sfx_play">sfx.play()</a></li>
@@ -1056,7 +1060,7 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 </ul>
 </li>
 <li><a href="#_links">Links</a></li>
-<li><a href="#_licences">Licences</a></li>
+<li><a href="#_licenses">Licenses</a></li>
 </ul>
 </div>
 </div>
@@ -1064,7 +1068,7 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>Welcome to the documentation for <code>🧸 Tiny</code>, the virtual console that offers an easy and efficient way to build games and other applications with its Lua programming support, hot reloading, and 256-color maximum.</p>
+<p>Welcome to the documentation for <code>🧸 Tiny</code>, a virtual console that makes building games and applications simple and fun! With Lua programming support, hot reloading, and a 256-color palette, you&#8217;ll have everything you need to bring your ideas to life.</p>
 </div>
 </div>
 </div>
@@ -1072,7 +1076,7 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <h2 id="_tiny_engine">Tiny Engine</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Despite its modest capabilities, <code>🧸 Tiny</code> is designed to help you create and test your ideas quickly and effectively. Not only can you run your games on your desktop computer, but you can also export them for the web, making it easy to share your creations with others.</p>
+<p><code>🧸 Tiny</code> is designed to help you create and test your ideas quickly and effectively. You can run your games on your desktop computer and export them for the web, making it easy to share your creations with others.</p>
 </div>
 <div class="paragraph">
 <p>With <code>🧸 Tiny</code>, you&#8217;ll be able to get started right away and see your progress in real-time, thanks to its hot reloading feature. This documentation will guide you through the setup and usage of <code>🧸 Tiny</code> as well as provide you with helpful tips and tricks to make the most out of this powerful tool.</p>
@@ -1103,7 +1107,7 @@ The code source of this sample is available in the <a href="https://github.com/m
 <h2 id="_tiny_playground">Tiny Playground</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>You can try to create a game right away <code>🧸 Tiny</code> using <a href="playground.html?game=">the Playground</a> or you can just try it by updating examples available in this page.</p>
+<p>You can try creating a game right away with <code>🧸 Tiny</code> using <a href="playground.html?game=">the Playground</a>, or you can experiment by updating the examples available on this page.</p>
 </div>
 </div>
 </div>
@@ -1129,7 +1133,7 @@ The code source of this sample is available in the <a href="https://github.com/m
 <i class="fa icon-tip" title="Tip"></i>
 </td>
 <td class="content">
-You can improve this documentation by updating <a href="https://github.com/minigdx/tiny/tree/main/tiny-doc/src/docs/asciidoc">the code of this documentation</a>
+Want to help make this documentation even better? Feel free to contribute by updating <a href="https://github.com/minigdx/tiny/tree/main/tiny-doc/src/docs/asciidoc">the documentation source code</a>!
 </td>
 </tr>
 </table>
@@ -1140,8 +1144,8 @@ You can improve this documentation by updating <a href="https://github.com/minig
 <h2 id="_tiny_install">Tiny Install</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><code>🧸 Tiny</code> is a game engine that can be run through its client.
-Once installed, you can run and develop games in no time!</p>
+<p><code>🧸 Tiny</code> is a game engine that runs through its command-line client.
+Once installed, you can start creating and developing games in no time!</p>
 </div>
 <div class="ulist">
 <ul>
@@ -1149,7 +1153,7 @@ Once installed, you can run and develop games in no time!</p>
 <p>Download Tiny CLI from <a href="https://github.com/minigdx/tiny/releases">the release Github page</a></p>
 </li>
 <li>
-<p>Unzip it and put the <code>bin</code> directory in your path (ie: <code>export PATH=$PATH:&lt;tiny-cli-path&gt;/bin</code>)</p>
+<p>Unzip it and put the <code>bin</code> directory in your path (i.e.: <code>export PATH=$PATH:&lt;tiny-cli-path&gt;/bin</code>)</p>
 </li>
 <li>
 <p>Create your first game using <code>tiny-cli create my-first-game</code></p>
@@ -1164,6 +1168,9 @@ Once installed, you can run and develop games in no time!</p>
 <div class="sect1">
 <h2 id="_tiny_tutorial">Tiny Tutorial</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>This tutorial will guide you through creating your very first game step by step. Don&#8217;t worry if you&#8217;re new to game development – we&#8217;ll take it nice and easy.</p>
+</div>
 <div class="paragraph">
 <p>In this tutorial, we&#8217;ll be creating a simple Pong game using the Lua programming language and <code>🧸 Tiny</code>.</p>
 </div>
@@ -1287,7 +1294,6 @@ end
 
 function _update()
     -- Update game state
-     -- Update game state
     player1_pos.y = player1_pos.y - 4 * num(ctrl.pressing(keys.z)) --azerty keyboard
     player1_pos.y = player1_pos.y - 4 * num(ctrl.pressing(keys.w)) -- qwerty keyboard
     player1_pos.y = player1_pos.y + 4 * num(ctrl.pressing(keys.s))
@@ -1337,7 +1343,10 @@ end
 <h2 id="_tiny_showcase">Tiny Showcase</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Here are a fews examples of game created using <code>🧸 Tiny</code>.</p>
+<p>Get inspired by what&#8217;s possible with <code>🧸 Tiny</code>! This showcase features amazing games created by our community, demonstrating the versatility and creative potential of the Tiny game engine.</p>
+</div>
+<div class="paragraph">
+<p>Here are a few examples of games created using <code>🧸 Tiny</code>.</p>
 </div>
 <div class="paragraph">
 <p><span class="image"><a class="image" href="https://dwursteisen.itch.io/trijam-camping"><img src="sample/camping.gif" alt="camping"></a></span>
@@ -1368,16 +1377,16 @@ Want your game to appear here? Create a post about it in <a href="https://github
 <h2 id="_tiny_cli">Tiny CLI</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Introducing the Tiny CLI, a powerful command-line interface that allows you to easily create, run, develop, and export games using the Tiny 2D game engine. With the Tiny CLI, you can quickly and easily create a new game project, add assets, and start developing your game in no time.</p>
+<p>The Tiny CLI is a powerful command-line interface that makes it easy to create, run, develop, and export games using the Tiny 2D game engine. With the Tiny CLI, you can quickly create new game projects, add assets, and start developing your games right away.</p>
 </div>
 <div class="paragraph">
 <p>To get started, simply install the Tiny CLI on your system and create a new project using the <code>tiny-cli create</code> command. This will generate a new project directory with all the necessary files and folder structure to start building your game. You can then add assets to your game using the <code>tiny-cli add</code> command, which allows you to import images, audio files, and other resources into your project.</p>
 </div>
 <div class="paragraph">
-<p>The Tiny CLI also includes a powerful development server that allows you to preview your game in real-time as you develop it. Simply run the tiny command and start to update your game.</p>
+<p>The Tiny CLI also includes a powerful development server that allows you to preview your game in real-time as you develop it. Simply run the <code>tiny-cli</code> command to start developing and updating your game.</p>
 </div>
 <div class="paragraph">
-<p>The Tiny CLI includes the <code>tuny-cli debug</code> command, which starts a debugging tool. Connect it to your running game to set breakpoints and examine variables. As with typical debuggers, you can resume execution or step through your code line by line.</p>
+<p>The Tiny CLI includes the <code>tiny-cli debug</code> command, which starts a debugging tool. Connect it to your running game to set breakpoints and examine variables. As with typical debuggers, you can resume execution or step through your code line by line.</p>
 </div>
 <div class="paragraph">
 <p>When you&#8217;re ready to share your game with the world, the Tiny CLI makes it easy to export your game for web browsers. You can use the <code>tiny-cli export</code> command to generate a distributable version of your game that can be published on the web. You can also try the <code>export</code> result by using the command <code>tiny-cli serve</code>.</p>
@@ -1393,7 +1402,7 @@ Want your game to appear here? Create a post about it in <a href="https://github
 <div class="sect3">
 <h4 id="_usage">Usage</h4>
 <div class="paragraph">
-<p>To use the <code>tiny-cli create</code> command, simply open your terminal and type the following command:</p>
+<p>To use the <code>tiny-cli create</code> command, open your terminal and type the following command:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1415,8 +1424,7 @@ Want your game to appear here? Create a post about it in <a href="https://github
 <p>Open your terminal and navigate to the directory where you want to create your new game.</p>
 </li>
 <li>
-<p>Type the following command and press Enter: `tiny-cli create
-`</p>
+<p>Type the following command and press Enter: <code>tiny-cli create</code></p>
 </li>
 <li>
 <p>Follow the prompts to enter a name for your new game and configure other parameters such as the game&#8217;s screen resolution, background color, and more.</p>
@@ -1437,7 +1445,7 @@ Want your game to appear here? Create a post about it in <a href="https://github
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="bash">tiny-cli my-game</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">tiny-cli run my-game</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1471,11 +1479,11 @@ With the <code>tiny-cli create</code> command, you can quickly and easily create
 <div class="sect3">
 <h4 id="_usage_2">Usage</h4>
 <div class="paragraph">
-<p>To use the <code>tiny-cli run</code> command, simply open your terminal and type the following command:</p>
+<p>To use the <code>tiny-cli run</code> command, open your terminal and type the following command:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code>tiny-cli run &lt;game folder&gt;</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">tiny-cli run &lt;game folder&gt;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1532,7 +1540,7 @@ Using <code>tiny-cli run</code>, You can press Ctrl + R (or ⌘ + R) to record a
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code>tiny-cli add &lt;resource&gt;</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">tiny-cli add &lt;resource&gt;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1595,7 +1603,7 @@ Note that the added resource is not automatically copied to your game&#8217;s fo
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code>tiny-cli debug &lt;game folder&gt;</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">tiny-cli debug &lt;game folder&gt;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1612,7 +1620,7 @@ Note that the added resource is not automatically copied to your game&#8217;s fo
 <div class="sect2">
 <h3 id="_the_tiny_cli_palette_command">the <code>tiny-cli palette</code> command</h3>
 <div class="paragraph">
-<p>The tiny-cli lib command is used extract a color palette from an image to use it in your <code>🧸 Tiny</code> game. This command provides an easy way to use colors from an image as your game&#8217;s palette color.</p>
+<p>The tiny-cli palette command is used to extract a color palette from an image to use it in your <code>🧸 Tiny</code> game. This command provides an easy way to use colors from an image as your game&#8217;s palette color.</p>
 </div>
 <div class="sect3">
 <h4 id="_usage_5">Usage</h4>
@@ -1621,7 +1629,7 @@ Note that the added resource is not automatically copied to your game&#8217;s fo
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="shell">tiny-cli palette &lt;image_name&gt;</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">tiny-cli palette &lt;image_name&gt;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1629,28 +1637,28 @@ Note that the added resource is not automatically copied to your game&#8217;s fo
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="shell">tiny-cli palette my_palette.png</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">tiny-cli palette my_palette.png</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>This command will replace your game palette with the palette extract from the file.</p>
+<p>This command will replace your game palette with the palette extracted from the file.</p>
 </div>
 <div class="paragraph">
-<p>You might want to check before which palette will be extract from the image using the flag <code>--print</code>:</p>
+<p>You might want to check beforehand which palette will be extracted from the image using the flag <code>--print</code>:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="shell">tiny-cli palette <span class="nt">--print</span> my_palette.png</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">tiny-cli palette <span class="nt">--print</span> my_palette.png</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>If, instead to replace your game&#8217;s color palette,
+<p>If, instead of replacing your game&#8217;s color palette,
 the flag <code>--append</code> can help you to append colors in your game&#8217;s palette
 instead of replacing it:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="shell">tiny-cli palette <span class="nt">--append</span> my_palette.png</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">tiny-cli palette <span class="nt">--append</span> my_palette.png</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -1660,7 +1668,7 @@ instead of replacing it:</p>
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-Only colors that are not already in your game&#8217;s palette will be appended, to not mess with colors index.
+Only colors that are not already in your game&#8217;s palette will be appended to not mess with color index.
 </td>
 </tr>
 </table>
@@ -1724,12 +1732,12 @@ Only colors that are not already in your game&#8217;s palette will be appended, 
 <div class="sect2">
 <h3 id="_the_tiny_cli_serve_command">the <code>tiny-cli serve</code> command</h3>
 <div class="paragraph">
-<p>The tiny serve command is used to launch a local web server that allows you to test a game that has been exported using the tiny export command. This is useful for testing and debugging a game locally before publishing it online.</p>
+<p>The <code>tiny-cli serve</code> command is used to launch a local web server that allows you to test a game that has been exported using the <code>tiny-cli export</code> command. This is useful for testing and debugging a game locally before publishing it online.</p>
 </div>
 <div class="sect3">
 <h4 id="_syntax">Syntax</h4>
 <div class="paragraph">
-<p>To use the tiny serve command, open a terminal or command prompt and navigate to the directory containing the exported game zip file. Then, type the following command:</p>
+<p>To use the <code>tiny-cli serve</code> command, open a terminal or command prompt and navigate to the directory containing the exported game zip file. Then, type the following command:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1753,7 +1761,7 @@ Only colors that are not already in your game&#8217;s palette will be appended, 
 <div class="sect3">
 <h4 id="_usage_7">Usage</h4>
 <div class="paragraph">
-<p>To run the tiny serve command, you can use the following examples:</p>
+<p>To run the <code>tiny-cli serve</code> command, you can use the following examples:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1781,7 +1789,7 @@ Only colors that are not already in your game&#8217;s palette will be appended, 
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-The tiny serve command is intended for local testing only and should not be used to serve your game online. When you are ready to publish your game, you should upload the exported game files to a web server and serve them from there.
+The <code>tiny-cli serve</code> command is intended for local testing only and should not be used to serve your game online. When you are ready to publish your game, you should upload the exported game files to a web server and serve them from there.
 </td>
 </tr>
 </table>
@@ -1791,7 +1799,7 @@ The tiny serve command is intended for local testing only and should not be used
 <div class="sect2">
 <h3 id="_the_tiny_cli_sfx_command">the <code>tiny-cli sfx</code> command</h3>
 <div class="paragraph">
-<p>The tiny-cli sfx command is used to start a SFX edtor to generate sound to use in your <code>🧸 Tiny</code> game.</p>
+<p>The tiny-cli sfx command is used to start a SFX editor to generate sound to use in your <code>🧸 Tiny</code> game.</p>
 </div>
 <div class="paragraph">
 <p><a href="https://dwursteisen.itch.io/tiny-sfx-editor">This SFX editor can be tried online</a> on itch.io.</p>
@@ -1809,7 +1817,7 @@ The tiny serve command is intended for local testing only and should not be used
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="shell">tiny-cli sfx</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">tiny-cli sfx</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1817,7 +1825,7 @@ The tiny serve command is intended for local testing only and should not be used
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="shell">tiny-cli sfx &lt;game&gt;</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">tiny-cli sfx &lt;game&gt;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2338,6 +2346,23 @@ end
 <p>Access to graphical API like updating the color palette or applying a dithering pattern.</p>
 </div>
 <div class="sect3">
+<h4 id="_gfx_drawmode">gfx.drawMode()</h4>
+<div class="paragraph">
+<p>Switch to another draw mode.
+        |- 0: default.
+        |- 1: drawing with transparent (ie: can erase part of the screen)
+        |- 2: drawing a stencil that will be use with the next mode
+        |- 3: drawing using a stencil test (ie: drawing only in the stencil)
+        |- 4: drawing using a stencil test (ie: drawing everywhere except in the stencil)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">drawMode</span><span class="p">()</span> <span class="c1">-- Return the actual mode. Switch back to the default mode.</span>
+<span class="n">gfx</span><span class="p">.</span><span class="n">drawMode</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span> <span class="c1">-- Switch to another draw mode. Return the previous mode.</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_gfx_cls">gfx.cls()</h4>
 <div class="paragraph">
 <p>clear the screen</p>
@@ -2437,7 +2462,8 @@ end
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">to_sheet</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span> <span class="c1">-- Copy the current frame buffer to an new or existing sheet index.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">to_sheet</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span> <span class="c1">-- Copy the current frame buffer to an new or existing sheet index.</span>
+<span class="n">gfx</span><span class="p">.</span><span class="n">to_sheet</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">closure</span><span class="p">)</span> <span class="c1">-- Create a blank spritesheet. Execute the operation from the closure on the blank spritesheet and copy it to an new or existing sheet index.</span></code></pre>
 </div>
 </div>
 <tiny-editor style="display: none;"  >
@@ -4810,6 +4836,17 @@ end
 </tiny-editor>
 </div>
 <div class="sect3">
+<h4 id="_math_atan2">math.atan2()</h4>
+<div class="paragraph">
+<p>Calculate the angle in radians between the positive x-axis and the point (x, y).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">math</span><span class="p">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="c1">-- Calculate the angle for the point (x, y). Please note the argument order: y then x.</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_math_clamp">math.clamp()</h4>
 <div class="paragraph">
 <p>Clamp the value between 2 values.</p>
@@ -5107,6 +5144,17 @@ or by starting the sound as soon as the player is moving.</p>
 </div>
 </div>
 <div class="sect3">
+<h4 id="_sfx_track">sfx.track()</h4>
+<div class="paragraph">
+<p>Access track using its index or its name.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">sfx</span><span class="p">.</span><span class="n">track</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="c1">-- Access instrument using its index or its name.</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_sfx_instrument">sfx.instrument()</h4>
 <div class="paragraph">
 <p>Access instrument using its index or its name.</p>
@@ -5120,11 +5168,11 @@ or by starting the sound as soon as the player is moving.</p>
 <div class="sect3">
 <h4 id="_sfx_bar">sfx.bar()</h4>
 <div class="paragraph">
-<p>Access instrument using its index or its name.</p>
+<p>Access sfx using its index or its name.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">sfx</span><span class="p">.</span><span class="n">bar</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="c1">-- Access instrument using its index or its name.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">sfx</span><span class="p">.</span><span class="n">bar</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="c1">-- Access sfx using its index or its name.</span></code></pre>
 </div>
 </div>
 </div>
@@ -6505,11 +6553,11 @@ end
 </div>
 </div>
 <div class="sect1">
-<h2 id="_licences">Licences</h2>
+<h2 id="_licenses">Licenses</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This documentation is using assets from <a href="https://www.kenney.nl" class="bare">https://www.kenney.nl</a>.
-Please find below the licences regarding those assets.</p>
+<p>This documentation uses assets from <a href="https://www.kenney.nl" class="bare">https://www.kenney.nl</a>.
+Below are the licenses for these assets.</p>
 </div>
 <div class="ulist">
 <ul>
@@ -6542,8 +6590,8 @@ Support us by crediting Kenney or www.kenney.nl (this is not mandatory)</pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 1.4.0-alpha1<br>
-Last updated 2025-05-12 11:20:22 UTC
+Version 1.4.0-alpha2<br>
+Last updated 2025-06-28 22:11:30 UTC
 </div>
 </div>
 <style>
