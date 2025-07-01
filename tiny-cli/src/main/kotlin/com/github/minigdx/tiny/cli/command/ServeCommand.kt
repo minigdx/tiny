@@ -3,6 +3,7 @@ package com.github.minigdx.tiny.cli.command
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.arguments.default
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
@@ -18,6 +19,7 @@ import io.ktor.server.routing.RoutingContext
 import io.ktor.server.routing.get
 import io.ktor.server.routing.head
 import io.ktor.server.routing.routing
+import java.io.File
 import java.io.FileInputStream
 import java.util.zip.ZipInputStream
 
@@ -32,6 +34,7 @@ class ServeCommand : CliktCommand(name = "serve") {
                 "by the export command (ie: zip file).",
     )
         .file(mustExist = true, canBeDir = true, canBeFile = true)
+        .default(File("."))
 
     private val resources = mutableMapOf<String, ByteArray>()
 
@@ -39,13 +42,12 @@ class ServeCommand : CliktCommand(name = "serve") {
 
     override fun run() {
         // Get the zip
-        val zipFile =
-            if (game.isDirectory) {
-                GameExporter(withSourceMap = true).export(game, "tiny-export.zip")
-                game.resolve("tiny-export.zip")
-            } else {
-                game
-            }
+        val zipFile = if (game.isDirectory) {
+            GameExporter(withSourceMap = true).export(game, "tiny-export.zip")
+            game.resolve("tiny-export.zip")
+        } else {
+            game
+        }
 
         // Uncompressed in memory
         val zip = ZipInputStream(FileInputStream(zipFile))
