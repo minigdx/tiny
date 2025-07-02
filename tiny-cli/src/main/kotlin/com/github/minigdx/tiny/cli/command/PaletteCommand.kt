@@ -3,7 +3,7 @@ package com.github.minigdx.tiny.cli.command
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.arguments.argument
-import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.arguments.default
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
@@ -17,15 +17,12 @@ import kotlinx.coroutines.runBlocking
 import java.io.File
 
 class PaletteCommand : CliktCommand(name = "palette") {
-    val game by option(
-        help = "The directory containing all game information",
-    )
+    val gameDirectory by argument(help = "The directory containing your game to be update.")
         .file(mustExist = true, canBeDir = true, canBeFile = false)
         .default(File("."))
 
-    val image by argument(
-        help = "The image used to extract the palette.",
-    ).file(mustExist = true, canBeFile = true, canBeDir = false)
+    val image by argument(help = "The image used to extract the palette.")
+        .file(mustExist = true, canBeFile = true, canBeDir = false)
 
     val append by option(help = "Append, instead of replacing, the palette information in the game file.")
         .flag()
@@ -36,18 +33,22 @@ class PaletteCommand : CliktCommand(name = "palette") {
     override fun help(context: Context) = "Extract the color palette from an image."
 
     override fun run() {
-        val tiny = game.resolve("_tiny.json")
+        val tiny = gameDirectory.resolve("_tiny.json")
         if (!tiny.exists()) {
             throw MissingTinyConfigurationException(tiny)
         }
         // Open the _tiny.json
         val gameParameters = GameParameters.read(tiny)
         val gameOptions = gameParameters.toGameOptions()
-        val platform = GlfwPlatform(gameOptions, StdOutLogger("whatever"), CommonVirtualFileSystem(), game)
-        val imageData =
-            runBlocking {
-                platform.createImageStream(image.relativeTo(game).path).read()
-            }
+        val platform = GlfwPlatform(
+            gameOptions = gameOptions,
+            logger = StdOutLogger("whatever"),
+            vfs = CommonVirtualFileSystem(),
+            workdirectory = gameDirectory,
+        )
+        val imageData = runBlocking {
+            platform.createImageStream(image.relativeTo(gameDirectory).path).read()
+        }
 
         val colors = mutableSetOf<String>()
         if (append) {

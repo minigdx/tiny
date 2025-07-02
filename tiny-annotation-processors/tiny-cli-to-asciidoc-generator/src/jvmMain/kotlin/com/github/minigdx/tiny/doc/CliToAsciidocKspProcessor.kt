@@ -30,6 +30,8 @@ class CliToAsciidocKspProcessor(
                     superType.resolve().declaration.qualifiedName?.asString() == "com.github.ajalt.clikt.core.CliktCommand"
                 }
             }
+            // Skip the main command. As it does't contains any relevant information.
+            .filterNot { classDecl -> classDecl.simpleName.asString().contains("MainCommand")}
             .toList()
 
         if (cliktCommandClasses.isEmpty()) {
@@ -230,8 +232,6 @@ class CliToAsciidocKspProcessor(
                             if (propertyLineIndex >= 0 && propertyLineIndex < lines.size) {
                                 // Read the complete property declaration including chained methods
                                 val propertyDeclaration = readCompletePropertyDeclaration(lines, propertyLineIndex)
-
-                                logger.warn("DEBUG: Property $propertyName declaration: $propertyDeclaration")
 
                                 if (propertyDeclaration.contains("by argument(")) {
                                     // Extract help text from argument(help = "...") pattern - handle both single and multi-line strings

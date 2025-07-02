@@ -28,11 +28,7 @@ class ServeCommand : CliktCommand(name = "serve") {
         .int()
         .default(8080)
 
-    private val game by argument(
-        help =
-            "The game to serve. It has to be a tiny game exported " +
-                "by the export command (ie: zip file).",
-    )
+    private val gameDirectory by argument(help = "The game to serve by an embedded web server.",)
         .file(mustExist = true, canBeDir = true, canBeFile = true)
         .default(File("."))
 
@@ -42,11 +38,11 @@ class ServeCommand : CliktCommand(name = "serve") {
 
     override fun run() {
         // Get the zip
-        val zipFile = if (game.isDirectory) {
-            GameExporter(withSourceMap = true).export(game, "tiny-export.zip")
-            game.resolve("tiny-export.zip")
+        val zipFile = if (gameDirectory.isDirectory) {
+            GameExporter(withSourceMap = true).export(gameDirectory, "tiny-export.zip")
+            gameDirectory.resolve("tiny-export.zip")
         } else {
-            game
+            gameDirectory
         }
 
         // Uncompressed in memory
