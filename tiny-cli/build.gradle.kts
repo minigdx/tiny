@@ -48,7 +48,7 @@ dependencies {
             "so it can be included when the game is exported.",
     )
 
-    add("ksp", project(":tiny-doc-generator")) {
+    add("ksp", project(":tiny-annotation-processors:tiny-cli-to-asciidoc-generator")) {
         because("KSP will generate the asciidoctor documentation of all Lua libs from Tiny.")
     }
 }
