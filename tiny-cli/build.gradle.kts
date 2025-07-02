@@ -95,3 +95,15 @@ project.tasks.withType(JavaExec::class.java).configureEach {
 
     classpath(jar, runtimeClasspath, externalDependencies)
 }
+
+val tinyCliApiAsciidoctor = configurations.create("tinyCliApiAsciidoctor") {
+    isCanBeResolved = false
+    isCanBeConsumed = true
+}
+
+artifacts {
+    // CLI as Asciidoctor.
+    add(tinyCliApiAsciidoctor.name, project.layout.buildDirectory.file("generated/ksp/main/resources/tiny-cli-commands.adoc")) {
+        builtBy("kspKotlin")
+    }
+}
