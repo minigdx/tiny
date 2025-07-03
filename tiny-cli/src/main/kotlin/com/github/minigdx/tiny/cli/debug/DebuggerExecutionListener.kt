@@ -102,6 +102,50 @@ class DebuggerExecutionListener(
         scriptName: String,
         line: Int,
     ) {
+        val context = getLuaContext()
+
+        engineCommandSender.send(
+            BreakpointHit(
+                script = scriptName,
+                line = line,
+                locals = context.locals,
+                upValues = context.upValues,
+            ),
+        )
+    }
+
+    private fun toggleBreakpoint(debugRemoteCommand: ToggleBreakpoint) {
+        val executionPoint = ExecutionPoint(debugRemoteCommand.script, debugRemoteCommand.line)
+        val storedBreakpoint = breakpoints[executionPoint]
+
+        if (storedBreakpoint == null) {
+            val entry =
+                executionPoint to
+                    Breakpoint(
+                        script = debugRemoteCommand.script,
+                        line = debugRemoteCommand.line,
+                        enabled = debugRemoteCommand.enabled,
+                        condition = debugRemoteCommand.condition,
+                    )
+            breakpoints = breakpoints + entry
+        } else {
+            storedBreakpoint.enabled = debugRemoteCommand.enabled
+            storedBreakpoint.condition = debugRemoteCommand.condition
+        }
+    }
+
+    /**
+     * Data class to hold Lua context information.
+     */
+    private data class LuaContext(
+        val upValues: Map<String, com.github.minigdx.tiny.cli.debug.LuaValue>,
+        val locals: Map<String, com.github.minigdx.tiny.cli.debug.LuaValue>,
+    )
+
+    /**
+     * Retrieves all relevant local and upvalues once to avoid redundant access.
+     */
+    private fun getLuaContext(): LuaContext {
         val frames = callstack(globals.running).getCallFrames()
 
         val upValues =
@@ -127,34 +171,7 @@ class DebuggerExecutionListener(
                 it.arg(1).tojstring() to formatValue(it.arg(2))
             }
 
-        engineCommandSender.send(
-            BreakpointHit(
-                script = scriptName,
-                line = line,
-                locals = locals,
-                upValues = upValues,
-            ),
-        )
-    }
-
-    private fun toggleBreakpoint(debugRemoteCommand: ToggleBreakpoint) {
-        val executionPoint = ExecutionPoint(debugRemoteCommand.script, debugRemoteCommand.line)
-        val storedBreakpoint = breakpoints[executionPoint]
-
-        if (storedBreakpoint == null) {
-            val entry =
-                executionPoint to
-                    Breakpoint(
-                        script = debugRemoteCommand.script,
-                        line = debugRemoteCommand.line,
-                        enabled = debugRemoteCommand.enabled,
-                        condition = debugRemoteCommand.condition,
-                    )
-            breakpoints = breakpoints + entry
-        } else {
-            storedBreakpoint.enabled = debugRemoteCommand.enabled
-            storedBreakpoint.condition = debugRemoteCommand.condition
-        }
+        return LuaContext(upValues, locals)
     }
 
     /**
@@ -362,20 +379,15 @@ class DebuggerExecutionListener(
         line: Int,
         errorMessage: String,
     ) {
-        // For now, we'll add this as a comment in the locals
-        // This could be enhanced to send a specific error command to the UI
-        val errorComment = "[CONDITION ERROR] $errorMessage"
-
-        // Send a breakpoint hit with the error in the locals
-        val currentLocals = mutableMapOf<String, com.github.minigdx.tiny.cli.debug.LuaValue>()
-        currentLocals["[DEBUG_CONDITION_ERROR]"] = Primitive(errorComment)
+        val context = getLuaContext()
 
         engineCommandSender.send(
             BreakpointHit(
                 script = scriptName,
                 line = line,
-                locals = currentLocals,
-                upValues = emptyMap(),
+                locals = context.locals,
+                upValues = context.upValues,
+                conditionError = errorMessage,
             ),
         )
     }

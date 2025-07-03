@@ -66,6 +66,7 @@ data class BreakpointHit(
     val line: Int,
     val locals: Map<String, LuaValue>,
     val upValues: Map<String, LuaValue>,
+    val conditionError: String? = null,
 ) : EngineRemoteCommand
 
 /**
