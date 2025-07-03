@@ -75,11 +75,9 @@ class SfxLib(
         ctrl.set("loop", loop())
         ctrl.set("stop", stop())
 
-        // TODO: a music is looping by default?
-        //       play(true) for loop instead?
-        // TODO: mplay: play music by it's index
-        //       mloop ?
-        //       mstop ?
+        ctrl.set("mplay", mplay())
+        ctrl.set("mloop", mloop())
+        ctrl.set("mstop", mstop())
 
         ctrl.set("music", music())
 
@@ -98,12 +96,14 @@ class SfxLib(
     }
 
     private data class SoundKey(val soundIndex: Int, val barIndex: Int)
+    private data class SequenceKey(val soundIndex: Int, val sequenceIndex: Int)
 
     private var currentMusic: Music? = null
     private var currentSound: Int = 0
     private var currentSequence: Int = 0
 
     private val handlers = mutableMapOf<SoundKey, SoundHandler>()
+    private val sequenceHandlers = mutableMapOf<SequenceKey, SoundHandler>()
 
     fun getCurrentMusic(): Music {
         return currentMusic ?: (resourceAccess.sound(0)?.data?.music ?: Music()).also { currentMusic = it }
@@ -593,6 +593,104 @@ class SfxLib(
             }
 
             handlers[SoundKey(currentSound, index)]?.stop() ?: return NIL
+            return NONE
+        }
+    }
+
+    @TinyFunction(
+        "Play the sequence by it's index of the current sound. " +
+            "The index of a sequence of the current music.",
+    )
+    inner class mplay : OneArgFunction() {
+        @TinyCall("Play the sequence at the index 0.")
+        override fun call(): LuaValue = super.call()
+
+        @TinyCall("Play the sequence by it's index.")
+        override fun call(
+            @TinyArg("sequence") arg: LuaValue,
+        ): LuaValue {
+            val sequences = getCurrentMusic().sequences
+            if (sequences.isEmpty()) return NIL
+
+            val index = if (arg.isnumber()) {
+                arg.checkint().coerceIn(0, sequences.size - 1)
+            } else {
+                0
+            }
+
+            if (playSound) {
+                val soundData = resourceAccess.sound(currentSound)?.data
+                val sfx = soundData?.musicalSequences?.getOrNull(index) ?: return NIL
+
+                val handler = soundData.soundManager.createSoundHandler(sfx, sfx.size.toLong())
+                sequenceHandlers[SequenceKey(currentSound, index)] = handler
+                handler.play()
+
+                return NONE
+            } else {
+                return NIL
+            }
+        }
+    }
+
+    @TinyFunction(
+        "Loop the sequence by it's index of the current sound. " +
+            "The index of a sequence of the current music.",
+    )
+    inner class mloop : OneArgFunction() {
+        @TinyCall("Loop the sequence at the index 0.")
+        override fun call(): LuaValue = super.call()
+
+        @TinyCall("Loop the sequence by it's index.")
+        override fun call(
+            @TinyArg("sequence") arg: LuaValue,
+        ): LuaValue {
+            val sequences = getCurrentMusic().sequences
+            if (sequences.isEmpty()) return NIL
+
+            val index = if (arg.isnumber()) {
+                arg.checkint().coerceIn(0, sequences.size - 1)
+            } else {
+                0
+            }
+
+            if (playSound) {
+                val soundData = resourceAccess.sound(currentSound)?.data
+                val sfx = soundData?.musicalSequences?.getOrNull(index) ?: return NIL
+
+                val handler = soundData.soundManager.createSoundHandler(sfx, sfx.size.toLong())
+                sequenceHandlers[SequenceKey(currentSound, index)] = handler
+                handler.loop()
+
+                return NONE
+            } else {
+                return NIL
+            }
+        }
+    }
+
+    @TinyFunction(
+        "Stop the sequence by it's index of the current sound. " +
+            "The index of a sequence of the current music.",
+    )
+    inner class mstop : OneArgFunction() {
+        @TinyCall("Stop the sequence at the index 0.")
+        override fun call(): LuaValue = super.call()
+
+        @TinyCall("Stop the sequence by it's index.")
+        override fun call(
+            @TinyArg("sequence") arg: LuaValue,
+        ): LuaValue {
+            val sequences = getCurrentMusic().sequences
+            if (sequences.isEmpty()) return NIL
+
+            val index = if (arg.isnumber()) {
+                arg.checkint().coerceIn(0, sequences.size - 1)
+            } else {
+                0
+            }
+
+            sequenceHandlers[SequenceKey(currentSound, index)]?.stop() ?: return NIL
             return NONE
         }
     }
