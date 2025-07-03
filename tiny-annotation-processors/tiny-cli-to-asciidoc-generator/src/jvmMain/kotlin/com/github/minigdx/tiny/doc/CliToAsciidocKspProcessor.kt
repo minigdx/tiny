@@ -378,16 +378,54 @@ class CliToAsciidocKspProcessor(
             .forEach { property ->
                 val propertyName = property.simpleName.asString()
 
-                // Check if this property uses option() by examining its type and initialization
-                val propertyString = property.toString()
+                // Read the property declaration from source code to capture chained method calls
+                val location = property.location
+                if (location is FileLocation) {
+                    try {
+                        val sourceFile = File(location.filePath)
+                        if (sourceFile.exists()) {
+                            val lines = sourceFile.readLines()
+                            val propertyLineIndex = location.lineNumber - 1
 
-                if (propertyString.contains("option(")) {
-                    // Extract help text from option(help = "...") pattern
-                    val helpPattern = """option\([^)]*help\s*=\s*"([^"]+)"""".toRegex()
-                    val helpMatch = helpPattern.find(propertyString)
-                    val helpText = helpMatch?.groupValues?.get(1)
+                            if (propertyLineIndex >= 0 && propertyLineIndex < lines.size) {
+                                // Read the complete property declaration including chained methods
+                                val propertyDeclaration = readCompletePropertyDeclaration(lines, propertyLineIndex)
 
-                    options.add(CliParameterDescriptor(propertyName, helpText))
+                                if (propertyDeclaration.contains("by option(")) {
+                                    // Extract help text from option(help = "...") pattern - handle both single and multi-line strings
+                                    val helpPattern = """option\s*\([^)]*help\s*=\s*"([^"]+(?:\s*\+\s*"[^"]*")*?)"""".toRegex()
+                                    val helpMatch = helpPattern.find(propertyDeclaration)
+                                    var helpText = helpMatch?.groupValues?.get(1)
+
+                                    // Clean up multi-line help text by removing string concatenation artifacts
+                                    helpText = helpText?.replace("""\s*\+\s*""".toRegex(), " ")?.trim()
+
+                                    // Extract default value from .default(...) pattern - improved to handle nested parentheses
+                                    val defaultValue = extractDefaultValue(propertyDeclaration)
+
+                                    // Create enhanced description including default value if present
+                                    val enhancedDescription = if (defaultValue != null) {
+                                        "${helpText ?: "No description available"} (default: $defaultValue)"
+                                    } else {
+                                        helpText
+                                    }
+
+                                    options.add(CliParameterDescriptor(propertyName, enhancedDescription))
+                                }
+                            }
+                        }
+                    } catch (e: Exception) {
+                        logger.warn("Error reading source file for property ${property.simpleName.asString()}: ${e.message}")
+
+                        // Fallback to the old method if source reading fails
+                        val propertyString = property.toString()
+                        if (propertyString.contains("option(")) {
+                            val helpPattern = """option\([^)]*help\s*=\s*"([^"]+)"""".toRegex()
+                            val helpMatch = helpPattern.find(propertyString)
+                            val helpText = helpMatch?.groupValues?.get(1)
+                            options.add(CliParameterDescriptor(propertyName, helpText))
+                        }
+                    }
                 }
             }
 
