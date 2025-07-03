@@ -120,6 +120,9 @@ class TinyDebuggerUI(
     // Store active breakpoints for each script and line
     private val activeBreakpoints: MutableSet<Pair<String, Int>> = mutableSetOf()
 
+    // Track condition error states to prevent redundant updates
+    private val breakpointConditionErrors: MutableMap<Pair<String, Int>, String?> = mutableMapOf()
+
     private val io = CoroutineScope(Dispatchers.IO)
 
     init {
@@ -183,9 +186,9 @@ class TinyDebuggerUI(
 
                             // Update visual indicator with condition error information
                             updateBreakpointVisualIndicator(
-                                command.script, 
-                                command.line, 
-                                conditionError = command.conditionError
+                                command.script,
+                                command.line,
+                                conditionError = command.conditionError,
                             )
                         }
                     }
@@ -201,6 +204,7 @@ class TinyDebuggerUI(
                             // Clear our tracking data structures
                             activeBreakpoints.clear()
                             breakpointConditions.clear()
+                            breakpointConditionErrors.clear()
 
                             // Add received breakpoints to the UI
                             command.breakpoints.forEach { breakpointInfo ->
@@ -462,6 +466,16 @@ class TinyDebuggerUI(
         val breakpointKey = Pair(scriptName, line)
         val storedCondition = condition ?: breakpointConditions[breakpointKey]
 
+        // Check if the condition error has changed to avoid redundant updates
+        val previousConditionError = breakpointConditionErrors[breakpointKey]
+        if (conditionError == previousConditionError && condition == null) {
+            // No change in condition error state, skip update
+            return
+        }
+
+        // Update the stored condition error state
+        breakpointConditionErrors[breakpointKey] = conditionError
+
         // Remove any existing condition comments from this line
         removeConditionComment(textArea, line)
 
@@ -483,7 +497,11 @@ class TinyDebuggerUI(
     /**
      * Adds a Lua comment with emoji and condition to the end of the specified line.
      */
-    private fun addConditionComment(textArea: RSyntaxTextArea, line: Int, comment: String) {
+    private fun addConditionComment(
+        textArea: RSyntaxTextArea,
+        line: Int,
+        comment: String,
+    ) {
         try {
             val lineIndex = line - 1 // Convert to 0-based index
             if (lineIndex < 0 || lineIndex >= textArea.lineCount) return
@@ -510,7 +528,10 @@ class TinyDebuggerUI(
     /**
      * Removes condition comments from the specified line.
      */
-    private fun removeConditionComment(textArea: RSyntaxTextArea, line: Int) {
+    private fun removeConditionComment(
+        textArea: RSyntaxTextArea,
+        line: Int,
+    ) {
         try {
             val lineIndex = line - 1 // Convert to 0-based index
             if (lineIndex < 0 || lineIndex >= textArea.lineCount) return
@@ -535,7 +556,10 @@ class TinyDebuggerUI(
     /**
      * Highlights the line with light yellow background for condition errors.
      */
-    private fun highlightConditionError(textArea: RSyntaxTextArea, line: Int) {
+    private fun highlightConditionError(
+        textArea: RSyntaxTextArea,
+        line: Int,
+    ) {
         try {
             val lineIndex = line - 1 // Convert to 0-based index
             if (lineIndex < 0 || lineIndex >= textArea.lineCount) return
@@ -554,7 +578,10 @@ class TinyDebuggerUI(
     /**
      * Removes condition error highlighting from the specified line.
      */
-    private fun removeConditionErrorHighlight(textArea: RSyntaxTextArea, line: Int) {
+    private fun removeConditionErrorHighlight(
+        textArea: RSyntaxTextArea,
+        line: Int,
+    ) {
         try {
             val lineIndex = line - 1 // Convert to 0-based index
             if (lineIndex < 0 || lineIndex >= textArea.lineCount) return
