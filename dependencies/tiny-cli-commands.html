@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.10">
-<title>Tiny CLI</title>
+<title>Tiny CLI Commands</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /* Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -441,462 +441,471 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_tiny_cli">Tiny CLI</h2>
+<h2 id="_tiny_cli_commands">Tiny CLI Commands</h2>
 <div class="sectionbody">
-<div class="paragraph">
-<p>The Tiny CLI is a powerful command-line interface that makes it easy to create, run, develop, and export games using the Tiny 2D game engine. With the Tiny CLI, you can quickly create new game projects, add assets, and start developing your games right away.</p>
-</div>
-<div class="paragraph">
-<p>To get started, simply install the Tiny CLI on your system and create a new project using the <code>tiny-cli create</code> command. This will generate a new project directory with all the necessary files and folder structure to start building your game. You can then add assets to your game using the <code>tiny-cli add</code> command, which allows you to import images, audio files, and other resources into your project.</p>
-</div>
-<div class="paragraph">
-<p>The Tiny CLI also includes a powerful development server that allows you to preview your game in real-time as you develop it. Simply run the <code>tiny-cli</code> command to start developing and updating your game.</p>
-</div>
-<div class="paragraph">
-<p>The Tiny CLI includes the <code>tiny-cli debug</code> command, which starts a debugging tool. Connect it to your running game to set breakpoints and examine variables. As with typical debuggers, you can resume execution or step through your code line by line.</p>
-</div>
-<div class="paragraph">
-<p>When you&#8217;re ready to share your game with the world, the Tiny CLI makes it easy to export your game for web browsers. You can use the <code>tiny-cli export</code> command to generate a distributable version of your game that can be published on the web. You can also try the <code>export</code> result by using the command <code>tiny-cli serve</code>.</p>
-</div>
-<div class="paragraph">
-<p>Whether you&#8217;re a seasoned game developer or just getting started, the Tiny CLI is a powerful tool that can help you create, run, develop, and export amazing 2D games with the Tiny engine. With its intuitive command-line interface and powerful features, the Tiny CLI is the ultimate tool for building your next great game.</p>
-</div>
-<div class="sect2">
-<h3 id="_the_tiny_cli_create_command">the <code>tiny-cli create</code> command</h3>
-<div class="paragraph">
-<p>The <code>tiny-cli create</code> command is a helpful tool for creating new games for the tiny game engine. This command allows you to easily create a new game by prompting you for a few details about the game you want to create.</p>
-</div>
 <div class="sect3">
-<h4 id="_usage">Usage</h4>
+<h4 id="_add">add</h4>
 <div class="paragraph">
-<p>To use the <code>tiny-cli create</code> command, open your terminal and type the following command:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">tiny-cli create</code></pre>
-</div>
+<p>Add a resource to your game.</p>
 </div>
 <div class="paragraph">
-<p>This will launch the game creation process and prompt you to enter a name for your new game, along with other parameters to configure it.</p>
+<p><strong>Arguments:</strong></p>
 </div>
-</div>
-<div class="sect3">
-<h4 id="_creating_a_new_game">Creating a New Game</h4>
-<div class="paragraph">
-<p>To create a new game using the <code>tiny-cli create</code> command, follow these steps:</p>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>Open your terminal and navigate to the directory where you want to create your new game.</p>
-</li>
-<li>
-<p>Type the following command and press Enter: <code>tiny-cli create</code></p>
-</li>
-<li>
-<p>Follow the prompts to enter a name for your new game and configure other parameters such as the game&#8217;s screen resolution, background color, and more.</p>
-</li>
-<li>
-<p>Once you have entered all the required information, the <code>tiny-cli create</code> command will create a new folder with the name of your game in the current directory.</p>
-</li>
-<li>
-<p>You can now open this folder and begin developing your new game using the tiny game engine.</p>
-</li>
-</ol>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_running_your_game">Running Your Game</h4>
-<div class="paragraph">
-<p>To run your newly created game, use the <code>tiny-cli</code> command followed by the name of your game&#8217;s folder. For example:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">tiny-cli run my-game</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This will launch your game and allow you to begin testing and refining your gameplay mechanics.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_adding_resources">Adding Resources</h4>
-<div class="paragraph">
-<p>You can also add resources such as images, sounds, and other assets to your game using the <code>tiny-cli add</code> command. For more information on how to use this command, please refer to the associated documentation.</p>
-</div>
-<div class="admonitionblock tip">
-<table>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
 <tr>
-<td class="icon">
-<div class="title">Tip</div>
-</td>
-<td class="content">
-With the <code>tiny-cli create</code> command, you can quickly and easily create new games for the tiny game engine, giving you the flexibility and control you need to bring your game ideas to life.
-</td>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
 </tr>
-</table>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_the_tiny_cli_run_command">The <code>tiny-cli run</code> command</h3>
-<div class="paragraph">
-<p>The <code>tiny-cli run</code> command is a command line tool for running and testing your tiny game. This command takes only one parameter: the path to the directory containing your game&#8217;s assets and <code>_tiny.json</code> file.</p>
-</div>
-<div class="sect3">
-<h4 id="_usage_2">Usage</h4>
-<div class="paragraph">
-<p>To use the <code>tiny-cli run</code> command, open your terminal and type the following command:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">tiny-cli run &lt;game folder&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>where <code>&lt;game folder&gt;</code> is the path to the directory containing your game&#8217;s assets and <code>_tiny.json</code> file.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_running_a_game">Running a Game</h4>
-<div class="paragraph">
-<p>To run your game using the <code>tiny-cli run</code> command, follow these steps:</p>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>Open your terminal and navigate to the directory where your game&#8217;s <code>_tiny.json</code> file is located.</p>
-</li>
-<li>
-<p>Type the following command and press Enter, replacing <code>&lt;game folder&gt;</code> with the path to your game&#8217;s folder: <code>tiny-cli run &lt;game folder&gt;</code></p>
-</li>
-<li>
-<p>The <code>tiny-cli</code> command will start your game and display it in a new window.</p>
-</li>
-<li>
-<p>If you make changes to your game&#8217;s Lua scripts or update any spritesheets, the game will automatically reload to use the latest version of those resources.</p>
-</li>
-</ol>
-</div>
-<div class="paragraph">
-<p>With the <code>tiny-cli run</code> command, you can quickly test and run your tiny game, making it easy to iterate and refine your game as you develop it.</p>
-</div>
-<div class="admonitionblock tip">
-<table>
+</thead>
+<tbody>
 <tr>
-<td class="icon">
-<div class="title">Tip</div>
-</td>
-<td class="content">
-Using <code>tiny-cli run</code>, You can press Ctrl + R (or ⌘ + R) to record a GIF of the last 8 seconds of your game or Ctrl + S (or ⌘ + S) to take a screenshot.
-</td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">gameDirectory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The directory containing all game information. (default: File("."))</p></td>
 </tr>
-</table>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_the_tiny_cli_add_command">The <code>tiny-cli add</code> command</h3>
-<div class="paragraph">
-<p>The <code>tiny-cli add</code> command allows you to quickly and easily add new spritesheets, sounds, and other assets to your game, making it easy to customize and improve your game&#8217;s functionality.</p>
-</div>
-<div class="sect3">
-<h4 id="_usage_3">Usage</h4>
-<div class="paragraph">
-<p>To use the <code>tiny-cli add</code> command, simply open your terminal and type the following command:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">tiny-cli add &lt;resource&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>where <code>&lt;resource&gt;</code> is the path to the resource you want to add to your game. The resource can be a png file (which will be added as a spritesheet), a midi file (which will be added as a sound), or any other asset that can be used in the tiny game engine.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_adding_a_resource">Adding a Resource</h4>
-<div class="paragraph">
-<p>To add a resource to your game using the <code>tiny-cli add</code> command, follow these steps:</p>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>Open your terminal and navigate to the directory where your game&#8217;s <code>_tiny.json</code> file is located.</p>
-</li>
-<li>
-<p>Type the following command and press Enter, replacing <code>&lt;resource&gt;</code> with the path to the resource you want to add: <code>tiny-cli add &lt;resource&gt;</code></p>
-</li>
-<li>
-<p>The <code>tiny-cli add</code> command will automatically detect the type of resource you are adding and add it to your game accordingly. For example, if you add a png file, it will be added as a spritesheet.</p>
-</li>
-<li>
-<p>The added resource will be reflected in the <code>_tiny.json</code> file in the <code>"spritesheets"</code>, <code>"sounds"</code>, or <code>"levels"</code> array, depending on the type of resource you added.</p>
-</li>
-</ol>
-</div>
-<div class="admonitionblock warning">
-<table>
 <tr>
-<td class="icon">
-<div class="title">Warning</div>
-</td>
-<td class="content">
-Note that the added resource is not automatically copied to your game&#8217;s folder and needs to be in the same directory as the <code>_tiny.json</code> file.
-</td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">resources</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The resource to add to the game. The kind of resource will be deducted from the file extension.</p></td>
 </tr>
+</tbody>
 </table>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua"># Usage
+tiny-cli add &lt;gameDirectory&gt; &lt;resources&gt;</code></pre>
+</div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_editing_the_tiny_json_file">Editing the <code>_tiny.json</code> File</h4>
+<h4 id="_create">create</h4>
 <div class="paragraph">
-<p>Alternatively, you can also manually add resources to your game by editing the <code>_tiny.json</code> file directly. Simply open the file in a text editor and add the resource to the appropriate array.</p>
-</div>
-<div class="paragraph">
-<p>With the <code>tiny-cli add</code> command, you can easily add new resources to your game and customize its functionality and appearance. Whether you are adding new spritesheets, sounds, or fonts, this command makes it easy to create the game of your dreams with the tiny game engine.</p>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_the_tiny_cli_debug_command">The <code>tiny-cli debug</code> command</h3>
-<div class="paragraph">
-<p>The <code>tiny-cli debug</code> command is a debug tool to debug the current game.</p>
-</div>
-<div class="sect3">
-<h4 id="_usage_4">Usage</h4>
-<div class="paragraph">
-<p>To use the <code>tiny-cli debug</code> command, simply open your terminal and type the following command:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">tiny-cli debug &lt;game folder&gt;</code></pre>
-</div>
+<p>Create a new game with the help of a wizard 🧙.</p>
 </div>
 <div class="paragraph">
-<p>where <code>&lt;game folder&gt;</code> is the path to the directory containing your game&#8217;s assets and <code>_tiny.json</code> file.</p>
+<p><strong>Arguments:</strong></p>
 </div>
-<div class="paragraph">
-<p><span class="image"><img src="sample/tiny-cli-debug.png" alt="tiny cli debug"></span></p>
-</div>
-<div class="paragraph">
-<p>Clicking in the editor&#8217;s gutter adds a breakpoint, indicated by a red flag. When execution reaches a breakpoint, it pauses the execution, displaying variables within that context. Use the buttons above the variable display to resume execution or step through code line by line.</p>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_the_tiny_cli_palette_command">the <code>tiny-cli palette</code> command</h3>
-<div class="paragraph">
-<p>The tiny-cli palette command is used to extract a color palette from an image to use it in your <code>🧸 Tiny</code> game. This command provides an easy way to use colors from an image as your game&#8217;s palette color.</p>
-</div>
-<div class="sect3">
-<h4 id="_usage_5">Usage</h4>
-<div class="paragraph">
-<p>To use the <code>tiny-cli palette</code> command, follow the syntax:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">tiny-cli palette &lt;image_name&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>For example:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">tiny-cli palette my_palette.png</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This command will replace your game palette with the palette extracted from the file.</p>
-</div>
-<div class="paragraph">
-<p>You might want to check beforehand which palette will be extracted from the image using the flag <code>--print</code>:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">tiny-cli palette --print my_palette.png</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>If, instead of replacing your game&#8217;s color palette,
-the flag <code>--append</code> can help you to append colors in your game&#8217;s palette
-instead of replacing it:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">tiny-cli palette --append my_palette.png</code></pre>
-</div>
-</div>
-<div class="admonitionblock note">
-<table>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
 <tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">
-Only colors that are not already in your game&#8217;s palette will be appended to not mess with color index.
-</td>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
 </tr>
-</table>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_the_tiny_cli_export_command">The <code>tiny-cli export</code> command</h3>
-<div class="paragraph">
-<p>The <code>tiny-cli export</code> command is a tool for exporting your tiny game to a zip file, which includes all the assets needed to run the game in a browser. This command makes it easy to distribute your game and share it with others.</p>
-</div>
-<div class="sect3">
-<h4 id="_usage_6">Usage</h4>
-<div class="paragraph">
-<p>To use the <code>tiny-cli export</code> command, simply open your terminal and type the following command:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">tiny-cli export &lt;game folder&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>where <code>&lt;game folder&gt;</code> is the path to the folder containing your game&#8217;s assets and <code>_tiny.json</code> file.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_exporting_a_game">Exporting a Game</h4>
-<div class="paragraph">
-<p>To export your game using the <code>tiny-cli export</code> command, follow these steps:</p>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>Open your terminal and navigate to the directory where your game&#8217;s <code>_tiny.json</code> file is located.</p>
-</li>
-<li>
-<p>Type the following command and press Enter, replacing <code>&lt;game folder&gt;</code> with the path to your game&#8217;s folder: <code>tiny-cli export &lt;game folder&gt;</code></p>
-</li>
-<li>
-<p>The <code>tiny-cli export</code> command will generate a zip file containing all the assets needed to run your game in a browser.</p>
-</li>
-<li>
-<p>The generated zip file will be saved in the same directory as the <code>_tiny.json</code> file with the name <code>&lt;game folder&gt;.zip</code>.</p>
-</li>
-<li>
-<p>You can now upload the generated zip file to a game hosting platform like itch.io to share your game with others.</p>
-</li>
-<li>
-<p>To run the exported game in a browser, use the <code>tiny-cli serve</code> command, which will serve the game from a local server. Type the following command and press Enter: <code>tiny-cli serve &lt;game folder&gt;.zip</code></p>
-</li>
-<li>
-<p>Open your browser and navigate to <code><a href="http://localhost:8080" class="bare">http://localhost:8080</a></code> to play the exported game.</p>
-</li>
-</ol>
-</div>
-<div class="paragraph">
-<p>With the <code>tiny-cli export</code> command, you can easily export your tiny game and share it with others. Whether you want to distribute your game on itch.io or share it with friends, this command makes it easy to package your game and get it into the hands of others.</p>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_the_tiny_cli_serve_command">the <code>tiny-cli serve</code> command</h3>
-<div class="paragraph">
-<p>The <code>tiny-cli serve</code> command is used to launch a local web server that allows you to test a game that has been exported using the <code>tiny-cli export</code> command. This is useful for testing and debugging a game locally before publishing it online.</p>
-</div>
-<div class="sect3">
-<h4 id="_syntax">Syntax</h4>
-<div class="paragraph">
-<p>To use the <code>tiny-cli serve</code> command, open a terminal or command prompt and navigate to the directory containing the exported game zip file. Then, type the following command:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">tiny-cli serve [options] game.zip</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Where:</p>
-</div>
-<div class="paragraph">
-<p><code>[options]</code>: Optional arguments to modify the behavior of the command.
-<code>game.zip</code>: The path to the exported game zip file.</p>
-</div>
-<div class="sect4">
-<h5 id="_options">Options</h5>
-<div class="paragraph">
-<p><code>--port [port number]</code>: Allows you to specify a custom port number to run the server on. The default port number is 8080.</p>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_usage_7">Usage</h4>
-<div class="paragraph">
-<p>To run the <code>tiny-cli serve</code> command, you can use the following examples:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">tiny-cli serve myGame.zip</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This will launch the local web server on the default port number (<code>8080</code>) and serve the game located in the <code>myGame.zip</code> file.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">tiny-cli serve MyGame.zip --port 8081</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This will launch the local web server on port number <code>8081</code> and serve the game located in the <code>MyGame.zip</code> file.</p>
-</div>
-<div class="paragraph">
-<p>Once the server is running, you can access the game in your web browser by navigating to the URL <code><a href="http://localhost:">port number</a>/</code>. For example, if you used the default port number, you would navigate to <code><a href="http://localhost:8080/" class="bare">http://localhost:8080/</a></code> in your web browser to access the game.</p>
-</div>
-<div class="admonitionblock note">
-<table>
+</thead>
+<tbody>
 <tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">
-The <code>tiny-cli serve</code> command is intended for local testing only and should not be used to serve your game online. When you are ready to publish your game, you should upload the exported game files to a web server and serve them from there.
-</td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">gameDirectory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The directory containing all game information (default: File("."))</p></td>
 </tr>
+</tbody>
 </table>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_the_tiny_cli_sfx_command">the <code>tiny-cli sfx</code> command</h3>
 <div class="paragraph">
-<p>The tiny-cli sfx command is used to start a SFX editor to generate sound to use in your <code>🧸 Tiny</code> game.</p>
+<p><strong>Options:</strong></p>
 </div>
-<div class="paragraph">
-<p><a href="https://dwursteisen.itch.io/tiny-sfx-editor">This SFX editor can be tried online</a> on itch.io.</p>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--gameName</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">🏷 The name of the game</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--gameResolution</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">🖥 The game resolution (e.g., 800x600)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--gameScript</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">📝 Name of the default game script</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--spriteSize</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">📐 The sprite size (e.g., 16x16)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--zoom</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">🔍 Game zoom</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--spritesheets</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">🖼️ The filenames of the sprite sheets, separated by a comma (e.g., file1.png, file2.png)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--palette</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">🎨 The Color palette to use</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--hideMouseCursor</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">🖱️ Hide system cursor mouse</p></td>
+</tr>
+</tbody>
+</table>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua"># Usage
+tiny-cli create &lt;gameDirectory&gt; [options]</code></pre>
 </div>
-<div class="paragraph">
-<p><span class="image"><img src="sample/tiny-cli-sfx1.gif" alt="tiny cli sfx1"></span></p>
 </div>
-<div class="paragraph">
-<p><span class="image"><img src="sample/tiny-cli-sfx0.gif" alt="tiny cli sfx0"></span></p>
 </div>
 <div class="sect3">
-<h4 id="_usage_8">Usage</h4>
+<h4 id="_debug">debug</h4>
 <div class="paragraph">
-<p>To use the <code>tiny-cli sfx</code> command, follow the syntax:</p>
+<p>Debug the current game</p>
 </div>
+<div class="paragraph">
+<p><strong>Arguments:</strong></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">gameDirectory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The directory containing all game information. (default: File("."))</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Options:</strong></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--debug</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Debug port used by the game. (default: 8081)</p></td>
+</tr>
+</tbody>
+</table>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">tiny-cli sfx</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua"># Usage
+tiny-cli debug &lt;gameDirectory&gt; [options]</code></pre>
 </div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_export">export</h4>
+<div class="paragraph">
+<p>Export your game for web or desktop platforms.</p>
 </div>
 <div class="paragraph">
-<p>The command can be used to edit sounds used by your <code>🧸 Tiny</code> game.</p>
+<p><strong>Arguments:</strong></p>
 </div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">gameDirectory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The directory containing all game information (default: File("."))</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Options:</strong></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--platform</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Target platform (default: "web")</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--archive</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the exported archive (web only) (default: "tiny-export.zip")</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--outputDirectory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Output directory for the exported application (desktop only) (default: File("exported-game"))</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--desktopPlatform</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Target desktop platform (default: "current")</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--includeJdk</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Include JDK in the package (requires jpackage, desktop only)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--appName</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Application name (defaults to game name, desktop only)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--appVersion</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Application version (desktop only) (default: "1.0.0")</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--debug</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Debug the game (desktop only)</p></td>
+</tr>
+</tbody>
+</table>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">tiny-cli sfx &lt;game&gt;</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua"># Usage
+tiny-cli export &lt;gameDirectory&gt; [options]</code></pre>
 </div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_palette">palette</h4>
+<div class="paragraph">
+<p>Extract the color palette from an image.</p>
 </div>
 <div class="paragraph">
-<p>The editor will be run with all SFX sounds from your game loaded.</p>
+<p><strong>Arguments:</strong></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">gameDirectory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The directory containing your game to be update. (default: File("."))</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">image</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The image used to extract the palette.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Options:</strong></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--append</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Append, instead of replacing, the palette information in the game file.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--print</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Print in the console the palette information, without updating the game.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua"># Usage
+tiny-cli palette &lt;gameDirectory&gt; &lt;image&gt; [options]</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_run">run</h4>
+<div class="paragraph">
+<p>Run your game.</p>
+</div>
+<div class="paragraph">
+<p><strong>Arguments:</strong></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">gameDirectory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The directory containing your game to be run. (default: File("."))</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Options:</strong></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--test</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Run tests before running the game.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--debug</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Port used for debugging (default: 8081)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--macFromJpackage</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No description</p></td>
+</tr>
+</tbody>
+</table>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua"># Usage
+tiny-cli run &lt;gameDirectory&gt; [options]</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_serve">serve</h4>
+<div class="paragraph">
+<p>Run your game as a web game, by default on <a href="http://localhost:8080" class="bare">http://localhost:8080</a>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Arguments:</strong></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">gameDirectory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The game to serve by an embedded web server. (default: File("."))</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Options:</strong></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--port</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Port of the local webserver. (default: 8080)</p></td>
+</tr>
+</tbody>
+</table>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua"># Usage
+tiny-cli serve &lt;gameDirectory&gt; [options]</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_sfx">sfx</h4>
+<div class="paragraph">
+<p>Start the SFX Editor</p>
+</div>
+<div class="paragraph">
+<p><strong>Arguments:</strong></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">filename</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The sound file to create/edit</p></td>
+</tr>
+</tbody>
+</table>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua"># Usage
+tiny-cli sfx &lt;filename&gt;</code></pre>
 </div>
 </div>
 </div>
@@ -905,8 +914,8 @@ The <code>tiny-cli serve</code> command is intended for local testing only and s
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 1.4.0-alpha2<br>
-Last updated 2025-06-28 22:11:30 UTC
+Version 1.4.0-alpha3<br>
+Last updated 2025-07-03 14:30:08 UTC
 </div>
 </div>
 </body>

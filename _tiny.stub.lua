@@ -480,6 +480,18 @@ sfx.loop = function() end
 --- @overload fun(): any -- Stop the sound at the index 0.
 --- @overload fun(sound: any): any -- Stop the sound by it's index.
 sfx.stop = function() end
+--- Play the sequence by it's index of the current sound. The index of a sequence of the current music.
+--- @overload fun(): any -- Play the sequence at the index 0.
+--- @overload fun(sequence: any): any -- Play the sequence by it's index.
+sfx.mplay = function() end
+--- Loop the sequence by it's index of the current sound. The index of a sequence of the current music.
+--- @overload fun(): any -- Loop the sequence at the index 0.
+--- @overload fun(sequence: any): any -- Loop the sequence by it's index.
+sfx.mloop = function() end
+--- Stop the sequence by it's index of the current sound. The index of a sequence of the current music.
+--- @overload fun(): any -- Stop the sequence at the index 0.
+--- @overload fun(sequence: any): any -- Stop the sequence by it's index.
+sfx.mstop = function() end
 
 
 --- Shape API to draw...shapes. Those shapes can be circle, rectangle, line or oval.All shapes can be draw filed or not filed.

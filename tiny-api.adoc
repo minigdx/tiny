@@ -2947,6 +2947,36 @@ sfx.stop(sound) -- Stop the sound by it's index.
 ```
 
 
+==== sfx.mplay()
+
+Play the sequence by it's index of the current sound. The index of a sequence of the current music.
+
+```lua
+sfx.mplay() -- Play the sequence at the index 0.
+sfx.mplay(sequence) -- Play the sequence by it's index.
+```
+
+
+==== sfx.mloop()
+
+Loop the sequence by it's index of the current sound. The index of a sequence of the current music.
+
+```lua
+sfx.mloop() -- Loop the sequence at the index 0.
+sfx.mloop(sequence) -- Loop the sequence by it's index.
+```
+
+
+==== sfx.mstop()
+
+Stop the sequence by it's index of the current sound. The index of a sequence of the current music.
+
+```lua
+sfx.mstop() -- Stop the sequence at the index 0.
+sfx.mstop(sequence) -- Stop the sequence by it's index.
+```
+
+
 
 === shape
 
