@@ -102,6 +102,50 @@ class DebuggerExecutionListener(
         scriptName: String,
         line: Int,
     ) {
+        val context = getLuaContext()
+
+        engineCommandSender.send(
+            BreakpointHit(
+                script = scriptName,
+                line = line,
+                locals = context.locals,
+                upValues = context.upValues,
+            ),
+        )
+    }
+
+    private fun toggleBreakpoint(debugRemoteCommand: ToggleBreakpoint) {
+        val executionPoint = ExecutionPoint(debugRemoteCommand.script, debugRemoteCommand.line)
+        val storedBreakpoint = breakpoints[executionPoint]
+
+        if (storedBreakpoint == null) {
+            val entry =
+                executionPoint to
+                    Breakpoint(
+                        script = debugRemoteCommand.script,
+                        line = debugRemoteCommand.line,
+                        enabled = debugRemoteCommand.enabled,
+                        condition = debugRemoteCommand.condition,
+                    )
+            breakpoints = breakpoints + entry
+        } else {
+            storedBreakpoint.enabled = debugRemoteCommand.enabled
+            storedBreakpoint.condition = debugRemoteCommand.condition
+        }
+    }
+
+    /**
+     * Data class to hold Lua context information.
+     */
+    private data class LuaContext(
+        val upValues: Map<String, com.github.minigdx.tiny.cli.debug.LuaValue>,
+        val locals: Map<String, com.github.minigdx.tiny.cli.debug.LuaValue>,
+    )
+
+    /**
+     * Retrieves all relevant local and upvalues once to avoid redundant access.
+     */
+    private fun getLuaContext(): LuaContext {
         val frames = callstack(globals.running).getCallFrames()
 
         val upValues =
@@ -127,34 +171,7 @@ class DebuggerExecutionListener(
                 it.arg(1).tojstring() to formatValue(it.arg(2))
             }
 
-        engineCommandSender.send(
-            BreakpointHit(
-                script = scriptName,
-                line = line,
-                locals = locals,
-                upValues = upValues,
-            ),
-        )
-    }
-
-    private fun toggleBreakpoint(debugRemoteCommand: ToggleBreakpoint) {
-        val executionPoint = ExecutionPoint(debugRemoteCommand.script, debugRemoteCommand.line)
-        val storedBreakpoint = breakpoints[executionPoint]
-
-        if (storedBreakpoint == null) {
-            val entry =
-                executionPoint to
-                    Breakpoint(
-                        script = debugRemoteCommand.script,
-                        line = debugRemoteCommand.line,
-                        enabled = debugRemoteCommand.enabled,
-                        condition = debugRemoteCommand.condition,
-                    )
-            breakpoints = breakpoints + entry
-        } else {
-            storedBreakpoint.enabled = debugRemoteCommand.enabled
-            storedBreakpoint.condition = debugRemoteCommand.condition
-        }
+        return LuaContext(upValues, locals)
     }
 
     /**
@@ -362,37 +379,14 @@ class DebuggerExecutionListener(
         line: Int,
         errorMessage: String,
     ) {
-        val frames = callstack(globals.running).getCallFrames()
-
-        val upValues =
-            frames.flatMap { frame ->
-                val upValues = (frame.f as? LuaClosure)?.upValues ?: emptyArray()
-                val upValuesDesc = (frame.f as? LuaClosure)?.p?.upvalues ?: emptyArray()
-
-                upValues.zip(upValuesDesc) { value, name ->
-                    val upValueName = name.name?.tojstring() ?: ""
-                    val upValueValue = value?.value ?: LuaValue.NIL
-                    upValueName to upValueValue
-                }
-                    // Skip the _ENV upvalue
-                    .filterNot { (name, _) -> name == "_ENV" }
-            }.toMap()
-                .mapValues { (_, value) -> formatValue(value) }
-
-        val locals =
-            frames.flatMap {
-                it.getLocals()
-            }.associate {
-                // name to value
-                it.arg(1).tojstring() to formatValue(it.arg(2))
-            }
+        val context = getLuaContext()
 
         engineCommandSender.send(
             BreakpointHit(
                 script = scriptName,
                 line = line,
-                locals = locals,
-                upValues = upValues,
+                locals = context.locals,
+                upValues = context.upValues,
                 conditionError = errorMessage,
             ),
         )
