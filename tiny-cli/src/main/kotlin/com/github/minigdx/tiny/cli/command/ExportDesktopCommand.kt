@@ -9,6 +9,7 @@ import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.choice
 import com.github.ajalt.clikt.parameters.types.file
+import com.github.mingdx.tiny.doc.CliAnnotation
 import com.github.minigdx.tiny.cli.config.GameParameters
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
@@ -17,6 +18,7 @@ import java.io.FileInputStream
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
+@CliAnnotation(hidden = true)
 class ExportDesktopCommand : CliktCommand(name = "export-desktop") {
     val gameDirectory by argument(help = "The directory containing all game information")
         .file(mustExist = true, canBeDir = true, canBeFile = false)

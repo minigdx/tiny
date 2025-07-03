@@ -27,6 +27,7 @@ dependencies {
     implementation(libs.jna)
     implementation(libs.rsyntax)
 
+    implementation(project(":tiny-doc-annotations"))
     implementation(project(":tiny-engine", "jvmRuntimeElements"))!!
         .because("Depends on the JVM Jar containing commons resources in the JAR.")
 

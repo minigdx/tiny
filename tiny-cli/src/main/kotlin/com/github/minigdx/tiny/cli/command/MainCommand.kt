@@ -2,7 +2,9 @@ package com.github.minigdx.tiny.cli.command
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.subcommands
+import com.github.mingdx.tiny.doc.CliAnnotation
 
+@CliAnnotation(hidden = true)
 class MainCommand : CliktCommand() {
     init {
         subcommands(

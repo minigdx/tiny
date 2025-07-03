@@ -48,7 +48,7 @@ include::tiny-tutorial.adoc[]
 
 include::tiny-showcase.adoc[]
 
-include::tiny-cli.adoc[]
+include::dependencies/tiny-cli-commands.adoc[]
 
 include::dependencies/tiny-api.adoc[]
 

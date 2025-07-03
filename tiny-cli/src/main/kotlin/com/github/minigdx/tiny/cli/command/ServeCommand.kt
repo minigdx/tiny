@@ -28,7 +28,7 @@ class ServeCommand : CliktCommand(name = "serve") {
         .int()
         .default(8080)
 
-    private val gameDirectory by argument(help = "The game to serve by an embedded web server.",)
+    private val gameDirectory by argument(help = "The game to serve by an embedded web server.")
         .file(mustExist = true, canBeDir = true, canBeFile = true)
         .default(File("."))
 

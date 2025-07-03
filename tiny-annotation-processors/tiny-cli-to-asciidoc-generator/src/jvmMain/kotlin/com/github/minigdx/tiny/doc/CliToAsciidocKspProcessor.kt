@@ -1,5 +1,8 @@
 package com.github.minigdx.tiny.doc
 
+import com.github.mingdx.tiny.doc.CliAnnotation
+import com.google.devtools.ksp.KspExperimental
+import com.google.devtools.ksp.getAnnotationsByType
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
@@ -16,6 +19,7 @@ class CliToAsciidocKspProcessor(
 ) : SymbolProcessor {
     val logger = env.logger
 
+    @OptIn(KspExperimental::class)
     override fun process(resolver: Resolver): List<KSAnnotated> {
         // Skip last KSP round. Everything should be done in one round
         resolver.getNewFiles().firstOrNull() ?: return emptyList()
@@ -30,8 +34,8 @@ class CliToAsciidocKspProcessor(
                     superType.resolve().declaration.qualifiedName?.asString() == "com.github.ajalt.clikt.core.CliktCommand"
                 }
             }
-            // Skip the main command. As it does't contains any relevant information.
-            .filterNot { classDecl -> classDecl.simpleName.asString().contains("MainCommand")}
+            // Skip commands to be hidden
+            .filterNot { classDecl -> classDecl.getAnnotationsByType(CliAnnotation::class).any { it.hidden } }
             .toList()
 
         if (cliktCommandClasses.isEmpty()) {
@@ -62,7 +66,7 @@ class CliToAsciidocKspProcessor(
 
         val result = asciidoc {
             title = "Tiny CLI Commands"
-            section("Commands", "Available commands for the Tiny CLI tool.") {
+            section {
                 commands.forEach { command ->
                     lib(command.name ?: command.className) {
                         paragraph(command.description ?: "No description available.")
