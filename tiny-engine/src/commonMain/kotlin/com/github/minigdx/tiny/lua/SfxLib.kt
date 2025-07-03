@@ -96,6 +96,7 @@ class SfxLib(
     }
 
     private data class SoundKey(val soundIndex: Int, val barIndex: Int)
+
     private data class SequenceKey(val soundIndex: Int, val sequenceIndex: Int)
 
     private var currentMusic: Music? = null
