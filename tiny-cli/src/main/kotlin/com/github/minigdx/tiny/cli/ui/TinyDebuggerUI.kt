@@ -180,6 +180,13 @@ class TinyDebuggerUI(
                             command.upValues.forEach { (name, value) ->
                                 addValueToTable(name, value)
                             }
+
+                            // Update visual indicator with condition error information
+                            updateBreakpointVisualIndicator(
+                                command.script, 
+                                command.line, 
+                                conditionError = command.conditionError
+                            )
                         }
                     }
 
@@ -210,6 +217,9 @@ class TinyDebuggerUI(
                                     breakpointInfo.condition?.let { condition ->
                                         breakpointConditions[breakpointKey] = condition
                                     }
+
+                                    // Restore visual indicator for conditional breakpoints
+                                    updateBreakpointVisualIndicator(breakpointInfo.script, breakpointInfo.line)
                                 }
                             }
                         }
@@ -445,12 +455,134 @@ class TinyDebuggerUI(
     private fun updateBreakpointVisualIndicator(
         scriptName: String,
         line: Int,
+        condition: String? = null,
+        conditionError: String? = null,
     ) {
         val textArea = textAreas[scriptName] ?: return
-        val hasCondition = breakpointConditions.containsKey(Pair(scriptName, line))
+        val breakpointKey = Pair(scriptName, line)
+        val storedCondition = condition ?: breakpointConditions[breakpointKey]
 
-        // TODO: Update breakpoint icon color based on condition
-        // This would require creating different colored icons for conditional breakpoints
+        // Remove any existing condition comments from this line
+        removeConditionComment(textArea, line)
+
+        // Remove any existing background highlighting for condition errors
+        removeConditionErrorHighlight(textArea, line)
+
+        if (storedCondition != null) {
+            if (conditionError != null) {
+                // Condition evaluation failed - use boom emoji and highlight background
+                addConditionComment(textArea, line, "💥 $storedCondition (error: $conditionError)")
+                highlightConditionError(textArea, line)
+            } else {
+                // Condition is valid - use bug emoji
+                addConditionComment(textArea, line, "🐛 $storedCondition")
+            }
+        }
+    }
+
+    /**
+     * Adds a Lua comment with emoji and condition to the end of the specified line.
+     */
+    private fun addConditionComment(textArea: RSyntaxTextArea, line: Int, comment: String) {
+        try {
+            val lineIndex = line - 1 // Convert to 0-based index
+            if (lineIndex < 0 || lineIndex >= textArea.lineCount) return
+
+            val lineStart = textArea.getLineStartOffset(lineIndex)
+            val lineEnd = textArea.getLineEndOffset(lineIndex)
+            val lineText = textArea.getText(lineStart, lineEnd - lineStart)
+
+            // Check if line already has our condition comment
+            if (lineText.contains("-- 🐛") || lineText.contains("-- 💥")) {
+                return // Comment already exists
+            }
+
+            // Remove trailing newline if present
+            val cleanLineText = lineText.trimEnd('\n', '\r')
+            val newLineText = "$cleanLineText -- $comment\n"
+
+            textArea.replaceRange(newLineText, lineStart, lineEnd)
+        } catch (e: BadLocationException) {
+            // Ignore if line doesn't exist
+        }
+    }
+
+    /**
+     * Removes condition comments from the specified line.
+     */
+    private fun removeConditionComment(textArea: RSyntaxTextArea, line: Int) {
+        try {
+            val lineIndex = line - 1 // Convert to 0-based index
+            if (lineIndex < 0 || lineIndex >= textArea.lineCount) return
+
+            val lineStart = textArea.getLineStartOffset(lineIndex)
+            val lineEnd = textArea.getLineEndOffset(lineIndex)
+            val lineText = textArea.getText(lineStart, lineEnd - lineStart)
+
+            // Remove condition comments (both bug and boom emojis)
+            val cleanedText = lineText
+                .replace(Regex("\\s*-- 🐛[^\\n\\r]*"), "")
+                .replace(Regex("\\s*-- 💥[^\\n\\r]*"), "")
+
+            if (cleanedText != lineText) {
+                textArea.replaceRange(cleanedText, lineStart, lineEnd)
+            }
+        } catch (e: BadLocationException) {
+            // Ignore if line doesn't exist
+        }
+    }
+
+    /**
+     * Highlights the line with light yellow background for condition errors.
+     */
+    private fun highlightConditionError(textArea: RSyntaxTextArea, line: Int) {
+        try {
+            val lineIndex = line - 1 // Convert to 0-based index
+            if (lineIndex < 0 || lineIndex >= textArea.lineCount) return
+
+            val lineStart = textArea.getLineStartOffset(lineIndex)
+            val lineEnd = textArea.getLineEndOffset(lineIndex)
+
+            val highlighter = textArea.highlighter
+            val lightYellow = Color(255, 255, 224) // Light yellow background
+            highlighter.addHighlight(lineStart, lineEnd - 1, DefaultHighlighter.DefaultHighlightPainter(lightYellow))
+        } catch (e: BadLocationException) {
+            // Ignore if line doesn't exist
+        }
+    }
+
+    /**
+     * Removes condition error highlighting from the specified line.
+     */
+    private fun removeConditionErrorHighlight(textArea: RSyntaxTextArea, line: Int) {
+        try {
+            val lineIndex = line - 1 // Convert to 0-based index
+            if (lineIndex < 0 || lineIndex >= textArea.lineCount) return
+
+            val lineStart = textArea.getLineStartOffset(lineIndex)
+            val lineEnd = textArea.getLineEndOffset(lineIndex)
+
+            val highlighter = textArea.highlighter
+            val highlights = highlighter.highlights
+
+            // Remove highlights that match our line range and are light yellow
+            highlights.forEach { highlight ->
+                if (highlight.startOffset >= lineStart && highlight.endOffset <= lineEnd) {
+                    val painter = highlight.painter
+                    if (painter is DefaultHighlighter.DefaultHighlightPainter) {
+                        // Check if it's our light yellow highlight
+                        val lightYellow = Color(255, 255, 224)
+                        try {
+                            highlighter.removeHighlight(highlight)
+                        } catch (e: Exception) {
+                            // Ignore removal errors
+                        }
+                    }
+                }
+            }
+        } catch (e: BadLocationException) {
+            // Ignore if line doesn't exist
+        }
     }
 
     /**

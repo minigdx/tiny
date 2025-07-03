@@ -362,20 +362,38 @@ class DebuggerExecutionListener(
         line: Int,
         errorMessage: String,
     ) {
-        // For now, we'll add this as a comment in the locals
-        // This could be enhanced to send a specific error command to the UI
-        val errorComment = "[CONDITION ERROR] $errorMessage"
+        val frames = callstack(globals.running).getCallFrames()
 
-        // Send a breakpoint hit with the error in the locals
-        val currentLocals = mutableMapOf<String, com.github.minigdx.tiny.cli.debug.LuaValue>()
-        currentLocals["[DEBUG_CONDITION_ERROR]"] = Primitive(errorComment)
+        val upValues =
+            frames.flatMap { frame ->
+                val upValues = (frame.f as? LuaClosure)?.upValues ?: emptyArray()
+                val upValuesDesc = (frame.f as? LuaClosure)?.p?.upvalues ?: emptyArray()
+
+                upValues.zip(upValuesDesc) { value, name ->
+                    val upValueName = name.name?.tojstring() ?: ""
+                    val upValueValue = value?.value ?: LuaValue.NIL
+                    upValueName to upValueValue
+                }
+                    // Skip the _ENV upvalue
+                    .filterNot { (name, _) -> name == "_ENV" }
+            }.toMap()
+                .mapValues { (_, value) -> formatValue(value) }
+
+        val locals =
+            frames.flatMap {
+                it.getLocals()
+            }.associate {
+                // name to value
+                it.arg(1).tojstring() to formatValue(it.arg(2))
+            }
 
         engineCommandSender.send(
             BreakpointHit(
                 script = scriptName,
                 line = line,
-                locals = currentLocals,
-                upValues = emptyMap(),
+                locals = locals,
+                upValues = upValues,
+                conditionError = errorMessage,
             ),
         )
     }
