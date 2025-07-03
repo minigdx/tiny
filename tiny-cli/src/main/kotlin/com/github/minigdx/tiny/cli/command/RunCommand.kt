@@ -45,7 +45,7 @@ import java.io.File
 import kotlin.time.ExperimentalTime
 
 class RunCommand : CliktCommand(name = "run") {
-    val gameDirectory by argument(help = "The directory containing all game information.")
+    val gameDirectory by argument(help = "The directory containing your game to be run.")
         .file(mustExist = true, canBeDir = true, canBeFile = false)
         .default(File("."))
 

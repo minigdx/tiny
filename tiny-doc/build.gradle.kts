@@ -36,6 +36,16 @@ dependencies {
             ),
         ),
     )
+
+    add(
+        asciidoctorDependencies.name,
+        project(
+            mapOf(
+                "path" to ":tiny-cli",
+                "configuration" to "tinyCliApiAsciidoctor",
+            ),
+        ),
+    )
 }
 
 val unzipAsciidoctorResources =
@@ -48,11 +58,9 @@ val unzipAsciidoctorResources =
 
 val copyAsciidoctorDependencies =
     tasks.maybeCreate("copy-asciidoctorDependencies", Copy::class).also { cp ->
-        asciidoctorDependencies.resolvedConfiguration.resolvedArtifacts.forEach {
-            cp.from(it.file)
-        }
-        // I'm bit lazy, I copy the result stray in the source directory :grimace:
+        // I'm bit lazy, I copy the result straight into the source directory :grimace:
         cp.into(project.projectDir.resolve("src/docs/asciidoc/dependencies"))
+        cp.from(asciidoctorDependencies)
     }
 
 val copySample =

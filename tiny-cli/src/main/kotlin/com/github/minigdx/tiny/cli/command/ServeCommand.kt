@@ -3,6 +3,7 @@ package com.github.minigdx.tiny.cli.command
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.arguments.default
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
@@ -18,6 +19,7 @@ import io.ktor.server.routing.RoutingContext
 import io.ktor.server.routing.get
 import io.ktor.server.routing.head
 import io.ktor.server.routing.routing
+import java.io.File
 import java.io.FileInputStream
 import java.util.zip.ZipInputStream
 
@@ -26,26 +28,22 @@ class ServeCommand : CliktCommand(name = "serve") {
         .int()
         .default(8080)
 
-    private val game by argument(
-        help =
-            "The game to serve. It has to be a tiny game exported " +
-                "by the export command (ie: zip file).",
-    )
+    private val gameDirectory by argument(help = "The game to serve by an embedded web server.")
         .file(mustExist = true, canBeDir = true, canBeFile = true)
+        .default(File("."))
 
     private val resources = mutableMapOf<String, ByteArray>()
 
-    override fun help(context: Context) = "Run your game as a web game."
+    override fun help(context: Context) = "Run your game as a web game, by default on http://localhost:8080."
 
     override fun run() {
         // Get the zip
-        val zipFile =
-            if (game.isDirectory) {
-                GameExporter(withSourceMap = true).export(game, "tiny-export.zip")
-                game.resolve("tiny-export.zip")
-            } else {
-                game
-            }
+        val zipFile = if (gameDirectory.isDirectory) {
+            GameExporter(withSourceMap = true).export(gameDirectory, "tiny-export.zip")
+            gameDirectory.resolve("tiny-export.zip")
+        } else {
+            gameDirectory
+        }
 
         // Uncompressed in memory
         val zip = ZipInputStream(FileInputStream(zipFile))
