@@ -78,7 +78,7 @@ class CliToAsciidocKspProcessor(
 
                         if (command.options.isNotEmpty()) {
                             paragraph("*Options:*")
-                            tableArgs(command.options.map { it.name to (it.description ?: "No description") })
+                            tableArgs(command.options.map { "--${it.name}" to (it.description ?: "No description") })
                         }
 
                         // Generate usage example

@@ -34,7 +34,7 @@ class ServeCommand : CliktCommand(name = "serve") {
 
     private val resources = mutableMapOf<String, ByteArray>()
 
-    override fun help(context: Context) = "Run your game as a web game."
+    override fun help(context: Context) = "Run your game as a web game, by default on http://localhost:8080."
 
     override fun run() {
         // Get the zip

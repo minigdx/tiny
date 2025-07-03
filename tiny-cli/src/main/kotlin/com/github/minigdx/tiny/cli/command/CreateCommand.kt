@@ -49,7 +49,7 @@ class CreateCommand : CliktCommand(name = "create") {
         .prompt(text = "\uD83D\uDDA5  Game resolution (e.g., 800x600)", default = "256x256")
         .validate { require(it.matches(Regex("\\d+x\\d+"))) { "Invalid resolution format: $it" } }
 
-    private val gameScript by option(help = "\uD83D\uDCDD Name of the default game script")
+    private val gameScript by option(help = "📝 Name of the default game script")
         .prompt(text = "\uD83D\uDCDD Name of the first game script", default = "game.lua")
         .validate { require(it.endsWith(".lua")) { "Invalid game script extension: $it" } }
 
@@ -61,9 +61,7 @@ class CreateCommand : CliktCommand(name = "create") {
         .int()
         .prompt(text = "\uD83D\uDD0D  Game zoom", default = 2)
 
-    private val spritesheets by option(
-        help = "\uD83D\uDCC4 The filenames of the sprite sheets, separated by a comma (e.g., file1.png, file2.png)",
-    )
+    private val spritesheets by option(help = "🖼️ The filenames of the sprite sheets, separated by a comma (e.g., file1.png, file2.png)")
         .prompt(text = "\uD83D\uDCC4  Sprite sheet name to include", default = "")
         .validate {
             require(
@@ -85,11 +83,11 @@ ${
 """,
         )
 
-    private val hideMouseCursor by option(help = "\uD83D\uDDB1\uFE0F Hide system cursor mouse")
+    private val hideMouseCursor by option(help = "🖱️ Hide system cursor mouse")
         .prompt("\uD83D\uDDB1\uFE0F  Hide system cursor mouse? (yes or no)", default = "No")
         .validate { it.lowercase() == "yes" || it.lowercase() == "no" }
 
-    override fun help(context: Context) = "Create a new game."
+    override fun help(context: Context) = "Create a new game with the help of a wizard 🧙."
 
     override fun run() {
         echo("➡\uFE0F  Game Name: $gameName")
