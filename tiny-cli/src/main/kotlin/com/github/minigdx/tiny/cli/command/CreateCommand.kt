@@ -10,6 +10,7 @@ import com.github.ajalt.clikt.parameters.options.validate
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.mordant.rendering.TextColors
+import com.github.ajalt.mordant.rendering.TextStyles
 import com.github.minigdx.tiny.cli.GamePalette
 import com.github.minigdx.tiny.cli.command.utils.ColorUtils.brightness
 import com.github.minigdx.tiny.cli.config.GameParameters
@@ -166,7 +167,12 @@ ${
                 ""
             }
 
-            return "[${index + 1}] ${palette.name}  $colorSquares$overflowText"
+            return if (palette.source != null) {
+                val invoke = TextStyles.hyperlink(palette.source).invoke(palette.name)
+                "[${index + 1}] $invoke $colorSquares$overflowText"
+            } else {
+                "[${index + 1}] ${palette.name} $colorSquares$overflowText"
+            }
         }
     }
 }

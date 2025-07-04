@@ -1,6 +1,6 @@
 package com.github.minigdx.tiny.cli
 
-class GamePalette(val name: String, val colors: List<String>) {
+class GamePalette(val name: String, val colors: List<String>, val source: String? = null) {
     companion object {
         val ONE_BIT =
             GamePalette(
@@ -28,6 +28,7 @@ class GamePalette(val name: String, val colors: List<String>) {
                     "#FF77A8",
                     "#FFCCAA",
                 ),
+                "https://lospec.com/palette-list/pico-8",
             )
 
         val GAMEBOY =
@@ -65,6 +66,7 @@ class GamePalette(val name: String, val colors: List<String>) {
                     "#FFBF40",
                     "#CC1424",
                 ),
+                "https://lospec.com/palette-list/rgr-proto16",
             )
         val ALL = listOf(ONE_BIT, PICO8, GAMEBOY, RGR_PROTO16)
     }
