@@ -10,6 +10,8 @@ import com.github.ajalt.clikt.parameters.options.validate
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.minigdx.tiny.cli.GamePalette
+import com.github.minigdx.tiny.cli.command.utils.ColorUtils
+import com.github.minigdx.tiny.cli.command.utils.ColorUtils.brightness
 import com.github.minigdx.tiny.cli.config.GameParameters
 import com.github.minigdx.tiny.cli.config.GameParameters.Companion.JSON
 import com.github.minigdx.tiny.cli.config.GameParametersV1
@@ -102,7 +104,7 @@ ${
                 resolution = gameResolution.toSize(),
                 sprites = spriteSize.toSize(),
                 zoom = zoom,
-                colors = GamePalette.ALL[palette - 1].colors,
+                colors = GamePalette.ALL[palette - 1].colors.sortedBy { brightness(it) },
                 scripts = listOf(gameScript),
                 hideMouseCursor = hideMouseCursor == "yes".lowercase(),
             ) as GameParameters
