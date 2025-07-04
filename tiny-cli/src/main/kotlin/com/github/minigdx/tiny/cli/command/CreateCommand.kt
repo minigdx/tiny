@@ -9,8 +9,8 @@ import com.github.ajalt.clikt.parameters.options.prompt
 import com.github.ajalt.clikt.parameters.options.validate
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.ajalt.clikt.parameters.types.int
+import com.github.ajalt.mordant.rendering.TextColors
 import com.github.minigdx.tiny.cli.GamePalette
-import com.github.minigdx.tiny.cli.command.utils.ColorUtils
 import com.github.minigdx.tiny.cli.command.utils.ColorUtils.brightness
 import com.github.minigdx.tiny.cli.config.GameParameters
 import com.github.minigdx.tiny.cli.config.GameParameters.Companion.JSON
@@ -24,15 +24,15 @@ import java.io.FileOutputStream
 @Language("Lua")
 private const val DEFAULT_GAME_SCRIPT = """
 function _init()
-    
+
 end
-    
-    
+
+
 function _update()
-    
+
 end
-    
-    
+
+
 function _draw()
     gfx.cls()
     print("Congratulation! Your game is running!")
@@ -79,7 +79,7 @@ class CreateCommand : CliktCommand(name = "create") {
             """🎨  Please choose a game color palette:
 ${
                 GamePalette.ALL.mapIndexed { index, gamePalette ->
-                    "[${index + 1}] ${gamePalette.name}"
+                    formatPaletteDisplay(gamePalette, index)
                 }.joinToString("\n")
             }
 """,
@@ -140,5 +140,33 @@ ${
     private fun computePath(gamePath: File): String {
         val currentPath = File(".")
         return gamePath.relativeTo(currentPath).path
+    }
+
+    companion object {
+        private const val MAX_COLOR_PALETTE_DISPLAYED = 28
+
+        private fun formatPaletteDisplay(
+            palette: GamePalette,
+            index: Int,
+        ): String {
+            val colorSquares = palette.colors.take(MAX_COLOR_PALETTE_DISPLAYED).joinToString("") { hexColor ->
+                // Remove the '#' prefix and parse RGB components
+                val colorWithoutHash = hexColor.removePrefix("#")
+                val r = colorWithoutHash.substring(0, 2).toInt(16)
+                val g = colorWithoutHash.substring(2, 4).toInt(16)
+                val b = colorWithoutHash.substring(4, 6).toInt(16)
+
+                // Create colored square using Mordant's background color
+                TextColors.rgb(r / 255.0, g / 255.0, b / 255.0)("◼")
+            }
+
+            val overflowText = if (palette.colors.size > MAX_COLOR_PALETTE_DISPLAYED) {
+                " + ${palette.colors.size - MAX_COLOR_PALETTE_DISPLAYED} colors"
+            } else {
+                ""
+            }
+
+            return "[${index + 1}] ${palette.name}  $colorSquares$overflowText"
+        }
     }
 }

@@ -93,4 +93,3 @@ class PaletteCommand : CliktCommand(name = "palette") {
         echo("\uD83C\uDFA8 Game has been updated with the new color palette (with ${replacedColors.size} colors)")
     }
 }
-
