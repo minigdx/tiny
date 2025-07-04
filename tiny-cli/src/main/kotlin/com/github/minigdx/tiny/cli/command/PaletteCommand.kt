@@ -118,6 +118,8 @@ class PaletteCommand : CliktCommand(name = "palette") {
     }
 
     private fun formatCurrentPaletteDisplay(colors: List<String>): String {
+        if (colors.isEmpty()) return ""
+
         return colors.mapIndexed { index, hexColor ->
             // Remove the '#' prefix and parse RGB components
             val colorWithoutHash = hexColor.removePrefix("#")
@@ -125,14 +127,9 @@ class PaletteCommand : CliktCommand(name = "palette") {
             val g = colorWithoutHash.substring(2, 4).toInt(16)
             val b = colorWithoutHash.substring(4, 6).toInt(16)
 
-            // Calculate brightness to determine text color for optimal contrast
-            val brightness = (r * 0.299 + g * 0.587 + b * 0.114) / 255.0
-            val textColor = if (brightness > 0.5) TextColors.black else TextColors.white
-            val backgroundColor = TextColors.rgb(r / 255.0, g / 255.0, b / 255.0)
-
-            // Create numbered square with optimal contrast
-            val number = (index + 1).toString()
-            backgroundColor(textColor(number.padStart(2)))
-        }.joinToString("")
+            // Create foreground-colored square using TextColors.rgb()
+            val foregroundColor = TextColors.rgb(r / 255.0, g / 255.0, b / 255.0)
+            (index + 1).toString() + " " + foregroundColor("◼")
+        }.joinToString(" ")
     }
 }
