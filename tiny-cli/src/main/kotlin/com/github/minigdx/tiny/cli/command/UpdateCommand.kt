@@ -3,9 +3,12 @@ package com.github.minigdx.tiny.cli.command
 import com.github.ajalt.clikt.core.Abort
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.Context
+import com.github.ajalt.clikt.core.terminal
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.default
 import com.github.ajalt.clikt.parameters.types.file
+import com.github.ajalt.mordant.input.InputReceiver
+import com.github.ajalt.mordant.input.receiveKeyEvents
 import com.github.ajalt.mordant.rendering.TextColors
 import com.github.ajalt.mordant.rendering.TextStyles
 import com.github.ajalt.mordant.table.table
@@ -97,11 +100,42 @@ class UpdateCommand : CliktCommand(name = "update") {
         echo()
 
         displayParameters()
+        currentContext.terminal.receiveKeyEvents { event ->
+            val next = when (event.key) {
+                "ArrowUp" -> {
+                    selectedIndex = (selectedIndex - 1).coerceAtLeast(0)
+                    true
+                }
+
+                "ArrowDown" -> {
+                    selectedIndex = (selectedIndex + 1).coerceAtMost(editableParameters.lastIndex)
+                    true
+                }
+
+                "Enter" -> {
+                    toggleParameter()
+                    true
+                }
+
+                "q" -> {
+                    saveAndExit(configFile)
+                    false
+                }
+                else -> true
+            }
+            if (next) {
+                displayParameters()
+                InputReceiver.Status.Continue
+            } else {
+                InputReceiver.Status.Finished
+            }
+        }
     }
 
     private fun displayParameters() {
-        // Clear screen (simple approach)
-        repeat(50) { echo() }
+        currentContext.terminal.cursor.move {
+            clearScreen()
+        }
 
         echo("🎮 Game Parameters for: ${currentParameters?.name}")
         echo()
@@ -131,18 +165,10 @@ class UpdateCommand : CliktCommand(name = "update") {
         echo("Press 'q' to quit and save changes")
     }
 
-    private fun readInput(): String {
-        // Simple input reading - in a real implementation, you'd want to handle raw terminal input
-        // For now, we'll use a simplified approach
-        print("> ")
-        return readLine()?.lowercase()?.trim() ?: "q"
-    }
-
     private fun toggleParameter() {
         val param = editableParameters[selectedIndex]
         if (!param.isEditable) {
             echo("⚠️  This parameter is not editable")
-            Thread.sleep(1000)
             return
         }
 
@@ -153,7 +179,6 @@ class UpdateCommand : CliktCommand(name = "update") {
                 currentParameters = currentParams.copy(hideMouseCursor = newValue)
                 param.value = if (newValue) "Yes" else "No"
                 echo("✅ ${param.name} toggled to: ${param.value}")
-                Thread.sleep(1000)
             }
         }
     }
