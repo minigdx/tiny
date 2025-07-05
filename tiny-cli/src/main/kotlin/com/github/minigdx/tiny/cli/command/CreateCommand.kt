@@ -99,16 +99,15 @@ ${
         echo("➡\uFE0F  Sprite Sheet Filenames: ${spritesheets.ifBlank { "No spritesheet added!" }}")
         echo("➡\uFE0F  Color palette: ${GamePalette.ALL[palette - 1].name}")
 
-        val configuration =
-            GameParametersV1(
-                name = gameName,
-                resolution = gameResolution.toSize(),
-                sprites = spriteSize.toSize(),
-                zoom = zoom,
-                colors = GamePalette.ALL[palette - 1].colors.sortedBy { brightness(it) },
-                scripts = listOf(gameScript),
-                hideMouseCursor = hideMouseCursor == "yes".lowercase(),
-            ) as GameParameters
+        val configuration = GameParametersV1(
+            name = gameName,
+            resolution = gameResolution.toSize(),
+            sprites = spriteSize.toSize(),
+            zoom = zoom,
+            colors = GamePalette.ALL[palette - 1].colors.sortedBy { brightness(it) },
+            scripts = listOf(gameScript),
+            hideMouseCursor = hideMouseCursor == "yes".lowercase(),
+        ) as GameParameters
 
         if (!gameDirectory.exists()) gameDirectory.mkdirs()
 
