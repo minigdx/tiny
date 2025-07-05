@@ -149,7 +149,9 @@ ${
             palette: GamePalette,
             index: Int,
         ): String {
-            val colorSquares = palette.colors.take(MAX_COLOR_PALETTE_DISPLAYED).joinToString("") { hexColor ->
+            val colorSquares = palette.colors
+                .take(MAX_COLOR_PALETTE_DISPLAYED)
+                .joinToString("") { hexColor ->
                 // Remove the '#' prefix and parse RGB components
                 val colorWithoutHash = hexColor.removePrefix("#")
                 val r = colorWithoutHash.substring(0, 2).toInt(16)

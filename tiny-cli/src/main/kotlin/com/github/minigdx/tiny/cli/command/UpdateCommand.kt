@@ -77,7 +77,7 @@ class UpdateCommand : CliktCommand(name = "update") {
     private fun formatPaletteDisplay(colors: List<String>): String {
         if (colors.isEmpty()) return "No colors"
 
-        val colorSquares = colors.take(16).joinToString(" ") { hexColor ->
+        val colorSquares = colors.take(16).joinToString("") { hexColor ->
             val colorWithoutHash = hexColor.removePrefix("#")
             val r = colorWithoutHash.substring(0, 2).toInt(16)
             val g = colorWithoutHash.substring(2, 4).toInt(16)
