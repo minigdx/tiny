@@ -8,6 +8,7 @@ import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.render.RenderContext
+import kotlinx.coroutines.runBlocking
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
@@ -106,7 +107,7 @@ class TinyRenderer(
         config: EGLConfig?,
     ) {
         // OpenGL ES initialization is handled by the RenderContext
-        logger.debug { "Surface created" }
+        logger.debug(TAG) { "Surface created" }
     }
 
     override fun onSurfaceChanged(
@@ -118,11 +119,9 @@ class TinyRenderer(
         this.height = height
 
         // Update viewport
-        renderContext?.let { context ->
-            context.updateViewport(0, 0, width, height)
-        }
+        // renderContext?.updateViewport(0, 0, width, height)
 
-        logger.debug { "Surface changed: ${width}x$height" }
+        logger.debug(TAG) { "Surface changed: ${width}x$height" }
     }
 
     override fun onDrawFrame(gl: GL10?) {
@@ -135,8 +134,10 @@ class TinyRenderer(
         // Clamp delta time to prevent large jumps
         val clampedDelta = deltaTime.coerceAtMost(1f / 30f)
 
-        // Advance the game loop
-        gameLoop?.advance(clampedDelta)
+        runBlocking {
+            // Advance the game loop
+            gameLoop?.advance(clampedDelta)
+        }
 
         // The actual rendering is handled by the Platform.draw() method
         // which is called from within the game loop
@@ -153,5 +154,9 @@ class TinyRenderer(
 
     fun destroy() {
         // Clean up resources if needed
+    }
+
+    companion object {
+        private const val TAG = "\uD83E\uDDF8 TINY"
     }
 }

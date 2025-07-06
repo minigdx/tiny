@@ -5,6 +5,7 @@ import com.danielgergely.kgl.KglAndroid
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.file.LocalFile
+import com.github.minigdx.tiny.file.SoundDataSourceStream
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
@@ -44,7 +45,7 @@ class AndroidPlatform(
     override fun gameLoop(gameLoop: GameLoop) {
         // Android's game loop is driven by the GLSurfaceView's renderer
         // This will be called from the TinyView's renderer
-        (windowManager as AndroidWindowManager).setGameLoop(gameLoop)
+        windowManager.setGameLoop(gameLoop)
     }
 
     override fun endGameLoop() {
@@ -83,7 +84,7 @@ class AndroidPlatform(
     }
 
     override fun createSoundStream(name: String): SourceStream<SoundData> {
-        return AndroidSoundStream(context, name, soundManager)
+        return SoundDataSourceStream(name, soundManager, createByteArrayStream(name))
     }
 
     override fun createLocalFile(
@@ -105,7 +106,7 @@ class AndroidPlatform(
     }
 
     override fun draw(renderContext: RenderContext) {
-        render.draw(renderContext)
+        render.drawOnScreen(renderContext)
     }
 
     override fun executeOffScreen(
@@ -115,13 +116,7 @@ class AndroidPlatform(
         return render.executeOffScreen(renderContext, block)
     }
 
-    override fun record() {
-        // TODO: Implement screen recording on Android
-        logger.info { "Screen recording not yet implemented on Android" }
-    }
+    override fun record()  = Unit
 
-    override fun screenshot() {
-        // TODO: Implement screenshot on Android
-        logger.info { "Screenshot not yet implemented on Android" }
-    }
+    override fun screenshot() = Unit
 }
