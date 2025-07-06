@@ -64,7 +64,7 @@ class UpdateCommand : CliktCommand(name = "update") {
             ),
         )
         editableParameters.add(EditableParameter("sprites", "${params.sprites.width}x${params.sprites.height}", false))
-        editableParameters.add(EditableParameter("zoom", params.zoom.toString(), false))
+        editableParameters.add(EditableParameter("zoom", params.zoom.toString(), true))
         editableParameters.add(EditableParameter("palette", ColorUtils.formatCurrentPaletteDisplay(params.colors, maxColors = 16), false))
         editableParameters.add(EditableParameter("scripts", params.scripts.joinToString(", "), false))
         editableParameters.add(EditableParameter("spritesheets", params.spritesheets.joinToString(", "), false))
@@ -159,6 +159,13 @@ class UpdateCommand : CliktCommand(name = "update") {
                 currentParameters = currentParams.copy(hideMouseCursor = newValue)
                 param.value = if (newValue) "Yes" else "No"
                 echo("✅ ${param.name} toggled to: ${param.value}")
+            }
+
+            "zoom" -> {
+                val currentParams = currentParameters ?: return
+                val newValue = ((currentParams.zoom + 1) % 9).coerceIn(1, 8)
+                param.value = newValue.toString()
+                currentParameters = currentParams.copy(zoom = newValue)
             }
         }
     }
