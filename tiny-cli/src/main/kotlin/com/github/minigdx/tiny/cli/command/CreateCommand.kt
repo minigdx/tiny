@@ -9,9 +9,9 @@ import com.github.ajalt.clikt.parameters.options.prompt
 import com.github.ajalt.clikt.parameters.options.validate
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.ajalt.clikt.parameters.types.int
-import com.github.ajalt.mordant.rendering.TextColors
 import com.github.ajalt.mordant.rendering.TextStyles
 import com.github.minigdx.tiny.cli.GamePalette
+import com.github.minigdx.tiny.cli.command.utils.ColorUtils
 import com.github.minigdx.tiny.cli.command.utils.ColorUtils.brightness
 import com.github.minigdx.tiny.cli.config.GameParameters
 import com.github.minigdx.tiny.cli.config.GameParameters.Companion.JSON
@@ -149,30 +149,13 @@ ${
             palette: GamePalette,
             index: Int,
         ): String {
-            val colorSquares = palette.colors
-                .take(MAX_COLOR_PALETTE_DISPLAYED)
-                .joinToString("") { hexColor ->
-                // Remove the '#' prefix and parse RGB components
-                val colorWithoutHash = hexColor.removePrefix("#")
-                val r = colorWithoutHash.substring(0, 2).toInt(16)
-                val g = colorWithoutHash.substring(2, 4).toInt(16)
-                val b = colorWithoutHash.substring(4, 6).toInt(16)
-
-                // Create colored square using Mordant's background color
-                TextColors.rgb(r / 255.0, g / 255.0, b / 255.0)("◼")
-            }
-
-            val overflowText = if (palette.colors.size > MAX_COLOR_PALETTE_DISPLAYED) {
-                " + ${palette.colors.size - MAX_COLOR_PALETTE_DISPLAYED} colors"
-            } else {
-                ""
-            }
+            val colorsText = ColorUtils.formatCurrentPaletteDisplay(palette.colors, maxColors = MAX_COLOR_PALETTE_DISPLAYED)
 
             return if (palette.source != null) {
                 val invoke = TextStyles.hyperlink(palette.source).invoke(palette.name)
-                "[${index + 1}] $invoke $colorSquares$overflowText"
+                "[${index + 1}] $invoke $colorsText"
             } else {
-                "[${index + 1}] ${palette.name} $colorSquares$overflowText"
+                "[${index + 1}] ${palette.name} $colorsText"
             }
         }
     }

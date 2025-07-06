@@ -8,7 +8,7 @@ import com.github.ajalt.clikt.parameters.arguments.optional
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
-import com.github.ajalt.mordant.rendering.TextColors
+import com.github.minigdx.tiny.cli.command.utils.ColorUtils
 import com.github.minigdx.tiny.cli.command.utils.ColorUtils.brightness
 import com.github.minigdx.tiny.cli.config.GameParameters
 import com.github.minigdx.tiny.cli.exception.MissingTinyConfigurationException
@@ -114,22 +114,6 @@ class PaletteCommand : CliktCommand(name = "palette") {
 
     private fun displayCurrentColors(colors: List<String>) {
         echo("\uD83C\uDFA8 Current colors:")
-        echo(formatCurrentPaletteDisplay(colors))
-    }
-
-    private fun formatCurrentPaletteDisplay(colors: List<String>): String {
-        if (colors.isEmpty()) return ""
-
-        return colors.mapIndexed { index, hexColor ->
-            // Remove the '#' prefix and parse RGB components
-            val colorWithoutHash = hexColor.removePrefix("#")
-            val r = colorWithoutHash.substring(0, 2).toInt(16)
-            val g = colorWithoutHash.substring(2, 4).toInt(16)
-            val b = colorWithoutHash.substring(4, 6).toInt(16)
-
-            // Create foreground-colored square using TextColors.rgb()
-            val foregroundColor = TextColors.rgb(r / 255.0, g / 255.0, b / 255.0)
-            (index + 1).toString() + " " + foregroundColor("◼")
-        }.joinToString(" ")
+        echo(ColorUtils.formatCurrentPaletteDisplay(colors, withIndex = true))
     }
 }

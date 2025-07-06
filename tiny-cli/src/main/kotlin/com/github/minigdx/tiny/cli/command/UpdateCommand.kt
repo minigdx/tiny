@@ -9,9 +9,9 @@ import com.github.ajalt.clikt.parameters.arguments.default
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.ajalt.mordant.input.InputReceiver
 import com.github.ajalt.mordant.input.receiveKeyEvents
-import com.github.ajalt.mordant.rendering.TextColors
 import com.github.ajalt.mordant.rendering.TextStyles
 import com.github.ajalt.mordant.table.table
+import com.github.minigdx.tiny.cli.command.utils.ColorUtils
 import com.github.minigdx.tiny.cli.config.GameParameters
 import com.github.minigdx.tiny.cli.config.GameParametersV1
 import java.io.File
@@ -65,33 +65,13 @@ class UpdateCommand : CliktCommand(name = "update") {
         )
         editableParameters.add(EditableParameter("sprites", "${params.sprites.width}x${params.sprites.height}", false))
         editableParameters.add(EditableParameter("zoom", params.zoom.toString(), false))
-        editableParameters.add(EditableParameter("palette", formatPaletteDisplay(params.colors), false))
+        editableParameters.add(EditableParameter("palette", ColorUtils.formatCurrentPaletteDisplay(params.colors, maxColors = 16), false))
         editableParameters.add(EditableParameter("scripts", params.scripts.joinToString(", "), false))
         editableParameters.add(EditableParameter("spritesheets", params.spritesheets.joinToString(", "), false))
         editableParameters.add(EditableParameter("levels", params.levels.joinToString(", "), false))
         editableParameters.add(EditableParameter("sounds", params.sounds.joinToString(", "), false))
         editableParameters.add(EditableParameter("libraries", params.libraries.joinToString(", "), false))
         editableParameters.add(EditableParameter("hideMouseCursor", if (params.hideMouseCursor) "Yes" else "No", true))
-    }
-
-    private fun formatPaletteDisplay(colors: List<String>): String {
-        if (colors.isEmpty()) return "No colors"
-
-        val colorSquares = colors.take(16).joinToString("") { hexColor ->
-            val colorWithoutHash = hexColor.removePrefix("#")
-            val r = colorWithoutHash.substring(0, 2).toInt(16)
-            val g = colorWithoutHash.substring(2, 4).toInt(16)
-            val b = colorWithoutHash.substring(4, 6).toInt(16)
-
-            TextColors.rgb(r / 255.0, g / 255.0, b / 255.0)("◼")
-        }
-
-        val extraCount = colors.size - 16
-        return if (extraCount > 0) {
-            "$colorSquares +$extraCount"
-        } else {
-            colorSquares
-        }
     }
 
     private fun runInteractiveLoop(configFile: File) {
