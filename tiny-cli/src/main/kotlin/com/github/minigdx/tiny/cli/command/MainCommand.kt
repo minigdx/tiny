@@ -16,6 +16,8 @@ class MainCommand : CliktCommand() {
             ServeCommand(),
             PaletteCommand(),
             SfxCommand(),
+            UpdateCommand(),
+            ResourcesCommand(),
         )
     }
 

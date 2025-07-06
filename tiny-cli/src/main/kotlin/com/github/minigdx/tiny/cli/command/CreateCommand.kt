@@ -9,7 +9,10 @@ import com.github.ajalt.clikt.parameters.options.prompt
 import com.github.ajalt.clikt.parameters.options.validate
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.ajalt.clikt.parameters.types.int
+import com.github.ajalt.mordant.rendering.TextStyles
 import com.github.minigdx.tiny.cli.GamePalette
+import com.github.minigdx.tiny.cli.command.utils.ColorUtils
+import com.github.minigdx.tiny.cli.command.utils.ColorUtils.brightness
 import com.github.minigdx.tiny.cli.config.GameParameters
 import com.github.minigdx.tiny.cli.config.GameParameters.Companion.JSON
 import com.github.minigdx.tiny.cli.config.GameParametersV1
@@ -22,15 +25,15 @@ import java.io.FileOutputStream
 @Language("Lua")
 private const val DEFAULT_GAME_SCRIPT = """
 function _init()
-    
+
 end
-    
-    
+
+
 function _update()
-    
+
 end
-    
-    
+
+
 function _draw()
     gfx.cls()
     print("Congratulation! Your game is running!")
@@ -77,7 +80,7 @@ class CreateCommand : CliktCommand(name = "create") {
             """🎨  Please choose a game color palette:
 ${
                 GamePalette.ALL.mapIndexed { index, gamePalette ->
-                    "[${index + 1}] ${gamePalette.name}"
+                    formatPaletteDisplay(gamePalette, index)
                 }.joinToString("\n")
             }
 """,
@@ -96,16 +99,15 @@ ${
         echo("➡\uFE0F  Sprite Sheet Filenames: ${spritesheets.ifBlank { "No spritesheet added!" }}")
         echo("➡\uFE0F  Color palette: ${GamePalette.ALL[palette - 1].name}")
 
-        val configuration =
-            GameParametersV1(
-                name = gameName,
-                resolution = gameResolution.toSize(),
-                sprites = spriteSize.toSize(),
-                zoom = zoom,
-                colors = GamePalette.ALL[palette - 1].colors,
-                scripts = listOf(gameScript),
-                hideMouseCursor = hideMouseCursor == "yes".lowercase(),
-            ) as GameParameters
+        val configuration = GameParametersV1(
+            name = gameName,
+            resolution = gameResolution.toSize(),
+            sprites = spriteSize.toSize(),
+            zoom = zoom,
+            colors = GamePalette.ALL[palette - 1].colors.sortedBy { brightness(it) },
+            scripts = listOf(gameScript),
+            hideMouseCursor = hideMouseCursor == "yes".lowercase(),
+        ) as GameParameters
 
         if (!gameDirectory.exists()) gameDirectory.mkdirs()
 
@@ -138,5 +140,23 @@ ${
     private fun computePath(gamePath: File): String {
         val currentPath = File(".")
         return gamePath.relativeTo(currentPath).path
+    }
+
+    companion object {
+        private const val MAX_COLOR_PALETTE_DISPLAYED = 28
+
+        private fun formatPaletteDisplay(
+            palette: GamePalette,
+            index: Int,
+        ): String {
+            val colorsText = ColorUtils.formatCurrentPaletteDisplay(palette.colors, maxColors = MAX_COLOR_PALETTE_DISPLAYED)
+
+            return if (palette.source != null) {
+                val invoke = TextStyles.hyperlink(palette.source).invoke(palette.name)
+                "[${index + 1}] $invoke $colorsText"
+            } else {
+                "[${index + 1}] ${palette.name} $colorsText"
+            }
+        }
     }
 }
