@@ -9,10 +9,15 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/tiny-annotation-processors" />
+            <option value="$PROJECT_DIR$/tiny-annotation-processors/tiny-api-to-asciidoc-generator" />
+            <option value="$PROJECT_DIR$/tiny-annotation-processors/tiny-asciidoctor-dsl" />
+            <option value="$PROJECT_DIR$/tiny-annotation-processors/tiny-cli-to-asciidoc-generator" />
+            <option value="$PROJECT_DIR$/tiny-annotation-processors/tiny-lua-dsl" />
+            <option value="$PROJECT_DIR$/tiny-annotation-processors/tiny-lua-stub-generator" />
             <option value="$PROJECT_DIR$/tiny-cli" />
             <option value="$PROJECT_DIR$/tiny-doc" />
             <option value="$PROJECT_DIR$/tiny-doc-annotations" />
-            <option value="$PROJECT_DIR$/tiny-doc-generator" />
             <option value="$PROJECT_DIR$/tiny-engine" />
             <option value="$PROJECT_DIR$/tiny-sample" />
             <option value="$PROJECT_DIR$/tiny-web-editor" />

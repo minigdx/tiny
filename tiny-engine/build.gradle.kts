@@ -1,9 +1,22 @@
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
+    alias(libs.plugins.android.library)
     alias(libs.plugins.minigdx.mpp)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.mokkery)
+}
+
+android {
+    namespace = "com.github.minigdx.tiny"
+    compileSdk = 34
+    defaultConfig {
+        minSdk = 21
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -40,6 +53,10 @@ dependencies {
     this.jvmMainImplementation(libs.jvm.gifencoder)
 
     jsMainImplementation("org.jetbrains.kotlin:kotlinx-atomicfu-runtime:2.1.20")?.because("https://youtrack.jetbrains.com/issue/KT-57235")
+
+    // Android Specific
+    this.androidMainImplementation(libs.kotlin.coroutines.android)
+    this.androidMainImplementation(libs.kgl.android)
 
     add("kspJvm", project(":tiny-annotation-processors:tiny-lua-stub-generator")) {
         because("KSP will generate all Lua stub methods from all Lua libs from Tiny.")

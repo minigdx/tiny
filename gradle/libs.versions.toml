@@ -1,4 +1,5 @@
 [versions]
+android-gradle = "8.7.3"
 asciidoctorj = "3.3.2"
 clikt = "5.0.3"
 gifencoder = "0.10.1"
@@ -23,6 +24,7 @@ jna = {module="net.java.dev.jna:jna-platform", version.ref = "jna"}
 rsyntax = {module="com.fifesoft:rsyntaxtextarea", version.ref = "rsyntax"}
 
 kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
+kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlin-coroutines" }
 kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization-json" }
 
 luak = { module = "com.github.minigdx:luak", version.ref = "luak" }
@@ -33,6 +35,7 @@ lwjgl-opengl = { module = "org.lwjgl:lwjgl-opengl", version.ref = "lwjgl" }
 
 kgl-core = { module = "com.github.minigdx:kgl", version.ref = "kgl" }
 kgl-lwjgl = { module = "com.github.minigdx:kgl-lwjgl", version.ref = "kgl" }
+kgl-android = { module = "com.github.minigdx:kgl-android", version.ref = "kgl" }
 ksp-symbol-processing-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "kotlin-ksp" }
 
 jvm-gifencoder = { module = "com.squareup:gifencoder", version.ref = "gifencoder" }
@@ -64,6 +67,7 @@ jvm-ktor-client = [
 ]
 
 [plugins]
+android-library = { id = "com.android.library", version.ref = "android-gradle" }
 asciidoctorj = { id = "org.asciidoctor.jvm.convert", version.ref = "asciidoctorj" }
 minigdx-mpp = { id = "com.github.minigdx.gradle.plugin.developer.mpp", version.ref = "minigdx-developer" }
 minigdx-jvm = { id = "com.github.minigdx.gradle.plugin.developer.jvm" }

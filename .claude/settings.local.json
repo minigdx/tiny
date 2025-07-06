@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew:*)",
+      "Bash(make lintfix:*)",
+      "Bash(find:*)"
+    ],
+    "deny": []
+  }
+}
