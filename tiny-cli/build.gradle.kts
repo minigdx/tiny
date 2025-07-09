@@ -1,5 +1,3 @@
-import java.io.Reader
-
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
@@ -63,29 +61,14 @@ application {
 
 // Update the start script to include jar from the Kotlin MPP dependencies
 project.tasks.withType(CreateStartScripts::class.java).configureEach {
-    this.classpath =
-        project.tasks.getByName("jar").outputs.files
-            .plus(project.configurations.getByName("runtimeClasspath"))
-            .plus(externalDependencies)
+    setClasspath(
+        tasks.named<Jar>("jar").map { it.outputs.files }.get()
+            .plus(configurations.named("runtimeClasspath").get())
+            .plus(externalDependencies),
+    )
 
     (this.unixStartScriptGenerator as TemplateBasedScriptGenerator).template =
-        object : TextResource {
-            override fun getBuildDependencies(): TaskDependency = TODO("Not yet implemented")
-
-            override fun asString(): String = TODO("Not yet implemented")
-
-            override fun asReader(): Reader {
-                return project.file("unixCustomStartScript.txt").reader()
-            }
-
-            override fun asFile(charset: String): File = TODO("Not yet implemented")
-
-            override fun asFile(): File = TODO("Not yet implemented")
-
-            override fun getInputProperties(): Any? = TODO("Not yet implemented")
-
-            override fun getInputFiles(): FileCollection? = TODO("Not yet implemented")
-        }
+        resources.text.fromFile(project.layout.projectDirectory.file("unixCustomStartScript.txt"))
 }
 
 // Make the application plugin start with the right classpath
