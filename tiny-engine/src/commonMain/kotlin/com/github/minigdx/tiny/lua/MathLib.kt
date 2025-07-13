@@ -172,7 +172,13 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
             if (arg2.isnil()) {
                 return call(arg1)
             }
-            return valueOf(Random.nextInt(arg1.toint(), arg2.toint()))
+            val a = arg1.toint()
+            val b = arg2.toint()
+            return if (a == b) {
+                valueOf(a)
+            } else {
+                valueOf(Random.nextInt(a, b))
+            }
         }
     }
 
