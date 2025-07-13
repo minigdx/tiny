@@ -57,6 +57,7 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
         |- 3: drawing using a stencil test (ie: drawing only in the stencil) 
         |- 4: drawing using a stencil test (ie: drawing everywhere except in the stencil) 
     """,
+        "draw_mode"
     )
     internal inner class drawMode : LibFunction() {
         private var current: Int = 0
