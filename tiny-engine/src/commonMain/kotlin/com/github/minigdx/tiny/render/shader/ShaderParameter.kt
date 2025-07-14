@@ -29,7 +29,7 @@ sealed class ShaderParameter(val name: String) {
 
     interface Uniform
 
-    interface Attribute {
+    interface In {
         fun bind(): Unit = TODO()
 
         fun unbind(): Unit = TODO()
@@ -224,7 +224,7 @@ sealed class ShaderParameter(val name: String) {
         override fun toString() = "uniform vec4 $name[$size];"
     }
 
-    class AttributeVec2(name: String) : ShaderParameter(name), Attribute {
+    class InVec2(name: String) : ShaderParameter(name), In {
         private var buffer: GlBuffer? = null
 
         private lateinit var program: ShaderProgram<*, *>
@@ -263,10 +263,10 @@ sealed class ShaderParameter(val name: String) {
             program.bindBuffer(GL_ARRAY_BUFFER, null)
         }
 
-        override fun toString() = "attribute vec2 $name;"
+        override fun toString() = "in vec2 $name;"
     }
 
-    class AttributeVec3(name: String) : ShaderParameter(name), Attribute {
+    class InVec3(name: String) : ShaderParameter(name), In {
         override fun create(program: ShaderProgram<*, *>) {
             program.createAttrib(name)
         }
@@ -287,10 +287,10 @@ sealed class ShaderParameter(val name: String) {
             program.enableVertexAttribArray(program.getAttrib(name))
         }
 
-        override fun toString() = "attribute vec3 $name;"
+        override fun toString() = "in vec3 $name;"
     }
 
-    class AttributeVec4(name: String) : ShaderParameter(name), Attribute {
+    class InVec4(name: String) : ShaderParameter(name), In {
         override fun create(program: ShaderProgram<*, *>) {
             program.createAttrib(name)
         }
@@ -311,7 +311,7 @@ sealed class ShaderParameter(val name: String) {
             program.enableVertexAttribArray(program.getAttrib(name))
         }
 
-        override fun toString() = "attribute vec3 $name;"
+        override fun toString() = "in vec3 $name;"
     }
 
     class UniformSample2D(name: String, override val index: Int, private val existingTexture: Boolean = false) :
@@ -411,33 +411,35 @@ sealed class ShaderParameter(val name: String) {
         override fun toString() = "uniform sampler2D $name;"
     }
 
-    class VaryingVec2(name: String) : ShaderParameter(name), Varying {
+    class OutVec2(name: String) : ShaderParameter(name), Varying {
         override fun create(program: ShaderProgram<*, *>) = Unit
 
-        override fun toString() = "varying vec2 $name;"
+        override fun toString() = "out vec2 $name;"
     }
 
-    class VaryingVec3(name: String) : ShaderParameter(name), Varying {
+    class OutVec3(name: String) : ShaderParameter(name), Varying {
         override fun create(program: ShaderProgram<*, *>) = Unit
 
-        override fun toString() = "varying vec3 $name;"
+        override fun toString() = "out vec3 $name;"
     }
 
-    class VaryingVec4(name: String) : ShaderParameter(name), Varying {
+    class OutVec4(name: String) : ShaderParameter(name), Varying {
         override fun create(program: ShaderProgram<*, *>) = Unit
 
-        override fun toString() = "varying vec4 $name;"
+        override fun toString() = "out vec4 $name;"
     }
 
+    // FIXME: remplacer attribute par in
+    //   remplacer varying par on OU out selon context
     class VaryingFloat(name: String) : ShaderParameter(name), Varying {
         override fun create(program: ShaderProgram<*, *>) = Unit
 
-        override fun toString() = "varying float $name;"
+        override fun toString() = "out float $name;"
     }
 
     class VaryingInt(name: String) : ShaderParameter(name), Varying {
         override fun create(program: ShaderProgram<*, *>) = Unit
 
-        override fun toString() = "varying int $name;"
+        override fun toString() = "out int $name;"
     }
 }

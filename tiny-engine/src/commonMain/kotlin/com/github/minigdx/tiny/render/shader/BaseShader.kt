@@ -1,5 +1,7 @@
 package com.github.minigdx.tiny.render.shader
 
+internal expect fun headerProlog(): String
+
 /**
  * Shader code unit.
  *
@@ -12,7 +14,7 @@ abstract class BaseShader(private val shader: String) {
      */
     val parameters: MutableList<ShaderParameter> = mutableListOf()
 
-    val attributes: MutableList<ShaderParameter.Attribute> = mutableListOf()
+    val inParameters: MutableList<ShaderParameter.In> = mutableListOf()
 
     val samplers: MutableList<ShaderParameter.UniformSample2D> = mutableListOf()
 
@@ -28,15 +30,23 @@ abstract class BaseShader(private val shader: String) {
         return ShaderParameter.UniformVec2(name).also { parameters += it }
     }
 
-    fun attributeVec2(name: String): ShaderParameter.AttributeVec2 {
-        return ShaderParameter.AttributeVec2(name).also {
+    fun inVec2(name: String): ShaderParameter.InVec2 {
+        return ShaderParameter.InVec2(name).also {
             parameters += it
-            attributes += it
+            inParameters += it
         }
     }
 
-    fun varyingVec2(name: String): ShaderParameter.VaryingVec2 {
-        return ShaderParameter.VaryingVec2(name).also { parameters += it }
+    fun outVec2(name: String): ShaderParameter.OutVec2 {
+        return ShaderParameter.OutVec2(name).also { parameters += it }
+    }
+
+    fun outVec3(name: String): ShaderParameter.OutVec3 {
+        return ShaderParameter.OutVec3(name).also { parameters += it }
+    }
+
+    fun outVec4(name: String): ShaderParameter.OutVec4 {
+        return ShaderParameter.OutVec4(name).also { parameters += it }
     }
 
     fun uniformSample2D(
@@ -59,9 +69,12 @@ abstract class BaseShader(private val shader: String) {
     override fun toString(): String {
         var tmpShader =
             """
+            ${headerProlog()}
+            
             #ifdef GL_ES
-            precision highp float;
+                precision highp float;
             #endif
+           
             """.trimIndent()
 
         val allParameters = parameters
@@ -72,7 +85,7 @@ abstract class BaseShader(private val shader: String) {
         allParameters.forEach {
             when (it) {
                 is ShaderParameter.Uniform -> uniforms.add(it)
-                is ShaderParameter.Attribute -> attributes.add(it)
+                is ShaderParameter.In -> attributes.add(it)
                 is ShaderParameter.Varying -> varyings.add(it)
                 else -> throw IllegalArgumentException(
                     "Invalid type parameter! ${it::class.simpleName}. " +
@@ -97,4 +110,6 @@ abstract class BaseShader(private val shader: String) {
 
 abstract class VertexShader(shader: String) : BaseShader(shader)
 
-abstract class FragmentShader(shader: String) : BaseShader(shader)
+abstract class FragmentShader(shader: String) : BaseShader(shader) {
+    val fragColor = outVec4("fragColor")
+}

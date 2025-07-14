@@ -245,14 +245,14 @@ class OperationsShader(
     }
 
     class VShader : VertexShader(VERTEX_SHADER) {
-        val aPos = attributeVec2("a_pos") // position of the sprite in the viewport
-        val aSpr = attributeVec2("a_spr")
+        val aPos = inVec2("a_pos") // position of the sprite in the viewport
+        val aSpr = inVec2("a_spr")
         val uViewport = uniformVec2("u_viewport") // Size of the viewport; in pixel.
         val uSpritesheet = uniformVec2("u_spritesheet") // Size of the viewport; in pixel.
         val uCamera = uniformVec2("u_camera") // Position of the camera (offset)
 
-        val vUvs = varyingVec2("v_uvs")
-        val vPos = varyingVec2("v_pos")
+        val vUvs = outVec2("v_uvs")
+        val vPos = outVec2("v_pos")
     }
 
     class FShader : FragmentShader(FRAGMENT_SHADER) {
@@ -260,8 +260,8 @@ class OperationsShader(
         val spritesheet = uniformSample2D("spritesheet")
         val uDither = uniformInt("u_dither")
 
-        val vUvs = varyingVec2("v_uvs")
-        val vPos = varyingVec2("v_pos")
+        val vUvs = inVec2("v_uvs")
+        val vPos = inVec2("v_pos")
     }
 
     companion object {
@@ -314,7 +314,7 @@ class OperationsShader(
                 int x = imod(index, textureWidth); // index % textureWidth
                 int y =  index / textureWidth;
                 vec2 uv = vec2((float(x) + 0.5) / float(textureWidth), (float(y) + 0.5) / float(textureHeight));
-                return texture2D(txt, uv);
+                return texture(txt, uv);
             }
             
             /**
@@ -327,12 +327,12 @@ class OperationsShader(
             
             void main() {
                 if (dither(u_dither, int(v_pos.x), int(v_pos.y))) {
-                    int index = int(texture2D(spritesheet, v_uvs).r * 255.0 + 0.5);
+                    int index = int(texture(spritesheet, v_uvs).r * 255.0 + 0.5);
                     vec4 color = readColor(index);
                     if(color.a <= 0.1) {
                         discard;
                     } else {
-                        gl_FragColor = color; 
+                        fragColor = color; 
                     }
                 } else {
                     discard;

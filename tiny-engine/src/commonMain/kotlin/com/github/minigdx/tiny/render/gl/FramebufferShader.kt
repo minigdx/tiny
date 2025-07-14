@@ -74,13 +74,13 @@ class FramebufferShader(val gl: Kgl, val logger: Logger, val gameOptions: GameOp
     }
 
     class VShader : VertexShader(VERTEX_SHADER) {
-        val position = attributeVec2("position")
-        val uvs = attributeVec2("uvs")
-        val viewport = varyingVec2("viewport")
+        val position = inVec2("position")
+        val uvs = inVec2("uvs")
+        val viewport = outVec2("viewport")
     }
 
     class FShader : FragmentShader(FRAGMENT_SHADER) {
-        val viewport = varyingVec2("viewport")
+        val viewport = inVec2("viewport")
         val frameBuffer = uniformSample2D("frame_buffer", existingTexture = true)
     }
 
@@ -98,7 +98,7 @@ class FramebufferShader(val gl: Kgl, val logger: Logger, val gameOptions: GameOp
         val FRAGMENT_SHADER =
             """
             void main() {
-                gl_FragColor = texture2D(frame_buffer, viewport);
+                fragColor = texture(frame_buffer, viewport);
             }
             """.trimIndent()
     }

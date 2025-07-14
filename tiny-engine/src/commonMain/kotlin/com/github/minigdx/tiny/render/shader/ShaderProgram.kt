@@ -104,7 +104,7 @@ class ShaderProgram<V : VertexShader, F : FragmentShader>(
     }
 
     fun bind() {
-        for (attribute in vertexShader.attributes) {
+        for (attribute in vertexShader.inParameters) {
             attribute.bind()
         }
 
@@ -118,7 +118,7 @@ class ShaderProgram<V : VertexShader, F : FragmentShader>(
             sampler.unbind()
         }
 
-        for (attribute in vertexShader.attributes) {
+        for (attribute in vertexShader.inParameters) {
             attribute.unbind()
         }
     }
