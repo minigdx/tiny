@@ -239,6 +239,10 @@ sealed class ShaderParameter(val name: String) {
             data: FloatArray,
             stride: Int = 0,
         ) {
+            // Bind VAO to ensure vertex attribute configuration is captured
+            val vaoManager = VaoManager(program.gl)
+            vaoManager.bindVao(program.vao)
+
             program.bindBuffer(GL_ARRAY_BUFFER, buffer)
             program.bufferData(GL_ARRAY_BUFFER, FloatBuffer(data), data.size * GL_FLOAT, GL_DYNAMIC_DRAW)
             program.vertexAttribPointer(
@@ -250,12 +254,14 @@ sealed class ShaderParameter(val name: String) {
                 offset = 0,
             )
             program.enableVertexAttribArray(program.getAttrib(name))
-            program.bindBuffer(GL_ARRAY_BUFFER, null)
+
+            vaoManager.unbindVao()
         }
 
         override fun bind() {
             program.bindBuffer(GL_ARRAY_BUFFER, buffer)
-            program.enableVertexAttribArray(program.getAttrib(name))
+            // Note: In OpenGL 3.3 Core Profile with VAO, vertex attributes should already be configured
+            // in the VAO when apply() was called, so we don't need to re-enable them here
         }
 
         override fun unbind() {
@@ -429,8 +435,6 @@ sealed class ShaderParameter(val name: String) {
         override fun toString() = "out vec4 $name;"
     }
 
-    // FIXME: remplacer attribute par in
-    //   remplacer varying par on OU out selon context
     class VaryingFloat(name: String) : ShaderParameter(name), Varying {
         override fun create(program: ShaderProgram<*, *>) = Unit
 
