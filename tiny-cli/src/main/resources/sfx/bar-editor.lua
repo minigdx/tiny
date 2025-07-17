@@ -433,8 +433,7 @@ function _init()
         local knob = widgets:create_knob(k)
         table.insert(w, knob)
         if (knob.fields.Label == "BPM") then
-            wire.produce_to(knob, { "value" }, state, { "current_bar", "bpm" }, to_bpm)
-            wire.produce_to(state, { "current_bar", "bpm" }, knob, { "value" }, from_bpm)
+            wire.bind(knob, "value", state, "current_bar.bpm", to_bpm)
 
         end
     end
@@ -446,11 +445,11 @@ function _init()
 
     for instrument_name in all(entities["InstrumentName"]) do
         local label = new(InstrumentName, instrument_name)
-        wire.consume_on_update(label, { "index" }, state, { "current_instrument", "index" })
+        wire.sync(state, "current_instrument.index", label, "index", nil, "update")
         table.insert(w, label)
 
         local prev = wire.find_widget(w, label.fields.Prev)
-        wire.listen_to(prev, { "status" }, function(source, value)
+        wire.listen(prev, "status", function(source, value)
             state.current_bar.instrument(state.current_bar.instrument() - 1)
             state.current_instrument = sfx.instrument(state.current_bar.instrument())
             if (state.on_change) then
@@ -458,7 +457,7 @@ function _init()
             end
         end)
         local next = wire.find_widget(w, label.fields.Next)
-        wire.listen_to(next, { "status" }, function(source, value)
+        wire.listen(next, "status", function(source, value)
             state.current_bar.instrument(state.current_bar.instrument() + 1)
             state.current_instrument = sfx.instrument(state.current_bar.instrument())
             if (state.on_change) then
@@ -490,8 +489,8 @@ function _init()
     for b in all(entities["SfxMatrix"]) do
         local button = new(SfxMatrix, b)
 
-        wire.consume_on_update(button, { "value" }, state, { "current_bar", "index" })
-        wire.listen_to(button, { "value" }, function(source, value)
+        wire.sync(state, "current_bar.index", button, "value", nil, "update")
+        wire.listen(button, "value", function(source, value)
             state.current_bar = sfx.bar(value)
             if (state.on_change) then
                 state:on_change()

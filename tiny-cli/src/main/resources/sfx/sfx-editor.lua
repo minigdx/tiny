@@ -41,26 +41,19 @@ function _init()
         table.insert(m.widgets, knob)
 
         if knob.fields.Label == "Harm1" then
-            wire.produce_to(knob, { "value" }, state, { "instrument", "harmonics", "1" })
-            wire.produce_to(state, { "instrument", "harmonics", "1" }, knob, { "value" })
+            wire.bind(knob, "value", state, "instrument.harmonics.1")
         elseif knob.fields.Label == "Harm2" then
-            wire.produce_to(knob, { "value" }, state, { "instrument", "harmonics", "2" })
-            wire.produce_to(state, { "instrument", "harmonics", "2" }, knob, { "value" })
+            wire.bind(knob, "value", state, "instrument.harmonics.2")
         elseif knob.fields.Label == "Harm3" then
-            wire.produce_to(knob, { "value" }, state, { "instrument", "harmonics", "3" })
-            wire.produce_to(state, { "instrument", "harmonics", "3" }, knob, { "value" })
+            wire.bind(knob, "value", state, "instrument.harmonics.3")
         elseif knob.fields.Label == "Harm4" then
-            wire.produce_to(knob, { "value" }, state, { "instrument", "harmonics", "4" })
-            wire.produce_to(state, { "instrument", "harmonics", "4" }, knob, { "value" })
+            wire.bind(knob, "value", state, "instrument.harmonics.4")
         elseif knob.fields.Label == "Harm5" then
-            wire.produce_to(knob, { "value" }, state, { "instrument", "harmonics", "5" })
-            wire.produce_to(state, { "instrument", "harmonics", "5" }, knob, { "value" })
+            wire.bind(knob, "value", state, "instrument.harmonics.5")
         elseif knob.fields.Label == "Harm6" then
-            wire.produce_to(knob, { "value" }, state, { "instrument", "harmonics", "6" })
-            wire.produce_to(state, { "instrument", "harmonics", "6" }, knob, { "value" })
+            wire.bind(knob, "value", state, "instrument.harmonics.6")
         elseif knob.fields.Label == "Harm7" then
-            wire.produce_to(knob, { "value" }, state, { "instrument", "harmonics", "7" })
-            wire.produce_to(state, { "instrument", "harmonics", "7" }, knob, { "value" })
+            wire.bind(knob, "value", state, "instrument.harmonics.7")
         end
     end
 
@@ -71,24 +64,20 @@ function _init()
         envelop.on_hover = on_menu_item_hover
 
         local f = wire.find_widget(m.widgets, envelop.fields.Attack)
-        wire.produce_to(f, { "value" }, state, { "instrument", "attack" })
-        wire.produce_to(state, { "instrument", "attack" }, f, { "value" })
-        wire.consume_on_update(envelop, { "attack" }, f, { "value" })
+        wire.bind(f, "value", state, "instrument.attack")
+        wire.sync(f, "value", envelop, "attack", nil, "update")
 
         f = wire.find_widget(m.widgets, envelop.fields.Decay)
-        wire.produce_to(f, { "value" }, state, { "instrument", "decay" })
-        wire.produce_to(state, { "instrument", "decay" }, f, { "value" })
-        wire.consume_on_update(envelop, { "decay" }, f, { "value" })
+        wire.bind(f, "value", state, "instrument.decay")
+        wire.sync(f, "value", envelop, "decay", nil, "update")
 
         f = wire.find_widget(m.widgets, envelop.fields.Sustain)
-        wire.produce_to(f, { "value" }, state, { "instrument", "sustain" })
-        wire.produce_to(state, { "instrument", "sustain" }, f, { "value" })
-        wire.consume_on_update(envelop, { "sustain" }, f, { "value" })
+        wire.bind(f, "value", state, "instrument.sustain")
+        wire.sync(f, "value", envelop, "sustain", nil, "update")
 
         f = wire.find_widget(m.widgets, envelop.fields.Release)
-        wire.produce_to(f, { "value" }, state, { "instrument", "release" })
-        wire.produce_to(state, { "instrument", "release" }, f, { "value" })
-        wire.consume_on_update(envelop, { "release" }, f, { "value" })
+        wire.bind(f, "value", state, "instrument.release")
+        wire.sync(f, "value", envelop, "release", nil, "update")
 
         table.insert(m.widgets, envelop)
     end
@@ -110,15 +99,15 @@ function _init()
         if (button.fields.Type == "SAVE") then
 
         else
-            wire.produce_to(button, { "status" }, state, { "instrument", "wave" }, buttonToWave)
-            wire.consume_on_update(button, { "status" }, state, { "instrument", "wave" }, waveToButton)
+            wire.sync(button, "status", state, "instrument.wave", buttonToWave)
+            wire.sync(state, "instrument.wave", button, "status", waveToButton, "update")
         end
         table.insert(m.widgets, button)
     end
 
     for h in all(entities["InstrumentName"]) do
         local label = new(InstrumentName, h)
-        wire.consume_on_update(label, { "index" }, state, { "instrument", "index" })
+        wire.sync(state, "instrument.index", label, "index", nil, "update")
         table.insert(m.widgets, label)
     end
 
@@ -128,21 +117,21 @@ function _init()
 
     for k in all(entities["Keyboard"]) do
         local label = widgets:create_keyboard(k)
-        wire.listen_to(label, { "value" }, playNote)
+        wire.listen(label, "value", playNote)
         table.insert(m.widgets, label)
     end
 
     for b in all(entities["MenuItem"]) do
         local button = widgets:create_menu_item(b)
         if (button.fields.Item == "Prev") then
-            wire.listen_to(button, { "status" }, function(source, value)
+            wire.listen(button, "status", function(source, value)
                 state.instrument = sfx.instrument((state.instrument.index - 1 + 8) % 8)
                 if (state.on_change) then
                     state:on_change()
                 end
             end)
         elseif button.fields.Item == "Next" then
-            wire.listen_to(button, { "status" }, function(source, value)
+            wire.listen(button, "status", function(source, value)
                 state.instrument = sfx.instrument((state.instrument.index + 1) % 8)
                 if (state.on_change) then
                     state:on_change()
@@ -167,18 +156,18 @@ function _init()
         local acceleration = wire.find_widget(m.widgets, effect.fields.Acceleration)
         local sweep = wire.find_widget(m.widgets, effect.fields.Sweep)
 
-        wire.produce_to(active, { "value" }, state, { "instrument", "sweep", "active" })
-        wire.consume_on_update(active, { "value" }, state, { "instrument", "sweep", "active" })
+        wire.sync(active, "value", state, "instrument.sweep.active")
+        wire.sync(state, "instrument.sweep.active", active, "value", nil, "update")
 
-        wire.produce_to(acceleration, { "value" }, state, { "instrument", "sweep", "acceleration" })
-        wire.consume_on_update(acceleration, { "value" }, state, { "instrument", "sweep", "acceleration" })
+        wire.sync(acceleration, "value", state, "instrument.sweep.acceleration")
+        wire.sync(state, "instrument.sweep.acceleration", acceleration, "value", nil, "update")
 
-        wire.produce_to(sweep, { "value" }, state, { "instrument", "sweep", "frequency" }, function(source, target, value)
+        wire.sync(sweep, "value", state, "instrument.sweep.frequency", function(source, target, value)
             return juice.pow2(200, 2000, value)
         end)
-        wire.consume_on_update(sweep, { "value" }, state, { "instrument", "sweep", "frequency" }, function(source, target, value)
+        wire.sync(state, "instrument.sweep.frequency", sweep, "value", function(source, target, value)
             return (value - 200) / (2000 - 200)
-        end)
+        end, "update")
 
     end
 

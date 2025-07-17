@@ -271,8 +271,7 @@ function _init()
 
         track.track = sfx.track(track.fields.Track)
 
-        wire.produce_to(volume, { "value" }, track, { "track", "volume" })
-        wire.consume_on_update(volume, { "value" }, track, { "track", "volume" })
+        wire.bind(volume, "value", track, "track.volume")
 
         table.insert(m.widgets, track)
         table.insert(tracks, track)
