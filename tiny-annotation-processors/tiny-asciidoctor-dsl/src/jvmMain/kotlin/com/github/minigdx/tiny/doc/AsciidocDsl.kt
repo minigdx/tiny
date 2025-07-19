@@ -79,7 +79,10 @@ class AsciidocLibSection(val title: String?) {
         paragraphs.add(text)
     }
 
-    fun code(code: String, language: String = "lua") {
+    fun code(
+        code: String,
+        language: String = "lua",
+    ) {
         paragraph(
             """
                 >```$language

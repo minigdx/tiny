@@ -69,7 +69,6 @@ class CliToAsciidocKspProcessor(
 
             commands.forEach { command ->
                 section(command.name ?: command.className) {
-
                     lib {
                         paragraph(command.description ?: "No description available.")
 
@@ -148,7 +147,7 @@ class CliToAsciidocKspProcessor(
             .filterIsInstance<KSFunctionDeclaration>()
             .find { func ->
                 func.simpleName.asString() == "help" &&
-                        func.parentDeclaration == classDecl // Only methods declared in this class
+                    func.parentDeclaration == classDecl // Only methods declared in this class
             }
 
         helpFunction?.let { func ->
@@ -295,11 +294,11 @@ class CliToAsciidocKspProcessor(
             // If we're past the first line and hit a new property/method declaration, stop
             if (currentLineIndex > startLineIndex &&
                 (
-                        line.startsWith("val ") || line.startsWith("var ") ||
-                                line.startsWith("private val ") || line.startsWith("private var ") ||
-                                line.startsWith("override fun ") || line.startsWith("fun ") ||
-                                line.startsWith("class ") || line.startsWith("}")
-                        )
+                    line.startsWith("val ") || line.startsWith("var ") ||
+                        line.startsWith("private val ") || line.startsWith("private var ") ||
+                        line.startsWith("override fun ") || line.startsWith("fun ") ||
+                        line.startsWith("class ") || line.startsWith("}")
+                )
             ) {
                 break
             }
