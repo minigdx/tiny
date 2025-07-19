@@ -6,7 +6,7 @@ In this tutorial, we'll be creating a simple Pong game using the Lua programming
 
 Pong is a classic 2D arcade game where two players control paddles on opposite sides of the screen, and try to hit a ball back and forth without letting it pass their paddle. The game ends when one player misses the ball, and the other player scores a point.
 
-Our implementation of Pong will have a fixed screen size of 256 pixels for width and height, and we'll use the `ctrl.pressing()` function to check for key presses. Check the <<Tiny API>> to know more about the Tiny Engine API.
+Our implementation of Pong will have a fixed screen size of 256 pixels for width and height, and we'll use the `ctrl.pressing()` function to check for key presses. Check the <<_tiny_api,Tiny API>> to know more about the Tiny Engine API.
 
 We'll cover four main steps: initializing the game state with the `_init()` function, updating the game state with the `_update()` function and drawing the game with the `_draw()` function.
 

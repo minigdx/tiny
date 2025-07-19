@@ -79,10 +79,10 @@ class AsciidocLibSection(val title: String?) {
         paragraphs.add(text)
     }
 
-    fun code(code: String) {
+    fun code(code: String, language: String = "lua") {
         paragraph(
             """
-                >```lua
+                >```$language
                 >$code
                 >```
                """.trimMargin(">"),

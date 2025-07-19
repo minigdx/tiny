@@ -7,4 +7,4 @@ Once installed, you can start creating and developing games in no time!
 - Unzip it and put the `bin` directory in your path (i.e.: `export PATH=$PATH:<tiny-cli-path>/bin`)
 - Create your first game using `tiny-cli create my-first-game`
 
-What's next? You can check the <<Tiny Tutorial>>, <<Tiny API>> or get more information about the <<Tiny CLI>>.
+What's next? You can check the <<_tiny_tutorial,Tiny Tutorial>>, <<_tiny_api,Tiny API>> or get more information about the <<_tiny_cli_commands,Tiny CLI>>.

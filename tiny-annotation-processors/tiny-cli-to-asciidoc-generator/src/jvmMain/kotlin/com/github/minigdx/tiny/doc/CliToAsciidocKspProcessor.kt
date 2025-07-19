@@ -66,9 +66,11 @@ class CliToAsciidocKspProcessor(
 
         val result = asciidoc {
             title = "Tiny CLI Commands"
-            section {
-                commands.forEach { command ->
-                    lib(command.name ?: command.className) {
+
+            commands.forEach { command ->
+                section(command.name ?: command.className) {
+
+                    lib {
                         paragraph(command.description ?: "No description available.")
 
                         if (command.arguments.isNotEmpty()) {
@@ -92,7 +94,7 @@ class CliToAsciidocKspProcessor(
                             }
                         }
 
-                        code("# Usage\n$usage")
+                        code("# Usage\n$usage", "bash")
                     }
                 }
             }
@@ -146,7 +148,7 @@ class CliToAsciidocKspProcessor(
             .filterIsInstance<KSFunctionDeclaration>()
             .find { func ->
                 func.simpleName.asString() == "help" &&
-                    func.parentDeclaration == classDecl // Only methods declared in this class
+                        func.parentDeclaration == classDecl // Only methods declared in this class
             }
 
         helpFunction?.let { func ->
@@ -239,7 +241,8 @@ class CliToAsciidocKspProcessor(
 
                                 if (propertyDeclaration.contains("by argument(")) {
                                     // Extract help text from argument(help = "...") pattern - handle both single and multi-line strings
-                                    val helpPattern = """argument\s*\(\s*help\s*=\s*"([^"]+(?:\s*\+\s*"[^"]*")*?)"""".toRegex()
+                                    val helpPattern =
+                                        """argument\s*\(\s*help\s*=\s*"([^"]+(?:\s*\+\s*"[^"]*")*?)"""".toRegex()
                                     val helpMatch = helpPattern.find(propertyDeclaration)
                                     var helpText = helpMatch?.groupValues?.get(1)
 
@@ -292,11 +295,11 @@ class CliToAsciidocKspProcessor(
             // If we're past the first line and hit a new property/method declaration, stop
             if (currentLineIndex > startLineIndex &&
                 (
-                    line.startsWith("val ") || line.startsWith("var ") ||
-                        line.startsWith("private val ") || line.startsWith("private var ") ||
-                        line.startsWith("override fun ") || line.startsWith("fun ") ||
-                        line.startsWith("class ") || line.startsWith("}")
-                )
+                        line.startsWith("val ") || line.startsWith("var ") ||
+                                line.startsWith("private val ") || line.startsWith("private var ") ||
+                                line.startsWith("override fun ") || line.startsWith("fun ") ||
+                                line.startsWith("class ") || line.startsWith("}")
+                        )
             ) {
                 break
             }
@@ -393,7 +396,8 @@ class CliToAsciidocKspProcessor(
 
                                 if (propertyDeclaration.contains("by option(")) {
                                     // Extract help text from option(help = "...") pattern - handle both single and multi-line strings
-                                    val helpPattern = """option\s*\([^)]*help\s*=\s*"([^"]+(?:\s*\+\s*"[^"]*")*?)"""".toRegex()
+                                    val helpPattern =
+                                        """option\s*\([^)]*help\s*=\s*"([^"]+(?:\s*\+\s*"[^"]*")*?)"""".toRegex()
                                     val helpMatch = helpPattern.find(propertyDeclaration)
                                     var helpText = helpMatch?.groupValues?.get(1)
 

@@ -77,6 +77,7 @@ val copyResources =
 
 tasks.withType(AsciidoctorTask::class.java).configureEach {
     this.baseDirFollowsSourceDir()
+    this.notCompatibleWithConfigurationCache("AsciidoctorJ plugin is not compatible with configuration cache")
 
     this.dependsOn(
         unzipAsciidoctorResources.dependsOn(":tiny-web-editor:tinyWebEditor"),
