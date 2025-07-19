@@ -70,7 +70,7 @@ class GameScript(
 
     var globals: Globals? = null
 
-    private val tinyLib: TinyLib = TinyLib(gameOptions.gameScripts)
+    private val tinyLib: TinyLib = TinyLib(gameOptions.gameScripts, gameOptions)
 
     internal val testResults = mutableListOf<TestResult>()
 
