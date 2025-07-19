@@ -188,19 +188,19 @@ class MapLib(
             }
         }
 
-        @TinyCall("Convert the cell coordinates from a table [cx,cy] into screen coordinates as a table [x,y].")
+        @TinyCall("Convert the cell coordinates from a table {cx,cy} into screen coordinates as a table {x,y}.")
         override fun call(
             @TinyArg("cell") arg: LuaValue,
         ): LuaValue = super.call(arg)
     }
 
     @TinyFunction(
-        "Convert screen coordinates x, y into map cell coordinates cx, cy.\n" +
+        "Convert screen coordinates x, y into map cell coordinates {cx, cy}.\n" +
             "For example, coordinates of the player can be converted to cell coordinates to access the flag " +
             "of the tile matching the player coordinates.",
     )
     inner class to : TwoArgFunction() {
-        @TinyCall("Convert the coordinates into cell coordinates as a table [cx,cy].")
+        @TinyCall("Convert the coordinates into cell coordinates as a table {cx = cx,cy = cy}.")
         override fun call(
             @TinyArg("x") arg1: LuaValue,
             @TinyArg("y") arg2: LuaValue,
@@ -218,7 +218,7 @@ class MapLib(
             }
         }
 
-        @TinyCall("Convert the coordinates from a table [x,y] into cell coordinates as a table [cx,cy].")
+        @TinyCall("Convert the coordinates from a table {x,y} into cell coordinates as a table {cx,cy}.")
         override fun call(
             @TinyArg("coordinates") arg: LuaValue,
         ) = super.call(arg)

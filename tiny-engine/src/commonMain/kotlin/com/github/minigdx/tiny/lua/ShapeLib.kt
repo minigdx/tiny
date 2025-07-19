@@ -370,7 +370,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess, private val gameO
     internal inner class line : LibFunction() {
         @TinyCall("Draw a line.")
         override fun invoke(
-            @TinyArgs(["x0", "y0", "x1", "y2", "color"])
+            @TinyArgs(["x0", "y0", "x1", "y1", "color"])
             args: Varargs,
         ): Varargs {
             return when (args.narg()) {

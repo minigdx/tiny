@@ -91,3 +91,16 @@ artifacts {
         builtBy("kspKotlin")
     }
 }
+
+// Task to run the TestPoB class
+tasks.register<JavaExec>("runTestPoB") {
+    group = "application"
+    description = "Run the PBO rotating line test"
+    mainClass.set("com.github.minigdx.tiny.cli.TestPoBKt")
+    classpath = sourceSets["main"].runtimeClasspath
+    
+    // Add macOS-specific JVM argument for GLFW
+    if (System.getProperty("os.name").contains("Mac")) {
+        jvmArgs("-XstartOnFirstThread")
+    }
+}

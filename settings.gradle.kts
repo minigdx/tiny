@@ -15,7 +15,7 @@ pluginManagement {
 }
 
 plugins {
-    id("com.gradle.develocity") version ("4.0")
+    id("com.gradle.develocity") version ("4.1")
 }
 
 include("tiny-cli")
