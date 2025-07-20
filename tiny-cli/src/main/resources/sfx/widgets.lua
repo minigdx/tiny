@@ -162,12 +162,12 @@ factory.create_mode_switch = function(self, value)
     if (value.fields.EditorType == "InstrumentEditor") then
         result.overlay = { x = 0, y = 9*16 }
         result.on_change = function()
-            tiny.exit("sfx-editor.lua")
+            tiny.exit("instrument-editor.lua")
         end
     elseif (value.fields.EditorType == "MusicalBarEditor") then
         result.overlay = { x = 16, y = 9*16 }
         result.on_change = function()
-            tiny.exit("bar-editor.lua")
+            tiny.exit("sfx-editor.lua")
         end
     elseif (value.fields.EditorType == "MusicalEditor") then
         result.overlay = { x = 32, y = 9*16 }

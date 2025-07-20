@@ -7,7 +7,6 @@ import com.github.mingdx.tiny.doc.TinyLib
 import com.github.mingdx.tiny.doc.TinyVariable
 import com.github.minigdx.tiny.engine.Exit
 import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.platform.Platform
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.OneArgFunction
@@ -26,7 +25,6 @@ internal expect fun platformValue(): Int
 class TinyLib(
     private val gameScript: List<String>,
     private val gameOptions: GameOptions,
-    private val platform: Platform,
 ) : TwoArgFunction() {
     private var time: Double = 0.0
     private var frame: Int = 0
