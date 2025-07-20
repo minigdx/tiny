@@ -36,7 +36,8 @@
     "game.lua",
     "mouse.lua",
     "widgets.lua",
-    "music-editor.lua"
+    "music-editor.lua",
+    "widgets/MatrixSelector.lua"
   ],
   "spritesheets": [
     "sfx.png"
