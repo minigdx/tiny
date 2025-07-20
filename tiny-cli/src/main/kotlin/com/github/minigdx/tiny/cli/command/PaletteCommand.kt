@@ -8,6 +8,7 @@ import com.github.ajalt.clikt.parameters.arguments.optional
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
+import com.github.minigdx.tiny.cli.command.utils.PaletteImageGenerator
 import com.github.minigdx.tiny.cli.command.utils.ColorUtils
 import com.github.minigdx.tiny.cli.command.utils.ColorUtils.brightness
 import com.github.minigdx.tiny.cli.config.GameParameters
@@ -34,6 +35,9 @@ class PaletteCommand : CliktCommand(name = "palette") {
     val print by option(help = "Print in the console the palette information, without updating the game.")
         .flag()
 
+    val palette by option(help = "Generate a palette.png image file with all colors from the palette.")
+        .flag()
+
     override fun help(context: Context) = "Extract the color palette from an image or display current colors."
 
     override fun run() {
@@ -46,9 +50,17 @@ class PaletteCommand : CliktCommand(name = "palette") {
         val gameParameters = GameParameters.read(tiny)
         val gameOptions = gameParameters.toGameOptions()
 
+
         if (image == null) {
             // No image provided - display current colors
             displayCurrentColors(gameOptions.palette)
+
+            // Generate palette image if requested
+            if (palette) {
+                val paletteFile = PaletteImageGenerator.generatePaletteImage(gameDirectory, gameOptions.palette)
+                echo("🎨 Palette image generated: ${paletteFile.name}")
+            }
+
             return
         }
 
@@ -110,6 +122,12 @@ class PaletteCommand : CliktCommand(name = "palette") {
         // Display current colors at the end
         echo()
         displayCurrentColors(sortedColors)
+
+        // Generate palette image if requested
+        if (palette) {
+            val paletteFile = PaletteImageGenerator.generatePaletteImage(gameDirectory, sortedColors)
+            echo("🎨 Palette image generated: ${paletteFile.name}")
+        }
     }
 
     private fun displayCurrentColors(colors: List<String>) {

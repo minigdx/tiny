@@ -13,6 +13,7 @@ import com.github.ajalt.mordant.rendering.TextStyles
 import com.github.minigdx.tiny.cli.GamePalette
 import com.github.minigdx.tiny.cli.command.utils.ColorUtils
 import com.github.minigdx.tiny.cli.command.utils.ColorUtils.brightness
+import com.github.minigdx.tiny.cli.command.utils.PaletteImageGenerator
 import com.github.minigdx.tiny.cli.config.GameParameters
 import com.github.minigdx.tiny.cli.config.GameParameters.Companion.JSON
 import com.github.minigdx.tiny.cli.config.GameParametersV1
@@ -122,7 +123,11 @@ ${
             gameDirectory.resolve("_tiny.stub.lua").writeBytes(content.readAllBytes())
         }
 
+        // Generate palette image
+        val paletteFile = PaletteImageGenerator.generatePaletteImage(gameDirectory, (configuration as GameParametersV1).colors)
+        
         echo("\uD83C\uDFD7\uFE0F  Game created into: ${gameDirectory.absolutePath}")
+        echo("\uD83C\uDFA8  Palette image created: ${paletteFile.name}")
         echo("\uD83C\uDFC3\u200D♂\uFE0F To run the game: tiny-cli run ${computePath(gameDirectory)}")
     }
 
