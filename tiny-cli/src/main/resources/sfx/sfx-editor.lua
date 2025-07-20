@@ -35,7 +35,8 @@ end
 local SfxMatrix = {
     hover_index = nil,
     value = nil,
-    size = 16
+    size = 16,
+    active_indices = {}
 }
 
 SfxMatrix._update = function(self)
@@ -84,12 +85,19 @@ SfxMatrix._draw = function(self)
             if index < self.size then
                 local x = self.x + col * cell_width
                 local y = self.y + row * cell_height
+                local is_active = self:is_active(index)
 
                 if (self.value == index) then
+                    -- Selected index: filled with color 3
                     shape.rectf(x, y, cell_width, cell_height, 3)
                 elseif (self.hover_index == index) then
+                    -- Hovered index: border with color 3
                     shape.rect(x, y, cell_width, cell_height, 3)
+                elseif is_active then
+                    -- Active index (not selected, not hovered): filled with color 8
+                    shape.rectf(x, y, cell_width, cell_height, 8)
                 else
+                    -- Inactive index: border with color 4
                     shape.rect(x, y, cell_width, cell_height, 4)
                 end
                 print(index, x + 2, y + 2)
@@ -97,6 +105,32 @@ SfxMatrix._draw = function(self)
             index = index + 1
         end
     end
+end
+
+-- Function to toggle the active state of an index
+SfxMatrix.toggle_active = function(self, index)
+    if self:is_active(index) then
+        -- Remove from active list
+        for i = #self.active_indices, 1, -1 do
+            if self.active_indices[i] == index then
+                table.remove(self.active_indices, i)
+                break
+            end
+        end
+    else
+        -- Add to active list
+        table.insert(self.active_indices, index)
+    end
+end
+
+-- Function to check if an index is active
+SfxMatrix.is_active = function(self, index)
+    for i = 1, #self.active_indices do
+        if self.active_indices[i] == index then
+            return true
+        end
+    end
+    return false
 end
 
 local InstrumentName = {
