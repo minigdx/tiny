@@ -34,21 +34,31 @@ end
 
 local SfxMatrix = {
     hover_index = nil,
-    value = nil
+    value = nil,
+    size = 16
 }
 
 SfxMatrix._update = function(self)
     local p = ctrl.touch()
 
-    local cell_width = self.width / 4
+    local cols = math.ceil(math.sqrt(self.size))
+    local rows = math.ceil(self.size / cols)
+    local cell_width = self.width / cols
+    local cell_height = self.height / rows
 
     if inside_widget(self, p.x, p.y) then
         local x = p.x - self.x
         local y = p.y - self.y
 
-        local index = math.floor(x / cell_width) + math.floor((y / cell_width)) * 4
+        local col = math.floor(x / cell_width)
+        local row = math.floor(y / cell_height)
+        local index = col + row * cols
 
-        self.hover_index = index
+        if index < self.size then
+            self.hover_index = index
+        else
+            self.hover_index = nil
+        end
     else
         self.hover_index = nil
     end
@@ -62,19 +72,28 @@ SfxMatrix._update = function(self)
 end
 
 SfxMatrix._draw = function(self)
+    local cols = math.ceil(math.sqrt(self.size))
+    local rows = math.ceil(self.size / cols)
+    local cell_width = self.width / cols
+    local cell_height = self.height / rows
+    
     local index = 0
 
-    for y = self.y, self.y + self.height - 16, 16 do
-        for x = self.x, self.x + self.width - 16, 16 do
+    for row = 0, rows - 1 do
+        for col = 0, cols - 1 do
+            if index < self.size then
+                local x = self.x + col * cell_width
+                local y = self.y + row * cell_height
 
-            if (self.value == index) then
-                shape.rectf(x, y, 16, 16, 3)
-            elseif (self.hover_index == index) then
-                shape.rect(x, y, 16, 16, 3)
-            else
-                shape.rect(x, y, 16, 16, 4)
+                if (self.value == index) then
+                    shape.rectf(x, y, cell_width, cell_height, 3)
+                elseif (self.hover_index == index) then
+                    shape.rect(x, y, cell_width, cell_height, 3)
+                else
+                    shape.rect(x, y, cell_width, cell_height, 4)
+                end
+                print(index, x + 2, y + 2)
             end
-            print(index, x + 2, y + 2)
             index = index + 1
         end
     end
