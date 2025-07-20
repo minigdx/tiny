@@ -125,7 +125,7 @@ ${
 
         // Generate palette image
         val paletteFile = PaletteImageGenerator.generatePaletteImage(gameDirectory, (configuration as GameParametersV1).colors)
-        
+
         echo("\uD83C\uDFD7\uFE0F  Game created into: ${gameDirectory.absolutePath}")
         echo("\uD83C\uDFA8  Palette image created: ${paletteFile.name}")
         echo("\uD83C\uDFC3\u200D♂\uFE0F To run the game: tiny-cli run ${computePath(gameDirectory)}")

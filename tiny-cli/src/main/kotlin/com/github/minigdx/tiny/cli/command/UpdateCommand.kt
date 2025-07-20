@@ -4,8 +4,8 @@ import com.github.ajalt.clikt.core.Abort
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.core.terminal
-import com.github.ajalt.clikt.parameters.arguments.argument
-import com.github.ajalt.clikt.parameters.arguments.default
+import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.ajalt.mordant.input.InputReceiver
 import com.github.ajalt.mordant.input.receiveKeyEvents
@@ -17,7 +17,7 @@ import com.github.minigdx.tiny.cli.config.GameParametersV1
 import java.io.File
 
 class UpdateCommand : CliktCommand(name = "update") {
-    val gameDirectory by argument(help = "The directory containing your game to be updated.")
+    val gameDirectory by option("-d", "--directory", help = "The directory containing your game to be updated.")
         .file(mustExist = true, canBeDir = true, canBeFile = false)
         .default(File("."))
 

@@ -3,14 +3,14 @@ package com.github.minigdx.tiny.cli.command
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.arguments.argument
-import com.github.ajalt.clikt.parameters.arguments.default
 import com.github.ajalt.clikt.parameters.arguments.optional
+import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
-import com.github.minigdx.tiny.cli.command.utils.PaletteImageGenerator
 import com.github.minigdx.tiny.cli.command.utils.ColorUtils
 import com.github.minigdx.tiny.cli.command.utils.ColorUtils.brightness
+import com.github.minigdx.tiny.cli.command.utils.PaletteImageGenerator
 import com.github.minigdx.tiny.cli.config.GameParameters
 import com.github.minigdx.tiny.cli.exception.MissingTinyConfigurationException
 import com.github.minigdx.tiny.file.CommonVirtualFileSystem
@@ -21,7 +21,7 @@ import kotlinx.coroutines.runBlocking
 import java.io.File
 
 class PaletteCommand : CliktCommand(name = "palette") {
-    val gameDirectory by argument(help = "The directory containing your game to be update.")
+    val gameDirectory by option("-d", "--directory", help = "The directory containing your game to be update.")
         .file(mustExist = true, canBeDir = true, canBeFile = false)
         .default(File("."))
 
@@ -49,7 +49,6 @@ class PaletteCommand : CliktCommand(name = "palette") {
         // Open the _tiny.json
         val gameParameters = GameParameters.read(tiny)
         val gameOptions = gameParameters.toGameOptions()
-
 
         if (image == null) {
             // No image provided - display current colors
