@@ -3630,11 +3630,11 @@
 			"doc": null,
 			"width": 16,
 			"height": 16,
-			"resizableX": false,
-			"resizableY": false,
-			"minWidth": null,
+			"resizableX": true,
+			"resizableY": true,
+			"minWidth": 16,
 			"maxWidth": null,
-			"minHeight": null,
+			"minHeight": 16,
 			"maxHeight": null,
 			"keepAspectRatio": false,
 			"tileOpacity": 1,
@@ -3654,45 +3654,7 @@
 			"limitBehavior": "MoveLastOne",
 			"pivotX": 0,
 			"pivotY": 0,
-			"fieldDefs": [
-				{
-					"identifier": "EditorType",
-					"doc": null,
-					"__type": "LocalEnum.EditorType",
-					"uid": 121,
-					"type": "F_Enum(108)",
-					"isArray": false,
-					"canBeNull": false,
-					"arrayMinLength": null,
-					"arrayMaxLength": null,
-					"editorDisplayMode": "EntityTile",
-					"editorDisplayScale": 1,
-					"editorDisplayPos": "Above",
-					"editorLinkStyle": "StraightArrow",
-					"editorDisplayColor": null,
-					"editorAlwaysShow": true,
-					"editorShowInWorld": true,
-					"editorCutLongValues": true,
-					"editorTextSuffix": null,
-					"editorTextPrefix": null,
-					"useForSmartColor": false,
-					"exportToToc": false,
-					"searchable": false,
-					"min": null,
-					"max": null,
-					"regex": null,
-					"acceptFileTypes": null,
-					"defaultOverride": null,
-					"textLanguageMode": null,
-					"symmetricalRef": false,
-					"autoChainRef": true,
-					"allowOutOfLevelRef": true,
-					"allowedRefs": "OnlySame",
-					"allowedRefsEntityUid": null,
-					"allowedRefTags": [],
-					"tilesetUid": null
-				}
-			]
+			"fieldDefs": []
 		},
 		{
 			"identifier": "BarEditor",
@@ -4467,23 +4429,6 @@
 							]
 						},
 						{
-							"__identifier": "EditorMode",
-							"__grid": [29,0],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": { "tilesetUid": 1, "x": 16, "y": 144, "w": 16, "h": 16 },
-							"__smartColor": "#5A6988",
-							"iid": "7abf3440-1030-11f0-a6b8-97331f0ab111",
-							"width": 16,
-							"height": 16,
-							"defUid": 120,
-							"px": [232,0],
-							"fieldInstances": [{ "__identifier": "EditorType", "__type": "LocalEnum.EditorType", "__value": "MusicalBarEditor", "__tile": { "tilesetUid": 1, "x": 16, "y": 144, "w": 16, "h": 16 }, "defUid": 121, "realEditorValues": [{
-								"id": "V_String",
-								"params": ["MusicalBarEditor"]
-							}] }]
-						},
-						{
 							"__identifier": "Button",
 							"__grid": [44,0],
 							"__pivot": [0,0],
@@ -4783,20 +4728,17 @@
 						},
 						{
 							"__identifier": "EditorMode",
-							"__grid": [32,0],
+							"__grid": [29,0],
 							"__pivot": [0,0],
 							"__tags": [],
-							"__tile": { "tilesetUid": 1, "x": 32, "y": 144, "w": 16, "h": 16 },
+							"__tile": null,
 							"__smartColor": "#5A6988",
-							"iid": "976fce90-3740-11f0-8560-691b1d6d49da",
-							"width": 16,
+							"iid": "ff65fc40-5e50-11f0-9375-4978931f3cb5",
+							"width": 104,
 							"height": 16,
 							"defUid": 120,
-							"px": [256,0],
-							"fieldInstances": [{ "__identifier": "EditorType", "__type": "LocalEnum.EditorType", "__value": "MusicalEditor", "__tile": { "tilesetUid": 1, "x": 32, "y": 144, "w": 16, "h": 16 }, "defUid": 121, "realEditorValues": [{
-								"id": "V_String",
-								"params": ["MusicalEditor"]
-							}] }]
+							"px": [232,0],
+							"fieldInstances": []
 						}
 					]
 				},
@@ -7757,17 +7699,14 @@
 							"__grid": [22,0],
 							"__pivot": [0,0],
 							"__tags": [],
-							"__tile": { "tilesetUid": 1, "x": 0, "y": 144, "w": 16, "h": 16 },
+							"__tile": null,
 							"__smartColor": "#5A6988",
 							"iid": "66f79330-1030-11f0-a6b8-f9a5e236cdf4",
-							"width": 16,
+							"width": 120,
 							"height": 16,
 							"defUid": 120,
 							"px": [176,0],
-							"fieldInstances": [{ "__identifier": "EditorType", "__type": "LocalEnum.EditorType", "__value": "InstrumentEditor", "__tile": { "tilesetUid": 1, "x": 0, "y": 144, "w": 16, "h": 16 }, "defUid": 121, "realEditorValues": [{
-								"id": "V_String",
-								"params": ["InstrumentEditor"]
-							}] }]
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "BarEditor",
@@ -7924,23 +7863,6 @@
 							"defUid": 127,
 							"px": [16,160],
 							"fieldInstances": []
-						},
-						{
-							"__identifier": "EditorMode",
-							"__grid": [26,0],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": { "tilesetUid": 1, "x": 32, "y": 144, "w": 16, "h": 16 },
-							"__smartColor": "#5A6988",
-							"iid": "3457f570-3740-11f0-8560-594cc079aece",
-							"width": 16,
-							"height": 16,
-							"defUid": 120,
-							"px": [208,0],
-							"fieldInstances": [{ "__identifier": "EditorType", "__type": "LocalEnum.EditorType", "__value": "MusicalEditor", "__tile": { "tilesetUid": 1, "x": 32, "y": 144, "w": 16, "h": 16 }, "defUid": 121, "realEditorValues": [{
-								"id": "V_String",
-								"params": ["MusicalEditor"]
-							}] }]
 						}
 					]
 				},
@@ -9979,17 +9901,14 @@
 							"__grid": [22,0],
 							"__pivot": [0,0],
 							"__tags": [],
-							"__tile": { "tilesetUid": 1, "x": 0, "y": 144, "w": 16, "h": 16 },
+							"__tile": null,
 							"__smartColor": "#5A6988",
 							"iid": "4179c672-3740-11f0-8560-39d8c0b1c722",
-							"width": 16,
+							"width": 80,
 							"height": 16,
 							"defUid": 120,
 							"px": [176,0],
-							"fieldInstances": [{ "__identifier": "EditorType", "__type": "LocalEnum.EditorType", "__value": "InstrumentEditor", "__tile": { "tilesetUid": 1, "x": 0, "y": 144, "w": 16, "h": 16 }, "defUid": 121, "realEditorValues": [{
-								"id": "V_String",
-								"params": ["InstrumentEditor"]
-							}] }]
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Button",
@@ -10010,23 +9929,6 @@
 								}] },
 								{ "__identifier": "Help", "__type": "String", "__value": "", "__tile": null, "defUid": 23, "realEditorValues": [] }
 							]
-						},
-						{
-							"__identifier": "EditorMode",
-							"__grid": [26,0],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": { "tilesetUid": 1, "x": 16, "y": 144, "w": 16, "h": 16 },
-							"__smartColor": "#5A6988",
-							"iid": "4179c67b-3740-11f0-8560-672b611071c4",
-							"width": 16,
-							"height": 16,
-							"defUid": 120,
-							"px": [208,0],
-							"fieldInstances": [{ "__identifier": "EditorType", "__type": "LocalEnum.EditorType", "__value": "MusicalBarEditor", "__tile": { "tilesetUid": 1, "x": 16, "y": 144, "w": 16, "h": 16 }, "defUid": 121, "realEditorValues": [{
-								"id": "V_String",
-								"params": ["MusicalBarEditor"]
-							}] }]
 						},
 						{
 							"__identifier": "TrackEditor",

@@ -420,9 +420,9 @@ function _init()
         end)
     end
 
-    local modes = entities["EditorMode"]
-    if #modes > 0 then
-        local modeSwitch = widgets:create_mode_switch_component(modes[1])
+    for mode in all(entities["EditorMode"]) do
+        local modeSwitch = widgets:create_mode_switch_component(mode)
+        modeSwitch.selected_index = 1
         table.insert(w, modeSwitch)
     end
 

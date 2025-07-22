@@ -22,7 +22,7 @@ InstrumentName._update = function(self)
 end
 
 InstrumentName._draw = function(self)
-    local x,y = 0,160
+    local x, y = 0, 160
     local ox = (self.index % 4) * 16
     local oy = math.floor(self.index / 4) * 16
     spr.sdraw(self.x, self.y, x + ox, y + oy, 16, 16)
@@ -141,9 +141,9 @@ function _init()
         table.insert(m.widgets, button)
     end
 
-    local modes = entities["EditorMode"]
-    if #modes > 0 then
-        local modeSwitch = widgets:create_mode_switch_component(modes[1])
+    for mode in all(entities["EditorMode"]) do
+        local modeSwitch = widgets:create_mode_switch_component(mode)
+        modeSwitch.selected_index = 0
         table.insert(m.widgets, modeSwitch)
     end
 

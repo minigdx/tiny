@@ -3,6 +3,7 @@ local ModeSwitch = {
     selected_index = 0,
     button_width = 16,
     button_height = 16,
+    button_margin_right = 8,
     buttons = {
         {
             overlay = { x = 0, y = 9*16 },
@@ -33,9 +34,10 @@ ModeSwitch._update = function(self)
     
     if inside_widget(self, pos.x, pos.y) then
         local relative_x = pos.x - self.x
-        local button_index = math.floor(relative_x / self.button_width)
-        
-        if button_index >= 0 and button_index < #self.buttons then
+        local button_index = math.floor(relative_x / (self.button_width + self.button_margin_right))
+        local is_hover_button = (relative_x - button_index * (self.button_width + self.button_margin_right)) <= self.button_width
+
+        if is_hover_button and button_index >= 0 and button_index < #self.buttons then
             self.hover_index = button_index
             
             if self.on_hover then
@@ -63,7 +65,7 @@ end
 ModeSwitch._draw = function(self)
     for i = 0, #self.buttons - 1 do
         local button = self.buttons[i + 1]
-        local x = self.x + i * self.button_width
+        local x = self.x + i * (self.button_width + self.button_margin_right)
         local y = self.y
         
         local background = 0

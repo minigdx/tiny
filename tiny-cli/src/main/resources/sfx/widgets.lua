@@ -580,8 +580,6 @@ local ModeSwitch = require("widgets.ModeSwitch")
 
 factory.create_mode_switch_component = function(self, value)
     local result = new(ModeSwitch, value)
-    result.width = 48
-    result.height = 16
     return result
 end
 
