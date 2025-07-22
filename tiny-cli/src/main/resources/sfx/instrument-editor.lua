@@ -141,9 +141,10 @@ function _init()
         table.insert(m.widgets, button)
     end
 
-    for mode in all(entities["EditorMode"]) do
-        local button = widgets:create_mode_switch(mode)
-        table.insert(m.widgets, button)
+    local modes = entities["EditorMode"]
+    if #modes > 0 then
+        local modeSwitch = widgets:create_mode_switch_component(modes[1])
+        table.insert(m.widgets, modeSwitch)
     end
 
     for mode in all(entities["Checkbox"]) do

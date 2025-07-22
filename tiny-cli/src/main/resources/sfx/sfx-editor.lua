@@ -420,9 +420,10 @@ function _init()
         end)
     end
 
-    for mode in all(entities["EditorMode"]) do
-        local button = widgets:create_mode_switch(mode)
-        table.insert(w, button)
+    local modes = entities["EditorMode"]
+    if #modes > 0 then
+        local modeSwitch = widgets:create_mode_switch_component(modes[1])
+        table.insert(w, modeSwitch)
     end
 
     for mode in all(entities["VolumeEditor"]) do

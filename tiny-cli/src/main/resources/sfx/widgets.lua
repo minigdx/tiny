@@ -156,27 +156,6 @@ factory.create_button = function(self, value)
     return result
 end
 
-factory.create_mode_switch = function(self, value)
-    local result = new(Button, value)
-    result.help = result.fields.Help
-    if (value.fields.EditorType == "InstrumentEditor") then
-        result.overlay = { x = 0, y = 9*16 }
-        result.on_change = function()
-            tiny.exit("instrument-editor.lua")
-        end
-    elseif (value.fields.EditorType == "MusicalBarEditor") then
-        result.overlay = { x = 16, y = 9*16 }
-        result.on_change = function()
-            tiny.exit("sfx-editor.lua")
-        end
-    elseif (value.fields.EditorType == "MusicalEditor") then
-        result.overlay = { x = 32, y = 9*16 }
-        result.on_change = function()
-            tiny.exit("music-editor.lua")
-        end
-    end
-    return result
-end
 
 Button._update = function(self)
     if self.status == 2 then
@@ -595,6 +574,15 @@ factory.create_menu_item = function(self, data)
 
     table.insert(menuItems, menu)
     return menu
+end
+
+local ModeSwitch = require("widgets.ModeSwitch")
+
+factory.create_mode_switch_component = function(self, value)
+    local result = new(ModeSwitch, value)
+    result.width = 48
+    result.height = 16
+    return result
 end
 
 factory._draw = function(self)
