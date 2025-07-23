@@ -42,7 +42,11 @@
     "widgets/ModeSwitch.lua",
     "widgets/Knob.lua",
     "widgets/Checkbox.lua",
-    "widgets/Fader.lua"
+    "widgets/Fader.lua",
+    "widgets/MenuItem.lua",
+    "widgets/Keyboard.lua",
+    "widgets/Help.lua",
+    "widgets/Button.lua"
   ],
   "spritesheets": [
     "sfx.png"
