@@ -39,7 +39,10 @@
     "music-editor.lua",
     "widgets/Envelop.lua",
     "widgets/MatrixSelector.lua",
-    "widgets/ModeSwitch.lua"
+    "widgets/ModeSwitch.lua",
+    "widgets/Knob.lua",
+    "widgets/Checkbox.lua",
+    "widgets/Fader.lua"
   ],
   "spritesheets": [
     "sfx.png"

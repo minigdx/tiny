@@ -16,28 +16,6 @@ local set_value = function(self, value)
     self:fire_on_update(value)
 end
 
-local Fader = {
-    x = 0,
-    y = 0,
-    width = 11,
-    height = 80,
-    enabled = true,
-    min_value = 0,
-    max_value = 10,
-    value = 0,
-    tip_color = 9,
-    disabled_color = 7,
-    label = "",
-    type = "fader",
-    data = nil,
-    index = 0,
-    on_value_update = function(fader, value)
-    end,
-    listeners = {},
-    on_update = on_update,
-    fire_on_update = fire_on_update,
-    set_value = set_value,
-}
 
 local Button = {
     x = 0,
@@ -56,29 +34,7 @@ local Button = {
 }
 
 
-local Checkbox = {
-    label = "",
-    value = false,
-    x = 0,
-    y = 0,
-    width = 8,
-    height = 8,
-    enabled = true
-}
 
-local Knob = {
-    label = "",
-    value = 0,
-    x = 0,
-    y = 0,
-    width = 16,
-    height = 16,
-    enabled = true,
-    listeners = {},
-    on_update = on_update,
-    fire_on_update = fire_on_update,
-    set_value = set_value,
-}
 
 local MenuItem = {
     _type = "MenuItem",
@@ -176,12 +132,6 @@ Button._draw = function(self)
 end
 
 
-factory.create_knob = function(self, value)
-    local result = new(Knob, value)
-    result.label = result.fields.Label
-    result.help = result.fields.Help
-    return result
-end
 
 factory.create_tabs = function(self)
     local tabs = new(TabManager)
@@ -191,105 +141,7 @@ factory.create_tabs = function(self)
     return tabs
 end
 
-Knob._draw = function(self)
-    local angle = (1.8 * math.pi) * self.value + math.pi * 0.6
 
-    local target_x = math.cos(angle) * 8 + self.x + 8
-    local target_y = math.sin(angle) * 8 + self.y + 8
-
-    spr.sdraw(self.x, self.y, 0, 64, 16, 16)
-    shape.line(self.x + 8, self.y + 8, target_x, target_y, 9)
-    print(self.label, self.x - 1, self.y + 18)
-
-    if self.is_hover or self.active_color then
-        local c = 9
-        if (self.active_color) then
-            c = self.active_color
-        end
-        shape.rect(self.x, self.y, self.width, self.height, c)
-    end
-end
-
-Knob._update = function(self)
-
-    local touching = ctrl.touching(0)
-
-    -- the click started in the widget?
-    if touching ~= nil and inside_widget(self, touching.x, touching.y) then
-        if self.start_value == nil then
-            self.start_value = self.value
-        end
-        local touch = ctrl.touch()
-
-        self.active_color = 11
-
-        local dst = self.y + 4 - touch.y
-        local percent = math.max(math.min(1, dst / 32), -1)
-        local value = math.min(math.max(0, self.start_value + percent), 1)
-        self:set_value(value)
-
-    end
-
-    local pos = ctrl.touch()
-    if inside_widget(self, pos.x, pos.y) then
-        if self.on_hover ~= nil then
-            self:on_hover()
-        end
-        self.is_hover = true
-    else
-        self.is_hover = false
-    end
-
-    if touching == nil then
-        self.start_value = nil
-        self.active_color = nil
-    end
-end
-
-factory.create_fader = function(self, value)
-    local result = new(Fader, value)
-    result.help = result.fields.Help
-    result.label = result.fields.Label
-    result.hitbox = {
-        x = result.x,
-        y = result.y,
-        width = result.width,
-        height = result.height + 4
-    }
-    return result
-end
-
-Fader._update = function(self)
-    local pos = ctrl.touch()
-    if inside_widget(self.hitbox, pos.x, pos.y) then
-        if self.on_hover ~= nil then
-            self:on_hover()
-        end
-
-        if ctrl.touching(0) then
-            local percent = math.max(0.0, 1.0 - ((pos.y - self.y) / self.height))
-            self.value = percent
-
-            -- todo: to be removed as fire_on_update should be used instead
-            if self.on_value_update then
-                self:on_value_update(self.value)
-            end
-
-            self:fire_on_update(self.value)
-        end
-    end
-end
-
-Fader._draw = function(self)
-    local color = self.disabled_color
-
-    if self.value ~= nil and self.value > 0 then
-        color = self.tip_color
-    end
-    local y = self.height - self.value * self.height
-    local tipy = self.y + y
-    shape.rectf(self.x + 1, tipy, self.width - 2, 2, self.tip_color)
-end
 
 function draw_counter(counter)
     spr.draw(counter.spr + counter.status, counter.x, counter.y)
@@ -299,44 +151,6 @@ function draw_counter(counter)
 end
 
 
-factory.create_checkbox = function(self, data)
-    local result = new(Checkbox, data)
-    result.help = result.fields.Help
-    result.label = result.fields.Label
-    return result
-end
-
-Checkbox._update = function(self)
-    local pos = ctrl.touched(0)
-    if pos ~= nil then
-        local w = {
-            x = self.x,
-            y = self.y,
-            height = self.height,
-            width = self.width + #self.label * 4
-        }
-        if inside_widget(w, pos.x, pos.y) then
-            self.value = not self.value
-            if self.on_change then
-                self:on_change()
-            end
-        end
-    end
-
-    pos = ctrl.touch()
-    if self.on_hover and inside_widget(self, pos.x, pos.y) then
-        self:on_hover()
-    end
-end
-
-Checkbox._draw = function(self)
-    if self.value then
-        spr.sdraw(self.x, self.y, 8, 48, 8, 8)
-    else
-        spr.sdraw(self.x, self.y, 0, 48, 8, 8)
-    end
-    print(self.label, self.x + 10, self.y + 2)
-end
 
 local Help = {
     _type = "Help",
@@ -479,6 +293,9 @@ end
 
 local ModeSwitch = require("widgets.ModeSwitch")
 local Envelop = require("widgets.Envelop")
+local Knob = require("widgets.Knob")
+local Checkbox = require("widgets.Checkbox")
+local Fader = require("widgets.Fader")
 
 factory.create_mode_switch_component = function(self, value)
     local result = new(ModeSwitch, value)
@@ -490,6 +307,33 @@ factory.create_envelop = function(self, data)
     result.attack_start_x = result.x
     result.attack_start_y = result.y + result.height
 
+    return result
+end
+
+factory.create_knob = function(self, value)
+    local result = new(Knob, value)
+    result.label = result.fields.Label
+    result.help = result.fields.Help
+    return result
+end
+
+factory.create_checkbox = function(self, data)
+    local result = new(Checkbox, data)
+    result.help = result.fields.Help
+    result.label = result.fields.Label
+    return result
+end
+
+factory.create_fader = function(self, value)
+    local result = new(Fader, value)
+    result.help = result.fields.Help
+    result.label = result.fields.Label
+    result.hitbox = {
+        x = result.x,
+        y = result.y,
+        width = result.width,
+        height = result.height + 4
+    }
     return result
 end
 
