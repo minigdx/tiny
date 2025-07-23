@@ -55,26 +55,6 @@ local Button = {
     fire_on_update = fire_on_update,
 }
 
-local Envelop = {
-    label = "",
-    value = 0,
-    x = 0,
-    y = 0,
-    width = 128,
-    height = 64,
-    enabled = true,
-    attack = 0,
-    decay = 0.2,
-    sustain = 0.5,
-    release = 0,
-
-    attack_end_x = 0,
-    attack_end_y = 0,
-    decay_end_x = 0,
-    decay_end_y = 0,
-    release_start_x = 0,
-    release_start_y = 0
-}
 
 local Checkbox = {
     label = "",
@@ -195,13 +175,6 @@ Button._draw = function(self)
     end
 end
 
-factory.create_envelop = function(self, data)
-    local result = new(Envelop, data)
-    result.attack_start_x = result.x
-    result.attack_start_y = result.y + result.height
-
-    return result
-end
 
 factory.create_knob = function(self, value)
     local result = new(Knob, value)
@@ -325,78 +298,6 @@ function draw_counter(counter)
     print(string.sub(counter.value, 1, 4), counter.x + 3, counter.y + 2)
 end
 
-Envelop._update = function(self)
-    self.decay = math.min(self.decay, 1 - self.attack)
-    self.release = math.min(self.release, 1 - (self.decay + self.attack))
-
-    self.attack_end_x = self.x + self.attack * self.width
-    self.attack_end_y = self.y
-
-    self.decay_end_x = self.attack_end_x + self.decay * self.width
-    self.decay_end_y = self.y + self.height * (1 - self.sustain)
-
-    self.release_start_x = self.x + self.width - self.release * self.width
-    self.release_start_y = self.y + self.height * (1 - self.sustain)
-end
-
-Envelop._draw = function(self)
-    shape.rect(self.x, self.y, self.width + 1, self.height + 1, 9)
-
-    -- attack
-    shape.line(self.x, self.y + self.height, self.attack_end_x, self.attack_end_y, 8)
-    shape.circle(self.attack_end_x, self.attack_end_y, 2, 8)
-
-    -- decay
-    shape.line(self.attack_end_x, self.attack_end_y, self.decay_end_x, self.decay_end_y, 10)
-    shape.circle(self.decay_end_x, self.decay_end_y, 2, 10)
-
-    -- release
-    shape.line(self.release_start_x, self.release_start_y, self.x + self.width, self.y + self.height, 9)
-    shape.circle(self.release_start_x, self.release_start_y, 2, 9)
-
-    shape.line(self.decay_end_x, self.decay_end_y, self.release_start_x, self.release_start_y, 9)
-
-    -- sustain
-    local width = 8
-    local height = 4
-    shape.rect(self.decay_end_x + (self.release_start_x - self.decay_end_x - width) * 0.5, self.y + (1 - self.sustain) * self.height - height * 0.5, width, height, 8)
-end
-
-Envelop.set_attack = function(self, widget)
-    self.attack_fader = widget
-    local on_value_update = function(nested, value)
-        self.attack = value
-    end
-    -- set the initial value on the widget
-    widget:on_update(on_value_update)
-end
-
-Envelop.set_decay = function(self, widget)
-    self.decay_fader = widget
-    local on_value_update = function(nested, value)
-        self.decay = value
-    end
-    -- set the initial value on the widget
-    widget:on_update(on_value_update)
-end
-
-Envelop.set_sustain = function(self, widget)
-    self.sustain_fader = widget
-    local on_value_update = function(nested, value)
-        self.sustain = value
-    end
-    -- set the initial value on the widget
-    widget:on_update(on_value_update)
-end
-
-Envelop.set_release = function(self, widget)
-    self.release_fader = widget
-    local on_value_update = function(nested, value)
-        self.release = value
-    end
-    -- set the initial value on the widget
-    widget:on_update(on_value_update)
-end
 
 factory.create_checkbox = function(self, data)
     local result = new(Checkbox, data)
@@ -577,9 +478,18 @@ factory.create_menu_item = function(self, data)
 end
 
 local ModeSwitch = require("widgets.ModeSwitch")
+local Envelop = require("widgets.Envelop")
 
 factory.create_mode_switch_component = function(self, value)
     local result = new(ModeSwitch, value)
+    return result
+end
+
+factory.create_envelop = function(self, data)
+    local result = new(Envelop, data)
+    result.attack_start_x = result.x
+    result.attack_start_y = result.y + result.height
+
     return result
 end
 

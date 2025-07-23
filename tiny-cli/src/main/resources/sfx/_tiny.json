@@ -37,6 +37,7 @@
     "mouse.lua",
     "widgets.lua",
     "music-editor.lua",
+    "widgets/Envelop.lua",
     "widgets/MatrixSelector.lua",
     "widgets/ModeSwitch.lua"
   ],
