@@ -51,7 +51,7 @@ end
 -- @param transform Optional function to transform values (obj_from, obj_to, value) -> transformed_value
 wire.bind = function(obj1, path1, obj2, path2, transform)
     -- obj1 -> obj2
-    wire.sync(obj1, path1, obj2, path2, transform)
+    wire.sync(obj1, path1, obj2, path2, transform, "update")
     
     -- obj2 -> obj1
     local reverse_transform = nil

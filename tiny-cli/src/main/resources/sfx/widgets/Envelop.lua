@@ -6,6 +6,7 @@ local Envelop = {
     width = 128,
     height = 64,
     enabled = true,
+    -- values --
     attack = 0,
     decay = 0.2,
     sustain = 0.5,
@@ -54,42 +55,6 @@ Envelop._draw = function(self)
     local width = 8
     local height = 4
     shape.rect(self.decay_end_x + (self.release_start_x - self.decay_end_x - width) * 0.5, self.y + (1 - self.sustain) * self.height - height * 0.5, width, height, 8)
-end
-
-Envelop.set_attack = function(self, widget)
-    self.attack_fader = widget
-    local on_value_update = function(nested, value)
-        self.attack = value
-    end
-    -- set the initial value on the widget
-    widget:on_update(on_value_update)
-end
-
-Envelop.set_decay = function(self, widget)
-    self.decay_fader = widget
-    local on_value_update = function(nested, value)
-        self.decay = value
-    end
-    -- set the initial value on the widget
-    widget:on_update(on_value_update)
-end
-
-Envelop.set_sustain = function(self, widget)
-    self.sustain_fader = widget
-    local on_value_update = function(nested, value)
-        self.sustain = value
-    end
-    -- set the initial value on the widget
-    widget:on_update(on_value_update)
-end
-
-Envelop.set_release = function(self, widget)
-    self.release_fader = widget
-    local on_value_update = function(nested, value)
-        self.release = value
-    end
-    -- set the initial value on the widget
-    widget:on_update(on_value_update)
 end
 
 return Envelop

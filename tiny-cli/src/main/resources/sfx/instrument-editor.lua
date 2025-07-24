@@ -35,50 +35,51 @@ local state = {
 function _init()
     map.level("InstrumentEditor")
     local entities = map.entities()
+    state.instrument = sfx.instrument(1)
+
     for k in all(entities["Knob"]) do
         local knob = widgets:create_knob(k)
         knob.on_hover = on_menu_item_hover
         table.insert(m.widgets, knob)
 
         if knob.fields.Label == "Harm1" then
-            wire.bind(knob, "value", state, "instrument.harmonics.1")
+            wire.bind(state, "instrument.harmonics.1", knob, "value")
         elseif knob.fields.Label == "Harm2" then
-            wire.bind(knob, "value", state, "instrument.harmonics.2")
+            wire.bind(state, "instrument.harmonics.2", knob, "value")
         elseif knob.fields.Label == "Harm3" then
-            wire.bind(knob, "value", state, "instrument.harmonics.3")
+            wire.bind(state, "instrument.harmonics.3", knob, "value")
         elseif knob.fields.Label == "Harm4" then
-            wire.bind(knob, "value", state, "instrument.harmonics.4")
+            wire.bind(state, "instrument.harmonics.4", knob, "value")
         elseif knob.fields.Label == "Harm5" then
-            wire.bind(knob, "value", state, "instrument.harmonics.5")
+            wire.bind(state, "instrument.harmonics.5", knob, "value")
         elseif knob.fields.Label == "Harm6" then
+            wire.bind(state, "instrument.harmonics.6", knob, "value")
             wire.bind(knob, "value", state, "instrument.harmonics.6")
         elseif knob.fields.Label == "Harm7" then
-            wire.bind(knob, "value", state, "instrument.harmonics.7")
+            wire.bind(state, "instrument.harmonics.7", knob, "value")
         end
     end
 
-    state.instrument = sfx.instrument(1)
 
     for k in all(entities["Envelop"]) do
         local envelop = widgets:create_envelop(k)
         envelop.on_hover = on_menu_item_hover
 
         local f = wire.find_widget(m.widgets, envelop.fields.Attack)
-        wire.bind(f, "value", state, "instrument.attack")
-        wire.sync(f, "value", envelop, "attack", nil, "update")
+        wire.bind(state, "instrument.attack", f, "value")
+        wire.bind(state, "instrument.attack", envelop, "attack")
 
         f = wire.find_widget(m.widgets, envelop.fields.Decay)
-        wire.bind(f, "value", state, "instrument.decay")
-        wire.sync(f, "value", envelop, "decay", nil, "update")
+        wire.bind(state, "instrument.decay", f, "value")
+        wire.bind(state, "instrument.decay", envelop, "decay")
 
         f = wire.find_widget(m.widgets, envelop.fields.Sustain)
-        wire.bind(f, "value", state, "instrument.sustain")
-        wire.sync(f, "value", envelop, "sustain", nil, "update")
+        wire.bind(state, "instrument.sustain", f, "value")
+        wire.bind(state, "instrument.sustain", envelop, "sustain")
 
         f = wire.find_widget(m.widgets, envelop.fields.Release)
-        wire.bind(f, "value", state, "instrument.release")
-        wire.sync(f, "value", envelop, "release", nil, "update")
-
+        wire.bind(state, "instrument.release", f, "value")
+        wire.bind(state, "instrument.release", envelop, "release")
         table.insert(m.widgets, envelop)
     end
 

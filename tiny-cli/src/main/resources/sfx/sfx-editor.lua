@@ -17,6 +17,8 @@ local State = {
 
     -- the instrument of the current_bar
     current_instrument = nil,
+
+    on_change = function()  end
 }
 
 local state = new(State)
