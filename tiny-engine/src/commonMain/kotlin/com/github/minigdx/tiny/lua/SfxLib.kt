@@ -15,6 +15,7 @@ import com.github.minigdx.tiny.sound.Sweep
 import kotlinx.serialization.json.Json
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
+import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
@@ -293,20 +294,49 @@ class SfxLib(
     }
 
     @TinyFunction("Access instrument using its index or its name.")
-    inner class instrument : OneArgFunction() {
+    inner class instrument : LibFunction() {
         @TinyCall("Access instrument using its index or its name.")
-        override fun call(arg: LuaValue): LuaValue {
+        override fun call(a: LuaValue): LuaValue {
             val music = getCurrentMusic()
-            val index = arg.asInstrumentIndex(music) ?: return NIL
+            val index = a.asInstrumentIndex(music) ?: return NIL
             return music.instruments
                 .getOrNull(index)
                 ?.toLua() ?: NIL
         }
 
+        @TinyCall(
+            "Access instrument using its index or its name. " +
+                "Create it if the instrument is missing and the flag is true.",
+        )
+        override fun call(
+            a: LuaValue,
+            b: LuaValue,
+        ): LuaValue {
+            val instrument = call(a)
+            return if (instrument == NIL && b.optboolean(false)) {
+                val index = a.toint()
+                val newInstrument = Instrument(index)
+                getCurrentMusic().instruments[index] = newInstrument
+                newInstrument.toLua()
+            } else {
+                instrument
+            }
+        }
+
         fun Instrument.toLua(): LuaValue {
             val obj = WrapperLuaTable()
 
-            obj.wrap("index") { valueOf(this.index) }
+            obj.wrap(
+                "index",
+                { valueOf(this.index) },
+            )
+            obj.wrap("all") {
+                val luaTable = LuaTable()
+                getCurrentMusic().instruments.mapNotNull { it?.index }.forEach {
+                    luaTable.insert(0, valueOf(it))
+                }
+                luaTable
+            }
             obj.wrap(
                 "name",
                 { this.name?.let { valueOf(it) } ?: NIL },
@@ -698,10 +728,13 @@ class SfxLib(
 
     private fun LuaValue.asInstrumentIndex(music: Music): Int? {
         return if (this.isint()) {
-            this.checkint() % music.instruments.size
+            val index = this.checkint()
+            music.instruments
+                .firstOrNull { it?.index == index }
+                ?.index
         } else {
             music.instruments
-                .firstOrNull { inst -> inst.name == this.checkjstring() }
+                .firstOrNull { inst -> inst?.name == this.checkjstring() }
                 ?.index
         }
     }

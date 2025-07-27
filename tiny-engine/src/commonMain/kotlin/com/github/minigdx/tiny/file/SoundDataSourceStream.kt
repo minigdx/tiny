@@ -18,6 +18,13 @@ class SoundDataSourceStream(
 
         val json = Json { ignoreUnknownKeys = true }
         val music: Music = json.decodeFromString(bytes.decodeToString())
+        music.instruments = Array(16) {
+            if (it in 0 until music.instruments.size) {
+                music.instruments[it]
+            } else {
+                null
+            }
+        }
         music.musicalBars.forEach { musicBar ->
             musicBar.instrument = music.instruments[musicBar.instrumentIndex]
         }

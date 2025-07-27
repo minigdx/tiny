@@ -1,6 +1,7 @@
 local widgets = require("widgets")
 local mouse = require("mouse")
 local wire = require("wire")
+local MatrixSelector = require("widgets/MatrixSelector")
 
 local instruments_screen = {
     widgets = {}
@@ -32,15 +33,9 @@ local state = {
     instrument = nil
 }
 
-function _init()
-    map.level("InstrumentEditor")
-    local entities = map.entities()
-    state.instrument = sfx.instrument(1)
-
+function _init_knob(entities)
     for k in all(entities["Knob"]) do
         local knob = widgets:create_knob(k)
-        knob.on_hover = on_menu_item_hover
-        table.insert(m.widgets, knob)
 
         if knob.fields.Label == "Harm1" then
             wire.bind(state, "instrument.harmonics.1", knob, "value")
@@ -54,35 +49,77 @@ function _init()
             wire.bind(state, "instrument.harmonics.5", knob, "value")
         elseif knob.fields.Label == "Harm6" then
             wire.bind(state, "instrument.harmonics.6", knob, "value")
-            wire.bind(knob, "value", state, "instrument.harmonics.6")
         elseif knob.fields.Label == "Harm7" then
             wire.bind(state, "instrument.harmonics.7", knob, "value")
         end
+
+        table.insert(m.widgets, knob)
     end
+end
 
-
+function _init_envelop(entities)
     for k in all(entities["Envelop"]) do
         local envelop = widgets:create_envelop(k)
-        envelop.on_hover = on_menu_item_hover
 
-        local f = wire.find_widget(m.widgets, envelop.fields.Attack)
-        wire.bind(state, "instrument.attack", f, "value")
+        local widget = wire.find_widget(m.widgets, envelop.fields.Attack)
+        wire.bind(state, "instrument.attack", widget, "value")
         wire.bind(state, "instrument.attack", envelop, "attack")
 
-        f = wire.find_widget(m.widgets, envelop.fields.Decay)
-        wire.bind(state, "instrument.decay", f, "value")
+        widget = wire.find_widget(m.widgets, envelop.fields.Decay)
+        wire.bind(state, "instrument.decay", widget, "value")
         wire.bind(state, "instrument.decay", envelop, "decay")
 
-        f = wire.find_widget(m.widgets, envelop.fields.Sustain)
-        wire.bind(state, "instrument.sustain", f, "value")
+        widget = wire.find_widget(m.widgets, envelop.fields.Sustain)
+        wire.bind(state, "instrument.sustain", widget, "value")
         wire.bind(state, "instrument.sustain", envelop, "sustain")
 
-        f = wire.find_widget(m.widgets, envelop.fields.Release)
-        wire.bind(state, "instrument.release", f, "value")
+        widget = wire.find_widget(m.widgets, envelop.fields.Release)
+        wire.bind(state, "instrument.release", widget, "value")
         wire.bind(state, "instrument.release", envelop, "release")
         table.insert(m.widgets, envelop)
     end
+end
 
+function _init_instrument_matrix(entities)
+    for matrix in all(entities["SfxMatrix"]) do
+        local widget = new(MatrixSelector, matrix)
+        wire.sync(state, "instrument.index", widget, "value")
+        wire.listen(widget, "value", function(source, value)
+            state.instrument = sfx.instrument(value, true)
+            debug.console(state.instrument)
+        end)
+        wire.sync(state, "instrument.all", widget, "active_indices")
+        table.insert(m.widgets, widget)
+    end
+end
+
+function _init_sweep(entities)
+    for effect in all(entities["Sweep"]) do
+        local active = wire.find_widget(m.widgets, effect.fields.Enabled)
+        local acceleration = wire.find_widget(m.widgets, effect.fields.Acceleration)
+        local sweep = wire.find_widget(m.widgets, effect.fields.Sweep)
+
+        wire.bind(state, "instrument.sweep.active", active, "value")
+        wire.bind(state, "instrument.sweep.acceleration", acceleration, "value")
+        wire.bind(state, "instrument.sweep.frequency", sweep, "value", function(source, target, value)
+            return (value - 200) / (2000 - 200)
+        end, "update")
+    end
+end
+
+function _init_keyboard(entities)
+    local playNote = function(source, value)
+        state.instrument.play(value)
+    end
+
+    for k in all(entities["Keyboard"]) do
+        local label = widgets:create_keyboard(k)
+        wire.listen(label, "value", playNote)
+        table.insert(m.widgets, label)
+    end
+end
+
+function _init_wave_type(entities)
     local waveToButton = function(source, target, value)
         if value == target.fields.Type then
             return 2
@@ -105,73 +142,35 @@ function _init()
         end
         table.insert(m.widgets, button)
     end
+end
 
-    for h in all(entities["InstrumentName"]) do
-        local label = new(InstrumentName, h)
-        wire.sync(state, "instrument.index", label, "index", nil, "update")
-        table.insert(m.widgets, label)
-    end
-
-    local playNote = function(source, value)
-        state.instrument.play(value)
-    end
-
-    for k in all(entities["Keyboard"]) do
-        local label = widgets:create_keyboard(k)
-        wire.listen(label, "value", playNote)
-        table.insert(m.widgets, label)
-    end
-
-    for b in all(entities["MenuItem"]) do
-        local button = widgets:create_menu_item(b)
-        if (button.fields.Item == "Prev") then
-            wire.listen(button, "status", function(source, value)
-                state.instrument = sfx.instrument((state.instrument.index - 1 + 8) % 8)
-                if (state.on_change) then
-                    state:on_change()
-                end
-            end)
-        elseif button.fields.Item == "Next" then
-            wire.listen(button, "status", function(source, value)
-                state.instrument = sfx.instrument((state.instrument.index + 1) % 8)
-                if (state.on_change) then
-                    state:on_change()
-                end
-            end)
-        end
-        table.insert(m.widgets, button)
-    end
-
+function _init_editor_mode(entities)
     for mode in all(entities["EditorMode"]) do
         local modeSwitch = widgets:create_mode_switch_component(mode)
         modeSwitch.selected_index = 0
         table.insert(m.widgets, modeSwitch)
     end
+end
 
+function _init_checkbox(entities)
     for mode in all(entities["Checkbox"]) do
         local button = widgets:create_checkbox(mode)
         table.insert(m.widgets, button)
     end
+end
 
-    for effect in all(entities["Sweep"]) do
-        local active = wire.find_widget(m.widgets, effect.fields.Enabled)
-        local acceleration = wire.find_widget(m.widgets, effect.fields.Acceleration)
-        local sweep = wire.find_widget(m.widgets, effect.fields.Sweep)
+function _init()
+    map.level("InstrumentEditor")
+    local entities = map.entities()
+    state.instrument = sfx.instrument(1)
 
-        wire.sync(active, "value", state, "instrument.sweep.active")
-        wire.sync(state, "instrument.sweep.active", active, "value", nil, "update")
-
-        wire.sync(acceleration, "value", state, "instrument.sweep.acceleration")
-        wire.sync(state, "instrument.sweep.acceleration", acceleration, "value", nil, "update")
-
-        wire.sync(sweep, "value", state, "instrument.sweep.frequency", function(source, target, value)
-            return juice.pow2(200, 2000, value)
-        end)
-        wire.sync(state, "instrument.sweep.frequency", sweep, "value", function(source, target, value)
-            return (value - 200) / (2000 - 200)
-        end, "update")
-
-    end
+    _init_knob(entities)
+    _init_envelop(entities)
+    _init_instrument_matrix(entities)
+    _init_wave_type(entities)
+    _init_editor_mode(entities)
+    _init_checkbox(entities)
+    _init_sweep(entities)
 
     -- force setting correct values
     if (state.on_change) then

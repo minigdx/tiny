@@ -64,6 +64,13 @@ wire.bind = function(obj1, path1, obj2, path2, transform)
     wire.sync(obj2, path2, obj1, path1, reverse_transform)
 end
 
+function guessMode(target)
+    if(target._update ~= nil) then
+        return "update"
+    else
+        return "change"
+    end
+end
 --- Sync data from source to target
 -- Updates target whenever source changes (via on_change) or continuously (via _update)
 -- @param source Source object
@@ -73,8 +80,9 @@ end
 -- @param transform Optional transformation function (source, target, value) -> transformed_value
 -- @param mode "change" (default) or "update" - how to listen for changes
 wire.sync = function(source, source_path, target, target_path, transform, mode)
-    mode = mode or "change"
-    
+
+    mode = mode or guessMode(target)
+
     local update_target = function()
         local value = get_value(source, source_path)
         if transform then

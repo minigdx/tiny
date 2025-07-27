@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 class Music(
-    val instruments: Array<Instrument> =
+    var instruments: Array<Instrument?> =
         arrayOf(
             clarinet,
             violon,
@@ -17,6 +17,14 @@ class Music(
             custom2,
             custom3,
             custom4,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
         ),
     val musicalBars: Array<MusicalBar> = Array(32) {
         MusicalBar(it, clarinet, clarinet.index)

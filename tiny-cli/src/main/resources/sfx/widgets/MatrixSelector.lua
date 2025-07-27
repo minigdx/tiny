@@ -61,7 +61,7 @@ MatrixSelector._draw = function(self)
                     shape.rect(x, y, cell_width, cell_height, 3)
                 elseif is_active then
                     -- Active index (not selected, not hovered): filled with color 8
-                    shape.rectf(x, y, cell_width, cell_height, 8)
+                    shape.rectf(x, y, cell_width, cell_height, 4)
                 else
                     -- Inactive index: border with color 4
                     shape.rect(x, y, cell_width, cell_height, 4)
