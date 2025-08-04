@@ -406,7 +406,8 @@ class GameEngine(
             "TINY",
         ) {
             val error = "line ${ex.lineNumber}:${ex.line} <-- the \uD83D\uDC1E is around here (${ex.message})"
-            "The line ${ex.lineNumber} trigger an execution error (${ex.message}). Please fix your script!\n" + error
+            "The line ${ex.lineNumber} trigger an execution error (${ex.message}). " +
+                    "Please fix the script ${ex.name}!\n" + error
         }
         val msg = "error line ${ex.lineNumber}:${ex.line} (${ex.message})"
         popup(msg, "#FF0000", true)

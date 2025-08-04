@@ -213,7 +213,13 @@ class GameScript(
             if (luaCause is Exit) {
                 exited = luaCause.script
             } else {
-                throw ex.toTinyException(content.decodeToString())
+                val content = if(ex.script.isNotBlank()) {
+                    val script = this.resourceAccess.script(ex.script.replaceFirst("@", ""))
+                    script?.content?.decodeToString() ?: content.decodeToString()
+                } else {
+                    content.decodeToString()
+                }
+                throw ex.toTinyException(content)
             }
         }
     }
