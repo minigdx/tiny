@@ -90,6 +90,7 @@ factory.create_knob = function(self, value)
     local result = new(Knob, value)
     result.label = result.fields.Label
     result.help = result.fields.Help
+    result:_init()
     return result
 end
 
@@ -116,21 +117,6 @@ end
 factory.create_button = function(self, value)
     local result = new(Button, value)
     result.help = result.fields.Help
-    if (value.fields.Type == "SINE") then
-        result.overlay = { x = 0, y = 16 }
-    elseif (value.fields.Type == "NOISE") then
-        result.overlay = { x = 16, y = 16 }
-    elseif (value.fields.Type == "PULSE") then
-        result.overlay = { x = 32, y = 16 }
-    elseif (value.fields.Type == "TRIANGLE") then
-        result.overlay = { x = 48, y = 16 }
-    elseif (value.fields.Type == "SAW_TOOTH") then
-        result.overlay = { x = 64, y = 16 }
-    elseif (value.fields.Type == "SQUARE") then
-        result.overlay = { x = 80, y = 16 }
-    elseif (value.fields.Type == "SAVE") then
-        result.overlay = { x = 48, y = 32 }
-    end
     return result
 end
 

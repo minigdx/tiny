@@ -51,17 +51,32 @@ end
 -- @param transform Optional function to transform values (obj_from, obj_to, value) -> transformed_value
 wire.bind = function(obj1, path1, obj2, path2, transform)
     -- obj1 -> obj2
-    wire.sync(obj1, path1, obj2, path2, transform, "update")
-    
-    -- obj2 -> obj1
-    local reverse_transform = nil
+    debug.console("wire.bind", transform)
+    local to_widget = nil
     if transform then
-        -- Create a reverse transform that swaps the object parameters
-        reverse_transform = function(from, to, value)
-            return transform(to, from, value)
+        if type(transform) == "function" then
+            to_widget = transform
+        elseif transform.to_widget then
+            to_widget = transform.to_widget
         end
     end
-    wire.sync(obj2, path2, obj1, path1, reverse_transform)
+    debug.console("to widget", to_widget)
+    wire.sync(obj1, path1, obj2, path2, to_widget, "update")
+
+    -- obj2 -> obj1
+    local from_widget = nil
+    if transform then
+        if type(transform) == "function" then
+            -- Create a reverse transform that swaps the object parameters
+            from_widget = function(from, to, value)
+                return transform(to, from, value)
+            end
+        elseif transform.from_widget then
+            from_widget = transform.from_widget
+        end
+    end
+    debug.console("from widget", from_widget)
+    wire.sync(obj2, path2, obj1, path1, from_widget)
 end
 
 function guessMode(target)
@@ -136,6 +151,10 @@ end
 -- @param ref Reference object with entityIid field
 -- @return The widget with matching iid, or nil
 wire.find_widget = function(widgets, ref)
+    if (not ref) then
+        error("find_widget is called without a valid entity ref")
+    end
+
     for widget in all(widgets) do
         if widget.iid == ref.entityIid then
             return widget

@@ -28,7 +28,7 @@ local Button = {
     enabled = true,
     grouped = true,
     status = 0, -- 0 : idle ; 1 : over ; 2 : active
-    overlay = 0, -- sprite index,
+    overlay = {x = 0, y = 0}, -- sprite index,
     on_active_button = function(current, prec)
     end,
     listeners = {},
@@ -67,7 +67,7 @@ Button._draw = function(self)
         background = 16
     end
 
-    spr.sdraw(self.x, self.y, 0 + background, 0, self.width, self.height)
+    spr.sdraw(self.x, self.y, 80 + background, 0, self.width, self.height)
 
     if self.overlay ~= nil then
         spr.sdraw(self.x, self.y, self.overlay.x, self.overlay.y, self.width, self.height)

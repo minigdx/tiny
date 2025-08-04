@@ -11,26 +11,29 @@
   },
   "zoom": 2,
   "colors": [
-    "#000000",
+    "#28282E",
     "#1D2B53",
-    "#7E2553",
-    "#008751",
-    "#AB5236",
-    "#5F574F",
-    "#C2C3C7",
-    "#FFF1E8",
-    "#FF004D",
+    "#6C5671",
+    "#87A889",
+    "#F98284",
     "#FFA300",
-    "#FFEC27",
-    "#00E436",
-    "#29ADFF",
-    "#83769C",
-    "#FF77A8",
-    "#FFCCAA"
+    "#B0A9E4",
+    "#DEA38B",
+    "#ACCCE4",
+    "#FEAAE4",
+    "#D9C8BF",
+    "#FFC384",
+    "#B0EB93",
+    "#FFCCAA",
+    "#E9F59D",
+    "#FFE6C6",
+    "#FFF7A0",
+    "#FFF1E8",
+    "#FFF7E4"
   ],
   "scripts": [
-    "sfx-editor.lua",
     "instrument-editor.lua",
+    "sfx-editor.lua",
     "wire.lua",
     "test-game.lua",
     "game.lua",
@@ -49,9 +52,11 @@
     "widgets/Button.lua"
   ],
   "spritesheets": [
+    "sfx-spritesheet.png",
     "sfx.png"
   ],
   "levels": [
+    "sfx-editor.ldtk",
     "editor.ldtk"
   ],
   "sounds": [

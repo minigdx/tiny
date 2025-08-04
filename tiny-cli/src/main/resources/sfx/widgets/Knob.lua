@@ -36,29 +36,28 @@ local Knob = {
     width = 16,
     height = 16,
     enabled = true,
+    color = 0,
     listeners = {},
     on_update = on_update,
     fire_on_update = fire_on_update,
     set_value = set_value,
 }
 
+Knob._init = function(self)
+    local color_mapping = {
+        Blue = 0,
+        Green = 1,
+        Purple = 2,
+        Red = 3
+    }
+    self.color = color_mapping[self.fields.Color] or 0
+end
+
 Knob._draw = function(self)
-    local angle = (1.8 * math.pi) * self.value + math.pi * 0.6
+    local i = math.floor(self.value * 7)
 
-    local target_x = math.cos(angle) * 8 + self.x + 8
-    local target_y = math.sin(angle) * 8 + self.y + 8
-
-    spr.sdraw(self.x, self.y, 0, 64, 16, 16)
-    shape.line(self.x + 8, self.y + 8, target_x, target_y, 9)
-    print(self.label, self.x - 1, self.y + 18)
-
-    if self.is_hover or self.active_color then
-        local c = 9
-        if (self.active_color) then
-            c = self.active_color
-        end
-        shape.rect(self.x, self.y, self.width, self.height, c)
-    end
+    spr.sdraw(self.x, self.y, 16 + self.color * 16, 48, 16, 16)
+    spr.sdraw(self.x, self.y, 16 + i * 16, 64, 16, 16)
 end
 
 Knob._update = function(self)

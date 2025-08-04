@@ -120,27 +120,39 @@ function _init_keyboard(entities)
 end
 
 function _init_wave_type(entities)
-    local waveToButton = function(source, target, value)
-        if value == target.fields.Type then
-            return 2
-        else
-            return 0
+    local buttonToWave = function(type)
+        local result = {}
+        result.from_widget = function(source, target, value)
+            return type
+        end
+        result.to_widget = function(source, target, value)
+            if value == type then
+                return 2
+            else
+                return 0
+            end
         end
     end
 
-    local buttonToWave = function(source, target, value)
-        return source.fields.Type
-    end
-
+    local overlays = {
+        Sine = {x = 16, y = 16},
+        Pulse = {x = 32, y = 16},
+        Noise = {x = 48, y = 16},
+        Sawtooth = {x = 64, y = 16},
+        Triangle = {x = 80, y = 16},
+        Square = {x = 96, y = 16},
+    }
     for b in all(entities["Button"]) do
         local button = widgets:create_button(b)
-        if (button.fields.Type == "SAVE") then
-
-        else
-            wire.sync(button, "status", state, "instrument.wave", buttonToWave)
-            wire.sync(state, "instrument.wave", button, "status", waveToButton, "update")
-        end
+        button.overlay = overlays[button.fields.WaveType]
         table.insert(m.widgets, button)
+    end
+
+    for b in all(entities["WaveTypeSelector"]) do
+        local sine = wire.find_widget(m.widgets, b.fields.Sine)
+        wire.bind(sine, "status", state, "instrument.wave", buttonToWave("SINE"))
+        local triangle = wire.find_widget(m.widgets, b.fields.Triangle)
+        wire.bind(triangle, "status", state, "instrument.wave", buttonToWave("TRIANGLE"))
     end
 end
 
@@ -170,7 +182,11 @@ function _init()
     _init_wave_type(entities)
     _init_editor_mode(entities)
     _init_checkbox(entities)
+    debug.console("0")
     _init_sweep(entities)
+    debug.console("A")
+    _init_keyboard(entities)
+    debug.console("B")
 
     -- force setting correct values
     if (state.on_change) then
