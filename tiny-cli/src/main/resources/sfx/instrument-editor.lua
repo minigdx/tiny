@@ -81,7 +81,7 @@ function _init_envelop(entities)
 end
 
 function _init_instrument_matrix(entities)
-    for matrix in all(entities["SfxMatrix"]) do
+    for matrix in all(entities["MatrixSelector"]) do
         local widget = new(MatrixSelector, matrix)
         wire.sync(state, "instrument.index", widget, "value")
         wire.listen(widget, "value", function(source, value)

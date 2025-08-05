@@ -54,7 +54,7 @@ Keyboard._update = function(self)
 end
 
 Keyboard._draw = function(self)
-    spr.sdraw(self.x, self.y, 16, 80, self.width, self.height)
+    spr.sdraw(self.x, self.y, 0, 192, self.width, self.height)
 end
 
 return Keyboard

@@ -1,10 +1,11 @@
 local MatrixSelector = {
     hover_index = nil,
     value = nil,
-    size = 16,
+    size = 9,
     active_indices = {}
 }
 
+-- 16/96
 MatrixSelector._update = function(self)
     local p = ctrl.touch()
 
@@ -38,6 +39,10 @@ MatrixSelector._update = function(self)
     end
 end
 
+local active_index = 0
+local inactive_index = 5
+local hover_index = 1
+local selected_index = 3
 MatrixSelector._draw = function(self)
     local cols = math.ceil(math.sqrt(self.size))
     local rows = math.ceil(self.size / cols)
@@ -55,16 +60,16 @@ MatrixSelector._draw = function(self)
 
                 if (self.value == index) then
                     -- Selected index: filled with color 3
-                    shape.rectf(x, y, cell_width, cell_height, 3)
+                    spr.sdraw(x, y, 16 + selected_index * 16, 96, 16, 8)
                 elseif (self.hover_index == index) then
                     -- Hovered index: border with color 3
-                    shape.rect(x, y, cell_width, cell_height, 3)
+                    spr.sdraw(x, y, 16 + hover_index * 16, 96, 16, 8)
                 elseif is_active then
                     -- Active index (not selected, not hovered): filled with color 8
-                    shape.rectf(x, y, cell_width, cell_height, 4)
+                    spr.sdraw(x, y, 16 + active_index * 16, 96, 16, 8)
                 else
                     -- Inactive index: border with color 4
-                    shape.rect(x, y, cell_width, cell_height, 4)
+                    spr.sdraw(x, y, 16 + inactive_index * 16, 96, 16, 8)
                 end
                 print(index, x + 2, y + 2)
             end

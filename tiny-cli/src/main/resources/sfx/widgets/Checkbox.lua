@@ -45,9 +45,9 @@ end
 
 Checkbox._draw = function(self)
     if self.value then
-        spr.sdraw(self.x, self.y, 8, 48, 8, 8)
+        spr.sdraw(self.x, self.y, 16, 32, 8, 8)
     else
-        spr.sdraw(self.x, self.y, 0, 48, 8, 8)
+        spr.sdraw(self.x, self.y, 32, 32, 8, 8)
     end
     print(self.label, self.x + 10, self.y + 2)
 end
