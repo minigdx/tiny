@@ -182,11 +182,8 @@ function _init()
     _init_wave_type(entities)
     _init_editor_mode(entities)
     _init_checkbox(entities)
-    debug.console("0")
     _init_sweep(entities)
-    debug.console("A")
     _init_keyboard(entities)
-    debug.console("B")
 
     -- force setting correct values
     if (state.on_change) then

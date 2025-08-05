@@ -83,6 +83,8 @@ factory.create_envelop = function(self, data)
     result.attack_start_x = result.x
     result.attack_start_y = result.y + result.height
 
+    result:_init()
+
     return result
 end
 

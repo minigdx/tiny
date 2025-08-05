@@ -54,7 +54,7 @@ Knob._init = function(self)
 end
 
 Knob._draw = function(self)
-    local i = math.floor(self.value * 7)
+    local i = math.floor(self.value * 6)
 
     spr.sdraw(self.x, self.y, 16 + self.color * 16, 48, 16, 16)
     spr.sdraw(self.x, self.y, 16 + i * 16, 64, 16, 16)
