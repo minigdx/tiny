@@ -11,7 +11,7 @@
 	"iid": "89bab230-5e50-11f0-9e1e-fb2ec5447df7",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 79,
+	"nextUid": 82,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -865,6 +865,43 @@
 					"allowedRefsEntityUid": null,
 					"allowedRefTags": [],
 					"tilesetUid": null
+				},
+				{
+					"identifier": "Label",
+					"doc": null,
+					"__type": "String",
+					"uid": 79,
+					"type": "F_String",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "NameAndValue",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": true,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
 				}
 			]
 		},
@@ -901,7 +938,45 @@
 			"limitBehavior": "MoveLastOne",
 			"pivotX": 0,
 			"pivotY": 0,
-			"fieldDefs": []
+			"fieldDefs": [
+				{
+					"identifier": "Label",
+					"doc": null,
+					"__type": "String",
+					"uid": 80,
+					"type": "F_String",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				}
+			]
 		},
 		{
 			"identifier": "Keyboard",
@@ -1036,7 +1111,7 @@
 			"showName": true,
 			"tilesetId": 4,
 			"tileRenderMode": "Repeat",
-			"tileRect": { "tilesetUid": 4, "x": 16, "y": 0, "w": 16, "h": 16 },
+			"tileRect": { "tilesetUid": 4, "x": 16, "y": 96, "w": 16, "h": 16 },
 			"uiTileRect": null,
 			"nineSliceBorders": [],
 			"maxCount": 0,
@@ -1044,7 +1119,45 @@
 			"limitBehavior": "MoveLastOne",
 			"pivotX": 0,
 			"pivotY": 0,
-			"fieldDefs": []
+			"fieldDefs": [
+				{
+					"identifier": "Label",
+					"doc": null,
+					"__type": "String",
+					"uid": 81,
+					"type": "F_String",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				}
+			]
 		},
 		{
 			"identifier": "Envelop",
@@ -2041,14 +2154,17 @@
 							"__grid": [3,4],
 							"__pivot": [0,0],
 							"__tags": [],
-							"__tile": { "tilesetUid": 4, "x": 16, "y": 0, "w": 16, "h": 16 },
+							"__tile": { "tilesetUid": 4, "x": 16, "y": 96, "w": 16, "h": 16 },
 							"__smartColor": "#733E39",
 							"iid": "29913f10-5e50-11f0-9e1e-a93568acc3e8",
 							"width": 64,
 							"height": 32,
 							"defUid": 48,
 							"px": [24,32],
-							"fieldInstances": [],
+							"fieldInstances": [{ "__identifier": "Label", "__type": "String", "__value": "Instruments", "__tile": null, "defUid": 81, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Instruments"]
+							}] }],
 							"__worldX": 24,
 							"__worldY": 32
 						},
@@ -2247,7 +2363,13 @@
 							"height": 16,
 							"defUid": 44,
 							"px": [208,48],
-							"fieldInstances": [{ "__identifier": "Color", "__type": "LocalEnum.Color", "__value": "Blue", "__tile": null, "defUid": 78, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Color", "__type": "LocalEnum.Color", "__value": "Blue", "__tile": null, "defUid": 78, "realEditorValues": [] },
+								{ "__identifier": "Label", "__type": "String", "__value": "Attack", "__tile": null, "defUid": 79, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Attack"]
+								}] }
+							],
 							"__worldX": 208,
 							"__worldY": 48
 						},
@@ -2263,10 +2385,16 @@
 							"height": 16,
 							"defUid": 44,
 							"px": [248,48],
-							"fieldInstances": [{ "__identifier": "Color", "__type": "LocalEnum.Color", "__value": "Green", "__tile": null, "defUid": 78, "realEditorValues": [{
-								"id": "V_String",
-								"params": ["Green"]
-							}] }],
+							"fieldInstances": [
+								{ "__identifier": "Color", "__type": "LocalEnum.Color", "__value": "Green", "__tile": null, "defUid": 78, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Green"]
+								}] },
+								{ "__identifier": "Label", "__type": "String", "__value": "Release", "__tile": null, "defUid": 79, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Release"]
+								}] }
+							],
 							"__worldX": 248,
 							"__worldY": 48
 						},
@@ -2282,10 +2410,16 @@
 							"height": 16,
 							"defUid": 44,
 							"px": [288,48],
-							"fieldInstances": [{ "__identifier": "Color", "__type": "LocalEnum.Color", "__value": "Purple", "__tile": null, "defUid": 78, "realEditorValues": [{
-								"id": "V_String",
-								"params": ["Purple"]
-							}] }],
+							"fieldInstances": [
+								{ "__identifier": "Color", "__type": "LocalEnum.Color", "__value": "Purple", "__tile": null, "defUid": 78, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Purple"]
+								}] },
+								{ "__identifier": "Label", "__type": "String", "__value": "Substain", "__tile": null, "defUid": 79, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Substain"]
+								}] }
+							],
 							"__worldX": 288,
 							"__worldY": 48
 						},
@@ -2301,10 +2435,16 @@
 							"height": 16,
 							"defUid": 44,
 							"px": [328,48],
-							"fieldInstances": [{ "__identifier": "Color", "__type": "LocalEnum.Color", "__value": "Red", "__tile": null, "defUid": 78, "realEditorValues": [{
-								"id": "V_String",
-								"params": ["Red"]
-							}] }],
+							"fieldInstances": [
+								{ "__identifier": "Color", "__type": "LocalEnum.Color", "__value": "Red", "__tile": null, "defUid": 78, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Red"]
+								}] },
+								{ "__identifier": "Label", "__type": "String", "__value": "Release", "__tile": null, "defUid": 79, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Release"]
+								}] }
+							],
 							"__worldX": 328,
 							"__worldY": 48
 						},
@@ -2320,7 +2460,13 @@
 							"height": 16,
 							"defUid": 44,
 							"px": [24,152],
-							"fieldInstances": [{ "__identifier": "Color", "__type": "LocalEnum.Color", "__value": "Blue", "__tile": null, "defUid": 78, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Color", "__type": "LocalEnum.Color", "__value": "Blue", "__tile": null, "defUid": 78, "realEditorValues": [] },
+								{ "__identifier": "Label", "__type": "String", "__value": "Harm1", "__tile": null, "defUid": 79, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Harm1"]
+								}] }
+							],
 							"__worldX": 24,
 							"__worldY": 152
 						},
@@ -2336,7 +2482,13 @@
 							"height": 16,
 							"defUid": 44,
 							"px": [48,152],
-							"fieldInstances": [{ "__identifier": "Color", "__type": "LocalEnum.Color", "__value": "Blue", "__tile": null, "defUid": 78, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Color", "__type": "LocalEnum.Color", "__value": "Blue", "__tile": null, "defUid": 78, "realEditorValues": [] },
+								{ "__identifier": "Label", "__type": "String", "__value": "Harm2", "__tile": null, "defUid": 79, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Harm2"]
+								}] }
+							],
 							"__worldX": 48,
 							"__worldY": 152
 						},
@@ -2352,7 +2504,13 @@
 							"height": 16,
 							"defUid": 44,
 							"px": [72,152],
-							"fieldInstances": [{ "__identifier": "Color", "__type": "LocalEnum.Color", "__value": "Blue", "__tile": null, "defUid": 78, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Color", "__type": "LocalEnum.Color", "__value": "Blue", "__tile": null, "defUid": 78, "realEditorValues": [] },
+								{ "__identifier": "Label", "__type": "String", "__value": "Harm3", "__tile": null, "defUid": 79, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Harm3"]
+								}] }
+							],
 							"__worldX": 72,
 							"__worldY": 152
 						},
@@ -2368,7 +2526,13 @@
 							"height": 16,
 							"defUid": 44,
 							"px": [24,184],
-							"fieldInstances": [{ "__identifier": "Color", "__type": "LocalEnum.Color", "__value": "Blue", "__tile": null, "defUid": 78, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Color", "__type": "LocalEnum.Color", "__value": "Blue", "__tile": null, "defUid": 78, "realEditorValues": [] },
+								{ "__identifier": "Label", "__type": "String", "__value": "Harm4", "__tile": null, "defUid": 79, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Harm4"]
+								}] }
+							],
 							"__worldX": 24,
 							"__worldY": 184
 						},
@@ -2384,7 +2548,13 @@
 							"height": 16,
 							"defUid": 44,
 							"px": [48,184],
-							"fieldInstances": [{ "__identifier": "Color", "__type": "LocalEnum.Color", "__value": "Blue", "__tile": null, "defUid": 78, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Color", "__type": "LocalEnum.Color", "__value": "Blue", "__tile": null, "defUid": 78, "realEditorValues": [] },
+								{ "__identifier": "Label", "__type": "String", "__value": "Harm5", "__tile": null, "defUid": 79, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Harm5"]
+								}] }
+							],
 							"__worldX": 48,
 							"__worldY": 184
 						},
@@ -2400,7 +2570,13 @@
 							"height": 16,
 							"defUid": 44,
 							"px": [72,184],
-							"fieldInstances": [{ "__identifier": "Color", "__type": "LocalEnum.Color", "__value": "Blue", "__tile": null, "defUid": 78, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Color", "__type": "LocalEnum.Color", "__value": "Blue", "__tile": null, "defUid": 78, "realEditorValues": [] },
+								{ "__identifier": "Label", "__type": "String", "__value": "Harm6", "__tile": null, "defUid": 79, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Harm6"]
+								}] }
+							],
 							"__worldX": 72,
 							"__worldY": 184
 						},
@@ -2416,7 +2592,10 @@
 							"height": 16,
 							"defUid": 45,
 							"px": [120,48],
-							"fieldInstances": [],
+							"fieldInstances": [{ "__identifier": "Label", "__type": "String", "__value": "Sweep", "__tile": null, "defUid": 80, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Sweep"]
+							}] }],
 							"__worldX": 120,
 							"__worldY": 48
 						},
@@ -2432,7 +2611,13 @@
 							"height": 16,
 							"defUid": 44,
 							"px": [120,72],
-							"fieldInstances": [{ "__identifier": "Color", "__type": "LocalEnum.Color", "__value": "Blue", "__tile": null, "defUid": 78, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Color", "__type": "LocalEnum.Color", "__value": "Blue", "__tile": null, "defUid": 78, "realEditorValues": [] },
+								{ "__identifier": "Label", "__type": "String", "__value": "Sweep", "__tile": null, "defUid": 79, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Sweep"]
+								}] }
+							],
 							"__worldX": 120,
 							"__worldY": 72
 						},
@@ -2448,7 +2633,13 @@
 							"height": 16,
 							"defUid": 44,
 							"px": [120,104],
-							"fieldInstances": [{ "__identifier": "Color", "__type": "LocalEnum.Color", "__value": "Blue", "__tile": null, "defUid": 78, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Color", "__type": "LocalEnum.Color", "__value": "Blue", "__tile": null, "defUid": 78, "realEditorValues": [] },
+								{ "__identifier": "Label", "__type": "String", "__value": "Acceleration", "__tile": null, "defUid": 79, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Acceleration"]
+								}] }
+							],
 							"__worldX": 120,
 							"__worldY": 104
 						},
@@ -2464,7 +2655,13 @@
 							"height": 16,
 							"defUid": 44,
 							"px": [120,176],
-							"fieldInstances": [{ "__identifier": "Color", "__type": "LocalEnum.Color", "__value": "Blue", "__tile": null, "defUid": 78, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Color", "__type": "LocalEnum.Color", "__value": "Blue", "__tile": null, "defUid": 78, "realEditorValues": [] },
+								{ "__identifier": "Label", "__type": "String", "__value": "Speed", "__tile": null, "defUid": 79, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Speed"]
+								}] }
+							],
 							"__worldX": 120,
 							"__worldY": 176
 						},
@@ -2480,7 +2677,10 @@
 							"height": 16,
 							"defUid": 45,
 							"px": [120,152],
-							"fieldInstances": [],
+							"fieldInstances": [{ "__identifier": "Label", "__type": "String", "__value": "Vibrato", "__tile": null, "defUid": 80, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["Vibrato"]
+							}] }],
 							"__worldX": 120,
 							"__worldY": 152
 						},

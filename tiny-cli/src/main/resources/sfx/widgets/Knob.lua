@@ -51,6 +51,7 @@ Knob._init = function(self)
         Red = 3
     }
     self.color = color_mapping[self.fields.Color] or 0
+    self.label = self.fields.Label
 end
 
 Knob._draw = function(self)
@@ -58,6 +59,8 @@ Knob._draw = function(self)
 
     spr.sdraw(self.x, self.y, 16 + self.color * 16, 48, 16, 16)
     spr.sdraw(self.x, self.y, 16 + i * 16, 64, 16, 16)
+
+    print(self.label, self.x, self.y + self.height + 2)
 end
 
 Knob._update = function(self)

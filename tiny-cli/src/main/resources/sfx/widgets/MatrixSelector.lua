@@ -2,10 +2,14 @@ local MatrixSelector = {
     hover_index = nil,
     value = nil,
     size = 9,
+    label = "",
     active_indices = {}
 }
 
--- 16/96
+MatrixSelector._init = function(self)
+    self.label = self.fields.Label
+end
+
 MatrixSelector._update = function(self)
     local p = ctrl.touch()
 
@@ -43,6 +47,7 @@ local active_index = 0
 local inactive_index = 5
 local hover_index = 1
 local selected_index = 3
+
 MatrixSelector._draw = function(self)
     local cols = math.ceil(math.sqrt(self.size))
     local rows = math.ceil(self.size / cols)
@@ -76,6 +81,7 @@ MatrixSelector._draw = function(self)
             index = index + 1
         end
     end
+    print(self.label, self.x, self.y - 6)
 end
 
 -- Function to toggle the active state of an index

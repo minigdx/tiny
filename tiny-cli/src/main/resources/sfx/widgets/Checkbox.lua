@@ -36,11 +36,6 @@ Checkbox._update = function(self)
             end
         end
     end
-
-    pos = ctrl.touch()
-    if self.on_hover and inside_widget(self, pos.x, pos.y) then
-        self:on_hover()
-    end
 end
 
 Checkbox._draw = function(self)

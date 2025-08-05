@@ -29,6 +29,8 @@ end
 
 -- Set a nested value in an object using a path
 local function set_value(obj, path, value)
+    debug.console("path", path)
+
     local parts = parse_path(path)
     local current = obj
     
@@ -51,7 +53,6 @@ end
 -- @param transform Optional function to transform values (obj_from, obj_to, value) -> transformed_value
 wire.bind = function(obj1, path1, obj2, path2, transform)
     -- obj1 -> obj2
-    debug.console("wire.bind", transform)
     local to_widget = nil
     if transform then
         if type(transform) == "function" then
@@ -60,7 +61,6 @@ wire.bind = function(obj1, path1, obj2, path2, transform)
             to_widget = transform.to_widget
         end
     end
-    debug.console("to widget", to_widget)
     wire.sync(obj1, path1, obj2, path2, to_widget, "update")
 
     -- obj2 -> obj1
@@ -75,7 +75,6 @@ wire.bind = function(obj1, path1, obj2, path2, transform)
             from_widget = transform.from_widget
         end
     end
-    debug.console("from widget", from_widget)
     wire.sync(obj2, path2, obj1, path1, from_widget)
 end
 
@@ -95,7 +94,6 @@ end
 -- @param transform Optional transformation function (source, target, value) -> transformed_value
 -- @param mode "change" (default) or "update" - how to listen for changes
 wire.sync = function(source, source_path, target, target_path, transform, mode)
-
     mode = mode or guessMode(target)
 
     local update_target = function()

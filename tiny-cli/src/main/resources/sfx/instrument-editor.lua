@@ -3,31 +3,9 @@ local mouse = require("mouse")
 local wire = require("wire")
 local MatrixSelector = require("widgets/MatrixSelector")
 
-local instruments_screen = {
+local m = {
     widgets = {}
 }
-
-local m = instruments_screen
-
-local on_menu_item_hover = function(self)
-    -- help.label = self.help
-    -- TODO: afficher le label quelque part.
-end
-
-local InstrumentName = {
-    index = 0
-}
-
-InstrumentName._update = function(self)
-
-end
-
-InstrumentName._draw = function(self)
-    local x, y = 0, 160
-    local ox = (self.index % 4) * 16
-    local oy = math.floor(self.index / 4) * 16
-    spr.sdraw(self.x, self.y, x + ox, y + oy, 16, 16)
-end
 
 local state = {
     instrument = nil
@@ -36,23 +14,6 @@ local state = {
 function _init_knob(entities)
     for k in all(entities["Knob"]) do
         local knob = widgets:create_knob(k)
-
-        if knob.fields.Label == "Harm1" then
-            wire.bind(state, "instrument.harmonics.1", knob, "value")
-        elseif knob.fields.Label == "Harm2" then
-            wire.bind(state, "instrument.harmonics.2", knob, "value")
-        elseif knob.fields.Label == "Harm3" then
-            wire.bind(state, "instrument.harmonics.3", knob, "value")
-        elseif knob.fields.Label == "Harm4" then
-            wire.bind(state, "instrument.harmonics.4", knob, "value")
-        elseif knob.fields.Label == "Harm5" then
-            wire.bind(state, "instrument.harmonics.5", knob, "value")
-        elseif knob.fields.Label == "Harm6" then
-            wire.bind(state, "instrument.harmonics.6", knob, "value")
-        elseif knob.fields.Label == "Harm7" then
-            wire.bind(state, "instrument.harmonics.7", knob, "value")
-        end
-
         table.insert(m.widgets, knob)
     end
 end
@@ -83,6 +44,7 @@ end
 function _init_instrument_matrix(entities)
     for matrix in all(entities["MatrixSelector"]) do
         local widget = new(MatrixSelector, matrix)
+        widget:_init()
         wire.sync(state, "instrument.index", widget, "value")
         wire.listen(widget, "value", function(source, value)
             state.instrument = sfx.instrument(value, true)
@@ -99,11 +61,12 @@ function _init_sweep(entities)
         local acceleration = wire.find_widget(m.widgets, effect.fields.Acceleration)
         local sweep = wire.find_widget(m.widgets, effect.fields.Sweep)
 
+        debug.console("swwep", state.instrument.sweep)
+        debug.console("instrument", state.instrument.sweep.active)
+
         wire.bind(state, "instrument.sweep.active", active, "value")
         wire.bind(state, "instrument.sweep.acceleration", acceleration, "value")
-        wire.bind(state, "instrument.sweep.frequency", sweep, "value", function(source, target, value)
-            return (value - 200) / (2000 - 200)
-        end, "update")
+        -- FIXME: manage sweep
     end
 end
 
@@ -135,12 +98,12 @@ function _init_wave_type(entities)
     end
 
     local overlays = {
-        Sine = {x = 16, y = 16},
-        Pulse = {x = 32, y = 16},
-        Noise = {x = 48, y = 16},
-        Sawtooth = {x = 64, y = 16},
-        Triangle = {x = 80, y = 16},
-        Square = {x = 96, y = 16},
+        Sine = { x = 16, y = 16 },
+        Pulse = { x = 32, y = 16 },
+        Noise = { x = 48, y = 16 },
+        Sawtooth = { x = 64, y = 16 },
+        Triangle = { x = 80, y = 16 },
+        Square = { x = 96, y = 16 },
     }
     for b in all(entities["Button"]) do
         local button = widgets:create_button(b)
@@ -171,19 +134,29 @@ function _init_checkbox(entities)
     end
 end
 
+function _init_harmonics(entities)
+    for mode in all(entities["Harmonics"]) do
+        for index, harmonic in ipairs(mode.fields.Harmonics) do
+            local knob = wire.find_widget(m.widgets, harmonic)
+            wire.bind(state, "instrument.harmonics." .. index, knob, "value")
+        end
+    end
+end
+
 function _init()
     map.level("InstrumentEditor")
     local entities = map.entities()
     state.instrument = sfx.instrument(1)
 
     _init_knob(entities)
+    _init_checkbox(entities)
     _init_envelop(entities)
     _init_instrument_matrix(entities)
     _init_wave_type(entities)
     _init_editor_mode(entities)
-    _init_checkbox(entities)
     _init_sweep(entities)
     _init_keyboard(entities)
+    _init_harmonics(entities)
 
     -- force setting correct values
     if (state.on_change) then
