@@ -107,9 +107,21 @@ class SfxLib(
 
     private val handlers = mutableMapOf<SoundKey, SoundHandler>()
     private val sequenceHandlers = mutableMapOf<SequenceKey, SoundHandler>()
+    
+    // Cache for instrument Lua wrappers
+    private val instrumentWrapperCache = mutableMapOf<Int, LuaValue>()
+    private var lastMusicVersion = 0
 
     fun getCurrentMusic(): Music {
-        return currentMusic ?: (resourceAccess.sound(0)?.data?.music ?: Music()).also { currentMusic = it }
+        return currentMusic ?: (resourceAccess.sound(0)?.data?.music ?: Music()).also { 
+            currentMusic = it
+            invalidateInstrumentCache()
+        }
+    }
+    
+    private fun invalidateInstrumentCache() {
+        instrumentWrapperCache.clear()
+        lastMusicVersion++
     }
 
     inner class export : ZeroArgFunction() {
@@ -152,6 +164,8 @@ class SfxLib(
                 val soundIndex = currentSound
                 currentMusic = sound.data.music
                 currentSound = sound.index
+                // Clear cache when music changes
+                invalidateInstrumentCache()
                 valueOf(soundIndex)
             }
         }
@@ -300,9 +314,13 @@ class SfxLib(
         override fun call(a: LuaValue): LuaValue {
             val music = getCurrentMusic()
             val index = a.asInstrumentIndex(music) ?: return NIL
-            return music.instruments
-                .getOrNull(index)
-                ?.toLua() ?: NIL
+            
+            // Check cache first
+            return instrumentWrapperCache[index]
+                // Check music
+                ?: music.instruments.getOrNull(index)?.toLua()
+                // Give up
+                ?: NIL
         }
 
         @TinyCall(
@@ -318,6 +336,8 @@ class SfxLib(
                 val index = a.toint()
                 val newInstrument = Instrument(index)
                 getCurrentMusic().instruments[index] = newInstrument
+                // Clear cache for this index since we're creating new instrument
+                instrumentWrapperCache.remove(index)
                 newInstrument.toLua()
             } else {
                 instrument
@@ -325,6 +345,10 @@ class SfxLib(
         }
 
         fun Instrument.toLua(): LuaValue {
+            // Return cached wrapper if available
+            instrumentWrapperCache[index]?.let { return it }
+            
+            // Create new wrapper and cache it
             val obj = WrapperLuaTable()
 
             obj.wrap(
@@ -373,6 +397,7 @@ class SfxLib(
                 { this.release = it.optdouble(0.0).toFloat() },
             )
             obj.wrap("sweep") {
+                // FIXME: to be cached
                 val sweep = WrapperLuaTable()
                 sweep.wrap(
                     "active",
@@ -398,6 +423,7 @@ class SfxLib(
                 sweep
             }
             obj.wrap("vibrato") {
+                // FIXME: to be cached
                 val vibrato = WrapperLuaTable()
                 vibrato.wrap(
                     "active",
@@ -459,6 +485,8 @@ class SfxLib(
                 }
             }
 
+            // Cache the wrapper before returning
+            instrumentWrapperCache[index] = obj
             return obj
         }
     }
