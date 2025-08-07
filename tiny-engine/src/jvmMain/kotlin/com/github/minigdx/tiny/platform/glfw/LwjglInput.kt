@@ -17,10 +17,12 @@ import org.lwjgl.glfw.GLFW.GLFW_STICKY_KEYS
 import org.lwjgl.glfw.GLFW.GLFW_TRUE
 import org.lwjgl.glfw.GLFW.glfwGetCursorPos
 import org.lwjgl.glfw.GLFW.glfwSetCursorEnterCallback
+import org.lwjgl.glfw.GLFW.glfwSetCursorPosCallback
 import org.lwjgl.glfw.GLFW.glfwSetInputMode
 import org.lwjgl.glfw.GLFW.glfwSetKeyCallback
 import org.lwjgl.glfw.GLFW.glfwSetMouseButtonCallback
 import org.lwjgl.glfw.GLFWCursorEnterCallback
+import org.lwjgl.glfw.GLFWCursorPosCallback
 import org.lwjgl.glfw.GLFWKeyCallback
 import org.lwjgl.glfw.GLFWMouseButtonCallback
 import java.nio.DoubleBuffer
@@ -36,6 +38,7 @@ class LwjglInput(private val projector: MouseProject) : InputHandler, InputManag
     private var mousePosition: Vector2 = Vector2(0f, 0f)
     private var isMouseInsideGameScreen: Boolean = false
     private var isMouseInsideWindow: Boolean = false
+    private var mousePositionDirty: Boolean = true
 
     private fun keyDown(event: Int) {
         touchManager.onKeyPressed(event)
@@ -74,6 +77,19 @@ class LwjglInput(private val projector: MouseProject) : InputHandler, InputManag
                     entered: Boolean,
                 ) {
                     isMouseInsideWindow = entered
+                    mousePositionDirty = true
+                }
+            },
+        )
+        glfwSetCursorPosCallback(
+            windowAddress,
+            object : GLFWCursorPosCallback() {
+                override fun invoke(
+                    window: Long,
+                    xpos: Double,
+                    ypos: Double,
+                ) {
+                    mousePositionDirty = true
                 }
             },
         )
@@ -116,9 +132,8 @@ class LwjglInput(private val projector: MouseProject) : InputHandler, InputManag
     }
 
     override fun record() {
-        // Update mouse position
-        // https://www.glfw.org/docs/3.3/input_guide.html#cursor_pos
-        if (isMouseInsideWindow) {
+        // Update mouse position only when it has changed
+        if (isMouseInsideWindow && mousePositionDirty) {
             glfwGetCursorPos(window, b1, b2)
             val gamePosition = projector.project(b1[0].toFloat(), b2[0].toFloat())
             if (gamePosition == null) {
@@ -129,7 +144,8 @@ class LwjglInput(private val projector: MouseProject) : InputHandler, InputManag
                 mousePosition.x = gamePosition.x
                 mousePosition.y = gamePosition.y
             }
-        } else {
+            mousePositionDirty = false
+        } else if (!isMouseInsideWindow) {
             isMouseInsideGameScreen = false
         }
     }
