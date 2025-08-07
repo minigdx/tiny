@@ -61,12 +61,24 @@ function _init_sweep(entities)
         local acceleration = wire.find_widget(m.widgets, effect.fields.Acceleration)
         local sweep = wire.find_widget(m.widgets, effect.fields.Sweep)
 
-        debug.console("swwep", state.instrument.sweep)
-        debug.console("instrument", state.instrument.sweep.active)
-
+        -- Use manual sync with correct modes for checkboxes
         wire.bind(state, "instrument.sweep.active", active, "value")
         wire.bind(state, "instrument.sweep.acceleration", acceleration, "value")
-        -- FIXME: manage sweep
+        wire.bind(state, "instrument.sweep.sweep", sweep, "value")
+    end
+end
+
+function _init_vibrato(entities)
+    for effect in all(entities["Vibrato"]) do
+        local active = wire.find_widget(m.widgets, effect.fields.Enabled)
+        local frequency = wire.find_widget(m.widgets, effect.fields.Frequency)
+        local depth = wire.find_widget(m.widgets, effect.fields.Depth)
+
+        -- Use manual sync with correct modes for checkboxes
+        wire.bind(state, "instrument.vibrato.active", active, "value")
+
+        wire.bind(state, "instrument.vibrato.frequency", frequency, "value")
+        wire.bind(state, "instrument.vibrato.depth", depth, "value")
     end
 end
 
@@ -95,27 +107,39 @@ function _init_wave_type(entities)
                 return 0
             end
         end
-    end
-
-    local overlays = {
-        Sine = { x = 16, y = 16 },
-        Pulse = { x = 32, y = 16 },
-        Noise = { x = 48, y = 16 },
-        Sawtooth = { x = 64, y = 16 },
-        Triangle = { x = 80, y = 16 },
-        Square = { x = 96, y = 16 },
-    }
-    for b in all(entities["Button"]) do
-        local button = widgets:create_button(b)
-        button.overlay = overlays[button.fields.WaveType]
-        table.insert(m.widgets, button)
+        return result
     end
 
     for b in all(entities["WaveTypeSelector"]) do
         local sine = wire.find_widget(m.widgets, b.fields.Sine)
-        wire.bind(sine, "status", state, "instrument.wave", buttonToWave("SINE"))
+        wire.bind(state, "instrument.wave", sine, "status", buttonToWave("SINE"))
+        local square = wire.find_widget(m.widgets, b.fields.Square)
+        wire.bind(state, "instrument.wave", square, "status", buttonToWave("SQUARE"))
+        local pulse = wire.find_widget(m.widgets, b.fields.Pulse)
+        wire.bind(state, "instrument.wave", pulse, "status", buttonToWave("PULSE"))
         local triangle = wire.find_widget(m.widgets, b.fields.Triangle)
-        wire.bind(triangle, "status", state, "instrument.wave", buttonToWave("TRIANGLE"))
+        wire.bind(state, "instrument.wave", triangle, "status", buttonToWave("TRIANGLE"))
+        local noise = wire.find_widget(m.widgets, b.fields.Noise)
+        wire.bind(state, "instrument.wave", noise, "status", buttonToWave("NOISE"))
+        local sawtooth = wire.find_widget(m.widgets, b.fields.Sawtooth)
+        wire.bind(state, "instrument.wave", sawtooth, "status", buttonToWave("SAW_TOOTH"))
+    end
+end
+
+local overlays = {
+    Sine = { x = 16, y = 16 },
+    Pulse = { x = 32, y = 16 },
+    Noise = { x = 48, y = 16 },
+    Sawtooth = { x = 64, y = 16 },
+    Triangle = { x = 80, y = 16 },
+    Square = { x = 96, y = 16 },
+}
+
+function _init_buttons(entities)
+    for b in all(entities["Button"]) do
+        local button = widgets:create_button(b)
+        button.overlay = overlays[button.fields.WaveType]
+        table.insert(m.widgets, button)
     end
 end
 
@@ -150,11 +174,13 @@ function _init()
 
     _init_knob(entities)
     _init_checkbox(entities)
+    _init_buttons(entities)
     _init_envelop(entities)
     _init_instrument_matrix(entities)
     _init_wave_type(entities)
     _init_editor_mode(entities)
     _init_sweep(entities)
+    _init_vibrato(entities)
     _init_keyboard(entities)
     _init_harmonics(entities)
 

@@ -29,8 +29,7 @@ end
 
 -- Set a nested value in an object using a path
 local function set_value(obj, path, value)
-    debug.console("path", path)
-
+    -- debug.console("set_value", obj, path, value)
     local parts = parse_path(path)
     local current = obj
     
@@ -75,7 +74,7 @@ wire.bind = function(obj1, path1, obj2, path2, transform)
             from_widget = transform.from_widget
         end
     end
-    wire.sync(obj2, path2, obj1, path1, from_widget)
+    wire.sync(obj2, path2, obj1, path1, from_widget, "change")
 end
 
 function guessMode(target)

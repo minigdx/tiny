@@ -45,12 +45,8 @@ Button._update = function(self)
 
     if inside_widget(self, pos.x, pos.y) then
         self.status = 1
-        if self.on_hover ~= nil then
-            self:on_hover()
-        end
         local touched = ctrl.touched(0)
         if touched then
-            self:fire_on_update(self.status)
             if (self.on_change) then
                 self:on_change()
             end

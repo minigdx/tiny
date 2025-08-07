@@ -12,6 +12,7 @@ import com.github.minigdx.tiny.sound.MusicalNote
 import com.github.minigdx.tiny.sound.MusicalSequence
 import com.github.minigdx.tiny.sound.SoundHandler
 import com.github.minigdx.tiny.sound.Sweep
+import com.github.minigdx.tiny.sound.Vibrato
 import kotlinx.serialization.json.Json
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
@@ -375,8 +376,14 @@ class SfxLib(
                 val sweep = WrapperLuaTable()
                 sweep.wrap(
                     "active",
-                    { valueOf(this.modulations[0].active) },
-                    { this.modulations[0].active = it.optboolean(false) },
+                    { 
+                        val value = this.modulations[0].active
+                        valueOf(value)
+                    },
+                    { 
+                        val newValue = it.optboolean(false)
+                        this.modulations[0].active = newValue
+                    },
                 )
                 sweep.wrap(
                     "acceleration",
@@ -389,6 +396,31 @@ class SfxLib(
                     { (this.modulations[0] as Sweep).sweep = it.optdouble(0.0).toFloat() },
                 )
                 sweep
+            }
+            obj.wrap("vibrato") {
+                val vibrato = WrapperLuaTable()
+                vibrato.wrap(
+                    "active",
+                    { 
+                        val value = this.modulations[1].active
+                        valueOf(value)
+                    },
+                    { 
+                        val newValue = it.optboolean(false)
+                        this.modulations[1].active = newValue
+                    },
+                )
+                vibrato.wrap(
+                    "frequency",
+                    { valueOf((this.modulations[1] as Vibrato).vibratoFrequency.toDouble()) },
+                    { (this.modulations[1] as Vibrato).vibratoFrequency = it.optdouble(0.0).toFloat() },
+                )
+                vibrato.wrap(
+                    "depth",
+                    { valueOf((this.modulations[1] as Vibrato).depth.toDouble()) },
+                    { (this.modulations[1] as Vibrato).depth = it.optdouble(0.0).toFloat() },
+                )
+                vibrato
             }
 
             obj.function1("play") { noteAsString ->
