@@ -19,6 +19,7 @@ import com.github.minigdx.tiny.platform.ImageData
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
+import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.render.Render
 import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.RenderFrame
@@ -55,6 +56,7 @@ class GlfwPlatform(
     private val render: Render = OpenGLRender(KglLwjgl, logger, gameOptions),
     private val jarResourcePrefix: String = "",
 ) : Platform {
+    override val performanceMonitor: PerformanceMonitor = LwjglPerformanceMonitor()
     private var window: Long = 0
 
     private var lastFrame: Long = getTime()

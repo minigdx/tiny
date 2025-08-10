@@ -17,6 +17,7 @@ import com.github.minigdx.tiny.platform.ImageData
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
+import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.RenderFrame
 import com.github.minigdx.tiny.render.gl.OpenGLRender
@@ -36,6 +37,7 @@ class WebGlPlatform(
     override val gameOptions: GameOptions,
     val rootUrl: String,
 ) : Platform {
+    override val performanceMonitor: PerformanceMonitor = WebGlPerformanceMonitor()
     private lateinit var render: OpenGLRender
 
     private val jsInputHandler = JsInputHandler(canvas, gameOptions)

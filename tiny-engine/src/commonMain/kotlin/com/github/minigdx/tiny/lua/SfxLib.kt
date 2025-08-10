@@ -107,18 +107,18 @@ class SfxLib(
 
     private val handlers = mutableMapOf<SoundKey, SoundHandler>()
     private val sequenceHandlers = mutableMapOf<SequenceKey, SoundHandler>()
-    
+
     // Cache for instrument Lua wrappers
     private val instrumentWrapperCache = mutableMapOf<Int, LuaValue>()
     private var lastMusicVersion = 0
 
     fun getCurrentMusic(): Music {
-        return currentMusic ?: (resourceAccess.sound(0)?.data?.music ?: Music()).also { 
+        return currentMusic ?: (resourceAccess.sound(0)?.data?.music ?: Music()).also {
             currentMusic = it
             invalidateInstrumentCache()
         }
     }
-    
+
     private fun invalidateInstrumentCache() {
         instrumentWrapperCache.clear()
         lastMusicVersion++
@@ -314,7 +314,7 @@ class SfxLib(
         override fun call(a: LuaValue): LuaValue {
             val music = getCurrentMusic()
             val index = a.asInstrumentIndex(music) ?: return NIL
-            
+
             // Check cache first
             return instrumentWrapperCache[index]
                 // Check music
@@ -347,7 +347,7 @@ class SfxLib(
         fun Instrument.toLua(): LuaValue {
             // Return cached wrapper if available
             instrumentWrapperCache[index]?.let { return it }
-            
+
             // Create new wrapper and cache it
             val obj = WrapperLuaTable()
 
@@ -401,11 +401,11 @@ class SfxLib(
                 val sweep = WrapperLuaTable()
                 sweep.wrap(
                     "active",
-                    { 
+                    {
                         val value = this.modulations[0].active
                         valueOf(value)
                     },
-                    { 
+                    {
                         val newValue = it.optboolean(false)
                         this.modulations[0].active = newValue
                     },
@@ -427,11 +427,11 @@ class SfxLib(
                 val vibrato = WrapperLuaTable()
                 vibrato.wrap(
                     "active",
-                    { 
+                    {
                         val value = this.modulations[1].active
                         valueOf(value)
                     },
-                    { 
+                    {
                         val newValue = it.optboolean(false)
                         this.modulations[1].active = newValue
                     },

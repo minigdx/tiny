@@ -13,6 +13,7 @@ import com.github.minigdx.tiny.platform.ImageData
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
+import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.platform.webgl.WebGlPlatform
 import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.RenderFrame
@@ -289,6 +290,8 @@ private fun createGame(
 
 class EditorWebGlPlatform(val delegate: Platform) : Platform {
     override val gameOptions: GameOptions = delegate.gameOptions
+
+    override val performanceMonitor: PerformanceMonitor = delegate.performanceMonitor
 
     override fun initWindowManager(): WindowManager = delegate.initWindowManager()
 

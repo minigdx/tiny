@@ -7,6 +7,7 @@ import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
+import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.RenderFrame
 import com.github.minigdx.tiny.render.operations.RenderOperation
@@ -41,6 +42,11 @@ interface Platform {
      * Game Option from the game.
      */
     val gameOptions: GameOptions
+
+    /**
+     * Performance monitor for this platform
+     */
+    val performanceMonitor: PerformanceMonitor
 
     /**
      * Create the window where the game will render

@@ -13,6 +13,7 @@ import com.github.minigdx.tiny.input.internal.PoolObject
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.lua.toTinyException
 import com.github.minigdx.tiny.platform.Platform
+import com.github.minigdx.tiny.platform.performance.PerformanceMetrics
 import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.RenderFrame
 import com.github.minigdx.tiny.render.RenderUnit
@@ -154,6 +155,9 @@ class GameEngine(
     }
 
     override suspend fun advance(delta: Seconds) {
+        platform.performanceMonitor.frameStart()
+        platform.performanceMonitor.operationStart("game_update")
+
         workEvents.addAll(events)
 
         workEvents.forEach { resource ->
@@ -389,6 +393,14 @@ class GameEngine(
                 inputManager.reset()
             }
         }
+
+        // End performance monitoring for game update
+        val updateTime = platform.performanceMonitor.operationEnd("game_update")
+
+        // Log performance metrics if debug is enabled
+        if (debugEnabled) {
+            logPerformanceMetrics(updateTime)
+        }
     }
 
     override fun debug(action: DebugAction) {
@@ -423,6 +435,46 @@ class GameEngine(
 
     private suspend fun clear() {
         engineGameScript?.invoke("clear")
+    }
+
+    /**
+     * Log performance metrics during game update
+     */
+    private fun logPerformanceMetrics(updateTime: Double) {
+        // Only log every 60 frames to avoid spam
+        if (platform.performanceMonitor.isEnabled && current % 60 == 0) {
+            val averageMetrics = platform.performanceMonitor.getAverageMetrics(60)
+            if (averageMetrics != null) {
+                logger.debug("PERFORMANCE") {
+                    "Avg FPS: ${averageMetrics.fps}, " +
+                        "Frame: ${averageMetrics.frameTime}ms, " +
+                        "Update: ${updateTime}ms, " +
+                        "Memory: ${(averageMetrics.memoryUsed / 1024 / 1024)}MB"
+                }
+            }
+        }
+    }
+
+    /**
+     * Store frame metrics for debugging visualization
+     */
+    private fun storeFrameMetrics(metrics: PerformanceMetrics) {
+        if (!platform.performanceMonitor.isEnabled) {
+            return
+        }
+        // Add performance debug messages
+        if (metrics.fps < 30) {
+            debug(DebugMessage("LOW FPS: ${metrics.fps}", "#FF0000"))
+        }
+
+        if (metrics.memoryAllocated > 1024 * 1024) { // More than 1MB allocated
+            debug(DebugMessage("HIGH ALLOC: ${(metrics.memoryAllocated / 1024 / 1024)}MB", "#FFAA00"))
+        }
+
+        // Show frame time if it's high
+        if (metrics.frameTime > 16.67) { // Slower than 60 FPS
+            debug(DebugMessage("Frame: ${metrics.frameTime}ms", "#AAAA00"))
+        }
     }
 
     override fun spritesheet(index: Int): SpriteSheet? {
@@ -529,8 +581,21 @@ class GameEngine(
      * Will render the remaining operations on the screen.
      */
     override fun draw() {
+        platform.performanceMonitor.operationStart("render")
         render() // Render the last operation into the frame buffer
+        val renderTime = platform.performanceMonitor.operationEnd("render")
+
+        platform.performanceMonitor.operationStart("draw")
         platform.draw(renderContext)
+        val drawTime = platform.performanceMonitor.operationEnd("draw")
+
+        // Complete frame monitoring and get metrics
+        val metrics = platform.performanceMonitor.frameEnd()
+
+        // Store performance data for debugging if needed
+        if (debugEnabled) {
+            storeFrameMetrics(metrics)
+        }
     }
 
     /**

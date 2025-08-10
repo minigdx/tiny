@@ -14,6 +14,8 @@ import com.github.minigdx.tiny.platform.ImageData
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
+import com.github.minigdx.tiny.platform.performance.PerformanceMetrics
+import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.render.NopRenderContext
 import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.RenderFrame
@@ -25,6 +27,28 @@ import com.github.minigdx.tiny.util.MutableFixedSizeList
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 
+class HeadlessPerformanceMonitor : PerformanceMonitor {
+    override fun frameStart() = Unit
+
+    override fun frameEnd(): PerformanceMetrics = PerformanceMetrics(0.0, 0.0, 0, 0)
+
+    override fun operationStart(name: String) = Unit
+
+    override fun operationEnd(name: String): Double = 0.0
+
+    override fun getCurrentMemoryUsage(): Long = 0
+
+    override fun getAllocatedMemorySinceLastCheck(): Long = 0
+
+    override fun reset() = Unit
+
+    override fun getAverageMetrics(frameCount: Int): PerformanceMetrics? = null
+
+    override fun now(): Long = 0
+
+    override var isEnabled: Boolean = false
+}
+
 class HeadlessPlatform(
     override val gameOptions: GameOptions,
     private val resources: Map<String, Any>,
@@ -35,6 +59,8 @@ class HeadlessPlatform(
     val frames: MutableFixedSizeList<FrameBuffer> = MutableFixedSizeList(frames)
 
     private var gameLoop: GameLoop? = null
+
+    override val performanceMonitor: PerformanceMonitor = HeadlessPerformanceMonitor()
 
     override fun initWindowManager(): WindowManager {
         return WindowManager(
