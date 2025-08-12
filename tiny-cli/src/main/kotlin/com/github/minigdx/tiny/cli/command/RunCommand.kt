@@ -49,9 +49,6 @@ class RunCommand : CliktCommand(name = "run") {
         .file(mustExist = true, canBeDir = true, canBeFile = false)
         .default(File("."))
 
-    val test by option(help = "Run tests before running the game.")
-        .flag()
-
     val debug by option(help = "Port used for debugging")
         .int()
         .default(8081)
@@ -144,42 +141,45 @@ class RunCommand : CliktCommand(name = "run") {
             val logger = StdOutLogger("tiny-cli", level = LogLevel.DEBUG)
 
             val vfs = CommonVirtualFileSystem()
-            val gameOption =
-                gameParameters.toGameOptions()
-                    .copy(runTests = test)
+            val gameOption = gameParameters.toGameOptions()
 
             val debugListener = DebuggerExecutionListener(debugCommandReceiver, engineCommandSender)
 
-            val gameEngine =
-                GameEngine(
-                    gameOptions = gameOption,
-                    platform = GlfwPlatform(gameOption, logger, vfs, effectiveGameDirectory, LwjglGLRender(logger, gameOption)),
-                    vfs = vfs,
-                    logger = logger,
-                    listener =
-                        object : GameEngineListener {
-                            override fun switchScript(
-                                before: GameScript?,
-                                after: GameScript?,
-                            ) {
-                                if (after != null) {
-                                    debugListener.globals = after.globals!!
-                                    debugListener.globals.debuglib = debugListener
+            val gameEngine = GameEngine(
+                gameOptions = gameOption,
+                platform = GlfwPlatform(
+                    gameOption,
+                    logger,
+                    vfs,
+                    effectiveGameDirectory,
+                    LwjglGLRender(logger, gameOption),
+                ),
+                vfs = vfs,
+                logger = logger,
+                listener =
+                    object : GameEngineListener {
+                        override fun switchScript(
+                            before: GameScript?,
+                            after: GameScript?,
+                        ) {
+                            if (after != null) {
+                                debugListener.globals = after.globals!!
+                                debugListener.globals.debuglib = debugListener
+                            }
+                        }
+
+                        override fun reload(gameScript: GameScript?) {
+                            gameScript?.run {
+                                debugListener.globals = gameScript.globals!!
+                                debugListener.globals.debuglib = debugListener
+
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    engineCommandSender.send(Reload(gameScript.name))
                                 }
                             }
-
-                            override fun reload(gameScript: GameScript?) {
-                                gameScript?.run {
-                                    debugListener.globals = gameScript.globals!!
-                                    debugListener.globals.debuglib = debugListener
-
-                                    CoroutineScope(Dispatchers.IO).launch {
-                                        engineCommandSender.send(Reload(gameScript.name))
-                                    }
-                                }
-                            }
-                        },
-                )
+                        }
+                    },
+            )
             Runtime.getRuntime().addShutdownHook(
                 Thread {
                     gameEngine.end()

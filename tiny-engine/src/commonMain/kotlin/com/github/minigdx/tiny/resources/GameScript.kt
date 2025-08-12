@@ -116,29 +116,6 @@ class GameScript(
         with(createLuaGlobals(customizeLuaGlobal, forValidation = true)) {
             load(content.decodeToString()).call()
             get("_init").nullIfNil()?.callSuspend(valueOf(gameOptions.width), valueOf(gameOptions.height))
-            if (gameOptions.runTests) {
-                gameOptions.gameScripts.map { name ->
-                    // use the new content for the game script evaluated
-                    if (name == this@GameScript.name) {
-                        content.decodeToString()
-                    } else {
-                        // use the cached content for the script not updated.
-                        resourceAccess.script(name)?.content!!.decodeToString()
-                    }
-                }.forEach { scriptContent ->
-                    val globalForTest = createLuaGlobals(customizeLuaGlobal, forValidation = true)
-                    globalForTest.load(scriptContent).call()
-                    globalForTest.get("_test").callSuspend()
-                }
-                logger.info("TEST") { "⚙\uFE0F === Ran ${testResults.size} tests ===" }
-                testResults.forEach {
-                    if (it.passed) {
-                        logger.info("TEST") { "✅ ${it.script} - ${it.test}" }
-                    } else {
-                        logger.info("TEST") { "\uD83D\uDD34 ${it.script} - ${it.test}: ${it.reason}" }
-                    }
-                }
-            }
         }
         return true
     }

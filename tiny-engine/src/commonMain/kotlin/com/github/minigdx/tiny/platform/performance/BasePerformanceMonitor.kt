@@ -3,7 +3,7 @@ package com.github.minigdx.tiny.platform.performance
 /**
  * Common implementation with shared functionality
  */
-abstract class BasePerformanceMonitor : PerformanceMonitor {
+abstract class BasePerformanceMonitor() : PerformanceMonitor {
     protected var frameStartTime = 0L
     protected var lastFrameTime = 0L
     protected var lastMemoryCheck = 0L
@@ -14,6 +14,14 @@ abstract class BasePerformanceMonitor : PerformanceMonitor {
 
     // Operation timing
     private val operationStartTimes = mutableMapOf<String, Long>()
+
+    override var isEnabled: Boolean = false
+        set(value) {
+            field = value
+            if (value) {
+                reset()
+            }
+        }
 
     override fun frameStart() {
         if (!isEnabled) return
@@ -82,14 +90,6 @@ abstract class BasePerformanceMonitor : PerformanceMonitor {
         operationStartTimes.clear()
         lastMemoryCheck = getCurrentMemoryUsage()
     }
-
-    override var isEnabled: Boolean = false
-        set(value) {
-            field = value
-            if (value) {
-                reset()
-            }
-        }
 
     /**
      * Platform-specific metrics creation
