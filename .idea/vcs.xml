@@ -2,5 +2,10 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/worktrees/doc-analyse" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/worktrees/object-pool" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/worktrees/opengl4" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/worktrees/parameters" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/worktrees/pbo-test" vcs="Git" />
   </component>
 </project>
