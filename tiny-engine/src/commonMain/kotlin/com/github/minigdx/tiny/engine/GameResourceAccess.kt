@@ -125,12 +125,6 @@ interface GameResourceAccess {
     fun script(name: String): GameScript?
 
     /**
-     * Perform an action (draw message, rect, ...) over the current screen,
-     * after the game rendered.
-     */
-    fun debug(action: DebugAction) = Unit
-
-    /**
      * Add an Ops to be executed by the shader
      */
     fun addOp(op: RenderOperation) = Unit

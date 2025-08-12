@@ -62,9 +62,6 @@ class GameEngine(
 
     private var numberOfResources: Int = 0
 
-    private var debugEnabled: Boolean = true
-    private val debugActions = mutableListOf<DebugAction>()
-
     private val ops = mutableListOf<RenderOperation>()
 
     private lateinit var scripts: Array<GameScript?>
@@ -82,11 +79,13 @@ class GameEngine(
     /**
      * Current script by index.
      */
-    private var current: Int = 0
+    private var currentScriptIndex: Int = 0
 
     override val frameBuffer = FrameBuffer(gameOptions.width, gameOptions.height, gameOptions.colors())
 
     private var accumulator: Seconds = 0f
+    private var currentFrame: Long = 0L
+    private var currentMetrics: PerformanceMetrics? = null
 
     lateinit var renderContext: RenderContext
     lateinit var inputHandler: InputHandler
@@ -237,7 +236,7 @@ class GameEngine(
                             scripts[resource.index] = resource
                             // Force the reloading of the script, as the script update might be used as resource of
                             // the current game script.
-                            scripts[current]?.reload = true
+                            scripts[currentScriptIndex]?.reload = true
                             clear()
                         }
                     }
@@ -260,7 +259,7 @@ class GameEngine(
                     GAME_LEVEL -> {
                         levels[resource.index] = resource as GameLevel
                         // Force the reloading of the script as level init might occur in the _init block.
-                        scripts[current]?.reload = true
+                        scripts[currentScriptIndex]?.reload = true
                     }
 
                     GAME_SOUND -> {
@@ -272,24 +271,24 @@ class GameEngine(
         events.removeAll(workEvents)
         workEvents.clear()
 
-        with(scripts[current]) {
+        with(scripts[currentScriptIndex]) {
             if (this == null) return
 
             if (exited >= 0) {
-                val previous = current
+                val previous = currentScriptIndex
                 // next script
-                current = min(exited + 1, scripts.size - 1)
+                currentScriptIndex = min(exited + 1, scripts.size - 1)
                 try {
                     val state = getState()
 
                     logger.debug("GAME_ENGINE") {
-                        "Stop $name to switch the next game script ${scripts[current]?.name}"
+                        "Stop $name to switch the next game script ${scripts[currentScriptIndex]?.name}"
                     }
                     // Reevaluate the game to flush the previous state.
-                    scripts[current]?.evaluate(customizeLuaGlobal)
-                    scripts[current]?.setState(state)
+                    scripts[currentScriptIndex]?.evaluate(customizeLuaGlobal)
+                    scripts[currentScriptIndex]?.setState(state)
 
-                    listener?.switchScript(scripts[previous], scripts[current])
+                    listener?.switchScript(scripts[previous], scripts[currentScriptIndex])
                 } catch (ex: LuaError) {
                     popupError(ex.toTinyException(content.decodeToString()))
                 }
@@ -300,7 +299,7 @@ class GameEngine(
                     evaluate(customizeLuaGlobal)
                     setState(state)
 
-                    listener?.reload(scripts[current])
+                    listener?.reload(scripts[currentScriptIndex])
 
                     inError = false
                 } catch (ex: LuaError) {
@@ -315,7 +314,7 @@ class GameEngine(
                 inError =
                     try {
                         ops.clear() // Remove all drawing operation to prepare the new frame.
-                        scripts[current]?.advance()
+                        scripts[currentScriptIndex]?.advance()
                         false
                     } catch (ex: TinyException) {
                         if (!inError) { // display the log only once.
@@ -325,6 +324,7 @@ class GameEngine(
                     }
                 engineGameScript?.advance()
                 accumulator -= REFRESH_LIMIT
+                currentFrame++
 
                 // The user hit Ctrl + R(ecord)
                 if (inputHandler.isCombinationPressed(Key.CTRL, Key.R)) {
@@ -334,62 +334,17 @@ class GameEngine(
                 } else if (inputHandler.isCombinationPressed(Key.CTRL, Key.S)) {
                     popup("screenshot PNG", "#00FF00")
                     platform.screenshot()
-                }
-
-                var msgIndex = 0
-                if (!debugEnabled) {
-                    debugActions.clear()
-                }
-                debugActions.forEach { debugAction ->
-                    when (debugAction) {
-                        is DebugMessage -> {
-                            val (msg, color) = debugAction
-                            engineGameScript?.invoke(
-                                "printDebug",
-                                valueOf(msgIndex++),
-                                valueOf(msg),
-                                valueOf(color),
-                            )
-                        }
-
-                        is DebugRect -> {
-                            val (x, y, width, height, color) = debugAction
-                            engineGameScript?.invoke(
-                                "shape.rect",
-                                valueOf(x),
-                                valueOf(y),
-                                valueOf(width),
-                                valueOf(height),
-                                valueOf(color),
-                            )
-                        }
-
-                        is DebugEnabled -> Unit // NOP
-                        is DebugLine -> {
-                            val (x1, y1, x2, y2, color) = debugAction
-                            engineGameScript?.invoke(
-                                "shape.line",
-                                valueOf(x1),
-                                valueOf(y1),
-                                valueOf(x2),
-                                valueOf(y2),
-                                valueOf(color),
-                            )
-                        }
-
-                        is DebugPoint -> {
-                            val (x, y, color) = debugAction
-                            engineGameScript?.invoke(
-                                "shape.circlef",
-                                valueOf(x),
-                                valueOf(y),
-                                valueOf(2),
-                                valueOf(color),
-                            )
-                        }
+                } else if (inputHandler.isCombinationPressed(Key.CTRL, Key.P)) {
+                    platform.performanceMonitor.isEnabled = !platform.performanceMonitor.isEnabled
+                    val message = if (platform.performanceMonitor.isEnabled) {
+                        "enable the profiler (Ctrl+P to disabled)"
+                    } else {
+                        "disabled the profiler"
                     }
+                    popup(message, "#00FF00")
                 }
-                debugActions.clear()
+                currentMetrics?.run { storeFrameMetrics(this) }
+
                 inputManager.reset()
             }
         }
@@ -397,20 +352,7 @@ class GameEngine(
         // End performance monitoring for game update
         val updateTime = platform.performanceMonitor.operationEnd("game_update")
 
-        // Log performance metrics if debug is enabled
-        if (debugEnabled) {
-            logPerformanceMetrics(updateTime)
-        }
-    }
-
-    override fun debug(action: DebugAction) {
-        when (action) {
-            is DebugEnabled -> {
-                debugEnabled = action.enabled
-            }
-
-            else -> debugActions.add(action)
-        }
+        logPerformanceMetrics(updateTime)
     }
 
     private suspend fun GameEngine.popupError(ex: TinyException) {
@@ -442,7 +384,7 @@ class GameEngine(
      */
     private fun logPerformanceMetrics(updateTime: Double) {
         // Only log every 60 frames to avoid spam
-        if (platform.performanceMonitor.isEnabled && current % 60 == 0) {
+        if (platform.performanceMonitor.isEnabled && (currentFrame % 60 == 0L)) {
             val averageMetrics = platform.performanceMonitor.getAverageMetrics(60)
             if (averageMetrics != null) {
                 logger.debug("PERFORMANCE") {
@@ -458,22 +400,22 @@ class GameEngine(
     /**
      * Store frame metrics for debugging visualization
      */
-    private fun storeFrameMetrics(metrics: PerformanceMetrics) {
+    private suspend fun storeFrameMetrics(metrics: PerformanceMetrics) {
         if (!platform.performanceMonitor.isEnabled) {
             return
         }
         // Add performance debug messages
         if (metrics.fps < 30) {
-            debug(DebugMessage("LOW FPS: ${metrics.fps}", "#FF0000"))
+            popup("LOW FPS: ${metrics.fps}", "#FF0000")
         }
 
         if (metrics.memoryAllocated > 1024 * 1024) { // More than 1MB allocated
-            debug(DebugMessage("HIGH ALLOC: ${(metrics.memoryAllocated / 1024 / 1024)}MB", "#FFAA00"))
+            popup("HIGH ALLOC: ${(metrics.memoryAllocated / 1024 / 1024)}MB", "#FFAA00")
         }
 
         // Show frame time if it's high
         if (metrics.frameTime > 16.67) { // Slower than 60 FPS
-            debug(DebugMessage("Frame: ${metrics.frameTime}ms", "#AAAA00"))
+            popup("Frame: ${metrics.frameTime}ms", "#AAAA00")
         }
     }
 
@@ -583,19 +525,14 @@ class GameEngine(
     override fun draw() {
         platform.performanceMonitor.operationStart("render")
         render() // Render the last operation into the frame buffer
-        val renderTime = platform.performanceMonitor.operationEnd("render")
+        platform.performanceMonitor.operationEnd("render")
 
         platform.performanceMonitor.operationStart("draw")
         platform.draw(renderContext)
-        val drawTime = platform.performanceMonitor.operationEnd("draw")
+        platform.performanceMonitor.operationEnd("draw")
 
         // Complete frame monitoring and get metrics
-        val metrics = platform.performanceMonitor.frameEnd()
-
-        // Store performance data for debugging if needed
-        if (debugEnabled) {
-            storeFrameMetrics(metrics)
-        }
+        currentMetrics = platform.performanceMonitor.frameEnd()
     }
 
     /**

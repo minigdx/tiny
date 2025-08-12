@@ -4,8 +4,6 @@ import com.github.mingdx.tiny.doc.TinyArg
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
-import com.github.minigdx.tiny.engine.DebugMessage
-import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.log.Logger
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
@@ -14,13 +12,13 @@ import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.VarArgFunction
 
 @TinyLib("debug", "Helpers to debug your game by drawing or printing information on screen.")
-class DebugLib(private val resourceAccess: GameResourceAccess, private val logger: Logger) : TwoArgFunction() {
+class DebugLib(private val logger: Logger) : TwoArgFunction() {
     override fun call(
         arg1: LuaValue,
         arg2: LuaValue,
     ): LuaValue {
         val tiny = LuaTable()
-        tiny["log"] = log()
+        // TODO: move it into console.log instead of debug.console ?
         tiny["console"] = console()
 
         arg2["debug"] = tiny
@@ -52,22 +50,6 @@ class DebugLib(private val resourceAccess: GameResourceAccess, private val logge
             arg.toString()
         }
 
-    @TinyFunction("Log a message on the screen.", example = DEBUG_EXAMPLE)
-    internal inner class log : VarArgFunction() {
-        @TinyCall("Log a message on the screen.")
-        override fun invoke(
-            @TinyArg("str") args: Varargs,
-        ): Varargs {
-            val nbArgs = args.narg()
-            val message = (1..nbArgs).joinToString("") {
-                formatValue(args.arg(it))
-            }
-
-            resourceAccess.debug(DebugMessage(message, "#32CD32"))
-            return NIL
-        }
-    }
-
     @TinyFunction("Log a message into the console.", example = DEBUG_EXAMPLE)
     internal inner class console : VarArgFunction() {
         @TinyCall("Log a message into the console.")
@@ -75,10 +57,9 @@ class DebugLib(private val resourceAccess: GameResourceAccess, private val logge
             @TinyArg("str") args: Varargs,
         ): Varargs {
             val nbArgs = args.narg()
-            val message =
-                (1..nbArgs).map {
-                    formatValue(args.arg(it))
-                }.joinToString(" ")
+            val message = (1..nbArgs).joinToString(" ") {
+                formatValue(args.arg(it))
+            }
 
             logger.debug("\uD83D\uDC1B") { message }
             return NIL

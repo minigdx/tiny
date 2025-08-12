@@ -95,7 +95,7 @@ class GameScript(
             load(CtrlLib(inputHandler, sprLib))
             load(SfxLib(this@GameScript.resourceAccess, playSound = !forValidation))
             load(ShapeLib(this@GameScript.resourceAccess, gameOptions))
-            load(DebugLib(this@GameScript.resourceAccess, this@GameScript.logger))
+            load(DebugLib(this@GameScript.logger))
             load(KeysLib())
             load(MathLib())
             load(Vec2Lib())
