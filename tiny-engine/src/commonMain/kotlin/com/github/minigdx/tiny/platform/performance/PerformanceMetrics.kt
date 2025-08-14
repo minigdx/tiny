@@ -17,4 +17,16 @@ data class PerformanceMetrics(
     val renderTime: Double = 0.0,
     // CPU processing time
     val cpuTime: Double = 0.0,
+    // Number of draw calls
+    val drawCalls: Long = 0,
+    // Number of read pixels
+    val readPixels: Long = 0,
+    // Number of vertex
+    val vertexCount: Long = 0,
+    // Number of batch primitives draw
+    val drawBatchPrimitives: Long = 0,
+    // Number of batch sprites draw
+    val drawBatchSprites: Long = 0,
+    // Number of screen draw
+    val drawOnScreen: Long = 0,
 )

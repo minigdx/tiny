@@ -25,7 +25,6 @@ import com.github.minigdx.tiny.log.StdOutLogger
 import com.github.minigdx.tiny.lua.WorkspaceLib
 import com.github.minigdx.tiny.lua.errorLine
 import com.github.minigdx.tiny.platform.glfw.GlfwPlatform
-import com.github.minigdx.tiny.render.LwjglGLRender
 import com.github.minigdx.tiny.resources.GameScript
 import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
@@ -152,7 +151,6 @@ class RunCommand : CliktCommand(name = "run") {
                     logger,
                     vfs,
                     effectiveGameDirectory,
-                    LwjglGLRender(logger, gameOption),
                 ),
                 vfs = vfs,
                 logger = logger,

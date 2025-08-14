@@ -48,6 +48,10 @@ class LwjglPerformanceMonitor : BasePerformanceMonitor() {
         fps: Double,
         memoryUsed: Long,
         memoryAllocated: Long,
+        drawCalls: Long,
+        vertexCount: Long,
+        readPixels: Long,
+        drawOnScreen: Long,
     ): PerformanceMetrics {
         val currentGcCount = getTotalGcCount()
         val gcCountDelta = currentGcCount - lastGcCount
@@ -72,6 +76,10 @@ class LwjglPerformanceMonitor : BasePerformanceMonitor() {
             gcCount = gcCountDelta,
             renderTime = renderTime,
             cpuTime = cpuTime,
+            drawCalls = drawCalls,
+            vertexCount = vertexCount,
+            drawOnScreen = drawOnScreen,
+            readPixels = readPixels,
         )
     }
 

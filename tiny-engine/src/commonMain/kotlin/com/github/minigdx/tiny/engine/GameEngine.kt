@@ -388,10 +388,23 @@ class GameEngine(
             val averageMetrics = platform.performanceMonitor.getAverageMetrics(60)
             if (averageMetrics != null) {
                 logger.debug("PERFORMANCE") {
-                    "Avg FPS: ${averageMetrics.fps}, " +
-                        "Frame: ${averageMetrics.frameTime}ms, " +
-                        "Update: ${updateTime}ms, " +
-                        "Memory: ${(averageMetrics.memoryUsed / 1024 / 1024)}MB"
+                    val fps = ((averageMetrics.fps * 10).toInt() / 10.0).toString().padStart(6)
+                    val frameTime = ((averageMetrics.frameTime * 100).toInt() / 100.0).toString().padStart(6)
+                    val updateTimeFormatted = ((updateTime * 100).toInt() / 100.0).toString().padStart(6)
+                    val memory = (((averageMetrics.memoryUsed / 1024.0 / 1024.0) * 10).toInt() / 10.0).toString().padStart(6)
+                    val drawCalls = averageMetrics.drawCalls.toString().padStart(6)
+                    val readPixels = averageMetrics.readPixels.toString().padStart(6)
+                    val drawOnScreen = averageMetrics.drawOnScreen.toString().padStart(6)
+
+                    "\n┌─────────────────┬────────┐\n" +
+                        "│ FPS             │ $fps │\n" +
+                        "│ Frame Time      │ ${frameTime}ms │\n" +
+                        "│ Update Time     │ ${updateTimeFormatted}ms │\n" +
+                        "│ Memory          │ ${memory}MB │\n" +
+                        "│ Draw Calls      │ $drawCalls │\n" +
+                        "│ Read Pixels     │ $readPixels │\n" +
+                        "│ Draw On Screen  │ $drawOnScreen │\n" +
+                        "└─────────────────┴────────┘"
                 }
             }
         }
@@ -499,6 +512,7 @@ class GameEngine(
         if (last == null || op.target.compatibleWith(last.target)) {
             ops.add(op)
         } else {
+            println("last -> $last ; $op")
             // Render only the framebuffer OR GPU operations
             render()
             ops.add(op)

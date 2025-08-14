@@ -12,7 +12,6 @@ import com.github.minigdx.tiny.file.CommonVirtualFileSystem
 import com.github.minigdx.tiny.log.StdOutLogger
 import com.github.minigdx.tiny.lua.errorLine
 import com.github.minigdx.tiny.platform.glfw.GlfwPlatform
-import com.github.minigdx.tiny.render.LwjglGLRender
 import com.github.minigdx.tiny.sound.Music
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
@@ -73,7 +72,6 @@ class SfxCommand : CliktCommand(name = "sfx") {
                     logger,
                     vfs,
                     File("."),
-                    LwjglGLRender(logger, commandOptions),
                     jarResourcePrefix = "/sfx",
                 ),
                 vfs = vfs,

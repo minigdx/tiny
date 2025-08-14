@@ -67,8 +67,7 @@ fun setupGames(
         )
     }
 
-    var index = 0
-    tinyGameTag.forEach { game ->
+    tinyGameTag.forEachIndexed { index, game ->
 
         val gameWidth = game.getAttribute("width")?.toInt() ?: 128
         val gameHeight = game.getAttribute("height")?.toInt() ?: 128
@@ -136,7 +135,6 @@ fun setupGames(
 
         val logger = StdOutLogger("game-$index")
         logger.debug("TINY-JS") { "Boot the game using the URL '$rootPath'." }
-        index++
 
         GameEngine(
             gameOptions = gameOptions,

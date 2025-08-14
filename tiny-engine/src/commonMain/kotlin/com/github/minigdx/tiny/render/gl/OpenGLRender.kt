@@ -20,8 +20,8 @@ import com.danielgergely.kgl.Kgl
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.graphic.PixelFormat
-import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.WindowManager
+import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.render.Render
 import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.RenderFrame
@@ -29,11 +29,11 @@ import com.github.minigdx.tiny.render.operations.RenderOperation
 
 class OpenGLRender(
     private val gl: Kgl,
-    private val logger: Logger,
     private val gameOptions: GameOptions,
+    private val performanceMonitor: PerformanceMonitor,
 ) : Render {
-    private val operationsShader = OperationsShader(gl, logger, gameOptions)
-    private val framebufferShader = FramebufferShader(gl, logger, gameOptions)
+    private val operationsShader = OperationsShader(gl, gameOptions, performanceMonitor)
+    private val framebufferShader = FramebufferShader(gl, performanceMonitor)
 
     override fun init(windowManager: WindowManager): RenderContext {
         operationsShader.init(windowManager)
@@ -122,6 +122,8 @@ class OpenGLRender(
         )
 
         gl.bindFramebuffer(GL_FRAMEBUFFER, null)
+
+        performanceMonitor.readPixels()
 
         return OpenGLFrame(context.fboBuffer, gameOptions)
     }

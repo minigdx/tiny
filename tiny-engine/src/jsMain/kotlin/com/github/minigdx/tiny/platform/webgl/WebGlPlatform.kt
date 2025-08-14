@@ -63,7 +63,7 @@ class WebGlPlatform(
                         "WebGL2 doesn't seems to be supported by your browser. " +
                         "Please update to a compatible browser to run the game in WebGL2.",
                 )
-        render = OpenGLRender(KglJs(context), logger, gameOptions)
+        render = OpenGLRender(KglJs(context), gameOptions, performanceMonitor)
         return render.init(windowManager)
     }
 

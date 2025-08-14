@@ -53,10 +53,11 @@ class GlfwPlatform(
     private val logger: Logger,
     private val vfs: VirtualFileSystem,
     private val workdirectory: File,
-    private val render: Render = OpenGLRender(KglLwjgl, logger, gameOptions),
     private val jarResourcePrefix: String = "",
 ) : Platform {
     override val performanceMonitor: PerformanceMonitor = LwjglPerformanceMonitor()
+    private val render: Render = OpenGLRender(KglLwjgl, gameOptions, performanceMonitor)
+
     private var window: Long = 0
 
     private var lastFrame: Long = getTime()

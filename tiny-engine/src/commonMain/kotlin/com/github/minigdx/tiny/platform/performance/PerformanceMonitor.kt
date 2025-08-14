@@ -15,6 +15,21 @@ interface PerformanceMonitor {
     fun frameEnd(): PerformanceMetrics
 
     /**
+     * Monitoring draw calls with the number of vertex
+     */
+    fun drawCall(nbVertex: Int)
+
+    /**
+     * Monitoring read pixels calls
+     */
+    fun readPixels()
+
+    /**
+     * Monitoring draw on screen calls
+     */
+    fun drawOnScreen()
+
+    /**
      * Start monitoring a specific operation
      */
     fun operationStart(name: String)

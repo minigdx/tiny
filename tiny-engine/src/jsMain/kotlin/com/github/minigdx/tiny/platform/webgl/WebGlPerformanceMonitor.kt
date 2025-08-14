@@ -57,6 +57,10 @@ class WebGlPerformanceMonitor : BasePerformanceMonitor() {
         fps: Double,
         memoryUsed: Long,
         memoryAllocated: Long,
+        drawCalls: Long,
+        vertexCount: Long,
+        readPixels: Long,
+        drawOnScreen: Long,
     ): PerformanceMetrics {
         // Use high-resolution timer for more accurate frame timing
         val now = performance.now()
@@ -82,6 +86,8 @@ class WebGlPerformanceMonitor : BasePerformanceMonitor() {
             gcCount = 0,
             renderTime = renderTime,
             cpuTime = cpuTime,
+            drawOnScreen = drawOnScreen,
+            readPixels = readPixels,
         )
     }
 

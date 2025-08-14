@@ -18,9 +18,9 @@ import com.danielgergely.kgl.GL_ZERO
 import com.danielgergely.kgl.Kgl
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.graphic.PixelFormat
-import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.DrawingMode
 import com.github.minigdx.tiny.platform.WindowManager
+import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.render.NopRenderContext
 import com.github.minigdx.tiny.render.OperationsRender
 import com.github.minigdx.tiny.render.RenderContext
@@ -35,8 +35,8 @@ import com.github.minigdx.tiny.render.shader.VertexShader
 
 class OperationsShader(
     private val gl: Kgl,
-    private val logger: Logger,
     private val gameOptions: GameOptions,
+    private val performanceMonitor: PerformanceMonitor,
 ) : OperationsRender, WriteRender {
     private val program = ShaderProgram(gl, VShader(), FShader())
 
@@ -183,6 +183,7 @@ class OperationsShader(
 
         program.bind()
         program.drawArrays(GL_TRIANGLES, 0, nbVertex)
+        performanceMonitor.drawCall(nbVertex)
         program.unbind()
 
         gl.disable(GL_SCISSOR_TEST)
