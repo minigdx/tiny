@@ -19,6 +19,7 @@ class BatchManager(
     private val resourceAccess: GameResourceAccess,
 ) {
     private val activeBatches = mutableListOf<SpriteBatch>()
+    private var currentBatch: SpriteBatch? = null
 
     private val batchKeyPool = object : ObjectPool<BatchKey>(DEFAULT_SPRITE_POOL_SIZE) {
         override fun newInstance(): BatchKey {
@@ -51,7 +52,7 @@ class BatchManager(
     /**
      * Submit a new sprite.
      *
-     * @return the actual batch that needs to be drawn
+     * @return is the actual batches need to be renderend.
      */
     fun submitSprite(
         source: SpriteSheet,
@@ -67,7 +68,7 @@ class BatchManager(
         palette: Array<ColorIndex> = emptyArray(),
         camera: Camera? = null,
         clipper: Clipper? = null,
-    ): SpriteBatch? {
+    ): Boolean {
         val key = batchKeyPool.obtain().set(
             dither = dither,
             palette = palette,
@@ -88,22 +89,38 @@ class BatchManager(
 
         // Try to add to existing batch
         val existingBatch = activeBatches.lastOrNull()
-        if (existingBatch?.addSprite(key, source, instance) == true) {
-            return null
+        val rejectReason = existingBatch?.addSprite(key, source, instance)
+        if (existingBatch != null && rejectReason == null) {
+            return false
         }
 
         // Create new batch
         val newBatch = spriteBatchPool.obtain()
 
         newBatch.addSprite(key, source, instance)
-        activeBatches.add(newBatch)
 
-        return existingBatch
+        return when (rejectReason) {
+            // The batch will be added after the previous batch has been rendered
+            SpriteBatch.RejectReason.BATCH_MIXED -> {
+                currentBatch = newBatch
+                true
+            }
+            SpriteBatch.RejectReason.BATCH_FULL,
+            SpriteBatch.RejectReason.BATCH_DIFFEREND_PARAMETERS,
+            null,
+            -> {
+                activeBatches.add(newBatch)
+                false
+            }
+        }
     }
 
     fun flushAllBatches() {
         spriteBatchPool.free(activeBatches)
         activeBatches.clear()
+
+        // Add the current batch, if any
+        currentBatch?.let { activeBatches.add(it) }
     }
 
     fun getActiveBatchCount(): Int = activeBatches.size

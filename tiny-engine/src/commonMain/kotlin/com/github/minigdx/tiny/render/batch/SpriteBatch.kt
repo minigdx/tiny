@@ -14,7 +14,6 @@ class SpriteBatch(
     internal val instances: MutableList<SpriteInstance> = mutableListOf(),
     internal val sheets: MutableList<SpriteSheet> = mutableListOf(),
 ) {
-    // FIXME: add immediate rendering? if immediateRendering -> render the sprite, reset the primitie ?
     val key: BatchKey
         get() = _key!!
 
@@ -29,19 +28,19 @@ class SpriteBatch(
     fun canAddSprite(
         currentKey: BatchKey,
         currentSpriteSheet: SpriteSheet,
-    ): Boolean {
+    ): RejectReason? {
         // First add in this batch
         if (_key == null) {
-            return true
+            return null
         }
         // Check capacity first
         if (instances.size >= MAX_SPRITE_PER_BATCH) {
-            return false
+            return RejectReason.BATCH_FULL
         }
 
         // Check if the key is identical
         if (currentKey != key) {
-            return false
+            return RejectReason.BATCH_DIFFEREND_PARAMETERS
         }
 
         val currentIsPrimitive = currentSpriteSheet.type == ResourceType.PRIMITIVE_SPRITESHEET
@@ -49,21 +48,26 @@ class SpriteBatch(
 
         // if both are same nature
         if (currentIsPrimitive && lastIsPrimitive) {
-            return true
+            return null
         } else if (!currentIsPrimitive && !!lastIsPrimitive) {
-            return true
+            return null
         }
 
-        // Different non-primitive keys cannot be mixed
-        return !hasMixedTypes
+        return if (hasMixedTypes) {
+            // Different non-primitive cannot be mixed
+            RejectReason.BATCH_MIXED
+        } else {
+            null
+        }
     }
 
     fun addSprite(
         key: BatchKey,
         spriteSheet: SpriteSheet,
         instance: SpriteInstance,
-    ): Boolean {
-        if (!canAddSprite(key, spriteSheet)) return false
+    ): RejectReason? {
+        val rejectReason = canAddSprite(key, spriteSheet)
+        if (rejectReason != null) return rejectReason
 
         if (_key == null) {
             _key = key
@@ -82,10 +86,16 @@ class SpriteBatch(
             sheets.add(spriteSheet)
             instances.add(instance)
         }
-        return true
+        return null
     }
 
     companion object {
         const val MAX_SPRITE_PER_BATCH = 100
+    }
+
+    enum class RejectReason {
+        BATCH_FULL,
+        BATCH_MIXED,
+        BATCH_DIFFEREND_PARAMETERS,
     }
 }
