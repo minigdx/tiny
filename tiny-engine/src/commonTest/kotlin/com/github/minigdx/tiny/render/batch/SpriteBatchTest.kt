@@ -5,8 +5,7 @@ import com.github.minigdx.tiny.resources.ResourceType
 import com.github.minigdx.tiny.resources.SpriteSheet
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import kotlin.test.assertNull
 
 class SpriteBatchTest {
     private fun createTestSpriteSheet(): SpriteSheet {
@@ -43,18 +42,18 @@ class SpriteBatchTest {
     }
 
     @Test
-    fun canAddSprite_with_same_key_returns_true() {
+    fun canAddSprite_with_same_key_returns_null() {
         val spriteSheet = createTestSpriteSheet()
         val key = createTestBatchKey()
         val batch = SpriteBatch(key)
 
         val sameKey = createTestBatchKey()
 
-        assertTrue(batch.canAddSprite(sameKey, spriteSheet))
+        assertNull(batch.canAddSprite(sameKey, spriteSheet))
     }
 
     @Test
-    fun canAddSprite_with_max_instances_returns_false() {
+    fun canAddSprite_with_max_instances_returns_batch_full() {
         val spriteSheet = createTestSpriteSheet()
         val key = createTestBatchKey()
         val batch = SpriteBatch(_key = key)
@@ -66,11 +65,11 @@ class SpriteBatchTest {
 
         val sameKey = createTestBatchKey()
 
-        assertFalse(batch.canAddSprite(sameKey, spriteSheet))
+        assertEquals(SpriteBatch.RejectReason.BATCH_FULL, batch.canAddSprite(sameKey, spriteSheet))
     }
 
     @Test
-    fun canAddSprite_with_different_key_returns_false() {
+    fun canAddSprite_with_different_key_returns_batch_different_parameters() {
         val spriteSheet = createTestSpriteSheet()
 
         val key1 = BatchKey(
@@ -90,20 +89,20 @@ class SpriteBatchTest {
 
         val batch = SpriteBatch(_key = key1)
 
-        assertFalse(batch.canAddSprite(key2, spriteSheet))
+        assertEquals(SpriteBatch.RejectReason.BATCH_DIFFEREND_PARAMETERS, batch.canAddSprite(key2, spriteSheet))
     }
 
     @Test
-    fun add_primitive_returns_true() {
+    fun add_primitive_returns_null() {
         val primitiveSheet = createTestPrimitiveSpriteSheet()
         val key = createTestBatchKey()
         val batch = SpriteBatch(_key = key)
 
-        assertTrue(batch.canAddSprite(key, primitiveSheet))
+        assertNull(batch.canAddSprite(key, primitiveSheet))
     }
 
     @Test
-    fun add_primitive_then_primitive_returns_true_but_no_new_instance() {
+    fun add_primitive_then_primitive_returns_null_but_no_new_instance() {
         val primitiveSheet1 = createTestPrimitiveSpriteSheet()
         val primitiveSheet2 = SpriteSheet(
             version = 1,
@@ -118,14 +117,14 @@ class SpriteBatchTest {
         val key1 = createTestBatchKey()
         val batch = SpriteBatch()
 
-        assertTrue(batch.addSprite(key1, primitiveSheet1, SpriteInstance()))
-        assertTrue(batch.addSprite(key1, primitiveSheet2, SpriteInstance()))
+        assertNull(batch.addSprite(key1, primitiveSheet1, SpriteInstance()))
+        assertNull(batch.addSprite(key1, primitiveSheet2, SpriteInstance()))
 
         assertEquals(1, batch.instances.size)
     }
 
     @Test
-    fun game_spritesheet_then_primitive_returns_true() {
+    fun game_spritesheet_then_primitive_returns_null() {
         val gameSheet = createTestSpriteSheet()
         val primitiveSheet = createTestPrimitiveSpriteSheet()
 
@@ -133,11 +132,11 @@ class SpriteBatchTest {
         val primitiveKey = createTestBatchKey()
         val batch = SpriteBatch(_key = gameKey)
 
-        assertTrue(batch.canAddSprite(primitiveKey, primitiveSheet))
+        assertNull(batch.canAddSprite(primitiveKey, primitiveSheet))
     }
 
     @Test
-    fun game_spritesheet_then_primitive_then_game_spritesheet_returns_false() {
+    fun game_spritesheet_then_primitive_then_game_spritesheet_returns_batch_mixed() {
         val gameSheet = createTestSpriteSheet()
         val primitiveSheet = createTestPrimitiveSpriteSheet()
 
@@ -150,12 +149,12 @@ class SpriteBatchTest {
         // Add primitive to the game spritesheet batch
         batch.addSprite(key, primitiveSheet, SpriteInstance())
 
-        // Now trying to add game spritesheet should return false
-        assertFalse(batch.canAddSprite(key, gameSheet))
+        // Now trying to add game spritesheet should return BATCH_MIXED
+        assertEquals(SpriteBatch.RejectReason.BATCH_MIXED, batch.canAddSprite(key, gameSheet))
     }
 
     @Test
-    fun primitive_then_game_spritesheet_returns_true() {
+    fun primitive_then_game_spritesheet_returns_null() {
         val primitiveSheet = createTestPrimitiveSpriteSheet()
         val gameSheet = createTestSpriteSheet()
 
@@ -163,11 +162,11 @@ class SpriteBatchTest {
         val gameKey = createTestBatchKey()
         val batch = SpriteBatch(_key = primitiveKey)
 
-        assertTrue(batch.canAddSprite(gameKey, gameSheet))
+        assertNull(batch.canAddSprite(gameKey, gameSheet))
     }
 
     @Test
-    fun primitive_then_game_spritesheet_then_primitive_returns_false() {
+    fun primitive_then_game_spritesheet_then_primitive_returns_batch_mixed() {
         val primitiveSheet = createTestPrimitiveSpriteSheet()
         val gameSheet = createTestSpriteSheet()
 
@@ -180,7 +179,7 @@ class SpriteBatchTest {
         // Add game spritesheet
         batch.addSprite(gameKey, gameSheet, SpriteInstance())
 
-        // Now trying to add primitive should return false
-        assertFalse(batch.canAddSprite(gameKey, primitiveSheet))
+        // Now trying to add primitive should return BATCH_MIXED
+        assertEquals(SpriteBatch.RejectReason.BATCH_MIXED, batch.canAddSprite(gameKey, primitiveSheet))
     }
 }
