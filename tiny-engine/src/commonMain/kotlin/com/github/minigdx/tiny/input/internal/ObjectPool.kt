@@ -12,7 +12,7 @@ abstract class ObjectPool<T>(private val size: Int) {
     @Suppress("UNCHECKED_CAST")
     fun obtain(): T {
         if (pool.isEmpty()) {
-            for (it in 0 until size) {
+            (0 until size).forEach { _ ->
                 free(newInstance())
             }
         }

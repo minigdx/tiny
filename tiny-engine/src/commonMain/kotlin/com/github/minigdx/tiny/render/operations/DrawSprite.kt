@@ -14,6 +14,7 @@ import com.github.minigdx.tiny.render.RenderUnit
 import com.github.minigdx.tiny.resources.ResourceType
 import com.github.minigdx.tiny.resources.SpriteSheet
 
+// FIXME(Performance): Rename it into a SpriteBatch ?
 class DrawSprite(
     var source: SpriteSheet? = null,
     // dither pattern

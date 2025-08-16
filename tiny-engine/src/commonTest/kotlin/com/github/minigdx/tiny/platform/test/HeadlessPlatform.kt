@@ -32,6 +32,12 @@ class HeadlessPerformanceMonitor : PerformanceMonitor {
 
     override fun frameEnd(): PerformanceMetrics = PerformanceMetrics(0.0, 0.0, 0, 0)
 
+    override fun drawCall(nbVertex: Int) = Unit
+
+    override fun readPixels() = Unit
+
+    override fun drawOnScreen() = Unit
+
     override fun operationStart(name: String) = Unit
 
     override fun operationEnd(name: String): Double = 0.0

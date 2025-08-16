@@ -23,6 +23,7 @@ import com.github.minigdx.tiny.resources.GameLevel
 import com.github.minigdx.tiny.resources.GameResource
 import com.github.minigdx.tiny.resources.GameScript
 import com.github.minigdx.tiny.resources.ResourceFactory
+import com.github.minigdx.tiny.resources.ResourceType
 import com.github.minigdx.tiny.resources.ResourceType.BOOT_GAMESCRIPT
 import com.github.minigdx.tiny.resources.ResourceType.BOOT_SPRITESHEET
 import com.github.minigdx.tiny.resources.ResourceType.ENGINE_GAMESCRIPT
@@ -201,6 +202,8 @@ class GameEngine(
                     GAME_SOUND -> {
                         sounds[resource.index] = resource as Sound
                     }
+
+                    ResourceType.PRIMITIVE_SPRITESHEET -> Unit
                 }
                 numberOfResources--
                 logger.debug("GAME_ENGINE") { "Remaining resources to load: $numberOfResources." }
@@ -265,6 +268,8 @@ class GameEngine(
                     GAME_SOUND -> {
                         sounds[resource.index] = resource as Sound
                     }
+
+                    ResourceType.PRIMITIVE_SPRITESHEET -> Unit
                 }
             }
         }

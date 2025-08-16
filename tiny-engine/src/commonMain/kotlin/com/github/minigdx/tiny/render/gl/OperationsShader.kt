@@ -65,6 +65,7 @@ class OperationsShader(
         context: RenderContext,
         op: DrawSprite,
     ) {
+        // FIXME(Performance): create the vertex data upfront.
         var indexVertex = 0
         op.attributes.forEach { a ->
             // A - Left/Up
@@ -131,6 +132,8 @@ class OperationsShader(
             source.width,
             source.height,
         )
+
+        // FIXME(Performance): set the palette buffer at the game init; update it only when changed.
 
         // -- Set the color palette -- //
         val colors = gameOptions.colors()
@@ -252,11 +255,15 @@ class OperationsShader(
         val uSpritesheet = uniformVec2("u_spritesheet") // Size of the viewport; in pixel.
         val uCamera = uniformVec2("u_camera") // Position of the camera (offset)
 
+        // FIXME(Performance): at the texture unit: spritesheet, system or primitives ?
         val vUvs = outVec2("v_uvs")
         val vPos = outVec2("v_pos")
     }
 
     class FShader : FragmentShader(FRAGMENT_SHADER) {
+        // FIXME(Performance): Add the system spritesheet and the primitives sprite sheet.
+        // FIXME(Performance): Add more user texture units to avoid draw call for switching.
+        // FIXME(Performance): When the primitives is drawn, reset it.
         val paletteColors = uniformSample2D("palette_colors")
         val spritesheet = uniformSample2D("spritesheet")
         val uDither = uniformInt("u_dither")
