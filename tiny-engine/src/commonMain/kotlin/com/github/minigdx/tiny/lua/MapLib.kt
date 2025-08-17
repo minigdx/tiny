@@ -472,6 +472,7 @@ entity.fields -- access custom field of the entity
             }
 
             val world = resourceAccess.level(currentWorld) ?: return NIL
+            // FIXME(Performance): Draw each tile as a sprite with the BatchManager.
             toDrawSprite(world, layer).forEach {
                 resourceAccess.addOp(it)
             }

@@ -127,6 +127,7 @@ class OperationsShader(
             source.height.toFloat(),
         )
 
+        // FIXME(Performance): Don't set the spritesheet for each frame
         program.fragmentShader.spritesheet.applyIndex(
             source.pixels.pixels,
             source.width,

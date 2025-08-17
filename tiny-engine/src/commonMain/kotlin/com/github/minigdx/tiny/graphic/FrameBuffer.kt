@@ -260,7 +260,7 @@ class FrameBuffer(
             0,
             0,
             "framebuffer",
-            type = ResourceType.GAME_SPRITESHEET,
+            type = ResourceType.PRIMITIVE_SPRITESHEET,
             pixels = this.colorIndexBuffer,
             width = this.width,
             height = this.height,

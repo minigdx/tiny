@@ -2,7 +2,6 @@ package com.github.minigdx.tiny.render.batch
 
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
-import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.graphic.Camera
 import com.github.minigdx.tiny.graphic.Clipper
 import com.github.minigdx.tiny.input.internal.ObjectPool
@@ -15,9 +14,7 @@ import com.github.minigdx.tiny.resources.SpriteSheet
  * and flushing full batches to the render queue. Integrates with the object pooling
  * system for memory efficiency.
  */
-class BatchManager(
-    private val resourceAccess: GameResourceAccess,
-) {
+class BatchManager {
     private val activeBatches = mutableListOf<SpriteBatch>()
     private var currentBatch: SpriteBatch? = null
 

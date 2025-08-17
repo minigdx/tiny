@@ -8,6 +8,7 @@ plugins {
 
 dependencies {
     this.commonTestImplementation(kotlin("test"))
+    this.commonTestImplementation(libs.kotlin.coroutines.test)
 
     // Multiplatform
     this.commonMainImplementation(libs.luak)

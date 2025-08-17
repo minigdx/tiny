@@ -25,6 +25,7 @@ import com.github.minigdx.tiny.lua.Vec2Lib
 import com.github.minigdx.tiny.lua.WorkspaceLib
 import com.github.minigdx.tiny.lua.toTinyException
 import com.github.minigdx.tiny.platform.Platform
+import com.github.minigdx.tiny.render.batch.BatchManager
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LoadState
 import org.luaj.vm2.LuaError
@@ -48,6 +49,7 @@ class GameScript(
      */
     override val name: String,
     val gameOptions: GameOptions,
+    val batchManager: BatchManager,
     val inputHandler: InputHandler,
     val platform: Platform,
     val logger: Logger,
@@ -94,7 +96,7 @@ class GameScript(
             load(GfxLib(this@GameScript.resourceAccess, gameOptions))
             load(CtrlLib(inputHandler, sprLib))
             load(SfxLib(this@GameScript.resourceAccess, playSound = !forValidation))
-            load(ShapeLib(this@GameScript.resourceAccess, gameOptions))
+            load(ShapeLib(this@GameScript.resourceAccess, gameOptions, batchManager))
             load(DebugLib(this@GameScript.logger))
             load(KeysLib())
             load(MathLib())

@@ -9,6 +9,7 @@ import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
+import com.github.minigdx.tiny.render.batch.BatchManager
 import com.github.minigdx.tiny.render.operations.FrameBufferOperation
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaTable
@@ -19,6 +20,7 @@ import org.luaj.vm2.lib.TwoArgFunction
 import kotlin.math.abs
 
 private class Shape(private val resourceAccess: GameResourceAccess) {
+
     fun rectArgs(args: Varargs): List<Int>? {
         when (args.narg()) {
             // rect including color
@@ -74,8 +76,13 @@ private class Shape(private val resourceAccess: GameResourceAccess) {
         "Those shapes can be circle, rectangle, line or oval." +
         "All shapes can be draw filed or not filed.",
 )
-class ShapeLib(private val resourceAccess: GameResourceAccess, private val gameOptions: GameOptions) : TwoArgFunction() {
+class ShapeLib(
+    private val resourceAccess: GameResourceAccess,
+    private val gameOptions: GameOptions,
+    private val batchManager: BatchManager,
+) : TwoArgFunction() {
     private val shape = Shape(resourceAccess)
+
 
     override fun call(
         arg1: LuaValue,
@@ -289,10 +296,28 @@ class ShapeLib(private val resourceAccess: GameResourceAccess, private val gameO
         ): Varargs {
             val (x, y, width, height, color) = shape.rectArgs(args) ?: return NIL
 
+            // Add the framebuffer in the batch
+            batchManager.submitSprite(
+                source = resourceAccess.frameBuffer.asSpriteSheet,
+                sourceX = 0,
+                sourceY = 0,
+                sourceWidth = resourceAccess.frameBuffer.width,
+                sourceHeight = resourceAccess.frameBuffer.height,
+                destinationX = 0,
+                destinationY = 0,
+                flipX = false,
+                flipY = false,
+                dither = resourceAccess.frameBuffer.blender.dithering,
+                palette = resourceAccess.frameBuffer.blender.switch,
+                camera = resourceAccess.frameBuffer.camera,
+                clipper = resourceAccess.frameBuffer.clipper
+            )
+
+            // Draw the shape in the current frame buffer
             for (j in y until y + height) {
                 resourceAccess.frameBuffer.fill(x, x + width, j, color)
             }
-            resourceAccess.addOp(FrameBufferOperation)
+
             return NIL
         }
 
@@ -420,6 +445,7 @@ class ShapeLib(private val resourceAccess: GameResourceAccess, private val gameO
                     y += sy
                 }
             }
+            // FIXME(Performance): Add the current primitive as a sprite.
             resourceAccess.addOp(FrameBufferOperation)
             return NONE
         }

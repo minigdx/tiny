@@ -17,20 +17,13 @@ import com.github.minigdx.tiny.platform.performance.PerformanceMetrics
 import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.RenderFrame
 import com.github.minigdx.tiny.render.RenderUnit
+import com.github.minigdx.tiny.render.batch.BatchManager
 import com.github.minigdx.tiny.render.operations.DrawSprite
 import com.github.minigdx.tiny.render.operations.RenderOperation
 import com.github.minigdx.tiny.resources.GameLevel
 import com.github.minigdx.tiny.resources.GameResource
 import com.github.minigdx.tiny.resources.GameScript
 import com.github.minigdx.tiny.resources.ResourceFactory
-import com.github.minigdx.tiny.resources.ResourceType
-import com.github.minigdx.tiny.resources.ResourceType.BOOT_GAMESCRIPT
-import com.github.minigdx.tiny.resources.ResourceType.BOOT_SPRITESHEET
-import com.github.minigdx.tiny.resources.ResourceType.ENGINE_GAMESCRIPT
-import com.github.minigdx.tiny.resources.ResourceType.GAME_GAMESCRIPT
-import com.github.minigdx.tiny.resources.ResourceType.GAME_LEVEL
-import com.github.minigdx.tiny.resources.ResourceType.GAME_SOUND
-import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
 import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.resources.SpriteSheet
 import com.github.minigdx.tiny.sound.MusicalBar
@@ -59,16 +52,8 @@ class GameEngine(
     val listener: GameEngineListener? = null,
 ) : GameLoop, GameResourceAccess {
     private val events: MutableList<GameResource> = mutableListOf()
-    private val workEvents: MutableList<GameResource> = mutableListOf()
-
-    private var numberOfResources: Int = 0
 
     private val ops = mutableListOf<RenderOperation>()
-
-    private lateinit var scripts: Array<GameScript?>
-    private lateinit var spriteSheets: Array<SpriteSheet?>
-    private lateinit var levels: Array<GameLevel?>
-    private lateinit var sounds: Array<Sound?>
 
     override var bootSpritesheet: SpriteSheet? = null
         private set
@@ -97,6 +82,12 @@ class GameEngine(
 
     private val operationFactory = OperationsObjectPool()
 
+    private val batchManager = BatchManager()
+
+    private val performanceMonitor = platform.performanceMonitor
+
+    private lateinit var gameResourceProcessor: GameResourceProcessor
+
     fun main() {
         val windowManager = platform.initWindowManager()
 
@@ -109,42 +100,15 @@ class GameEngine(
             platform = platform,
             logger = logger,
             colorPalette = gameOptions.colors(),
+            batchManager = batchManager,
         )
 
         val resourcesScope = CoroutineScope(platform.io())
 
-        val gameScripts = gameOptions.gameScripts.mapIndexed { index, script ->
-            resourceFactory.gamescript(index + 1, script, inputHandler, gameOptions)
-        }
-        this.scripts = Array(gameScripts.size + 1) { null }
-
-        val spriteSheets = gameOptions.spriteSheets.mapIndexed { index, sheet ->
-            resourceFactory.gameSpritesheet(index, sheet)
-        }
-        this.spriteSheets = Array(spriteSheets.size) { null }
-
-        val gameLevels = gameOptions.gameLevels.mapIndexed { index, level ->
-            resourceFactory.gameLevel(index, level)
-        }
-        this.levels = Array(gameLevels.size) { null }
-
-        val sounds = gameOptions.sounds.mapIndexed { index, sound ->
-            resourceFactory.soundEffect(index, sound)
-        }
-        this.sounds = Array(sounds.size) { null }
-
-        val resources = listOf(
-            resourceFactory.bootscript("_boot.lua", inputHandler, gameOptions),
-            resourceFactory.enginescript("_engine.lua", inputHandler, gameOptions),
-            resourceFactory.bootSpritesheet("_boot.png"),
-        ) + gameScripts + spriteSheets + gameLevels + sounds
-
-        numberOfResources = resources.size
-
-        logger.debug("GAME_ENGINE") { "Number of resources to load: $numberOfResources" }
+        gameResourceProcessor = GameResourceProcessor(resourceFactory, inputHandler, gameOptions, logger)
 
         resourcesScope.launch {
-            resources.asFlow()
+            gameResourceProcessor.resources.asFlow()
                 .flatMapMerge(concurrency = 128) { resource -> resource }
                 .collect(ScriptsCollector(events))
         }
@@ -155,127 +119,24 @@ class GameEngine(
     }
 
     override suspend fun advance(delta: Seconds) {
-        platform.performanceMonitor.frameStart()
-        platform.performanceMonitor.operationStart("game_update")
+        performanceMonitor.frameStart()
+        performanceMonitor.operationStart("game_update")
 
-        workEvents.addAll(events)
+        // TODO: plan to refactor this game loop
+        // -- update
+        // 1. Process the new events
+        // 2. Prepare the resource
+        // 3. (re)load resources
+        // 4. advance the gamescript
+        // 5. advance the engine gamescript
+        // 6. intercept user shortcut
+        // -- draw
+        // 1. play sounds
+        // 2. draw the gamescript
+        // 3. draw the engine gamescript
+        gameResourceProcessor.process(events)
 
-        workEvents.forEach { resource ->
-            // The resource is loading
-            if (!resource.reload) {
-                logger.info("GAME_ENGINE") { "Loaded ${resource.name} ${resource.type} (version: ${resource.version})" }
-                when (resource.type) {
-                    BOOT_GAMESCRIPT -> {
-                        // Always put the boot script at the top of the stack
-                        val bootScript = resource as GameScript
-                        bootScript.resourceAccess = this
-                        bootScript.evaluate(customizeLuaGlobal)
-                        scripts[0] = bootScript
-                    }
-
-                    GAME_GAMESCRIPT -> {
-                        resource as GameScript
-                        resource.resourceAccess = this
-                        // Game script will be evaluated when the boot script will exit
-                        scripts[resource.index] = resource
-                    }
-
-                    ENGINE_GAMESCRIPT -> {
-                        // Don't put the engine script in the stack
-                        engineGameScript = resource as GameScript
-                        engineGameScript?.resourceAccess = this
-                        engineGameScript?.evaluate(customizeLuaGlobal)
-                    }
-
-                    BOOT_SPRITESHEET -> {
-                        bootSpritesheet = resource as SpriteSheet
-                    }
-
-                    GAME_SPRITESHEET -> {
-                        spriteSheets[resource.index] = resource as SpriteSheet
-                    }
-
-                    GAME_LEVEL -> {
-                        levels[resource.index] = resource as GameLevel
-                    }
-
-                    GAME_SOUND -> {
-                        sounds[resource.index] = resource as Sound
-                    }
-
-                    ResourceType.PRIMITIVE_SPRITESHEET -> Unit
-                }
-                numberOfResources--
-                logger.debug("GAME_ENGINE") { "Remaining resources to load: $numberOfResources." }
-                if (numberOfResources == 0) {
-                    logger.debug("GAME_ENGINE") { "All resources are loaded. Notify the boot script." }
-                    // Force to notify the boot script
-                    scripts[0]!!.resourcesLoaded()
-                }
-            } else {
-                logger.info("GAME_ENGINE") { "Reload ${resource.name} ${resource.type} (version: ${resource.version})" }
-                // The resource already has been loaded.
-                when (resource.type) {
-                    BOOT_GAMESCRIPT -> {
-                        // Always put the boot script at the top of the stack
-                        val bootScript = resource as GameScript
-                        bootScript.resourceAccess = this
-                        bootScript.evaluate(customizeLuaGlobal)
-                        scripts[0] = bootScript
-                    }
-
-                    GAME_GAMESCRIPT -> {
-                        resource as GameScript
-                        resource.resourceAccess = this
-                        val isValid =
-                            try {
-                                resource.isValid(customizeLuaGlobal)
-                                true
-                            } catch (ex: LuaError) {
-                                popupError(ex.toTinyException(resource.content.decodeToString()))
-                                false
-                            }
-                        if (isValid) {
-                            scripts[resource.index] = resource
-                            // Force the reloading of the script, as the script update might be used as resource of
-                            // the current game script.
-                            scripts[currentScriptIndex]?.reload = true
-                            clear()
-                        }
-                    }
-
-                    ENGINE_GAMESCRIPT -> {
-                        // Don't put the engine script in the stack
-                        engineGameScript = resource as GameScript
-                        engineGameScript?.resourceAccess = this
-                        engineGameScript?.evaluate(customizeLuaGlobal)
-                    }
-
-                    BOOT_SPRITESHEET -> {
-                        bootSpritesheet = resource as SpriteSheet
-                    }
-
-                    GAME_SPRITESHEET -> {
-                        spriteSheets[resource.index] = resource as SpriteSheet
-                    }
-
-                    GAME_LEVEL -> {
-                        levels[resource.index] = resource as GameLevel
-                        // Force the reloading of the script as level init might occur in the _init block.
-                        scripts[currentScriptIndex]?.reload = true
-                    }
-
-                    GAME_SOUND -> {
-                        sounds[resource.index] = resource as Sound
-                    }
-
-                    ResourceType.PRIMITIVE_SPRITESHEET -> Unit
-                }
-            }
-        }
-        events.removeAll(workEvents)
-        workEvents.clear()
-
+        val scripts = gameResourceProcessor.scripts
         with(scripts[currentScriptIndex]) {
             if (this == null) return
 
@@ -340,8 +201,8 @@ class GameEngine(
                     popup("screenshot PNG", "#00FF00")
                     platform.screenshot()
                 } else if (inputHandler.isCombinationPressed(Key.CTRL, Key.P)) {
-                    platform.performanceMonitor.isEnabled = !platform.performanceMonitor.isEnabled
-                    val message = if (platform.performanceMonitor.isEnabled) {
+                    performanceMonitor.isEnabled = !performanceMonitor.isEnabled
+                    val message = if (performanceMonitor.isEnabled) {
                         "enable the profiler (Ctrl+P to disabled)"
                     } else {
                         "disabled the profiler"
@@ -355,7 +216,7 @@ class GameEngine(
         }
 
         // End performance monitoring for game update
-        val updateTime = platform.performanceMonitor.operationEnd("game_update")
+        val updateTime = performanceMonitor.operationEnd("game_update")
 
         logPerformanceMetrics(updateTime)
     }
@@ -366,7 +227,7 @@ class GameEngine(
         ) {
             val error = "line ${ex.lineNumber}:${ex.line} <-- the \uD83D\uDC1E is around here (${ex.message})"
             "The line ${ex.lineNumber} trigger an execution error (${ex.message}). " +
-                "Please fix the script ${ex.name}!\n" + error
+                    "Please fix the script ${ex.name}!\n" + error
         }
         val msg = "error line ${ex.lineNumber}:${ex.line} (${ex.message})"
         popup(msg, "#FF0000", true)
@@ -389,27 +250,28 @@ class GameEngine(
      */
     private fun logPerformanceMetrics(updateTime: Double) {
         // Only log every 60 frames to avoid spam
-        if (platform.performanceMonitor.isEnabled && (currentFrame % 60 == 0L)) {
-            val averageMetrics = platform.performanceMonitor.getAverageMetrics(60)
+        if (performanceMonitor.isEnabled && (currentFrame % 60 == 0L)) {
+            val averageMetrics = performanceMonitor.getAverageMetrics(60)
             if (averageMetrics != null) {
                 logger.debug("PERFORMANCE") {
                     val fps = ((averageMetrics.fps * 10).toInt() / 10.0).toString().padStart(6)
                     val frameTime = ((averageMetrics.frameTime * 100).toInt() / 100.0).toString().padStart(6)
                     val updateTimeFormatted = ((updateTime * 100).toInt() / 100.0).toString().padStart(6)
-                    val memory = (((averageMetrics.memoryUsed / 1024.0 / 1024.0) * 10).toInt() / 10.0).toString().padStart(6)
+                    val memory =
+                        (((averageMetrics.memoryUsed / 1024.0 / 1024.0) * 10).toInt() / 10.0).toString().padStart(6)
                     val drawCalls = averageMetrics.drawCalls.toString().padStart(6)
                     val readPixels = averageMetrics.readPixels.toString().padStart(6)
                     val drawOnScreen = averageMetrics.drawOnScreen.toString().padStart(6)
 
                     "\n┌─────────────────┬────────┐\n" +
-                        "│ FPS             │ $fps │\n" +
-                        "│ Frame Time      │ ${frameTime}ms │\n" +
-                        "│ Update Time     │ ${updateTimeFormatted}ms │\n" +
-                        "│ Memory          │ ${memory}MB │\n" +
-                        "│ Draw Calls      │ $drawCalls │\n" +
-                        "│ Read Pixels     │ $readPixels │\n" +
-                        "│ Draw On Screen  │ $drawOnScreen │\n" +
-                        "└─────────────────┴────────┘"
+                            "│ FPS             │ $fps │\n" +
+                            "│ Frame Time      │ ${frameTime}ms │\n" +
+                            "│ Update Time     │ ${updateTimeFormatted}ms │\n" +
+                            "│ Memory          │ ${memory}MB │\n" +
+                            "│ Draw Calls      │ $drawCalls │\n" +
+                            "│ Read Pixels     │ $readPixels │\n" +
+                            "│ Draw On Screen  │ $drawOnScreen │\n" +
+                            "└─────────────────┴────────┘"
                 }
             }
         }
@@ -419,7 +281,7 @@ class GameEngine(
      * Store frame metrics for debugging visualization
      */
     private suspend fun storeFrameMetrics(metrics: PerformanceMetrics) {
-        if (!platform.performanceMonitor.isEnabled) {
+        if (!performanceMonitor.isEnabled) {
             return
         }
         // Add performance debug messages
@@ -438,22 +300,27 @@ class GameEngine(
     }
 
     override fun spritesheet(index: Int): SpriteSheet? {
+        val spriteSheets = gameResourceProcessor.spriteSheets
         val protected = max(0, min(index, spriteSheets.size - 1))
         if (protected >= spriteSheets.size) return null
         return spriteSheets[protected]
     }
 
     override fun spritesheet(name: String): Int? {
+        val spriteSheets = gameResourceProcessor.spriteSheets
         return spriteSheets
             .indexOfFirst { it?.name == name }
             .takeIf { it >= 0 }
     }
 
     override fun newSpritesheetIndex(): Int {
+        val spriteSheets = gameResourceProcessor.spriteSheets
         return spriteSheets.size
     }
 
     override fun spritesheet(sheet: SpriteSheet) {
+        /*
+        val spriteSheets = gameResourceProcessor.spriteSheets
         if (sheet.index < 0) {
             // The index is negative. Let's copy it at the last place.
             spriteSheets = spriteSheets.copyOf(spriteSheets.size + 1)
@@ -465,24 +332,38 @@ class GameEngine(
         } else {
             spriteSheets[sheet.index] = sheet
         }
+
+         */
     }
 
     override fun level(index: Int): GameLevel? {
+        /*
         val protected = max(0, min(index, levels.size - 1))
         if (protected >= levels.size) return null
         return levels[protected]
+
+         */
+        return null
     }
 
     override fun sound(index: Int): Sound? {
+        /*
         return sounds.getOrNull(index.coerceIn(0, sounds.size - 1))
+
+         */
+        return null
     }
 
     override fun sound(name: String): Sound? {
+        /*
         val index = sounds.indexOfFirst { it?.data?.name == name }
             .takeIf { it >= 0 }
             ?: return null
 
         return sound(index)
+
+         */
+        return null
     }
 
     override fun play(musicalBar: MusicalBar): SoundHandler {
@@ -502,9 +383,13 @@ class GameEngine(
     }
 
     override fun script(name: String): GameScript? {
+        /*
         return scripts
             .drop(1) // drop the _boot.lua
             .firstOrNull { script -> script?.name == name }
+
+         */
+        return null
     }
 
     override fun addOp(op: RenderOperation) {
@@ -517,7 +402,6 @@ class GameEngine(
         if (last == null || op.target.compatibleWith(last.target)) {
             ops.add(op)
         } else {
-            println("last -> $last ; $op")
             // Render only the framebuffer OR GPU operations
             render()
             ops.add(op)
@@ -542,16 +426,16 @@ class GameEngine(
      * Will render the remaining operations on the screen.
      */
     override fun draw() {
-        platform.performanceMonitor.operationStart("render")
+        performanceMonitor.operationStart("render")
         render() // Render the last operation into the frame buffer
-        platform.performanceMonitor.operationEnd("render")
+        performanceMonitor.operationEnd("render")
 
-        platform.performanceMonitor.operationStart("draw")
+        performanceMonitor.operationStart("draw")
         platform.draw(renderContext)
-        platform.performanceMonitor.operationEnd("draw")
+        performanceMonitor.operationEnd("draw")
 
         // Complete frame monitoring and get metrics
-        currentMetrics = platform.performanceMonitor.frameEnd()
+        currentMetrics = performanceMonitor.frameEnd()
     }
 
     /**

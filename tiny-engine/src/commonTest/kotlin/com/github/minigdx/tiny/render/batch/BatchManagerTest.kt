@@ -37,7 +37,7 @@ class BatchManagerTest {
 
     @Test
     fun submitSprite_can_submit_sprite() {
-        val batchManager = BatchManager(mockGameResourceAccess)
+        val batchManager = BatchManager()
         val spriteSheet = createTestSpriteSheet()
 
         val needsRender = batchManager.submitSprite(
@@ -57,7 +57,7 @@ class BatchManagerTest {
 
     @Test
     fun submitSprite_different_dither_behaves_correctly() {
-        val batchManager = BatchManager(mockGameResourceAccess)
+        val batchManager = BatchManager()
         val spriteSheet = createTestSpriteSheet()
 
         // First sprite with default dither

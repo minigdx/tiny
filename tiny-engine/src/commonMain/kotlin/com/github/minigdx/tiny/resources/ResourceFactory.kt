@@ -9,6 +9,7 @@ import com.github.minigdx.tiny.graphic.PixelFormat
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.Platform
+import com.github.minigdx.tiny.render.batch.BatchManager
 import com.github.minigdx.tiny.resources.ResourceType.BOOT_GAMESCRIPT
 import com.github.minigdx.tiny.resources.ResourceType.BOOT_SPRITESHEET
 import com.github.minigdx.tiny.resources.ResourceType.ENGINE_GAMESCRIPT
@@ -28,6 +29,7 @@ import kotlinx.coroutines.flow.onEach
 class ResourceFactory(
     private val vfs: VirtualFileSystem,
     private val platform: Platform,
+    private val batchManager: BatchManager,
     private val logger: Logger,
     private val colorPalette: ColorPalette,
 ) {
@@ -137,7 +139,17 @@ class ResourceFactory(
                 canUseJarPrefix = !protectedResources.contains(resourceType),
             ),
         ).map { content ->
-            GameScript(version++, index, name, gameOptions, inputHandler, platform, logger, resourceType).apply {
+            GameScript(
+                version = version++,
+                index = index,
+                name = name,
+                gameOptions = gameOptions,
+                batchManager = batchManager,
+                platform = platform,
+                logger = logger,
+                inputHandler = inputHandler,
+                type = resourceType
+            ).apply {
                 this.content = content
             }
         }.onEach {
