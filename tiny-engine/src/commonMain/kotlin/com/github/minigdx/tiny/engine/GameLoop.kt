@@ -10,6 +10,9 @@ interface GameLoop {
      */
     suspend fun advance(delta: Seconds)
 
+    /**
+     * Draw the frame on the screen
+     */
     fun draw()
 
     /**

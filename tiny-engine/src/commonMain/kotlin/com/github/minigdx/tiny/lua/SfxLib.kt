@@ -4,7 +4,7 @@ import com.github.mingdx.tiny.doc.TinyArg
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
-import com.github.minigdx.tiny.engine.GameResourceAccess
+import com.github.minigdx.tiny.engine.GameResourceAccess2
 import com.github.minigdx.tiny.sound.Instrument
 import com.github.minigdx.tiny.sound.Music
 import com.github.minigdx.tiny.sound.MusicalBar
@@ -13,7 +13,6 @@ import com.github.minigdx.tiny.sound.MusicalSequence
 import com.github.minigdx.tiny.sound.SoundHandler
 import com.github.minigdx.tiny.sound.Sweep
 import com.github.minigdx.tiny.sound.Vibrato
-import kotlinx.serialization.json.Json
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.LibFunction
@@ -64,7 +63,7 @@ or by starting the sound as soon as the player is moving.
 """,
 )
 class SfxLib(
-    private val resourceAccess: GameResourceAccess,
+    private val resourceAccess: GameResourceAccess2,
     // When validating the script, don't play sound
     private val playSound: Boolean = true,
 ) : TwoArgFunction() {
@@ -113,10 +112,15 @@ class SfxLib(
     private var lastMusicVersion = 0
 
     fun getCurrentMusic(): Music {
+        /*
         return currentMusic ?: (resourceAccess.sound(0)?.data?.music ?: Music()).also {
             currentMusic = it
             invalidateInstrumentCache()
         }
+
+         */
+        // FIXME:
+        TODO()
     }
 
     private fun invalidateInstrumentCache() {
@@ -126,11 +130,16 @@ class SfxLib(
 
     inner class export : ZeroArgFunction() {
         override fun call(): LuaValue {
+            // FIXME:
+            TODO()
+/*
             val music = getCurrentMusic()
             val sequence = music.sequences.getOrNull(currentSequence)
             sequence?.run { resourceAccess.exportAsSound(sequence) }
 
             return NIL
+
+ */
         }
     }
 
@@ -140,10 +149,15 @@ class SfxLib(
         override fun call(
             @TinyArg("filename") arg: LuaValue,
         ): LuaValue {
+            // FIXME:
+            TODO()
+/*
             val music = getCurrentMusic()
             val content = Json.encodeToString(music)
             resourceAccess.save(arg.checkjstring()!!, content)
             return NONE
+
+ */
         }
     }
 
@@ -153,6 +167,9 @@ class SfxLib(
         override fun call(
             @TinyArg("filename") arg: LuaValue,
         ): LuaValue {
+            // FIXME:
+            TODO()
+/*
             val sound = if (arg.isint()) {
                 resourceAccess.sound(arg.checkint())
             } else {
@@ -168,16 +185,23 @@ class SfxLib(
                 invalidateInstrumentCache()
                 valueOf(soundIndex)
             }
+
+ */
         }
     }
 
     inner class music() : OneArgFunction() {
         override fun call(arg: LuaValue): LuaValue {
+            // FIXME:
+            TODO()
+/*
             val music = getCurrentMusic()
             val index = arg.checkint().coerceIn(0, music.sequences.size)
             val sequence = music.sequences.getOrNull(index) ?: return NIL
             resourceAccess.play(sequence)
             return NONE
+
+ */
         }
     }
 
@@ -206,8 +230,13 @@ class SfxLib(
             val obj = WrapperLuaTable()
 
             obj.function1("play") {
+                // FIXME:
+                TODO()
+/*
                 resourceAccess.play(this)
                 NONE
+
+ */
             }
 
             obj.wrap(
@@ -469,8 +498,13 @@ class SfxLib(
                     )
                 }
 
+                // FIXME:
+                TODO()
+/*
                 resourceAccess.play(oneNote)
                 NONE
+
+ */
             }
 
             obj.wrap("harmonics") {
@@ -569,8 +603,13 @@ class SfxLib(
             }
 
             obj.function0("play") {
+                // FIXME:
+                TODO()
+/*
                 resourceAccess.play(this)
                 NONE
+
+ */
             }
 
             obj.function1("instrument") { arg ->
@@ -612,6 +651,9 @@ class SfxLib(
             }
 
             if (playSound) {
+                // FIXME:
+                TODO()
+/*
                 val soundData = resourceAccess.sound(currentSound)?.data
                 val sfx = soundData?.musicalBars?.getOrNull(index) ?: return NIL
 
@@ -620,6 +662,8 @@ class SfxLib(
                 handler.play()
 
                 return NONE
+
+ */
             } else {
                 return NIL
             }
@@ -648,6 +692,9 @@ class SfxLib(
             }
 
             if (playSound) {
+                // FIXME:
+                TODO()
+/*
                 val soundData = resourceAccess.sound(currentSound)?.data
                 val sfx = soundData?.musicalBars?.getOrNull(index) ?: return NIL
 
@@ -656,6 +703,8 @@ class SfxLib(
                 handler.loop()
 
                 return NONE
+
+ */
             } else {
                 return NIL
             }
@@ -710,6 +759,9 @@ class SfxLib(
             }
 
             if (playSound) {
+                // FIXME:
+                TODO()
+/*
                 val soundData = resourceAccess.sound(currentSound)?.data
                 val sfx = soundData?.musicalSequences?.getOrNull(index) ?: return NIL
 
@@ -718,6 +770,8 @@ class SfxLib(
                 handler.play()
 
                 return NONE
+
+ */
             } else {
                 return NIL
             }
@@ -746,6 +800,9 @@ class SfxLib(
             }
 
             if (playSound) {
+                // FIXME:
+                TODO()
+/*
                 val soundData = resourceAccess.sound(currentSound)?.data
                 val sfx = soundData?.musicalSequences?.getOrNull(index) ?: return NIL
 
@@ -754,6 +811,8 @@ class SfxLib(
                 handler.loop()
 
                 return NONE
+
+ */
             } else {
                 return NIL
             }
@@ -799,7 +858,7 @@ class SfxLib(
         }
     }
 
-    private fun LuaValue.asTrackIndex(music: Music): Int? {
+    private fun LuaValue.asTrackIndex(music: Music): Int {
         return this.checkint() % music.sequences[currentSequence].tracks.size
     }
 }

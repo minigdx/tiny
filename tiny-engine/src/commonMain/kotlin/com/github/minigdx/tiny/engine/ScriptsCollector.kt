@@ -5,7 +5,6 @@ import com.github.minigdx.tiny.resources.ResourceType
 import kotlinx.coroutines.flow.FlowCollector
 
 class ScriptsCollector(private val events: MutableList<GameResource>) : FlowCollector<GameResource> {
-
     private val waitingList: MutableList<GameResource> = mutableListOf()
 
     private val loadedResources: MutableMap<ResourceType, MutableMap<Int, GameResource>> = mutableMapOf()
@@ -24,20 +23,20 @@ class ScriptsCollector(private val events: MutableList<GameResource>) : FlowColl
         val firstToBeLoaded = loadingOrder.firstOrNull()
         val currentType = value.type
         loadingOrder.remove(currentType)
-        if(firstToBeLoaded == null) {
+        if (firstToBeLoaded == null) {
             // Every mandatory element has been loaded
             val resourcesOfType = loadedResources.getOrPut(currentType) { mutableMapOf() }
             val exist = resourcesOfType[value.index]
             resourcesOfType[value.index] = value
             value.reload = exist != null
             events.add(value)
-        } else if(loadingOrder.isEmpty()) {
+        } else if (loadingOrder.isEmpty()) {
             // Last mandatory element to be loaded. Sort it then emit it in order
             waitingList.add(value)
             val tmp = sortWaitingListByMandatoryLoadingOrder()
             waitingList.clear()
             tmp.forEach { emit(it) }
-        } else if(loadingOrder.isNotEmpty()) {
+        } else if (loadingOrder.isNotEmpty()) {
             // Still waiting for mandatory elements
             waitingList.add(value)
         }

@@ -5,7 +5,7 @@ import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.Pixel
-import com.github.minigdx.tiny.engine.GameResourceAccess
+import com.github.minigdx.tiny.engine.GameResourceAccess2
 import com.github.minigdx.tiny.render.operations.DrawSprite
 import com.github.minigdx.tiny.resources.GameLevel
 import com.github.minigdx.tiny.resources.ldtk.CustomField
@@ -49,7 +49,7 @@ import kotlin.math.floor
     "Access map created with LDTk ( https://ldtk.io/ ).",
 )
 class MapLib(
-    private val resourceAccess: GameResourceAccess,
+    private val resourceAccess: GameResourceAccess2,
     private val spriteSize: Pair<Pixel, Pixel>,
 ) : TwoArgFunction() {
     private var currentWorld: Int = 0
@@ -96,7 +96,7 @@ class MapLib(
             // The parameter is an index. Let's check if the index is valid.
             if (a.isint()) {
                 val index = a.checkint()
-                val world = resourceAccess.level(currentWorld) ?: return NIL
+                val world = resourceAccess.findLevel(currentWorld) ?: return NIL
                 if (index in (0..world.ldtk.levels.size)) {
                     val previous = valueOf(currentLevel)
                     currentLevel = index
@@ -106,7 +106,7 @@ class MapLib(
                 }
             } else {
                 val id = a.tojstring() // can be an identifier of an uuid
-                val world = resourceAccess.level(currentWorld) ?: return NIL
+                val world = resourceAccess.findLevel(currentWorld) ?: return NIL
                 val index = world
                     .ldtk
                     .levels
@@ -319,11 +319,11 @@ entity.fields -- access custom field of the entity
                 cache == null ||
                 // Any change occurs on the current level used.
                 currentWorldIndex != currentWorld ||
-                currentWorldVersion != resourceAccess.level(currentWorld)?.version ||
+                currentWorldVersion != resourceAccess.findLevel(currentWorld)?.version ||
                 currentLevelIndex != currentLevel
             ) {
                 currentWorldIndex = currentWorld
-                currentWorldVersion = resourceAccess.level(currentWorld)?.version ?: -1
+                currentWorldVersion = resourceAccess.findLevel(currentWorld)?.version ?: -1
                 currentLevelIndex = currentLevel
                 // Create the entities and cache it.
                 factory().also { cachedEntities.put(name, it) }
@@ -414,7 +414,7 @@ entity.fields -- access custom field of the entity
     }
 
     private fun activeLevel(): Level? {
-        val world = resourceAccess.level(currentWorld)
+        val world = resourceAccess.findLevel(currentWorld)
         return world
             ?.ldtk
             ?.levels
@@ -438,7 +438,7 @@ entity.fields -- access custom field of the entity
             description = "Draw all active layers on the screen.",
         )
         override fun call(): LuaValue {
-            val world = resourceAccess.level(currentWorld) ?: return NIL
+            val world = resourceAccess.findLevel(currentWorld) ?: return NIL
             val level = activeLevel() ?: return NIL
 
             val layers =
@@ -448,10 +448,11 @@ entity.fields -- access custom field of the entity
                     // Layers will be drawn in the reverse order (from the back to the front)
                     .asReversed()
                     .asSequence()
-
+            // FIXME: rework
+/*
             layers.flatMap { layer -> toDrawSprite(world, layer) }
                 .forEach { opcode -> resourceAccess.addOp(opcode) }
-
+*/
             return NONE
         }
 
@@ -471,10 +472,10 @@ entity.fields -- access custom field of the entity
                 return NIL
             }
 
-            val world = resourceAccess.level(currentWorld) ?: return NIL
+            val world = resourceAccess.findLevel(currentWorld) ?: return NIL
             // FIXME(Performance): Draw each tile as a sprite with the BatchManager.
             toDrawSprite(world, layer).forEach {
-                resourceAccess.addOp(it)
+                // resourceAccess.addOp(it)
             }
             return NONE
         }
@@ -506,6 +507,7 @@ entity.fields -- access custom field of the entity
             world: GameLevel,
             layer: Layer,
         ): List<DrawSprite> {
+            /*
             val tileset = world.tilesset[layer.__tilesetRelPath!!]!!
 
             val attributesGrid = layer.gridTiles?.map { tile -> toAttribute(layer.__gridSize, tile) } ?: emptyList()
@@ -513,12 +515,16 @@ entity.fields -- access custom field of the entity
                 layer.autoLayerTiles?.map { tile -> toAttribute(layer.__gridSize, tile) } ?: emptyList()
             val attributes = attributesGrid + attributesAutoLayer
 
+
             return DrawSprite.from(
                 resourceAccess = resourceAccess,
                 name = layer.__identifier,
                 tileset = tileset,
                 attributes = attributes,
             )
+
+             */
+            return emptyList()
         }
     }
 

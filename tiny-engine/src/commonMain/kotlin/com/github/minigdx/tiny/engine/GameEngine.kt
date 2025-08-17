@@ -1,46 +1,24 @@
 package com.github.minigdx.tiny.engine
 
-import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.file.VirtualFileSystem
-import com.github.minigdx.tiny.graphic.ColorPalette
-import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.input.Key
-import com.github.minigdx.tiny.input.internal.ObjectPool
-import com.github.minigdx.tiny.input.internal.PoolObject
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.lua.toTinyException
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.performance.PerformanceMetrics
 import com.github.minigdx.tiny.render.RenderContext
-import com.github.minigdx.tiny.render.RenderFrame
-import com.github.minigdx.tiny.render.RenderUnit
 import com.github.minigdx.tiny.render.batch.BatchManager
-import com.github.minigdx.tiny.render.operations.DrawSprite
 import com.github.minigdx.tiny.render.operations.RenderOperation
-import com.github.minigdx.tiny.resources.GameLevel
 import com.github.minigdx.tiny.resources.GameResource
 import com.github.minigdx.tiny.resources.GameScript
 import com.github.minigdx.tiny.resources.ResourceFactory
-import com.github.minigdx.tiny.resources.Sound
-import com.github.minigdx.tiny.resources.SpriteSheet
-import com.github.minigdx.tiny.sound.MusicalBar
-import com.github.minigdx.tiny.sound.MusicalSequence
-import com.github.minigdx.tiny.sound.SoundHandler
 import com.github.minigdx.tiny.sound.SoundManager
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.flatMapMerge
-import kotlinx.coroutines.launch
-import org.luaj.vm2.Globals
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaValue.Companion.valueOf
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.reflect.KClass
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class GameEngine(
@@ -48,26 +26,13 @@ class GameEngine(
     val platform: Platform,
     val vfs: VirtualFileSystem,
     val logger: Logger,
-    val customizeLuaGlobal: GameResourceAccess.(Globals) -> Unit = {},
     val listener: GameEngineListener? = null,
-) : GameLoop, GameResourceAccess {
+) : GameLoop {
     private val events: MutableList<GameResource> = mutableListOf()
 
     private val ops = mutableListOf<RenderOperation>()
 
-    override var bootSpritesheet: SpriteSheet? = null
-        private set
-
-    private var engineGameScript: GameScript? = null
-
-    private var inError = false
-
-    /**
-     * Current script by index.
-     */
-    private var currentScriptIndex: Int = 0
-
-    override val frameBuffer = FrameBuffer(gameOptions.width, gameOptions.height, gameOptions.colors())
+    private var currentScripthasError = false
 
     private var accumulator: Seconds = 0f
     private var currentFrame: Long = 0L
@@ -79,8 +44,6 @@ class GameEngine(
     lateinit var soundManager: SoundManager
 
     private lateinit var resourceFactory: ResourceFactory
-
-    private val operationFactory = OperationsObjectPool()
 
     private val batchManager = BatchManager()
 
@@ -98,20 +61,19 @@ class GameEngine(
         resourceFactory = ResourceFactory(
             vfs = vfs,
             platform = platform,
+            inputHandler = inputHandler,
             logger = logger,
-            colorPalette = gameOptions.colors(),
+            gameOptions = gameOptions,
             batchManager = batchManager,
         )
 
-        val resourcesScope = CoroutineScope(platform.io())
-
-        gameResourceProcessor = GameResourceProcessor(resourceFactory, inputHandler, gameOptions, logger)
-
-        resourcesScope.launch {
-            gameResourceProcessor.resources.asFlow()
-                .flatMapMerge(concurrency = 128) { resource -> resource }
-                .collect(ScriptsCollector(events))
-        }
+        gameResourceProcessor = GameResourceProcessor(
+            events,
+            resourceFactory,
+            gameOptions,
+            platform,
+            logger,
+        )
 
         renderContext = platform.initRenderManager(windowManager)
 
@@ -124,101 +86,136 @@ class GameEngine(
 
         // TODO: plan to refactor this game loop
         // -- update
-        // 1. Process the new events
-        // 2. Prepare the resource
-        // 3. (re)load resources
-        // 4. advance the gamescript
-        // 5. advance the engine gamescript
-        // 6. intercept user shortcut
+        // 1. Process the new events ✔️
+        // 2. Prepare the resource ✔️
+        // 3. (re)load resources ✔️
+        // 4. advance the gamescript ✔️
+        // 5. advance the engine gamescript ✔️
+        // 6. intercept user shortcut  ✔️
         // -- draw
         // 1. play sounds
         // 2. draw the gamescript
         // 3. draw the engine gamescript
         gameResourceProcessor.process(events)
+        events.clear()
 
-        val scripts = gameResourceProcessor.scripts
-        with(scripts[currentScriptIndex]) {
-            if (this == null) return
+        val currentGameScript = gameResourceProcessor.currentScript ?: return
 
-            if (exited >= 0) {
-                val previous = currentScriptIndex
-                // next script
-                currentScriptIndex = min(exited + 1, scripts.size - 1)
-                try {
-                    val state = getState()
+        if (currentGameScript.exited >= 0) {
+            exitCurrentGameScript(currentGameScript)
+        } else if (currentGameScript.reload) {
+            reloadCurrentGameScript(currentGameScript)
+        }
 
-                    logger.debug("GAME_ENGINE") {
-                        "Stop $name to switch the next game script ${scripts[currentScriptIndex]?.name}"
-                    }
-                    // Reevaluate the game to flush the previous state.
-                    scripts[currentScriptIndex]?.evaluate(customizeLuaGlobal)
-                    scripts[currentScriptIndex]?.setState(state)
+        // Fixed step simulation
+        accumulator += delta
+        if (accumulator >= REFRESH_LIMIT) {
+            inputManager.record()
+            advanceGameScript(gameResourceProcessor.currentScript)
+            advanceEngineScript()
 
-                    listener?.switchScript(scripts[previous], scripts[currentScriptIndex])
-                } catch (ex: LuaError) {
-                    popupError(ex.toTinyException(content.decodeToString()))
-                }
-            } else if (reload) {
-                clear()
-                try {
-                    val state = getState()
-                    evaluate(customizeLuaGlobal)
-                    setState(state)
+            accumulator -= REFRESH_LIMIT
+            currentFrame++
 
-                    listener?.reload(scripts[currentScriptIndex])
+            // The user hit Ctrl + R(ecord)
+            interceptUserShortcup()
+            currentMetrics?.run { storeFrameMetrics(this) }
 
-                    inError = false
-                } catch (ex: LuaError) {
-                    popupError(ex.toTinyException(content.decodeToString()))
-                }
-            }
-
-            // Fixed step simulation
-            accumulator += delta
-            if (accumulator >= REFRESH_LIMIT) {
-                inputManager.record()
-                inError =
-                    try {
-                        ops.clear() // Remove all drawing operation to prepare the new frame.
-                        scripts[currentScriptIndex]?.advance()
-                        false
-                    } catch (ex: TinyException) {
-                        if (!inError) { // display the log only once.
-                            popupError(ex)
-                        }
-                        true
-                    }
-                engineGameScript?.advance()
-                accumulator -= REFRESH_LIMIT
-                currentFrame++
-
-                // The user hit Ctrl + R(ecord)
-                if (inputHandler.isCombinationPressed(Key.CTRL, Key.R)) {
-                    popup("recording GIF", "#00FF00")
-                    platform.record()
-                    // The user hit Ctrl + S(creenshot)
-                } else if (inputHandler.isCombinationPressed(Key.CTRL, Key.S)) {
-                    popup("screenshot PNG", "#00FF00")
-                    platform.screenshot()
-                } else if (inputHandler.isCombinationPressed(Key.CTRL, Key.P)) {
-                    performanceMonitor.isEnabled = !performanceMonitor.isEnabled
-                    val message = if (performanceMonitor.isEnabled) {
-                        "enable the profiler (Ctrl+P to disabled)"
-                    } else {
-                        "disabled the profiler"
-                    }
-                    popup(message, "#00FF00")
-                }
-                currentMetrics?.run { storeFrameMetrics(this) }
-
-                inputManager.reset()
-            }
+            inputManager.reset()
         }
 
         // End performance monitoring for game update
         val updateTime = performanceMonitor.operationEnd("game_update")
 
         logPerformanceMetrics(updateTime)
+    }
+
+    /**
+     * Will render the remaining operations on the screen.
+     */
+    override fun draw() {
+        performanceMonitor.operationStart("render")
+        render() // Render the last operation into the frame buffer
+        performanceMonitor.operationEnd("render")
+
+        performanceMonitor.operationStart("draw")
+        platform.draw(renderContext)
+        performanceMonitor.operationEnd("draw")
+
+        // Complete frame monitoring and get metrics
+        currentMetrics = performanceMonitor.frameEnd()
+    }
+
+    private suspend fun advanceEngineScript() {
+        gameResourceProcessor.engineGameScript?.advance()
+    }
+
+    private suspend fun advanceGameScript(currentScript: GameScript?) {
+        currentScripthasError = try {
+            ops.clear() // Remove all drawing operation to prepare the new frame.
+            currentScript?.advance()
+            false
+        } catch (ex: TinyException) {
+            if (!currentScripthasError) { // display the log only once.
+                popupError(ex)
+            }
+            true
+        }
+    }
+
+    private suspend fun interceptUserShortcup() {
+        if (inputHandler.isCombinationPressed(Key.CTRL, Key.R)) {
+            popup("recording GIF", "#00FF00")
+            platform.record()
+            // The user hit Ctrl + S(creenshot)
+        } else if (inputHandler.isCombinationPressed(Key.CTRL, Key.S)) {
+            popup("screenshot PNG", "#00FF00")
+            platform.screenshot()
+        } else if (inputHandler.isCombinationPressed(Key.CTRL, Key.P)) {
+            performanceMonitor.isEnabled = !performanceMonitor.isEnabled
+            val message = if (performanceMonitor.isEnabled) {
+                "enable the profiler (Ctrl+P to disabled)"
+            } else {
+                "disabled the profiler"
+            }
+            popup(message, "#00FF00")
+        }
+    }
+
+    private suspend fun reloadCurrentGameScript(currentGameScript: GameScript) {
+        clear()
+        try {
+            val state = currentGameScript.getState()
+            currentGameScript.evaluate()
+            currentGameScript.setState(state)
+
+            listener?.reload(currentGameScript)
+
+            currentScripthasError = false
+        } catch (ex: LuaError) {
+            popupError(ex.toTinyException(currentGameScript.content.decodeToString()))
+        }
+    }
+
+    private suspend fun exitCurrentGameScript(
+        currentGameScript: GameScript,
+    ) {
+        val (previous, current) = gameResourceProcessor.setCurrentScript(currentGameScript.exited)
+
+        try {
+            val state = currentGameScript.getState()
+
+            logger.debug("GAME_ENGINE") {
+                "Stop ${currentGameScript.name} to switch the next game script ${current.name}"
+            }
+            // Reevaluate the game to flush the previous state.
+            current.evaluate()
+            current.setState(state)
+
+            listener?.switchScript(previous, current)
+        } catch (ex: LuaError) {
+            popupError(ex.toTinyException(currentGameScript.content.decodeToString()))
+        }
     }
 
     private suspend fun GameEngine.popupError(ex: TinyException) {
@@ -238,11 +235,17 @@ class GameEngine(
         color: String,
         forever: Boolean = false,
     ) {
-        engineGameScript?.invoke("popup", valueOf(0), valueOf(message), valueOf(color), valueOf(forever))
+        gameResourceProcessor.engineGameScript?.invoke(
+            "popup",
+            valueOf(0),
+            valueOf(message),
+            valueOf(color),
+            valueOf(forever),
+        )
     }
 
     private suspend fun clear() {
-        engineGameScript?.invoke("clear")
+        gameResourceProcessor.engineGameScript?.invoke("clear")
     }
 
     /**
@@ -299,304 +302,18 @@ class GameEngine(
         }
     }
 
-    override fun spritesheet(index: Int): SpriteSheet? {
-        val spriteSheets = gameResourceProcessor.spriteSheets
-        val protected = max(0, min(index, spriteSheets.size - 1))
-        if (protected >= spriteSheets.size) return null
-        return spriteSheets[protected]
-    }
-
-    override fun spritesheet(name: String): Int? {
-        val spriteSheets = gameResourceProcessor.spriteSheets
-        return spriteSheets
-            .indexOfFirst { it?.name == name }
-            .takeIf { it >= 0 }
-    }
-
-    override fun newSpritesheetIndex(): Int {
-        val spriteSheets = gameResourceProcessor.spriteSheets
-        return spriteSheets.size
-    }
-
-    override fun spritesheet(sheet: SpriteSheet) {
-        /*
-        val spriteSheets = gameResourceProcessor.spriteSheets
-        if (sheet.index < 0) {
-            // The index is negative. Let's copy it at the last place.
-            spriteSheets = spriteSheets.copyOf(spriteSheets.size + 1)
-            spriteSheets[spriteSheets.size - 1] = sheet
-        } else if (sheet.index >= spriteSheets.size) {
-            require(sheet.index <= 256) { "Tiny support only 256 spritesheets" }
-            spriteSheets = spriteSheets.copyOf(sheet.index + 1)
-            spriteSheets[sheet.index] = sheet
-        } else {
-            spriteSheets[sheet.index] = sheet
-        }
-
-         */
-    }
-
-    override fun level(index: Int): GameLevel? {
-        /*
-        val protected = max(0, min(index, levels.size - 1))
-        if (protected >= levels.size) return null
-        return levels[protected]
-
-         */
-        return null
-    }
-
-    override fun sound(index: Int): Sound? {
-        /*
-        return sounds.getOrNull(index.coerceIn(0, sounds.size - 1))
-
-         */
-        return null
-    }
-
-    override fun sound(name: String): Sound? {
-        /*
-        val index = sounds.indexOfFirst { it?.data?.name == name }
-            .takeIf { it >= 0 }
-            ?: return null
-
-        return sound(index)
-
-         */
-        return null
-    }
-
-    override fun play(musicalBar: MusicalBar): SoundHandler {
-        return soundManager.createSoundHandler(musicalBar).also { it.play() }
-    }
-
-    override fun play(musicalSequence: MusicalSequence): SoundHandler {
-        return soundManager.createSoundHandler(musicalSequence).also { it.play() }
-    }
-
-    override fun play(track: MusicalSequence.Track): SoundHandler {
-        return soundManager.createSoundHandler(track).also { it.play() }
-    }
-
-    override fun exportAsSound(sequence: MusicalSequence) {
-        soundManager.exportAsSound(sequence)
-    }
-
-    override fun script(name: String): GameScript? {
-        /*
-        return scripts
-            .drop(1) // drop the _boot.lua
-            .firstOrNull { script -> script?.name == name }
-
-         */
-        return null
-    }
-
-    override fun addOp(op: RenderOperation) {
-        renderFrame = null // invalid the previous render frame
-        val last = ops.lastOrNull()
-        if (op.mergeWith(last)) {
-            return
-        }
-
-        if (last == null || op.target.compatibleWith(last.target)) {
-            ops.add(op)
-        } else {
-            // Render only the framebuffer OR GPU operations
-            render()
-            ops.add(op)
-        }
-    }
-
-    override fun renderAsBuffer(block: () -> Unit): FrameBuffer {
-        // Render on the screen to clean up render states.
-        render()
-
-        val renderFrame = platform.executeOffScreen(renderContext) {
-            block.invoke()
-            render()
-        }
-
-        val buffer = FrameBuffer(gameOptions.width, gameOptions.height, gameOptions.colors())
-        renderFrame.copyInto(buffer.colorIndexBuffer)
-        return buffer
-    }
-
-    /**
-     * Will render the remaining operations on the screen.
-     */
-    override fun draw() {
-        performanceMonitor.operationStart("render")
-        render() // Render the last operation into the frame buffer
-        performanceMonitor.operationEnd("render")
-
-        performanceMonitor.operationStart("draw")
-        platform.draw(renderContext)
-        performanceMonitor.operationEnd("draw")
-
-        // Complete frame monitoring and get metrics
-        currentMetrics = performanceMonitor.frameEnd()
-    }
-
     /**
      * Will render the actual operations in the frame buffer
      */
     fun render() {
-        val last = ops.lastOrNull() ?: return
-
-        val frameBufferRender = last.target.compatibleWith(RenderUnit.CPU)
-        if (frameBufferRender) {
-            // The remaining operations are only for the CPU.
-            // Let's execute it now.
-            ops.forEach {
-                check(it.target.compatibleWith(RenderUnit.CPU)) { "Expected only ops than can be executed on CPU!" }
-            }
-            ops.clear()
-            // The framebuffer will be the next render operation
-            val op = DrawSprite.from(
-                this,
-                frameBuffer.asSpriteSheet,
-                0,
-                0,
-                frameBuffer.width,
-                frameBuffer.height,
-            )
-            ops.add(op)
-        }
-
-        // Render operations in the GPU frame buffer
-        platform.render(renderContext, ops)
-
-        // The framebuffer has been rendered.
-        // It can be reset.
-        if (frameBufferRender) {
-            frameBuffer.clear()
-        }
-        ops.clear()
-    }
-
-    private var renderFrame: RenderFrame? = null
-
-    override fun readPixel(
-        x: Int,
-        y: Int,
-    ): ColorIndex {
-        if (renderFrame == null) {
-            render()
-            renderFrame = platform.readRender(renderContext)
-        }
-        return renderFrame?.getPixel(x, y) ?: ColorPalette.TRANSPARENT_INDEX
-    }
-
-    override fun readFrame(): FrameBuffer {
-        if (renderFrame == null) {
-            render()
-            renderFrame = platform.readRender(renderContext)
-        }
-        val copy = FrameBuffer(frameBuffer.width, frameBuffer.height, frameBuffer.gamePalette)
-        renderFrame?.copyInto(copy.colorIndexBuffer)
-        return copy
+        // FIXME: implement
     }
 
     override fun end() {
         soundManager.destroy()
     }
 
-    override fun save(
-        filename: String,
-        content: String,
-    ) {
-        platform.createLocalFile(filename, null).save(content.encodeToByteArray())
-    }
-
-    override fun <T : PoolObject<T>> obtain(type: KClass<T>): T {
-        return operationFactory.obtain(type)
-    }
-
-    override fun <T : PoolObject<T>> releaseOperation(
-        operation: T,
-        type: KClass<T>,
-    ) {
-        operationFactory.release(operation, type)
-    }
-
     companion object {
         private const val REFRESH_LIMIT: Seconds = 1 / 60f
-    }
-}
-
-class OperationsObjectPool {
-    private abstract class PoolObjectPool<T : PoolObject<T>>(size: Int) : ObjectPool<T>(size) {
-        abstract fun new(): T
-
-        abstract fun destroy(obj: T)
-
-        override fun newInstance(): T {
-            return new().also {
-                it.pool = this
-            }
-        }
-
-        override fun destroyInstance(obj: T) {
-            destroy(obj)
-            obj.pool = null
-        }
-    }
-
-    private val drawSprite =
-        object : PoolObjectPool<DrawSprite>(256) {
-            override fun new(): DrawSprite {
-                return DrawSprite()
-            }
-
-            override fun destroy(obj: DrawSprite) {
-                obj.source = null
-                obj.dither = 0xFFFF
-                obj.pal = emptyArray()
-                obj.camera = null
-                obj.clipper = null
-                obj._attributes.forEach { attribute -> attribute.release() }
-                obj._attributes.clear()
-            }
-        }
-
-    private val drawSpriteAttribute =
-        object : PoolObjectPool<DrawSprite.DrawSpriteAttribute>(2048) {
-            override fun new(): DrawSprite.DrawSpriteAttribute {
-                return DrawSprite.DrawSpriteAttribute()
-            }
-
-            override fun destroy(obj: DrawSprite.DrawSpriteAttribute) {
-                obj.sourceX = 0
-                obj.sourceY = 0
-                obj.sourceWidth = 0
-                obj.sourceHeight = 0
-                obj.destinationX = 0
-                obj.destinationY = 0
-                obj.flipX = false
-                obj.flipY = false
-            }
-        }
-
-    private fun <T : PoolObject<T>> getPool(type: KClass<T>): ObjectPool<T> {
-        @Suppress("UNCHECKED_CAST")
-        val pool: ObjectPool<T> =
-            when (type) {
-                DrawSprite::class -> drawSprite as ObjectPool<T>
-                DrawSprite.DrawSpriteAttribute::class -> drawSpriteAttribute as ObjectPool<T>
-                else -> throw IllegalArgumentException("No pool found for type: $type")
-            }
-        return pool
-    }
-
-    fun <T : PoolObject<T>> obtain(type: KClass<T>): T {
-        return getPool(type).obtain()
-    }
-
-    fun <T : PoolObject<T>> release(
-        operation: T,
-        type: KClass<T>,
-    ) {
-        getPool(type).destroyInstance(operation)
     }
 }

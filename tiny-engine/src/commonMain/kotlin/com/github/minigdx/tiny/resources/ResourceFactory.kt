@@ -3,7 +3,6 @@ package com.github.minigdx.tiny.resources
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.file.VirtualFileSystem
-import com.github.minigdx.tiny.graphic.ColorPalette
 import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.graphic.PixelFormat
 import com.github.minigdx.tiny.input.InputHandler
@@ -29,10 +28,16 @@ import kotlinx.coroutines.flow.onEach
 class ResourceFactory(
     private val vfs: VirtualFileSystem,
     private val platform: Platform,
+    private val inputHandler: InputHandler,
     private val batchManager: BatchManager,
+    private val gameOptions: GameOptions,
     private val logger: Logger,
-    private val colorPalette: ColorPalette,
 ) {
+    /**
+     * Resource that can be only read from the jar.
+     */
+    private val protectedResources = setOf(BOOT_GAMESCRIPT, ENGINE_GAMESCRIPT, BOOT_SPRITESHEET)
+
     /**
      * Load a SFX file and convert it into a Sound.
      */
@@ -107,29 +112,15 @@ class ResourceFactory(
     fun gamescript(
         index: Int,
         name: String,
-        inputHandler: InputHandler,
-        gameOptions: GameOptions,
-    ) = script(index, name, inputHandler, gameOptions, GAME_GAMESCRIPT)
+    ) = script(index, name, GAME_GAMESCRIPT)
 
-    fun enginescript(
-        name: String,
-        inputHandler: InputHandler,
-        gameOptions: GameOptions,
-    ) = script(0, name, inputHandler, gameOptions, ENGINE_GAMESCRIPT)
+    fun enginescript(name: String) = script(0, name, ENGINE_GAMESCRIPT)
 
-    fun bootscript(
-        name: String,
-        inputHandler: InputHandler,
-        gameOptions: GameOptions,
-    ) = script(0, name, inputHandler, gameOptions, BOOT_GAMESCRIPT)
-
-    private val protectedResources = setOf(BOOT_GAMESCRIPT, ENGINE_GAMESCRIPT, BOOT_SPRITESHEET)
+    fun bootscript(name: String) = script(0, name, BOOT_GAMESCRIPT)
 
     private fun script(
         index: Int,
         name: String,
-        inputHandler: InputHandler,
-        gameOptions: GameOptions,
         resourceType: ResourceType,
     ): Flow<GameScript> {
         var version = 0
@@ -148,7 +139,7 @@ class ResourceFactory(
                 platform = platform,
                 logger = logger,
                 inputHandler = inputHandler,
-                type = resourceType
+                type = resourceType,
             ).apply {
                 this.content = content
             }
@@ -201,15 +192,14 @@ class ResourceFactory(
         (0 until width).forEach { x ->
             (0 until height).forEach { y ->
                 val coord = (x + y * width) * PixelFormat.RGBA
-                val index =
-                    colorPalette.fromRGBA(
-                        byteArrayOf(
-                            data[coord + 0],
-                            data[coord + 1],
-                            data[coord + 2],
-                            data[coord + 3],
-                        ),
-                    )
+                val index = gameOptions.colors().fromRGBA(
+                    byteArrayOf(
+                        data[coord + 0],
+                        data[coord + 1],
+                        data[coord + 2],
+                        data[coord + 3],
+                    ),
+                )
 
                 result.set(x, y, index)
             }

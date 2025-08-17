@@ -78,11 +78,10 @@ class TinyLib(
             @TinyArg("scriptIndex") arg: LuaValue,
         ): LuaValue {
             if (arg.isint()) {
-                val index = arg.checkint() % gameScript.size
-                throw Exit(index)
+                throw Exit(arg.toint())
             } else {
                 val scriptName = arg.checkjstring()!!
-                val index = gameScript.indexOfFirst { it == scriptName } % gameScript.size
+                val index = gameScript.indexOfFirst { it == scriptName }
                 throw Exit(index)
             }
         }

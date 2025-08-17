@@ -8,10 +8,8 @@ import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.engine.GameResourceAccess
+import com.github.minigdx.tiny.engine.GameResourceAccess2
 import com.github.minigdx.tiny.render.batch.BatchManager
-import com.github.minigdx.tiny.render.operations.FrameBufferOperation
-import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
@@ -19,8 +17,7 @@ import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import kotlin.math.abs
 
-private class Shape(private val resourceAccess: GameResourceAccess) {
-
+private class Shape(private val resourceAccess: GameResourceAccess2) {
     fun rectArgs(args: Varargs): List<Int>? {
         when (args.narg()) {
             // rect including color
@@ -65,7 +62,12 @@ private class Shape(private val resourceAccess: GameResourceAccess) {
         return if (this.isnumber()) {
             this.checkint()
         } else {
+            // FIXME:
+            TODO()
+/*
             resourceAccess.frameBuffer.gamePalette.getColorIndex(this.checkjstring()!!)
+
+ */
         }
     }
 }
@@ -77,12 +79,11 @@ private class Shape(private val resourceAccess: GameResourceAccess) {
         "All shapes can be draw filed or not filed.",
 )
 class ShapeLib(
-    private val resourceAccess: GameResourceAccess,
+    private val resourceAccess: GameResourceAccess2,
     private val gameOptions: GameOptions,
     private val batchManager: BatchManager,
 ) : TwoArgFunction() {
     private val shape = Shape(resourceAccess)
-
 
     override fun call(
         arg1: LuaValue,
@@ -113,6 +114,9 @@ class ShapeLib(
         ): Varargs {
             val (x, y, width, height, color) = shape.rectArgs(args) ?: return NIL
 
+            // FIXME:
+            TODO()
+/*
             for (i in x until x + width) {
                 resourceAccess.frameBuffer.pixel(i, y, color)
                 resourceAccess.frameBuffer.pixel(i, y + height - 1, color)
@@ -123,6 +127,8 @@ class ShapeLib(
             }
             resourceAccess.addOp(FrameBufferOperation)
             return NIL
+
+ */
         }
 
         @TinyCall("Draw a rectangle.")
@@ -169,6 +175,9 @@ class ShapeLib(
             val radiusY = args.checkint(4)
             val color = args.arg(5).checkColorIndex()
 
+            // FIXME:
+            TODO()
+/*
             val frameBuffer = resourceAccess.frameBuffer
 
             var x = 0
@@ -211,6 +220,8 @@ class ShapeLib(
             }
             resourceAccess.addOp(FrameBufferOperation)
             return NONE
+
+ */
         }
     }
 
@@ -244,6 +255,9 @@ class ShapeLib(
             val radiusY = args.checkint(4)
             val color = args.arg(5).checkColorIndex()
 
+            // FIXME:
+            TODO()
+/*
             val frameBuffer = resourceAccess.frameBuffer
 
             var x = 0
@@ -284,6 +298,8 @@ class ShapeLib(
             }
             resourceAccess.addOp(FrameBufferOperation)
             return NIL
+
+ */
         }
     }
 
@@ -296,6 +312,9 @@ class ShapeLib(
         ): Varargs {
             val (x, y, width, height, color) = shape.rectArgs(args) ?: return NIL
 
+            // FIXME:
+            TODO()
+/*
             // Add the framebuffer in the batch
             batchManager.submitSprite(
                 source = resourceAccess.frameBuffer.asSpriteSheet,
@@ -310,7 +329,7 @@ class ShapeLib(
                 dither = resourceAccess.frameBuffer.blender.dithering,
                 palette = resourceAccess.frameBuffer.blender.switch,
                 camera = resourceAccess.frameBuffer.camera,
-                clipper = resourceAccess.frameBuffer.clipper
+                clipper = resourceAccess.frameBuffer.clipper,
             )
 
             // Draw the shape in the current frame buffer
@@ -319,6 +338,8 @@ class ShapeLib(
             }
 
             return NIL
+
+ */
         }
 
         @TinyCall("Draw a filled rectangle.")
@@ -339,7 +360,12 @@ class ShapeLib(
         return if (this.isnumber()) {
             this.checkint()
         } else {
+            // FIXME:
+            TODO()
+/*
             resourceAccess.frameBuffer.gamePalette.getColorIndex(this.checkjstring()!!)
+
+ */
         }
     }
 
@@ -360,7 +386,9 @@ class ShapeLib(
             var x = 0
             var y = radius
             var dst = 3 - 2 * radius
-
+            // FIXME:
+            TODO()
+/*
             while (x <= y) {
                 // Draw the outline of the circle
                 resourceAccess.frameBuffer.pixel(centerX + x, centerY + y, color)
@@ -388,6 +416,8 @@ class ShapeLib(
             }
             resourceAccess.addOp(FrameBufferOperation)
             return NIL
+
+ */
         }
     }
 
@@ -431,7 +461,9 @@ class ShapeLib(
 
             var x = x0
             var y = y0
-
+            // FIXME:
+            TODO()
+/*
             while (true) {
                 resourceAccess.frameBuffer.pixel(x, y, color)
                 if (x == x1 && y == y1) break
@@ -448,6 +480,8 @@ class ShapeLib(
             // FIXME(Performance): Add the current primitive as a sprite.
             resourceAccess.addOp(FrameBufferOperation)
             return NONE
+
+ */
         }
 
         @TinyCall("Draw a line with a default color.")
@@ -481,6 +515,9 @@ class ShapeLib(
             @TinyArg("radius") c: LuaValue,
             @TinyArg("color") d: LuaValue,
         ): LuaValue {
+            // FIXME:
+            TODO()
+/*
             val centerX = a.checkint()
             val centerY = b.checkint()
             val radius = c.checkint()
@@ -510,6 +547,8 @@ class ShapeLib(
             }
             resourceAccess.addOp(FrameBufferOperation)
             return NONE
+
+ */
         }
     }
 
@@ -522,6 +561,9 @@ class ShapeLib(
         override fun invoke(
             @TinyArgs(["x1", "y1", "x2", "y2", "x3", "y3", "color"]) args: Varargs,
         ): Varargs {
+            // FIXME:
+            TODO()
+/*
             if (args.narg() < 7) throw LuaError("Expected 7 args")
 
             val x1 = args.checkint(1)
@@ -565,6 +607,8 @@ class ShapeLib(
             }
             resourceAccess.addOp(FrameBufferOperation)
             return NONE
+
+ */
         }
     }
 
@@ -579,6 +623,9 @@ class ShapeLib(
         override fun invoke(
             @TinyArgs(["x1", "y1", "x2", "y2", "x3", "y3", "color"]) args: Varargs,
         ): Varargs {
+            // FIXME:
+            TODO()
+/*
             if (args.narg() < 7) throw LuaError("Expected 7 args")
 
             val x1 = args.checkint(1)
@@ -626,6 +673,8 @@ class ShapeLib(
             )
             resourceAccess.addOp(FrameBufferOperation)
             return NONE
+
+ */
         }
     }
 
@@ -663,6 +712,9 @@ class ShapeLib(
         override fun invoke(
             @TinyArgs(["x", "y", "width", "height", "color1", "color2", "is_horizontal"]) args: Varargs,
         ): Varargs {
+            // FIXME:
+            TODO()
+/*
             if (args.narg() < 6) throw LuaError("Expected 6  args")
 
             val x = args.checkint(1)
@@ -712,6 +764,8 @@ class ShapeLib(
             resourceAccess.addOp(FrameBufferOperation)
 
             return NIL
+
+ */
         }
     }
 }

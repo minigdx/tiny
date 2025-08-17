@@ -2,7 +2,7 @@ package com.github.minigdx.tiny.resources
 
 import com.github.minigdx.tiny.engine.Exit
 import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.engine.GameResourceAccess
+import com.github.minigdx.tiny.engine.GameResourceAccess2
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.lua.CtrlLib
@@ -58,7 +58,7 @@ class GameScript(
     var exited: Int = -1
     var evaluated: Boolean = false
 
-    lateinit var resourceAccess: GameResourceAccess
+    lateinit var resourceAccess: GameResourceAccess2
 
     override var reload: Boolean = false
 
@@ -78,10 +78,7 @@ class GameScript(
 
     class State(val args: LuaValue)
 
-    private fun createLuaGlobals(
-        customizeLuaGlobal: GameResourceAccess.(Globals) -> Unit,
-        forValidation: Boolean = false,
-    ): Globals =
+    private fun createLuaGlobals(forValidation: Boolean = false): Globals =
         Globals().apply {
             val sprLib = SprLib(this@GameScript.gameOptions, this@GameScript.resourceAccess)
 
@@ -108,22 +105,20 @@ class GameScript(
             load(WorkspaceLib(platform = platform))
             load(TestLib(this@GameScript))
 
-            this@GameScript.resourceAccess.customizeLuaGlobal(this)
-
             LoadState.install(this)
             LuaC.install(this)
         }
 
-    suspend fun isValid(customizeLuaGlobal: GameResourceAccess.(Globals) -> Unit): Boolean {
-        with(createLuaGlobals(customizeLuaGlobal, forValidation = true)) {
+    suspend fun isValid(): Boolean {
+        with(createLuaGlobals(forValidation = true)) {
             load(content.decodeToString()).call()
             get("_init").nullIfNil()?.callSuspend(valueOf(gameOptions.width), valueOf(gameOptions.height))
         }
         return true
     }
 
-    suspend fun evaluate(customizeLuaGlobal: GameResourceAccess.(Globals) -> Unit) {
-        globals = createLuaGlobals(customizeLuaGlobal)
+    suspend fun evaluate() {
+        globals = createLuaGlobals()
 
         evaluated = true
         exited = -1
@@ -193,7 +188,7 @@ class GameScript(
                 exited = luaCause.script
             } else {
                 val content = if (ex.script.isNotBlank()) {
-                    val script = this.resourceAccess.script(ex.script.replaceFirst("@", ""))
+                    val script = this.resourceAccess.findGameScript(ex.script.replaceFirst("@", ""))
                     script?.content?.decodeToString() ?: content.decodeToString()
                 } else {
                     content.decodeToString()

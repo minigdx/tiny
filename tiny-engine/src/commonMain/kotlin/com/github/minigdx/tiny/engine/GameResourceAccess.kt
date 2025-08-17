@@ -13,28 +13,10 @@ import com.github.minigdx.tiny.sound.MusicalSequence
 import com.github.minigdx.tiny.sound.SoundHandler
 import kotlin.reflect.KClass
 
-sealed interface DebugAction
-
-data class DebugMessage(val mesage: String, val color: String) : DebugAction
-
-data class DebugRect(
-    val x: Int,
-    val y: Int,
-    val width: Int,
-    val height: Int,
-    val color: String,
-    val filed: Boolean = false,
-) : DebugAction
-
-data class DebugPoint(val x: Int, val y: Int, val color: String) : DebugAction
-
-data class DebugLine(val x1: Int, val y1: Int, val x2: Int, val y2: Int, val color: String) : DebugAction
-
-data class DebugEnabled(val enabled: Boolean) : DebugAction
-
 /**
  * Descriptor to access the game resource
  */
+@Deprecated("To be replaced with GameResourceAccess2")
 interface GameResourceAccess {
     /**
      * The boot script sprite sheet.
@@ -132,11 +114,13 @@ interface GameResourceAccess {
     /**
      * Obtain a new instance of the operation.
      */
+    @Deprecated("To be removed")
     fun <T : PoolObject<T>> obtain(type: KClass<T>): T
 
     /**
      * Release this instance. This instance will be reused later.
      */
+    @Deprecated("To be removed")
     fun <T : PoolObject<T>> releaseOperation(
         operation: T,
         type: KClass<T>,

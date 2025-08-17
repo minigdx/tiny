@@ -6,8 +6,7 @@ import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.engine.GameResourceAccess
-import com.github.minigdx.tiny.render.operations.FrameBufferOperation
+import com.github.minigdx.tiny.engine.GameResourceAccess2
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
@@ -18,7 +17,7 @@ import org.luaj.vm2.lib.VarArgFunction
 @TinyLib(description = "Standard library.")
 class StdLib(
     val gameOptions: GameOptions,
-    val resourceAccess: GameResourceAccess,
+    val resourceAccess: GameResourceAccess2,
 ) : TwoArgFunction() {
     override fun call(
         arg1: LuaValue,
@@ -281,6 +280,8 @@ class StdLib(
                     }
                 if (coord != null) {
                     val (indexX, indexY) = coord
+                    // FIXME: chars as sprite
+                    /*
                     resourceAccess.frameBuffer.copyFrom(
                         spritesheet.pixels,
                         currentX,
@@ -297,11 +298,13 @@ class StdLib(
                             pixel
                         }
                     }
+
+                     */
                 }
                 currentX += space
             }
 
-            resourceAccess.addOp(FrameBufferOperation)
+            // resourceAccess.addOp(FrameBufferOperation)
 
             return NONE
         }
@@ -314,7 +317,9 @@ class StdLib(
         return if (this.isnumber()) {
             this.checkint()
         } else {
-            resourceAccess.frameBuffer.gamePalette.getColorIndex(this.checkjstring()!!)
+            // FIXME:
+            // resourceAccess.frameBuffer.gamePalette.getColorIndex(this.checkjstring()!!)
+            -1
         }
     }
 

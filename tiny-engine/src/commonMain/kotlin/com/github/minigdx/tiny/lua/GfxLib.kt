@@ -5,16 +5,8 @@ import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.engine.GameResourceAccess
+import com.github.minigdx.tiny.engine.GameResourceAccess2
 import com.github.minigdx.tiny.platform.DrawingMode
-import com.github.minigdx.tiny.render.operations.CameraOperation
-import com.github.minigdx.tiny.render.operations.ClipOperation
-import com.github.minigdx.tiny.render.operations.DitheringOperation
-import com.github.minigdx.tiny.render.operations.DrawingModeOperation
-import com.github.minigdx.tiny.render.operations.FrameBufferOperation
-import com.github.minigdx.tiny.render.operations.PaletteOperation
-import com.github.minigdx.tiny.resources.ResourceType
-import com.github.minigdx.tiny.resources.SpriteSheet
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.LibFunction
@@ -28,7 +20,7 @@ import kotlin.math.min
     "gfx",
     "Access to graphical API like updating the color palette or applying a dithering pattern.",
 )
-class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOptions: GameOptions) : TwoArgFunction() {
+class GfxLib(private val resourceAccess: GameResourceAccess2, private val gameOptions: GameOptions) : TwoArgFunction() {
     override fun call(
         arg1: LuaValue,
         arg2: LuaValue,
@@ -74,7 +66,8 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
         override fun call(): LuaValue {
             return valueOf(current).also {
                 current = 0
-                resourceAccess.addOp(DrawingModeOperation(modes[current]))
+                // FIXME:
+                // resourceAccess.addOp(DrawingModeOperation(modes[current]))
             }
         }
 
@@ -90,7 +83,8 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
             }
             current = index
             val f = modes[current]
-            resourceAccess.addOp(DrawingModeOperation(f))
+            // FIXME:
+            // resourceAccess.addOp(DrawingModeOperation(f))
 
             return valueOf(before)
         }
@@ -111,8 +105,12 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
                 } else {
                     arg.checkColorIndex()
                 }
+            // FIXME:
+            /*
             resourceAccess.frameBuffer.clear(color)
             resourceAccess.addOp(FrameBufferOperation)
+
+             */
             return NIL
         }
     }
@@ -125,8 +123,12 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
             @TinyArg("y") arg2: LuaValue,
             @TinyArg("color") arg3: LuaValue,
         ): LuaValue {
+            // FIXME:
+            /*
             resourceAccess.frameBuffer.pixel(arg1.checkint(), arg2.checkint(), arg3.checkint())
             resourceAccess.addOp(FrameBufferOperation)
+
+             */
             return NIL
         }
     }
@@ -141,7 +143,9 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
             val x = min(max(0, arg1.checkint()), gameOptions.width - 1)
             val y = min(max(0, arg2.checkint()), gameOptions.height - 1)
 
-            val index = resourceAccess.readPixel(x, y)
+            // val index = resourceAccess.readPixel(x, y)
+            // FIXME:
+            val index = 0
             return valueOf(index)
         }
     }
@@ -161,7 +165,8 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
             @TinyArg("sheet") a: LuaValue,
         ): LuaValue {
             val (index, name) = getIndexAndName(a)
-
+// FIXME:
+            /*
             val frameBuffer = resourceAccess.readFrame()
             val sheet = SpriteSheet(
                 0,
@@ -174,6 +179,8 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
             )
 
             resourceAccess.spritesheet(sheet)
+
+             */
             return valueOf(index)
         }
 
@@ -189,6 +196,9 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
             val (index, name) = getIndexAndName(a)
             val closure = b.checkclosure() ?: return call(a)
 
+            // FIXME:
+            /*
+
             val frameBuffer = resourceAccess.renderAsBuffer { closure.invoke() }
             val sheet = SpriteSheet(
                 0,
@@ -200,10 +210,12 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
                 frameBuffer.height,
             )
             resourceAccess.spritesheet(sheet)
+             */
             return valueOf(index)
         }
 
         private fun getIndexAndName(arg: LuaValue): Pair<Int, String> {
+            /*
             return if (arg.isstring()) {
                 val index = resourceAccess.spritesheet(arg.tojstring()) ?: resourceAccess.newSpritesheetIndex()
                 index to arg.tojstring()
@@ -211,6 +223,10 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
                 val spriteSheet = resourceAccess.spritesheet(arg.checkint())
                 arg.toint() to (spriteSheet?.name ?: "frame_buffer_${arg.toint()}")
             }
+
+             */
+            // FIXME:
+            TODO()
         }
     }
 
@@ -221,8 +237,12 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
     inner class pal : LibFunction() {
         @TinyCall("Reset all previous color changes.")
         override fun call(): LuaValue {
+            /*
             resourceAccess.addOp(PaletteOperation)
             resourceAccess.frameBuffer.blender.pal()
+
+             */
+            // FIXME:
             return NONE
         }
 
@@ -231,8 +251,12 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
             a: LuaValue,
             b: LuaValue,
         ): LuaValue {
+            // FIXME:
+            /*
             resourceAccess.addOp(PaletteOperation)
             resourceAccess.frameBuffer.blender.pal(a.checkint(), b.checkint())
+
+             */
             return NONE
         }
     }
@@ -241,9 +265,14 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
     inner class camera : TwoArgFunction() {
         @TinyCall("Reset the game camera to it's default position (0,0).")
         override fun call(): LuaValue {
+            /*
             resourceAccess.addOp(CameraOperation)
             val previous = coordinates()
             resourceAccess.frameBuffer.camera.set(0, 0)
+
+             */
+            // FIXME:
+            val previous = coordinates()
             return previous
         }
 
@@ -252,16 +281,22 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
             @TinyArg("x") arg1: LuaValue,
             @TinyArg("y") arg2: LuaValue,
         ): LuaValue {
+            /*
             resourceAccess.addOp(CameraOperation)
             val previous = coordinates()
             resourceAccess.frameBuffer.camera.set(arg1.toint(), arg2.toint())
+
+             */
+            // FIXME:
+            val previous = coordinates()
             return previous
         }
 
         private fun coordinates(): LuaTable {
             return LuaTable().apply {
-                set("x", resourceAccess.frameBuffer.camera.x)
-                set("y", resourceAccess.frameBuffer.camera.y)
+                // FIXME:
+                // set("x", resourceAccess.frameBuffer.camera.x)
+                // set("y", resourceAccess.frameBuffer.camera.y)
             }
         }
     }
@@ -277,16 +312,26 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
     inner class dither : LibFunction() {
         @TinyCall("Reset dithering pattern. The previous dithering pattern is returned.")
         override fun call(): LuaValue {
+            /*
+
             resourceAccess.addOp(DitheringOperation)
             return valueOf(resourceAccess.frameBuffer.blender.dither(0xFFFF))
+             */
+            // FIXME:
+            TODO()
         }
 
         @TinyCall("Apply dithering pattern. The previous dithering pattern is returned.")
         override fun call(
             @TinyArg("pattern", "Dither pattern. For example: 0xA5A5 or 0x3030") a: LuaValue,
         ): LuaValue {
+            /*
             resourceAccess.addOp(DitheringOperation)
             return valueOf(resourceAccess.frameBuffer.blender.dither(a.checkint()))
+
+             */
+            // FIXME:
+            TODO()
         }
     }
 
@@ -297,8 +342,12 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
     inner class clip : LibFunction() {
         @TinyCall("Reset the clip and draw on the fullscreen.")
         override fun call(): LuaValue {
+            /*
             resourceAccess.addOp(ClipOperation)
             resourceAccess.frameBuffer.clipper.reset()
+
+             */
+            // FIXME:
             return NONE
         }
 
@@ -309,8 +358,12 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
             @TinyArg("width") c: LuaValue,
             @TinyArg("height") d: LuaValue,
         ): LuaValue {
+            /*
+
             resourceAccess.addOp(ClipOperation)
             resourceAccess.frameBuffer.clipper.set(a.checkint(), b.checkint(), c.checkint(), d.checkint())
+             */
+            // FIXME:
             return NONE
         }
     }
@@ -319,7 +372,9 @@ class GfxLib(private val resourceAccess: GameResourceAccess, private val gameOpt
         return if (this.isnumber()) {
             this.checkint()
         } else {
-            resourceAccess.frameBuffer.gamePalette.getColorIndex(this.checkjstring()!!)
+            // resourceAccess.frameBuffer.gamePalette.getColorIndex(this.checkjstring()!!)
+            // FIXME:
+            return 0
         }
     }
 }

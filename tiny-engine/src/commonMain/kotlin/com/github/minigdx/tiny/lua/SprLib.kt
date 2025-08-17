@@ -6,9 +6,8 @@ import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.engine.GameResourceAccess
+import com.github.minigdx.tiny.engine.GameResourceAccess2
 import com.github.minigdx.tiny.graphic.PixelArray
-import com.github.minigdx.tiny.render.operations.DrawSprite
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
@@ -18,7 +17,7 @@ import org.luaj.vm2.lib.ThreeArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 
 @TinyLib("spr", "Sprite API to draw or update sprites.")
-class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAccess) : TwoArgFunction() {
+class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAccess2) : TwoArgFunction() {
     private var currentSpritesheet: Int = 0
 
     override fun call(
@@ -47,6 +46,9 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
             @TinyArg("x") arg1: LuaValue,
             @TinyArg("y") arg2: LuaValue,
         ): LuaValue {
+            // FIXME:
+            TODO()
+/*
             val pixelArray = resourceAccess.spritesheet(currentSpritesheet)?.pixels ?: return NIL
 
             val x = arg1.checkint()
@@ -59,6 +61,8 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
             } else {
                 return NIL
             }
+
+ */
         }
     }
 
@@ -82,6 +86,9 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
             @TinyArg("y") arg2: LuaValue,
             @TinyArg("color") arg3: LuaValue,
         ): LuaValue {
+            // FIXME:
+            TODO()
+/*
             val x = arg1.checkint()
             val y = arg2.checkint()
             val pixels = resourceAccess.spritesheet(currentSpritesheet)?.pixels ?: return NIL
@@ -91,6 +98,8 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
             } else {
                 NIL
             }
+
+ */
         }
     }
 
@@ -109,6 +118,9 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
         override fun call(
             @TinyArg("spritesheetN") arg: LuaValue,
         ): LuaValue {
+            // FIXME:
+            TODO()
+/*
             val previousSpriteSheet = currentSpritesheet
             currentSpritesheet =
                 if (arg.isnil()) {
@@ -119,6 +131,8 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
                     arg.checkint()
                 }
             return valueOf(previousSpriteSheet)
+
+ */
         }
     }
 
@@ -177,6 +191,9 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
                     ),
             ) args: Varargs,
         ): Varargs {
+            // FIXME:
+            TODO()
+/*
             val spritesheet = resourceAccess.spritesheet(currentSpritesheet) ?: return NIL
 
             val x = args.arg(1).optint(0)
@@ -207,6 +224,8 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
             resourceAccess.addOp(op)
 
             return NONE
+
+ */
         }
     }
 
@@ -228,6 +247,9 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
         override fun invoke(
             @TinyArgs(["sprN", "x", "y", "flipX", "flipY"]) args: Varargs,
         ): Varargs {
+            // FIXME:
+            TODO()
+/*
             if (args.narg() < 1) return NIL
             val sprN = args.arg(1).checkint()
             val x = args.arg(2).optint(0)
@@ -262,6 +284,8 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
             resourceAccess.addOp(op)
 
             return NONE
+
+ */
         }
     }
 }
