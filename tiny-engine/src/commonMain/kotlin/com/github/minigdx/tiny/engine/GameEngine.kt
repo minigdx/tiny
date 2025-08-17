@@ -9,8 +9,9 @@ import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.lua.toTinyException
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.performance.PerformanceMetrics
+import com.github.minigdx.tiny.render.DefaultVirtualFrameBuffer
 import com.github.minigdx.tiny.render.RenderContext
-import com.github.minigdx.tiny.render.batch.BatchManager
+import com.github.minigdx.tiny.render.VirtualFrameBuffer
 import com.github.minigdx.tiny.render.operations.RenderOperation
 import com.github.minigdx.tiny.resources.GameResource
 import com.github.minigdx.tiny.resources.GameScript
@@ -32,7 +33,7 @@ class GameEngine(
 
     private val ops = mutableListOf<RenderOperation>()
 
-    private var currentScripthasError = false
+    private var currentScriptHasError = false
 
     private var accumulator: Seconds = 0f
     private var currentFrame: Long = 0L
@@ -45,8 +46,7 @@ class GameEngine(
 
     private lateinit var resourceFactory: ResourceFactory
 
-    private val batchManager = BatchManager()
-
+    private val virtualFrameBuffer = DefaultVirtualFrameBuffer(platform, gameOptions)
     private val performanceMonitor = platform.performanceMonitor
 
     private lateinit var gameResourceProcessor: GameResourceProcessor
@@ -64,7 +64,7 @@ class GameEngine(
             inputHandler = inputHandler,
             logger = logger,
             gameOptions = gameOptions,
-            batchManager = batchManager,
+            virtualFrameBuffer = virtualFrameBuffer,
             soundManager = soundManager,
         )
 
@@ -135,12 +135,9 @@ class GameEngine(
      * Will render the remaining operations on the screen.
      */
     override fun draw() {
-        performanceMonitor.operationStart("render")
-        render() // Render the last operation into the frame buffer
-        performanceMonitor.operationEnd("render")
-
         performanceMonitor.operationStart("draw")
-        platform.draw(renderContext)
+
+        virtualFrameBuffer.draw()
         performanceMonitor.operationEnd("draw")
 
         // Complete frame monitoring and get metrics
@@ -152,12 +149,12 @@ class GameEngine(
     }
 
     private suspend fun advanceGameScript(currentScript: GameScript?) {
-        currentScripthasError = try {
+        currentScriptHasError = try {
             ops.clear() // Remove all drawing operation to prepare the new frame.
             currentScript?.advance()
             false
         } catch (ex: TinyException) {
-            if (!currentScripthasError) { // display the log only once.
+            if (!currentScriptHasError) { // display the log only once.
                 popupError(ex)
             }
             true
@@ -192,7 +189,7 @@ class GameEngine(
 
             listener?.reload(currentGameScript)
 
-            currentScripthasError = false
+            currentScriptHasError = false
         } catch (ex: LuaError) {
             popupError(ex.toTinyException(currentGameScript.content.decodeToString()))
         }
@@ -299,13 +296,6 @@ class GameEngine(
         if (metrics.frameTime > 16.67) { // Slower than 60 FPS
             popup("Frame: ${metrics.frameTime}ms", "#AAAA00")
         }
-    }
-
-    /**
-     * Will render the actual operations in the frame buffer
-     */
-    fun render() {
-        // FIXME: implement
     }
 
     override fun end() {

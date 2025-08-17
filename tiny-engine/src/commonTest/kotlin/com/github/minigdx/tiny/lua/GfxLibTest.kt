@@ -2,6 +2,7 @@ package com.github.minigdx.tiny.lua
 
 class GfxLibTest {
     // FIXME:
+
     /*
     private val frameBuffer = FrameBuffer(10, 10, ColorPalette(listOf("#FFFFFF")))
 

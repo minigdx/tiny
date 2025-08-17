@@ -8,7 +8,7 @@ import com.github.minigdx.tiny.graphic.PixelFormat
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.Platform
-import com.github.minigdx.tiny.render.batch.BatchManager
+import com.github.minigdx.tiny.render.VirtualFrameBuffer
 import com.github.minigdx.tiny.resources.ResourceType.BOOT_GAMESCRIPT
 import com.github.minigdx.tiny.resources.ResourceType.BOOT_SPRITESHEET
 import com.github.minigdx.tiny.resources.ResourceType.ENGINE_GAMESCRIPT
@@ -30,7 +30,7 @@ class ResourceFactory(
     private val vfs: VirtualFileSystem,
     private val platform: Platform,
     private val inputHandler: InputHandler,
-    private val batchManager: BatchManager,
+    private val virtualFrameBuffer: VirtualFrameBuffer,
     private val soundManager: SoundManager,
     private val gameOptions: GameOptions,
     private val logger: Logger,
@@ -137,7 +137,7 @@ class ResourceFactory(
                 index = index,
                 name = name,
                 gameOptions = gameOptions,
-                batchManager = batchManager,
+                virtualFrameBuffer = virtualFrameBuffer,
                 platform = platform,
                 logger = logger,
                 inputHandler = inputHandler,

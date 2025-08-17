@@ -20,6 +20,7 @@ import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.RenderFrame
+import com.github.minigdx.tiny.render.batch.SpriteBatch
 import com.github.minigdx.tiny.render.gl.OpenGLRender
 import com.github.minigdx.tiny.render.operations.RenderOperation
 import com.github.minigdx.tiny.sound.SoundManager
@@ -117,6 +118,10 @@ class WebGlPlatform(
         soundManager: SoundManager,
     ): SourceStream<SoundData> {
         return SoundDataSourceStream(name, soundManager, createByteArrayStream(name))
+    }
+
+    override fun drawIntoFrameBuffer(batch: SpriteBatch) {
+        render.draw(batch)
     }
 
     override fun createLocalFile(

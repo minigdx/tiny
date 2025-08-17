@@ -1,6 +1,7 @@
 package com.github.minigdx.tiny.render
 
 import com.github.minigdx.tiny.platform.WindowManager
+import com.github.minigdx.tiny.render.batch.SpriteBatch
 import com.github.minigdx.tiny.render.operations.RenderOperation
 
 interface WriteRender {
@@ -21,4 +22,6 @@ interface WriteRender {
      * Draw the frame buffer on the screen
      */
     fun drawOnScreen(context: RenderContext) = Unit
+
+    fun draw(batch: SpriteBatch) = Unit
 }

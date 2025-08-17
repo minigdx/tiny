@@ -19,6 +19,7 @@ import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.render.NopRenderContext
 import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.RenderFrame
+import com.github.minigdx.tiny.render.batch.SpriteBatch
 import com.github.minigdx.tiny.render.operations.DrawSprite
 import com.github.minigdx.tiny.render.operations.RenderOperation
 import com.github.minigdx.tiny.sound.SoundHandler
@@ -148,6 +149,10 @@ class HeadlessPlatform(
     ): SourceStream<SoundData> {
         val data = resources[name] as? SoundData ?: throw IllegalStateException("$name is not a valid SoundData.")
         return ObjectStream(data)
+    }
+
+    override fun drawIntoFrameBuffer(batch: SpriteBatch) {
+        TODO("Not yet implemented")
     }
 
     override fun createLocalFile(

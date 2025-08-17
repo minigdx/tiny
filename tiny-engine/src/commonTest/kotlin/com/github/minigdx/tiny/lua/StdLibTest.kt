@@ -2,6 +2,7 @@ package com.github.minigdx.tiny.lua
 
 class StdLibTest {
     // FIXME: fix
+
     /*
     private val colors = listOf("#FFFFFF", "#000000")
 

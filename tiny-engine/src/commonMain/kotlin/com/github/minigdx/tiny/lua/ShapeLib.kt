@@ -9,7 +9,8 @@ import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess2
-import com.github.minigdx.tiny.render.batch.BatchManager
+import com.github.minigdx.tiny.render.VirtualFrameBuffer
+import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
@@ -17,7 +18,7 @@ import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import kotlin.math.abs
 
-private class Shape(private val resourceAccess: GameResourceAccess2) {
+private class Shape(private val gameOptions: GameOptions) {
     fun rectArgs(args: Varargs): List<Int>? {
         when (args.narg()) {
             // rect including color
@@ -62,12 +63,7 @@ private class Shape(private val resourceAccess: GameResourceAccess2) {
         return if (this.isnumber()) {
             this.checkint()
         } else {
-            // FIXME:
-            TODO()
-/*
-            resourceAccess.frameBuffer.gamePalette.getColorIndex(this.checkjstring()!!)
-
- */
+            gameOptions.colors().getColorIndex(this.checkjstring()!!)
         }
     }
 }
@@ -75,15 +71,14 @@ private class Shape(private val resourceAccess: GameResourceAccess2) {
 @TinyLib(
     "shape",
     "Shape API to draw...shapes. " +
-        "Those shapes can be circle, rectangle, line or oval." +
-        "All shapes can be draw filed or not filed.",
+            "Those shapes can be circle, rectangle, line or oval." +
+            "All shapes can be draw filed or not filed.",
 )
 class ShapeLib(
-    private val resourceAccess: GameResourceAccess2,
     private val gameOptions: GameOptions,
-    private val batchManager: BatchManager,
+    private val virtualFrameBuffer: VirtualFrameBuffer,
 ) : TwoArgFunction() {
-    private val shape = Shape(resourceAccess)
+    private val shape = Shape(gameOptions)
 
     override fun call(
         arg1: LuaValue,
@@ -114,21 +109,18 @@ class ShapeLib(
         ): Varargs {
             val (x, y, width, height, color) = shape.rectArgs(args) ?: return NIL
 
-            // FIXME:
-            TODO()
-/*
-            for (i in x until x + width) {
-                resourceAccess.frameBuffer.pixel(i, y, color)
-                resourceAccess.frameBuffer.pixel(i, y + height - 1, color)
-            }
-            for (i in y until y + height) {
-                resourceAccess.frameBuffer.pixel(x, i, color)
-                resourceAccess.frameBuffer.pixel(x + width - 1, i, color)
-            }
-            resourceAccess.addOp(FrameBufferOperation)
-            return NIL
+            virtualFrameBuffer.drawPrimitive { frameBuffer ->
 
- */
+                for (i in x until x + width) {
+                    frameBuffer.pixel(i, y, color)
+                    frameBuffer.pixel(i, y + height - 1, color)
+                }
+                for (i in y until y + height) {
+                    frameBuffer.pixel(x, i, color)
+                    frameBuffer.pixel(x + width - 1, i, color)
+                }
+            }
+            return NIL
         }
 
         @TinyCall("Draw a rectangle.")
@@ -175,53 +167,48 @@ class ShapeLib(
             val radiusY = args.checkint(4)
             val color = args.arg(5).checkColorIndex()
 
-            // FIXME:
-            TODO()
-/*
-            val frameBuffer = resourceAccess.frameBuffer
+            virtualFrameBuffer.drawPrimitive { frameBuffer ->
 
-            var x = 0
-            var y = radiusY
-            var p: Int = (radiusY * radiusY) - (radiusX * radiusX * radiusY) + ((radiusX * radiusX) / 4)
+                var x = 0
+                var y = radiusY
+                var p: Int = (radiusY * radiusY) - (radiusX * radiusX * radiusY) + ((radiusX * radiusX) / 4)
 
-            while (2 * x * radiusY * radiusY <= 2 * y * radiusX * radiusX) {
-                frameBuffer.pixel(centerX + x, centerY + y, color)
-                frameBuffer.pixel(centerX - x, centerY + y, color)
-                frameBuffer.pixel(centerX + x, centerY - y, color)
-                frameBuffer.pixel(centerX - x, centerY - y, color)
+                while (2 * x * radiusY * radiusY <= 2 * y * radiusX * radiusX) {
+                    frameBuffer.pixel(centerX + x, centerY + y, color)
+                    frameBuffer.pixel(centerX - x, centerY + y, color)
+                    frameBuffer.pixel(centerX + x, centerY - y, color)
+                    frameBuffer.pixel(centerX - x, centerY - y, color)
 
-                x++
-
-                if (p < 0) {
-                    p += 2 * radiusY * radiusY * x + radiusY * radiusY
-                } else {
-                    y--
-                    p += 2 * radiusY * radiusY * x - 2 * radiusX * radiusX * y + radiusY * radiusY
-                }
-            }
-
-            p =
-                (radiusY * radiusY) * (x * x + x) + (radiusX * radiusX) * (y * y - y) - (radiusX * radiusX * radiusY * radiusY)
-
-            while (y >= 0) {
-                frameBuffer.pixel(centerX + x, centerY + y, color)
-                frameBuffer.pixel(centerX - x, centerY + y, color)
-                frameBuffer.pixel(centerX + x, centerY - y, color)
-                frameBuffer.pixel(centerX - x, centerY - y, color)
-
-                y--
-
-                if (p > 0) {
-                    p -= 2 * radiusX * radiusX * y + radiusX * radiusX
-                } else {
                     x++
-                    p += 2 * radiusY * radiusY * x - 2 * radiusX * radiusX * y + radiusX * radiusX
+
+                    if (p < 0) {
+                        p += 2 * radiusY * radiusY * x + radiusY * radiusY
+                    } else {
+                        y--
+                        p += 2 * radiusY * radiusY * x - 2 * radiusX * radiusX * y + radiusY * radiusY
+                    }
+                }
+
+                p =
+                    (radiusY * radiusY) * (x * x + x) + (radiusX * radiusX) * (y * y - y) - (radiusX * radiusX * radiusY * radiusY)
+
+                while (y >= 0) {
+                    frameBuffer.pixel(centerX + x, centerY + y, color)
+                    frameBuffer.pixel(centerX - x, centerY + y, color)
+                    frameBuffer.pixel(centerX + x, centerY - y, color)
+                    frameBuffer.pixel(centerX - x, centerY - y, color)
+
+                    y--
+
+                    if (p > 0) {
+                        p -= 2 * radiusX * radiusX * y + radiusX * radiusX
+                    } else {
+                        x++
+                        p += 2 * radiusY * radiusY * x - 2 * radiusX * radiusX * y + radiusX * radiusX
+                    }
                 }
             }
-            resourceAccess.addOp(FrameBufferOperation)
             return NONE
-
- */
         }
     }
 
@@ -255,51 +242,46 @@ class ShapeLib(
             val radiusY = args.checkint(4)
             val color = args.arg(5).checkColorIndex()
 
-            // FIXME:
-            TODO()
-/*
-            val frameBuffer = resourceAccess.frameBuffer
+            virtualFrameBuffer.drawPrimitive { frameBuffer ->
 
-            var x = 0
-            var y = radiusY
-            var p = (radiusY * radiusY) - (radiusX * radiusX * radiusY) + ((radiusX * radiusX) / 4)
+                var x = 0
+                var y = radiusY
+                var p = (radiusY * radiusY) - (radiusX * radiusX * radiusY) + ((radiusX * radiusX) / 4)
 
-            while (2 * x * radiusY * radiusY <= 2 * y * radiusX * radiusX) {
-                // filled oval
-                frameBuffer.fill(centerX - x, centerX + x, centerY + y, color)
-                frameBuffer.fill(centerX - x, centerX + x, centerY - y, color)
+                while (2 * x * radiusY * radiusY <= 2 * y * radiusX * radiusX) {
+                    // filled oval
+                    frameBuffer.fill(centerX - x, centerX + x, centerY + y, color)
+                    frameBuffer.fill(centerX - x, centerX + x, centerY - y, color)
 
-                x++
-
-                if (p < 0) {
-                    p += 2 * radiusY * radiusY * x + radiusY * radiusY
-                } else {
-                    y--
-                    p += 2 * radiusY * radiusY * x - 2 * radiusX * radiusX * y + radiusY * radiusY
-                }
-            }
-
-            p =
-                (radiusY * radiusY) * (x * x + x) + (radiusX * radiusX) * (y * y - y) - (radiusX * radiusX * radiusY * radiusY)
-
-            while (y >= 0) {
-                // filled oval
-                frameBuffer.fill(centerX - x, centerX + x, centerY + y, color)
-                frameBuffer.fill(centerX - x, centerX + x, centerY - y, color)
-
-                y--
-
-                if (p > 0) {
-                    p -= 2 * radiusX * radiusX * y + radiusX * radiusX
-                } else {
                     x++
-                    p += 2 * radiusY * radiusY * x - 2 * radiusX * radiusX * y + radiusX * radiusX
+
+                    if (p < 0) {
+                        p += 2 * radiusY * radiusY * x + radiusY * radiusY
+                    } else {
+                        y--
+                        p += 2 * radiusY * radiusY * x - 2 * radiusX * radiusX * y + radiusY * radiusY
+                    }
+                }
+
+                p =
+                    (radiusY * radiusY) * (x * x + x) + (radiusX * radiusX) * (y * y - y) - (radiusX * radiusX * radiusY * radiusY)
+
+                while (y >= 0) {
+                    // filled oval
+                    frameBuffer.fill(centerX - x, centerX + x, centerY + y, color)
+                    frameBuffer.fill(centerX - x, centerX + x, centerY - y, color)
+
+                    y--
+
+                    if (p > 0) {
+                        p -= 2 * radiusX * radiusX * y + radiusX * radiusX
+                    } else {
+                        x++
+                        p += 2 * radiusY * radiusY * x - 2 * radiusX * radiusX * y + radiusX * radiusX
+                    }
                 }
             }
-            resourceAccess.addOp(FrameBufferOperation)
             return NIL
-
- */
         }
     }
 
@@ -312,34 +294,14 @@ class ShapeLib(
         ): Varargs {
             val (x, y, width, height, color) = shape.rectArgs(args) ?: return NIL
 
-            // FIXME:
-            TODO()
-/*
-            // Add the framebuffer in the batch
-            batchManager.submitSprite(
-                source = resourceAccess.frameBuffer.asSpriteSheet,
-                sourceX = 0,
-                sourceY = 0,
-                sourceWidth = resourceAccess.frameBuffer.width,
-                sourceHeight = resourceAccess.frameBuffer.height,
-                destinationX = 0,
-                destinationY = 0,
-                flipX = false,
-                flipY = false,
-                dither = resourceAccess.frameBuffer.blender.dithering,
-                palette = resourceAccess.frameBuffer.blender.switch,
-                camera = resourceAccess.frameBuffer.camera,
-                clipper = resourceAccess.frameBuffer.clipper,
-            )
-
-            // Draw the shape in the current frame buffer
-            for (j in y until y + height) {
-                resourceAccess.frameBuffer.fill(x, x + width, j, color)
+            virtualFrameBuffer.drawPrimitive { frameBuffer ->
+                // Draw the shape in the current frame buffer
+                for (j in y until y + height) {
+                    frameBuffer.fill(x, x + width, j, color)
+                }
             }
 
             return NIL
-
- */
         }
 
         @TinyCall("Draw a filled rectangle.")
@@ -360,12 +322,7 @@ class ShapeLib(
         return if (this.isnumber()) {
             this.checkint()
         } else {
-            // FIXME:
-            TODO()
-/*
-            resourceAccess.frameBuffer.gamePalette.getColorIndex(this.checkjstring()!!)
-
- */
+            gameOptions.colors().getColorIndex(this.checkjstring()!!)
         }
     }
 
@@ -383,41 +340,38 @@ class ShapeLib(
             val radius = c.checkint()
             val color = d.checkColorIndex()
 
-            var x = 0
-            var y = radius
-            var dst = 3 - 2 * radius
-            // FIXME:
-            TODO()
-/*
-            while (x <= y) {
-                // Draw the outline of the circle
-                resourceAccess.frameBuffer.pixel(centerX + x, centerY + y, color)
-                resourceAccess.frameBuffer.pixel(centerX - x, centerY + y, color)
-                resourceAccess.frameBuffer.pixel(centerX + x, centerY - y, color)
-                resourceAccess.frameBuffer.pixel(centerX - x, centerY - y, color)
-                resourceAccess.frameBuffer.pixel(centerX + y, centerY + x, color)
-                resourceAccess.frameBuffer.pixel(centerX - y, centerY + x, color)
-                resourceAccess.frameBuffer.pixel(centerX + y, centerY - x, color)
-                resourceAccess.frameBuffer.pixel(centerX - y, centerY - x, color)
+            virtualFrameBuffer.drawPrimitive { frameBuffer ->
 
-                // Fill the circle
-                resourceAccess.frameBuffer.fill(centerX - x, centerX + x, centerY + y, color)
-                resourceAccess.frameBuffer.fill(centerX - x, centerX + x, centerY - y, color)
-                resourceAccess.frameBuffer.fill(centerX - y, centerX + y, centerY + x, color)
-                resourceAccess.frameBuffer.fill(centerX - y, centerX + y, centerY - x, color)
+                var x = 0
+                var y = radius
+                var dst = 3 - 2 * radius
+                while (x <= y) {
+                    // Draw the outline of the circle
+                    frameBuffer.pixel(centerX + x, centerY + y, color)
+                    frameBuffer.pixel(centerX - x, centerY + y, color)
+                    frameBuffer.pixel(centerX + x, centerY - y, color)
+                    frameBuffer.pixel(centerX - x, centerY - y, color)
+                    frameBuffer.pixel(centerX + y, centerY + x, color)
+                    frameBuffer.pixel(centerX - y, centerY + x, color)
+                    frameBuffer.pixel(centerX + y, centerY - x, color)
+                    frameBuffer.pixel(centerX - y, centerY - x, color)
 
-                if (dst < 0) {
-                    dst += 4 * x + 6
-                } else {
-                    dst += 4 * (x - y) + 10
-                    y--
+                    // Fill the circle
+                    frameBuffer.fill(centerX - x, centerX + x, centerY + y, color)
+                    frameBuffer.fill(centerX - x, centerX + x, centerY - y, color)
+                    frameBuffer.fill(centerX - y, centerX + y, centerY + x, color)
+                    frameBuffer.fill(centerX - y, centerX + y, centerY - x, color)
+
+                    if (dst < 0) {
+                        dst += 4 * x + 6
+                    } else {
+                        dst += 4 * (x - y) + 10
+                        y--
+                    }
+                    x++
                 }
-                x++
             }
-            resourceAccess.addOp(FrameBufferOperation)
             return NIL
-
- */
         }
     }
 
@@ -461,27 +415,23 @@ class ShapeLib(
 
             var x = x0
             var y = y0
-            // FIXME:
-            TODO()
-/*
-            while (true) {
-                resourceAccess.frameBuffer.pixel(x, y, color)
-                if (x == x1 && y == y1) break
-                val e2 = 2 * err
-                if (e2 > -dy) {
-                    err -= dy
-                    x += sx
-                }
-                if (e2 < dx) {
-                    err += dx
-                    y += sy
+
+            virtualFrameBuffer.drawPrimitive { frameBuffer ->
+                while (true) {
+                    frameBuffer.pixel(x, y, color)
+                    if (x == x1 && y == y1) break
+                    val e2 = 2 * err
+                    if (e2 > -dy) {
+                        err -= dy
+                        x += sx
+                    }
+                    if (e2 < dx) {
+                        err += dx
+                        y += sy
+                    }
                 }
             }
-            // FIXME(Performance): Add the current primitive as a sprite.
-            resourceAccess.addOp(FrameBufferOperation)
             return NONE
-
- */
         }
 
         @TinyCall("Draw a line with a default color.")
@@ -515,40 +465,37 @@ class ShapeLib(
             @TinyArg("radius") c: LuaValue,
             @TinyArg("color") d: LuaValue,
         ): LuaValue {
-            // FIXME:
-            TODO()
-/*
             val centerX = a.checkint()
             val centerY = b.checkint()
             val radius = c.checkint()
             val color = d.checkColorIndex()
 
-            var x = 0
-            var y = radius
-            var dst = 3 - 2 * radius
+            virtualFrameBuffer.drawPrimitive { frameBuffer ->
 
-            while (x <= y) {
-                resourceAccess.frameBuffer.pixel(centerX + x, centerY + y, color)
-                resourceAccess.frameBuffer.pixel(centerX - x, centerY + y, color)
-                resourceAccess.frameBuffer.pixel(centerX + x, centerY - y, color)
-                resourceAccess.frameBuffer.pixel(centerX - x, centerY - y, color)
-                resourceAccess.frameBuffer.pixel(centerX + y, centerY + x, color)
-                resourceAccess.frameBuffer.pixel(centerX - y, centerY + x, color)
-                resourceAccess.frameBuffer.pixel(centerX + y, centerY - x, color)
-                resourceAccess.frameBuffer.pixel(centerX - y, centerY - x, color)
+                var x = 0
+                var y = radius
+                var dst = 3 - 2 * radius
 
-                if (dst < 0) {
-                    dst += 4 * x + 6
-                } else {
-                    dst += 4 * (x - y) + 10
-                    y--
+                while (x <= y) {
+                    frameBuffer.pixel(centerX + x, centerY + y, color)
+                    frameBuffer.pixel(centerX - x, centerY + y, color)
+                    frameBuffer.pixel(centerX + x, centerY - y, color)
+                    frameBuffer.pixel(centerX - x, centerY - y, color)
+                    frameBuffer.pixel(centerX + y, centerY + x, color)
+                    frameBuffer.pixel(centerX - y, centerY + x, color)
+                    frameBuffer.pixel(centerX + y, centerY - x, color)
+                    frameBuffer.pixel(centerX - y, centerY - x, color)
+
+                    if (dst < 0) {
+                        dst += 4 * x + 6
+                    } else {
+                        dst += 4 * (x - y) + 10
+                        y--
+                    }
+                    x++
                 }
-                x++
             }
-            resourceAccess.addOp(FrameBufferOperation)
             return NONE
-
- */
         }
     }
 
@@ -561,9 +508,6 @@ class ShapeLib(
         override fun invoke(
             @TinyArgs(["x1", "y1", "x2", "y2", "x3", "y3", "color"]) args: Varargs,
         ): Varargs {
-            // FIXME:
-            TODO()
-/*
             if (args.narg() < 7) throw LuaError("Expected 7 args")
 
             val x1 = args.checkint(1)
@@ -587,28 +531,28 @@ class ShapeLib(
             val slope1 = (middleVertex.first - topVertex.first).toFloat() / (middleVertex.second - topVertex.second)
             val slope2 = (bottomVertex.first - topVertex.first).toFloat() / (bottomVertex.second - topVertex.second)
 
-            // Draw the upper part of the triangle
-            for (y in topVertex.second until middleVertex.second) {
-                val xx1 = topVertex.first + ((y - topVertex.second) * slope1).toInt()
-                val xx2 = topVertex.first + ((y - topVertex.second) * slope2).toInt()
-                resourceAccess.frameBuffer.fill(xx1, xx2, y, color)
-            }
+            virtualFrameBuffer.drawPrimitive { frameBuffer ->
 
-            // Calculate the slopes of the two sides of the bottom part of the triangle
-            val slope3 =
-                (bottomVertex.first - middleVertex.first).toFloat() / (bottomVertex.second - middleVertex.second)
-            val slope4 = (bottomVertex.first - topVertex.first).toFloat() / (bottomVertex.second - topVertex.second)
+                // Draw the upper part of the triangle
+                for (y in topVertex.second until middleVertex.second) {
+                    val xx1 = topVertex.first + ((y - topVertex.second) * slope1).toInt()
+                    val xx2 = topVertex.first + ((y - topVertex.second) * slope2).toInt()
+                    frameBuffer.fill(xx1, xx2, y, color)
+                }
 
-            // Draw the lower part of the triangle
-            for (y in middleVertex.second until bottomVertex.second) {
-                val xx1 = middleVertex.first + ((y - middleVertex.second) * slope3).toInt()
-                val xx2 = topVertex.first + ((y - topVertex.second) * slope4).toInt()
-                resourceAccess.frameBuffer.fill(xx1, xx2, y, color)
+                // Calculate the slopes of the two sides of the bottom part of the triangle
+                val slope3 =
+                    (bottomVertex.first - middleVertex.first).toFloat() / (bottomVertex.second - middleVertex.second)
+                val slope4 = (bottomVertex.first - topVertex.first).toFloat() / (bottomVertex.second - topVertex.second)
+
+                // Draw the lower part of the triangle
+                for (y in middleVertex.second until bottomVertex.second) {
+                    val xx1 = middleVertex.first + ((y - middleVertex.second) * slope3).toInt()
+                    val xx2 = topVertex.first + ((y - topVertex.second) * slope4).toInt()
+                    frameBuffer.fill(xx1, xx2, y, color)
+                }
             }
-            resourceAccess.addOp(FrameBufferOperation)
             return NONE
-
- */
         }
     }
 
@@ -623,9 +567,6 @@ class ShapeLib(
         override fun invoke(
             @TinyArgs(["x1", "y1", "x2", "y2", "x3", "y3", "color"]) args: Varargs,
         ): Varargs {
-            // FIXME:
-            TODO()
-/*
             if (args.narg() < 7) throw LuaError("Expected 7 args")
 
             val x1 = args.checkint(1)
@@ -671,10 +612,7 @@ class ShapeLib(
                     ),
                 ),
             )
-            resourceAccess.addOp(FrameBufferOperation)
             return NONE
-
- */
         }
     }
 
@@ -706,7 +644,7 @@ class ShapeLib(
 
         private val rectf = rectf()
 
-        private val dither = GfxLib(resourceAccess, gameOptions).dither()
+        // private val dither = GfxLib(resourceAccess, gameOptions).dither()
 
         @TinyCall("Draw a gradient using dithering, only from color c1 to color c2.")
         override fun invoke(
@@ -714,58 +652,58 @@ class ShapeLib(
         ): Varargs {
             // FIXME:
             TODO()
-/*
-            if (args.narg() < 6) throw LuaError("Expected 6  args")
+            /*
+                        if (args.narg() < 6) throw LuaError("Expected 6  args")
 
-            val x = args.checkint(1)
-            val y = args.checkint(2)
-            val width = args.checkint(3)
-            val height = args.checkint(4)
+                        val x = args.checkint(1)
+                        val y = args.checkint(2)
+                        val width = args.checkint(3)
+                        val height = args.checkint(4)
 
-            val color2 = args.arg(6).checkColorIndex()
+                        val color2 = args.arg(6).checkColorIndex()
 
-            val isHorizontal = args.optboolean(7, false)
+                        val isHorizontal = args.optboolean(7, false)
 
-            // Draw the background color
-            rectf.invoke(arrayOf(args.arg(1), args.arg(2), args.arg(3), args.arg(4), args.arg(5)))
+                        // Draw the background color
+                        rectf.invoke(arrayOf(args.arg(1), args.arg(2), args.arg(3), args.arg(4), args.arg(5)))
 
-            val previous = dither.call()
-            dithering.forEachIndexed { index, pattern ->
-                if (isHorizontal) {
-                    val xx = x + width * index / dithering.size
-                    val xx2 = x + width * (index + 1) / dithering.size
-                    dither.call(pattern)
-                    rectf.invoke(
-                        arrayOf(
-                            valueOf(xx),
-                            valueOf(y),
-                            valueOf(xx2 - xx),
-                            valueOf(height),
-                            valueOf(color2),
-                        ),
-                    )
-                } else {
-                    val yy = y + height * index / dithering.size
-                    val yy2 = y + height * (index + 1) / dithering.size
-                    dither.call(pattern)
-                    rectf.invoke(
-                        arrayOf(
-                            valueOf(x),
-                            valueOf(yy),
-                            valueOf(width),
-                            valueOf(yy2 - yy),
-                            valueOf(color2),
-                        ),
-                    )
-                }
-            }
-            dither.call(previous)
+                        val previous = dither.call()
+                        dithering.forEachIndexed { index, pattern ->
+                            if (isHorizontal) {
+                                val xx = x + width * index / dithering.size
+                                val xx2 = x + width * (index + 1) / dithering.size
+                                dither.call(pattern)
+                                rectf.invoke(
+                                    arrayOf(
+                                        valueOf(xx),
+                                        valueOf(y),
+                                        valueOf(xx2 - xx),
+                                        valueOf(height),
+                                        valueOf(color2),
+                                    ),
+                                )
+                            } else {
+                                val yy = y + height * index / dithering.size
+                                val yy2 = y + height * (index + 1) / dithering.size
+                                dither.call(pattern)
+                                rectf.invoke(
+                                    arrayOf(
+                                        valueOf(x),
+                                        valueOf(yy),
+                                        valueOf(width),
+                                        valueOf(yy2 - yy),
+                                        valueOf(color2),
+                                    ),
+                                )
+                            }
+                        }
+                        dither.call(previous)
 
-            resourceAccess.addOp(FrameBufferOperation)
+                        resourceAccess.addOp(FrameBufferOperation)
 
-            return NIL
+                        return NIL
 
- */
+             */
         }
     }
 }

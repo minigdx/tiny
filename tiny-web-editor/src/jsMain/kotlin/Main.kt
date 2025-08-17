@@ -17,6 +17,7 @@ import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.platform.webgl.WebGlPlatform
 import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.RenderFrame
+import com.github.minigdx.tiny.render.batch.SpriteBatch
 import com.github.minigdx.tiny.render.operations.RenderOperation
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.browser.document
@@ -328,7 +329,16 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
             name,
         )
 
-    override fun createSoundStream(name: String, soundManager: SoundManager): SourceStream<SoundData> = delegate.createSoundStream(name, soundManager)
+    override fun createSoundStream(
+        name: String,
+        soundManager: SoundManager,
+    ): SourceStream<SoundData> =
+        delegate.createSoundStream(
+            name,
+            soundManager,
+        )
+
+    override fun drawIntoFrameBuffer(batch: SpriteBatch) = delegate.drawIntoFrameBuffer(batch)
 
     override fun createLocalFile(
         name: String,

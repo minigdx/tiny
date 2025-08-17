@@ -10,6 +10,7 @@ import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.RenderFrame
+import com.github.minigdx.tiny.render.batch.SpriteBatch
 import com.github.minigdx.tiny.render.operations.RenderOperation
 import com.github.minigdx.tiny.sound.Music
 import com.github.minigdx.tiny.sound.SoundManager
@@ -147,6 +148,8 @@ interface Platform {
      */
     fun draw(renderContext: RenderContext)
 
+    fun drawIntoFrameBuffer(batch: SpriteBatch)
+
     /**
      * Execute the block using an off-screen buffer.
      * All drawing operation will use this off-screen buffer instead
@@ -155,4 +158,6 @@ interface Platform {
         renderContext: RenderContext,
         block: () -> Unit,
     ): RenderFrame
+
+    fun drawFrameBuffer() = Unit
 }

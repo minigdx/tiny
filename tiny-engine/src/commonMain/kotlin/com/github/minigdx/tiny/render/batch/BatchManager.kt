@@ -49,7 +49,7 @@ class BatchManager {
     /**
      * Submit a new sprite.
      *
-     * @return is the actual batches need to be renderend.
+     * @return is the actual batches need to be rendered.
      */
     fun submitSprite(
         source: SpriteSheet,
@@ -112,7 +112,12 @@ class BatchManager {
         }
     }
 
-    fun flushAllBatches() {
+    fun consumeAllBatches(action: (SpriteBatch) -> Unit) {
+        activeBatches.forEach(action)
+        flushAllBatches()
+    }
+
+    private fun flushAllBatches() {
         spriteBatchPool.free(activeBatches)
         activeBatches.clear()
 
