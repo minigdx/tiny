@@ -27,8 +27,6 @@ class ImageData(
 class SoundData(
     // Name of the file.
     val name: String,
-    // Sound manager to actually play the sound or the music.
-    val soundManager: SoundManager,
     // Deserialized data of the file.
     val music: Music,
     // Ready to play musical bars. (sfx)
@@ -114,9 +112,12 @@ interface Platform {
     ): SourceStream<ImageData>
 
     /**
-     * Create a SourceStream from a midi file.
+     * Create a SourceStream from a sfx file.
      */
-    fun createSoundStream(name: String): SourceStream<SoundData>
+    fun createSoundStream(
+        name: String,
+        soundManager: SoundManager,
+    ): SourceStream<SoundData>
 
     /**
      * Create a file using the name.

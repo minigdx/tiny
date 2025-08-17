@@ -379,16 +379,15 @@ class GlfwPlatform(
         }
     }
 
-    override fun createSoundStream(name: String): SourceStream<SoundData> {
+    override fun createSoundStream(
+        name: String,
+        soundManager: SoundManager,
+    ): SourceStream<SoundData> {
         return SoundDataSourceStream(name, soundManager, createByteArrayStream(name))
     }
 
-    private lateinit var soundManager: SoundManager
-
     override fun initSoundManager(inputHandler: InputHandler): SoundManager {
         return JavaSoundManager().also {
-            soundManager = it
-        }.also {
             it.initSoundManager(inputHandler)
         }
     }

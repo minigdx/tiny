@@ -106,15 +106,16 @@ class WebGlPlatform(
         return ImageDataStream("$rootUrl/$name")
     }
 
-    private lateinit var soundManager: SoundManager
-
     override fun initSoundManager(inputHandler: InputHandler): SoundManager {
-        soundManager = WebSoundMananger()
+        val soundManager = WebSoundMananger()
         soundManager.initSoundManager(inputHandler)
         return soundManager
     }
 
-    override fun createSoundStream(name: String): SourceStream<SoundData> {
+    override fun createSoundStream(
+        name: String,
+        soundManager: SoundManager,
+    ): SourceStream<SoundData> {
         return SoundDataSourceStream(name, soundManager, createByteArrayStream(name))
     }
 

@@ -17,6 +17,7 @@ import com.github.minigdx.tiny.resources.ResourceType.GAME_LEVEL
 import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
 import com.github.minigdx.tiny.resources.ldtk.Layer
 import com.github.minigdx.tiny.resources.ldtk.Ldtk
+import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapMerge
@@ -30,6 +31,7 @@ class ResourceFactory(
     private val platform: Platform,
     private val inputHandler: InputHandler,
     private val batchManager: BatchManager,
+    private val soundManager: SoundManager,
     private val gameOptions: GameOptions,
     private val logger: Logger,
 ) {
@@ -46,7 +48,7 @@ class ResourceFactory(
         name: String,
     ): Flow<Sound> {
         var version = 0
-        return vfs.watch(platform.createSoundStream(name))
+        return vfs.watch(platform.createSoundStream(name, soundManager))
             .map { soundData -> Sound(version++, index, name, soundData) }
             .onEach {
                 logger.debug("RESOURCE_FACTORY") {

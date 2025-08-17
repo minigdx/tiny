@@ -36,7 +36,7 @@ class SoundDataSourceStream(
 
         val sounds = music.musicalBars.map { bar -> soundManager.convert(bar) }
 
-        return SoundData(name, soundManager, music, sounds)
+        return SoundData(name, music, sounds)
     }
 
     override fun wasModified(): Boolean = delegate.wasModified()

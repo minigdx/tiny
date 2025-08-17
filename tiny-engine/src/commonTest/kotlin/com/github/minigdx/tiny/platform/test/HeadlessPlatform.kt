@@ -142,7 +142,10 @@ class HeadlessPlatform(
         return ObjectStream(data)
     }
 
-    override fun createSoundStream(name: String): SourceStream<SoundData> {
+    override fun createSoundStream(
+        name: String,
+        soundManager: SoundManager,
+    ): SourceStream<SoundData> {
         val data = resources[name] as? SoundData ?: throw IllegalStateException("$name is not a valid SoundData.")
         return ObjectStream(data)
     }

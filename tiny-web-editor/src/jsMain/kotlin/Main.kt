@@ -328,7 +328,7 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
             name,
         )
 
-    override fun createSoundStream(name: String): SourceStream<SoundData> = delegate.createSoundStream(name)
+    override fun createSoundStream(name: String, soundManager: SoundManager): SourceStream<SoundData> = delegate.createSoundStream(name, soundManager)
 
     override fun createLocalFile(
         name: String,

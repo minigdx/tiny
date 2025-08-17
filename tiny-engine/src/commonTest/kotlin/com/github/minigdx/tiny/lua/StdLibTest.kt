@@ -1,23 +1,5 @@
 package com.github.minigdx.tiny.lua
 
-import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.engine.GameResourceAccess
-import com.github.minigdx.tiny.engine.GameResourceAccess2
-import com.github.minigdx.tiny.graphic.ColorPalette
-import com.github.minigdx.tiny.graphic.FrameBuffer
-import com.github.minigdx.tiny.graphic.PixelArray
-import com.github.minigdx.tiny.graphic.PixelFormat
-import com.github.minigdx.tiny.resources.ResourceType
-import com.github.minigdx.tiny.resources.SpriteSheet
-import dev.mokkery.answering.returns
-import dev.mokkery.every
-import dev.mokkery.matcher.any
-import dev.mokkery.mock
-import org.luaj.vm2.LuaValue.Companion.valueOf
-import org.luaj.vm2.LuaValue.Companion.varargsOf
-import kotlin.test.Test
-import kotlin.test.assertEquals
-
 class StdLibTest {
     // FIXME: fix
     /*
