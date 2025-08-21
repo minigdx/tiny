@@ -7,6 +7,7 @@ import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess2
 import com.github.minigdx.tiny.platform.DrawingMode
+import com.github.minigdx.tiny.render.VirtualFrameBuffer
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.LibFunction
@@ -20,7 +21,11 @@ import kotlin.math.min
     "gfx",
     "Access to graphical API like updating the color palette or applying a dithering pattern.",
 )
-class GfxLib(private val resourceAccess: GameResourceAccess2, private val gameOptions: GameOptions) : TwoArgFunction() {
+class GfxLib(
+    private val resourceAccess: GameResourceAccess2,
+    private val gameOptions: GameOptions,
+    virtualFrameBuffer: VirtualFrameBuffer
+) : TwoArgFunction() {
     override fun call(
         arg1: LuaValue,
         arg2: LuaValue,

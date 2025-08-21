@@ -6,11 +6,12 @@ import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameResourceAccess2
-import com.github.minigdx.tiny.render.operations.DrawSprite
-import com.github.minigdx.tiny.resources.GameLevel
+import com.github.minigdx.tiny.render.VirtualFrameBuffer
+import com.github.minigdx.tiny.resources.SpriteSheet
 import com.github.minigdx.tiny.resources.ldtk.CustomField
 import com.github.minigdx.tiny.resources.ldtk.Entity
 import com.github.minigdx.tiny.resources.ldtk.EntityRef
+import com.github.minigdx.tiny.resources.ldtk.GridInt
 import com.github.minigdx.tiny.resources.ldtk.GridPoint
 import com.github.minigdx.tiny.resources.ldtk.Layer
 import com.github.minigdx.tiny.resources.ldtk.Level
@@ -51,6 +52,7 @@ import kotlin.math.floor
 class MapLib(
     private val resourceAccess: GameResourceAccess2,
     private val spriteSize: Pair<Pixel, Pixel>,
+    private val virtualFrameBuffer: VirtualFrameBuffer,
 ) : TwoArgFunction() {
     private var currentWorld: Int = 0
     private var currentLevel: Int = 0
@@ -467,23 +469,17 @@ entity.fields -- access custom field of the entity
                 return NIL
             }
             val layer = activeLevel()?.layerInstances?.getOrNull(layerIndex) ?: return NIL
+
             // Not a drawable layer.
             if (layer.__tilesetRelPath == null) {
                 return NIL
             }
 
             val world = resourceAccess.findLevel(currentWorld) ?: return NIL
-            // FIXME(Performance): Draw each tile as a sprite with the BatchManager.
-            toDrawSprite(world, layer).forEach {
-                // resourceAccess.addOp(it)
-            }
-            return NONE
-        }
 
-        fun toAttribute(
-            size: Int,
-            tile: Tile,
-        ): DrawSprite.DrawSpriteAttribute {
+            val tileset = world.tilesset[layer.__tilesetRelPath!!]!!
+
+            /*
             fun Int.toFlip(): Pair<Boolean, Boolean> {
                 return ((this and 0x01) == 0x01) to ((this and 0x02) == 0x02)
             }
@@ -491,41 +487,45 @@ entity.fields -- access custom field of the entity
             val (destX, destY) = tile.px
             val (flipX, flipY) = tile.f.toFlip()
 
-            return DrawSprite.DrawSpriteAttribute(
-                srcX,
-                srcY,
-                size,
-                size,
-                destX,
-                destY,
-                flipX,
-                flipY,
-            )
-        }
+            virtualFrameBuffer.draw(
+                tileset,
 
-        fun toDrawSprite(
-            world: GameLevel,
-            layer: Layer,
-        ): List<DrawSprite> {
-            /*
-            val tileset = world.tilesset[layer.__tilesetRelPath!!]!!
-
-            val attributesGrid = layer.gridTiles?.map { tile -> toAttribute(layer.__gridSize, tile) } ?: emptyList()
-            val attributesAutoLayer =
-                layer.autoLayerTiles?.map { tile -> toAttribute(layer.__gridSize, tile) } ?: emptyList()
-            val attributes = attributesGrid + attributesAutoLayer
-
-
-            return DrawSprite.from(
-                resourceAccess = resourceAccess,
-                name = layer.__identifier,
-                tileset = tileset,
-                attributes = attributes,
             )
 
              */
-            return emptyList()
+
+            layer.gridTiles?.forEach { tile ->
+                drawTile(tileset, layer.__gridSize, tile)
+            }
+
+            layer.autoLayerTiles?.forEach { tile ->
+                drawTile(tileset, layer.__gridSize, tile)
+            }
+
+            return NONE
         }
+
+    }
+
+    private fun drawTile(tileset: SpriteSheet, tileSize: GridInt, tile: Tile) {
+        fun Int.toFlip(): Pair<Boolean, Boolean> {
+            return ((this and 0x01) == 0x01) to ((this and 0x02) == 0x02)
+        }
+        val (srcX, srcY) = tile.src
+        val (destX, destY) = tile.px
+        val (flipX, flipY) = tile.f.toFlip()
+
+        virtualFrameBuffer.draw(
+            tileset,
+            srcX,
+            srcY,
+            tileSize,
+            tileSize,
+            destX,
+            destY,
+            flipX,
+            flipY,
+        )
     }
 
     private fun EntityRef.toLua(): LuaTable {

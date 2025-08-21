@@ -4,6 +4,7 @@ import com.github.minigdx.tiny.render.OperationsRender
 import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.RenderUnit
 
+@Deprecated("use SpriteBatch instead")
 sealed interface RenderOperation {
     val target: RenderUnit
 

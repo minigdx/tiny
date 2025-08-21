@@ -23,6 +23,7 @@ import com.github.minigdx.tiny.render.RenderFrame
 import com.github.minigdx.tiny.render.batch.SpriteBatch
 import com.github.minigdx.tiny.render.gl.OpenGLRender
 import com.github.minigdx.tiny.render.operations.RenderOperation
+import com.github.minigdx.tiny.resources.SpriteSheet
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineDispatcher
@@ -124,6 +125,10 @@ class WebGlPlatform(
         render.draw(batch)
     }
 
+    override fun drawFrameBuffer() {
+        TODO("Not yet implemented")
+    }
+
     override fun createLocalFile(
         name: String,
         parentDirectory: String?,
@@ -149,7 +154,11 @@ class WebGlPlatform(
         return render.executeOffScreen(renderContext, block)
     }
 
-    override fun readRender(renderContext: RenderContext): RenderFrame {
+    override fun readFrameBuffer(renderContext: RenderContext): RenderFrame {
         return render.readRender(renderContext)
+    }
+
+    override fun bindTextures(spritesheets: List<SpriteSheet>) {
+        TODO("Not yet implemented")
     }
 }

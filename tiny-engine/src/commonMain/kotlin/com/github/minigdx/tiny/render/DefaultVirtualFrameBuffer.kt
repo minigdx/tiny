@@ -11,6 +11,9 @@ class DefaultVirtualFrameBuffer(
     private val platform: Platform,
     private val gameOptions: GameOptions,
 ) : VirtualFrameBuffer {
+
+    private var isPrimitiveBufferUpdated = false
+
     private val batchManager = BatchManager()
 
     private val primitiveBuffer = FrameBuffer(
@@ -30,6 +33,7 @@ class DefaultVirtualFrameBuffer(
         flipX: Boolean,
         flipY: Boolean,
     ) {
+        // TODO: si source.version a changé, le mettre dans le batch
         val immediateDraw = batchManager.submitSprite(
             source,
             sourceX,
@@ -55,6 +59,10 @@ class DefaultVirtualFrameBuffer(
     }
 
     override fun drawPrimitive(block: (FrameBuffer) -> Unit) {
+        if(!isPrimitiveBufferUpdated) {
+            isPrimitiveBufferUpdated = true
+            // TODO: trouver un moyen de rajouter le spritesheet dans le batch
+        }
         val immediateDraw = batchManager.submitSprite(
             primitiveBuffer.asSpriteSheet,
             0,
@@ -74,6 +82,7 @@ class DefaultVirtualFrameBuffer(
             batchManager.consumeAllBatches { batch ->
                 platform.drawIntoFrameBuffer(batch)
                 primitiveBuffer.clear(0)
+                isPrimitiveBufferUpdated = false
             }
         }
         block(primitiveBuffer)

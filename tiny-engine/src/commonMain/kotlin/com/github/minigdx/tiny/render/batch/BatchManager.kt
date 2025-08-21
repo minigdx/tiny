@@ -40,8 +40,13 @@ class BatchManager {
         }
 
         override fun destroyInstance(obj: SpriteBatch) {
+            spriteInstancePool.free(obj.instances)
+            batchKeyPool.free(obj.key)
+
             obj.instances.clear()
             obj.sheets.clear()
+            obj.pendingTextureBinds.clear()
+
             obj._key = null
         }
     }
@@ -88,6 +93,7 @@ class BatchManager {
         val existingBatch = activeBatches.lastOrNull()
         val rejectReason = existingBatch?.addSprite(key, source, instance)
         if (existingBatch != null && rejectReason == null) {
+            batchKeyPool.free(key)
             return false
         }
 

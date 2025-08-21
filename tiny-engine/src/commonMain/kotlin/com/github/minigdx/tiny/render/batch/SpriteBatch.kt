@@ -13,6 +13,7 @@ class SpriteBatch(
     internal var _key: BatchKey? = null,
     internal val instances: MutableList<SpriteInstance> = mutableListOf(),
     internal val sheets: MutableList<SpriteSheet> = mutableListOf(),
+    internal val pendingTextureBinds: MutableList<SpriteSheet> = mutableListOf()
 ) {
     val key: BatchKey
         get() = _key!!
@@ -78,7 +79,7 @@ class SpriteBatch(
         // The type is different. As we can add the sprite, we can mix the instances
         val effectiveAdd = lastSpritesheetType != spriteSheet.type ||
             // Is not a primitive
-            spriteSheet.type != ResourceType.PRIMITIVE_SPRITESHEET
+            !spriteSheet.isPrimitives
 
         lastSpritesheetType = spriteSheet.type
 

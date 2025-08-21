@@ -51,6 +51,10 @@ class FramebufferShader(
         return NopRenderContext
     }
 
+    fun init() {
+        program.compileShader()
+    }
+
     override fun render(
         context: RenderContext,
         ops: List<RenderOperation>,

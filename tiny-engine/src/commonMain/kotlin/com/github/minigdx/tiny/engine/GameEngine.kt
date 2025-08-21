@@ -94,11 +94,12 @@ class GameEngine(
         // 5. advance the engine gamescript ✔️
         // 6. intercept user shortcut  ✔️
         // -- draw
-        // 1. play sounds
-        // 2. draw the gamescript
-        // 3. draw the engine gamescript
+        // 1. play sounds ✔️
+        // 2. draw the gamescript  ✔️
+        // 3. draw the engine gamescript ✔️
         gameResourceProcessor.process(events)
         events.clear()
+        platform.bindTextures(gameResourceProcessor.spritesheetToBind)
 
         val currentGameScript = gameResourceProcessor.currentScript ?: return
 

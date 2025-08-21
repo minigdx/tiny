@@ -20,8 +20,8 @@ import com.github.minigdx.tiny.render.NopRenderContext
 import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.RenderFrame
 import com.github.minigdx.tiny.render.batch.SpriteBatch
-import com.github.minigdx.tiny.render.operations.DrawSprite
 import com.github.minigdx.tiny.render.operations.RenderOperation
+import com.github.minigdx.tiny.resources.SpriteSheet
 import com.github.minigdx.tiny.sound.SoundHandler
 import com.github.minigdx.tiny.sound.SoundManager
 import com.github.minigdx.tiny.util.MutableFixedSizeList
@@ -155,6 +155,14 @@ class HeadlessPlatform(
         TODO("Not yet implemented")
     }
 
+    override fun drawFrameBuffer() {
+        TODO("Not yet implemented")
+    }
+
+    override fun bindTextures(spritesheets: List<SpriteSheet>) {
+        TODO("Not yet implemented")
+    }
+
     override fun createLocalFile(
         name: String,
         parentDirectory: String?,
@@ -175,6 +183,7 @@ class HeadlessPlatform(
         renderContext: RenderContext,
         ops: List<RenderOperation>,
     ) {
+        /*
         val pixels =
             ops.firstOrNull { op -> (op as? DrawSprite)?.source?.name == "framebuffer" }
                 ?.let { drawSprite -> (drawSprite as DrawSprite).source?.pixels }
@@ -184,9 +193,11 @@ class HeadlessPlatform(
             frameBuffer.copyFrom(pixels)
             frames.add(frameBuffer)
         }
+
+         */
     }
 
-    override fun readRender(renderContext: RenderContext): RenderFrame {
+    override fun readFrameBuffer(renderContext: RenderContext): RenderFrame {
         if (frames.isEmpty()) {
             // Force to generate at least one frame.
             draw(renderContext)

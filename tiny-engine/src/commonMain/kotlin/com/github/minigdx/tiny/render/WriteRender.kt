@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.render
 
+import com.danielgergely.kgl.Texture
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.render.batch.SpriteBatch
 import com.github.minigdx.tiny.render.operations.RenderOperation
@@ -23,5 +24,5 @@ interface WriteRender {
      */
     fun drawOnScreen(context: RenderContext) = Unit
 
-    fun draw(batch: SpriteBatch) = Unit
+    fun draw(batch: Texture?) = Unit
 }

@@ -24,8 +24,11 @@ import com.github.minigdx.tiny.render.Render
 import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.RenderFrame
 import com.github.minigdx.tiny.render.batch.SpriteBatch
+import com.github.minigdx.tiny.render.gl.FrameBufferStage
 import com.github.minigdx.tiny.render.gl.OpenGLRender
+import com.github.minigdx.tiny.render.gl.SpriteBatchStage
 import com.github.minigdx.tiny.render.operations.RenderOperation
+import com.github.minigdx.tiny.resources.SpriteSheet
 import com.github.minigdx.tiny.sound.JavaSoundManager
 import com.github.minigdx.tiny.sound.SoundManager
 import com.github.minigdx.tiny.util.MutableFixedSizeList
@@ -71,6 +74,10 @@ class GlfwPlatform(
     private val lwjglInputHandler = LwjglInput(gameOptions)
 
     private val recordScope = CoroutineScope(Dispatchers.IO)
+
+    private val frameBufferStage = FrameBufferStage(KglLwjgl, performanceMonitor)
+
+    private val spriteBatchStage = SpriteBatchStage(KglLwjgl)
 
     /**
      * Get the time in milliseconds
@@ -219,6 +226,10 @@ class GlfwPlatform(
         lastDraw = imageCopy
     }
 
+    override fun bindTextures(spritesheets: List<SpriteSheet>) {
+        spriteBatchStage.bindTextures(spritesheets)
+    }
+
     override fun executeOffScreen(
         renderContext: RenderContext,
         block: () -> Unit,
@@ -233,7 +244,7 @@ class GlfwPlatform(
         render.render(renderContext, ops)
     }
 
-    override fun readRender(renderContext: RenderContext): RenderFrame {
+    override fun readFrameBuffer(renderContext: RenderContext): RenderFrame {
         return render.readRender(renderContext)
     }
 
@@ -394,7 +405,11 @@ class GlfwPlatform(
     }
 
     override fun drawIntoFrameBuffer(batch: SpriteBatch) {
-        render.draw(batch)
+        spriteBatchStage.execute(batch)
+    }
+
+    override fun drawFrameBuffer() {
+        frameBufferStage.execute(spriteBatchStage)
     }
 
     override fun createLocalFile(

@@ -64,7 +64,7 @@ class ResourceFactory(
         index: Int,
         name: String,
     ): Flow<GameLevel> {
-        suspend fun getTilesets(ldtk: Ldtk): Map<String, PixelArray> {
+        suspend fun getTilesets(ldtk: Ldtk): Map<String, SpriteSheet> {
             return ldtk.levels.flatMap { level -> level.layerInstances }
                 .mapNotNull {
                     // Collect all tileset
@@ -78,12 +78,22 @@ class ResourceFactory(
                 .map { file -> file to platform.createImageStream(file).takeIf { it.exists() }?.read() }
                 .filter { it.second != null }
                 .associate { (file, imageData) ->
-                    file to
-                        convertToColorIndex(
-                            imageData!!.data,
-                            imageData.width,
-                            imageData.height,
-                        )
+                    val pixels = convertToColorIndex(
+                        imageData!!.data,
+                        imageData.width,
+                        imageData.height,
+                    )
+
+                    val spritesheet = SpriteSheet(
+                        version = 0,
+                        index = 0,
+                        name = "__level-$name",
+                        type = GAME_SPRITESHEET,
+                        pixels = pixels,
+                        width = pixels.width,
+                        height = pixels.height,
+                    )
+                    file to spritesheet
                 }
         }
 

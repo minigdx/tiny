@@ -17,6 +17,7 @@ import com.danielgergely.kgl.GL_TEXTURE_MAG_FILTER
 import com.danielgergely.kgl.GL_TEXTURE_MIN_FILTER
 import com.danielgergely.kgl.GL_UNSIGNED_BYTE
 import com.danielgergely.kgl.Kgl
+import com.danielgergely.kgl.Texture
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.graphic.PixelFormat
@@ -25,18 +26,20 @@ import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.render.Render
 import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.RenderFrame
+import com.github.minigdx.tiny.render.batch.SpriteBatch
 import com.github.minigdx.tiny.render.operations.RenderOperation
+
 
 class OpenGLRender(
     private val gl: Kgl,
     private val gameOptions: GameOptions,
     private val performanceMonitor: PerformanceMonitor,
 ) : Render {
-    private val operationsShader = OperationsShader(gl, gameOptions, performanceMonitor)
+//    private val operationsShader = OperationsShader(gl, gameOptions, performanceMonitor)
     private val framebufferShader = FramebufferShader(gl, performanceMonitor)
 
     override fun init(windowManager: WindowManager): RenderContext {
-        operationsShader.init(windowManager)
+  //      operationsShader.init(windowManager)
         framebufferShader.init(windowManager)
 
         val onscreen = createNewFrameBuffer()
@@ -101,7 +104,7 @@ class OpenGLRender(
 
         gl.viewport(0, 0, gameOptions.width, gameOptions.height)
 
-        operationsShader.render(context, ops)
+   //     operationsShader.render(context, ops)
 
         gl.bindFramebuffer(GL_FRAMEBUFFER, null)
     }
@@ -145,6 +148,10 @@ class OpenGLRender(
         )
 
         framebufferShader.drawOnScreen(context)
+    }
+
+    override fun draw(batch: Texture?) {
+        super.draw(batch)
     }
 
     override fun executeOffScreen(

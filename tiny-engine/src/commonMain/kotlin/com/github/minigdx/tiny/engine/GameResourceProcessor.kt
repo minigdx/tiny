@@ -16,6 +16,7 @@ import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
 import com.github.minigdx.tiny.resources.ResourceType.PRIMITIVE_SPRITESHEET
 import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.resources.SpriteSheet
+import com.github.minigdx.tiny.resources.SpriteSheet.SpriteSheetKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -108,6 +109,14 @@ class GameResourceProcessor(
      */
     private var currentScriptIndex: Int = 0
 
+    val spritesheetToBind = mutableListOf<SpriteSheet>()
+
+    // next available texture unit
+    // The unit 0 is reserved for the primitive texture.
+    private var nextAvailableTextureUnit = 1
+
+    private val textureUnitPerSpriteSheet = mutableMapOf<SpriteSheetKey, Int>()
+
     init {
         val gameScripts = gameOptions.gameScripts.mapIndexed { index, script ->
             resourceFactory.gamescript(index + 1, script)
@@ -147,6 +156,8 @@ class GameResourceProcessor(
     }
 
     suspend fun process(events: List<GameResource>) {
+        spritesheetToBind.clear()
+
         workEvents.addAll(events)
         workEvents.forEach { event ->
             if (event.reload) {
@@ -193,33 +204,36 @@ class GameResourceProcessor(
     }
 
     private fun loadGameLevel(resource: GameResource) {
-/*
-        resource as GameScript
-        resource.resourceAccess = this
-        val isValid = try {
-            resource.isValid(customizeLuaGlobal)
-            true
-        } catch (ex: LuaError) {
-            popupError(ex.toTinyException(resource.content.decodeToString()))
-            false
-        }
-        if (isValid) {
-            scripts[resource.index] = resource
-            // Force the reloading of the script, as the script update might be used as resource of
-            // the current game script.
-            scripts[currentScriptIndex]?.reload = true
-            clear()
-        }
+        val gameLevel = resource as GameLevel
+        levels[resource.index] = gameLevel
+        // Force the reloading of the script as level init might occur in the _init block.
+        scripts[currentScriptIndex]?.reload = true
 
- */
+        spritesheetToBind.addAll(gameLevel.tilesset.values)
     }
 
     private fun loadGameSpriteSheet(resource: GameResource) {
-        spriteSheets[resource.index] = resource as SpriteSheet
+        val spriteSheet = resource as SpriteSheet
+        spriteSheets[resource.index] = spriteSheet
+
+        spriteSheet.textureUnit = textureUnitPerSpriteSheet.getOrPut(spriteSheet.key) { getNextAvailableTextureUnit() }
+        spritesheetToBind.add(spriteSheet)
     }
 
     private fun loadBootSpriteSheet(resource: GameResource) {
-        bootSpritesheet = resource as SpriteSheet
+        val spriteSheet = resource as SpriteSheet
+        bootSpritesheet = spriteSheet
+
+        spriteSheet.textureUnit = textureUnitPerSpriteSheet.getOrPut(spriteSheet.key) { getNextAvailableTextureUnit() }
+        spritesheetToBind.add(spriteSheet)
+    }
+
+    private fun getNextAvailableTextureUnit(): Int {
+        check(nextAvailableTextureUnit < MAX_TEXTURE_UNIT) {
+            "There is too many textures managed by the engine. " +
+                    "The maximum texture allowed is $MAX_TEXTURE_UNIT"
+        }
+        return nextAvailableTextureUnit++
     }
 
     private suspend fun loadEngineScript(resource: GameResource) {
@@ -264,6 +278,8 @@ class GameResourceProcessor(
     }
 
     override fun saveSpritesheet(sheet: SpriteSheet) {
+        // TODO: set the spritesheet texture unit?
+        // TODO: add it into the texture to bind
         TODO("Not yet implemented")
     }
 
@@ -281,5 +297,12 @@ class GameResourceProcessor(
 
     override fun findGameScript(name: String): GameScript? {
         TODO("Not yet implemented")
+    }
+
+    companion object {
+        // Number of total texture managed by the game engine
+        // (game engine + spritesheets + primitives + levels spritesheets)
+        // It needs to be sync with the number of texture unit in [com.github.minigdx.tiny.render.gl.SpriteBatchStage]
+        private const val MAX_TEXTURE_UNIT = 17
     }
 }

@@ -11,7 +11,7 @@ import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.RenderFrame
 import com.github.minigdx.tiny.render.batch.SpriteBatch
-import com.github.minigdx.tiny.render.operations.RenderOperation
+import com.github.minigdx.tiny.resources.SpriteSheet
 import com.github.minigdx.tiny.sound.Music
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.coroutines.CoroutineDispatcher
@@ -131,24 +131,24 @@ interface Platform {
     ): LocalFile
 
     /**
-     * Render the operations into the frame buffer.
+     * Bind [spritesheets] into the GPU to be used during [drawIntoFrameBuffer] operation.
      */
-    fun render(
-        renderContext: RenderContext,
-        ops: List<RenderOperation>,
-    )
+    fun bindTextures(spritesheets: List<SpriteSheet>)
+
+    /**
+     * Draw the [batch] into the framebuffer.
+     */
+    fun drawIntoFrameBuffer(batch: SpriteBatch)
+
+    /**
+     * Draw the framebuffer on the screen.
+     */
+    fun drawFrameBuffer()
 
     /**
      * Read the full rendered screen into a frame.
      */
-    fun readRender(renderContext: RenderContext): RenderFrame
-
-    /**
-     * Draw the frame buffer on the screen.
-     */
-    fun draw(renderContext: RenderContext)
-
-    fun drawIntoFrameBuffer(batch: SpriteBatch)
+    fun readFrameBuffer(renderContext: RenderContext): RenderFrame
 
     /**
      * Execute the block using an off-screen buffer.
@@ -159,5 +159,4 @@ interface Platform {
         block: () -> Unit,
     ): RenderFrame
 
-    fun drawFrameBuffer() = Unit
 }

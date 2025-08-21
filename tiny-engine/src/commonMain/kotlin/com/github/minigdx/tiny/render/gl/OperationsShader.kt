@@ -25,14 +25,12 @@ import com.github.minigdx.tiny.render.NopRenderContext
 import com.github.minigdx.tiny.render.OperationsRender
 import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.WriteRender
-import com.github.minigdx.tiny.render.operations.DrawSprite
-import com.github.minigdx.tiny.render.operations.DrawSprite.Companion.MAX_SPRITE_PER_COMMAND
 import com.github.minigdx.tiny.render.operations.DrawingModeOperation
 import com.github.minigdx.tiny.render.operations.RenderOperation
 import com.github.minigdx.tiny.render.shader.FragmentShader
 import com.github.minigdx.tiny.render.shader.ShaderProgram
 import com.github.minigdx.tiny.render.shader.VertexShader
-
+/*
 class OperationsShader(
     private val gl: Kgl,
     private val gameOptions: GameOptions,
@@ -350,3 +348,4 @@ class OperationsShader(
             """.trimIndent()
     }
 }
+*/
