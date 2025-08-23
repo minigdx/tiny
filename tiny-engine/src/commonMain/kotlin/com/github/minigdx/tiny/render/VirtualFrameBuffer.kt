@@ -30,4 +30,3 @@ interface VirtualFrameBuffer {
      */
     fun draw()
 }
-

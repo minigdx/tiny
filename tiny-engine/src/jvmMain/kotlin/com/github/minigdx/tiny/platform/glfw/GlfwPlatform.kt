@@ -27,7 +27,6 @@ import com.github.minigdx.tiny.render.batch.SpriteBatch
 import com.github.minigdx.tiny.render.gl.FrameBufferStage
 import com.github.minigdx.tiny.render.gl.OpenGLRender
 import com.github.minigdx.tiny.render.gl.SpriteBatchStage
-import com.github.minigdx.tiny.render.operations.RenderOperation
 import com.github.minigdx.tiny.resources.SpriteSheet
 import com.github.minigdx.tiny.sound.JavaSoundManager
 import com.github.minigdx.tiny.sound.SoundManager
@@ -77,7 +76,7 @@ class GlfwPlatform(
 
     private val frameBufferStage = FrameBufferStage(KglLwjgl, performanceMonitor)
 
-    private val spriteBatchStage = SpriteBatchStage(KglLwjgl)
+    private val spriteBatchStage = SpriteBatchStage(KglLwjgl, gameOptions)
 
     /**
      * Get the time in milliseconds
@@ -176,8 +175,9 @@ class GlfwPlatform(
         )
     }
 
-    override fun initRenderManager(windowManager: WindowManager): RenderContext {
-        return render.init(windowManager)
+    override fun initRenderManager(windowManager: WindowManager) {
+        spriteBatchStage.init()
+        frameBufferStage.init()
     }
 
     override fun initInputManager(): InputManager {
@@ -212,40 +212,6 @@ class GlfwPlatform(
             result[index] = colorPalette.getRGAasInt(byte.toInt())
         }
         return result
-    }
-
-    override fun draw(renderContext: RenderContext) {
-        render.drawOnScreen(renderContext)
-        val pixels = render.readRenderAsFrameBuffer(renderContext)
-
-        val imageCopy = pixels.pixels.copyOf()
-        recordScope.launch {
-            gifFrameCache.add(convert(imageCopy))
-        }
-
-        lastDraw = imageCopy
-    }
-
-    override fun bindTextures(spritesheets: List<SpriteSheet>) {
-        spriteBatchStage.bindTextures(spritesheets)
-    }
-
-    override fun executeOffScreen(
-        renderContext: RenderContext,
-        block: () -> Unit,
-    ): RenderFrame {
-        return render.executeOffScreen(renderContext, block)
-    }
-
-    override fun render(
-        renderContext: RenderContext,
-        ops: List<RenderOperation>,
-    ) {
-        render.render(renderContext, ops)
-    }
-
-    override fun readFrameBuffer(renderContext: RenderContext): RenderFrame {
-        return render.readRender(renderContext)
     }
 
     override fun endGameLoop() = Unit
@@ -402,6 +368,14 @@ class GlfwPlatform(
         return JavaSoundManager().also {
             it.initSoundManager(inputHandler)
         }
+    }
+
+    override fun bindTextures(spritesheets: List<SpriteSheet>) {
+        spriteBatchStage.bindTextures(spritesheets)
+    }
+
+    override fun readFrameBuffer(renderContext: RenderContext): RenderFrame {
+        TODO()
     }
 
     override fun drawIntoFrameBuffer(batch: SpriteBatch) {

@@ -24,7 +24,7 @@ import kotlin.math.min
 class GfxLib(
     private val resourceAccess: GameResourceAccess2,
     private val gameOptions: GameOptions,
-    virtualFrameBuffer: VirtualFrameBuffer
+    virtualFrameBuffer: VirtualFrameBuffer,
 ) : TwoArgFunction() {
     override fun call(
         arg1: LuaValue,
@@ -111,6 +111,7 @@ class GfxLib(
                     arg.checkColorIndex()
                 }
             // FIXME:
+
             /*
             resourceAccess.frameBuffer.clear(color)
             resourceAccess.addOp(FrameBufferOperation)
@@ -129,6 +130,7 @@ class GfxLib(
             @TinyArg("color") arg3: LuaValue,
         ): LuaValue {
             // FIXME:
+
             /*
             resourceAccess.frameBuffer.pixel(arg1.checkint(), arg2.checkint(), arg3.checkint())
             resourceAccess.addOp(FrameBufferOperation)
@@ -171,6 +173,7 @@ class GfxLib(
         ): LuaValue {
             val (index, name) = getIndexAndName(a)
 // FIXME:
+
             /*
             val frameBuffer = resourceAccess.readFrame()
             val sheet = SpriteSheet(

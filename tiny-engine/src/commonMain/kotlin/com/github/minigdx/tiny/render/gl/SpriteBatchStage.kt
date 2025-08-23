@@ -2,30 +2,25 @@ package com.github.minigdx.tiny.render.gl
 
 import com.danielgergely.kgl.Kgl
 import com.danielgergely.kgl.Texture
+import com.github.minigdx.tiny.engine.GameOptions
+import com.github.minigdx.tiny.graphic.PixelFormat
 import com.github.minigdx.tiny.render.batch.SpriteBatch
 import com.github.minigdx.tiny.render.shader.FragmentShader
 import com.github.minigdx.tiny.render.shader.ShaderProgram
 import com.github.minigdx.tiny.render.shader.VertexShader
 import com.github.minigdx.tiny.resources.SpriteSheet
 
-class SpriteBatchStage(gl: Kgl) {
-
+class SpriteBatchStage(gl: Kgl, private val gameOptions: GameOptions) {
     val frameBuffer: Texture? = null
 
     private val program = ShaderProgram(gl, VShader(), FShader())
 
-    fun execute(batch: SpriteBatch) {
-        // 1. Upload palette color if changed
-
-        batch.key.palette
-        // 2. upload vertex along site sprite index
-
-
-        // 3. setup uniforms (dithering, ...)
-        // 4. draw
+    fun init() {
+        program.compileShader()
     }
 
     fun bindTextures(spritesheets: List<SpriteSheet>) {
+        program.use()
         spritesheets.forEach { texture: SpriteSheet ->
 
             val textureUnit = texture.textureUnit
@@ -38,10 +33,45 @@ class SpriteBatchStage(gl: Kgl) {
         }
     }
 
+    fun execute(batch: SpriteBatch) {
+        program.use()
+
+        // 1. Upload palette color if changed
+        // -- Set the color palette -- //
+        val colorsSwitch = batch.key.palette
+        val colorPaletteBuffer = ByteArray(256 * 256 * PixelFormat.RGBA)
+        var pos = 0
+        for (index in 0 until 256) {
+            val pal = if (colorsSwitch.isNotEmpty()) {
+                // Get the pal color
+                colorsSwitch[index % colorsSwitch.size]
+            } else {
+                // Get the straight color
+                index
+            }
+
+            val color = gameOptions.colors().getRGBA(pal)
+            colorPaletteBuffer[pos++] = color[0]
+            colorPaletteBuffer[pos++] = color[1]
+            colorPaletteBuffer[pos++] = color[2]
+            colorPaletteBuffer[pos++] = color[3]
+        }
+
+        program.fragmentShader.paletteColors.applyRGBA(colorPaletteBuffer, 256, 256)
+
+        // 2. upload vertex along site sprite index
+
+        // 3. setup uniforms (dithering, ...)
+        // 4. draw
+        program.bind()
+    }
+
     class VShader : VertexShader(VERTEX_SHADER) {
         val aPos = inVec2("a_pos") // position of the sprite in the viewport
         val aSpr = inVec2("a_spr")
         val uViewport = uniformVec2("u_viewport") // Size of the viewport; in pixel.
+
+        // FIXME: pass the spritesheets size
         val uSpritesheet = uniformVec2("u_spritesheet") // Size of the spritesheet; in pixel.
         val uCamera = uniformVec2("u_camera") // Position of the camera (offset)
 
@@ -66,7 +96,7 @@ class SpriteBatchStage(gl: Kgl) {
         val spritesheet8 = uniformSample2D("spritesheet8")
         val spritesheet9 = uniformSample2D("spritesheet9")
         val spritesheet10 = uniformSample2D("spritesheet10")
-        val spritesheet11= uniformSample2D("spritesheet11")
+        val spritesheet11 = uniformSample2D("spritesheet11")
         val spritesheet12 = uniformSample2D("spritesheet12")
         val spritesheet13 = uniformSample2D("spritesheet13")
         val spritesheet14 = uniformSample2D("spritesheet14")
@@ -160,10 +190,26 @@ class SpriteBatchStage(gl: Kgl) {
                 return readData(palette_colors, icolor, 255, 255);
             }
             
+            /**
+            * Return the pixel color index at the 
+            */
+            int readPixel(int textureIndex, vec2 uvs) {
+                vec4 color;
+                if(textureIndex == 0) {
+                     color = texture(spritesheet0, v_uvs);
+                }  else if (textureIndex == 1) {
+                     color = texture(spritesheet1, v_uvs);
+                } else {
+                     color = texture(spritesheet16, v_uvs);
+                }
+                
+                return int(color.r * 255.0 + 0.5);
+            }
+                         
             void main() {
                 if (dither(u_dither, int(v_pos.x), int(v_pos.y))) {
-                    int index = int(texture(spritesheet, v_uvs).r * 255.0 + 0.5);
-                    vec4 color = readColor(index);
+                    int pixel = readPixel(0, v_uvs);
+                    vec4 color = readColor(pixel);
                     if(color.a <= 0.1) {
                         discard;
                     } else {
@@ -175,5 +221,4 @@ class SpriteBatchStage(gl: Kgl) {
             }
             """.trimIndent()
     }
-
 }

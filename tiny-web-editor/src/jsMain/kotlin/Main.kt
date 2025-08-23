@@ -16,9 +16,7 @@ import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.platform.webgl.WebGlPlatform
 import com.github.minigdx.tiny.render.RenderContext
-import com.github.minigdx.tiny.render.RenderFrame
 import com.github.minigdx.tiny.render.batch.SpriteBatch
-import com.github.minigdx.tiny.render.operations.RenderOperation
 import com.github.minigdx.tiny.resources.SpriteSheet
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.browser.document
@@ -297,7 +295,7 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
 
     override fun initWindowManager(): WindowManager = delegate.initWindowManager()
 
-    override fun initRenderManager(windowManager: WindowManager): RenderContext = delegate.initRenderManager(windowManager)
+    override fun initRenderManager(windowManager: WindowManager) = delegate.initRenderManager(windowManager)
 
     override fun gameLoop(gameLoop: GameLoop) = delegate.gameLoop(gameLoop)
 
@@ -339,39 +337,23 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
             soundManager,
         )
 
-    override fun drawIntoFrameBuffer(batch: SpriteBatch) = delegate.drawIntoFrameBuffer(batch)
-
-    override fun drawFrameBuffer() = delegate.drawFrameBuffer()
-
     override fun createLocalFile(
         name: String,
         parentDirectory: String?,
-    ): LocalFile =
-        delegate.createLocalFile(
+    ): LocalFile {
+        return delegate.createLocalFile(
             name = name,
             parentDirectory = parentDirectory,
         )
-
-    override fun render(
-        renderContext: RenderContext,
-        ops: List<RenderOperation>,
-    ) = delegate.render(
-        renderContext,
-        ops,
-    )
-
-    override fun draw(renderContext: RenderContext) = delegate.draw(renderContext)
-
-    override fun executeOffScreen(
-        renderContext: RenderContext,
-        block: () -> Unit,
-    ): RenderFrame {
-        return delegate.executeOffScreen(renderContext, block)
     }
 
     override fun bindTextures(spritesheets: List<SpriteSheet>) {
-        TODO("Not yet implemented")
+        return delegate.bindTextures(spritesheets)
     }
+
+    override fun drawIntoFrameBuffer(batch: SpriteBatch) = delegate.drawIntoFrameBuffer(batch)
+
+    override fun drawFrameBuffer() = delegate.drawFrameBuffer()
 
     override fun readFrameBuffer(renderContext: RenderContext) = delegate.readFrameBuffer(renderContext)
 }

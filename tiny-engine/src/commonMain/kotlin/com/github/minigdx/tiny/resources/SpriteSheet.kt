@@ -31,10 +31,8 @@ class SpriteSheet(
      * Texture unit assigned by the [com.github.minigdx.tiny.engine.GameResourceProcessor].
      */
     var textureUnit: Int? = null,
-
     override var reload: Boolean = false,
 ) : GameResource {
-
     data class SpriteSheetKey(val index: Int, val type: ResourceType)
 
     val key = SpriteSheetKey(index, type)

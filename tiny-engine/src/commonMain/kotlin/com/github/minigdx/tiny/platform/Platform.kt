@@ -55,7 +55,7 @@ interface Platform {
     /**
      * Prepare the platform for the game loop
      */
-    fun initRenderManager(windowManager: WindowManager): RenderContext
+    fun initRenderManager(windowManager: WindowManager)
 
     /**
      * Let's run the game loop
@@ -149,14 +149,4 @@ interface Platform {
      * Read the full rendered screen into a frame.
      */
     fun readFrameBuffer(renderContext: RenderContext): RenderFrame
-
-    /**
-     * Execute the block using an off-screen buffer.
-     * All drawing operation will use this off-screen buffer instead
-     */
-    fun executeOffScreen(
-        renderContext: RenderContext,
-        block: () -> Unit,
-    ): RenderFrame
-
 }

@@ -11,7 +11,6 @@ import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.performance.PerformanceMetrics
 import com.github.minigdx.tiny.render.DefaultVirtualFrameBuffer
 import com.github.minigdx.tiny.render.RenderContext
-import com.github.minigdx.tiny.render.VirtualFrameBuffer
 import com.github.minigdx.tiny.render.operations.RenderOperation
 import com.github.minigdx.tiny.resources.GameResource
 import com.github.minigdx.tiny.resources.GameScript
@@ -76,7 +75,7 @@ class GameEngine(
             logger,
         )
 
-        renderContext = platform.initRenderManager(windowManager)
+        platform.initRenderManager(windowManager)
 
         platform.gameLoop(this)
     }

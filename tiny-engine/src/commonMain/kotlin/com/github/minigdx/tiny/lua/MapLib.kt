@@ -504,10 +504,13 @@ entity.fields -- access custom field of the entity
 
             return NONE
         }
-
     }
 
-    private fun drawTile(tileset: SpriteSheet, tileSize: GridInt, tile: Tile) {
+    private fun drawTile(
+        tileset: SpriteSheet,
+        tileSize: GridInt,
+        tile: Tile,
+    ) {
         fun Int.toFlip(): Pair<Boolean, Boolean> {
             return ((this and 0x01) == 0x01) to ((this and 0x02) == 0x02)
         }

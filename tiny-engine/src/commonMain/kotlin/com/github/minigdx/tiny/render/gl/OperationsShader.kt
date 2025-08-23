@@ -1,35 +1,5 @@
 package com.github.minigdx.tiny.render.gl
 
-import com.danielgergely.kgl.GL_ALWAYS
-import com.danielgergely.kgl.GL_BLEND
-import com.danielgergely.kgl.GL_DEPTH_TEST
-import com.danielgergely.kgl.GL_EQUAL
-import com.danielgergely.kgl.GL_KEEP
-import com.danielgergely.kgl.GL_NOTEQUAL
-import com.danielgergely.kgl.GL_ONE
-import com.danielgergely.kgl.GL_ONE_MINUS_SRC_ALPHA
-import com.danielgergely.kgl.GL_REPLACE
-import com.danielgergely.kgl.GL_SCISSOR_TEST
-import com.danielgergely.kgl.GL_SRC_ALPHA
-import com.danielgergely.kgl.GL_STENCIL_BUFFER_BIT
-import com.danielgergely.kgl.GL_STENCIL_TEST
-import com.danielgergely.kgl.GL_TRIANGLES
-import com.danielgergely.kgl.GL_ZERO
-import com.danielgergely.kgl.Kgl
-import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.graphic.PixelFormat
-import com.github.minigdx.tiny.platform.DrawingMode
-import com.github.minigdx.tiny.platform.WindowManager
-import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
-import com.github.minigdx.tiny.render.NopRenderContext
-import com.github.minigdx.tiny.render.OperationsRender
-import com.github.minigdx.tiny.render.RenderContext
-import com.github.minigdx.tiny.render.WriteRender
-import com.github.minigdx.tiny.render.operations.DrawingModeOperation
-import com.github.minigdx.tiny.render.operations.RenderOperation
-import com.github.minigdx.tiny.render.shader.FragmentShader
-import com.github.minigdx.tiny.render.shader.ShaderProgram
-import com.github.minigdx.tiny.render.shader.VertexShader
 /*
 class OperationsShader(
     private val gl: Kgl,
@@ -57,8 +27,8 @@ class OperationsShader(
     private val spr = FloatArray(MAX_SPRITE_PER_COMMAND * FLOAT_PER_SPRITE)
 
     /**
-     * Execute the operation of drawing a sprite
-     */
+ * Execute the operation of drawing a sprite
+ */
     override fun drawSprite(
         context: RenderContext,
         op: DrawSprite,
@@ -285,14 +255,14 @@ class OperationsShader(
                 vec2 ndc_pos = final_pos / u_viewport ;
                 // Move the origin to the left/up corner
                 vec2 origin_pos = vec2(-1.0, 1.0) + ndc_pos * 2.0;
-                
+
                 gl_Position = vec4(origin_pos, 0.0, 1.0);
-                
+
                 // UV computation
                 // Convert the texture coordinates to NDC coordinates
                 vec2 ndc_spr = a_spr / u_spritesheet;
                 v_uvs = ndc_spr;
-                
+
                 v_pos = final_pos;
             }
             """.trimIndent()
@@ -303,35 +273,35 @@ class OperationsShader(
             int imod(int value, int limit) {
                 return value - limit * (value / limit);
             }
-            
+
             bool dither(int pattern, int x, int y) {
                   int a = imod(x,  4);
                   int b = imod(y, 4) * 4;
                   int bitPosition = a + b;
-                  
+
                   float powerOfTwo = pow(2.0, float(bitPosition));
                   int bit = int(floor(mod(float(pattern) / powerOfTwo, 2.0)));
-                   
+
                   return bit > 0;
             }
             /**
-            * Extract data from a "kind of" texture1D
-            */
+ * Extract data from a "kind of" texture1D
+ */
             vec4 readData(sampler2D txt, int index, int textureWidth, int textureHeight) {
                 int x = imod(index, textureWidth); // index % textureWidth
                 int y =  index / textureWidth;
                 vec2 uv = vec2((float(x) + 0.5) / float(textureWidth), (float(y) + 0.5) / float(textureHeight));
                 return texture(txt, uv);
             }
-            
+
             /**
-            * Read a color from the colors texture.
-            */
+ * Read a color from the colors texture.
+ */
             vec4 readColor(int index) {
                 int icolor = imod(index, 256);
                 return readData(palette_colors, icolor, 255, 255);
             }
-            
+
             void main() {
                 if (dither(u_dither, int(v_pos.x), int(v_pos.y))) {
                     int index = int(texture(spritesheet, v_uvs).r * 255.0 + 0.5);
@@ -339,7 +309,7 @@ class OperationsShader(
                     if(color.a <= 0.1) {
                         discard;
                     } else {
-                        fragColor = color; 
+                        fragColor = color;
                     }
                 } else {
                     discard;

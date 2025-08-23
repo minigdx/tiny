@@ -26,9 +26,7 @@ import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.render.Render
 import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.RenderFrame
-import com.github.minigdx.tiny.render.batch.SpriteBatch
 import com.github.minigdx.tiny.render.operations.RenderOperation
-
 
 class OpenGLRender(
     private val gl: Kgl,
@@ -39,7 +37,7 @@ class OpenGLRender(
     private val framebufferShader = FramebufferShader(gl, performanceMonitor)
 
     override fun init(windowManager: WindowManager): RenderContext {
-  //      operationsShader.init(windowManager)
+        //      operationsShader.init(windowManager)
         framebufferShader.init(windowManager)
 
         val onscreen = createNewFrameBuffer()
@@ -104,7 +102,7 @@ class OpenGLRender(
 
         gl.viewport(0, 0, gameOptions.width, gameOptions.height)
 
-   //     operationsShader.render(context, ops)
+        //     operationsShader.render(context, ops)
 
         gl.bindFramebuffer(GL_FRAMEBUFFER, null)
     }

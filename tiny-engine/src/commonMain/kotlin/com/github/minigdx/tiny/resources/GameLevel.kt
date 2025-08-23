@@ -1,6 +1,5 @@
 package com.github.minigdx.tiny.resources
 
-import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.resources.ldtk.Ldtk
 
 class GameLevel(

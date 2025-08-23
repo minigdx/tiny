@@ -209,6 +209,9 @@ class GameResourceProcessor(
         // Force the reloading of the script as level init might occur in the _init block.
         scripts[currentScriptIndex]?.reload = true
 
+        gameLevel.tilesset.values.forEach { spriteSheet ->
+            spriteSheet.textureUnit = textureUnitPerSpriteSheet.getOrPut(spriteSheet.key) { getNextAvailableTextureUnit() }
+        }
         spritesheetToBind.addAll(gameLevel.tilesset.values)
     }
 
@@ -231,7 +234,7 @@ class GameResourceProcessor(
     private fun getNextAvailableTextureUnit(): Int {
         check(nextAvailableTextureUnit < MAX_TEXTURE_UNIT) {
             "There is too many textures managed by the engine. " +
-                    "The maximum texture allowed is $MAX_TEXTURE_UNIT"
+                "The maximum texture allowed is $MAX_TEXTURE_UNIT"
         }
         return nextAvailableTextureUnit++
     }

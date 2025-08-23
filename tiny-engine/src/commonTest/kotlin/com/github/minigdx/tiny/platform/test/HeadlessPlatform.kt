@@ -16,11 +16,9 @@ import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMetrics
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
-import com.github.minigdx.tiny.render.NopRenderContext
 import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.RenderFrame
 import com.github.minigdx.tiny.render.batch.SpriteBatch
-import com.github.minigdx.tiny.render.operations.RenderOperation
 import com.github.minigdx.tiny.resources.SpriteSheet
 import com.github.minigdx.tiny.sound.SoundHandler
 import com.github.minigdx.tiny.sound.SoundManager
@@ -78,9 +76,7 @@ class HeadlessPlatform(
         )
     }
 
-    override fun initRenderManager(windowManager: WindowManager): RenderContext {
-        return NopRenderContext
-    }
+    override fun initRenderManager(windowManager: WindowManager) = Unit
 
     suspend fun advance() {
         gameLoop?.advance(1f)
@@ -176,48 +172,8 @@ class HeadlessPlatform(
             override fun save(content: ByteArray) = Unit
         }
 
-    /**
-     * Render of GPU operation is not supported yet
-     */
-    override fun render(
-        renderContext: RenderContext,
-        ops: List<RenderOperation>,
-    ) {
-        /*
-        val pixels =
-            ops.firstOrNull { op -> (op as? DrawSprite)?.source?.name == "framebuffer" }
-                ?.let { drawSprite -> (drawSprite as DrawSprite).source?.pixels }
-
-        if (pixels != null) {
-            val frameBuffer = FrameBuffer(gameOptions.width, gameOptions.height, gameOptions.colors())
-            frameBuffer.copyFrom(pixels)
-            frames.add(frameBuffer)
-        }
-
-         */
-    }
-
     override fun readFrameBuffer(renderContext: RenderContext): RenderFrame {
-        if (frames.isEmpty()) {
-            // Force to generate at least one frame.
-            draw(renderContext)
-        }
-        return FrameBufferFrame(frames.last())
-    }
-
-    override fun draw(renderContext: RenderContext) = Unit
-
-    override fun executeOffScreen(
-        renderContext: RenderContext,
-        block: () -> Unit,
-    ): RenderFrame {
-        draw(renderContext)
-        // Render the frame
-        block.invoke()
-        val frame = FrameBufferFrame(frames.last())
-        // Drop the rendered frame
-        frames.removeLast()
-        return frame
+        TODO()
     }
 
     fun saveAnimation(name: String) = toGif(name, frames)

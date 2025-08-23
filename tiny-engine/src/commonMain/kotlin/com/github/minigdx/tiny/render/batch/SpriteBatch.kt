@@ -13,7 +13,7 @@ class SpriteBatch(
     internal var _key: BatchKey? = null,
     internal val instances: MutableList<SpriteInstance> = mutableListOf(),
     internal val sheets: MutableList<SpriteSheet> = mutableListOf(),
-    internal val pendingTextureBinds: MutableList<SpriteSheet> = mutableListOf()
+    internal val pendingTextureBinds: MutableList<SpriteSheet> = mutableListOf(),
 ) {
     val key: BatchKey
         get() = _key!!
@@ -25,6 +25,8 @@ class SpriteBatch(
 
     private var hasMixedTypes = false
     private var lastSpritesheetType: ResourceType? = null
+
+    var vertexIndex = 0
 
     fun canAddSprite(
         currentKey: BatchKey,

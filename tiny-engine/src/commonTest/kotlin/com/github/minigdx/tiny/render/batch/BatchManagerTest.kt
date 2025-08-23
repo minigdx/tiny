@@ -8,7 +8,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 
 class BatchManagerTest {
-
     private fun createTestSpriteSheet(): SpriteSheet {
         return SpriteSheet(
             version = 1,

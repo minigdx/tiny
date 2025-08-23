@@ -21,8 +21,8 @@ import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.RenderFrame
 import com.github.minigdx.tiny.render.batch.SpriteBatch
-import com.github.minigdx.tiny.render.gl.OpenGLRender
-import com.github.minigdx.tiny.render.operations.RenderOperation
+import com.github.minigdx.tiny.render.gl.FrameBufferStage
+import com.github.minigdx.tiny.render.gl.SpriteBatchStage
 import com.github.minigdx.tiny.resources.SpriteSheet
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.browser.window
@@ -40,7 +40,10 @@ class WebGlPlatform(
     val rootUrl: String,
 ) : Platform {
     override val performanceMonitor: PerformanceMonitor = WebGlPerformanceMonitor()
-    private lateinit var render: OpenGLRender
+
+    private lateinit var frameBufferStage: FrameBufferStage
+
+    private lateinit var spriteBatchStage: SpriteBatchStage
 
     private val jsInputHandler = JsInputHandler(canvas, gameOptions)
 
@@ -57,7 +60,7 @@ class WebGlPlatform(
         )
     }
 
-    override fun initRenderManager(windowManager: WindowManager): RenderContext {
+    override fun initRenderManager(windowManager: WindowManager) {
         val context =
             canvas.getContext("webgl2") as? WebGL2RenderingContext
                 ?: throw IllegalStateException(
@@ -65,8 +68,10 @@ class WebGlPlatform(
                         "WebGL2 doesn't seems to be supported by your browser. " +
                         "Please update to a compatible browser to run the game in WebGL2.",
                 )
-        render = OpenGLRender(KglJs(context), gameOptions, performanceMonitor)
-        return render.init(windowManager)
+
+        val gl = KglJs(context)
+        frameBufferStage = FrameBufferStage(gl, performanceMonitor)
+        spriteBatchStage = SpriteBatchStage(gl)
     }
 
     override fun gameLoop(gameLoop: GameLoop) {
@@ -121,14 +126,6 @@ class WebGlPlatform(
         return SoundDataSourceStream(name, soundManager, createByteArrayStream(name))
     }
 
-    override fun drawIntoFrameBuffer(batch: SpriteBatch) {
-        render.draw(batch)
-    }
-
-    override fun drawFrameBuffer() {
-        TODO("Not yet implemented")
-    }
-
     override fun createLocalFile(
         name: String,
         parentDirectory: String?,
@@ -136,29 +133,19 @@ class WebGlPlatform(
         return JsLocalFile(name, parentDirectory?.let { "tiny-$parentDirectory" } ?: "tiny")
     }
 
-    override fun draw(renderContext: RenderContext) {
-        render.drawOnScreen(renderContext)
+    override fun bindTextures(spritesheets: List<SpriteSheet>) {
+        TODO("Not yet implemented")
     }
 
-    override fun render(
-        renderContext: RenderContext,
-        ops: List<RenderOperation>,
-    ) {
-        render.render(renderContext, ops)
+    override fun drawIntoFrameBuffer(batch: SpriteBatch) {
+        spriteBatchStage.execute(batch)
     }
 
-    override fun executeOffScreen(
-        renderContext: RenderContext,
-        block: () -> Unit,
-    ): RenderFrame {
-        return render.executeOffScreen(renderContext, block)
+    override fun drawFrameBuffer() {
+        frameBufferStage.execute(spriteBatchStage)
     }
 
     override fun readFrameBuffer(renderContext: RenderContext): RenderFrame {
-        return render.readRender(renderContext)
-    }
-
-    override fun bindTextures(spritesheets: List<SpriteSheet>) {
-        TODO("Not yet implemented")
+        TODO()
     }
 }
