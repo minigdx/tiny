@@ -6,6 +6,7 @@ import com.github.minigdx.tiny.resources.GameLevel
 import com.github.minigdx.tiny.resources.GameResource
 import com.github.minigdx.tiny.resources.GameScript
 import com.github.minigdx.tiny.resources.ResourceFactory
+import com.github.minigdx.tiny.resources.ResourceType
 import com.github.minigdx.tiny.resources.ResourceType.BOOT_GAMESCRIPT
 import com.github.minigdx.tiny.resources.ResourceType.BOOT_SPRITESHEET
 import com.github.minigdx.tiny.resources.ResourceType.ENGINE_GAMESCRIPT
@@ -19,6 +20,7 @@ import com.github.minigdx.tiny.resources.SpriteSheet
 import com.github.minigdx.tiny.resources.SpriteSheet.SpriteSheetKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flatMapMerge
@@ -79,7 +81,6 @@ interface GameResourceAccess2 {
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class GameResourceProcessor(
-    val events: MutableList<GameResource>,
     resourceFactory: ResourceFactory,
     gameOptions: GameOptions,
     platform: Platform,
@@ -98,8 +99,6 @@ class GameResourceProcessor(
     var engineGameScript: GameScript? = null
         private set
 
-    private val workEvents: MutableList<GameResource> = mutableListOf()
-
     private var numberOfResources: Int = 0
 
     private val resources: List<Flow<GameResource>>
@@ -117,7 +116,13 @@ class GameResourceProcessor(
 
     private val textureUnitPerSpriteSheet = mutableMapOf<SpriteSheetKey, Int>()
 
+    private val eventChannel = Channel<GameResource>(Channel.UNLIMITED)
+    private val gameResourceCollector = GameResourceCollector(eventChannel)
+
+    val toBeLoaded = mutableSetOf<String>()
+
     init {
+
         val gameScripts = gameOptions.gameScripts.mapIndexed { index, script ->
             resourceFactory.gamescript(index + 1, script)
         }
@@ -144,6 +149,14 @@ class GameResourceProcessor(
             resourceFactory.bootSpritesheet("_boot.png"),
         ) + gameScripts + spriteSheets + gameLevels + sounds
 
+        toBeLoaded.addAll(
+            setOf("_boot.lua", "_engine.lua", "_boot.png")
+        )
+        toBeLoaded.addAll(gameOptions.gameLevels)
+        toBeLoaded.addAll(gameOptions.gameScripts)
+        toBeLoaded.addAll(gameOptions.spriteSheets)
+        toBeLoaded.addAll(gameOptions.sounds)
+
         numberOfResources = resources.size
         logger.debug("GAME_ENGINE") { "Number of resources to load: $numberOfResources" }
 
@@ -151,29 +164,38 @@ class GameResourceProcessor(
         resourcesScope.launch {
             resources.asFlow()
                 .flatMapMerge(concurrency = 128) { resource -> resource }
-                .collect(ScriptsCollector(events))
+                .collect(gameResourceCollector)
         }
     }
 
-    suspend fun process(events: List<GameResource>) {
+    suspend fun processAvailableEvents() {
         spritesheetToBind.clear()
+        
+        // Process all available events from the channel without blocking
+        while (true) {
+            val result = eventChannel.tryReceive()
+            if (result.isFailure) {
+                // No more events available, break
+                break
+            }
+            
+            val event = result.getOrNull() ?: continue
 
-        workEvents.addAll(events)
-        workEvents.forEach { event ->
+            toBeLoaded.remove(event.name)
+
             if (event.reload) {
                 processReloadedResource(event)
             } else {
                 processNewResource(event)
             }
         }
-        workEvents.clear()
     }
 
     suspend fun processNewResource(resource: GameResource) {
         logger.info("GAME_ENGINE") { "Loaded ${resource.name} ${resource.type} (version: ${resource.version})" }
         processResourceByType(resource)
         numberOfResources--
-        logger.debug("GAME_ENGINE") { "Remaining resources to load: $numberOfResources." }
+        logger.debug("GAME_ENGINE") { "Remaining resources to load: $numberOfResources. (${toBeLoaded.joinToString(", ")})" }
         if (numberOfResources == 0) {
             logger.debug("GAME_ENGINE") { "All resources are loaded. Notify the boot script." }
             // Force to notify the boot script
@@ -300,6 +322,10 @@ class GameResourceProcessor(
 
     override fun findGameScript(name: String): GameScript? {
         TODO("Not yet implemented")
+    }
+
+    fun status(): Map<ResourceType, Collection<GameResource>> {
+        return gameResourceCollector.status()
     }
 
     companion object {

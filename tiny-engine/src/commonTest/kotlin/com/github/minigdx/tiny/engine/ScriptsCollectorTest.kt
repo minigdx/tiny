@@ -21,7 +21,7 @@ class ScriptsCollectorTest {
     fun emit_order_game_engine_boot_should_reorder_to_boot_engine_game() =
         runTest {
             val events = mutableListOf<GameResource>()
-            val collector = ScriptsCollector(events)
+            val collector = GameResourceCollector(events)
 
             val gameScript = TestGameResource(index = 1, type = ResourceType.GAME_GAMESCRIPT)
             val engineScript = TestGameResource(index = 1, type = ResourceType.ENGINE_GAMESCRIPT)
@@ -41,7 +41,7 @@ class ScriptsCollectorTest {
     fun emit_order_engine_game_boot_should_reorder_to_boot_engine_game() =
         runTest {
             val events = mutableListOf<GameResource>()
-            val collector = ScriptsCollector(events)
+            val collector = GameResourceCollector(events)
 
             val engineScript = TestGameResource(index = 2, type = ResourceType.ENGINE_GAMESCRIPT)
             val gameScript = TestGameResource(index = 2, type = ResourceType.GAME_GAMESCRIPT)
@@ -61,7 +61,7 @@ class ScriptsCollectorTest {
     fun emit_same_game_script_twice_should_set_reload_flag_on_second() =
         runTest {
             val events = mutableListOf<GameResource>()
-            val collector = ScriptsCollector(events)
+            val collector = GameResourceCollector(events)
 
             val bootScript = TestGameResource(index = 3, type = ResourceType.BOOT_GAMESCRIPT)
             val engineScript = TestGameResource(index = 3, type = ResourceType.ENGINE_GAMESCRIPT)

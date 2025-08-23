@@ -12,7 +12,6 @@ import com.github.minigdx.tiny.platform.performance.PerformanceMetrics
 import com.github.minigdx.tiny.render.DefaultVirtualFrameBuffer
 import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.operations.RenderOperation
-import com.github.minigdx.tiny.resources.GameResource
 import com.github.minigdx.tiny.resources.GameScript
 import com.github.minigdx.tiny.resources.ResourceFactory
 import com.github.minigdx.tiny.sound.SoundManager
@@ -28,7 +27,6 @@ class GameEngine(
     val logger: Logger,
     val listener: GameEngineListener? = null,
 ) : GameLoop {
-    private val events: MutableList<GameResource> = mutableListOf()
 
     private val ops = mutableListOf<RenderOperation>()
 
@@ -68,7 +66,6 @@ class GameEngine(
         )
 
         gameResourceProcessor = GameResourceProcessor(
-            events,
             resourceFactory,
             gameOptions,
             platform,
@@ -84,20 +81,7 @@ class GameEngine(
         performanceMonitor.frameStart()
         performanceMonitor.operationStart("game_update")
 
-        // TODO: plan to refactor this game loop
-        // -- update
-        // 1. Process the new events ✔️
-        // 2. Prepare the resource ✔️
-        // 3. (re)load resources ✔️
-        // 4. advance the gamescript ✔️
-        // 5. advance the engine gamescript ✔️
-        // 6. intercept user shortcut  ✔️
-        // -- draw
-        // 1. play sounds ✔️
-        // 2. draw the gamescript  ✔️
-        // 3. draw the engine gamescript ✔️
-        gameResourceProcessor.process(events)
-        events.clear()
+        gameResourceProcessor.processAvailableEvents()
         platform.bindTextures(gameResourceProcessor.spritesheetToBind)
 
         val currentGameScript = gameResourceProcessor.currentScript ?: return
