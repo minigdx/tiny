@@ -27,7 +27,6 @@ class GameEngine(
     val logger: Logger,
     val listener: GameEngineListener? = null,
 ) : GameLoop {
-
     private val ops = mutableListOf<RenderOperation>()
 
     private var currentScriptHasError = false
@@ -102,7 +101,6 @@ class GameEngine(
             accumulator -= REFRESH_LIMIT
             currentFrame++
 
-            // The user hit Ctrl + R(ecord)
             interceptUserShortcup()
             currentMetrics?.run { storeFrameMetrics(this) }
 
@@ -146,6 +144,7 @@ class GameEngine(
     }
 
     private suspend fun interceptUserShortcup() {
+        // The user hit Ctrl + R(ecord)
         if (inputHandler.isCombinationPressed(Key.CTRL, Key.R)) {
             popup("recording GIF", "#00FF00")
             platform.record()
@@ -153,6 +152,7 @@ class GameEngine(
         } else if (inputHandler.isCombinationPressed(Key.CTRL, Key.S)) {
             popup("screenshot PNG", "#00FF00")
             platform.screenshot()
+            // The user hit Ctrl + P(rofile)
         } else if (inputHandler.isCombinationPressed(Key.CTRL, Key.P)) {
             performanceMonitor.isEnabled = !performanceMonitor.isEnabled
             val message = if (performanceMonitor.isEnabled) {

@@ -6,7 +6,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.FlowCollector
 
 class GameResourceCollector(private val eventChannel: Channel<GameResource>) : FlowCollector<GameResource> {
-
     private val waitingList: MutableList<GameResource> = mutableListOf()
 
     private val loadedResources: MutableMap<ResourceType, MutableMap<Int, GameResource>> = mutableMapOf()
@@ -44,9 +43,7 @@ class GameResourceCollector(private val eventChannel: Channel<GameResource>) : F
         }
     }
 
-    private fun registerResource(
-        value: GameResource,
-    ) {
+    private fun registerResource(value: GameResource) {
         val currentType = value.type
         val resourcesOfType = loadedResources.getOrPut(currentType) { mutableMapOf() }
         val exist = resourcesOfType[value.index]

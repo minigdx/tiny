@@ -39,4 +39,83 @@ class SpriteInstance(
 
         return this
     }
+
+    fun addVertexInto(
+        vertexIndex: Int,
+        vertexData: FloatArray,
+    ): Int {
+        var indexVertex = vertexIndex
+        vertexData[indexVertex++] = positionLeft.toFloat()
+        vertexData[indexVertex++] = positionUp.toFloat()
+        // A - Right/Up
+        vertexData[indexVertex++] = positionRight.toFloat()
+        vertexData[indexVertex++] = positionUp.toFloat()
+        // A - Right/Down
+        vertexData[indexVertex++] = positionRight.toFloat()
+        vertexData[indexVertex++] = positionDown.toFloat()
+        // B - Right/Down
+        vertexData[indexVertex++] = positionRight.toFloat()
+        vertexData[indexVertex++] = positionDown.toFloat()
+        // B - Left/Down
+        vertexData[indexVertex++] = positionLeft.toFloat()
+        vertexData[indexVertex++] = positionDown.toFloat()
+        // B - Left/Up
+        vertexData[indexVertex++] = positionLeft.toFloat()
+        vertexData[indexVertex++] = positionUp.toFloat()
+
+        return indexVertex
+    }
+
+    fun addUvsInto(
+        uvsIndex: Int,
+        uvs: FloatArray,
+    ): Int {
+        var indexVertex = uvsIndex
+        val a = this
+        // A - Left/Up
+        val v1 = a.uvLeft to a.uvUp
+        // A - Right/Up
+        val v2 = a.uvRight to a.uvUp
+        // A - Right/Down
+        val v3 = a.uvRight to a.uvDown
+        // B - Right/Down
+        val va = a.uvRight to a.uvDown
+        // B - Left/Down
+        val vb = a.uvLeft to a.uvDown
+        // B - Left/Up
+        val vc = a.uvLeft to a.uvUp
+
+        val uvsPoint = if (!a.flipX && !a.flipY) {
+            listOf(v1, v2, v3, va, vb, vc)
+        } else if (a.flipX && !a.flipY) {
+            listOf(v2, v1, vb, vb, va, v2)
+        } else if (!a.flipX && a.flipY) {
+            listOf(vb, va, v2, v2, vc, vb)
+        } else {
+            listOf(va, vb, vc, v1, v2, v3)
+        }
+
+        uvsPoint.forEach { (x, y) ->
+            uvs[indexVertex++] = x.toFloat()
+            uvs[indexVertex++] = y.toFloat()
+        }
+        return indexVertex
+    }
+
+    val positionLeft: Pixel
+        get() = destinationX
+    val positionRight: Int
+        get() = destinationX + sourceWidth
+    val positionUp: Pixel
+        get() = destinationY
+    val positionDown: Int
+        get() = destinationY + sourceHeight
+    val uvLeft: Pixel
+        get() = sourceX
+    val uvRight: Int
+        get() = sourceX + sourceWidth
+    val uvUp: Pixel
+        get() = sourceY
+    val uvDown: Int
+        get() = sourceY + sourceHeight
 }

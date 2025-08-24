@@ -14,6 +14,6 @@ class FrameBufferStage(
     }
 
     fun execute(stage: SpriteBatchStage) {
-        shader.draw(stage.frameBuffer)
+        shader.draw(stage.frameBufferContext)
     }
 }

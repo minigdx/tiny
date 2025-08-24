@@ -17,7 +17,6 @@ import com.danielgergely.kgl.GL_TEXTURE_MAG_FILTER
 import com.danielgergely.kgl.GL_TEXTURE_MIN_FILTER
 import com.danielgergely.kgl.GL_UNSIGNED_BYTE
 import com.danielgergely.kgl.Kgl
-import com.danielgergely.kgl.Texture
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.graphic.PixelFormat
@@ -148,7 +147,7 @@ class OpenGLRender(
         framebufferShader.drawOnScreen(context)
     }
 
-    override fun draw(batch: Texture?) {
+    override fun draw(batch: FrameBufferContext2) {
         super.draw(batch)
     }
 

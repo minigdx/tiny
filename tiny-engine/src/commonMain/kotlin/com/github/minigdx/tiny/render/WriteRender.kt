@@ -1,7 +1,7 @@
 package com.github.minigdx.tiny.render
 
-import com.danielgergely.kgl.Texture
 import com.github.minigdx.tiny.platform.WindowManager
+import com.github.minigdx.tiny.render.gl.FrameBufferContext2
 import com.github.minigdx.tiny.render.operations.RenderOperation
 
 interface WriteRender {
@@ -23,5 +23,9 @@ interface WriteRender {
      */
     fun drawOnScreen(context: RenderContext) = Unit
 
-    fun draw(batch: Texture?) = Unit
+    fun draw(batch: FrameBufferContext2) {
+        // 1. Set the context to draw the frame buffer on the screen
+        // 2. Draw the frame buffer on the screen
+        // 3. rollback the context so new draw will be on the frame buffer.
+    }
 }

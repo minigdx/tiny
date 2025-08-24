@@ -49,7 +49,7 @@ interface GameResourceAccess2 {
     /**
      * Find a sprite sheet by its name
      */
-    fun findSpritesheet(name: String): Int?
+    fun findSpritesheet(name: String): SpriteSheet?
 
     /**
      * Generate a new Spritesheet index, in case of a new spritesheet.
@@ -150,7 +150,7 @@ class GameResourceProcessor(
         ) + gameScripts + spriteSheets + gameLevels + sounds
 
         toBeLoaded.addAll(
-            setOf("_boot.lua", "_engine.lua", "_boot.png")
+            setOf("_boot.lua", "_engine.lua", "_boot.png"),
         )
         toBeLoaded.addAll(gameOptions.gameLevels)
         toBeLoaded.addAll(gameOptions.gameScripts)
@@ -170,7 +170,7 @@ class GameResourceProcessor(
 
     suspend fun processAvailableEvents() {
         spritesheetToBind.clear()
-        
+
         // Process all available events from the channel without blocking
         while (true) {
             val result = eventChannel.tryReceive()
@@ -178,7 +178,7 @@ class GameResourceProcessor(
                 // No more events available, break
                 break
             }
-            
+
             val event = result.getOrNull() ?: continue
 
             toBeLoaded.remove(event.name)
@@ -200,6 +200,7 @@ class GameResourceProcessor(
             logger.debug("GAME_ENGINE") { "All resources are loaded. Notify the boot script." }
             // Force to notify the boot script
             scripts[0]!!.resourcesLoaded()
+            currentScript = scripts[0]
         }
     }
 
@@ -291,11 +292,11 @@ class GameResourceProcessor(
     }
 
     override fun findSpritesheet(index: Int): SpriteSheet? {
-        TODO("Not yet implemented")
+        return spriteSheets.atIndex(index)
     }
 
-    override fun findSpritesheet(name: String): Int? {
-        TODO("Not yet implemented")
+    override fun findSpritesheet(name: String): SpriteSheet? {
+        return spriteSheets.find { it?.name == name }
     }
 
     override fun newSpritesheetIndex(): Int {
@@ -309,23 +310,28 @@ class GameResourceProcessor(
     }
 
     override fun findLevel(index: Int): GameLevel? {
-        TODO("Not yet implemented")
+        return levels.atIndex(index)
     }
 
     override fun findSound(index: Int): Sound? {
-        TODO("Not yet implemented")
+        return sounds.atIndex(index)
     }
 
     override fun findSound(name: String): Sound? {
-        TODO("Not yet implemented")
+        return sounds.find { it?.name == name }
     }
 
     override fun findGameScript(name: String): GameScript? {
-        TODO("Not yet implemented")
+        return scripts.find { it?.name == name }
     }
 
     fun status(): Map<ResourceType, Collection<GameResource>> {
         return gameResourceCollector.status()
+    }
+
+    private fun <T> Array<T>.atIndex(index: Int): T? {
+        if (this.isEmpty()) return null
+        return this[index % this.size]
     }
 
     companion object {

@@ -76,7 +76,7 @@ class GlfwPlatform(
 
     private val frameBufferStage = FrameBufferStage(KglLwjgl, performanceMonitor)
 
-    private val spriteBatchStage = SpriteBatchStage(KglLwjgl, gameOptions)
+    private val spriteBatchStage = SpriteBatchStage(KglLwjgl, gameOptions, performanceMonitor)
 
     /**
      * Get the time in milliseconds

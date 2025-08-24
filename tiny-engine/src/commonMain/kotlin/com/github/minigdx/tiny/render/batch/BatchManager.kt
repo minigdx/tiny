@@ -41,7 +41,7 @@ class BatchManager {
 
         override fun destroyInstance(obj: SpriteBatch) {
             spriteInstancePool.free(obj.instances)
-            batchKeyPool.free(obj.key)
+            obj._key?.let { batchKeyPool.free(it) }
 
             obj.instances.clear()
             obj.sheets.clear()
