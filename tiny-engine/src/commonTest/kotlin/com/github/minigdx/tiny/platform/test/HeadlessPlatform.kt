@@ -17,8 +17,8 @@ import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMetrics
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.render.RenderFrame
-import com.github.minigdx.tiny.render.batch.SpriteBatch
-import com.github.minigdx.tiny.resources.SpriteSheet
+import com.github.minigdx.tiny.render.gl.FrameBufferStage
+import com.github.minigdx.tiny.render.gl.SpriteBatchStage
 import com.github.minigdx.tiny.sound.SoundHandler
 import com.github.minigdx.tiny.sound.SoundManager
 import com.github.minigdx.tiny.util.MutableFixedSizeList
@@ -146,18 +146,6 @@ class HeadlessPlatform(
         return ObjectStream(data)
     }
 
-    override fun drawIntoFrameBuffer(batch: SpriteBatch) {
-        TODO("Not yet implemented")
-    }
-
-    override fun drawFrameBuffer() {
-        TODO("Not yet implemented")
-    }
-
-    override fun bindTextures(spritesheets: List<SpriteSheet>) {
-        TODO("Not yet implemented")
-    }
-
     override fun createLocalFile(
         name: String,
         parentDirectory: String?,
@@ -171,8 +159,12 @@ class HeadlessPlatform(
             override fun save(content: ByteArray) = Unit
         }
 
-    override fun readFrameBuffer(): RenderFrame {
-        TODO()
+    override fun createSpriteStage(): SpriteBatchStage {
+        TODO("Not yet implemented")
+    }
+
+    override fun createFrameBufferStage(windowManager: WindowManager): FrameBufferStage {
+        TODO("Not yet implemented")
     }
 
     fun saveAnimation(name: String) = toGif(name, frames)

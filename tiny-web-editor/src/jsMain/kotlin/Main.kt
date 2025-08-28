@@ -15,8 +15,8 @@ import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.platform.webgl.WebGlPlatform
-import com.github.minigdx.tiny.render.batch.SpriteBatch
-import com.github.minigdx.tiny.resources.SpriteSheet
+import com.github.minigdx.tiny.render.gl.FrameBufferStage
+import com.github.minigdx.tiny.render.gl.SpriteBatchStage
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.browser.document
 import kotlinx.browser.window
@@ -346,13 +346,11 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
         )
     }
 
-    override fun bindTextures(spritesheets: List<SpriteSheet>) {
-        return delegate.bindTextures(spritesheets)
+    override fun createSpriteStage(): SpriteBatchStage {
+        return delegate.createSpriteStage()
     }
 
-    override fun drawIntoFrameBuffer(batch: SpriteBatch) = delegate.drawIntoFrameBuffer(batch)
-
-    override fun drawFrameBuffer() = delegate.drawFrameBuffer()
-
-    override fun readFrameBuffer() = delegate.readFrameBuffer()
+    override fun createFrameBufferStage(windowManager: WindowManager): FrameBufferStage {
+        return delegate.createFrameBufferStage(windowManager)
+    }
 }

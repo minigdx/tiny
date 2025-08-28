@@ -18,11 +18,8 @@ import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
-import com.github.minigdx.tiny.render.RenderFrame
-import com.github.minigdx.tiny.render.batch.SpriteBatch
 import com.github.minigdx.tiny.render.gl.FrameBufferStage
 import com.github.minigdx.tiny.render.gl.SpriteBatchStage
-import com.github.minigdx.tiny.resources.SpriteSheet
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineDispatcher
@@ -60,13 +57,12 @@ class WebGlPlatform(
     }
 
     override fun initRenderManager(windowManager: WindowManager) {
-        val context =
-            canvas.getContext("webgl2") as? WebGL2RenderingContext
-                ?: throw IllegalStateException(
-                    "The canvas context is expected to be a webgl2 context. " +
-                        "WebGL2 doesn't seems to be supported by your browser. " +
-                        "Please update to a compatible browser to run the game in WebGL2.",
-                )
+        val context = canvas.getContext("webgl2") as? WebGL2RenderingContext
+            ?: throw IllegalStateException(
+                "The canvas context is expected to be a webgl2 context. " +
+                    "WebGL2 doesn't seems to be supported by your browser. " +
+                    "Please update to a compatible browser to run the game in WebGL2.",
+            )
 
         val gl = KglJs(context)
         frameBufferStage = FrameBufferStage(gl, gameOptions, performanceMonitor).also {
@@ -136,19 +132,11 @@ class WebGlPlatform(
         return JsLocalFile(name, parentDirectory?.let { "tiny-$parentDirectory" } ?: "tiny")
     }
 
-    override fun bindTextures(spritesheets: List<SpriteSheet>) {
-        TODO("Not yet implemented")
+    override fun createSpriteStage(): SpriteBatchStage {
+        return spriteBatchStage
     }
 
-    override fun drawIntoFrameBuffer(batch: SpriteBatch) {
-        spriteBatchStage.execute(batch)
-    }
-
-    override fun drawFrameBuffer() {
-        frameBufferStage.execute(spriteBatchStage)
-    }
-
-    override fun readFrameBuffer(): RenderFrame {
-        TODO()
+    override fun createFrameBufferStage(windowManager: WindowManager): FrameBufferStage {
+        return frameBufferStage
     }
 }

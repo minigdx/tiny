@@ -29,4 +29,8 @@ interface VirtualFrameBuffer {
      * Draw the virtual frame buffer on the screen.
      */
     fun draw()
+
+    fun bindTextures(spritesheetToBind: List<SpriteSheet>)
+
+    fun readFrameBuffer(): RenderFrame
 }

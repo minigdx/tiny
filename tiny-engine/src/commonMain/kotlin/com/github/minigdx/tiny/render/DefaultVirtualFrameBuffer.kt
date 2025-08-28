@@ -3,12 +3,14 @@ package com.github.minigdx.tiny.render
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.graphic.FrameBuffer
-import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.render.batch.BatchManager
+import com.github.minigdx.tiny.render.gl.FrameBufferStage
+import com.github.minigdx.tiny.render.gl.SpriteBatchStage
 import com.github.minigdx.tiny.resources.SpriteSheet
 
 class DefaultVirtualFrameBuffer(
-    private val platform: Platform,
+    private val spriteBatchStage: SpriteBatchStage,
+    private val frameBufferStage: FrameBufferStage,
     private val gameOptions: GameOptions,
 ) : VirtualFrameBuffer {
     private var isPrimitiveBufferUpdated = false
@@ -50,7 +52,7 @@ class DefaultVirtualFrameBuffer(
 
         if (immediateDraw) {
             batchManager.consumeAllBatches { batch ->
-                platform.drawIntoFrameBuffer(batch)
+                spriteBatchStage.execute(batch)
                 primitiveBuffer.clear(0)
             }
         }
@@ -77,7 +79,7 @@ class DefaultVirtualFrameBuffer(
         )
         if (immediateDraw) {
             batchManager.consumeAllBatches { batch ->
-                platform.drawIntoFrameBuffer(batch)
+                spriteBatchStage.execute(batch)
                 primitiveBuffer.clear(0)
                 isPrimitiveBufferUpdated = false
             }
@@ -87,8 +89,18 @@ class DefaultVirtualFrameBuffer(
 
     override fun draw() {
         batchManager.consumeAllBatches { batch ->
-            platform.drawIntoFrameBuffer(batch)
+            spriteBatchStage.execute(batch)
         }
-        platform.drawFrameBuffer()
+        spriteBatchStage.endStage()
+        frameBufferStage.execute(spriteBatchStage)
+        spriteBatchStage.startStage()
+    }
+
+    override fun bindTextures(spritesheetToBind: List<SpriteSheet>) {
+        spriteBatchStage.bindTextures(spritesheetToBind)
+    }
+
+    override fun readFrameBuffer(): RenderFrame {
+        TODO()
     }
 }

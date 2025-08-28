@@ -8,9 +8,8 @@ import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
-import com.github.minigdx.tiny.render.RenderFrame
-import com.github.minigdx.tiny.render.batch.SpriteBatch
-import com.github.minigdx.tiny.resources.SpriteSheet
+import com.github.minigdx.tiny.render.gl.FrameBufferStage
+import com.github.minigdx.tiny.render.gl.SpriteBatchStage
 import com.github.minigdx.tiny.sound.Music
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.coroutines.CoroutineDispatcher
@@ -129,23 +128,7 @@ interface Platform {
         parentDirectory: String? = "data",
     ): LocalFile
 
-    /**
-     * Bind [spritesheets] into the GPU to be used during [drawIntoFrameBuffer] operation.
-     */
-    fun bindTextures(spritesheets: List<SpriteSheet>)
+    fun createSpriteStage(): SpriteBatchStage
 
-    /**
-     * Draw the [batch] into the framebuffer.
-     */
-    fun drawIntoFrameBuffer(batch: SpriteBatch)
-
-    /**
-     * Draw the framebuffer on the screen.
-     */
-    fun drawFrameBuffer()
-
-    /**
-     * Read the full rendered screen into a frame.
-     */
-    fun readFrameBuffer(): RenderFrame
+    fun createFrameBufferStage(windowManager: WindowManager): FrameBufferStage
 }

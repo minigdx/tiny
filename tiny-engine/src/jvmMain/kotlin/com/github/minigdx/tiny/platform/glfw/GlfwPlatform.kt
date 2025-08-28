@@ -20,11 +20,8 @@ import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
-import com.github.minigdx.tiny.render.RenderFrame
-import com.github.minigdx.tiny.render.batch.SpriteBatch
 import com.github.minigdx.tiny.render.gl.FrameBufferStage
 import com.github.minigdx.tiny.render.gl.SpriteBatchStage
-import com.github.minigdx.tiny.resources.SpriteSheet
 import com.github.minigdx.tiny.sound.JavaSoundManager
 import com.github.minigdx.tiny.sound.SoundManager
 import com.github.minigdx.tiny.util.MutableFixedSizeList
@@ -71,8 +68,6 @@ class GlfwPlatform(
     private val recordScope = CoroutineScope(Dispatchers.IO)
 
     private val frameBufferStage = FrameBufferStage(KglLwjgl, gameOptions, performanceMonitor)
-
-    private val spriteBatchStage = SpriteBatchStage(KglLwjgl, gameOptions, performanceMonitor)
 
     /**
      * Get the time in milliseconds
@@ -171,10 +166,7 @@ class GlfwPlatform(
         )
     }
 
-    override fun initRenderManager(windowManager: WindowManager) {
-        spriteBatchStage.init()
-        frameBufferStage.init(windowManager)
-    }
+    override fun initRenderManager(windowManager: WindowManager) = Unit
 
     override fun initInputManager(): InputManager {
         return lwjglInputHandler
@@ -366,22 +358,12 @@ class GlfwPlatform(
         }
     }
 
-    override fun bindTextures(spritesheets: List<SpriteSheet>) {
-        spriteBatchStage.bindTextures(spritesheets)
+    override fun createSpriteStage(): SpriteBatchStage {
+        return SpriteBatchStage(KglLwjgl, gameOptions, performanceMonitor).also { it.init() }
     }
 
-    override fun readFrameBuffer(): RenderFrame {
-        TODO()
-    }
-
-    override fun drawIntoFrameBuffer(batch: SpriteBatch) {
-        spriteBatchStage.execute(batch)
-    }
-
-    override fun drawFrameBuffer() {
-        spriteBatchStage.endStage()
-        frameBufferStage.execute(spriteBatchStage)
-        spriteBatchStage.startStage()
+    override fun createFrameBufferStage(windowManager: WindowManager): FrameBufferStage {
+        return FrameBufferStage(KglLwjgl, gameOptions, performanceMonitor).also { it.init(windowManager) }
     }
 
     override fun createLocalFile(

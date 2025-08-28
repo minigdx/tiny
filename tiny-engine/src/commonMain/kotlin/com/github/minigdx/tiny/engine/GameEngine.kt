@@ -10,6 +10,7 @@ import com.github.minigdx.tiny.lua.toTinyException
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.performance.PerformanceMetrics
 import com.github.minigdx.tiny.render.DefaultVirtualFrameBuffer
+import com.github.minigdx.tiny.render.VirtualFrameBuffer
 import com.github.minigdx.tiny.resources.GameScript
 import com.github.minigdx.tiny.resources.ResourceFactory
 import com.github.minigdx.tiny.sound.SoundManager
@@ -37,7 +38,8 @@ class GameEngine(
 
     private lateinit var resourceFactory: ResourceFactory
 
-    private val virtualFrameBuffer = DefaultVirtualFrameBuffer(platform, gameOptions)
+    private lateinit var virtualFrameBuffer: VirtualFrameBuffer
+
     private val performanceMonitor = platform.performanceMonitor
 
     private lateinit var gameResourceProcessor: GameResourceProcessor
@@ -48,6 +50,14 @@ class GameEngine(
         inputHandler = platform.initInputHandler()
         inputManager = platform.initInputManager()
         soundManager = platform.initSoundManager(inputHandler)
+
+        platform.initRenderManager(windowManager)
+
+        virtualFrameBuffer = DefaultVirtualFrameBuffer(
+            platform.createSpriteStage(),
+            platform.createFrameBufferStage(windowManager),
+            gameOptions,
+        )
 
         resourceFactory = ResourceFactory(
             vfs = vfs,
@@ -66,8 +76,6 @@ class GameEngine(
             logger,
         )
 
-        platform.initRenderManager(windowManager)
-
         platform.gameLoop(this)
     }
 
@@ -76,7 +84,7 @@ class GameEngine(
         performanceMonitor.operationStart("game_update")
 
         gameResourceProcessor.processAvailableEvents()
-        platform.bindTextures(gameResourceProcessor.spritesheetToBind)
+        virtualFrameBuffer.bindTextures(gameResourceProcessor.spritesheetToBind)
 
         val currentGameScript = gameResourceProcessor.currentScript ?: return
 
