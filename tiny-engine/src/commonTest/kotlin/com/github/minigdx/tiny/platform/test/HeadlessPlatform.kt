@@ -16,7 +16,6 @@ import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMetrics
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
-import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.RenderFrame
 import com.github.minigdx.tiny.render.batch.SpriteBatch
 import com.github.minigdx.tiny.resources.SpriteSheet
@@ -172,7 +171,7 @@ class HeadlessPlatform(
             override fun save(content: ByteArray) = Unit
         }
 
-    override fun readFrameBuffer(renderContext: RenderContext): RenderFrame {
+    override fun readFrameBuffer(): RenderFrame {
         TODO()
     }
 

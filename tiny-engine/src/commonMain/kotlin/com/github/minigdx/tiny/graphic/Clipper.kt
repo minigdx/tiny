@@ -42,4 +42,11 @@ class Clipper(private val width: Pixel, private val height: Pixel) {
         top = 0
         bottom = height
     }
+
+    override fun equals(other: Any?): Boolean {
+        val o = other as? Clipper ?: return false
+        return width == o.width && height == o.height &&
+            left == o.left && right == o.right &&
+            top == o.top && bottom == o.bottom
+    }
 }

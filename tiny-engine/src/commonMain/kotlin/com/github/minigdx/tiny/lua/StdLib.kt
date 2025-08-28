@@ -6,7 +6,7 @@ import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.engine.GameResourceAccess2
+import com.github.minigdx.tiny.engine.GameResourceAccess
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
@@ -17,7 +17,7 @@ import org.luaj.vm2.lib.VarArgFunction
 @TinyLib(description = "Standard library.")
 class StdLib(
     val gameOptions: GameOptions,
-    val resourceAccess: GameResourceAccess2,
+    val resourceAccess: GameResourceAccess,
 ) : TwoArgFunction() {
     override fun call(
         arg1: LuaValue,

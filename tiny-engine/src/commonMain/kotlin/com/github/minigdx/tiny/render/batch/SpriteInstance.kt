@@ -102,6 +102,22 @@ class SpriteInstance(
         return indexVertex
     }
 
+    fun addTextureIndicesInto(
+        textureIndicesIndex: Int,
+        textureIndices: FloatArray,
+        textureIndex: Int,
+    ): Int {
+        var index = textureIndicesIndex
+        val textureIndexFloat = textureIndex.toFloat()
+
+        // Set same texture index for all 6 vertices of this sprite
+        repeat(6) {
+            textureIndices[index++] = textureIndexFloat
+        }
+
+        return index
+    }
+
     val positionLeft: Pixel
         get() = destinationX
     val positionRight: Int

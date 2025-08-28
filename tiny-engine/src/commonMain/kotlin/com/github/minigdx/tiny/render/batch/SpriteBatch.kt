@@ -28,11 +28,13 @@ class SpriteBatch(
 
     var vertexIndex = 0
     var uvsIndex = 0
+    var textureIndicesIndex = 0
 
     var numberOfVertex = 0
 
     val vertex = FloatArray(VERTEX_ARRAY_SIZE)
     val uvs = FloatArray(UVS_ARRAY_SIZE)
+    val textureIndices = FloatArray(TEXTURE_INDICES_ARRAY_SIZE)
 
     fun canAddSprite(
         currentKey: BatchKey,
@@ -96,6 +98,7 @@ class SpriteBatch(
             instances.add(instance)
             vertexIndex = instance.addVertexInto(vertexIndex, vertex)
             uvsIndex = instance.addUvsInto(uvsIndex, uvs)
+            textureIndicesIndex = instance.addTextureIndicesInto(textureIndicesIndex, textureIndices, spriteSheet.textureUnit ?: 0)
             numberOfVertex += VERTEX_PER_SPRITE
         }
         return null
@@ -108,6 +111,9 @@ class SpriteBatch(
         // 2 floats per vertex. So the array is nb sprite * nb vertex * 2
         private const val VERTEX_ARRAY_SIZE = MAX_SPRITE_PER_BATCH * VERTEX_PER_SPRITE * 2
         private const val UVS_ARRAY_SIZE = MAX_SPRITE_PER_BATCH * VERTEX_PER_SPRITE * 2
+
+        // 1 float per vertex for texture index
+        private const val TEXTURE_INDICES_ARRAY_SIZE = MAX_SPRITE_PER_BATCH * VERTEX_PER_SPRITE
     }
 
     enum class RejectReason {

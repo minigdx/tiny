@@ -18,7 +18,6 @@ import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
-import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.RenderFrame
 import com.github.minigdx.tiny.render.batch.SpriteBatch
 import com.github.minigdx.tiny.render.gl.FrameBufferStage
@@ -70,8 +69,12 @@ class WebGlPlatform(
                 )
 
         val gl = KglJs(context)
-        frameBufferStage = FrameBufferStage(gl, performanceMonitor)
-        spriteBatchStage = SpriteBatchStage(gl)
+        frameBufferStage = FrameBufferStage(gl, gameOptions, performanceMonitor).also {
+            it.init(windowManager)
+        }
+        spriteBatchStage = SpriteBatchStage(gl, gameOptions, performanceMonitor).also {
+            it.init()
+        }
     }
 
     override fun gameLoop(gameLoop: GameLoop) {
@@ -145,7 +148,7 @@ class WebGlPlatform(
         frameBufferStage.execute(spriteBatchStage)
     }
 
-    override fun readFrameBuffer(renderContext: RenderContext): RenderFrame {
+    override fun readFrameBuffer(): RenderFrame {
         TODO()
     }
 }

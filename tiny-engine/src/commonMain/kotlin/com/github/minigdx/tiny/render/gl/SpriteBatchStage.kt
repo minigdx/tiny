@@ -1,7 +1,6 @@
 package com.github.minigdx.tiny.render.gl
 
 import com.danielgergely.kgl.ByteBuffer
-import com.danielgergely.kgl.Framebuffer
 import com.danielgergely.kgl.GL_COLOR_ATTACHMENT0
 import com.danielgergely.kgl.GL_DEPTH24_STENCIL8
 import com.danielgergely.kgl.GL_FRAMEBUFFER
@@ -9,6 +8,7 @@ import com.danielgergely.kgl.GL_FRAMEBUFFER_COMPLETE
 import com.danielgergely.kgl.GL_NEAREST
 import com.danielgergely.kgl.GL_RENDERBUFFER
 import com.danielgergely.kgl.GL_RGBA
+import com.danielgergely.kgl.GL_SCISSOR_TEST
 import com.danielgergely.kgl.GL_STENCIL_ATTACHMENT
 import com.danielgergely.kgl.GL_TEXTURE_2D
 import com.danielgergely.kgl.GL_TEXTURE_MAG_FILTER
@@ -16,8 +16,8 @@ import com.danielgergely.kgl.GL_TEXTURE_MIN_FILTER
 import com.danielgergely.kgl.GL_TRIANGLES
 import com.danielgergely.kgl.GL_UNSIGNED_BYTE
 import com.danielgergely.kgl.Kgl
-import com.danielgergely.kgl.Texture
 import com.github.minigdx.tiny.engine.GameOptions
+import com.github.minigdx.tiny.graphic.Clipper
 import com.github.minigdx.tiny.graphic.PixelFormat
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.render.batch.SpriteBatch
@@ -26,28 +26,23 @@ import com.github.minigdx.tiny.render.shader.ShaderProgram
 import com.github.minigdx.tiny.render.shader.VertexShader
 import com.github.minigdx.tiny.resources.SpriteSheet
 
-data class FrameBufferContext2(
-    /**
-     * Framebuffer texture.
-     * Use to draw the framebuffer on the screen.
-     */
-    var frameBufferTexture: Texture,
-    /**
-     * Reference to the framebuffer.
-     * Used to bind the framebuffer in the GPU context.
-     */
-    var frameBuffer: Framebuffer,
-    /**
-     * Data in which the Framebuffer will be written.
-     * Used to read the rendered framebuffer.
-     */
-    var frameBufferData: ByteBuffer,
-)
+class SpriteBatchStage(
+    gl: Kgl,
+    private val gameOptions: GameOptions,
+    private val performanceMonitor: PerformanceMonitor,
+) {
+    class SpriteBatchState private constructor(
+        var dither: Int = 0xFFFF,
+        val clipper: Clipper,
+    ) {
+        constructor(gameOptions: GameOptions) : this(0XFFFF, Clipper(gameOptions.width, gameOptions.height))
+    }
 
-class SpriteBatchStage(gl: Kgl, private val gameOptions: GameOptions, private val performanceMonitor: PerformanceMonitor) {
-    lateinit var frameBufferContext: FrameBufferContext2
+    lateinit var frameBufferContext: FrameBufferContext
 
     private val program = ShaderProgram(gl, VShader(), FShader())
+
+    private val spriteBatchState = SpriteBatchState(gameOptions)
 
     fun init() {
         program.compileShader()
@@ -90,9 +85,27 @@ class SpriteBatchStage(gl: Kgl, private val gameOptions: GameOptions, private va
         program.bindTexture(GL_TEXTURE_2D, null)
         program.bindFramebuffer(GL_FRAMEBUFFER, null)
 
-        frameBufferContext = FrameBufferContext2(
+        frameBufferContext = FrameBufferContext(
             frameBufferTexture, frameBuffer, frameBufferData,
         )
+
+        program.fragmentShader.uDither.apply(spriteBatchState.dither)
+
+        val clipper = spriteBatchState.clipper
+        program.enable(GL_SCISSOR_TEST)
+        val width = clipper.right - clipper.left
+        val height = clipper.bottom - clipper.top
+        program.scissor(
+            x = clipper.left,
+            y = gameOptions.height - clipper.top - height,
+            width = width,
+            height = height,
+        )
+
+        val emptyByteArray = ByteArray(8 * 8) { 3 }
+        program.fragmentShader.spritesheets.forEach {
+            it.applyIndex(emptyByteArray, 8, 8)
+        }
     }
 
     fun bindTextures(spritesheets: List<SpriteSheet>) {
@@ -109,8 +122,37 @@ class SpriteBatchStage(gl: Kgl, private val gameOptions: GameOptions, private va
         }
     }
 
+    fun startStage() {
+        program.bindFramebuffer(GL_FRAMEBUFFER, frameBufferContext.frameBuffer)
+
+        program.viewport(0, 0, gameOptions.width, gameOptions.height)
+    }
+
+    fun endStage() {
+        program.bindFramebuffer(GL_FRAMEBUFFER, null)
+    }
+
     fun execute(batch: SpriteBatch) {
         program.use()
+
+        if (batch.key.dither != spriteBatchState.dither) {
+            spriteBatchState.dither = batch.key.dither
+            program.fragmentShader.uDither.apply(spriteBatchState.dither)
+        }
+
+        val clipper = batch.key.clipper
+        checkNotNull(clipper) { "Clipper is not expected to be null." }
+        if (clipper != spriteBatchState.clipper) {
+            spriteBatchState.clipper.set(clipper.left, clipper.top, clipper.right, clipper.bottom)
+            val width = clipper.right - clipper.left
+            val height = clipper.bottom - clipper.top
+            program.scissor(
+                x = clipper.left,
+                y = gameOptions.height - clipper.top - height,
+                width = width,
+                height = height,
+            )
+        }
 
         // 1. Upload palette color if changed
         // -- Set the color palette -- //
@@ -133,20 +175,17 @@ class SpriteBatchStage(gl: Kgl, private val gameOptions: GameOptions, private va
             colorPaletteBuffer[pos++] = color[3]
         }
 
-        // FIXME: TO BE REMOVED. ONLY FOR TESTING
-        program.fragmentShader.spritesheets.forEach {
-            it.applyRGBA(colorPaletteBuffer, 256, 256)
-        }
-
         program.fragmentShader.paletteColors.applyRGBA(colorPaletteBuffer, 256, 256)
 
         // 2. upload vertex along site sprite index
         program.vertexShader.aPos.apply(batch.vertex)
         program.vertexShader.aSpr.apply(batch.uvs)
+        program.vertexShader.aTextureIndex.apply(batch.textureIndices)
 
         // FIXME: TODO: aSpr + type de sprite pour savoir quel sprite bank utiliser ?
         // 3. setup uniforms (dithering, ...)
         // 4. draw
+
         program.bind()
         program.drawArrays(GL_TRIANGLES, 0, batch.numberOfVertex)
         performanceMonitor.drawCall(batch.numberOfVertex)
@@ -156,6 +195,7 @@ class SpriteBatchStage(gl: Kgl, private val gameOptions: GameOptions, private va
     class VShader : VertexShader(VERTEX_SHADER) {
         val aPos = inVec2("a_pos") // position of the sprite in the viewport
         val aSpr = inVec2("a_spr")
+        val aTextureIndex = inFloat("a_texture_index") // texture unit index for this sprite
         val uViewport = uniformVec2("u_viewport") // Size of the viewport; in pixel.
 
         // FIXME: pass the spritesheets size
@@ -165,6 +205,7 @@ class SpriteBatchStage(gl: Kgl, private val gameOptions: GameOptions, private va
         // FIXME(Performance): at the texture unit: spritesheet, system or primitives ?
         val vUvs = outVec2("v_uvs")
         val vPos = outVec2("v_pos")
+        val vTextureIndex = outFloat("v_texture_index")
     }
 
     class FShader : FragmentShader(FRAGMENT_SHADER) {
@@ -182,13 +223,6 @@ class SpriteBatchStage(gl: Kgl, private val gameOptions: GameOptions, private va
         val spritesheet7 = uniformSample2D("spritesheet7")
         val spritesheet8 = uniformSample2D("spritesheet8")
         val spritesheet9 = uniformSample2D("spritesheet9")
-        val spritesheet10 = uniformSample2D("spritesheet10")
-        val spritesheet11 = uniformSample2D("spritesheet11")
-        val spritesheet12 = uniformSample2D("spritesheet12")
-        val spritesheet13 = uniformSample2D("spritesheet13")
-        val spritesheet14 = uniformSample2D("spritesheet14")
-        val spritesheet15 = uniformSample2D("spritesheet15")
-        val spritesheet16 = uniformSample2D("spritesheet16")
 
         val spritesheets = listOf(
             spritesheet0,
@@ -201,19 +235,13 @@ class SpriteBatchStage(gl: Kgl, private val gameOptions: GameOptions, private va
             spritesheet7,
             spritesheet8,
             spritesheet9,
-            spritesheet10,
-            spritesheet11,
-            spritesheet12,
-            spritesheet13,
-            spritesheet14,
-            spritesheet15,
-            spritesheet16,
         )
 
         val uDither = uniformInt("u_dither")
 
         val vUvs = inVec2("v_uvs")
         val vPos = inVec2("v_pos")
+        val vTextureIndex = inFloat("v_texture_index")
     }
 
     companion object {
@@ -239,6 +267,7 @@ class SpriteBatchStage(gl: Kgl, private val gameOptions: GameOptions, private va
                 v_uvs = ndc_spr;
                 
                 v_pos = final_pos;
+                v_texture_index = a_texture_index;
             }
             """.trimIndent()
 
@@ -284,18 +313,32 @@ class SpriteBatchStage(gl: Kgl, private val gameOptions: GameOptions, private va
                 vec4 color;
                 if(textureIndex == 0) {
                      color = texture(spritesheet0, v_uvs);
-                }  else if (textureIndex == 1) {
+                } else if (textureIndex == 1) {
                      color = texture(spritesheet1, v_uvs);
+                } else if (textureIndex == 2) {
+                     color = texture(spritesheet2, v_uvs);
+                } else if (textureIndex == 3) {
+                     color = texture(spritesheet3, v_uvs);
+                } else if (textureIndex == 4) {
+                     color = texture(spritesheet4, v_uvs);
+                } else if (textureIndex == 5) {
+                     color = texture(spritesheet5, v_uvs);
+                } else if (textureIndex == 6) {
+                     color = texture(spritesheet6, v_uvs);
+                } else if (textureIndex == 7) {
+                     color = texture(spritesheet7, v_uvs);
+                } else if (textureIndex == 8) {
+                     color = texture(spritesheet8, v_uvs);
                 } else {
-                     color = texture(spritesheet16, v_uvs);
-                }
-                
+                     color = texture(spritesheet9, v_uvs);
+                } 
+               
                 return int(color.r * 255.0 + 0.5);
             }
                          
             void main() {
                 if (dither(u_dither, int(v_pos.x), int(v_pos.y))) {
-                    int pixel = readPixel(0, v_uvs);
+                    int pixel = readPixel(int(v_texture_index), v_uvs);
                     vec4 color = readColor(pixel);
                     if(color.a <= 0.1) {
                         discard;

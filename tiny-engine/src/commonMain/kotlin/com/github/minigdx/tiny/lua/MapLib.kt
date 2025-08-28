@@ -5,7 +5,7 @@ import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.Pixel
-import com.github.minigdx.tiny.engine.GameResourceAccess2
+import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.render.VirtualFrameBuffer
 import com.github.minigdx.tiny.resources.SpriteSheet
 import com.github.minigdx.tiny.resources.ldtk.CustomField
@@ -50,7 +50,7 @@ import kotlin.math.floor
     "Access map created with LDTk ( https://ldtk.io/ ).",
 )
 class MapLib(
-    private val resourceAccess: GameResourceAccess2,
+    private val resourceAccess: GameResourceAccess,
     private val spriteSize: Pair<Pixel, Pixel>,
     private val virtualFrameBuffer: VirtualFrameBuffer,
 ) : TwoArgFunction() {

@@ -5,7 +5,7 @@ import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.engine.GameResourceAccess2
+import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.platform.DrawingMode
 import com.github.minigdx.tiny.render.VirtualFrameBuffer
 import org.luaj.vm2.LuaTable
@@ -22,7 +22,7 @@ import kotlin.math.min
     "Access to graphical API like updating the color palette or applying a dithering pattern.",
 )
 class GfxLib(
-    private val resourceAccess: GameResourceAccess2,
+    private val resourceAccess: GameResourceAccess,
     private val gameOptions: GameOptions,
     virtualFrameBuffer: VirtualFrameBuffer,
 ) : TwoArgFunction() {
@@ -205,6 +205,7 @@ class GfxLib(
             val closure = b.checkclosure() ?: return call(a)
 
             // FIXME:
+
             /*
 
             val frameBuffer = resourceAccess.renderAsBuffer { closure.invoke() }
@@ -233,7 +234,9 @@ class GfxLib(
             }
 
              */
+
             // FIXME:
+
             TODO()
         }
     }
@@ -250,7 +253,9 @@ class GfxLib(
             resourceAccess.frameBuffer.blender.pal()
 
              */
+
             // FIXME:
+
             return NONE
         }
 
@@ -260,11 +265,13 @@ class GfxLib(
             b: LuaValue,
         ): LuaValue {
             // FIXME:
+
             /*
             resourceAccess.addOp(PaletteOperation)
             resourceAccess.frameBuffer.blender.pal(a.checkint(), b.checkint())
 
              */
+
             return NONE
         }
     }
@@ -279,7 +286,9 @@ class GfxLib(
             resourceAccess.frameBuffer.camera.set(0, 0)
 
              */
+
             // FIXME:
+
             val previous = coordinates()
             return previous
         }
@@ -295,7 +304,9 @@ class GfxLib(
             resourceAccess.frameBuffer.camera.set(arg1.toint(), arg2.toint())
 
              */
+
             // FIXME:
+
             val previous = coordinates()
             return previous
         }
@@ -303,6 +314,7 @@ class GfxLib(
         private fun coordinates(): LuaTable {
             return LuaTable().apply {
                 // FIXME:
+
                 // set("x", resourceAccess.frameBuffer.camera.x)
                 // set("y", resourceAccess.frameBuffer.camera.y)
             }
@@ -325,7 +337,9 @@ class GfxLib(
             resourceAccess.addOp(DitheringOperation)
             return valueOf(resourceAccess.frameBuffer.blender.dither(0xFFFF))
              */
+
             // FIXME:
+
             TODO()
         }
 
@@ -338,7 +352,9 @@ class GfxLib(
             return valueOf(resourceAccess.frameBuffer.blender.dither(a.checkint()))
 
              */
+
             // FIXME:
+
             TODO()
         }
     }
@@ -355,7 +371,9 @@ class GfxLib(
             resourceAccess.frameBuffer.clipper.reset()
 
              */
+
             // FIXME:
+
             return NONE
         }
 
@@ -371,7 +389,9 @@ class GfxLib(
             resourceAccess.addOp(ClipOperation)
             resourceAccess.frameBuffer.clipper.set(a.checkint(), b.checkint(), c.checkint(), d.checkint())
              */
+
             // FIXME:
+
             return NONE
         }
     }
@@ -381,7 +401,9 @@ class GfxLib(
             this.checkint()
         } else {
             // resourceAccess.frameBuffer.gamePalette.getColorIndex(this.checkjstring()!!)
+
             // FIXME:
+
             return 0
         }
     }

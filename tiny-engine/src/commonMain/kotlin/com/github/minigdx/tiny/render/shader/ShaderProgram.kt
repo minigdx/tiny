@@ -97,8 +97,8 @@ class ShaderProgram<V : VertexShader, F : FragmentShader>(
     }
 
     fun createUniform(name: String) {
-        uniforms[name] =
-            gl.getUniformLocation(program!!, name) ?: throw IllegalArgumentException("Uniform $name not found")
+        val uniformLocation = gl.getUniformLocation(program!!, name)
+        uniforms[name] = uniformLocation ?: throw IllegalArgumentException("Uniform $name not found")
     }
 
     fun getAttrib(name: String): Int = attributes[name] ?: throw IllegalStateException("Attributes '$name' not created!")

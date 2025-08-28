@@ -6,8 +6,9 @@ import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.engine.GameResourceAccess2
+import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.graphic.PixelArray
+import com.github.minigdx.tiny.render.VirtualFrameBuffer
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
@@ -17,7 +18,11 @@ import org.luaj.vm2.lib.ThreeArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 
 @TinyLib("spr", "Sprite API to draw or update sprites.")
-class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAccess2) : TwoArgFunction() {
+class SprLib(
+    val virtualFrameBuffer: VirtualFrameBuffer,
+    val resourceAccess: GameResourceAccess,
+    val gameOptions: GameOptions,
+) : TwoArgFunction() {
     private var currentSpritesheet: Int = 0
 
     override fun call(
@@ -46,10 +51,7 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
             @TinyArg("x") arg1: LuaValue,
             @TinyArg("y") arg2: LuaValue,
         ): LuaValue {
-            // FIXME:
-            TODO()
-/*
-            val pixelArray = resourceAccess.spritesheet(currentSpritesheet)?.pixels ?: return NIL
+            val pixelArray = resourceAccess.findSpritesheet(currentSpritesheet)?.pixels ?: return NIL
 
             val x = arg1.checkint()
             val y = arg2.checkint()
@@ -61,8 +63,6 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
             } else {
                 return NIL
             }
-
- */
         }
     }
 
@@ -86,20 +86,15 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
             @TinyArg("y") arg2: LuaValue,
             @TinyArg("color") arg3: LuaValue,
         ): LuaValue {
-            // FIXME:
-            TODO()
-/*
             val x = arg1.checkint()
             val y = arg2.checkint()
-            val pixels = resourceAccess.spritesheet(currentSpritesheet)?.pixels ?: return NIL
+            val pixels = resourceAccess.findSpritesheet(currentSpritesheet)?.pixels ?: return NIL
             return if (isInPixelArray(pixels, x, y)) {
                 pixels.set(x, y, arg3.checkint())
                 arg3
             } else {
                 NIL
             }
-
- */
         }
     }
 
@@ -118,21 +113,16 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
         override fun call(
             @TinyArg("spritesheetN") arg: LuaValue,
         ): LuaValue {
-            // FIXME:
-            TODO()
-/*
             val previousSpriteSheet = currentSpritesheet
-            currentSpritesheet =
-                if (arg.isnil()) {
-                    0
-                } else if (arg.isstring()) {
-                    resourceAccess.spritesheet(arg.tojstring()) ?: 0
-                } else {
-                    arg.checkint()
-                }
+            currentSpritesheet = if (arg.isnil()) {
+                0
+            } else if (arg.isstring()) {
+                val spritesheet = resourceAccess.findSpritesheet(arg.tojstring())
+                spritesheet?.index ?: 0
+            } else {
+                arg.checkint()
+            }
             return valueOf(previousSpriteSheet)
-
- */
         }
     }
 
@@ -191,10 +181,7 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
                     ),
             ) args: Varargs,
         ): Varargs {
-            // FIXME:
-            TODO()
-/*
-            val spritesheet = resourceAccess.spritesheet(currentSpritesheet) ?: return NIL
+            val spritesheet = resourceAccess.findSpritesheet(currentSpritesheet) ?: return NIL
 
             val x = args.arg(1).optint(0)
             val y = args.arg(2).optint(0)
@@ -205,8 +192,7 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
             val flipX = args.arg(7).optboolean(false)
             val flipY = args.arg(8).optboolean(false)
 
-            val op = DrawSprite.from(
-                resourceAccess,
+            virtualFrameBuffer.draw(
                 spritesheet,
                 sourceX = sprX,
                 sourceY = sprY,
@@ -216,16 +202,9 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
                 destinationY = y,
                 flipX = flipX,
                 flipY = flipY,
-                dither = resourceAccess.frameBuffer.blender.dithering,
-                pal = resourceAccess.frameBuffer.blender.switch,
-                camera = resourceAccess.frameBuffer.camera,
-                clipper = resourceAccess.frameBuffer.clipper,
             )
-            resourceAccess.addOp(op)
 
             return NONE
-
- */
         }
     }
 
@@ -247,9 +226,6 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
         override fun invoke(
             @TinyArgs(["sprN", "x", "y", "flipX", "flipY"]) args: Varargs,
         ): Varargs {
-            // FIXME:
-            TODO()
-/*
             if (args.narg() < 1) return NIL
             val sprN = args.arg(1).checkint()
             val x = args.arg(2).optint(0)
@@ -257,7 +233,7 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
             val flipX = args.arg(4).optboolean(false)
             val flipY = args.arg(5).optboolean(false)
 
-            val spritesheet = resourceAccess.spritesheet(currentSpritesheet) ?: return NONE
+            val spritesheet = resourceAccess.findSpritesheet(currentSpritesheet) ?: return NONE
 
             val (sw, sh) = gameOptions.spriteSize
             val nbSpritePerRow = spritesheet.width / sw
@@ -265,8 +241,7 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
             val column = sprN % nbSpritePerRow
             val row = (sprN - column) / nbSpritePerRow
 
-            val op = DrawSprite.from(
-                resourceAccess,
+            virtualFrameBuffer.draw(
                 spritesheet,
                 sourceX = column * sw,
                 sourceY = row * sh,
@@ -276,16 +251,9 @@ class SprLib(val gameOptions: GameOptions, val resourceAccess: GameResourceAcces
                 destinationY = y,
                 flipX = flipX,
                 flipY = flipY,
-                dither = resourceAccess.frameBuffer.blender.dithering,
-                pal = resourceAccess.frameBuffer.blender.switch,
-                camera = resourceAccess.frameBuffer.camera,
-                clipper = resourceAccess.frameBuffer.clipper,
             )
-            resourceAccess.addOp(op)
 
             return NONE
-
- */
         }
     }
 }

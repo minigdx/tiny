@@ -2,7 +2,7 @@ package com.github.minigdx.tiny.resources
 
 import com.github.minigdx.tiny.engine.Exit
 import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.engine.GameResourceAccess2
+import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.lua.CtrlLib
@@ -58,7 +58,7 @@ class GameScript(
     var exited: Int = -1
     var evaluated: Boolean = false
 
-    lateinit var resourceAccess: GameResourceAccess2
+    lateinit var resourceAccess: GameResourceAccess
 
     override var reload: Boolean = false
 
@@ -80,7 +80,11 @@ class GameScript(
 
     private fun createLuaGlobals(forValidation: Boolean = false): Globals =
         Globals().apply {
-            val sprLib = SprLib(this@GameScript.gameOptions, this@GameScript.resourceAccess)
+            val sprLib = SprLib(
+                virtualFrameBuffer,
+                resourceAccess,
+                gameOptions,
+            )
 
             load(TinyBaseLib(this@GameScript.resourceAccess))
             load(PackageLib())

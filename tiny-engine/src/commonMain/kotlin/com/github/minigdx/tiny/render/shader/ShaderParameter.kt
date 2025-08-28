@@ -320,6 +320,54 @@ sealed class ShaderParameter(val name: String) {
         override fun toString() = "in vec3 $name;"
     }
 
+    class InFloat(name: String) : ShaderParameter(name), In {
+        private var buffer: GlBuffer? = null
+
+        private lateinit var program: ShaderProgram<*, *>
+
+        override fun create(program: ShaderProgram<*, *>) {
+            this.program = program
+            program.createAttrib(name)
+            buffer = program.createBuffer()
+        }
+
+        fun apply(
+            data: FloatArray,
+            stride: Int = 0,
+        ) {
+            // Bind VAO to ensure vertex attribute configuration is captured
+            val vaoManager = VaoManager(program.gl)
+            vaoManager.bindVao(program.vao)
+
+            program.bindBuffer(GL_ARRAY_BUFFER, buffer)
+            program.bufferData(GL_ARRAY_BUFFER, FloatBuffer(data), data.size * GL_FLOAT, GL_DYNAMIC_DRAW)
+            program.vertexAttribPointer(
+                location = program.getAttrib(name),
+                size = 1,
+                type = GL_FLOAT,
+                normalized = false,
+                stride = stride,
+                offset = 0,
+            )
+            program.enableVertexAttribArray(program.getAttrib(name))
+
+            vaoManager.unbindVao()
+        }
+
+        override fun bind() {
+            program.bindBuffer(GL_ARRAY_BUFFER, buffer)
+            // Note: In OpenGL 3.3 Core Profile with VAO, vertex attributes should already be configured
+            // in the VAO when apply() was called, so we don't need to re-enable them here
+        }
+
+        override fun unbind() {
+            program.disableVertexAttribArray(program.getAttrib(name))
+            program.bindBuffer(GL_ARRAY_BUFFER, null)
+        }
+
+        override fun toString() = "in float $name;"
+    }
+
     class UniformSample2D(name: String, override val index: Int, private val existingTexture: Boolean = false) :
         ShaderParameter(name), Uniform, Sampler {
         private var texture: Texture? = null
@@ -433,6 +481,12 @@ sealed class ShaderParameter(val name: String) {
         override fun create(program: ShaderProgram<*, *>) = Unit
 
         override fun toString() = "out vec4 $name;"
+    }
+
+    class OutFloat(name: String) : ShaderParameter(name), Varying {
+        override fun create(program: ShaderProgram<*, *>) = Unit
+
+        override fun toString() = "out float $name;"
     }
 
     class VaryingFloat(name: String) : ShaderParameter(name), Varying {

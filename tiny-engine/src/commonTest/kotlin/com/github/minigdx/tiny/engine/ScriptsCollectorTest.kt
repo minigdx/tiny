@@ -2,6 +2,8 @@ package com.github.minigdx.tiny.engine
 
 import com.github.minigdx.tiny.resources.GameResource
 import com.github.minigdx.tiny.resources.ResourceType
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -20,8 +22,16 @@ class ScriptsCollectorTest {
     @Test
     fun emit_order_game_engine_boot_should_reorder_to_boot_engine_game() =
         runTest {
+            val eventChannel = Channel<GameResource>(Channel.UNLIMITED)
+            val collector = GameResourceCollector(eventChannel)
             val events = mutableListOf<GameResource>()
-            val collector = GameResourceCollector(events)
+
+            // Launch a coroutine to collect events from the channel
+            val job = launch {
+                for (event in eventChannel) {
+                    events.add(event)
+                }
+            }
 
             val gameScript = TestGameResource(index = 1, type = ResourceType.GAME_GAMESCRIPT)
             val engineScript = TestGameResource(index = 1, type = ResourceType.ENGINE_GAMESCRIPT)
@@ -30,6 +40,9 @@ class ScriptsCollectorTest {
             collector.emit(gameScript)
             collector.emit(engineScript)
             collector.emit(bootScript)
+
+            eventChannel.close()
+            job.join()
 
             assertEquals(3, events.size)
             assertEquals(ResourceType.BOOT_GAMESCRIPT, events[0].type)
@@ -40,8 +53,16 @@ class ScriptsCollectorTest {
     @Test
     fun emit_order_engine_game_boot_should_reorder_to_boot_engine_game() =
         runTest {
+            val eventChannel = Channel<GameResource>(Channel.UNLIMITED)
+            val collector = GameResourceCollector(eventChannel)
             val events = mutableListOf<GameResource>()
-            val collector = GameResourceCollector(events)
+
+            // Launch a coroutine to collect events from the channel
+            val job = launch {
+                for (event in eventChannel) {
+                    events.add(event)
+                }
+            }
 
             val engineScript = TestGameResource(index = 2, type = ResourceType.ENGINE_GAMESCRIPT)
             val gameScript = TestGameResource(index = 2, type = ResourceType.GAME_GAMESCRIPT)
@@ -50,6 +71,9 @@ class ScriptsCollectorTest {
             collector.emit(engineScript)
             collector.emit(gameScript)
             collector.emit(bootScript)
+
+            eventChannel.close()
+            job.join()
 
             assertEquals(3, events.size)
             assertEquals(ResourceType.BOOT_GAMESCRIPT, events[0].type)
@@ -60,8 +84,16 @@ class ScriptsCollectorTest {
     @Test
     fun emit_same_game_script_twice_should_set_reload_flag_on_second() =
         runTest {
+            val eventChannel = Channel<GameResource>(Channel.UNLIMITED)
+            val collector = GameResourceCollector(eventChannel)
             val events = mutableListOf<GameResource>()
-            val collector = GameResourceCollector(events)
+
+            // Launch a coroutine to collect events from the channel
+            val job = launch {
+                for (event in eventChannel) {
+                    events.add(event)
+                }
+            }
 
             val bootScript = TestGameResource(index = 3, type = ResourceType.BOOT_GAMESCRIPT)
             val engineScript = TestGameResource(index = 3, type = ResourceType.ENGINE_GAMESCRIPT)
@@ -77,6 +109,9 @@ class ScriptsCollectorTest {
             collector.emit(engineScript)
             collector.emit(gameScript1)
             collector.emit(gameScript2)
+
+            eventChannel.close()
+            job.join()
 
             assertEquals(4, events.size)
             assertEquals(ResourceType.BOOT_GAMESCRIPT, events[0].type)

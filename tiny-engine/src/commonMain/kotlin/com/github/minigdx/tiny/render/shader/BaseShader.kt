@@ -37,6 +37,13 @@ abstract class BaseShader(private val shader: String) {
         }
     }
 
+    fun inFloat(name: String): ShaderParameter.InFloat {
+        return ShaderParameter.InFloat(name).also {
+            parameters += it
+            inParameters += it
+        }
+    }
+
     fun outVec2(name: String): ShaderParameter.OutVec2 {
         return ShaderParameter.OutVec2(name).also { parameters += it }
     }
@@ -47,6 +54,10 @@ abstract class BaseShader(private val shader: String) {
 
     fun outVec4(name: String): ShaderParameter.OutVec4 {
         return ShaderParameter.OutVec4(name).also { parameters += it }
+    }
+
+    fun outFloat(name: String): ShaderParameter.OutFloat {
+        return ShaderParameter.OutFloat(name).also { parameters += it }
     }
 
     fun uniformSample2D(

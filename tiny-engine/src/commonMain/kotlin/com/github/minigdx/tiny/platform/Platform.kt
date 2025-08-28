@@ -8,7 +8,6 @@ import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
-import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.RenderFrame
 import com.github.minigdx.tiny.render.batch.SpriteBatch
 import com.github.minigdx.tiny.resources.SpriteSheet
@@ -148,5 +147,5 @@ interface Platform {
     /**
      * Read the full rendered screen into a frame.
      */
-    fun readFrameBuffer(renderContext: RenderContext): RenderFrame
+    fun readFrameBuffer(): RenderFrame
 }

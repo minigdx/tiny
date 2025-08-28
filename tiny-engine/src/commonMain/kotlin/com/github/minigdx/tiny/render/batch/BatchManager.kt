@@ -47,6 +47,8 @@ class BatchManager {
             obj.sheets.clear()
             obj.pendingTextureBinds.clear()
             obj.vertexIndex = 0
+            obj.uvsIndex = 0
+            obj.textureIndicesIndex = 0
 
             obj._key = null
         }

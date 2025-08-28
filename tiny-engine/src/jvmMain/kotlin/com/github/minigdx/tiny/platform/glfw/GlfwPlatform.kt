@@ -20,12 +20,9 @@ import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
-import com.github.minigdx.tiny.render.Render
-import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.RenderFrame
 import com.github.minigdx.tiny.render.batch.SpriteBatch
 import com.github.minigdx.tiny.render.gl.FrameBufferStage
-import com.github.minigdx.tiny.render.gl.OpenGLRender
 import com.github.minigdx.tiny.render.gl.SpriteBatchStage
 import com.github.minigdx.tiny.resources.SpriteSheet
 import com.github.minigdx.tiny.sound.JavaSoundManager
@@ -59,7 +56,6 @@ class GlfwPlatform(
     private val jarResourcePrefix: String = "",
 ) : Platform {
     override val performanceMonitor: PerformanceMonitor = LwjglPerformanceMonitor()
-    private val render: Render = OpenGLRender(KglLwjgl, gameOptions, performanceMonitor)
 
     private var window: Long = 0
 
@@ -74,7 +70,7 @@ class GlfwPlatform(
 
     private val recordScope = CoroutineScope(Dispatchers.IO)
 
-    private val frameBufferStage = FrameBufferStage(KglLwjgl, performanceMonitor)
+    private val frameBufferStage = FrameBufferStage(KglLwjgl, gameOptions, performanceMonitor)
 
     private val spriteBatchStage = SpriteBatchStage(KglLwjgl, gameOptions, performanceMonitor)
 
@@ -177,7 +173,7 @@ class GlfwPlatform(
 
     override fun initRenderManager(windowManager: WindowManager) {
         spriteBatchStage.init()
-        frameBufferStage.init()
+        frameBufferStage.init(windowManager)
     }
 
     override fun initInputManager(): InputManager {
@@ -374,7 +370,7 @@ class GlfwPlatform(
         spriteBatchStage.bindTextures(spritesheets)
     }
 
-    override fun readFrameBuffer(renderContext: RenderContext): RenderFrame {
+    override fun readFrameBuffer(): RenderFrame {
         TODO()
     }
 
@@ -383,7 +379,9 @@ class GlfwPlatform(
     }
 
     override fun drawFrameBuffer() {
+        spriteBatchStage.endStage()
         frameBufferStage.execute(spriteBatchStage)
+        spriteBatchStage.startStage()
     }
 
     override fun createLocalFile(

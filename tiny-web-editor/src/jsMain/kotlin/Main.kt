@@ -15,7 +15,6 @@ import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.platform.webgl.WebGlPlatform
-import com.github.minigdx.tiny.render.RenderContext
 import com.github.minigdx.tiny.render.batch.SpriteBatch
 import com.github.minigdx.tiny.resources.SpriteSheet
 import com.github.minigdx.tiny.sound.SoundManager
@@ -355,5 +354,5 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
 
     override fun drawFrameBuffer() = delegate.drawFrameBuffer()
 
-    override fun readFrameBuffer(renderContext: RenderContext) = delegate.readFrameBuffer(renderContext)
+    override fun readFrameBuffer() = delegate.readFrameBuffer()
 }

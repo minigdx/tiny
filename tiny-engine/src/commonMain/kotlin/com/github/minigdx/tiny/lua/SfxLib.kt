@@ -4,7 +4,7 @@ import com.github.mingdx.tiny.doc.TinyArg
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
-import com.github.minigdx.tiny.engine.GameResourceAccess2
+import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.sound.Instrument
 import com.github.minigdx.tiny.sound.Music
 import com.github.minigdx.tiny.sound.MusicalBar
@@ -63,7 +63,7 @@ or by starting the sound as soon as the player is moving.
 """,
 )
 class SfxLib(
-    private val resourceAccess: GameResourceAccess2,
+    private val resourceAccess: GameResourceAccess,
     // When validating the script, don't play sound
     private val playSound: Boolean = true,
 ) : TwoArgFunction() {

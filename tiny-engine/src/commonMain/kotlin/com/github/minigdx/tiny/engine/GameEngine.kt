@@ -10,8 +10,6 @@ import com.github.minigdx.tiny.lua.toTinyException
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.performance.PerformanceMetrics
 import com.github.minigdx.tiny.render.DefaultVirtualFrameBuffer
-import com.github.minigdx.tiny.render.RenderContext
-import com.github.minigdx.tiny.render.operations.RenderOperation
 import com.github.minigdx.tiny.resources.GameScript
 import com.github.minigdx.tiny.resources.ResourceFactory
 import com.github.minigdx.tiny.sound.SoundManager
@@ -27,15 +25,12 @@ class GameEngine(
     val logger: Logger,
     val listener: GameEngineListener? = null,
 ) : GameLoop {
-    private val ops = mutableListOf<RenderOperation>()
-
     private var currentScriptHasError = false
 
     private var accumulator: Seconds = 0f
     private var currentFrame: Long = 0L
     private var currentMetrics: PerformanceMetrics? = null
 
-    lateinit var renderContext: RenderContext
     lateinit var inputHandler: InputHandler
     lateinit var inputManager: InputManager
     lateinit var soundManager: SoundManager
@@ -132,7 +127,6 @@ class GameEngine(
 
     private suspend fun advanceGameScript(currentScript: GameScript?) {
         currentScriptHasError = try {
-            ops.clear() // Remove all drawing operation to prepare the new frame.
             currentScript?.advance()
             false
         } catch (ex: TinyException) {
