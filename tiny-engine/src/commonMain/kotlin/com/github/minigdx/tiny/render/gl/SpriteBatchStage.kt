@@ -82,8 +82,6 @@ class SpriteBatchStage(
         if (program.checkFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
             throw IllegalStateException("Framebuffer is NOT complete!")
         }
-        program.bindTexture(GL_TEXTURE_2D, null)
-        program.bindFramebuffer(GL_FRAMEBUFFER, null)
 
         frameBufferContext = FrameBufferContext(
             frameBufferTexture, frameBuffer, frameBufferData,
@@ -106,6 +104,10 @@ class SpriteBatchStage(
         program.fragmentShader.spritesheets.forEach {
             it.applyIndex(emptyByteArray, 8, 8)
         }
+
+        program.disable(GL_SCISSOR_TEST)
+        program.bindTexture(GL_TEXTURE_2D, null)
+        program.bindFramebuffer(GL_FRAMEBUFFER, null)
     }
 
     fun bindTextures(spritesheets: List<SpriteSheet>) {
@@ -123,18 +125,19 @@ class SpriteBatchStage(
     }
 
     fun startStage() {
+        program.use()
         program.bindFramebuffer(GL_FRAMEBUFFER, frameBufferContext.frameBuffer)
+        program.enable(GL_SCISSOR_TEST)
 
         program.viewport(0, 0, gameOptions.width, gameOptions.height)
     }
 
     fun endStage() {
+        program.disable(GL_SCISSOR_TEST)
         program.bindFramebuffer(GL_FRAMEBUFFER, null)
     }
 
     fun execute(batch: SpriteBatch) {
-        program.use()
-
         if (batch.key.dither != spriteBatchState.dither) {
             spriteBatchState.dither = batch.key.dither
             program.fragmentShader.uDither.apply(spriteBatchState.dither)

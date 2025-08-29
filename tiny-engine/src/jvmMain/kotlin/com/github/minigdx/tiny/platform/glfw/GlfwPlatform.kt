@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.platform.glfw
 
+import com.danielgergely.kgl.Kgl
 import com.danielgergely.kgl.KglLwjgl
 import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.engine.GameLoop
@@ -359,11 +360,18 @@ class GlfwPlatform(
     }
 
     override fun createSpriteStage(): SpriteBatchStage {
-        return SpriteBatchStage(KglLwjgl, gameOptions, performanceMonitor).also { it.init() }
+        return SpriteBatchStage(kgl(), gameOptions, performanceMonitor).also { it.init() }
+    }
+
+    private fun kgl(): Kgl {
+        /*val before = { bf: String -> println("-> $bf") }
+        val afiter = { af: String -> println("<- $af")}
+        return DebugKgl(KglLwjgl, before, afiter)*/
+        return KglLwjgl
     }
 
     override fun createFrameBufferStage(windowManager: WindowManager): FrameBufferStage {
-        return FrameBufferStage(KglLwjgl, gameOptions, performanceMonitor).also { it.init(windowManager) }
+        return FrameBufferStage(kgl(), gameOptions, performanceMonitor).also { it.init(windowManager) }
     }
 
     override fun createLocalFile(

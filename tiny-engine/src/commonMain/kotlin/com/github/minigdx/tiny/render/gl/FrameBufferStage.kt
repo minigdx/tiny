@@ -2,6 +2,8 @@ package com.github.minigdx.tiny.render.gl
 
 import com.danielgergely.kgl.GL_COLOR_BUFFER_BIT
 import com.danielgergely.kgl.GL_DEPTH_BUFFER_BIT
+import com.danielgergely.kgl.GL_FRAMEBUFFER
+import com.danielgergely.kgl.GL_TRIANGLES
 import com.danielgergely.kgl.Kgl
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.platform.WindowManager
@@ -56,6 +58,7 @@ class FrameBufferStage(
 
     fun execute(stage: SpriteBatchStage) {
         program.use()
+        program.bindFramebuffer(GL_FRAMEBUFFER, null)
 
         program.viewport(
             gameOptions.gutter.first * gameOptions.zoom * windowManager.ratioWidth,
@@ -68,11 +71,11 @@ class FrameBufferStage(
 
         program.bind()
 
-        program.clear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
         program.clearColor(1f, 0f, 0f, 1.0f)
+        program.clear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 
         val nbVertex = 3
-        // program.drawArrays(GL_TRIANGLES, 0, nbVertex)
+        program.drawArrays(GL_TRIANGLES, 0, nbVertex)
         performanceMonitor.drawCall(nbVertex)
         performanceMonitor.drawOnScreen()
 

@@ -14,6 +14,7 @@ class DefaultVirtualFrameBuffer(
     private val gameOptions: GameOptions,
 ) : VirtualFrameBuffer {
     private var isPrimitiveBufferUpdated = false
+    private var shouldStartStage = true
 
     private val batchManager = BatchManager()
 
@@ -51,6 +52,10 @@ class DefaultVirtualFrameBuffer(
         )
 
         if (immediateDraw) {
+            if (shouldStartStage) {
+                shouldStartStage = false
+                spriteBatchStage.startStage()
+            }
             batchManager.consumeAllBatches { batch ->
                 spriteBatchStage.execute(batch)
                 primitiveBuffer.clear(0)
@@ -78,6 +83,10 @@ class DefaultVirtualFrameBuffer(
             primitiveBuffer.clipper,
         )
         if (immediateDraw) {
+            if (shouldStartStage) {
+                shouldStartStage = false
+                spriteBatchStage.startStage()
+            }
             batchManager.consumeAllBatches { batch ->
                 spriteBatchStage.execute(batch)
                 primitiveBuffer.clear(0)
@@ -88,12 +97,18 @@ class DefaultVirtualFrameBuffer(
     }
 
     override fun draw() {
+        if (shouldStartStage) {
+            shouldStartStage = false
+            spriteBatchStage.startStage()
+        }
         batchManager.consumeAllBatches { batch ->
             spriteBatchStage.execute(batch)
         }
         spriteBatchStage.endStage()
+
+        shouldStartStage = true
+
         frameBufferStage.execute(spriteBatchStage)
-        spriteBatchStage.startStage()
     }
 
     override fun bindTextures(spritesheetToBind: List<SpriteSheet>) {
