@@ -49,6 +49,7 @@ class BatchManager {
             obj.vertexIndex = 0
             obj.uvsIndex = 0
             obj.textureIndicesIndex = 0
+            obj.numberOfVertex = 0
 
             obj._key = null
         }
@@ -132,6 +133,7 @@ class BatchManager {
 
         // Add the current batch, if any
         currentBatch?.let { activeBatches.add(it) }
+        currentBatch = null
     }
 
     fun getActiveBatchCount(): Int = activeBatches.size

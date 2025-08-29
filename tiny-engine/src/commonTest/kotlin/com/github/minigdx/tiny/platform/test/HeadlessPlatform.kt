@@ -159,6 +159,10 @@ class HeadlessPlatform(
             override fun save(content: ByteArray) = Unit
         }
 
+    override fun writeImage(buffer: ByteArray) {
+        TODO("Not yet implemented")
+    }
+
     override fun createSpriteStage(): SpriteBatchStage {
         TODO("Not yet implemented")
     }

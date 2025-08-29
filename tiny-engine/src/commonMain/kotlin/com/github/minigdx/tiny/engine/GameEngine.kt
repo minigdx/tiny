@@ -2,6 +2,7 @@ package com.github.minigdx.tiny.engine
 
 import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.file.VirtualFileSystem
+import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.input.Key
@@ -162,6 +163,14 @@ class GameEngine(
             } else {
                 "disabled the profiler"
             }
+
+            val frame = virtualFrameBuffer.readFrameBuffer()
+            // FIXME: pour tester
+            val pixelArray = PixelArray(gameOptions.width, gameOptions.height)
+            frame.copyInto(pixelArray)
+
+            platform.writeImage(pixelArray.pixels)
+
             popup(message, "#00FF00")
         }
     }

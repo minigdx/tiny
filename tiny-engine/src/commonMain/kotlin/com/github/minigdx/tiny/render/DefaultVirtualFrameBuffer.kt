@@ -116,6 +116,6 @@ class DefaultVirtualFrameBuffer(
     }
 
     override fun readFrameBuffer(): RenderFrame {
-        TODO()
+        return spriteBatchStage.readFrameBuffer()
     }
 }

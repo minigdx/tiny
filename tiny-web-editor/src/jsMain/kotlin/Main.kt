@@ -298,6 +298,10 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
 
     override fun gameLoop(gameLoop: GameLoop) = delegate.gameLoop(gameLoop)
 
+    override fun writeImage(buffer: ByteArray) {
+        TODO("Not yet implemented")
+    }
+
     override fun endGameLoop() = delegate.endGameLoop()
 
     override fun initInputHandler(): InputHandler = delegate.initInputHandler()

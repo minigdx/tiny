@@ -70,6 +70,8 @@ interface Platform {
      */
     fun screenshot() = Unit
 
+    fun writeImage(buffer: ByteArray)
+
     /**
      * The game loop stopped.
      * Game is existing.

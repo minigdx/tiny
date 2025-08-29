@@ -20,6 +20,7 @@ import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.graphic.Clipper
 import com.github.minigdx.tiny.graphic.PixelFormat
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
+import com.github.minigdx.tiny.render.RenderFrame
 import com.github.minigdx.tiny.render.batch.SpriteBatch
 import com.github.minigdx.tiny.render.shader.FragmentShader
 import com.github.minigdx.tiny.render.shader.ShaderProgram
@@ -185,7 +186,9 @@ class SpriteBatchStage(
         program.vertexShader.aSpr.apply(batch.uvs)
         program.vertexShader.aTextureIndex.apply(batch.textureIndices)
 
-        // FIXME: TODO: aSpr + type de sprite pour savoir quel sprite bank utiliser ?
+        // FIXME: change to actual size
+        program.vertexShader.uSpritesheet.apply(256f, 256f)
+        program.vertexShader.uViewport.apply(256f, 256f)
         // 3. setup uniforms (dithering, ...)
         // 4. draw
 
@@ -193,6 +196,26 @@ class SpriteBatchStage(
         program.drawArrays(GL_TRIANGLES, 0, batch.numberOfVertex)
         performanceMonitor.drawCall(batch.numberOfVertex)
         program.unbind()
+    }
+
+    fun readFrameBuffer(): RenderFrame {
+        program.bindFramebuffer(GL_FRAMEBUFFER, frameBufferContext.frameBuffer)
+
+        program.readPixels(
+            0,
+            0,
+            gameOptions.width,
+            gameOptions.height,
+            GL_RGBA,
+            GL_UNSIGNED_BYTE,
+            frameBufferContext.frameBufferData,
+        )
+
+        program.bindFramebuffer(GL_FRAMEBUFFER, null)
+
+        val openGLFrame = OpenGLFrame(frameBufferContext.frameBufferData, gameOptions)
+
+        return openGLFrame
     }
 
     class VShader : VertexShader(VERTEX_SHADER) {

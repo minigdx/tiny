@@ -263,26 +263,30 @@ class GlfwPlatform(
         val buffer = lastDraw ?: return
 
         recordScope.launch {
-            val origin = newFile("screenshoot", "png")
-            val width = gameOptions.width
-            val height = gameOptions.height
-            val image = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
-
-            for (y in 0 until height) {
-                for (x in 0 until width) {
-                    val colorData = gameOptions.colors().getRGBA(buffer[x + y * width].toInt())
-
-                    val r = colorData[0].toInt() and 0xff
-                    val g = colorData[1].toInt() and 0xff
-                    val b = colorData[2].toInt() and 0xff
-                    val a = colorData[3].toInt() and 0xff
-                    val color = (a shl 24) or (r shl 16) or (g shl 8) or b
-                    image.setRGB(x, y, color)
-                }
-            }
-
-            ImageIO.write(image, "png", origin)
+            writeImage(buffer)
         }
+    }
+
+    override fun writeImage(buffer: ByteArray) {
+        val origin = newFile("screenshoot", "png")
+        val width = gameOptions.width
+        val height = gameOptions.height
+        val image = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
+
+        for (y in 0 until height) {
+            for (x in 0 until width) {
+                val colorData = gameOptions.colors().getRGBA(buffer[x + y * width].toInt())
+
+                val r = colorData[0].toInt() and 0xff
+                val g = colorData[1].toInt() and 0xff
+                val b = colorData[2].toInt() and 0xff
+                val a = colorData[3].toInt() and 0xff
+                val color = (a shl 24) or (r shl 16) or (g shl 8) or b
+                image.setRGB(x, y, color)
+            }
+        }
+
+        ImageIO.write(image, "png", origin)
     }
 
     private fun extractRGBA(imageData: ByteArray): ImageData {
