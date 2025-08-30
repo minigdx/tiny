@@ -11,12 +11,6 @@ import com.danielgergely.kgl.Shader
 import com.danielgergely.kgl.UniformLocation
 import com.danielgergely.kgl.VertexArrayObject
 
-internal expect fun Kgl.createVao(): VertexArrayObject?
-
-internal expect fun Kgl.bindVao(vao: VertexArrayObject?)
-
-internal expect fun Kgl.unbindVao()
-
 class ShaderProgram<V : VertexShader, F : FragmentShader>(
     val gl: Kgl,
     val vertexShader: V,
@@ -29,7 +23,6 @@ class ShaderProgram<V : VertexShader, F : FragmentShader>(
     private var program: Program? = null
     private var vertexShaderId: Shader? = null
     private var fragmentShaderId: Shader? = null
-    internal var vao: VertexArrayObject? = null
 
     fun compileShader() {
         val vertexShaderId = createShader(vertexShader.toString(), GL_VERTEX_SHADER)
@@ -55,8 +48,6 @@ class ShaderProgram<V : VertexShader, F : FragmentShader>(
 
         gl.useProgram(program!!)
 
-        vao = gl.createVao()
-        gl.bindVao(vao)
 
         vertexShader.parameters.forEach { parameter ->
             parameter.create(this)
@@ -64,8 +55,6 @@ class ShaderProgram<V : VertexShader, F : FragmentShader>(
         fragmentShader.parameters.forEach { parameter ->
             parameter.create(this)
         }
-
-        gl.unbindVao()
     }
 
     private fun createShader(
@@ -117,8 +106,6 @@ class ShaderProgram<V : VertexShader, F : FragmentShader>(
     }
 
     fun bind() {
-        gl.bindVao(vao)
-
         for (attribute in vertexShader.inParameters) {
             attribute.bind()
         }
@@ -136,7 +123,5 @@ class ShaderProgram<V : VertexShader, F : FragmentShader>(
         for (attribute in vertexShader.inParameters) {
             attribute.unbind()
         }
-
-        gl.unbindVao()
     }
 }

@@ -139,7 +139,6 @@ class SpriteBatchStage(
         // FIXME: adjust per sprite
         program.vertexShader.uSpritesheet.apply(256f, 256f)
 
-
         // FIXME: can be improved. Don't generate a palette each frame
         val colorsSwitch = batch.key.palette
         val colorPaletteBuffer = ByteArray(256 * 256 * PixelFormat.RGBA)
@@ -171,7 +170,6 @@ class SpriteBatchStage(
             null -> program.vertexShader.uCamera.apply(0f, 0f)
             else -> program.vertexShader.uCamera.apply(camera.x.toFloat(), camera.y.toFloat())
         }
-
 
         // 3. setup uniforms (dithering, ...)
         // 4. draw

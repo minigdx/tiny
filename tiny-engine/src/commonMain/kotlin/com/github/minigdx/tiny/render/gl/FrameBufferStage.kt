@@ -71,7 +71,6 @@ class FrameBufferStage(
 
         program.fragmentShader.frameBuffer.applyTexture(stage.frameBufferContext.frameBufferTexture)
 
-
         program.bind()
 
         program.clearColor(0f, 0f, 0f, 1.0f)

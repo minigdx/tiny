@@ -221,6 +221,11 @@ class GameResourceProcessor(
         resource.resourceAccess = this
         // Game script will be evaluated when the boot script will exit
         scripts[resource.index] = resource
+
+        // Update the current script, if the loaded script is the current script.
+        if(currentScriptIndex == resource.index) {
+            currentScript = resource
+        }
     }
 
     private suspend fun loadBootScript(resource: GameResource) {
@@ -233,7 +238,7 @@ class GameResourceProcessor(
 
     override fun setCurrentScript(index: Int): Pair<GameScript?, GameScript> {
         val previousGameScript = scripts[currentScriptIndex]
-        currentScriptIndex = index % scripts.size
+        currentScriptIndex = 1  + (index % scripts.size)
         currentScript = scripts[currentScriptIndex]
         return previousGameScript to currentScript!!
     }
