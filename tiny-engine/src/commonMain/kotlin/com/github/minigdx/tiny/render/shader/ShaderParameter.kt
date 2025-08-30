@@ -240,8 +240,7 @@ sealed class ShaderParameter(val name: String) {
             stride: Int = 0,
         ) {
             // Bind VAO to ensure vertex attribute configuration is captured
-            val vaoManager = VaoManager(program.gl)
-            vaoManager.bindVao(program.vao)
+            program.bindVao(program.vao)
 
             program.bindBuffer(GL_ARRAY_BUFFER, buffer)
             program.bufferData(GL_ARRAY_BUFFER, FloatBuffer(data), data.size * GL_FLOAT, GL_DYNAMIC_DRAW)
@@ -255,7 +254,7 @@ sealed class ShaderParameter(val name: String) {
             )
             program.enableVertexAttribArray(program.getAttrib(name))
 
-            vaoManager.unbindVao()
+            program.unbindVao()
         }
 
         override fun bind() {
@@ -336,8 +335,7 @@ sealed class ShaderParameter(val name: String) {
             stride: Int = 0,
         ) {
             // Bind VAO to ensure vertex attribute configuration is captured
-            val vaoManager = VaoManager(program.gl)
-            vaoManager.bindVao(program.vao)
+            program.bindVao(program.vao)
 
             program.bindBuffer(GL_ARRAY_BUFFER, buffer)
             program.bufferData(GL_ARRAY_BUFFER, FloatBuffer(data), data.size * GL_FLOAT, GL_DYNAMIC_DRAW)
@@ -351,7 +349,7 @@ sealed class ShaderParameter(val name: String) {
             )
             program.enableVertexAttribArray(program.getAttrib(name))
 
-            vaoManager.unbindVao()
+            program.unbindVao()
         }
 
         override fun bind() {
