@@ -118,6 +118,23 @@ class SpriteInstance(
         return index
     }
 
+    fun addTextureSizesInto(
+        textureSizesIndex: Int,
+        textureSizes: FloatArray,
+        textureWidth: Int,
+        textureHeight: Int,
+    ): Int {
+        var index = textureSizesIndex
+
+        // Set same texture index for all 6 vertices of this sprite
+        repeat(6) {
+            textureSizes[index++] = textureWidth.toFloat()
+            textureSizes[index++] = textureHeight.toFloat()
+        }
+
+        return index
+    }
+
     val positionLeft: Pixel
         get() = destinationX
     val positionRight: Int

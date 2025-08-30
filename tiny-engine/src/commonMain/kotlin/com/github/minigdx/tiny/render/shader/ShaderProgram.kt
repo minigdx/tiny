@@ -52,13 +52,14 @@ class ShaderProgram<V : VertexShader, F : FragmentShader>(
         gl.useProgram(program!!)
 
         vao = gl.createVertexArray()
-
+        gl.bindVertexArray(vao)
         vertexShader.parameters.forEach { parameter ->
             parameter.create(this)
         }
         fragmentShader.parameters.forEach { parameter ->
             parameter.create(this)
         }
+        gl.bindVertexArray(null)
     }
 
     private fun createShader(
@@ -122,7 +123,6 @@ class ShaderProgram<V : VertexShader, F : FragmentShader>(
         for (attribute in vertexShader.inParameters) {
             attribute.bind()
         }
-        gl.bindVertexArray(null)
 
         for (sampler in fragmentShader.samplers) {
             sampler.bind()
@@ -137,5 +137,6 @@ class ShaderProgram<V : VertexShader, F : FragmentShader>(
         for (attribute in vertexShader.inParameters) {
             attribute.unbind()
         }
+        gl.bindVertexArray(null)
     }
 }

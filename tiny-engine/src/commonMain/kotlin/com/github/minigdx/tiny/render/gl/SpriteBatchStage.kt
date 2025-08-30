@@ -121,11 +121,18 @@ class SpriteBatchStage(
 
         program.setup { vertexShader, fragmentShader ->
             vertexShader.aPos.apply(batch.vertex)
+            vertexShader.aSpr.apply(batch.uvs)
+            vertexShader.aSpritesheet.apply(batch.textureSizes)
+
             vertexShader.uViewport.apply(
                 gameOptions.width.toFloat(),
                 // Flip the vertical
                 gameOptions.height.toFloat() * -1,
             )
+
+            batch.spriteSheets.forEach { spriteSheet ->
+                fragmentShader.spritesheet0.applyIndex(spriteSheet.pixels.pixels, gameOptions.width, gameOptions.height)
+            }
         }
 
         program.bind()
@@ -156,10 +163,18 @@ class SpriteBatchStage(
 
     class VShader : VertexShader(VERTEX_SHADER) {
         val aPos = inVec2("a_pos") // position of the sprite in the viewport
+        val aSpritesheet = inVec2("a_spritesheet") // Size of the spritesheet; in pixel.
         val uViewport = uniformVec2("u_viewport") // Size of the viewport; in pixel.
+        val aSpr = inVec2("a_spr")
+
+        val vPos = outVec2("v_pos")
+        val vUvs = outVec2("v_uvs")
     }
 
     class FShader : FragmentShader(FRAGMENT_SHADER) {
+        val spritesheet0 = uniformSample2D("spritesheet0") // reserved for the primitive
+        val vPos = inVec2("v_pos") // position of the sprite in the viewport
+        val vUvs = inVec2("v_uvs") // position of the sprite in the viewport
     }
 
     companion object {
@@ -171,7 +186,20 @@ class SpriteBatchStage(
         private val VERTEX_SHADER =
             """
             void main() {
-                gl_Position = vec4((a_pos / u_viewport) * 2.0 - 1.0, 0.0, 1.0);
+                vec2 final_pos = a_pos;
+                // Convert the pixel coordinates into NDC coordinates
+                vec2 ndc_pos = final_pos / u_viewport ;
+                // Move the origin to the left/up corner
+                vec2 origin_pos = vec2(-1.0, 1.0) + ndc_pos * 2.0;
+                
+                gl_Position = vec4(origin_pos, 0.0, 1.0);
+                
+                v_pos = final_pos;
+                
+                // UV computation
+                // Convert the texture coordinates to NDC coordinates
+                vec2 ndc_spr = a_spr / a_spritesheet;
+                v_uvs = ndc_spr;
             }
             """.trimIndent()
 
@@ -179,7 +207,8 @@ class SpriteBatchStage(
         private val FRAGMENT_SHADER =
             """
             void main() {
-                fragColor = vec4(0.0, 1.0, 0.0, 1.0);
+                vec4 color = texture(spritesheet0, v_uvs);
+                fragColor = vec4(color.r * 100.0, 0.0, 0.0, 1.0);
                 
             }
             """.trimIndent()

@@ -49,6 +49,7 @@ class BatchManager {
             obj.vertexIndex = 0
             obj.uvsIndex = 0
             obj.textureIndicesIndex = 0
+            obj.textureSizesIndex = 0
             obj.numberOfVertex = 0
 
             obj._key = null
