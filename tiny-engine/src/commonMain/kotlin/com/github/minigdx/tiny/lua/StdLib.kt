@@ -7,6 +7,7 @@ import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
+import com.github.minigdx.tiny.render.VirtualFrameBuffer
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
@@ -18,6 +19,7 @@ import org.luaj.vm2.lib.VarArgFunction
 class StdLib(
     val gameOptions: GameOptions,
     val resourceAccess: GameResourceAccess,
+    val virtualFrameBuffer: VirtualFrameBuffer,
 ) : TwoArgFunction() {
     override fun call(
         arg1: LuaValue,
@@ -35,7 +37,7 @@ class StdLib(
 
     @TinyFunction(
         "Create new instance of a class by creating a new table and setting the metatable. " +
-            "It allow to create kind of Object Oriented Programming.\n\n ",
+                "It allow to create kind of Object Oriented Programming.\n\n ",
         example = STD_NEW_EXAMPLE,
     )
     inner class new : TwoArgFunction() {
@@ -132,9 +134,9 @@ class StdLib(
 
     @TinyFunction(
         "Iterate over values of a table.\n\n" +
-            "- If you want to iterate over keys, use `pairs(table)`.\n " +
-            "- If you want to iterate over index, use `ipairs(table)`.\n " +
-            "- If you want to iterate in reverse, use `rpairs(table)`.\n",
+                "- If you want to iterate over keys, use `pairs(table)`.\n " +
+                "- If you want to iterate over index, use `ipairs(table)`.\n " +
+                "- If you want to iterate in reverse, use `rpairs(table)`.\n",
     )
     internal inner class all : VarArgFunction() {
         @TinyCall("Iterate over the values of the table")
@@ -157,12 +159,11 @@ class StdLib(
                     }
                 }
             // If the expected table is nil, don't iterate.
-            val table =
-                if (args.isnil(1)) {
-                    LuaTable()
-                } else {
-                    args.checktable(1)!!
-                }
+            val table = if (args.isnil(1)) {
+                LuaTable()
+            } else {
+                args.checktable(1)!!
+            }
             // iterator, object to iterate, seed value.
             return varargsOf(iterator, table)
         }
@@ -170,9 +171,9 @@ class StdLib(
 
     @TinyFunction(
         "Iterate over values of a table in reverse order. " +
-            "The iterator return an index and the value. " +
-            "The method is useful to remove elements from a table while " +
-            "iterating on it.",
+                "The iterator return an index and the value. " +
+                "The method is useful to remove elements from a table while " +
+                "iterating on it.",
         example = STD_RPAIRS_EXAMPLE,
     )
     internal inner class rpairs : VarArgFunction() {
@@ -232,27 +233,26 @@ class StdLib(
             @TinyArg("y") c: LuaValue,
             @TinyArg("color") d: LuaValue,
         ): LuaValue {
+            val spritesheet = resourceAccess.bootSpritesheet ?: return NONE
             val str = a.tojstring()
             val x = b.checkint()
             val y = c.checkint()
             val color = d.checkColorIndex()
 
-            val spritesheet = resourceAccess.bootSpritesheet ?: return NONE
+            virtualFrameBuffer.drawPrimitive { frameBuffer ->
 
-            val space = 4
-            var currentX = x
-            var currentY = y
-            str.forEach { char ->
+                val space = 4
+                var currentX = x
+                var currentY = y
+                str.forEach { char ->
 
-                val coord =
-                    if (char.isLetter()) {
+                    val coord = if (char.isLetter()) {
                         // The character has an accent. Let's try to get rid of it
-                        val l =
-                            if (char.hasAccent) {
-                                ACCENT_MAP[char.lowercaseChar()] ?: char.lowercaseChar()
-                            } else {
-                                char.lowercaseChar()
-                            }
+                        val l = if (char.hasAccent) {
+                            ACCENT_MAP[char.lowercaseChar()] ?: char.lowercaseChar()
+                        } else {
+                            char.lowercaseChar()
+                        }
                         val index = l - 'a'
                         index to 0
                     } else if (char.isDigit()) {
@@ -278,33 +278,29 @@ class StdLib(
                         // Maybe it's an emoji: try EMOJI MAP conversion
                         EMOJI_MAP[char]
                     }
-                if (coord != null) {
-                    val (indexX, indexY) = coord
-                    // FIXME: chars as sprite
-                    /*
-                    resourceAccess.frameBuffer.copyFrom(
-                        spritesheet.pixels,
-                        currentX,
-                        currentY,
-                        indexX * 4,
-                        indexY * 4,
-                        4,
-                        4,
-                    ) { pixel: ByteArray, _, _ ->
-                        if (pixel[0].toInt() == 0) {
-                            pixel
-                        } else {
-                            pixel[0] = color.toByte()
-                            pixel
+                    if (coord != null) {
+                        val (indexX, indexY) = coord
+
+                        frameBuffer.copyFrom(
+                            spritesheet.pixels,
+                            currentX,
+                            currentY,
+                            indexX * 4,
+                            indexY * 4,
+                            4,
+                            4,
+                        ) { pixel: ByteArray, _, _ ->
+                            if (pixel[0].toInt() == 0) {
+                                pixel
+                            } else {
+                                pixel[0] = color.toByte()
+                                pixel
+                            }
                         }
                     }
-
-                     */
+                    currentX += space
                 }
-                currentX += space
             }
-
-            // resourceAccess.addOp(FrameBufferOperation)
 
             return NONE
         }
@@ -317,9 +313,7 @@ class StdLib(
         return if (this.isnumber()) {
             this.checkint()
         } else {
-            // FIXME:
-            // resourceAccess.frameBuffer.gamePalette.getColorIndex(this.checkjstring()!!)
-            -1
+            gameOptions.colors().getColorIndex(this.checkjstring()!!)
         }
     }
 

@@ -12,13 +12,16 @@ import com.danielgergely.kgl.UniformLocation
 import com.danielgergely.kgl.VertexArrayObject
 
 class ShaderProgram<V : VertexShader, F : FragmentShader>(
-    val gl: Kgl,
-    val vertexShader: V,
-    val fragmentShader: F,
+    private val gl: Kgl,
+    private val vertexShader: V,
+    private val fragmentShader: F,
 ) : Kgl by gl {
     private val attributes = mutableMapOf<String, Int>()
 
     private val uniforms = mutableMapOf<String, UniformLocation>()
+
+    // Assume that for each Shader program, the geometry is different.
+    private var vao: VertexArrayObject? = null
 
     private var program: Program? = null
     private var vertexShaderId: Shader? = null
@@ -48,6 +51,7 @@ class ShaderProgram<V : VertexShader, F : FragmentShader>(
 
         gl.useProgram(program!!)
 
+        vao = gl.createVertexArray()
 
         vertexShader.parameters.forEach { parameter ->
             parameter.create(this)
@@ -86,8 +90,10 @@ class ShaderProgram<V : VertexShader, F : FragmentShader>(
         return vertexShaderId
     }
 
-    fun createAttrib(name: String) {
-        attributes[name] = gl.getAttribLocation(program!!, name)
+    fun createAttrib(name: String): Int {
+        val attribLocation = gl.getAttribLocation(program!!, name)
+        attributes[name] = attribLocation
+        return attribLocation
     }
 
     fun createUniform(name: String) {
@@ -105,10 +111,18 @@ class ShaderProgram<V : VertexShader, F : FragmentShader>(
         useProgram(program!!)
     }
 
+    fun setup(block: (vertexShader: V, fragmentShader: F) -> Unit) {
+        gl.bindVertexArray(vao)
+        block(vertexShader, fragmentShader)
+        gl.bindVertexArray(null)
+    }
+
     fun bind() {
+        gl.bindVertexArray(vao)
         for (attribute in vertexShader.inParameters) {
             attribute.bind()
         }
+        gl.bindVertexArray(null)
 
         for (sampler in fragmentShader.samplers) {
             sampler.bind()

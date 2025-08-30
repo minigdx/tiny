@@ -51,8 +51,6 @@ class FrameBufferStage(
     fun init(windowManager: WindowManager) {
         program.compileShader()
 
-        program.vertexShader.position.apply(vertexData)
-        program.vertexShader.uvs.apply(uvsData)
         program.enable(GL_BLEND)
 
         this.windowManager = windowManager
@@ -69,12 +67,16 @@ class FrameBufferStage(
             gameOptions.height * gameOptions.zoom * windowManager.ratioHeight,
         )
 
-        program.fragmentShader.frameBuffer.applyTexture(stage.frameBufferContext.frameBufferTexture)
+        program.clearColor(1f, 0f, 0f, 1.0f)
+        program.clear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
+
+        program.setup { vertexShader, fragmentShader ->
+            vertexShader.position.apply(vertexData)
+            vertexShader.uvs.apply(uvsData)
+            fragmentShader.frameBuffer.applyTexture(stage.frameBufferContext.frameBufferTexture)
+        }
 
         program.bind()
-
-        program.clearColor(0f, 0f, 0f, 1.0f)
-        program.clear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 
         val nbVertex = 3
         program.drawArrays(GL_TRIANGLES, 0, nbVertex)

@@ -10,6 +10,7 @@ import com.danielgergely.kgl.GL_R8
 import com.danielgergely.kgl.GL_RED
 import com.danielgergely.kgl.GL_REPEAT
 import com.danielgergely.kgl.GL_RGBA
+import com.danielgergely.kgl.GL_STATIC_DRAW
 import com.danielgergely.kgl.GL_TEXTURE0
 import com.danielgergely.kgl.GL_TEXTURE_2D
 import com.danielgergely.kgl.GL_TEXTURE_MAG_FILTER
@@ -155,7 +156,6 @@ sealed class ShaderParameter(val name: String) {
             }
         }
 
-
         override fun toString(): String = "uniform float $name;"
     }
 
@@ -243,16 +243,14 @@ sealed class ShaderParameter(val name: String) {
 
     class InVec2(name: String) : ShaderParameter(name), In {
         private var buffer: GlBuffer? = null
-        private var vao: VertexArrayObject? = null
+        private var location: Int = 0
 
         private lateinit var program: ShaderProgram<*, *>
 
-
         override fun create(program: ShaderProgram<*, *>) {
             this.program = program
-            program.createAttrib(name)
+            location = program.createAttrib(name)
             buffer = program.createBuffer()
-            vao = program.createVertexArray()
         }
 
         fun apply(
@@ -262,34 +260,28 @@ sealed class ShaderParameter(val name: String) {
             if (!::program.isInitialized) {
                 throw IllegalStateException("create() must be called before apply() for $name")
             }
-            // Bind VAO to ensure vertex attribute configuration is captured
-            program.bindVertexArray(vao)
 
             program.bindBuffer(GL_ARRAY_BUFFER, buffer)
-            program.bufferData(GL_ARRAY_BUFFER, FloatBuffer(data), data.size * GL_FLOAT, GL_DYNAMIC_DRAW)
+            program.bufferData(GL_ARRAY_BUFFER, FloatBuffer(data), data.size * GL_FLOAT, GL_STATIC_DRAW)
             program.vertexAttribPointer(
-                location = program.getAttrib(name),
+                location = location,
                 size = 2,
                 type = GL_FLOAT,
                 normalized = false,
                 stride = stride,
                 offset = 0,
             )
-            program.enableVertexAttribArray(program.getAttrib(name))
-
-            program.bindVertexArray(null)
+            program.enableVertexAttribArray(location)
         }
 
         override fun bind() {
-            program.bindVertexArray(vao)
             program.bindBuffer(GL_ARRAY_BUFFER, buffer)
-            program.enableVertexAttribArray(program.getAttrib(name))
+            program.enableVertexAttribArray(location)
         }
 
         override fun unbind() {
-            program.disableVertexAttribArray(program.getAttrib(name))
+            program.disableVertexAttribArray(location)
             program.bindBuffer(GL_ARRAY_BUFFER, null)
-            program.bindVertexArray(null)
         }
 
         override fun toString() = "in vec2 $name;"
@@ -370,7 +362,7 @@ sealed class ShaderParameter(val name: String) {
                 throw IllegalStateException("create() must be called before apply() for $name")
             }
             // Bind VAO to ensure vertex attribute configuration is captured
-            program.bindVertexArray(vao)
+            // program.bindVertexArray(vao)
 
             program.bindBuffer(GL_ARRAY_BUFFER, buffer)
             program.bufferData(GL_ARRAY_BUFFER, FloatBuffer(data), data.size * GL_FLOAT, GL_DYNAMIC_DRAW)
@@ -386,7 +378,7 @@ sealed class ShaderParameter(val name: String) {
         }
 
         override fun bind() {
-            program.bindVertexArray(vao)
+            // program.bindVertexArray(vao)
             program.bindBuffer(GL_ARRAY_BUFFER, buffer)
             program.enableVertexAttribArray(program.getAttrib(name))
         }
@@ -394,14 +386,17 @@ sealed class ShaderParameter(val name: String) {
         override fun unbind() {
             program.disableVertexAttribArray(program.getAttrib(name))
             program.bindBuffer(GL_ARRAY_BUFFER, null)
-            program.bindVertexArray(null)
+           // program.bindVertexArray(null)
         }
 
         override fun toString() = "in float $name;"
     }
 
-    class UniformSample2D(name: String, override val index: Int, private val existingTexture: Boolean = false) :
-        ShaderParameter(name), Uniform, Sampler {
+    class UniformSample2D(
+        name: String,
+        override val index: Int,
+        private val existingTexture: Boolean = false,
+    ) : ShaderParameter(name), Uniform, Sampler {
         private var texture: Texture? = null
 
         private lateinit var program: ShaderProgram<*, *>

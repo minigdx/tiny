@@ -5,6 +5,7 @@ import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.Pixel
+import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.render.VirtualFrameBuffer
 import com.github.minigdx.tiny.resources.SpriteSheet
@@ -51,9 +52,11 @@ import kotlin.math.floor
 )
 class MapLib(
     private val resourceAccess: GameResourceAccess,
-    private val spriteSize: Pair<Pixel, Pixel>,
+    private val gameOptions: GameOptions,
     private val virtualFrameBuffer: VirtualFrameBuffer,
 ) : TwoArgFunction() {
+
+    private val spriteSize: Pair<Pixel, Pixel> = gameOptions.spriteSize
     private var currentWorld: Int = 0
     private var currentLevel: Int = 0
 

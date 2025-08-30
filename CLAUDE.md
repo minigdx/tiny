@@ -75,8 +75,8 @@ tiny-cli palette          # Generate color palettes
 
 ### Platform Abstraction
 The engine uses a Platform interface to abstract platform-specific functionality:
-- `GlfwPlatform` for desktop (LWJGL/GLFW)
-- `WebGlPlatform` for web (WebGL)
+- `GlfwPlatform` for desktop (LWJGL/GLFW). It uses OpenGL 3.
+- `WebGlPlatform` for web (WebGL). It uses WebGL 2.0.
 
 ### Resource Management
 Games are structured around:
@@ -92,6 +92,19 @@ The engine exposes functionality through organized Lua libraries:
 - `shape`: Drawing primitives
 - `ctrl`: Input handling
 - `map`: Level/tilemap operations
+
+### Open GL Organization
+The engine use 2 stages of rendering: 
+- tiny-engine/src/commonMain/kotlin/com/github/minigdx/tiny/render/gl/SpriteBatchStage.kt : it renders everything in a framebuffer at a lower resolution.
+- tiny-engine/src/commonMain/kotlin/com/github/minigdx/tiny/render/gl/FrameBufferStage.kt : it renders the framebuffer from the previous stage at the screen resolution.
+- The OpenGL abstraction is managers by 
+  - tiny-engine/src/commonMain/kotlin/com/github/minigdx/tiny/render/shader/ShaderProgram.kt (manage shader program)
+  - tiny-engine/src/commonMain/kotlin/com/github/minigdx/tiny/render/shader/ShaderParameter.kt (manager shader program parameters)
+  - the shader program is created, alongside the shader program parameters. These parameters are created in Kotlin and added in the shader source code program. 
+  - The shader program parameters can be configured using the method `setup` to access the vertex and fragment shader.
+  - before draw, the `blind` is called. `unbind` is called after. 
+  - fragColor is added automatically as out vec4 in FragmentShader (See tiny-engine/src/commonMain/kotlin/com/github/minigdx/tiny/render/shader/BaseShader.kt)
+  - #version is added automatically in the shader program source code (See tiny-engine/src/commonMain/kotlin/com/github/minigdx/tiny/render/shader/BaseShader.kt)
 
 ### Build Artifacts & Tasks
 The build produces several specialized artifacts:
@@ -145,6 +158,7 @@ You are Coding Copilot, configured to assist in a multi-language codebase (Kotli
 - If a task cannot be completed due to lack of information, respond with a comment indicating the missing context.
 - You MUST interpret the documentation with zero ambiguity — never make assumptions beyond what is explicitly provided.
 - Maintain consistency across languages (e.g., variable naming, file structure) as defined in the guidelines.
+- The code MUST be compatible with Open GL 3 and WebGL 2.0.
 ## Instructions
 1. Read the code context and user intent.
 2. Refer to the documentation attached to this prompt for all formatting, naming, and architecture rules.

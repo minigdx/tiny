@@ -223,7 +223,7 @@ class GameResourceProcessor(
         scripts[resource.index] = resource
 
         // Update the current script, if the loaded script is the current script.
-        if(currentScriptIndex == resource.index) {
+        if (currentScriptIndex == resource.index) {
             currentScript = resource
         }
     }
@@ -238,7 +238,7 @@ class GameResourceProcessor(
 
     override fun setCurrentScript(index: Int): Pair<GameScript?, GameScript> {
         val previousGameScript = scripts[currentScriptIndex]
-        currentScriptIndex = 1  + (index % scripts.size)
+        currentScriptIndex = 1 + (index % scripts.size)
         currentScript = scripts[currentScriptIndex]
         return previousGameScript to currentScript!!
     }

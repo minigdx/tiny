@@ -56,17 +56,18 @@ class DefaultVirtualFrameBuffer(
                 shouldStartStage = false
                 spriteBatchStage.startStage()
             }
+            if (isPrimitiveBufferUpdated) {
+                bindTextures(listOf(primitiveBuffer.asSpriteSheet))
+            }
             batchManager.consumeAllBatches { batch ->
                 spriteBatchStage.execute(batch)
-                primitiveBuffer.clear(0)
             }
+            isPrimitiveBufferUpdated = false
+            primitiveBuffer.clear(0)
         }
     }
 
     override fun drawPrimitive(block: (FrameBuffer) -> Unit) {
-        if (!isPrimitiveBufferUpdated) {
-            isPrimitiveBufferUpdated = true
-        }
         val immediateDraw = batchManager.submitSprite(
             primitiveBuffer.asSpriteSheet,
             0,
@@ -87,12 +88,15 @@ class DefaultVirtualFrameBuffer(
                 shouldStartStage = false
                 spriteBatchStage.startStage()
             }
+            if (isPrimitiveBufferUpdated) {
+                bindTextures(listOf(primitiveBuffer.asSpriteSheet))
+            }
             batchManager.consumeAllBatches { batch ->
                 spriteBatchStage.execute(batch)
-                primitiveBuffer.clear(0)
-                isPrimitiveBufferUpdated = false
             }
+            primitiveBuffer.clear(0)
         }
+        isPrimitiveBufferUpdated = true
         block(primitiveBuffer)
     }
 
@@ -101,9 +105,15 @@ class DefaultVirtualFrameBuffer(
             shouldStartStage = false
             spriteBatchStage.startStage()
         }
+        if (isPrimitiveBufferUpdated) {
+            bindTextures(listOf(primitiveBuffer.asSpriteSheet))
+        }
         batchManager.consumeAllBatches { batch ->
             spriteBatchStage.execute(batch)
         }
+        primitiveBuffer.clear(0)
+        isPrimitiveBufferUpdated = false
+
         spriteBatchStage.endStage()
 
         shouldStartStage = true

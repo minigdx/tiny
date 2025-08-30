@@ -255,15 +255,15 @@ class FrameBuffer(
         )
     }
 
-    val asSpriteSheet =
-        SpriteSheet(
-            0,
-            0,
-            "framebuffer",
-            type = ResourceType.PRIMITIVE_SPRITESHEET,
-            pixels = this.colorIndexBuffer,
-            width = this.width,
-            height = this.height,
-            reload = false,
-        )
+    val asSpriteSheet = SpriteSheet(
+        0,
+        0,
+        "framebuffer",
+        type = ResourceType.PRIMITIVE_SPRITESHEET,
+        pixels = this.colorIndexBuffer,
+        width = this.width,
+        height = this.height,
+        reload = false,
+        textureUnit = 0,
+    )
 }
