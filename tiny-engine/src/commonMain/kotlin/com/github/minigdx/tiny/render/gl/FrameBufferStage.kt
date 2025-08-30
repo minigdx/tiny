@@ -50,6 +50,8 @@ class FrameBufferStage(
     fun init(windowManager: WindowManager) {
         program.compileShader()
 
+        program.vertexShader.position.apply(vertexData)
+        program.vertexShader.uvs.apply(uvsData)
 
         this.windowManager = windowManager
     }
@@ -67,8 +69,6 @@ class FrameBufferStage(
 
         program.fragmentShader.frameBuffer.applyTexture(stage.frameBufferContext.frameBufferTexture)
 
-        program.vertexShader.position.apply(vertexData)
-        program.vertexShader.uvs.apply(uvsData)
 
         program.bind()
 

@@ -122,8 +122,16 @@ sealed class ShaderParameter(val name: String) {
     }
 
     class UniformFloat(name: String) : ShaderParameter(name), Uniform {
+
+        private lateinit var program: ShaderProgram<*, *>
+
         override fun create(program: ShaderProgram<*, *>) {
             program.createUniform(name)
+            this.program = program
+        }
+
+        fun apply(vararg value: Float) {
+            apply(program, *value)
         }
 
         fun apply(
@@ -258,9 +266,9 @@ sealed class ShaderParameter(val name: String) {
         }
 
         override fun bind() {
+            program.bindVao(program.vao)
             program.bindBuffer(GL_ARRAY_BUFFER, buffer)
-            // Note: In OpenGL 3.3 Core Profile with VAO, vertex attributes should already be configured
-            // in the VAO when apply() was called, so we don't need to re-enable them here
+            program.enableVertexAttribArray(program.getAttrib(name))
         }
 
         override fun unbind() {

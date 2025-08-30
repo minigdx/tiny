@@ -111,11 +111,19 @@ class SpriteBatchStage(
         program.bindFramebuffer(GL_FRAMEBUFFER, null)
     }
 
+    var a = 0.0f
+
     fun execute(batch: SpriteBatch) {
 
 
+        a = a + 0.001f
+        if(a > 1.0f) {
+            a = 0.0f
+        }
+
         // 2. upload vertex along site sprite index
         program.vertexShader.aPos.apply(batch.vertex)
+        program.fragmentShader.a.apply(a)
 
         // 3. setup uniforms (dithering, ...)
         // 4. draw
@@ -153,6 +161,7 @@ class SpriteBatchStage(
 
     class FShader : FragmentShader(FRAGMENT_SHADER) {
         val vPos = inVec2("v_pos")
+        val a = uniformFloat("a")
     }
 
     companion object {
@@ -173,7 +182,7 @@ class SpriteBatchStage(
         private val FRAGMENT_SHADER =
             """
             void main() {
-                fragColor = vec4(v_pos, 0.5, 1.0);
+                fragColor = vec4(v_pos, a, 1.0);
             }
             """.trimIndent()
     }
