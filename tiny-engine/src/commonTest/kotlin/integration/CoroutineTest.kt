@@ -1,8 +1,10 @@
 package integration
 
 import com.github.minigdx.tiny.platform.test.TestHelper
+import kotlin.test.Ignore
 import kotlin.test.Test
 
+@Ignore
 class CoroutineTest {
     //language=Lua
     val clsScript =

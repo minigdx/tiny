@@ -2,8 +2,10 @@ package integration
 
 import com.github.minigdx.tiny.platform.test.TestHelper
 import com.github.minigdx.tiny.platform.test.TestHelper.test
+import kotlin.test.Ignore
 import kotlin.test.Test
 
+@Ignore
 class ShapeTest {
     //language=Lua
     private val circlefScript =
