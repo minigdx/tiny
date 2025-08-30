@@ -45,7 +45,6 @@ class SpriteInstance(
         vertexData: FloatArray,
     ): Int {
         var indexVertex = vertexIndex
-        /*
         vertexData[indexVertex++] = positionLeft.toFloat()
         vertexData[indexVertex++] = positionUp.toFloat()
         // A - Right/Up
@@ -63,25 +62,6 @@ class SpriteInstance(
         // B - Left/Up
         vertexData[indexVertex++] = positionLeft.toFloat()
         vertexData[indexVertex++] = positionUp.toFloat()
-*/
-
-        vertexData[indexVertex++] = -0.5f
-        vertexData[indexVertex++] = -0.5f
-        // A - Right/Up
-        vertexData[indexVertex++] = 0.5f
-        vertexData[indexVertex++] = -0.5f
-        // A - Right/Down
-        vertexData[indexVertex++] = 0.5f
-        vertexData[indexVertex++] = 0.5f
-        // B - Right/Down
-        vertexData[indexVertex++] = 0.5f
-        vertexData[indexVertex++] = 0.5f
-        // B - Left/Down
-        vertexData[indexVertex++] = -0.5f
-        vertexData[indexVertex++] = 0.5f
-        // B - Left/Up
-        vertexData[indexVertex++] = -0.5f
-        vertexData[indexVertex++] = -0.5f
 
         return indexVertex
     }

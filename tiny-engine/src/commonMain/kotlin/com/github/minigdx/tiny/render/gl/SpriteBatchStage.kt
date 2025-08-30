@@ -1,6 +1,7 @@
 package com.github.minigdx.tiny.render.gl
 
 import com.danielgergely.kgl.ByteBuffer
+import com.danielgergely.kgl.GL_BLEND
 import com.danielgergely.kgl.GL_COLOR_ATTACHMENT0
 import com.danielgergely.kgl.GL_DEPTH24_STENCIL8
 import com.danielgergely.kgl.GL_FRAMEBUFFER
@@ -88,6 +89,9 @@ class SpriteBatchStage(
             frameBufferTexture, frameBuffer, frameBufferData,
         )
 
+        program.vertexShader.uViewport.apply(gameOptions.width.toFloat(), gameOptions.height.toFloat())
+
+        program.enable(GL_BLEND)
 
         program.disable(GL_SCISSOR_TEST)
         program.bindTexture(GL_TEXTURE_2D, null)
@@ -123,6 +127,18 @@ class SpriteBatchStage(
 
         // 2. upload vertex along site sprite index
         program.vertexShader.aPos.apply(batch.vertex)
+
+        program.vertexShader.uViewport.apply(
+            gameOptions.width.toFloat(),
+            // Flip the vertical
+            gameOptions.height.toFloat() * -1,
+        )
+
+        when (val camera = batch.key.camera) {
+            null -> program.vertexShader.uCamera.apply(0f, 0f)
+            else -> program.vertexShader.uCamera.apply(camera.x.toFloat(), camera.y.toFloat())
+        }
+
         program.fragmentShader.a.apply(a)
 
         // 3. setup uniforms (dithering, ...)
@@ -156,6 +172,9 @@ class SpriteBatchStage(
 
     class VShader : VertexShader(VERTEX_SHADER) {
         val aPos = inVec2("a_pos") // position of the sprite in the viewport
+        val uViewport = uniformVec2("u_viewport") // Size of the viewport; in pixel.
+        val uCamera = uniformVec2("u_camera") // Position of the camera (offset)
+
         val vPos = outVec2("v_pos")
     }
 
@@ -173,8 +192,15 @@ class SpriteBatchStage(
         private val VERTEX_SHADER =
             """
             void main() {
-                gl_Position = vec4(a_pos, 0.0, 1.0);
-                v_pos = a_pos;
+                vec2 final_pos = (a_pos - u_camera);
+                // Convert the pixel coordinates into NDC coordinates
+                vec2 ndc_pos = final_pos / u_viewport ;
+                // Move the origin to the left/up corner
+                vec2 origin_pos = vec2(-1.0, 1.0) + ndc_pos * 2.0;
+                
+                gl_Position = vec4(origin_pos, 0.0, 1.0);
+                
+                v_pos = origin_pos;
             }
             """.trimIndent()
 

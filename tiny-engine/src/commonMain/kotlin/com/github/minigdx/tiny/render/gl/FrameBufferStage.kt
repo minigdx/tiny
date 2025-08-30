@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.render.gl
 
+import com.danielgergely.kgl.GL_BLEND
 import com.danielgergely.kgl.GL_COLOR_BUFFER_BIT
 import com.danielgergely.kgl.GL_DEPTH_BUFFER_BIT
 import com.danielgergely.kgl.GL_FRAMEBUFFER
@@ -52,6 +53,7 @@ class FrameBufferStage(
 
         program.vertexShader.position.apply(vertexData)
         program.vertexShader.uvs.apply(uvsData)
+        program.enable(GL_BLEND)
 
         this.windowManager = windowManager
     }
