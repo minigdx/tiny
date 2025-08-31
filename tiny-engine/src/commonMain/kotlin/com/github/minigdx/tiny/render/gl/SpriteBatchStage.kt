@@ -106,6 +106,7 @@ class SpriteBatchStage(
     }
 
     fun bindTextures(spritesheets: List<SpriteSheet>) {
+        program.use()
         program.setup { _, fragmentShader ->
             spritesheets.forEach { spriteSheet ->
                 fragmentShader.spritesheets[spriteSheet.textureUnit!!].applyIndex(
@@ -167,7 +168,6 @@ class SpriteBatchStage(
 
             // Fragment shader uniforms
             fragmentShader.paletteColors.applyRGBA(colorPaletteBuffer, 256, 256)
-
         }
 
         program.bind()

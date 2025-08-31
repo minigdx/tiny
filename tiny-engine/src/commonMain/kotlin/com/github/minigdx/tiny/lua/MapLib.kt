@@ -402,7 +402,7 @@ entity.fields -- access custom field of the entity
                     is TilesetRect -> value.toLua()
                     is List<*> -> LuaValue.listOf(value.map { toLua(it) }.toTypedArray())
                     null -> NIL
-                    else -> TODO()
+                    else -> TODO("MapLib")
                 }
             }
             return listOf(

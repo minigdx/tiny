@@ -24,7 +24,7 @@ import kotlin.math.min
 class GfxLib(
     private val resourceAccess: GameResourceAccess,
     private val gameOptions: GameOptions,
-    virtualFrameBuffer: VirtualFrameBuffer,
+    private val virtualFrameBuffer: VirtualFrameBuffer,
 ) : TwoArgFunction() {
     override fun call(
         arg1: LuaValue,
@@ -104,19 +104,16 @@ class GfxLib(
         override fun call(
             @TinyArg("color") arg: LuaValue,
         ): LuaValue {
-            val color =
-                if (arg.isnil()) {
-                    valueOf("#000000").checkColorIndex()
-                } else {
-                    arg.checkColorIndex()
-                }
-            // FIXME:
+            val color = if (arg.isnil()) {
+                valueOf("#000000").checkColorIndex()
+            } else {
+                arg.checkColorIndex()
+            }
 
-            /*
-            resourceAccess.frameBuffer.clear(color)
-            resourceAccess.addOp(FrameBufferOperation)
+            virtualFrameBuffer.drawPrimitive { frameBuffer ->
+                frameBuffer.clear(color)
+            }
 
-             */
             return NIL
         }
     }
@@ -129,13 +126,9 @@ class GfxLib(
             @TinyArg("y") arg2: LuaValue,
             @TinyArg("color") arg3: LuaValue,
         ): LuaValue {
-            // FIXME:
-
-            /*
-            resourceAccess.frameBuffer.pixel(arg1.checkint(), arg2.checkint(), arg3.checkint())
-            resourceAccess.addOp(FrameBufferOperation)
-
-             */
+            virtualFrameBuffer.drawPrimitive { frameBuffer ->
+                frameBuffer.pixel(arg1.checkint(), arg2.checkint(), arg3.checkint())
+            }
             return NIL
         }
     }
@@ -150,9 +143,8 @@ class GfxLib(
             val x = min(max(0, arg1.checkint()), gameOptions.width - 1)
             val y = min(max(0, arg2.checkint()), gameOptions.height - 1)
 
-            // val index = resourceAccess.readPixel(x, y)
-            // FIXME:
-            val index = 0
+            // FIXME: cache the frame to avoid creating a new one each time
+            val index = virtualFrameBuffer.readFrameBuffer().getPixel(x, y)
             return valueOf(index)
         }
     }
@@ -237,7 +229,7 @@ class GfxLib(
 
             // FIXME:
 
-            TODO()
+            TODO("A")
         }
     }
 
@@ -340,7 +332,7 @@ class GfxLib(
 
             // FIXME:
 
-            TODO()
+            TODO("B")
         }
 
         @TinyCall("Apply dithering pattern. The previous dithering pattern is returned.")
@@ -355,7 +347,7 @@ class GfxLib(
 
             // FIXME:
 
-            TODO()
+            TODO("C")
         }
     }
 

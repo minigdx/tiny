@@ -140,7 +140,5 @@ class WebGlPlatform(
         return frameBufferStage
     }
 
-    override fun writeImage(buffer: ByteArray) {
-        TODO("Not yet implemented")
-    }
+    override fun writeImage(buffer: ByteArray) = Unit
 }

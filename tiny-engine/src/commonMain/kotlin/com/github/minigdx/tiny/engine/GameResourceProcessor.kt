@@ -252,13 +252,13 @@ class GameResourceProcessor(
     }
 
     override fun newSpritesheetIndex(): Int {
-        TODO("Not yet implemented")
+        TODO("Not yet implemented ???")
     }
 
     override fun saveSpritesheet(sheet: SpriteSheet) {
         // TODO: set the spritesheet texture unit?
         // TODO: add it into the texture to bind
-        TODO("Not yet implemented")
+        TODO("Not yet implemented COUCUO")
     }
 
     override fun findLevel(index: Int): GameLevel? {

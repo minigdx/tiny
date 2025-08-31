@@ -650,7 +650,7 @@ class ShapeLib(
             @TinyArgs(["x", "y", "width", "height", "color1", "color2", "is_horizontal"]) args: Varargs,
         ): Varargs {
             // FIXME:
-            TODO()
+            TODO("O")
             /*
                         if (args.narg() < 6) throw LuaError("Expected 6  args")
 

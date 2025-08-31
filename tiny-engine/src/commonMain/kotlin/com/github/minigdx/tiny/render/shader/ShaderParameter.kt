@@ -32,9 +32,9 @@ sealed class ShaderParameter(val name: String) {
     interface Uniform
 
     interface In {
-        fun bind(): Unit = TODO()
+        fun bind(): Unit = TODO("Missing bind implementation for In shader parameter.")
 
-        fun unbind(): Unit = TODO()
+        fun unbind(): Unit = TODO("Missing unbind implementation for In shader parameter.")
     }
 
     interface Sampler {
@@ -361,8 +361,6 @@ sealed class ShaderParameter(val name: String) {
             if (!::program.isInitialized) {
                 throw IllegalStateException("create() must be called before apply() for $name")
             }
-            // Bind VAO to ensure vertex attribute configuration is captured
-            // program.bindVertexArray(vao)
 
             program.bindBuffer(GL_ARRAY_BUFFER, buffer)
             program.bufferData(GL_ARRAY_BUFFER, FloatBuffer(data), data.size * GL_FLOAT, GL_DYNAMIC_DRAW)
