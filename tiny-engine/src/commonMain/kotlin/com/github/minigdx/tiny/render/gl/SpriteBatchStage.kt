@@ -109,7 +109,9 @@ class SpriteBatchStage(
         program.use()
         program.setup { _, fragmentShader ->
             spritesheets.forEach { spriteSheet ->
-                fragmentShader.spritesheets[spriteSheet.textureUnit!!].applyIndex(
+                val textureUnit = spriteSheet.textureUnit
+                checkNotNull(textureUnit) { "A Spritesheet is supposed to have a texture unit!" }
+                fragmentShader.spritesheets[textureUnit].applyIndex(
                     spriteSheet.pixels.pixels,
                     spriteSheet.width,
                     spriteSheet.height,
@@ -151,7 +153,7 @@ class SpriteBatchStage(
             colorPaletteBuffer[pos++] = color[2]
             colorPaletteBuffer[pos++] = color[3]
         }
-
+        program.use()
         program.setup { vertexShader, fragmentShader ->
             // Vertex shader attributes
             vertexShader.aPos.apply(batch.vertex)

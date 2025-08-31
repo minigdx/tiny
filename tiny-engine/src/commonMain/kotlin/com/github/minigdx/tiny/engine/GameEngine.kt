@@ -2,7 +2,6 @@ package com.github.minigdx.tiny.engine
 
 import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.file.VirtualFileSystem
-import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.input.Key
@@ -164,21 +163,9 @@ class GameEngine(
                 "disabled the profiler"
             }
 
-            count = 5
             popup(message, "#00FF00")
         }
-        if (count > 0) {
-            val frame = virtualFrameBuffer.readFrameBuffer()
-            // FIXME: pour tester
-            val pixelArray = PixelArray(gameOptions.width, gameOptions.height)
-            frame.copyInto(pixelArray)
-
-            platform.writeImage(pixelArray.pixels)
-            count--
-        }
     }
-
-    var count = 5
 
     private suspend fun reloadCurrentGameScript(currentGameScript: GameScript) {
         clear()

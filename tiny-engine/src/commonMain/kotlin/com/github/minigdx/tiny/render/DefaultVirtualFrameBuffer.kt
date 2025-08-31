@@ -13,7 +13,17 @@ class DefaultVirtualFrameBuffer(
     private val frameBufferStage: FrameBufferStage,
     private val gameOptions: GameOptions,
 ) : VirtualFrameBuffer {
+    /**
+     * Is the primitive frame buffer was updated?
+     * If this framebuffer was updated,
+     * it has to be updated in the GPU also.
+     */
     private var isPrimitiveBufferUpdated = false
+
+    /**
+     * Is the [SpriteBatchStage.startStage] should be invoked,
+     * as a group operation is started.
+     */
     private var shouldStartStage = true
 
     private val batchManager = BatchManager()
@@ -23,6 +33,23 @@ class DefaultVirtualFrameBuffer(
         gameOptions.height,
         gameOptions.colors(),
     )
+
+    private fun renderAllInFrameBuffer() {
+        if (shouldStartStage) {
+            shouldStartStage = false
+            spriteBatchStage.startStage()
+        }
+
+        if (isPrimitiveBufferUpdated) {
+            bindTextures(listOf(primitiveBuffer.asSpriteSheet))
+        }
+        // Render all remaining batch into the GPU Framebuffer.
+        batchManager.consumeAllBatches { batch ->
+            spriteBatchStage.execute(batch)
+        }
+        isPrimitiveBufferUpdated = false
+        primitiveBuffer.clear(0)
+    }
 
     override fun draw(
         source: SpriteSheet,
@@ -52,18 +79,7 @@ class DefaultVirtualFrameBuffer(
         )
 
         if (immediateDraw) {
-            if (shouldStartStage) {
-                shouldStartStage = false
-                spriteBatchStage.startStage()
-            }
-            if (isPrimitiveBufferUpdated) {
-                bindTextures(listOf(primitiveBuffer.asSpriteSheet))
-            }
-            batchManager.consumeAllBatches { batch ->
-                spriteBatchStage.execute(batch)
-            }
-            isPrimitiveBufferUpdated = false
-            primitiveBuffer.clear(0)
+            renderAllInFrameBuffer()
         }
     }
 
@@ -84,36 +100,14 @@ class DefaultVirtualFrameBuffer(
             primitiveBuffer.clipper,
         )
         if (immediateDraw) {
-            if (shouldStartStage) {
-                shouldStartStage = false
-                spriteBatchStage.startStage()
-            }
-            if (isPrimitiveBufferUpdated) {
-                bindTextures(listOf(primitiveBuffer.asSpriteSheet))
-            }
-            batchManager.consumeAllBatches { batch ->
-                spriteBatchStage.execute(batch)
-            }
-            primitiveBuffer.clear(0)
+            renderAllInFrameBuffer()
         }
         isPrimitiveBufferUpdated = true
         block(primitiveBuffer)
     }
 
     override fun draw() {
-        if (shouldStartStage) {
-            shouldStartStage = false
-            spriteBatchStage.startStage()
-        }
-        if (isPrimitiveBufferUpdated) {
-            bindTextures(listOf(primitiveBuffer.asSpriteSheet))
-        }
-        batchManager.consumeAllBatches { batch ->
-            spriteBatchStage.execute(batch)
-        }
-        primitiveBuffer.clear(0)
-        isPrimitiveBufferUpdated = false
-
+        renderAllInFrameBuffer()
         spriteBatchStage.endStage()
 
         shouldStartStage = true

@@ -44,13 +44,12 @@ class BatchManager {
             obj._key?.let { batchKeyPool.free(it) }
 
             obj.instances.clear()
-            obj.sheets.clear()
-            obj.pendingTextureBinds.clear()
             obj.vertexIndex = 0
             obj.uvsIndex = 0
             obj.textureIndicesIndex = 0
             obj.textureSizesIndex = 0
             obj.numberOfVertex = 0
+            obj.lastSpritesheetType = null
 
             obj._key = null
         }

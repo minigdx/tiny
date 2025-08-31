@@ -12,20 +12,15 @@ import com.github.minigdx.tiny.resources.SpriteSheet
 class SpriteBatch(
     internal var _key: BatchKey? = null,
     internal val instances: MutableList<SpriteInstance> = mutableListOf(),
-    internal val sheets: MutableList<SpriteSheet> = mutableListOf(),
-    internal val pendingTextureBinds: MutableList<SpriteSheet> = mutableListOf(),
 ) {
     val key: BatchKey
         get() = _key!!
 
-    val spriteSheets: List<SpriteSheet>
-        get() = sheets
-
     val sprites: List<SpriteInstance> get() = instances
 
     private var hasMixedTypes = false
-    private var lastSpritesheetType: ResourceType? = null
 
+    var lastSpritesheetType: ResourceType? = null
     var vertexIndex = 0
     var uvsIndex = 0
     var textureIndicesIndex = 0
@@ -96,8 +91,8 @@ class SpriteBatch(
         lastSpritesheetType = spriteSheet.type
 
         if (effectiveAdd) {
-            sheets.add(spriteSheet)
             instances.add(instance)
+
             vertexIndex = instance.addVertexInto(vertexIndex, vertex)
             uvsIndex = instance.addUvsInto(uvsIndex, uvs)
             textureIndicesIndex = instance.addTextureIndicesInto(

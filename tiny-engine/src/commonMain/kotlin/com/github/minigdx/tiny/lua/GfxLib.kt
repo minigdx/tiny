@@ -392,11 +392,7 @@ class GfxLib(
         return if (this.isnumber()) {
             this.checkint()
         } else {
-            // resourceAccess.frameBuffer.gamePalette.getColorIndex(this.checkjstring()!!)
-
-            // FIXME:
-
-            return 0
+            return gameOptions.colors().getColorIndex(this.checkjstring()!!)
         }
     }
 }
