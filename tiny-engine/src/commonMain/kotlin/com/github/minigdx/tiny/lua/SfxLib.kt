@@ -112,17 +112,10 @@ class SfxLib(
     private var lastMusicVersion = 0
 
     fun getCurrentMusic(): Music {
-        /*
-        return currentMusic ?: (resourceAccess.sound(0)?.data?.music ?: Music()).also {
+        return currentMusic ?: (resourceAccess.findSound(0)?.data?.music ?: Music()).also {
             currentMusic = it
             invalidateInstrumentCache()
         }
-
-         */
-
-        // FIXME:
-
-        TODO("D")
     }
 
     private fun invalidateInstrumentCache() {
@@ -500,13 +493,9 @@ class SfxLib(
                     )
                 }
 
-                // FIXME:
-                TODO("I")
-/*
-                resourceAccess.play(oneNote)
+                // resourceAccess.play(oneNote)
                 NONE
 
- */
             }
 
             obj.wrap("harmonics") {

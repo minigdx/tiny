@@ -8,6 +8,7 @@ import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.render.VirtualFrameBuffer
+import com.github.minigdx.tiny.resources.GameLevel
 import com.github.minigdx.tiny.resources.SpriteSheet
 import com.github.minigdx.tiny.resources.ldtk.CustomField
 import com.github.minigdx.tiny.resources.ldtk.Entity
@@ -91,8 +92,8 @@ class MapLib(
 
         @TinyCall(
             "Set the current level to use. " +
-                "The level can be an index, the name or the id defined by LDTK. " +
-                "Return the previous index level or NIL if the new level is invalid.",
+                    "The level can be an index, the name or the id defined by LDTK. " +
+                    "Return the previous index level or NIL if the new level is invalid.",
         )
         override fun call(
             @TinyArg("level") a: LuaValue,
@@ -132,7 +133,7 @@ class MapLib(
     inner class layer : OneArgFunction() {
         @TinyCall(
             "Get the layer at the specified index or name from the actual level. " +
-                "The layer in the front is 0.",
+                    "The layer in the front is 0.",
         )
         override fun call(
             @TinyArg("layer_index") arg: LuaValue,
@@ -200,8 +201,8 @@ class MapLib(
 
     @TinyFunction(
         "Convert screen coordinates x, y into map cell coordinates {cx, cy}.\n" +
-            "For example, coordinates of the player can be converted to cell coordinates to access the flag " +
-            "of the tile matching the player coordinates.",
+                "For example, coordinates of the player can be converted to cell coordinates to access the flag " +
+                "of the tile matching the player coordinates.",
     )
     inner class to : TwoArgFunction() {
         @TinyCall("Convert the coordinates into cell coordinates as a table {cx = cx,cy = cy}.")
@@ -319,7 +320,7 @@ entity.fields -- access custom field of the entity
         ): LuaValue {
             val cache = cachedEntities[name]
             return if (
-                // Entities aren't cached yet
+            // Entities aren't cached yet
                 cache == null ||
                 // Any change occurs on the current level used.
                 currentWorldIndex != currentWorld ||
@@ -445,20 +446,17 @@ entity.fields -- access custom field of the entity
             val world = resourceAccess.findLevel(currentWorld) ?: return NIL
             val level = activeLevel() ?: return NIL
 
-            val layers =
-                level.layerInstances
-                    // Select only actives layers
-                    .filterIndexed { index, layer -> isActiveLayer(index) && layer.__tilesetRelPath != null }
-                    // Layers will be drawn in the reverse order (from the back to the front)
-                    .asReversed()
-                    .asSequence()
+            val layers = level.layerInstances
+                // Select only actives layers
+                .filterIndexed { index, layer -> isActiveLayer(index) && layer.__tilesetRelPath != null }
+                // Layers will be drawn in the reverse order (from the back to the front)
+                .asReversed()
+                .asSequence()
 
-            // FIXME: rework
 
-/*
-            layers.flatMap { layer -> toDrawSprite(world, layer) }
-                .forEach { opcode -> resourceAccess.addOp(opcode) }
-*/
+            layers.forEach { layer ->
+                drawLayer(world, layer)
+            }
             return NONE
         }
 
@@ -481,22 +479,16 @@ entity.fields -- access custom field of the entity
 
             val world = resourceAccess.findLevel(currentWorld) ?: return NIL
 
+            drawLayer(world, layer)
+
+            return NONE
+        }
+
+        private fun drawLayer(
+            world: GameLevel,
+            layer: Layer,
+        ) {
             val tileset = world.tilesset[layer.__tilesetRelPath!!]!!
-
-            /*
-            fun Int.toFlip(): Pair<Boolean, Boolean> {
-                return ((this and 0x01) == 0x01) to ((this and 0x02) == 0x02)
-            }
-            val (srcX, srcY) = tile.src
-            val (destX, destY) = tile.px
-            val (flipX, flipY) = tile.f.toFlip()
-
-            virtualFrameBuffer.draw(
-                tileset,
-
-            )
-
-             */
 
             layer.gridTiles?.forEach { tile ->
                 drawTile(tileset, layer.__gridSize, tile)
@@ -505,8 +497,6 @@ entity.fields -- access custom field of the entity
             layer.autoLayerTiles?.forEach { tile ->
                 drawTile(tileset, layer.__gridSize, tile)
             }
-
-            return NONE
         }
     }
 

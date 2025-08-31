@@ -238,8 +238,6 @@ class GameResourceProcessor(
         scripts[0] = bootScript
         currentScript = bootScript
         currentScriptIndex = 0
-
-        println("COUCOU")
     }
 
     override fun setCurrentScript(index: Int): Pair<GameScript?, GameScript> {

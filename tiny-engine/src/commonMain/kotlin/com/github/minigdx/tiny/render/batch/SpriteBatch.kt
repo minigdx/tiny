@@ -31,7 +31,7 @@ class SpriteBatch(
     val vertex = FloatArray(VERTEX_ARRAY_SIZE)
     val uvs = FloatArray(UVS_ARRAY_SIZE)
     val textureIndices = FloatArray(TEXTURE_INDICES_ARRAY_SIZE)
-    val textureSizes = FloatArray(TEXTURE_INDICES_ARRAY_SIZE)
+    val textureSizes = FloatArray(TEXTURE_INDICES_ARRAY_SIZE * 2)
 
     fun canAddSprite(
         currentKey: BatchKey,
@@ -57,7 +57,7 @@ class SpriteBatch(
         // if both are same nature
         if (currentIsPrimitive && lastIsPrimitive) {
             return null
-        } else if (!currentIsPrimitive && !!lastIsPrimitive) {
+        } else if (!currentIsPrimitive && !lastIsPrimitive) {
             return null
         }
 
