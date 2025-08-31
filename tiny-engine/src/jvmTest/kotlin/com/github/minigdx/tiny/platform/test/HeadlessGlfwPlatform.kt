@@ -15,7 +15,9 @@ import com.github.minigdx.tiny.file.VirtualFileSystem
 import com.github.minigdx.tiny.graphic.PixelFormat.RGBA
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
+import com.github.minigdx.tiny.log.LogLevel
 import com.github.minigdx.tiny.log.Logger
+import com.github.minigdx.tiny.log.StdOutLogger
 import com.github.minigdx.tiny.platform.ImageData
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.SoundData
@@ -25,8 +27,6 @@ import com.github.minigdx.tiny.render.gl.FrameBufferStage
 import com.github.minigdx.tiny.render.gl.SpriteBatchStage
 import com.github.minigdx.tiny.sound.JavaSoundManager
 import com.github.minigdx.tiny.sound.SoundManager
-import com.github.minigdx.tiny.log.StdOutLogger
-import com.github.minigdx.tiny.log.LogLevel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -34,18 +34,22 @@ import org.lwjgl.glfw.GLFW
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11
 import org.lwjgl.system.MemoryUtil
-import java.nio.ByteBuffer
 import java.io.ByteArrayInputStream
 import java.io.File
+import java.nio.ByteBuffer
 import javax.imageio.ImageIO
 import kotlin.io.path.createTempDirectory
 import kotlin.math.min
 
 interface GameController {
     fun step()
+
     fun captureScreen(): ByteArray
+
     fun compareWith(reference: ByteArray): Boolean
+
     fun saveScreenshot(name: String)
+
     fun compareWithReference(name: String): Boolean
 }
 
@@ -169,9 +173,9 @@ class HeadlessGlfwPlatform(
         val width = gameOptions.width
         val height = gameOptions.height
         val buffer = ByteBuffer.allocateDirect(width * height * 4)
-        
+
         GL11.glReadPixels(0, 0, width, height, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer)
-        
+
         val result = ByteArray(width * height * 4)
         buffer.get(result)
         return result
@@ -190,7 +194,7 @@ class HeadlessGlfwPlatform(
             File(projectDirectory, ".test")
         }
         targetDir.mkdirs()
-        
+
         val file = File(targetDir, "$name.raw")
         file.writeBytes(screenshot)
     }
@@ -199,7 +203,7 @@ class HeadlessGlfwPlatform(
         val current = captureScreen()
         val referencesDir = File(projectDirectory, ".references")
         val referenceFile = File(referencesDir, "$name.raw")
-        
+
         if (!referenceFile.exists()) {
             // If generating references, save the current screenshot as reference
             if (generateReferences) {
@@ -208,16 +212,16 @@ class HeadlessGlfwPlatform(
             }
             throw IllegalStateException("Reference file not found: ${referenceFile.absolutePath}")
         }
-        
+
         val reference = referenceFile.readBytes()
         val matches = current.contentEquals(reference)
-        
+
         // Always save current screenshot to .test directory for comparison
         val testDir = File(projectDirectory, ".test")
         testDir.mkdirs()
         val testFile = File(testDir, "$name.raw")
         testFile.writeBytes(current)
-        
+
         return matches
     }
 
@@ -350,17 +354,17 @@ fun headlessGlfwTest(
 
     val (w, h) = size
     val gameOptions = GameOptions(w, h, colors, listOf("game.lua"), emptyList())
-    
+
     val tempDir = createTempDirectory("headless-glfw-test").toFile()
     tempDir.deleteOnExit()
-    
+
     val gameFile = File(tempDir, "game.lua")
     gameFile.writeText(script)
-    
+
     val bootFile = File(tempDir, "_boot.lua")
     bootFile.writeText("tiny.exit(0)")
-    
-    val engineFile = File(tempDir, "_engine.lua") 
+
+    val engineFile = File(tempDir, "_engine.lua")
     engineFile.writeText("")
 
     val logger = StdOutLogger("headless-test", LogLevel.NONE)
@@ -381,11 +385,10 @@ fun headlessGlfwTest(
             vfs = com.github.minigdx.tiny.file.CommonVirtualFileSystem(),
             logger = logger,
         )
-        
+
         engine.main()
-        
+
         block(platform)
-        
     } finally {
         platform.endGameLoop()
         tempDir.deleteRecursively()

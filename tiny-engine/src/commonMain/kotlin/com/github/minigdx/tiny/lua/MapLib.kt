@@ -55,7 +55,6 @@ class MapLib(
     private val gameOptions: GameOptions,
     private val virtualFrameBuffer: VirtualFrameBuffer,
 ) : TwoArgFunction() {
-
     private val spriteSize: Pair<Pixel, Pixel> = gameOptions.spriteSize
     private var currentWorld: Int = 0
     private var currentLevel: Int = 0
@@ -453,7 +452,9 @@ entity.fields -- access custom field of the entity
                     // Layers will be drawn in the reverse order (from the back to the front)
                     .asReversed()
                     .asSequence()
+
             // FIXME: rework
+
 /*
             layers.flatMap { layer -> toDrawSprite(world, layer) }
                 .forEach { opcode -> resourceAccess.addOp(opcode) }

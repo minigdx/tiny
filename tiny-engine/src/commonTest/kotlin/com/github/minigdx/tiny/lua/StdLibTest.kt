@@ -20,7 +20,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class StdLibTest {
-
     private val colors = listOf("#FFFFFF", "#000000")
 
     private val frameBuffer = FrameBuffer(10, 10, ColorPalette(colors))
@@ -36,7 +35,7 @@ class StdLibTest {
         )
 
     private val virtualFrameBuffer = mock<VirtualFrameBuffer> {
-       every { drawPrimitive(any()) } calls { (block: (FrameBuffer) -> Unit) -> block(frameBuffer) }
+        every { drawPrimitive(any()) } calls { (block: (FrameBuffer) -> Unit) -> block(frameBuffer) }
     }
 
     private val gameResourceAccess = mock<GameResourceAccess> {

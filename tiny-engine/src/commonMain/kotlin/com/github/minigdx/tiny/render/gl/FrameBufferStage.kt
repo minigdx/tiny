@@ -67,7 +67,7 @@ class FrameBufferStage(
             gameOptions.height * gameOptions.zoom * windowManager.ratioHeight,
         )
 
-        program.clearColor(1f, 0f, 0f, 1.0f)
+        program.clearColor(0f, 0f, 0f, 1.0f)
         program.clear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 
         program.setup { vertexShader, fragmentShader ->

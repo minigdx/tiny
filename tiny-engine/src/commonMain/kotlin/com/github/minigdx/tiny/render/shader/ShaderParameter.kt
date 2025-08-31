@@ -386,7 +386,7 @@ sealed class ShaderParameter(val name: String) {
         override fun unbind() {
             program.disableVertexAttribArray(program.getAttrib(name))
             program.bindBuffer(GL_ARRAY_BUFFER, null)
-           // program.bindVertexArray(null)
+            // program.bindVertexArray(null)
         }
 
         override fun toString() = "in float $name;"

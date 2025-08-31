@@ -1,6 +1,5 @@
 package com.github.minigdx.tiny.platform.glfw
 
-import com.danielgergely.kgl.DebugKgl
 import com.danielgergely.kgl.Kgl
 import com.danielgergely.kgl.KglLwjgl
 import com.github.minigdx.tiny.Seconds
@@ -253,7 +252,7 @@ class GlfwPlatform(
             if (index >= 999) {
                 throw IllegalStateException(
                     "Too many file '${prefixName}_xxx.$extension' generated! " +
-                            "You might need to delete some",
+                        "You might need to delete some",
                 )
             }
             origin = workdirectory.resolve("output_${index.toString().padStart(3, '0')}.$extension")
@@ -370,10 +369,13 @@ class GlfwPlatform(
     }
 
     private fun kgl(): Kgl {
+        /*
         val before = { bf: String -> println("-> $bf") }
         val afiter = { af: String -> println("<- $af") }
         return DebugKgl(KglLwjgl, before, afiter)
-        // return KglLwjgl
+
+         */
+        return KglLwjgl
     }
 
     override fun createFrameBufferStage(windowManager: WindowManager): FrameBufferStage {
