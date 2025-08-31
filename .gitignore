@@ -4,6 +4,9 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+# Test screenshots (generated during test runs)
+.test/
+
 ### IntelliJ IDEA ###
 .idea/**
 .idea/
