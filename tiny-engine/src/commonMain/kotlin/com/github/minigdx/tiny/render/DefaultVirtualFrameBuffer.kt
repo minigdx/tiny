@@ -13,19 +13,6 @@ class DefaultVirtualFrameBuffer(
     private val frameBufferStage: FrameBufferStage,
     private val gameOptions: GameOptions,
 ) : VirtualFrameBuffer {
-    /**
-     * Is the primitive frame buffer was updated?
-     * If this framebuffer was updated,
-     * it has to be updated in the GPU also.
-     */
-    private var isPrimitiveBufferUpdated = false
-
-    /**
-     * Is the [SpriteBatchStage.startStage] should be invoked,
-     * as a group operation is started.
-     */
-    private var shouldStartStage = true
-
     private val batchManager = BatchManager()
 
     private val primitiveBuffer = FrameBuffer(
@@ -33,23 +20,6 @@ class DefaultVirtualFrameBuffer(
         gameOptions.height,
         gameOptions.colors(),
     )
-
-    private fun renderAllInFrameBuffer() {
-        if (shouldStartStage) {
-            shouldStartStage = false
-            spriteBatchStage.startStage()
-        }
-
-        if (isPrimitiveBufferUpdated) {
-            bindTextures(listOf(primitiveBuffer.asSpriteSheet))
-        }
-        // Render all remaining batch into the GPU Framebuffer.
-        batchManager.consumeAllBatches { batch ->
-            spriteBatchStage.execute(batch)
-        }
-        isPrimitiveBufferUpdated = false
-        primitiveBuffer.clear(0)
-    }
 
     override fun draw(
         source: SpriteSheet,
@@ -62,7 +32,7 @@ class DefaultVirtualFrameBuffer(
         flipX: Boolean,
         flipY: Boolean,
     ) {
-        val immediateDraw = batchManager.submitSprite(
+        batchManager.submitSprite(
             source,
             sourceX,
             sourceY,
@@ -77,41 +47,23 @@ class DefaultVirtualFrameBuffer(
             primitiveBuffer.camera,
             primitiveBuffer.clipper,
         )
-
-        if (immediateDraw) {
-            renderAllInFrameBuffer()
-        }
     }
 
     override fun drawPrimitive(block: (FrameBuffer) -> Unit) {
-        val immediateDraw = batchManager.submitSprite(
-            primitiveBuffer.asSpriteSheet,
-            0,
-            0,
-            gameOptions.width,
-            gameOptions.height,
-            0,
-            0,
-            false,
-            false,
-            primitiveBuffer.blender.dithering,
-            primitiveBuffer.blender.switch,
-            primitiveBuffer.camera,
-            primitiveBuffer.clipper,
-        )
-        if (immediateDraw) {
-            renderAllInFrameBuffer()
+        // FIXME: TODO
+    }
+
+    private fun renderAllInFrameBuffer() {
+        spriteBatchStage.startStage()
+        // Render all remaining batch into the GPU Framebuffer.
+        batchManager.consumeAllBatches { key, batch ->
+            spriteBatchStage.execute(key, batch)
         }
-        isPrimitiveBufferUpdated = true
-        block(primitiveBuffer)
+        spriteBatchStage.endStage()
     }
 
     override fun draw() {
         renderAllInFrameBuffer()
-        spriteBatchStage.endStage()
-
-        shouldStartStage = true
-
         frameBufferStage.execute(spriteBatchStage)
     }
 

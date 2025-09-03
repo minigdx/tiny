@@ -444,8 +444,15 @@ sealed class ShaderParameter(val name: String) {
             image: ByteArray,
             width: Int,
             height: Int,
+            texture: Texture? = this.texture,
         ) {
             program.bindTexture(GL_TEXTURE_2D, texture)
+
+            program.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+            program.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
+
+            program.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+            program.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
 
             program.pixelStorei(GL_UNPACK_ALIGNMENT, 1)
             program.texImage2D(

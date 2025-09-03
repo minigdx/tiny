@@ -22,6 +22,7 @@ import com.github.minigdx.tiny.graphic.Clipper
 import com.github.minigdx.tiny.graphic.PixelFormat
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.render.RenderFrame
+import com.github.minigdx.tiny.render.batch.BatchKey
 import com.github.minigdx.tiny.render.batch.SpriteBatch
 import com.github.minigdx.tiny.render.shader.FragmentShader
 import com.github.minigdx.tiny.render.shader.ShaderProgram
@@ -91,13 +92,6 @@ class SpriteBatchStage(
             frameBufferData = frameBufferData,
         )
 
-        val emptyByteArray = ByteArray(8 * 8) { 3 }
-        program.setup { _, fragmentShader ->
-            fragmentShader.spritesheets.forEach {
-                it.applyIndex(emptyByteArray, 8, 8)
-            }
-        }
-
         program.enable(GL_BLEND)
 
         program.disable(GL_SCISSOR_TEST)
@@ -109,12 +103,14 @@ class SpriteBatchStage(
         program.use()
         program.setup { _, fragmentShader ->
             spritesheets.forEach { spriteSheet ->
-                val textureUnit = spriteSheet.textureUnit
-                checkNotNull(textureUnit) { "A Spritesheet is supposed to have a texture unit!" }
-                fragmentShader.spritesheets[textureUnit].applyIndex(
+                if (spriteSheet.textureUnit == null) {
+                    spriteSheet.textureUnit = program.createTexture()
+                }
+                fragmentShader.spritesheet.applyIndex(
                     spriteSheet.pixels.pixels,
                     spriteSheet.width,
                     spriteSheet.height,
+                    spriteSheet.textureUnit,
                 )
             }
         }
@@ -124,7 +120,6 @@ class SpriteBatchStage(
         program.use()
         program.disable(GL_SCISSOR_TEST)
         program.bindFramebuffer(GL_FRAMEBUFFER, frameBufferContext.frameBuffer)
-        // program.enable(GL_SCISSOR_TEST)
 
         program.viewport(0, 0, gameOptions.width, gameOptions.height)
     }
@@ -134,8 +129,11 @@ class SpriteBatchStage(
         program.bindFramebuffer(GL_FRAMEBUFFER, null)
     }
 
-    fun execute(batch: SpriteBatch) {
-        val colorsSwitch = batch.key.palette
+    fun execute(
+        key: BatchKey,
+        batch: SpriteBatch,
+    ) {
+        val colorsSwitch = key.palette
         val colorPaletteBuffer = ByteArray(256 * 256 * PixelFormat.RGBA)
         var pos = 0
         for (index in 0 until 256) {
@@ -158,8 +156,6 @@ class SpriteBatchStage(
             // Vertex shader attributes
             vertexShader.aPos.apply(batch.vertex)
             vertexShader.aSpr.apply(batch.uvs)
-            vertexShader.aSpritesheet.apply(batch.textureSizes)
-            vertexShader.aTextureIndex.apply(batch.textureIndices)
 
             // Vertex shader uniforms
             vertexShader.uViewport.apply(
@@ -167,9 +163,13 @@ class SpriteBatchStage(
                 // Flip the vertical
                 gameOptions.height.toFloat() * -1,
             )
+            vertexShader.uSpritesheet.apply(key.spriteSheet.width.toFloat(), key.spriteSheet.height.toFloat())
 
             // Fragment shader uniforms
             fragmentShader.paletteColors.applyRGBA(colorPaletteBuffer, 256, 256)
+            val textureUnit = key.spriteSheet.textureUnit
+            checkNotNull(textureUnit) { "Texture unit should be already initialized!" }
+            fragmentShader.spritesheet.applyTexture(textureUnit)
         }
 
         program.bind()
@@ -200,53 +200,24 @@ class SpriteBatchStage(
 
     class VShader : VertexShader(VERTEX_SHADER) {
         val aPos = inVec2("a_pos") // position of the sprite in the viewport
-        val aSpritesheet = inVec2("a_spritesheet") // Size of the spritesheet; in pixel.
         val uViewport = uniformVec2("u_viewport") // Size of the viewport; in pixel.
-        val aTextureIndex = inFloat("a_texture_index") // texture unit index for this sprite
+        val uSpritesheet = uniformVec2("u_spritesheet") // Size of the spritesheet; in pixel.
         val aSpr = inVec2("a_spr")
 
         val vPos = outVec2("v_pos")
         val vUvs = outVec2("v_uvs")
-        val vTextureIndex = outFloat("v_texture_index")
     }
 
     class FShader : FragmentShader(FRAGMENT_SHADER) {
         val paletteColors = uniformSample2D("palette_colors")
+        val spritesheet = uniformSample2D("spritesheet", existingTexture = true) // Spritesheet to be used.
 
-        // Spritesheets banks
-        val spritesheet0 = uniformSample2D("spritesheet0") // reserved for the primitive
-        val spritesheet1 = uniformSample2D("spritesheet1")
-        val spritesheet2 = uniformSample2D("spritesheet2")
-        val spritesheet3 = uniformSample2D("spritesheet3")
-        val spritesheet4 = uniformSample2D("spritesheet4")
-        val spritesheet5 = uniformSample2D("spritesheet5")
-        val spritesheet6 = uniformSample2D("spritesheet6")
-        val spritesheet7 = uniformSample2D("spritesheet7")
-        val spritesheet8 = uniformSample2D("spritesheet8")
-        val spritesheet9 = uniformSample2D("spritesheet9")
-
-        val spritesheets = listOf(
-            spritesheet0,
-            spritesheet1,
-            spritesheet2,
-            spritesheet3,
-            spritesheet4,
-            spritesheet5,
-            spritesheet6,
-            spritesheet7,
-            spritesheet8,
-            spritesheet9,
-        )
         val vPos = inVec2("v_pos") // position of the sprite in the viewport
         val vUvs = inVec2("v_uvs") // position of the sprite in the viewport
-        val vTextureIndex = inFloat("v_texture_index")
     }
 
     companion object {
         private const val VERTEX_PER_SPRITE = 6
-
-        // 12 floats are required to generate coordinates for a sprite.
-        private const val FLOAT_PER_SPRITE = VERTEX_PER_SPRITE * 2
 
         //language=Glsl
         private val VERTEX_SHADER =
@@ -264,9 +235,8 @@ class SpriteBatchStage(
                 
                 // UV computation
                 // Convert the texture coordinates to NDC coordinates
-                vec2 ndc_spr = a_spr / a_spritesheet;
+                vec2 ndc_spr = a_spr / u_spritesheet;
                 v_uvs = ndc_spr;
-                v_texture_index = a_texture_index;
             }
             """.trimIndent()
 
@@ -296,36 +266,14 @@ class SpriteBatchStage(
             /**
             * Return the pixel color index at the 
             */
-            int readPixel(int textureIndex, vec2 uvs) {
-                vec4 color;
-                if(textureIndex == 0) {
-                     color = texture(spritesheet0, v_uvs);
-                } else if (textureIndex == 1) {
-                     color = texture(spritesheet1, v_uvs);
-                } else if (textureIndex == 2) {
-                     color = texture(spritesheet2, v_uvs);
-                } else if (textureIndex == 3) {
-                     color = texture(spritesheet3, v_uvs);
-                } else if (textureIndex == 4) {
-                     color = texture(spritesheet4, v_uvs);
-                } else if (textureIndex == 5) {
-                     color = texture(spritesheet5, v_uvs);
-                } else if (textureIndex == 6) {
-                     color = texture(spritesheet6, v_uvs);
-                } else if (textureIndex == 7) {
-                     color = texture(spritesheet7, v_uvs);
-                } else if (textureIndex == 8) {
-                     color = texture(spritesheet8, v_uvs);
-                } else {
-                     color = texture(spritesheet9, v_uvs);
-                } 
-               
+            int readPixel(vec2 uvs) {
+                vec4 color = texture(spritesheet, v_uvs);
                 return int(color.r * 255.0 + 0.5);
             }
             
             void main() {
                 // Read the index color from the current texture.
-                int pixel = readPixel(int(v_texture_index), v_uvs);
+                int pixel = readPixel(v_uvs);
                 // Read the RGBA color from the index color.
                 vec4 color = readColor(pixel);
                 if(color.a <= 0.1) {

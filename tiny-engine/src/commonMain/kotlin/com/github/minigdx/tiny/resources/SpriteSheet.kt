@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.resources
 
+import com.danielgergely.kgl.Texture
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.graphic.PixelArray
 
@@ -28,9 +29,9 @@ class SpriteSheet(
     var width: Pixel,
     var height: Pixel,
     /**
-     * Texture unit assigned by the [com.github.minigdx.tiny.engine.GameResourceProcessor].
+     * Texture unit assigned by the [com.github.minigdx.tiny.render.gl.SpriteBatchStage] when the texture is bound.
      */
-    var textureUnit: Int? = null,
+    var textureUnit: Texture? = null,
     override var reload: Boolean = false,
 ) : GameResource {
     data class SpriteSheetKey(val index: Int, val type: ResourceType)

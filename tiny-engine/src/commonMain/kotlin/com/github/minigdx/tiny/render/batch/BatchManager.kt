@@ -15,15 +15,16 @@ import com.github.minigdx.tiny.resources.SpriteSheet
  * system for memory efficiency.
  */
 class BatchManager {
-    private val activeBatches = mutableListOf<SpriteBatch>()
-    private var currentBatch: SpriteBatch? = null
+    private val batches = mutableMapOf<BatchKey, MutableList<SpriteBatch>>()
 
     private val batchKeyPool = object : ObjectPool<BatchKey>(DEFAULT_SPRITE_POOL_SIZE) {
         override fun newInstance(): BatchKey {
             return BatchKey()
         }
 
-        override fun destroyInstance(obj: BatchKey) = Unit
+        override fun destroyInstance(obj: BatchKey) {
+            obj.reset()
+        }
     }
 
     private val spriteInstancePool = object : ObjectPool<SpriteInstance>(DEFAULT_SPRITE_POOL_SIZE) {
@@ -40,18 +41,7 @@ class BatchManager {
         }
 
         override fun destroyInstance(obj: SpriteBatch) {
-            spriteInstancePool.free(obj.instances)
-            obj._key?.let { batchKeyPool.free(it) }
-
-            obj.instances.clear()
-            obj.vertexIndex = 0
-            obj.uvsIndex = 0
-            obj.textureIndicesIndex = 0
-            obj.textureSizesIndex = 0
-            obj.numberOfVertex = 0
-            obj.lastSpritesheetType = null
-
-            obj._key = null
+            obj.reset()
         }
     }
 
@@ -74,8 +64,9 @@ class BatchManager {
         palette: Array<ColorIndex> = emptyArray(),
         camera: Camera? = null,
         clipper: Clipper? = null,
-    ): Boolean {
+    ) {
         val key = batchKeyPool.obtain().set(
+            spriteSheet = source,
             dither = dither,
             palette = palette,
             camera = camera,
@@ -93,52 +84,34 @@ class BatchManager {
             flipY = flipY,
         )
 
+        val spriteBatches = batches.getOrPut(key) { mutableListOf() }
+        val spriteBatch = spriteBatches.lastOrNull() ?: spriteBatchPool.obtain().also { spriteBatches.add(it) }
+
         // Try to add to existing batch
-        val existingBatch = activeBatches.lastOrNull()
-        val rejectReason = existingBatch?.addSprite(key, source, instance)
-        if (existingBatch != null && rejectReason == null) {
-            batchKeyPool.free(key)
-            return false
+        if (!spriteBatch.addSprite(instance)) {
+            // Create new batch
+            val newBatch = spriteBatchPool.obtain().also { spriteBatches.add(it) }
+            newBatch.addSprite(instance)
         }
 
-        // Create new batch
-        val newBatch = spriteBatchPool.obtain()
-
-        newBatch.addSprite(key, source, instance)
-
-        return when (rejectReason) {
-            // The batch will be added after the previous batch has been rendered
-            SpriteBatch.RejectReason.BATCH_MIXED -> {
-                currentBatch = newBatch
-                true
-            }
-            SpriteBatch.RejectReason.BATCH_FULL,
-            SpriteBatch.RejectReason.BATCH_DIFFEREND_PARAMETERS,
-            null,
-            -> {
-                activeBatches.add(newBatch)
-                false
-            }
-        }
+        spriteInstancePool.free(instance)
     }
 
-    fun consumeAllBatches(action: (SpriteBatch) -> Unit) {
-        activeBatches.forEach(action)
+    fun consumeAllBatches(action: (BatchKey, SpriteBatch) -> Unit) {
+        batches.forEach { (key, spriteBatches) ->
+            spriteBatches.forEach { spriteBatch ->
+                action.invoke(key, spriteBatch)
+            }
+        }
         flushAllBatches()
     }
 
     private fun flushAllBatches() {
-        spriteBatchPool.free(activeBatches)
-        activeBatches.clear()
+        spriteBatchPool.free(batches.values.flatten())
+        batchKeyPool.free(batches.keys)
 
-        // Add the current batch, if any
-        currentBatch?.let { activeBatches.add(it) }
-        currentBatch = null
+        batches.clear()
     }
-
-    fun getActiveBatchCount(): Int = activeBatches.size
-
-    fun getTotalSpriteCount(): Int = activeBatches.sumOf { it.sprites.size }
 
     companion object {
         private const val DEFAULT_SPRITE_POOL_SIZE = 1000

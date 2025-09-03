@@ -174,32 +174,34 @@ class GameResourceProcessor(
 
     private fun loadGameLevel(resource: GameResource) {
         val gameLevel = resource as GameLevel
+        gameLevel.tilesset.forEach { (name, spriteSheet) ->
+            spriteSheet.textureUnit = levels[resource.index]?.tilesset[name]?.textureUnit
+        }
         levels[resource.index] = gameLevel
         // If the current script is _boot, don't force reload as the game is still loading
-        if(currentScriptIndex > 0) {
+        if (currentScriptIndex > 0) {
             // Force the reloading of the script as level init might occur in the _init block.
             scripts[currentScriptIndex]?.reload = true
         }
 
-        gameLevel.tilesset.values.forEach { spriteSheet ->
-            spriteSheet.textureUnit = textureUnitPerSpriteSheet.getOrPut(spriteSheet.key) { getNextAvailableTextureUnit() }
-        }
         spritesheetToBind.addAll(gameLevel.tilesset.values)
     }
 
     private fun loadGameSpriteSheet(resource: GameResource) {
         val spriteSheet = resource as SpriteSheet
+        // Copy the texture unit used by the current spritesheet
+        spriteSheet.textureUnit = spriteSheets[resource.index]?.textureUnit
         spriteSheets[resource.index] = spriteSheet
 
-        spriteSheet.textureUnit = textureUnitPerSpriteSheet.getOrPut(spriteSheet.key) { getNextAvailableTextureUnit() }
         spritesheetToBind.add(spriteSheet)
     }
 
     private fun loadBootSpriteSheet(resource: GameResource) {
         val spriteSheet = resource as SpriteSheet
+
+        spriteSheet.textureUnit = bootSpritesheet?.textureUnit
         bootSpritesheet = spriteSheet
 
-        spriteSheet.textureUnit = textureUnitPerSpriteSheet.getOrPut(spriteSheet.key) { getNextAvailableTextureUnit() }
         spritesheetToBind.add(spriteSheet)
     }
 
