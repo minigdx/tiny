@@ -495,7 +495,6 @@ class SfxLib(
 
                 // resourceAccess.play(oneNote)
                 NONE
-
             }
 
             obj.wrap("harmonics") {

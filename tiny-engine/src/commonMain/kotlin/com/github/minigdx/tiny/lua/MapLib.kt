@@ -92,8 +92,8 @@ class MapLib(
 
         @TinyCall(
             "Set the current level to use. " +
-                    "The level can be an index, the name or the id defined by LDTK. " +
-                    "Return the previous index level or NIL if the new level is invalid.",
+                "The level can be an index, the name or the id defined by LDTK. " +
+                "Return the previous index level or NIL if the new level is invalid.",
         )
         override fun call(
             @TinyArg("level") a: LuaValue,
@@ -133,7 +133,7 @@ class MapLib(
     inner class layer : OneArgFunction() {
         @TinyCall(
             "Get the layer at the specified index or name from the actual level. " +
-                    "The layer in the front is 0.",
+                "The layer in the front is 0.",
         )
         override fun call(
             @TinyArg("layer_index") arg: LuaValue,
@@ -201,8 +201,8 @@ class MapLib(
 
     @TinyFunction(
         "Convert screen coordinates x, y into map cell coordinates {cx, cy}.\n" +
-                "For example, coordinates of the player can be converted to cell coordinates to access the flag " +
-                "of the tile matching the player coordinates.",
+            "For example, coordinates of the player can be converted to cell coordinates to access the flag " +
+            "of the tile matching the player coordinates.",
     )
     inner class to : TwoArgFunction() {
         @TinyCall("Convert the coordinates into cell coordinates as a table {cx = cx,cy = cy}.")
@@ -320,7 +320,7 @@ entity.fields -- access custom field of the entity
         ): LuaValue {
             val cache = cachedEntities[name]
             return if (
-            // Entities aren't cached yet
+                // Entities aren't cached yet
                 cache == null ||
                 // Any change occurs on the current level used.
                 currentWorldIndex != currentWorld ||
@@ -452,7 +452,6 @@ entity.fields -- access custom field of the entity
                 // Layers will be drawn in the reverse order (from the back to the front)
                 .asReversed()
                 .asSequence()
-
 
             layers.forEach { layer ->
                 drawLayer(world, layer)
