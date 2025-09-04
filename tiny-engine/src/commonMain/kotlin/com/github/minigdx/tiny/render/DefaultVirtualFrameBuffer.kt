@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.render
 
+import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.graphic.FrameBuffer
@@ -20,6 +21,45 @@ class DefaultVirtualFrameBuffer(
         gameOptions.height,
         gameOptions.colors(),
     )
+
+    private val monocolors = createFontPalettes()
+
+    private fun createFontPalettes(): Array<Array<ColorIndex>> {
+        return (0 until gameOptions.colors().size).map { index ->
+            val palette = Array(gameOptions.colors().size) { index }
+            palette[0] = 0 // Set the transparent color
+            palette
+        }.toTypedArray()
+    }
+
+    override fun drawMonocolor(
+        source: SpriteSheet,
+        color: ColorIndex,
+        sourceX: Pixel,
+        sourceY: Pixel,
+        sourceWidth: Pixel,
+        sourceHeight: Pixel,
+        destinationX: Pixel,
+        destinationY: Pixel,
+        flipX: Boolean,
+        flipY: Boolean,
+    ) {
+        batchManager.submitSprite(
+            source,
+            sourceX,
+            sourceY,
+            sourceWidth,
+            sourceHeight,
+            destinationX,
+            destinationY,
+            flipX,
+            flipY,
+            primitiveBuffer.blender.dithering,
+            monocolors[color],
+            primitiveBuffer.camera,
+            primitiveBuffer.clipper,
+        )
+    }
 
     override fun draw(
         source: SpriteSheet,

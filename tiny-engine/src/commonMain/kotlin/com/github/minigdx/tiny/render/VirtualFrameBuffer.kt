@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.render
 
+import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.resources.SpriteSheet
@@ -10,6 +11,22 @@ interface VirtualFrameBuffer {
      */
     fun draw(
         source: SpriteSheet,
+        sourceX: Pixel,
+        sourceY: Pixel,
+        sourceWidth: Pixel,
+        sourceHeight: Pixel,
+        destinationX: Pixel,
+        destinationY: Pixel,
+        flipX: Boolean = false,
+        flipY: Boolean = false,
+    )
+
+    /**
+     * Draw a sprite using one solid color
+     */
+    fun drawMonocolor(
+        source: SpriteSheet,
+        color: ColorIndex,
         sourceX: Pixel,
         sourceY: Pixel,
         sourceWidth: Pixel,

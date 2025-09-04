@@ -137,13 +137,8 @@ class SpriteBatchStage(
         val colorPaletteBuffer = ByteArray(256 * 256 * PixelFormat.RGBA)
         var pos = 0
         for (index in 0 until 256) {
-            val pal = if (colorsSwitch.isNotEmpty()) {
-                // Get the pal color
-                colorsSwitch[index % colorsSwitch.size]
-            } else {
-                // Get the straight color
-                index
-            }
+            // Get the pal color
+            val pal = colorsSwitch[index % colorsSwitch.size]
 
             val color = gameOptions.colors().getRGBA(pal)
             colorPaletteBuffer[pos++] = color[0]
@@ -167,6 +162,7 @@ class SpriteBatchStage(
 
             // Fragment shader uniforms
             fragmentShader.paletteColors.applyRGBA(colorPaletteBuffer, 256, 256)
+
             val textureUnit = key.spriteSheet.textureUnit
             checkNotNull(textureUnit) { "Texture unit should be already initialized!" }
             fragmentShader.spritesheet.applyTexture(textureUnit)
@@ -217,8 +213,6 @@ class SpriteBatchStage(
     }
 
     companion object {
-        private const val VERTEX_PER_SPRITE = 6
-
         //language=Glsl
         private val VERTEX_SHADER =
             """

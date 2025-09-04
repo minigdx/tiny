@@ -239,67 +239,60 @@ class StdLib(
             val y = c.checkint()
             val color = d.checkColorIndex()
 
-            virtualFrameBuffer.drawPrimitive { frameBuffer ->
+            val space = 4
+            var currentX = x
+            var currentY = y
+            str.forEach { char ->
 
-                val space = 4
-                var currentX = x
-                var currentY = y
-                str.forEach { char ->
-
-                    val coord = if (char.isLetter()) {
-                        // The character has an accent. Let's try to get rid of it
-                        val l = if (char.hasAccent) {
-                            ACCENT_MAP[char.lowercaseChar()] ?: char.lowercaseChar()
-                        } else {
-                            char.lowercaseChar()
-                        }
-                        val index = l - 'a'
-                        index to 0
-                    } else if (char.isDigit()) {
-                        val index = char.lowercaseChar() - '0'
-                        index to 1
-                    } else if (char in '!'..'/') {
-                        val index = char.lowercaseChar() - '!'
-                        index to 2
-                    } else if (char in '['..'`') {
-                        val index = char.lowercaseChar() - '['
-                        index to 3
-                    } else if (char in '{'..'~') {
-                        val index = char.lowercaseChar() - '{'
-                        index to 4
-                    } else if (char in ':'..'@') {
-                        val index = char.lowercaseChar() - ':'
-                        index to 5
-                    } else if (char == '\n') {
-                        currentY += 6
-                        currentX = x - space // compensate the next space
-                        null
+                val coord = if (char.isLetter()) {
+                    // The character has an accent. Let's try to get rid of it
+                    val l = if (char.hasAccent) {
+                        ACCENT_MAP[char.lowercaseChar()] ?: char.lowercaseChar()
                     } else {
-                        // Maybe it's an emoji: try EMOJI MAP conversion
-                        EMOJI_MAP[char]
+                        char.lowercaseChar()
                     }
-                    if (coord != null) {
-                        val (indexX, indexY) = coord
-
-                        frameBuffer.copyFrom(
-                            spritesheet.pixels,
-                            currentX,
-                            currentY,
-                            indexX * 4,
-                            indexY * 4,
-                            4,
-                            4,
-                        ) { pixel: ByteArray, _, _ ->
-                            if (pixel[0].toInt() == 0) {
-                                pixel
-                            } else {
-                                pixel[0] = color.toByte()
-                                pixel
-                            }
-                        }
-                    }
-                    currentX += space
+                    val index = l - 'a'
+                    index to 0
+                } else if (char.isDigit()) {
+                    val index = char.lowercaseChar() - '0'
+                    index to 1
+                } else if (char in '!'..'/') {
+                    val index = char.lowercaseChar() - '!'
+                    index to 2
+                } else if (char in '['..'`') {
+                    val index = char.lowercaseChar() - '['
+                    index to 3
+                } else if (char in '{'..'~') {
+                    val index = char.lowercaseChar() - '{'
+                    index to 4
+                } else if (char in ':'..'@') {
+                    val index = char.lowercaseChar() - ':'
+                    index to 5
+                } else if (char == '\n') {
+                    currentY += 6
+                    currentX = x - space // compensate the next space
+                    null
+                } else {
+                    // Maybe it's an emoji: try EMOJI MAP conversion
+                    EMOJI_MAP[char]
                 }
+                if (coord != null) {
+                    val (indexX, indexY) = coord
+
+                    virtualFrameBuffer.drawMonocolor(
+                        spritesheet,
+                        color,
+                        indexX * 4,
+                        indexY * 4,
+                        4,
+                        4,
+                        currentX,
+                        currentY,
+                        flipX = false,
+                        flipY = false,
+                    )
+                }
+                currentX += space
             }
 
             return NONE
