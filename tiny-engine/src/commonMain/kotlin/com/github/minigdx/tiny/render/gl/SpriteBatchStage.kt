@@ -3,7 +3,9 @@ package com.github.minigdx.tiny.render.gl
 import com.danielgergely.kgl.ByteBuffer
 import com.danielgergely.kgl.GL_BLEND
 import com.danielgergely.kgl.GL_COLOR_ATTACHMENT0
+import com.danielgergely.kgl.GL_COLOR_BUFFER_BIT
 import com.danielgergely.kgl.GL_DEPTH24_STENCIL8
+import com.danielgergely.kgl.GL_DEPTH_BUFFER_BIT
 import com.danielgergely.kgl.GL_FRAMEBUFFER
 import com.danielgergely.kgl.GL_FRAMEBUFFER_COMPLETE
 import com.danielgergely.kgl.GL_NEAREST
@@ -17,6 +19,7 @@ import com.danielgergely.kgl.GL_TEXTURE_MIN_FILTER
 import com.danielgergely.kgl.GL_TRIANGLES
 import com.danielgergely.kgl.GL_UNSIGNED_BYTE
 import com.danielgergely.kgl.Kgl
+import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.graphic.Clipper
 import com.github.minigdx.tiny.graphic.PixelFormat
@@ -192,6 +195,15 @@ class SpriteBatchStage(
         val openGLFrame = OpenGLFrame(frameBufferContext.frameBufferData, gameOptions)
 
         return openGLFrame
+    }
+
+    fun clear(color: ColorIndex) {
+        program.use()
+        program.bindFramebuffer(GL_FRAMEBUFFER, frameBufferContext.frameBuffer)
+        val (r, g, b) = gameOptions.colors().getRGBA(color)
+        program.clearColor(r.toInt() / 255f, g.toInt() / 255f, b.toInt() / 255f, 1.0f)
+        program.clear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
+        program.bindFramebuffer(GL_FRAMEBUFFER, null)
     }
 
     class VShader : VertexShader(VERTEX_SHADER) {

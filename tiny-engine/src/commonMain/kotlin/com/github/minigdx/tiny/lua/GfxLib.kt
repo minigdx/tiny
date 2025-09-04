@@ -110,9 +110,7 @@ class GfxLib(
                 arg.checkColorIndex()
             }
 
-            virtualFrameBuffer.drawPrimitive { frameBuffer ->
-                frameBuffer.clear(color)
-            }
+            virtualFrameBuffer.clear(color)
 
             return NIL
         }

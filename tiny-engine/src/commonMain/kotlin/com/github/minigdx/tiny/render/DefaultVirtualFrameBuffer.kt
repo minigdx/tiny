@@ -114,4 +114,9 @@ class DefaultVirtualFrameBuffer(
     override fun readFrameBuffer(): RenderFrame {
         return spriteBatchStage.readFrameBuffer()
     }
+
+    override fun clear(color: ColorIndex) {
+        batchManager.clear()
+        spriteBatchStage.clear(color)
+    }
 }

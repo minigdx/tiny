@@ -50,4 +50,9 @@ interface VirtualFrameBuffer {
     fun bindTextures(spritesheetToBind: List<SpriteSheet>)
 
     fun readFrameBuffer(): RenderFrame
+
+    /**
+     * Clear the virtual framebuffer.
+     */
+    fun clear(color: ColorIndex)
 }

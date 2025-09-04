@@ -103,10 +103,10 @@ class BatchManager {
                 action.invoke(key, spriteBatch)
             }
         }
-        flushAllBatches()
+        clear()
     }
 
-    private fun flushAllBatches() {
+    fun clear() {
         spriteBatchPool.free(batches.values.flatten())
         batchKeyPool.free(batches.keys)
 
