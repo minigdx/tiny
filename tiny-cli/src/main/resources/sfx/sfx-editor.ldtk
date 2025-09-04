@@ -2427,9 +2427,9 @@
 									"id": "V_String",
 									"params": ["Green"]
 								}] },
-								{ "__identifier": "Label", "__type": "String", "__value": "Release", "__tile": null, "defUid": 79, "realEditorValues": [{
+								{ "__identifier": "Label", "__type": "String", "__value": "Decay", "__tile": null, "defUid": 79, "realEditorValues": [{
 									"id": "V_String",
-									"params": ["Release"]
+									"params": ["Decay"]
 								}] }
 							],
 							"__worldX": 248,
