@@ -2,8 +2,6 @@ package com.github.minigdx.tiny.graphic
 
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
-import com.github.minigdx.tiny.resources.ResourceType
-import com.github.minigdx.tiny.resources.SpriteSheet
 import kotlin.math.max
 import kotlin.math.min
 
@@ -254,17 +252,4 @@ class FrameBuffer(
             colorIndexBuffer.size,
         )
     }
-
-    val asSpriteSheet: SpriteSheet
-        get() = SpriteSheet(
-            0,
-            0,
-            "framebuffer",
-            type = ResourceType.PRIMITIVE_SPRITESHEET,
-            pixels = this.colorIndexBuffer,
-            width = this.width,
-            height = this.height,
-            reload = false,
-            textureUnit = 0,
-        )
 }

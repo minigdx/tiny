@@ -21,12 +21,11 @@ import com.danielgergely.kgl.GL_UNSIGNED_BYTE
 import com.danielgergely.kgl.Kgl
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.graphic.Clipper
 import com.github.minigdx.tiny.graphic.PixelFormat
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.render.RenderFrame
-import com.github.minigdx.tiny.render.batch.BatchKey
 import com.github.minigdx.tiny.render.batch.SpriteBatch
+import com.github.minigdx.tiny.render.batch.SpriteBatchKey
 import com.github.minigdx.tiny.render.shader.FragmentShader
 import com.github.minigdx.tiny.render.shader.ShaderProgram
 import com.github.minigdx.tiny.render.shader.VertexShader
@@ -36,19 +35,10 @@ class SpriteBatchStage(
     gl: Kgl,
     private val gameOptions: GameOptions,
     private val performanceMonitor: PerformanceMonitor,
-) {
-    class SpriteBatchState private constructor(
-        var dither: Int = 0xFFFF,
-        val clipper: Clipper,
-    ) {
-        constructor(gameOptions: GameOptions) : this(0XFFFF, Clipper(gameOptions.width, gameOptions.height))
-    }
-
+) : Stage {
     lateinit var frameBufferContext: FrameBufferContext
 
     private val program = ShaderProgram(gl, VShader(), FShader())
-
-    private val spriteBatchState = SpriteBatchState(gameOptions)
 
     fun init() {
         program.compileShader()
@@ -119,7 +109,7 @@ class SpriteBatchStage(
         }
     }
 
-    fun startStage() {
+    override fun startStage() {
         program.use()
         program.disable(GL_SCISSOR_TEST)
         program.bindFramebuffer(GL_FRAMEBUFFER, frameBufferContext.frameBuffer)
@@ -127,13 +117,8 @@ class SpriteBatchStage(
         program.viewport(0, 0, gameOptions.width, gameOptions.height)
     }
 
-    fun endStage() {
-        program.disable(GL_SCISSOR_TEST)
-        program.bindFramebuffer(GL_FRAMEBUFFER, null)
-    }
-
     fun execute(
-        key: BatchKey,
+        key: SpriteBatchKey,
         batch: SpriteBatch,
     ) {
         val colorsSwitch = key.palette
@@ -195,6 +180,11 @@ class SpriteBatchStage(
         val openGLFrame = OpenGLFrame(frameBufferContext.frameBufferData, gameOptions)
 
         return openGLFrame
+    }
+
+    override fun endStage() {
+        program.disable(GL_SCISSOR_TEST)
+        program.bindFramebuffer(GL_FRAMEBUFFER, null)
     }
 
     fun clear(color: ColorIndex) {

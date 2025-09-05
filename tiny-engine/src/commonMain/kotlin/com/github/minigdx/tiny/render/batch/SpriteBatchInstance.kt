@@ -8,7 +8,7 @@ import com.github.minigdx.tiny.Pixel
  * coordinates on screen, along with flip flags for horizontal/vertical mirroring.
  * Instances with the same rendering state are grouped together in SpriteBatch objects.
  */
-class SpriteInstance(
+class SpriteBatchInstance(
     var sourceX: Pixel = 0,
     var sourceY: Pixel = 0,
     var sourceWidth: Pixel = 0,
@@ -17,7 +17,7 @@ class SpriteInstance(
     var destinationY: Pixel = 0,
     var flipX: Boolean = false,
     var flipY: Boolean = false,
-) {
+) : Instance {
     fun set(
         sourceX: Pixel,
         sourceY: Pixel,
@@ -27,7 +27,7 @@ class SpriteInstance(
         destinationY: Pixel,
         flipX: Boolean,
         flipY: Boolean,
-    ): SpriteInstance {
+    ): SpriteBatchInstance {
         this.sourceX = sourceX
         this.sourceY = sourceY
         this.sourceWidth = sourceWidth
@@ -38,6 +38,17 @@ class SpriteInstance(
         this.flipY = flipY
 
         return this
+    }
+
+    override fun reset() {
+        this.sourceX = 0
+        this.sourceY = 0
+        this.sourceWidth = 0
+        this.sourceHeight = 0
+        this.destinationX = 0
+        this.destinationY = 0
+        this.flipX = false
+        this.flipY = false
     }
 
     fun addVertexInto(
@@ -100,39 +111,6 @@ class SpriteInstance(
             uvs[indexVertex++] = y.toFloat()
         }
         return indexVertex
-    }
-
-    fun addTextureIndicesInto(
-        textureIndicesIndex: Int,
-        textureIndices: FloatArray,
-        textureIndex: Int,
-    ): Int {
-        var index = textureIndicesIndex
-        val textureIndexFloat = textureIndex.toFloat()
-
-        // Set same texture index for all 6 vertices of this sprite
-        repeat(6) {
-            textureIndices[index++] = textureIndexFloat
-        }
-
-        return index
-    }
-
-    fun addTextureSizesInto(
-        textureSizesIndex: Int,
-        textureSizes: FloatArray,
-        textureWidth: Int,
-        textureHeight: Int,
-    ): Int {
-        var index = textureSizesIndex
-
-        // Set same texture index for all 6 vertices of this sprite
-        repeat(6) {
-            textureSizes[index++] = textureWidth.toFloat()
-            textureSizes[index++] = textureHeight.toFloat()
-        }
-
-        return index
     }
 
     val positionLeft: Pixel

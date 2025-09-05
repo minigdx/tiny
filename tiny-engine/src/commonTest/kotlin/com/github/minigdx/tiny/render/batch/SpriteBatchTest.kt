@@ -29,8 +29,8 @@ class SpriteBatchTest {
         )
     }
 
-    private fun createTestBatchKey(): BatchKey {
-        return BatchKey(
+    private fun createTestBatchKey(): SpriteBatchKey {
+        return SpriteBatchKey(
             dither = 0,
             palette = emptyArray(),
             camera = null,

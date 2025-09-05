@@ -16,7 +16,7 @@ class FrameBufferStage(
     gl: Kgl,
     private val gameOptions: GameOptions,
     private val performanceMonitor: PerformanceMonitor,
-) {
+) : Stage {
     private val uvsData =
         floatArrayOf(
             // right/bottom

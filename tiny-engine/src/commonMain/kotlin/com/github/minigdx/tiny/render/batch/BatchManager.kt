@@ -1,11 +1,6 @@
 package com.github.minigdx.tiny.render.batch
 
-import com.github.minigdx.tiny.ColorIndex
-import com.github.minigdx.tiny.Pixel
-import com.github.minigdx.tiny.graphic.Camera
-import com.github.minigdx.tiny.graphic.Clipper
 import com.github.minigdx.tiny.input.internal.ObjectPool
-import com.github.minigdx.tiny.resources.SpriteSheet
 
 /**
  * Manages the creation and lifecycle of sprite batches for efficient rendering.
@@ -14,90 +9,66 @@ import com.github.minigdx.tiny.resources.SpriteSheet
  * and flushing full batches to the render queue. Integrates with the object pooling
  * system for memory efficiency.
  */
-class BatchManager {
-    private val batches = mutableMapOf<BatchKey, MutableList<SpriteBatch>>()
+class BatchManager<K : BatchKey, T : Instance, B : Batch<T>>(
+    private val keyGenerator: () -> K,
+    private val instanceGenerator: () -> T,
+    private val batchGenerator: () -> B,
+) {
+    private val batches = mutableMapOf<K, MutableList<B>>()
 
-    private val batchKeyPool = object : ObjectPool<BatchKey>(DEFAULT_SPRITE_POOL_SIZE) {
-        override fun newInstance(): BatchKey {
-            return BatchKey()
+    private val batchKeyPool = object : ObjectPool<K>(DEFAULT_SPRITE_POOL_SIZE) {
+        override fun newInstance(): K {
+            return keyGenerator()
         }
 
-        override fun destroyInstance(obj: BatchKey) {
+        override fun destroyInstance(obj: K) {
             obj.reset()
         }
     }
 
-    private val spriteInstancePool = object : ObjectPool<SpriteInstance>(DEFAULT_SPRITE_POOL_SIZE) {
-        override fun newInstance(): SpriteInstance {
-            return SpriteInstance()
+    private val instancePool = object : ObjectPool<T>(DEFAULT_SPRITE_POOL_SIZE) {
+        override fun newInstance(): T {
+            return instanceGenerator()
         }
 
-        override fun destroyInstance(obj: SpriteInstance) = Unit
-    }
-
-    private val spriteBatchPool = object : ObjectPool<SpriteBatch>(DEFAULT_BATH_POOL_SIZE) {
-        override fun newInstance(): SpriteBatch {
-            return SpriteBatch()
-        }
-
-        override fun destroyInstance(obj: SpriteBatch) {
+        override fun destroyInstance(obj: T) {
             obj.reset()
         }
     }
 
-    /**
-     * Submit a new sprite.
-     *
-     * @return is the actual batches need to be rendered.
-     */
-    fun submitSprite(
-        source: SpriteSheet,
-        sourceX: Pixel,
-        sourceY: Pixel,
-        sourceWidth: Pixel,
-        sourceHeight: Pixel,
-        destinationX: Pixel,
-        destinationY: Pixel,
-        flipX: Boolean = false,
-        flipY: Boolean = false,
-        dither: Int = 0xFFFF,
-        palette: Array<ColorIndex> = emptyArray(),
-        camera: Camera? = null,
-        clipper: Clipper? = null,
+    private val batchPool = object : ObjectPool<B>(DEFAULT_BATH_POOL_SIZE) {
+        override fun newInstance(): B {
+            return batchGenerator()
+        }
+
+        override fun destroyInstance(obj: B) {
+            obj.reset()
+        }
+    }
+
+    fun createKey(): K {
+        return batchKeyPool.obtain()
+    }
+
+    fun createInstance(): T {
+        return instancePool.obtain()
+    }
+
+    fun submit(
+        key: K,
+        instance: T,
     ) {
-        val key = batchKeyPool.obtain().set(
-            spriteSheet = source,
-            dither = dither,
-            palette = palette,
-            camera = camera,
-            clipper = clipper,
-        )
-
-        val instance = spriteInstancePool.obtain().set(
-            sourceX = sourceX,
-            sourceY = sourceY,
-            sourceWidth = sourceWidth,
-            sourceHeight = sourceHeight,
-            destinationX = destinationX,
-            destinationY = destinationY,
-            flipX = flipX,
-            flipY = flipY,
-        )
-
         val spriteBatches = batches.getOrPut(key) { mutableListOf() }
-        val spriteBatch = spriteBatches.lastOrNull() ?: spriteBatchPool.obtain().also { spriteBatches.add(it) }
+        val spriteBatch = spriteBatches.lastOrNull()
+            ?.takeIf { it.canAddInto() }
+            ?: batchPool.obtain().also { spriteBatches.add(it) }
 
-        // Try to add to existing batch
-        if (!spriteBatch.addSprite(instance)) {
-            // Create new batch
-            val newBatch = spriteBatchPool.obtain().also { spriteBatches.add(it) }
-            newBatch.addSprite(instance)
-        }
+        spriteBatch.add(instance)
 
-        spriteInstancePool.free(instance)
+        instancePool.free(instance)
     }
 
-    fun consumeAllBatches(action: (BatchKey, SpriteBatch) -> Unit) {
+    fun consumeAllBatches(action: (K, B) -> Unit) {
         batches.forEach { (key, spriteBatches) ->
             spriteBatches.forEach { spriteBatch ->
                 action.invoke(key, spriteBatch)
@@ -107,7 +78,7 @@ class BatchManager {
     }
 
     fun clear() {
-        spriteBatchPool.free(batches.values.flatten())
+        batchPool.free(batches.values.flatten())
         batchKeyPool.free(batches.keys)
 
         batches.clear()
