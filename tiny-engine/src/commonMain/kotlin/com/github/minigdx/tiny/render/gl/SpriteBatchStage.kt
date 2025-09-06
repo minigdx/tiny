@@ -1,29 +1,12 @@
 package com.github.minigdx.tiny.render.gl
 
-import com.danielgergely.kgl.ByteBuffer
-import com.danielgergely.kgl.GL_BLEND
-import com.danielgergely.kgl.GL_COLOR_ATTACHMENT0
-import com.danielgergely.kgl.GL_COLOR_BUFFER_BIT
-import com.danielgergely.kgl.GL_DEPTH24_STENCIL8
-import com.danielgergely.kgl.GL_DEPTH_BUFFER_BIT
 import com.danielgergely.kgl.GL_FRAMEBUFFER
-import com.danielgergely.kgl.GL_FRAMEBUFFER_COMPLETE
-import com.danielgergely.kgl.GL_NEAREST
-import com.danielgergely.kgl.GL_RENDERBUFFER
-import com.danielgergely.kgl.GL_RGBA
 import com.danielgergely.kgl.GL_SCISSOR_TEST
-import com.danielgergely.kgl.GL_STENCIL_ATTACHMENT
-import com.danielgergely.kgl.GL_TEXTURE_2D
-import com.danielgergely.kgl.GL_TEXTURE_MAG_FILTER
-import com.danielgergely.kgl.GL_TEXTURE_MIN_FILTER
 import com.danielgergely.kgl.GL_TRIANGLES
-import com.danielgergely.kgl.GL_UNSIGNED_BYTE
 import com.danielgergely.kgl.Kgl
-import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.graphic.PixelFormat
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
-import com.github.minigdx.tiny.render.RenderFrame
 import com.github.minigdx.tiny.render.batch.SpriteBatch
 import com.github.minigdx.tiny.render.batch.SpriteBatchKey
 import com.github.minigdx.tiny.render.shader.FragmentShader
@@ -36,60 +19,10 @@ class SpriteBatchStage(
     private val gameOptions: GameOptions,
     private val performanceMonitor: PerformanceMonitor,
 ) : Stage {
-    lateinit var frameBufferContext: FrameBufferContext
-
     private val program = ShaderProgram(gl, VShader(), FShader())
 
     fun init() {
         program.compileShader()
-
-        // Framebuffer of the size of the screen
-        val frameBufferData = ByteBuffer(gameOptions.width * gameOptions.height * PixelFormat.RGBA)
-
-        // Attach stencil buffer to the framebuffer.
-        val stencilBuffer = program.createRenderbuffer()
-        program.bindRenderbuffer(GL_RENDERBUFFER, stencilBuffer)
-        program.renderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, gameOptions.width, gameOptions.height)
-
-        val frameBuffer = program.createFramebuffer()
-        program.bindFramebuffer(GL_FRAMEBUFFER, frameBuffer)
-
-        program.framebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, stencilBuffer)
-
-        // Prepare the texture used for the FBO
-        val frameBufferTexture = program.createTexture()
-        program.bindTexture(GL_TEXTURE_2D, frameBufferTexture)
-
-        program.texImage2D(
-            GL_TEXTURE_2D,
-            0,
-            GL_RGBA,
-            gameOptions.width,
-            gameOptions.height,
-            0,
-            GL_RGBA,
-            GL_UNSIGNED_BYTE,
-            frameBufferData,
-        )
-        program.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-        program.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-        program.framebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, frameBufferTexture, 0)
-
-        if (program.checkFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-            throw IllegalStateException("Framebuffer is NOT complete!")
-        }
-
-        frameBufferContext = FrameBufferContext(
-            frameBufferTexture = frameBufferTexture,
-            frameBuffer = frameBuffer,
-            frameBufferData = frameBufferData,
-        )
-
-        program.enable(GL_BLEND)
-
-        program.disable(GL_SCISSOR_TEST)
-        program.bindTexture(GL_TEXTURE_2D, null)
-        program.bindFramebuffer(GL_FRAMEBUFFER, null)
     }
 
     fun bindTextures(spritesheets: List<SpriteSheet>) {
@@ -112,9 +45,6 @@ class SpriteBatchStage(
     override fun startStage() {
         program.use()
         program.disable(GL_SCISSOR_TEST)
-        program.bindFramebuffer(GL_FRAMEBUFFER, frameBufferContext.frameBuffer)
-
-        program.viewport(0, 0, gameOptions.width, gameOptions.height)
     }
 
     fun execute(
@@ -162,37 +92,8 @@ class SpriteBatchStage(
         program.unbind()
     }
 
-    fun readFrameBuffer(): RenderFrame {
-        program.bindFramebuffer(GL_FRAMEBUFFER, frameBufferContext.frameBuffer)
-
-        program.readPixels(
-            0,
-            0,
-            gameOptions.width,
-            gameOptions.height,
-            GL_RGBA,
-            GL_UNSIGNED_BYTE,
-            frameBufferContext.frameBufferData,
-        )
-
-        program.bindFramebuffer(GL_FRAMEBUFFER, null)
-
-        val openGLFrame = OpenGLFrame(frameBufferContext.frameBufferData, gameOptions)
-
-        return openGLFrame
-    }
-
     override fun endStage() {
         program.disable(GL_SCISSOR_TEST)
-        program.bindFramebuffer(GL_FRAMEBUFFER, null)
-    }
-
-    fun clear(color: ColorIndex) {
-        program.use()
-        program.bindFramebuffer(GL_FRAMEBUFFER, frameBufferContext.frameBuffer)
-        val (r, g, b) = gameOptions.colors().getRGBA(color)
-        program.clearColor(r.toInt() / 255f, g.toInt() / 255f, b.toInt() / 255f, 1.0f)
-        program.clear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
         program.bindFramebuffer(GL_FRAMEBUFFER, null)
     }
 

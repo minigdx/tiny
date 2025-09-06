@@ -3,6 +3,7 @@ package com.github.minigdx.tiny.render
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.graphic.FrameBuffer
+import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.resources.SpriteSheet
 
 interface VirtualFrameBuffer {
@@ -55,4 +56,6 @@ interface VirtualFrameBuffer {
      * Clear the virtual framebuffer.
      */
     fun clear(color: ColorIndex)
+
+    fun init(windowManager: WindowManager)
 }

@@ -11,10 +11,10 @@ dependencies {
     this.commonTestImplementation(libs.kotlin.coroutines.test)
 
     // Multiplatform
+    this.commonMainApi(libs.kgl.core)
     this.commonMainImplementation(libs.luak)
     this.commonMainImplementation(libs.kotlin.coroutines)
     this.commonMainImplementation(libs.kotlin.serialization.json)
-    this.commonMainImplementation(libs.kgl.core)
     this.commonMainImplementation(project(":tiny-doc-annotations"))
 
     // JVM Specific

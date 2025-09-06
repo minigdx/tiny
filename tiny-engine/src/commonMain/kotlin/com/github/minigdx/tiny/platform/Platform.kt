@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.platform
 
+import com.danielgergely.kgl.Kgl
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
@@ -8,8 +9,6 @@ import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
-import com.github.minigdx.tiny.render.gl.FrameBufferStage
-import com.github.minigdx.tiny.render.gl.SpriteBatchStage
 import com.github.minigdx.tiny.sound.Music
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.coroutines.CoroutineDispatcher
@@ -53,7 +52,7 @@ interface Platform {
     /**
      * Prepare the platform for the game loop
      */
-    fun initRenderManager(windowManager: WindowManager)
+    fun initRenderManager(windowManager: WindowManager): Kgl
 
     /**
      * Let's run the game loop
@@ -129,8 +128,4 @@ interface Platform {
         name: String,
         parentDirectory: String? = "data",
     ): LocalFile
-
-    fun createSpriteStage(): SpriteBatchStage
-
-    fun createFrameBufferStage(windowManager: WindowManager): FrameBufferStage
 }

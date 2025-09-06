@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.platform.test
 
+import com.danielgergely.kgl.Kgl
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameLoop
@@ -17,11 +18,10 @@ import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMetrics
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.render.RenderFrame
-import com.github.minigdx.tiny.render.gl.FrameBufferStage
-import com.github.minigdx.tiny.render.gl.SpriteBatchStage
 import com.github.minigdx.tiny.sound.SoundHandler
 import com.github.minigdx.tiny.sound.SoundManager
 import com.github.minigdx.tiny.util.MutableFixedSizeList
+import dev.mokkery.mock
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 
@@ -75,7 +75,7 @@ class HeadlessPlatform(
         )
     }
 
-    override fun initRenderManager(windowManager: WindowManager) = Unit
+    override fun initRenderManager(windowManager: WindowManager) = mock<Kgl> { }
 
     suspend fun advance() {
         gameLoop?.advance(1f)
@@ -160,14 +160,6 @@ class HeadlessPlatform(
         }
 
     override fun writeImage(buffer: ByteArray) {
-        TODO("Not yet implemented")
-    }
-
-    override fun createSpriteStage(): SpriteBatchStage {
-        TODO("Not yet implemented")
-    }
-
-    override fun createFrameBufferStage(windowManager: WindowManager): FrameBufferStage {
         TODO("Not yet implemented")
     }
 

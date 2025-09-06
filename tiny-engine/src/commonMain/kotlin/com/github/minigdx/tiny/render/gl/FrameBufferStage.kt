@@ -5,6 +5,7 @@ import com.danielgergely.kgl.GL_DEPTH_BUFFER_BIT
 import com.danielgergely.kgl.GL_FRAMEBUFFER
 import com.danielgergely.kgl.GL_TRIANGLES
 import com.danielgergely.kgl.Kgl
+import com.danielgergely.kgl.Texture
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
@@ -55,7 +56,7 @@ class FrameBufferStage(
         this.windowManager = windowManager
     }
 
-    fun execute(stage: SpriteBatchStage) {
+    fun execute(frameBuffer: Texture) {
         program.use()
         program.bindFramebuffer(GL_FRAMEBUFFER, null)
 
@@ -72,7 +73,7 @@ class FrameBufferStage(
         program.setup { vertexShader, fragmentShader ->
             vertexShader.position.apply(vertexData)
             vertexShader.uvs.apply(uvsData)
-            fragmentShader.frameBuffer.applyTexture(stage.frameBufferContext.frameBufferTexture)
+            fragmentShader.frameBuffer.applyTexture(frameBuffer)
         }
 
         program.bind()

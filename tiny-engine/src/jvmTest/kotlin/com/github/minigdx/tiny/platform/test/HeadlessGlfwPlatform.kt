@@ -1,6 +1,5 @@
 package com.github.minigdx.tiny.platform.test
 
-import com.danielgergely.kgl.Kgl
 import com.danielgergely.kgl.KglLwjgl
 import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.engine.GameLoop
@@ -23,8 +22,6 @@ import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
-import com.github.minigdx.tiny.render.gl.FrameBufferStage
-import com.github.minigdx.tiny.render.gl.SpriteBatchStage
 import com.github.minigdx.tiny.sound.JavaSoundManager
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.coroutines.CoroutineDispatcher
@@ -132,7 +129,7 @@ class HeadlessGlfwPlatform(
         )
     }
 
-    override fun initRenderManager(windowManager: WindowManager) = Unit
+    override fun initRenderManager(windowManager: WindowManager) = KglLwjgl
 
     override fun initInputManager(): InputManager {
         return lwjglInputHandler
@@ -298,18 +295,6 @@ class HeadlessGlfwPlatform(
         return JavaSoundManager().also {
             it.initSoundManager(inputHandler)
         }
-    }
-
-    override fun createSpriteStage(): SpriteBatchStage {
-        return SpriteBatchStage(kgl(), gameOptions, performanceMonitor).also { it.init() }
-    }
-
-    private fun kgl(): Kgl {
-        return KglLwjgl
-    }
-
-    override fun createFrameBufferStage(windowManager: WindowManager): FrameBufferStage {
-        return FrameBufferStage(kgl(), gameOptions, performanceMonitor).also { it.init(windowManager) }
     }
 
     override fun createLocalFile(

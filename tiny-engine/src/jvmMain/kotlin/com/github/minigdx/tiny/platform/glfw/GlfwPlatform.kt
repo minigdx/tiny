@@ -22,7 +22,6 @@ import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.render.gl.FrameBufferStage
-import com.github.minigdx.tiny.render.gl.SpriteBatchStage
 import com.github.minigdx.tiny.sound.JavaSoundManager
 import com.github.minigdx.tiny.sound.SoundManager
 import com.github.minigdx.tiny.util.MutableFixedSizeList
@@ -168,7 +167,9 @@ class GlfwPlatform(
         )
     }
 
-    override fun initRenderManager(windowManager: WindowManager) = Unit
+    override fun initRenderManager(windowManager: WindowManager): Kgl {
+        return KglLwjgl
+    }
 
     override fun initInputManager(): InputManager {
         return lwjglInputHandler
@@ -364,10 +365,6 @@ class GlfwPlatform(
         }
     }
 
-    override fun createSpriteStage(): SpriteBatchStage {
-        return SpriteBatchStage(kgl(), gameOptions, performanceMonitor).also { it.init() }
-    }
-
     private fun kgl(): Kgl {
         /*
         val before = { bf: String -> println("-> $bf") }
@@ -376,10 +373,6 @@ class GlfwPlatform(
 
          */
         return KglLwjgl
-    }
-
-    override fun createFrameBufferStage(windowManager: WindowManager): FrameBufferStage {
-        return FrameBufferStage(kgl(), gameOptions, performanceMonitor).also { it.init(windowManager) }
     }
 
     override fun createLocalFile(

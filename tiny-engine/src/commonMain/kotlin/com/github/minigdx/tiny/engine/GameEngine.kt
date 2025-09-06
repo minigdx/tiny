@@ -51,13 +51,15 @@ class GameEngine(
         inputManager = platform.initInputManager()
         soundManager = platform.initSoundManager(inputHandler)
 
-        platform.initRenderManager(windowManager)
+        val kgl = platform.initRenderManager(windowManager)
 
         virtualFrameBuffer = DefaultVirtualFrameBuffer(
-            platform.createSpriteStage(),
-            platform.createFrameBufferStage(windowManager),
+            kgl,
             gameOptions,
+            performanceMonitor,
         )
+
+        virtualFrameBuffer.init(windowManager)
 
         resourceFactory = ResourceFactory(
             vfs = vfs,

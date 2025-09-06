@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.platform.webgl
 
+import com.danielgergely.kgl.Kgl
 import com.danielgergely.kgl.KglJs
 import com.danielgergely.kgl.WebGL2RenderingContext
 import com.github.minigdx.tiny.engine.GameLoop
@@ -56,7 +57,7 @@ class WebGlPlatform(
         )
     }
 
-    override fun initRenderManager(windowManager: WindowManager) {
+    override fun initRenderManager(windowManager: WindowManager): Kgl {
         val context = canvas.getContext("webgl2") as? WebGL2RenderingContext
             ?: throw IllegalStateException(
                 "The canvas context is expected to be a webgl2 context. " +
@@ -64,13 +65,7 @@ class WebGlPlatform(
                     "Please update to a compatible browser to run the game in WebGL2.",
             )
 
-        val gl = KglJs(context)
-        frameBufferStage = FrameBufferStage(gl, gameOptions, performanceMonitor).also {
-            it.init(windowManager)
-        }
-        spriteBatchStage = SpriteBatchStage(gl, gameOptions, performanceMonitor).also {
-            it.init()
-        }
+        return KglJs(context)
     }
 
     override fun gameLoop(gameLoop: GameLoop) {
@@ -130,14 +125,6 @@ class WebGlPlatform(
         parentDirectory: String?,
     ): LocalFile {
         return JsLocalFile(name, parentDirectory?.let { "tiny-$parentDirectory" } ?: "tiny")
-    }
-
-    override fun createSpriteStage(): SpriteBatchStage {
-        return spriteBatchStage
-    }
-
-    override fun createFrameBufferStage(windowManager: WindowManager): FrameBufferStage {
-        return frameBufferStage
     }
 
     override fun writeImage(buffer: ByteArray) = Unit
