@@ -1,6 +1,7 @@
 package com.github.minigdx.tiny.render.batch
 
 import com.github.minigdx.tiny.Pixel
+import kotlin.math.abs
 
 class PrimitiveInstance(
     var parameters: Array<Int> = Array(7) { 0 },
@@ -67,14 +68,15 @@ class PrimitiveInstance(
         y1: Pixel,
         x2: Pixel,
         y2: Pixel,
-    ) {
+    ): PrimitiveInstance {
         parameters[0] = 3
         parameters[1] = x1
         parameters[2] = y1
-        parameters[3] = x2
-        parameters[4] = y2
+        parameters[3] = x2 - x1
+        parameters[4] = y2 - y1
         parameters[5] = 0
         parameters[6] = 0
+        return this
     }
 
     fun setPoint(

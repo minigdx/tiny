@@ -52,13 +52,21 @@ interface VirtualFrameBuffer {
 
     fun readFrameBuffer(): RenderFrame
 
-    fun drawRectf(
+    fun drawRect(
         x: Pixel,
         y: Pixel,
         width: Pixel,
         height: Pixel,
         colorIndex: ColorIndex,
         filled: Boolean,
+    )
+
+    fun drawLine(
+        x1: Pixel,
+        y1: Pixel,
+        x2: Pixel,
+        y2: Pixel,
+        colorIndex: ColorIndex,
     )
 
     /**

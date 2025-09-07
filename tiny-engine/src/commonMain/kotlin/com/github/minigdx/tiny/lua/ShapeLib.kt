@@ -108,7 +108,7 @@ class ShapeLib(
         ): Varargs {
             val (x, y, width, height, color) = shape.rectArgs(args) ?: return NIL
 
-            virtualFrameBuffer.drawRectf(
+            virtualFrameBuffer.drawRect(
                 x,
                 y,
                 width,
@@ -403,31 +403,7 @@ class ShapeLib(
             y1: Pixel,
             color: ColorIndex,
         ): LuaValue {
-            // (x1, y1), (x2, y2)
-            val dx = abs(x1 - x0)
-            val dy = abs(y1 - y0)
-            val sx = if (x0 < x1) 1 else -1
-            val sy = if (y0 < y1) 1 else -1
-            var err = dx - dy
-
-            var x = x0
-            var y = y0
-
-            virtualFrameBuffer.drawPrimitive { frameBuffer ->
-                while (true) {
-                    frameBuffer.pixel(x, y, color)
-                    if (x == x1 && y == y1) break
-                    val e2 = 2 * err
-                    if (e2 > -dy) {
-                        err -= dy
-                        x += sx
-                    }
-                    if (e2 < dx) {
-                        err += dx
-                        y += sy
-                    }
-                }
-            }
+            virtualFrameBuffer.drawLine(x0, y0, x1, y1, color)
             return NONE
         }
 

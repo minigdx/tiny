@@ -68,14 +68,14 @@ class ShaderProgram<V : VertexShader, F : FragmentShader>(
             .map { it.name }
             .toSet()
 
-        val missingInParameters = outParameterNames - inParametersNames
-        val missingOutParameters = inParametersNames - outParameterNames
+        val missingOutParameters = outParameterNames - inParametersNames
+        val missingInParameters = inParametersNames - outParameterNames
 
-        if (missingInParameters.isNotEmpty()) {
-            throw IllegalStateException("$missingInParameters are missing as out parameters from Vertex shader")
-        }
         if (missingOutParameters.isNotEmpty()) {
             throw IllegalStateException("$missingOutParameters are missing as in parameters from Fragment shader")
+        }
+        if (missingInParameters.isNotEmpty()) {
+            throw IllegalStateException("$missingInParameters are missing as out parameters from Vertex shader")
         }
         gl.bindVertexArray(null)
     }

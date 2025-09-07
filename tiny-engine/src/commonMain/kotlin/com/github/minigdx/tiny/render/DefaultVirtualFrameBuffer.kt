@@ -209,7 +209,7 @@ class DefaultVirtualFrameBuffer(
         // FIXME: TODO
     }
 
-    override fun drawRectf(
+    override fun drawRect(
         x: Pixel,
         y: Pixel,
         width: Pixel,
@@ -224,6 +224,23 @@ class DefaultVirtualFrameBuffer(
             width,
             height,
             filled = filled,
+        )
+        primitiveBatchManager.submit(key, instance)
+    }
+
+    override fun drawLine(
+        x1: Pixel,
+        y1: Pixel,
+        x2: Pixel,
+        y2: Pixel,
+        colorIndex: ColorIndex,
+    ) {
+        val key = primitiveBatchManager.createKey().set(colorIndex)
+        val instance = primitiveBatchManager.createInstance().setLine(
+            x1,
+            y1,
+            x2,
+            y2,
         )
         primitiveBatchManager.submit(key, instance)
     }
