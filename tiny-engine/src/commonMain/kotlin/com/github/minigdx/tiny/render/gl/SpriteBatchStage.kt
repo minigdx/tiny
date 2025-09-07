@@ -44,7 +44,6 @@ class SpriteBatchStage(
 
     override fun startStage() {
         program.use()
-        program.disable(GL_SCISSOR_TEST)
     }
 
     fun execute(
@@ -92,10 +91,7 @@ class SpriteBatchStage(
         program.unbind()
     }
 
-    override fun endStage() {
-        program.disable(GL_SCISSOR_TEST)
-        program.bindFramebuffer(GL_FRAMEBUFFER, null)
-    }
+    override fun endStage() = Unit
 
     class VShader : VertexShader(VERTEX_SHADER) {
         val aPos = inVec2("a_pos") // position of the sprite in the viewport
