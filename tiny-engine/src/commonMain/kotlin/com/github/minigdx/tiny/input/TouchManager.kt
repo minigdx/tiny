@@ -7,13 +7,13 @@ import com.github.minigdx.tiny.input.internal.ObjectPool
 typealias KeyCode = Int
 
 class TouchManager(lastKeyCode: KeyCode) {
-    private val touchSignalCache = TouchSignal.values()
+    private val touchSignalCache = TouchSignal.entries.toTypedArray()
 
     internal val lastTouch: Vector2 = Vector2(0f, 0f)
 
-    private val type = Array<Any?>(TouchSignal.values().size) { null }
-    private val touch = Array<Vector2?>(TouchSignal.values().size) { null }
-    private val justTouch = Array<Vector2?>(TouchSignal.values().size) { null }
+    private val type = Array<Any?>(TouchSignal.entries.size) { null }
+    private val touch = Array<Vector2?>(TouchSignal.entries.size) { null }
+    private val justTouch = Array<Vector2?>(TouchSignal.entries.size) { null }
 
     private val keyPressed = Array(lastKeyCode + 1) { false }
     private val justKeyPressed = Array(lastKeyCode + 1) { false }

@@ -48,7 +48,7 @@ class PrimitiveBatchStage(
             vertexShader.aPos.apply(vertex)
             vertexShader.aUvs.apply(vertex)
 
-           fragmentShader.paletteColors.applyRGBA(colorPaletteBuffer, 256, 256)
+            fragmentShader.paletteColors.applyRGBA(colorPaletteBuffer, 256, 256)
         }
     }
 
@@ -69,7 +69,7 @@ class PrimitiveBatchStage(
             vertexShader.aShapeType.apply(batch.parametersType)
             vertexShader.aShadeParams12.apply(batch.parameters12)
             vertexShader.aShadeParams34.apply(batch.parameters34)
-            // vertexShader.aShadeParams56.apply(batch.parameters56)
+            vertexShader.aShadeParams56.apply(batch.parameters56)
 
             fragmentShader.uColor.apply(key.color)
         }
@@ -86,7 +86,7 @@ class PrimitiveBatchStage(
         val aShapeType = inFloat("a_shapeType").forEachInstance() // Shape type (0=rect, 1=circle, 2=line, 3=rounded rect)
         val aShadeParams12 = inVec2("a_shapeParams12").forEachInstance() // Parameters 1-2 (usually x, y or x1, y1)
         val aShadeParams34 = inVec2("a_shapeParams34").forEachInstance() // Parameters 3-4 (usually width, height or x2, y2)
-        // val aShadeParams56 = inVec2("a_shapeParams56").forEachInstance() // Parameters 5-6 (extra params like thickness, corner radius)
+        val aShadeParams56 = inVec2("a_shapeParams56").forEachInstance() // Parameters 5-6 (extra params like thickness, corner radius)
 
         val aPos = inVec2("a_pos") // Position of the shape
         val aUvs = inVec2("a_uvs")
@@ -98,8 +98,7 @@ class PrimitiveBatchStage(
         val vShapeType = outFloat("v_shapeType", flat = true)
         val vParams12 = outVec2("v_shapeParams12", flat = true)
         val vParams34 = outVec2("v_shapeParams34", flat = true)
-       //  val vParams56 = outVec2("v_params56", flat = true)
-
+        val vParams56 = outVec2("v_shapeParams56", flat = true)
     }
 
     class FShader : FragmentShader(FRAGMENT_SHADER) {
@@ -112,12 +111,10 @@ class PrimitiveBatchStage(
         val vShapeType = inFloat("v_shapeType", flat = true)
         val vShapeParams12 = inVec2("v_shapeParams12", flat = true)
         val vShapeParams34 = inVec2("v_shapeParams34", flat = true)
-        // val vParams56 = inVec2("v_params56", flat = true)
+        val vParams56 = inVec2("v_shapeParams56", flat = true)
     }
 
     companion object {
-
-
         //language=Glsl
         private val VERTEX_SHADER =
             """
@@ -134,7 +131,9 @@ class PrimitiveBatchStage(
                 // Pass data to fragment shader
                 v_uvs = a_uvs;
                 v_shapeType = a_shapeType;
+                v_shapeParams12 = a_shapeParams12;
                 v_shapeParams34 = a_shapeParams34;
+                v_shapeParams56 = a_shapeParams56;
             }
             """.trimIndent()
 
@@ -143,6 +142,7 @@ class PrimitiveBatchStage(
             """
             #define T_RECT 1
             #define T_LINE 3
+            #define T_RECTF 240
                 
             int imod(int value, int limit) {
                 return value - limit * (value / limit);
@@ -175,7 +175,7 @@ class PrimitiveBatchStage(
             
             
             float sdfLine(vec2 p, vec2 a, vec2 b, float thickness) {
-                 vec2 pa = p - a;
+                vec2 pa = p - a;
                 vec2 ba = b - a;
                 float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
                 return length(pa - ba * h) - thickness * 0.5;
@@ -184,7 +184,39 @@ class PrimitiveBatchStage(
             void main() {
                 vec2 sdf;
                 if(int(v_shapeType) == T_LINE) {
-                    sdf = sdfLine(v_uvs, vec2(0.0), vec2(1.0), 0.0) * v_shapeParams34;
+                    vec2 lineStart = v_shapeParams12;
+                    vec2 lineEnd = v_shapeParams56;
+                    // Fragment position in pixels
+                    vec2 fragCoord = v_uvs * v_shapeParams34 + v_shapeParams12;
+                    
+                    // Convertir en coordonnées entières de pixels
+                    ivec2 p = ivec2(floor(fragCoord + 0.5));
+                    ivec2 p0 = ivec2(floor(lineStart + 0.5));
+                    ivec2 p1 = ivec2(floor(lineEnd + 0.5));
+                    
+                    // Vérifier les bornes d'abord
+                    if (p.x < min(p0.x, p1.x) || p.x > max(p0.x, p1.x) ||
+                        p.y < min(p0.y, p1.y) || p.y > max(p0.y, p1.y)) {
+                        discard;
+                    }
+                    
+                    // Test de Bresenham
+                    ivec2 d = p1 - p0;
+                    ivec2 pp = p - p0;
+                    
+                    // Condition de Bresenham : le pixel est sur la ligne si
+                    // la distance perpendiculaire est <= 0.5 pixel
+                    int cross = abs(pp.x * d.y - pp.y * d.x);
+                    int threshold = max(abs(d.x), abs(d.y));
+                    
+                    if (float(cross) <= float(threshold) / 2.0) {
+                        sdf = vec2(0.0);
+                    } else {
+                        sdf = vec2(1.5);
+                    }
+                } else if(int(v_shapeType) == T_RECTF) {
+                    sdf = sdfRectangle(v_uvs, vec2(1.0)) * v_shapeParams34;
+                  
                 } else {
                     // Calculate SDF for rectangle (UV is in [0,1] range)
                     sdf = sdfRectangleBorder(v_uvs, vec2(1.0), 0.0) * v_shapeParams34;

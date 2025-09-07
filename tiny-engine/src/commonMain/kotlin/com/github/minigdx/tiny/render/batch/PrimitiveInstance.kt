@@ -2,6 +2,7 @@ package com.github.minigdx.tiny.render.batch
 
 import com.github.minigdx.tiny.Pixel
 import kotlin.math.abs
+import kotlin.math.sign
 
 class PrimitiveInstance(
     var parameters: Array<Int> = Array(7) { 0 },
@@ -69,13 +70,17 @@ class PrimitiveInstance(
         x2: Pixel,
         y2: Pixel,
     ): PrimitiveInstance {
+        val width = (1 + abs(x2 - x1)) * sign((x2 - x1).toDouble()).toInt()
+        val height = (1 + abs(y2 - y1)) * sign((y2 - y1).toDouble()).toInt()
         parameters[0] = 3
         parameters[1] = x1
         parameters[2] = y1
-        parameters[3] = x2 - x1
-        parameters[4] = y2 - y1
-        parameters[5] = 0
-        parameters[6] = 0
+        parameters[3] = width // width
+        parameters[4] = height // heigth
+        // Si j'ai : 10, 10 -> 10, 120
+        // le mesh doit fait au mini w = 1 / h = 121
+        parameters[5] = x2
+        parameters[6] = y2
         return this
     }
 

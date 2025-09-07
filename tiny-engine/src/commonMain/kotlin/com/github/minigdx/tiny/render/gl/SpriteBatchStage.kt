@@ -1,7 +1,5 @@
 package com.github.minigdx.tiny.render.gl
 
-import com.danielgergely.kgl.GL_FRAMEBUFFER
-import com.danielgergely.kgl.GL_SCISSOR_TEST
 import com.danielgergely.kgl.GL_TRIANGLES
 import com.danielgergely.kgl.Kgl
 import com.github.minigdx.tiny.engine.GameOptions
