@@ -55,10 +55,10 @@ class PrimitiveInstance(
         filled: Boolean = false,
     ): PrimitiveInstance {
         parameters[0] = 2 + filled.asBitShit()
-        parameters[1] = x
-        parameters[2] = y
-        parameters[3] = radius
-        parameters[4] = 0
+        parameters[1] = x - radius
+        parameters[2] = y - radius
+        parameters[3] = 2 * radius + 1
+        parameters[4] = 2 * radius + 1
         parameters[5] = 0
         parameters[6] = 0
         return this

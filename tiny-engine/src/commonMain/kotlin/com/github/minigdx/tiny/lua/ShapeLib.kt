@@ -293,12 +293,7 @@ class ShapeLib(
         ): Varargs {
             val (x, y, width, height, color) = shape.rectArgs(args) ?: return NIL
 
-            virtualFrameBuffer.drawPrimitive { frameBuffer ->
-                // Draw the shape in the current frame buffer
-                for (j in y until y + height) {
-                    frameBuffer.fill(x, x + width, j, color)
-                }
-            }
+            virtualFrameBuffer.drawRect(x, y, width, height, color, filled = true)
 
             return NIL
         }
@@ -339,38 +334,8 @@ class ShapeLib(
             val radius = c.checkint()
             val color = d.checkColorIndex()
 
-            virtualFrameBuffer.drawPrimitive { frameBuffer ->
-
-                var x = 0
-                var y = radius
-                var dst = 3 - 2 * radius
-                while (x <= y) {
-                    // Draw the outline of the circle
-                    frameBuffer.pixel(centerX + x, centerY + y, color)
-                    frameBuffer.pixel(centerX - x, centerY + y, color)
-                    frameBuffer.pixel(centerX + x, centerY - y, color)
-                    frameBuffer.pixel(centerX - x, centerY - y, color)
-                    frameBuffer.pixel(centerX + y, centerY + x, color)
-                    frameBuffer.pixel(centerX - y, centerY + x, color)
-                    frameBuffer.pixel(centerX + y, centerY - x, color)
-                    frameBuffer.pixel(centerX - y, centerY - x, color)
-
-                    // Fill the circle
-                    frameBuffer.fill(centerX - x, centerX + x, centerY + y, color)
-                    frameBuffer.fill(centerX - x, centerX + x, centerY - y, color)
-                    frameBuffer.fill(centerX - y, centerX + y, centerY + x, color)
-                    frameBuffer.fill(centerX - y, centerX + y, centerY - x, color)
-
-                    if (dst < 0) {
-                        dst += 4 * x + 6
-                    } else {
-                        dst += 4 * (x - y) + 10
-                        y--
-                    }
-                    x++
-                }
-            }
-            return NIL
+            virtualFrameBuffer.drawCircle(centerX, centerY, radius, color, filled = true)
+            return NONE
         }
     }
 
@@ -458,31 +423,8 @@ class ShapeLib(
             val radius = c.checkint()
             val color = d.checkColorIndex()
 
-            virtualFrameBuffer.drawPrimitive { frameBuffer ->
+            virtualFrameBuffer.drawCircle(centerX, centerY, radius, color, filled = false)
 
-                var x = 0
-                var y = radius
-                var dst = 3 - 2 * radius
-
-                while (x <= y) {
-                    frameBuffer.pixel(centerX + x, centerY + y, color)
-                    frameBuffer.pixel(centerX - x, centerY + y, color)
-                    frameBuffer.pixel(centerX + x, centerY - y, color)
-                    frameBuffer.pixel(centerX - x, centerY - y, color)
-                    frameBuffer.pixel(centerX + y, centerY + x, color)
-                    frameBuffer.pixel(centerX - y, centerY + x, color)
-                    frameBuffer.pixel(centerX + y, centerY - x, color)
-                    frameBuffer.pixel(centerX - y, centerY - x, color)
-
-                    if (dst < 0) {
-                        dst += 4 * x + 6
-                    } else {
-                        dst += 4 * (x - y) + 10
-                        y--
-                    }
-                    x++
-                }
-            }
             return NONE
         }
     }

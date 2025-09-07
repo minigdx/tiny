@@ -245,6 +245,23 @@ class DefaultVirtualFrameBuffer(
         primitiveBatchManager.submit(key, instance)
     }
 
+    override fun drawCircle(
+        centerX: Pixel,
+        centerY: Pixel,
+        radius: Pixel,
+        color: ColorIndex,
+        filled: Boolean,
+    ) {
+        val key = primitiveBatchManager.createKey().set(color)
+        val instance = primitiveBatchManager.createInstance().setCircle(
+            centerX,
+            centerY,
+            radius,
+            filled = filled,
+        )
+        primitiveBatchManager.submit(key, instance)
+    }
+
     private fun renderAllInFrameBuffer() {
         kgl.bindFramebuffer(GL_FRAMEBUFFER, frameBufferContext.frameBuffer)
         kgl.viewport(0, 0, gameOptions.width, gameOptions.height)

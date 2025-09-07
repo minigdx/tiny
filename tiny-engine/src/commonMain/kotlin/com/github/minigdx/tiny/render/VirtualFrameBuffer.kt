@@ -69,10 +69,13 @@ interface VirtualFrameBuffer {
         colorIndex: ColorIndex,
     )
 
+    fun drawCircle(centerX: Pixel, centerY: Pixel, radius: Pixel, color: ColorIndex, filled: Boolean)
+
     /**
      * Clear the virtual framebuffer.
      */
     fun clear(color: ColorIndex)
 
     fun init(windowManager: WindowManager)
+
 }

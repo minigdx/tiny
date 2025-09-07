@@ -140,9 +140,11 @@ class PrimitiveBatchStage(
         //language=Glsl
         private val FRAGMENT_SHADER =
             """
-            #define T_RECT 1
+            #define T_RECT 0
+            #define T_CIRCLE 2
             #define T_LINE 3
             #define T_RECTF 240
+            #define T_CIRCLEF 242
                 
             int imod(int value, int limit) {
                 return value - limit * (value / limit);
@@ -163,6 +165,15 @@ class PrimitiveBatchStage(
             float sdfRectangle(vec2 p, vec2 size) {
                 vec2 d = abs(p - 0.5) - size * 0.5;
                 return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
+            }
+            
+            float sdfCircle(vec2 p, vec2 center, float radius) {
+                return length(p - center) - radius;
+            }
+            
+            float sdfCircleBorder(vec2 p, vec2 center, float radius, float thickness) {
+                float dist = length(p - center) - radius;
+                return abs(dist) - thickness * 0.5;
             }
             
             float sdfRectangleBorder(vec2 p, vec2 size, float thickness) {
@@ -214,9 +225,12 @@ class PrimitiveBatchStage(
                     } else {
                         sdf = vec2(1.5);
                     }
+                } else if(int(v_shapeType) == T_CIRCLE) {
+                    sdf = sdfCircleBorder(v_uvs, vec2(0.5, 0.5), 0.5, 0.0) * v_shapeParams34;
+                } else if(int(v_shapeType) == T_CIRCLEF) {
+                    sdf = sdfCircle(v_uvs, vec2(0.5, 0.5), 0.5) * v_shapeParams34;
                 } else if(int(v_shapeType) == T_RECTF) {
                     sdf = sdfRectangle(v_uvs, vec2(1.0)) * v_shapeParams34;
-                  
                 } else {
                     // Calculate SDF for rectangle (UV is in [0,1] range)
                     sdf = sdfRectangleBorder(v_uvs, vec2(1.0), 0.0) * v_shapeParams34;
