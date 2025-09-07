@@ -52,6 +52,15 @@ interface VirtualFrameBuffer {
 
     fun readFrameBuffer(): RenderFrame
 
+    fun drawRectf(
+        x: Pixel,
+        y: Pixel,
+        width: Pixel,
+        height: Pixel,
+        colorIndex: ColorIndex,
+        filled: Boolean,
+    )
+
     /**
      * Clear the virtual framebuffer.
      */

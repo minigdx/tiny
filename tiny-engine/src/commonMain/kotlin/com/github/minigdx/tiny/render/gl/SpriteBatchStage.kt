@@ -103,7 +103,6 @@ class SpriteBatchStage(
         val uSpritesheet = uniformVec2("u_spritesheet") // Size of the spritesheet; in pixel.
         val aSpr = inVec2("a_spr")
 
-        val vPos = outVec2("v_pos")
         val vUvs = outVec2("v_uvs")
     }
 
@@ -111,7 +110,6 @@ class SpriteBatchStage(
         val paletteColors = uniformSample2D("palette_colors")
         val spritesheet = uniformSample2D("spritesheet", existingTexture = true) // Spritesheet to be used.
 
-        val vPos = inVec2("v_pos") // position of the sprite in the viewport
         val vUvs = inVec2("v_uvs") // position of the sprite in the viewport
     }
 
@@ -127,8 +125,6 @@ class SpriteBatchStage(
                 vec2 origin_pos = vec2(-1.0, 1.0) + ndc_pos * 2.0;
                 
                 gl_Position = vec4(origin_pos, 0.0, 1.0);
-                
-                v_pos = final_pos;
                 
                 // UV computation
                 // Convert the texture coordinates to NDC coordinates
@@ -164,7 +160,7 @@ class SpriteBatchStage(
             * Return the pixel color index at the 
             */
             int readPixel(vec2 uvs) {
-                vec4 color = texture(spritesheet, v_uvs);
+                vec4 color = texture(spritesheet, uvs);
                 return int(color.r * 255.0 + 0.5);
             }
             

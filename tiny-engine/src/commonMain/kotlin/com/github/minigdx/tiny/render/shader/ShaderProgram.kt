@@ -59,6 +59,24 @@ class ShaderProgram<V : VertexShader, F : FragmentShader>(
         fragmentShader.parameters.forEach { parameter ->
             parameter.create(this)
         }
+
+        val outParameterNames = vertexShader.parameters.filter { it is ShaderParameter.Varying }
+            .map { it.name }
+            .toSet()
+
+        val inParametersNames = fragmentShader.parameters.filter { it is ShaderParameter.In }
+            .map { it.name }
+            .toSet()
+
+        val missingInParameters = outParameterNames - inParametersNames
+        val missingOutParameters = inParametersNames - outParameterNames
+
+        if (missingInParameters.isNotEmpty()) {
+            throw IllegalStateException("$missingInParameters are missing as out parameters from Vertex shader")
+        }
+        if (missingOutParameters.isNotEmpty()) {
+            throw IllegalStateException("$missingOutParameters are missing as in parameters from Fragment shader")
+        }
         gl.bindVertexArray(null)
     }
 
@@ -92,7 +110,11 @@ class ShaderProgram<V : VertexShader, F : FragmentShader>(
     }
 
     fun createAttrib(name: String): Int {
-        val attribLocation = gl.getAttribLocation(program!!, name)
+        val programId = checkNotNull(program) { "Program shader needs to be compiled first" }
+        val attribLocation = gl.getAttribLocation(programId, name)
+        if (attribLocation == -1) {
+            throw IllegalArgumentException("Attrib location $name not found")
+        }
         attributes[name] = attribLocation
         return attribLocation
     }
@@ -109,7 +131,10 @@ class ShaderProgram<V : VertexShader, F : FragmentShader>(
     }
 
     fun use() {
-        useProgram(program!!)
+        with(program) {
+            checkNotNull(this) { "Shader program needs to be compiled first." }
+            useProgram(this)
+        }
     }
 
     fun setup(block: (vertexShader: V, fragmentShader: F) -> Unit) {

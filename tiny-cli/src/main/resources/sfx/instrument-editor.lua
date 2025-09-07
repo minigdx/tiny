@@ -215,4 +215,7 @@ function _draw()
         w:_draw()
     end
     mouse._draw()
+
+    shape.rectf(10, 10, 120, 140, 4)
+    shape.rect(15, 15, 50, 50, 3)
 end

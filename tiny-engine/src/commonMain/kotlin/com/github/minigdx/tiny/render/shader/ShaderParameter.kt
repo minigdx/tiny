@@ -241,7 +241,7 @@ sealed class ShaderParameter(val name: String) {
         override fun toString() = "uniform vec4 $name[$size];"
     }
 
-    class InVec2(name: String) : ShaderParameter(name), In {
+    open class InVec2(name: String, private val flat: Boolean = false, private var divisor: Int = 0) : ShaderParameter(name), In {
         private var buffer: GlBuffer? = null
         private var location: Int = 0
 
@@ -271,6 +271,7 @@ sealed class ShaderParameter(val name: String) {
                 stride = stride,
                 offset = 0,
             )
+            program.vertexAttribDivisor(location, divisor)
             program.enableVertexAttribArray(location)
         }
 
@@ -284,7 +285,12 @@ sealed class ShaderParameter(val name: String) {
             program.bindBuffer(GL_ARRAY_BUFFER, null)
         }
 
-        override fun toString() = "in vec2 $name;"
+        fun forEachInstance(divisor: Int = 1): InVec2 {
+            this.divisor = divisor
+            return this
+        }
+
+        override fun toString() = if (flat) "flat in vec2 $name;" else "in vec2 $name;"
     }
 
     class InVec3(name: String) : ShaderParameter(name), In {
@@ -300,21 +306,22 @@ sealed class ShaderParameter(val name: String) {
                 throw IllegalStateException("create() must be called before apply() for $name")
             }
             program.bindBuffer(GL_ARRAY_BUFFER, source)
+            val location = program.getAttrib(name)
             program.vertexAttribPointer(
-                location = program.getAttrib(name),
+                location = location,
                 size = 3,
                 type = GL_FLOAT,
                 normalized = false,
                 stride = 0,
                 offset = 0,
             )
-            program.enableVertexAttribArray(program.getAttrib(name))
+            program.enableVertexAttribArray(location)
         }
 
         override fun toString() = "in vec3 $name;"
     }
 
-    class InVec4(name: String) : ShaderParameter(name), In {
+    open class InVec4(name: String, private val flat: Boolean = false, private var divisor: Int = 0) : ShaderParameter(name), In {
         private lateinit var program: ShaderProgram<*, *>
 
         override fun create(program: ShaderProgram<*, *>) {
@@ -327,21 +334,28 @@ sealed class ShaderParameter(val name: String) {
                 throw IllegalStateException("create() must be called before apply() for $name")
             }
             program.bindBuffer(GL_ARRAY_BUFFER, source)
+            val location = program.getAttrib(name)
             program.vertexAttribPointer(
-                location = program.getAttrib(name),
+                location = location,
                 size = 4,
                 type = GL_FLOAT,
                 normalized = false,
                 stride = 0,
                 offset = 0,
             )
-            program.enableVertexAttribArray(program.getAttrib(name))
+            program.vertexAttribDivisor(location, divisor)
+            program.enableVertexAttribArray(location)
         }
 
-        override fun toString() = "in vec4 $name;"
+        fun forEachInstance(divisor: Int = 1): InVec4 {
+            this.divisor = divisor
+            return this
+        }
+
+        override fun toString() = if (flat) "flat in vec4 $name;" else "in vec4 $name;"
     }
 
-    class InFloat(name: String) : ShaderParameter(name), In {
+    open class InFloat(name: String, private val flat: Boolean = false, private var divisor: Int = 0) : ShaderParameter(name), In {
         private var buffer: GlBuffer? = null
         private var vao: VertexArrayObject? = null
 
@@ -364,15 +378,19 @@ sealed class ShaderParameter(val name: String) {
 
             program.bindBuffer(GL_ARRAY_BUFFER, buffer)
             program.bufferData(GL_ARRAY_BUFFER, FloatBuffer(data), data.size * GL_FLOAT, GL_DYNAMIC_DRAW)
+
+            val location = program.getAttrib(name)
+
             program.vertexAttribPointer(
-                location = program.getAttrib(name),
+                location = location,
                 size = 1,
                 type = GL_FLOAT,
                 normalized = false,
                 stride = stride,
                 offset = 0,
             )
-            program.enableVertexAttribArray(program.getAttrib(name))
+            program.vertexAttribDivisor(location, divisor)
+            program.enableVertexAttribArray(location)
         }
 
         override fun bind() {
@@ -384,10 +402,14 @@ sealed class ShaderParameter(val name: String) {
         override fun unbind() {
             program.disableVertexAttribArray(program.getAttrib(name))
             program.bindBuffer(GL_ARRAY_BUFFER, null)
-            // program.bindVertexArray(null)
         }
 
-        override fun toString() = "in float $name;"
+        fun forEachInstance(divisor: Int = 1): InFloat {
+            this.divisor = divisor
+            return this
+        }
+
+        override fun toString() = if (flat) "flat in float $name;" else "in float $name;"
     }
 
     class UniformSample2D(
@@ -497,28 +519,28 @@ sealed class ShaderParameter(val name: String) {
         override fun toString() = "uniform sampler2D $name;"
     }
 
-    class OutVec2(name: String) : ShaderParameter(name), Varying {
+    class OutVec2(name: String, private val flat: Boolean = false) : ShaderParameter(name), Varying {
         override fun create(program: ShaderProgram<*, *>) = Unit
 
-        override fun toString() = "out vec2 $name;"
+        override fun toString() = if (flat) "flat out vec2 $name;" else "out vec2 $name;"
     }
 
-    class OutVec3(name: String) : ShaderParameter(name), Varying {
+    class OutVec3(name: String, private val flat: Boolean = false) : ShaderParameter(name), Varying {
         override fun create(program: ShaderProgram<*, *>) = Unit
 
-        override fun toString() = "out vec3 $name;"
+        override fun toString() = if (flat) "flat out vec3 $name;" else "out vec3 $name;"
     }
 
-    class OutVec4(name: String) : ShaderParameter(name), Varying {
+    class OutVec4(name: String, private val flat: Boolean = false) : ShaderParameter(name), Varying {
         override fun create(program: ShaderProgram<*, *>) = Unit
 
-        override fun toString() = "out vec4 $name;"
+        override fun toString() = if (flat) "flat out vec4 $name;" else "out vec4 $name;"
     }
 
-    class OutFloat(name: String) : ShaderParameter(name), Varying {
+    class OutFloat(name: String, private val flat: Boolean = false) : ShaderParameter(name), Varying {
         override fun create(program: ShaderProgram<*, *>) = Unit
 
-        override fun toString() = "out float $name;"
+        override fun toString() = if (flat) "flat out float $name;" else "out float $name;"
     }
 
     class VaryingFloat(name: String) : ShaderParameter(name), Varying {

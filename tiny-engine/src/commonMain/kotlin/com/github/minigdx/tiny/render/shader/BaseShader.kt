@@ -30,34 +30,47 @@ abstract class BaseShader(private val shader: String) {
         return ShaderParameter.UniformVec2(name).also { parameters += it }
     }
 
-    fun inVec2(name: String): ShaderParameter.InVec2 {
-        return ShaderParameter.InVec2(name).also {
-            parameters += it
-            inParameters += it
-        }
+    abstract fun inVec2(
+        name: String,
+        flat: Boolean = false,
+    ): ShaderParameter.InVec2
+
+    abstract fun inVec4(
+        name: String,
+        flat: Boolean = false,
+    ): ShaderParameter.InVec4
+
+    abstract fun inFloat(
+        name: String,
+        flat: Boolean = false,
+    ): ShaderParameter.InFloat
+
+    fun outVec2(
+        name: String,
+        flat: Boolean = false,
+    ): ShaderParameter.OutVec2 {
+        return ShaderParameter.OutVec2(name, flat).also { parameters += it }
     }
 
-    fun inFloat(name: String): ShaderParameter.InFloat {
-        return ShaderParameter.InFloat(name).also {
-            parameters += it
-            inParameters += it
-        }
+    fun outVec3(
+        name: String,
+        flat: Boolean = false,
+    ): ShaderParameter.OutVec3 {
+        return ShaderParameter.OutVec3(name, flat).also { parameters += it }
     }
 
-    fun outVec2(name: String): ShaderParameter.OutVec2 {
-        return ShaderParameter.OutVec2(name).also { parameters += it }
+    fun outVec4(
+        name: String,
+        flat: Boolean = false,
+    ): ShaderParameter.OutVec4 {
+        return ShaderParameter.OutVec4(name, flat).also { parameters += it }
     }
 
-    fun outVec3(name: String): ShaderParameter.OutVec3 {
-        return ShaderParameter.OutVec3(name).also { parameters += it }
-    }
-
-    fun outVec4(name: String): ShaderParameter.OutVec4 {
-        return ShaderParameter.OutVec4(name).also { parameters += it }
-    }
-
-    fun outFloat(name: String): ShaderParameter.OutFloat {
-        return ShaderParameter.OutFloat(name).also { parameters += it }
+    fun outFloat(
+        name: String,
+        flat: Boolean = false,
+    ): ShaderParameter.OutFloat {
+        return ShaderParameter.OutFloat(name, flat).also { parameters += it }
     }
 
     fun uniformSample2D(
@@ -119,8 +132,92 @@ abstract class BaseShader(private val shader: String) {
     }
 }
 
-abstract class VertexShader(shader: String) : BaseShader(shader)
+abstract class VertexShader(shader: String) : BaseShader(shader) {
+    override fun inVec2(
+        name: String,
+        flat: Boolean,
+    ): ShaderParameter.InVec2 {
+        return ShaderParameter.InVec2(name, flat).also {
+            parameters += it
+            inParameters += it
+        }
+    }
+
+    override fun inVec4(
+        name: String,
+        flat: Boolean,
+    ): ShaderParameter.InVec4 {
+        return ShaderParameter.InVec4(name, flat).also {
+            parameters += it
+            inParameters += it
+        }
+    }
+
+    override fun inFloat(
+        name: String,
+        flat: Boolean,
+    ): ShaderParameter.InFloat {
+        return ShaderParameter.InFloat(name, flat).also {
+            parameters += it
+            inParameters += it
+        }
+    }
+}
 
 abstract class FragmentShader(shader: String) : BaseShader(shader) {
     val fragColor = outVec4("fragColor")
+
+    class NameOnlyInVec2(name: String, flat: Boolean = false) : ShaderParameter.InVec2(name, flat) {
+        override fun create(program: ShaderProgram<*, *>) = Unit
+
+        override fun bind() = Unit
+
+        override fun unbind() = Unit
+    }
+
+    class NameOnlyInVec4(name: String, flat: Boolean = false) : ShaderParameter.InVec4(name, flat) {
+        override fun create(program: ShaderProgram<*, *>) = Unit
+
+        override fun bind() = Unit
+
+        override fun unbind() = Unit
+    }
+
+    class NameOnlyInFloat(name: String, flat: Boolean = false) : ShaderParameter.InFloat(name, flat) {
+        override fun create(program: ShaderProgram<*, *>) = Unit
+
+        override fun bind() = Unit
+
+        override fun unbind() = Unit
+    }
+
+    override fun inVec2(
+        name: String,
+        flat: Boolean,
+    ): ShaderParameter.InVec2 {
+        return NameOnlyInVec2(name, flat).also {
+            parameters += it
+            inParameters += it
+        }
+    }
+
+    override fun inVec4(
+        name: String,
+        flat: Boolean,
+    ): ShaderParameter.InVec4 {
+        return NameOnlyInVec4(name, flat).also {
+            parameters += it
+            inParameters += it
+        }
+    }
+
+    override fun inFloat(
+        name: String,
+        flat: Boolean,
+    ): ShaderParameter.InFloat {
+        return NameOnlyInFloat(name, flat).also {
+            parameters += it
+            inParameters += it
+        }
+    }
 }

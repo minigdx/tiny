@@ -108,17 +108,15 @@ class ShapeLib(
         ): Varargs {
             val (x, y, width, height, color) = shape.rectArgs(args) ?: return NIL
 
-            virtualFrameBuffer.drawPrimitive { frameBuffer ->
+            virtualFrameBuffer.drawRectf(
+                x,
+                y,
+                width,
+                height,
+                color,
+                false,
+            )
 
-                for (i in x until x + width) {
-                    frameBuffer.pixel(i, y, color)
-                    frameBuffer.pixel(i, y + height - 1, color)
-                }
-                for (i in y until y + height) {
-                    frameBuffer.pixel(x, i, color)
-                    frameBuffer.pixel(x + width - 1, i, color)
-                }
-            }
             return NIL
         }
 

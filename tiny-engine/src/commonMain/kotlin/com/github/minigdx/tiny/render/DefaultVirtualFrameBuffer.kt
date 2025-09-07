@@ -35,13 +35,11 @@ import com.github.minigdx.tiny.render.batch.SpriteBatchKey
 import com.github.minigdx.tiny.render.gl.FrameBufferContext
 import com.github.minigdx.tiny.render.gl.FrameBufferStage
 import com.github.minigdx.tiny.render.gl.OpenGLFrame
+import com.github.minigdx.tiny.render.gl.PrimitiveBatchStage
 import com.github.minigdx.tiny.render.gl.SpriteBatchStage
 import com.github.minigdx.tiny.resources.SpriteSheet
 
 // TODO list:
-// 1. bouger le framebuffer dans le default virtual frame buffer
-// 2. modifier ShapeLib pour utiliser virtual framebuffer + rect
-// 3. crééer nouveau stage. le stage va draw les shapers. -> utiliser instanciacing
 // 4. bien tester et comprendre comment ça marche.
 // 5. appliquer instanciacing sur SpriteBatchStage aussi.
 // 6. Appliquer dithering et voilà !!!
@@ -53,6 +51,7 @@ class DefaultVirtualFrameBuffer(
     lateinit var frameBufferContext: FrameBufferContext
 
     private val spriteBatchStage = SpriteBatchStage(kgl, gameOptions, performanceMonitor)
+    private val primitiveBatchStage = PrimitiveBatchStage(kgl, gameOptions, performanceMonitor)
     private val frameBufferStage = FrameBufferStage(kgl, gameOptions, performanceMonitor)
 
     private val spriteBatchManager = BatchManager(
@@ -78,6 +77,7 @@ class DefaultVirtualFrameBuffer(
 
     override fun init(windowManager: WindowManager) {
         spriteBatchStage.init()
+        primitiveBatchStage.init()
         frameBufferStage.init(windowManager)
 
         // Framebuffer of the size of the screen
@@ -209,7 +209,7 @@ class DefaultVirtualFrameBuffer(
         // FIXME: TODO
     }
 
-    fun drawRecf(
+    override fun drawRectf(
         x: Pixel,
         y: Pixel,
         width: Pixel,
@@ -233,17 +233,17 @@ class DefaultVirtualFrameBuffer(
         kgl.viewport(0, 0, gameOptions.width, gameOptions.height)
 
         spriteBatchStage.startStage()
-        // Render all remaining batch into the GPU Framebuffer.
         spriteBatchManager.consumeAllBatches { key, batch ->
             spriteBatchStage.execute(key, batch)
         }
         spriteBatchStage.endStage()
 
-        // otherStage.startStage()
-        // otherBatchManager.consumeAllBatches { key, batch ->
-        // OTHER STAGE.execute(key, batch)
-        // }
-        // otherStage.endStage()
+        primitiveBatchStage.startStage()
+        primitiveBatchManager.consumeAllBatches { key, batch ->
+            primitiveBatchStage.execute(key, batch)
+        }
+        primitiveBatchStage.endStage()
+
         kgl.bindFramebuffer(GL_FRAMEBUFFER, null)
     }
 
