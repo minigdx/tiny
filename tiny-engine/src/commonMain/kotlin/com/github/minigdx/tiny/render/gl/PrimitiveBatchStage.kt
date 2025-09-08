@@ -172,8 +172,26 @@ class PrimitiveBatchStage(
             }
             
             float sdfCircleBorder(vec2 p, vec2 center, float radius, float thickness) {
-                float dist = length(p - center) - radius;
-                return abs(dist) - thickness * 0.5;
+                // Position of the pixel on the screen 
+                vec2 pixelPos = v_shapeParams12 + p * v_shapeParams34;
+                // Position of the center on the screen
+                vec2 pixelCenter = v_shapeParams12 + center * v_shapeParams34;
+                // Radius in pixel
+                float pixelRadius = radius * min(v_shapeParams34.x, v_shapeParams34.y);
+                // Thickness in pixel
+                float pixelThickness = max(1.0, thickness * min(v_shapeParams34.x, v_shapeParams34.y));
+                
+                vec2 diff = pixelPos - pixelCenter;
+                float distSquared = dot(diff, diff);
+                
+                float innerRadiusSquared = pow(pixelRadius - pixelThickness * 0.5, 2.0);
+                float outerRadiusSquared = pow(pixelRadius + pixelThickness * 0.5, 2.0);
+                
+                if (distSquared >= innerRadiusSquared && distSquared <= outerRadiusSquared) {
+                    return 0.0; // Sur la bordure
+                } else {
+                    return 1.5; // Hors bordure
+                }
             }
             
             float sdfRectangleBorder(vec2 p, vec2 size, float thickness) {
