@@ -129,6 +129,10 @@ end
 -- @param path Path to watch (e.g. "button.clicked")
 -- @param callback Function to call when value changes (source, value)
 wire.listen = function(source, path, callback)
+    if (not source) then
+        error("missing source in the listen method.")
+    end
+
     local old_on_change = source.on_change
     
     source.on_change = function(self)

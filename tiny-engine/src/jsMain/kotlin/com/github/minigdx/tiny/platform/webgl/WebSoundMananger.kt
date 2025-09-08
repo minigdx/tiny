@@ -55,12 +55,11 @@ class WebSoundMananger : SoundManager() {
         result: Float32Array,
         loop: Boolean = false,
     ): AudioBufferSourceNode {
-        val sfxBuffer =
-            audioContext.createBuffer(
-                1,
-                result.length,
-                SAMPLE_RATE,
-            )
+        val sfxBuffer = audioContext.createBuffer(
+            1,
+            result.length,
+            SAMPLE_RATE,
+        )
 
         val channel = sfxBuffer.getChannelData(0)
         channel.set(result)

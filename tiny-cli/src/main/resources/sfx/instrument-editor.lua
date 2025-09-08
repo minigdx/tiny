@@ -48,7 +48,6 @@ function _init_instrument_matrix(entities)
         wire.sync(state, "instrument.index", widget, "value")
         wire.listen(widget, "value", function(source, value)
             state.instrument = sfx.instrument(value, true)
-            debug.console(state.instrument)
         end)
         wire.sync(state, "instrument.all", widget, "active_indices")
         table.insert(m.widgets, widget)
@@ -206,6 +205,10 @@ function _update()
     for w in all(m.widgets) do
         w:_update()
     end
+
+
+    -- Si modification d'un knob, alors stream un son.
+    -- Comment savoir si un knob est en cours de modification ??
 end
 
 function _draw()

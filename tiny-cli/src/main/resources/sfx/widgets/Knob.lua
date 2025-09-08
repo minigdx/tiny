@@ -1,19 +1,8 @@
-local on_update = function(self, listener)
-    table.insert(self.listeners, listener)
-end
-
-local fire_on_update = function(self, value)
-    for l in all(self.listeners) do
-        l(self, value)
-    end
-end
-
 local set_value = function(self, value)
     self.value = value
     if (self.on_change) then
         self:on_change()
     end
-    self:fire_on_update(value)
 end
 
 local function inside_widget(w, x, y, offset)
@@ -80,7 +69,6 @@ Knob._update = function(self)
         local percent = math.max(math.min(1, dst / 32), -1)
         local value = math.min(math.max(0, self.start_value + percent), 1)
         self:set_value(value)
-
     end
 
     local pos = ctrl.touch()
