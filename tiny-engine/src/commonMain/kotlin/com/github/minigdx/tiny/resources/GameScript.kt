@@ -26,6 +26,7 @@ import com.github.minigdx.tiny.lua.WorkspaceLib
 import com.github.minigdx.tiny.lua.toTinyException
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.render.VirtualFrameBuffer
+import com.github.minigdx.tiny.sound.VirtualSoundBoard
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LoadState
 import org.luaj.vm2.LuaError
@@ -50,6 +51,7 @@ class GameScript(
     override val name: String,
     val gameOptions: GameOptions,
     val virtualFrameBuffer: VirtualFrameBuffer,
+    val virtualSoundBoard: VirtualSoundBoard,
     val inputHandler: InputHandler,
     val platform: Platform,
     val logger: Logger,
@@ -96,7 +98,7 @@ class GameScript(
             load(MapLib(resourceAccess, gameOptions, virtualFrameBuffer))
             load(GfxLib(resourceAccess, gameOptions, virtualFrameBuffer))
             load(CtrlLib(inputHandler, sprLib))
-            load(SfxLib(resourceAccess, playSound = !forValidation))
+            load(SfxLib(resourceAccess, virtualSoundBoard, playSound = !forValidation))
             load(ShapeLib(gameOptions, virtualFrameBuffer))
             load(DebugLib(logger))
             load(KeysLib())

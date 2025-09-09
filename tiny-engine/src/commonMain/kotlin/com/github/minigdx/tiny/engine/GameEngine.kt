@@ -13,6 +13,7 @@ import com.github.minigdx.tiny.render.DefaultVirtualFrameBuffer
 import com.github.minigdx.tiny.render.VirtualFrameBuffer
 import com.github.minigdx.tiny.resources.GameScript
 import com.github.minigdx.tiny.resources.ResourceFactory
+import com.github.minigdx.tiny.sound.DefaultSoundBoard
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.luaj.vm2.LuaError
@@ -61,6 +62,8 @@ class GameEngine(
 
         virtualFrameBuffer.init(windowManager)
 
+        val virtualSoundBoard = DefaultSoundBoard(soundManager)
+
         resourceFactory = ResourceFactory(
             vfs = vfs,
             platform = platform,
@@ -68,6 +71,7 @@ class GameEngine(
             logger = logger,
             gameOptions = gameOptions,
             virtualFrameBuffer = virtualFrameBuffer,
+            virtualSoundBoard = virtualSoundBoard,
             soundManager = soundManager,
         )
 

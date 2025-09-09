@@ -230,6 +230,8 @@ class GameResourceProcessor(
         if (currentScriptIndex == resource.index) {
             currentScript = resource
         }
+        // Force the reload of the current script, as the script just updated might be used by the current script.
+        currentScript?.reload = true
     }
 
     private suspend fun loadBootScript(resource: GameResource) {

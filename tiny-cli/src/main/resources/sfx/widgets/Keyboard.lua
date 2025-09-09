@@ -16,22 +16,22 @@ local Keyboard = {
 
 Keyboard._update = function(self)
 
-    local spr_x = 16
-    local spr_y = 112
+    local spr_x = 0
+    local spr_y = 224
 
     local color_to_note = {
-        [16] = "C4",
-        [15] = "Cs4",
-        [14] = "D4",
-        [13] = "Ds4",
-        [12] = "E4",
-        [11] = "F4",
-        [10] = "Fs4",
-        [9] = "G4",
-        [7] = "Gs4",
-        [6] = "A4",
-        [5] = "As4",
-        [4] = "B4"
+        [1] = "C4",
+        [3] = "Cs4",
+        [4] = "D4",
+        [5] = "Ds4",
+        [8] = "E4",
+        [13] = "F4",
+        [12] = "Fs4",
+        [15] = "G4",
+        [11] = "Gs4",
+        [17] = "A4",
+        [7] = "As4",
+        [10] = "B4"
     }
     local pos = ctrl.touch()
     if (ctrl.touched(0) and inside_widget(self, pos.x, pos.y)) then

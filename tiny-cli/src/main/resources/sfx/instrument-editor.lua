@@ -82,7 +82,7 @@ function _init_vibrato(entities)
 end
 
 function _init_keyboard(entities)
-    local playNote = function(source, value)
+    local playNote = function(_, value)
         state.instrument.play(value)
     end
 

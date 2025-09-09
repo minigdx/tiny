@@ -7,6 +7,44 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
+interface VirtualSoundBoard {
+    fun prepare(
+        buffer: FloatArray,
+        numberOfSamples: Long,
+    ): SoundHandler
+
+    fun prepare(bar: MusicalBar): SoundHandler
+
+    fun prepare(sequence: MusicalSequence): SoundHandler
+
+    fun prepare(track: MusicalSequence.Track): SoundHandler
+}
+
+class DefaultSoundBoard(private val soundManager: SoundManager) : VirtualSoundBoard {
+    override fun prepare(
+        buffer: FloatArray,
+        numberOfSamples: Long,
+    ): SoundHandler {
+        return soundManager.createSoundHandler(buffer, numberOfSamples)
+    }
+
+    override fun prepare(bar: MusicalBar): SoundHandler {
+        val buffer = soundManager.convert(bar)
+        return soundManager.createSoundHandler(buffer, buffer.size.toLong())
+    }
+
+    override fun prepare(sequence: MusicalSequence): SoundHandler {
+        val buffer = soundManager.convert(sequence)
+        return soundManager.createSoundHandler(buffer, buffer.size.toLong())
+    }
+
+    override fun prepare(track: MusicalSequence.Track): SoundHandler {
+        val sequence = MusicalSequence(tracks = arrayOf(track), index = 0)
+        val buffer = soundManager.convert(sequence)
+        return soundManager.createSoundHandler(buffer, buffer.size.toLong())
+    }
+}
+
 abstract class SoundManager {
     abstract fun initSoundManager(inputHandler: InputHandler)
 
@@ -19,23 +57,6 @@ abstract class SoundManager {
         buffer: FloatArray,
         numberOfSamples: Long,
     ): SoundHandler
-
-    fun createSoundHandler(bar: MusicalBar): SoundHandler {
-        val buffer = convert(bar)
-        return createSoundHandler(buffer, buffer.size.toLong())
-    }
-
-    fun createSoundHandler(sequence: MusicalSequence): SoundHandler {
-        val buffer = convert(sequence)
-        return createSoundHandler(buffer, buffer.size.toLong())
-    }
-
-    fun createSoundHandler(bar: MusicalSequence.Track): SoundHandler {
-        // TODO: pass tempo
-        val sequence = MusicalSequence(tracks = arrayOf(bar), index = 0)
-        val buffer = convert(sequence)
-        return createSoundHandler(buffer, buffer.size.toLong())
-    }
 
     /**
      * Convert the MusicBar into a playable sound.

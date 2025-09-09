@@ -18,6 +18,7 @@ import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
 import com.github.minigdx.tiny.resources.ldtk.Layer
 import com.github.minigdx.tiny.resources.ldtk.Ldtk
 import com.github.minigdx.tiny.sound.SoundManager
+import com.github.minigdx.tiny.sound.VirtualSoundBoard
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapMerge
@@ -31,6 +32,7 @@ class ResourceFactory(
     private val platform: Platform,
     private val inputHandler: InputHandler,
     private val virtualFrameBuffer: VirtualFrameBuffer,
+    private val virtualSoundBoard: VirtualSoundBoard,
     private val soundManager: SoundManager,
     private val gameOptions: GameOptions,
     private val logger: Logger,
@@ -148,6 +150,7 @@ class ResourceFactory(
                 name = name,
                 gameOptions = gameOptions,
                 virtualFrameBuffer = virtualFrameBuffer,
+                virtualSoundBoard = virtualSoundBoard,
                 platform = platform,
                 logger = logger,
                 inputHandler = inputHandler,

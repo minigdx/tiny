@@ -13,6 +13,7 @@ import com.github.minigdx.tiny.sound.MusicalSequence
 import com.github.minigdx.tiny.sound.SoundHandler
 import com.github.minigdx.tiny.sound.Sweep
 import com.github.minigdx.tiny.sound.Vibrato
+import com.github.minigdx.tiny.sound.VirtualSoundBoard
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.LibFunction
@@ -64,6 +65,7 @@ or by starting the sound as soon as the player is moving.
 )
 class SfxLib(
     private val resourceAccess: GameResourceAccess,
+    private val soundBoard: VirtualSoundBoard,
     // When validating the script, don't play sound
     private val playSound: Boolean = true,
 ) : TwoArgFunction() {
@@ -112,10 +114,13 @@ class SfxLib(
     private var lastMusicVersion = 0
 
     fun getCurrentMusic(): Music {
-        return currentMusic ?: (resourceAccess.findSound(0)?.data?.music ?: Music()).also {
-            currentMusic = it
+        fun findCurrentMusic(): Music {
+            val defaultMusic = resourceAccess.findSound(0)?.data?.music ?: Music()
+            currentMusic = defaultMusic
             invalidateInstrumentCache()
+            return defaultMusic
         }
+        return currentMusic ?: findCurrentMusic()
     }
 
     private fun invalidateInstrumentCache() {
@@ -127,14 +132,14 @@ class SfxLib(
         override fun call(): LuaValue {
             // FIXME:
             TODO("E")
-/*
-            val music = getCurrentMusic()
-            val sequence = music.sequences.getOrNull(currentSequence)
-            sequence?.run { resourceAccess.exportAsSound(sequence) }
+            /*
+                        val music = getCurrentMusic()
+                        val sequence = music.sequences.getOrNull(currentSequence)
+                        sequence?.run { resourceAccess.exportAsSound(sequence) }
 
-            return NIL
+                        return NIL
 
- */
+             */
         }
     }
 
@@ -146,13 +151,13 @@ class SfxLib(
         ): LuaValue {
             // FIXME:
             TODO("F")
-/*
-            val music = getCurrentMusic()
-            val content = Json.encodeToString(music)
-            resourceAccess.save(arg.checkjstring()!!, content)
-            return NONE
+            /*
+                        val music = getCurrentMusic()
+                        val content = Json.encodeToString(music)
+                        resourceAccess.save(arg.checkjstring()!!, content)
+                        return NONE
 
- */
+             */
         }
     }
 
@@ -164,24 +169,24 @@ class SfxLib(
         ): LuaValue {
             // FIXME:
             TODO()
-/*
-            val sound = if (arg.isint()) {
-                resourceAccess.sound(arg.checkint())
-            } else {
-                resourceAccess.sound(arg.checkjstring()!!)
-            }
-            return if (sound == null) {
-                valueOf(currentSound)
-            } else {
-                val soundIndex = currentSound
-                currentMusic = sound.data.music
-                currentSound = sound.index
-                // Clear cache when music changes
-                invalidateInstrumentCache()
-                valueOf(soundIndex)
-            }
+            /*
+                        val sound = if (arg.isint()) {
+                            resourceAccess.sound(arg.checkint())
+                        } else {
+                            resourceAccess.sound(arg.checkjstring()!!)
+                        }
+                        return if (sound == null) {
+                            valueOf(currentSound)
+                        } else {
+                            val soundIndex = currentSound
+                            currentMusic = sound.data.music
+                            currentSound = sound.index
+                            // Clear cache when music changes
+                            invalidateInstrumentCache()
+                            valueOf(soundIndex)
+                        }
 
- */
+             */
         }
     }
 
@@ -189,14 +194,14 @@ class SfxLib(
         override fun call(arg: LuaValue): LuaValue {
             // FIXME:
             TODO("G")
-/*
-            val music = getCurrentMusic()
-            val index = arg.checkint().coerceIn(0, music.sequences.size)
-            val sequence = music.sequences.getOrNull(index) ?: return NIL
-            resourceAccess.play(sequence)
-            return NONE
+            /*
+                        val music = getCurrentMusic()
+                        val index = arg.checkint().coerceIn(0, music.sequences.size)
+                        val sequence = music.sequences.getOrNull(index) ?: return NIL
+                        resourceAccess.play(sequence)
+                        return NONE
 
- */
+             */
         }
     }
 
@@ -227,11 +232,11 @@ class SfxLib(
             obj.function1("play") {
                 // FIXME:
                 TODO("H")
-/*
-                resourceAccess.play(this)
-                NONE
+                /*
+                                resourceAccess.play(this)
+                                NONE
 
- */
+                 */
             }
 
             obj.wrap(
@@ -264,11 +269,13 @@ class SfxLib(
                                         b.note = null
                                         b.isOffNote = false
                                     }
+
                                     arg.checkint() == -1 -> {
                                         // Set to note off (silence)
                                         b.note = null
                                         b.isOffNote = true
                                     }
+
                                     else -> {
                                         // Set to specific note
                                         val noteIndex = arg.checkint()
@@ -342,7 +349,9 @@ class SfxLib(
             // Check cache first
             return instrumentWrapperCache[index]
                 // Check music
-                ?: music.instruments.getOrNull(index)?.toLua()
+                ?: music.instruments.getOrNull(index)?.toLua()?.also {
+                    instrumentWrapperCache[index] = it
+                }
                 // Give up
                 ?: NIL
         }
@@ -369,9 +378,6 @@ class SfxLib(
         }
 
         fun Instrument.toLua(): LuaValue {
-            // Return cached wrapper if available
-            instrumentWrapperCache[index]?.let { return it }
-
             // Create new wrapper and cache it
             val obj = WrapperLuaTable()
 
@@ -493,7 +499,7 @@ class SfxLib(
                     )
                 }
 
-                // resourceAccess.play(oneNote)
+                soundBoard.prepare(oneNote).play()
                 NONE
             }
 
@@ -595,11 +601,11 @@ class SfxLib(
             obj.function0("play") {
                 // FIXME:
                 TODO("J")
-/*
-                resourceAccess.play(this)
-                NONE
+                /*
+                                resourceAccess.play(this)
+                                NONE
 
- */
+                 */
             }
 
             obj.function1("instrument") { arg ->
@@ -643,17 +649,17 @@ class SfxLib(
             if (playSound) {
                 // FIXME:
                 TODO("K")
-/*
-                val soundData = resourceAccess.sound(currentSound)?.data
-                val sfx = soundData?.musicalBars?.getOrNull(index) ?: return NIL
+                /*
+                                val soundData = resourceAccess.sound(currentSound)?.data
+                                val sfx = soundData?.musicalBars?.getOrNull(index) ?: return NIL
 
-                val handler = soundData.soundManager.createSoundHandler(sfx, sfx.size.toLong())
-                handlers[SoundKey(currentSound, index)] = handler
-                handler.play()
+                                val handler = soundData.soundManager.createSoundHandler(sfx, sfx.size.toLong())
+                                handlers[SoundKey(currentSound, index)] = handler
+                                handler.play()
 
-                return NONE
+                                return NONE
 
- */
+                 */
             } else {
                 return NIL
             }
@@ -684,17 +690,17 @@ class SfxLib(
             if (playSound) {
                 // FIXME:
                 TODO("L")
-/*
-                val soundData = resourceAccess.sound(currentSound)?.data
-                val sfx = soundData?.musicalBars?.getOrNull(index) ?: return NIL
+                /*
+                                val soundData = resourceAccess.sound(currentSound)?.data
+                                val sfx = soundData?.musicalBars?.getOrNull(index) ?: return NIL
 
-                val handler = soundData.soundManager.createSoundHandler(sfx, sfx.size.toLong())
-                handlers[SoundKey(currentSound, index)] = handler
-                handler.loop()
+                                val handler = soundData.soundManager.createSoundHandler(sfx, sfx.size.toLong())
+                                handlers[SoundKey(currentSound, index)] = handler
+                                handler.loop()
 
-                return NONE
+                                return NONE
 
- */
+                 */
             } else {
                 return NIL
             }
@@ -751,17 +757,17 @@ class SfxLib(
             if (playSound) {
                 // FIXME:
                 TODO("M")
-/*
-                val soundData = resourceAccess.sound(currentSound)?.data
-                val sfx = soundData?.musicalSequences?.getOrNull(index) ?: return NIL
+                /*
+                                val soundData = resourceAccess.sound(currentSound)?.data
+                                val sfx = soundData?.musicalSequences?.getOrNull(index) ?: return NIL
 
-                val handler = soundData.soundManager.createSoundHandler(sfx, sfx.size.toLong())
-                sequenceHandlers[SequenceKey(currentSound, index)] = handler
-                handler.play()
+                                val handler = soundData.soundManager.createSoundHandler(sfx, sfx.size.toLong())
+                                sequenceHandlers[SequenceKey(currentSound, index)] = handler
+                                handler.play()
 
-                return NONE
+                                return NONE
 
- */
+                 */
             } else {
                 return NIL
             }
@@ -792,17 +798,17 @@ class SfxLib(
             if (playSound) {
                 // FIXME:
                 TODO("N")
-/*
-                val soundData = resourceAccess.sound(currentSound)?.data
-                val sfx = soundData?.musicalSequences?.getOrNull(index) ?: return NIL
+                /*
+                                val soundData = resourceAccess.sound(currentSound)?.data
+                                val sfx = soundData?.musicalSequences?.getOrNull(index) ?: return NIL
 
-                val handler = soundData.soundManager.createSoundHandler(sfx, sfx.size.toLong())
-                sequenceHandlers[SequenceKey(currentSound, index)] = handler
-                handler.loop()
+                                val handler = soundData.soundManager.createSoundHandler(sfx, sfx.size.toLong())
+                                sequenceHandlers[SequenceKey(currentSound, index)] = handler
+                                handler.loop()
 
-                return NONE
+                                return NONE
 
- */
+                 */
             } else {
                 return NIL
             }
