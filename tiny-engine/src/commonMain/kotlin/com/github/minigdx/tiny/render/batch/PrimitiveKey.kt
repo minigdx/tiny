@@ -2,7 +2,7 @@ package com.github.minigdx.tiny.render.batch
 
 import com.github.minigdx.tiny.ColorIndex
 
-class PrimitiveKey(
+data class PrimitiveKey(
     var color: ColorIndex = 0,
 ) : BatchKey {
     fun set(color: ColorIndex): PrimitiveKey {
