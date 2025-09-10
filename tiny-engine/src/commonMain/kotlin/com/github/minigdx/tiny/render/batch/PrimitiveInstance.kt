@@ -78,6 +78,10 @@ class PrimitiveInstance(
         meshHeight = 2 * radius + 1
         this.color = color
         this.filled = filled
+
+        parameters[0] = x + 1
+        parameters[1] = y + 1
+        parameters[2] = radius
         return this
     }
 

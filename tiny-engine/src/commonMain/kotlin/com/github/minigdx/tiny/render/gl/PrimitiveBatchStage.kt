@@ -248,7 +248,22 @@ class PrimitiveBatchStage(
             
             float sdfPoint(vec2 frag, vec2 pos) {
                 return 0.0;
-            }       
+            }  
+                 
+            float sdfCircle(vec2 frag, vec2 center, float radius) {
+                 vec2 p = frag - center;
+                
+                // Distance euclidienne simple
+                float dist = length(p + vec2(0.5)) - radius;
+                
+                // Pour un rendu pixelisé façon Bresenham
+                if (abs(dist) < 0.5) {
+                    // On est sur le périmètre du cercle
+                    return 0.0;
+                }
+                
+                return dist * 4.0;
+            }
             
             void main() {
                 float sdf;
@@ -257,6 +272,8 @@ class PrimitiveBatchStage(
                     sdf = sdfLine(v_fragPos, v_shapeParams12, v_shapeParams34);
                 } else if(type == T_POINT) {
                     sdf = sdfPoint(v_fragPos, v_shapePosition);
+                } else if(type == T_CIRCLE) {
+                    sdf = sdfCircle(v_fragPos, v_shapeParams12, v_shapeParams34.x);
                 } else {
                     sdf = sdfRectangleBorder(v_fragPos, v_shapePosition, v_shapeSize);
                 }
