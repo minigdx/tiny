@@ -1,31 +1,36 @@
 package com.github.minigdx.tiny.render.batch
 
+import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
 import kotlin.math.abs
-import kotlin.math.sign
+import kotlin.math.max
+import kotlin.math.min
 
 class PrimitiveInstance(
-    var parameters: Array<Int> = Array(7) { 0 },
+    var type: Int = 0,
+    var color: ColorIndex = 0,
+    var meshX: Pixel = 0,
+    var meshY: Pixel = 0,
+    var meshWidth: Pixel = 0,
+    var meshHeight: Pixel = 0,
+    var parameters: Array<Int> = Array(6) { 0 },
+    var filled: Boolean = false,
 ) : Instance {
-    private fun Boolean.asBitShit(): Int {
-        if (!this) return 0x00
-        return 0xF0
-    }
-
     fun setRect(
         x: Pixel,
         y: Pixel,
-        w: Pixel,
-        h: Pixel,
+        width: Pixel,
+        height: Pixel,
+        color: ColorIndex,
         filled: Boolean = false,
     ): PrimitiveInstance {
-        parameters[0] = 0 + filled.asBitShit()
-        parameters[1] = x
-        parameters[2] = y
-        parameters[3] = w
-        parameters[4] = h
-        parameters[5] = 0
-        parameters[6] = 0
+        type = 0
+        meshX = x
+        meshY = y
+        meshWidth = width
+        meshHeight = height
+        this.filled = filled
+        this.color = color
         return this
     }
 
@@ -36,15 +41,26 @@ class PrimitiveInstance(
         y2: Pixel,
         x3: Pixel,
         y3: Pixel,
+        color: ColorIndex,
         filled: Boolean = false,
     ): PrimitiveInstance {
-        parameters[0] = 1 + filled.asBitShit()
-        parameters[1] = x1
-        parameters[2] = y1
-        parameters[3] = x2
-        parameters[4] = y2
-        parameters[5] = x3
-        parameters[6] = y3
+        type = 1
+        // Find the most left x coordinate
+        meshX = min(min(x1, x2), x3)
+        // Find the most botton coordinate
+        meshY = min(min(y1, y2), y3)
+        meshWidth = max(max(x1, x2), x3) - meshX
+        meshHeight = max(max(y1, y2), y3) - meshY
+        // Set the triangle inside the mesh
+        parameters[0] = x1
+        parameters[1] = y1
+        parameters[2] = x2
+        parameters[3] = y2
+        parameters[4] = x3
+        parameters[5] = y3
+
+        this.filled = filled
+        this.color = color
         return this
     }
 
@@ -52,15 +68,16 @@ class PrimitiveInstance(
         x: Pixel,
         y: Pixel,
         radius: Pixel,
+        color: ColorIndex,
         filled: Boolean = false,
     ): PrimitiveInstance {
-        parameters[0] = 2 + filled.asBitShit()
-        parameters[1] = x - radius
-        parameters[2] = y - radius
-        parameters[3] = 2 * radius + 1
-        parameters[4] = 2 * radius + 1
-        parameters[5] = 0
-        parameters[6] = 0
+        type = 2
+        meshX = x - radius
+        meshY = y - radius
+        meshWidth = 2 * radius + 1
+        meshHeight = 2 * radius + 1
+        this.color = color
+        this.filled = filled
         return this
     }
 
@@ -69,37 +86,40 @@ class PrimitiveInstance(
         y1: Pixel,
         x2: Pixel,
         y2: Pixel,
+        color: ColorIndex,
     ): PrimitiveInstance {
-        val width = (1 + abs(x2 - x1))
-        val height = (1 + abs(y2 - y1))
-        val (a,b, c, d) = if(x1 < x2) {
+        type = 3
+        this.color = color
+        meshX = min(x1, x2)
+        meshY = min(y1, y2)
+        meshWidth = (1 + abs(x2 - x1))
+        meshHeight = (1 + abs(y2 - y1))
+        val (a, b, c, d) = if (x1 < x2) {
             listOf(x1, y1, x2, y2)
         } else {
             listOf(x2, y2, x1, y1)
         }
-        parameters[0] = 3
-        parameters[1] = a
-        parameters[2] = b
-        parameters[3] = width // width
-        parameters[4] = height // heigth
-        // Si j'ai : 10, 10 -> 10, 120
-        // le mesh doit fait au mini w = 1 / h = 121
-        parameters[5] = c
-        parameters[6] = d
+        parameters[0] = a
+        parameters[1] = b
+        parameters[2] = c
+        parameters[3] = d
+
+        this.filled = false
         return this
     }
 
     fun setPoint(
         x: Pixel,
         y: Pixel,
+        color: ColorIndex,
     ) {
-        parameters[0] = 4
-        parameters[1] = x
-        parameters[2] = y
-        parameters[3] = 0
-        parameters[4] = 0
-        parameters[5] = 0
-        parameters[6] = 0
+        type = 4
+        this.color = color
+        this.filled = false
+        meshX = x
+        meshY = y
+        meshWidth = 1
+        meshHeight = 1
     }
 
     override fun reset() = Unit

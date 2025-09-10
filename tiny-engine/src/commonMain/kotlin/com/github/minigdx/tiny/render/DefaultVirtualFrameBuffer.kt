@@ -224,6 +224,7 @@ class DefaultVirtualFrameBuffer(
             width,
             height,
             filled = filled,
+            color = colorIndex,
         )
         primitiveBatchManager.submit(key, instance)
     }
@@ -241,6 +242,7 @@ class DefaultVirtualFrameBuffer(
             y1,
             x2,
             y2,
+            color = colorIndex,
         )
         primitiveBatchManager.submit(key, instance)
     }
@@ -258,6 +260,7 @@ class DefaultVirtualFrameBuffer(
             centerY,
             radius,
             filled = filled,
+            color = color,
         )
         primitiveBatchManager.submit(key, instance)
     }

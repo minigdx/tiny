@@ -46,7 +46,6 @@ class PrimitiveBatchStage(
 
         program.setup { vertexShader, fragmentShader ->
             vertexShader.aPos.apply(vertex)
-            vertexShader.aUvs.apply(vertex)
 
             fragmentShader.paletteColors.applyRGBA(colorPaletteBuffer, 256, 256)
         }
@@ -66,13 +65,16 @@ class PrimitiveBatchStage(
                 gameOptions.height.toFloat() * -1,
             )
 
-            // FIXME: rename -> mesh position ; mesh size
             vertexShader.aShapeType.apply(batch.parametersType)
+            vertexShader.aShapeColor.apply(batch.parametersColor)
+            vertexShader.aShapeFilled.apply(batch.parametersFilled)
+
+            vertexShader.aShapePosition.apply(batch.meshPosition)
+            vertexShader.aShapeSize.apply(batch.meshSize)
+
             vertexShader.aShadeParams12.apply(batch.parameters12)
             vertexShader.aShadeParams34.apply(batch.parameters34)
             vertexShader.aShadeParams56.apply(batch.parameters56)
-
-            fragmentShader.uColor.apply(key.color)
         }
 
         program.bind()
@@ -85,34 +87,49 @@ class PrimitiveBatchStage(
 
     class VShader : VertexShader(VERTEX_SHADER) {
         val aShapeType = inFloat("a_shapeType").forEachInstance() // Shape type (0=rect, 1=circle, 2=line, 3=rounded rect)
+        val aShapeColor = inFloat("a_shapeColor").forEachInstance() // Shape color
+        val aShapeFilled = inFloat("a_shapeFilled").forEachInstance() // Shape is filled?
+
+        val aShapePosition = inVec2("a_shapePosition").forEachInstance() // Shape position on the screen ; in pixel
+        val aShapeSize = inVec2("a_shapeSize").forEachInstance() // Shape size on the screen ; in pixel
+
         val aShadeParams12 = inVec2("a_shapeParams12").forEachInstance() // Parameters 1-2 (usually x, y or x1, y1)
         val aShadeParams34 = inVec2("a_shapeParams34").forEachInstance() // Parameters 3-4 (usually width, height or x2, y2)
         val aShadeParams56 = inVec2("a_shapeParams56").forEachInstance() // Parameters 5-6 (extra params like thickness, corner radius)
 
-        val aPos = inVec2("a_pos") // Position of the shape
-        val aUvs = inVec2("a_uvs")
+        val aPos = inVec2("a_pos") // Position of the shape with NDC
+
         val uViewport = uniformVec2("u_viewport") // Size of the viewport; in pixel.
 
-        val vLocalPos = outVec2("v_localPos")
-        val vUvs = outVec2("v_uvs")
+        val vFragPos = outVec2("v_fragPos")
+
+        val vShapePosition = outVec2("v_shapePosition", flat = true)
+        val vShapeSize = outVec2("v_shapeSize", flat = true)
 
         val vShapeType = outFloat("v_shapeType", flat = true)
-        val vParams12 = outVec2("v_shapeParams12", flat = true)
-        val vParams34 = outVec2("v_shapeParams34", flat = true)
-        val vParams56 = outVec2("v_shapeParams56", flat = true)
+        val vShapeColor = outFloat("v_shapeColor", flat = true)
+        val vShapeFilled = outFloat("v_shapeFilled", flat = true)
+
+        val vShapeParams12 = outVec2("v_shapeParams12", flat = true)
+        val vShapeParams34 = outVec2("v_shapeParams34", flat = true)
+        val vShapeParams56 = outVec2("v_shapeParams56", flat = true)
     }
 
     class FShader : FragmentShader(FRAGMENT_SHADER) {
         val paletteColors = uniformSample2D("palette_colors")
 
-        val uColor = uniformInt("u_color") // Color of the shape
+        val vFragPos = inVec2("v_fragPos")
 
-        val vUvs = inVec2("v_uvs")
-        val vLocaPos = inVec2("v_localPos")
+        val vShapePosition = inVec2("v_shapePosition", flat = true)
+        val vShapeSize = inVec2("v_shapeSize", flat = true)
+
         val vShapeType = inFloat("v_shapeType", flat = true)
+        val vShapeColor = inFloat("v_shapeColor", flat = true)
+        val vShapeFilled = inFloat("v_shapeFilled", flat = true)
+
         val vShapeParams12 = inVec2("v_shapeParams12", flat = true)
         val vShapeParams34 = inVec2("v_shapeParams34", flat = true)
-        val vParams56 = inVec2("v_shapeParams56", flat = true)
+        val vShapeParams56 = inVec2("v_shapeParams56", flat = true)
     }
 
     companion object {
@@ -121,7 +138,7 @@ class PrimitiveBatchStage(
             """
             void main() {
                 // Scale the rectangle (mutiply by the size) then translate (add the offset)
-                vec2 vertex_pos =  ((a_pos * a_shapeParams34) + a_shapeParams12);
+                vec2 vertex_pos =  ((a_pos * a_shapeSize) + a_shapePosition);
                 // Convert the pixel coordinates into NDC coordinates
                 vec2 ndc_pos = vertex_pos / u_viewport;
                 // Move the origin to the left/up corner
@@ -129,9 +146,12 @@ class PrimitiveBatchStage(
                 
                 gl_Position = vec4(origin_pos, 0.0, 1.0);
                 
-                // Pass data to fragment shader
-                v_uvs = a_uvs;
+                v_fragPos = vertex_pos;
                 v_shapeType = a_shapeType;
+                v_shapeSize = a_shapeSize;
+                v_shapePosition = a_shapePosition;
+                v_shapeColor = a_shapeColor;
+                v_shapeFilled = a_shapeFilled;
                 v_shapeParams12 = a_shapeParams12;
                 v_shapeParams34 = a_shapeParams34;
                 v_shapeParams56 = a_shapeParams56;
@@ -163,50 +183,21 @@ class PrimitiveBatchStage(
                 return readData(palette_colors, icolor, 255, 255);
             }
             
-            float sdfRectangle(vec2 p, vec2 size) {
-                vec2 d = abs(p - 0.5) - size * 0.5;
-                return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
+            float sdfRectangleBorder(vec2 fragCoord, vec2 position, vec2 size) {
+                // Position of the center of the rectangle
+                vec2 center = position + size * 0.5;
+                // Position of the frag regarding the center
+                vec2 pos = abs(fragCoord - center);
+                // Distance from the edge to the pos.
+                vec2 d = pos - (size * 0.5);
+                
+                // > 1.0 is outside the rectangle.
+                // < 1.0 is inside the rectangle.
+                // 0 = is on the rectangle.
+                return max(d.x, d.y);
             }
             
-            float sdfCircle(vec2 p, vec2 center, float radius) {
-                return length(p - center) - radius;
-            }
-            
-            float sdfCircleBorder(vec2 p, vec2 center, float radius, float thickness) {
-                // Position of the pixel on the screen 
-                vec2 pixelPos = v_shapeParams12 + p * v_shapeParams34;
-                // Position of the center on the screen
-                vec2 pixelCenter = v_shapeParams12 + center * v_shapeParams34;
-                // Radius in pixel
-                float pixelRadius = radius * min(v_shapeParams34.x, v_shapeParams34.y);
-                // Thickness in pixel
-                float pixelThickness = max(1.0, thickness * min(v_shapeParams34.x, v_shapeParams34.y));
-                
-                vec2 diff = pixelPos - pixelCenter;
-                float distSquared = dot(diff, diff);
-                
-                float innerRadiusSquared = pow(pixelRadius - pixelThickness * 0.5, 2.0);
-                float outerRadiusSquared = pow(pixelRadius + pixelThickness * 0.5, 2.0);
-                
-                if (distSquared >= innerRadiusSquared && distSquared <= outerRadiusSquared) {
-                    return 0.0; // Sur la bordure
-                } else {
-                    return 1.5; // Hors bordure
-                }
-            }
-            
-            float sdfRectangleBorder(vec2 p, vec2 size, float thickness) {
-                vec2 d = abs(p - 0.5) - size * 0.5;
-                float rectSDF = length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
-                
-                // Convert to border: distance to edge, minus half thickness
-                return abs(rectSDF) - thickness * 0.5;
-            }
-            
-            
-            vec2 sdfLine(vec2 pos, vec2 size, vec2 startLine, vec2 endLine) {
-                // Position of the current pixel
-                vec2 fragCoord = pos * size + startLine;
+            float sdfLine(vec2 fragCoord, vec2 startLine, vec2 endLine) {
                 vec2 p = fragCoord + 0.5;
                 
                 // Position of the start of the line in pixel
@@ -217,7 +208,7 @@ class PrimitiveBatchStage(
                 // Check if the current pixel is out of the line
                 if (p.x < min(p0.x, p1.x) || p.x > max(p0.x, p1.x) ||
                     p.y < min(p0.y, p1.y) || p.y > max(p0.y, p1.y)) {
-                    return vec2(2.0);
+                    return 2.0;
                 }
                 
                 // Bresenham algorithm
@@ -242,39 +233,36 @@ class PrimitiveBatchStage(
                 
                 float expected = slope * a + b;
                
-                vec2 sdf;
+                float sdf;
                  // Is the current y match the expected y of the algo ?
                 if(int(expected) == int(c)) {
                     // It's on the line
-                    sdf = vec2(0.0);
+                    sdf = 0.0;
                 } else {
                     // It's NOT on the line
-                    sdf = vec2(2.0);
+                    sdf = 2.0;
                 } 
                  return sdf;
             }
             
             void main() {
-                vec2 sdf;
+                float sdf;
                 if(int(v_shapeType) == T_LINE) {
-                    sdf = sdfLine(v_uvs, v_shapeParams34, v_shapeParams12, v_shapeParams56);        
-                } else if(int(v_shapeType) == T_CIRCLE) {
-                    sdf = sdfCircleBorder(v_uvs, vec2(0.5, 0.5), 0.5, 0.0) * v_shapeParams34;
-                } else if(int(v_shapeType) == T_CIRCLEF) {
-                    sdf = sdfCircle(v_uvs, vec2(0.5, 0.5), 0.5) * v_shapeParams34;
-                } else if(int(v_shapeType) == T_RECTF) {
-                    sdf = sdfRectangle(v_uvs, vec2(1.0)) * v_shapeParams34;
+                    sdf = sdfLine(v_fragPos, v_shapePosition, v_shapeSize);        
                 } else {
-                    // Calculate SDF for rectangle (UV is in [0,1] range)
-                    sdf = sdfRectangleBorder(v_uvs, vec2(1.0), 0.0) * v_shapeParams34;
+                    sdf = sdfRectangleBorder(v_fragPos, v_shapePosition, v_shapeSize);
                 }
                 
-                // The distance from the rectangle is more than one pixel away (ie: it's out of the border)
-                if (sdf.x > 1.0 || sdf.y > 1.0) {
+                // The distance is more than one pixel away (ie: it's out of the border)
+                if (sdf >= 1.0) {
                     discard;
-                } else {
+                    // If the frag is inside the shape and the shape should NOT be filled.
+                } else if (sdf <= -1.0 && v_shapeFilled < 1.0) {
+                    discard;
+                } else {    
+                    // If the frag is on the border OR inside the shape AND should be filled
                     // Get color from palette
-                    vec4 color = readColor(u_color);
+                    vec4 color = readColor(int(v_shapeColor));
                 
                     fragColor = vec4(color.rgb, 1.0);
                 }

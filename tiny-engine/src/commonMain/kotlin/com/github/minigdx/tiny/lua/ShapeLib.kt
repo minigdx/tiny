@@ -15,9 +15,6 @@ import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
 import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.TwoArgFunction
-import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
 
 private class Shape(private val gameOptions: GameOptions) {
     fun rectArgs(args: Varargs): List<Int>? {
@@ -372,15 +369,6 @@ class ShapeLib(
         ): LuaValue {
             if (x0 == x1 && y0 == y1) {
                 return NONE
-           /* } else if (x0 == x1 || y0 == y1) {
-                virtualFrameBuffer.drawRect(
-                    x = min(x0, x1),
-                    y = min(y0, y1),
-                    width = max(1, abs(x1 - x0)),
-                    height = max(1, abs(y1 - y0)),
-                    colorIndex = color,
-                    filled = true,
-                ) */
             } else {
                 virtualFrameBuffer.drawLine(x0, y0, x1, y1, color)
             }
