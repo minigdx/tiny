@@ -70,17 +70,22 @@ class PrimitiveInstance(
         x2: Pixel,
         y2: Pixel,
     ): PrimitiveInstance {
-        val width = (1 + abs(x2 - x1)) * sign((x2 - x1).toDouble()).toInt()
-        val height = (1 + abs(y2 - y1)) * sign((y2 - y1).toDouble()).toInt()
+        val width = (1 + abs(x2 - x1))
+        val height = (1 + abs(y2 - y1))
+        val (a,b, c, d) = if(x1 < x2) {
+            listOf(x1, y1, x2, y2)
+        } else {
+            listOf(x2, y2, x1, y1)
+        }
         parameters[0] = 3
-        parameters[1] = x1
-        parameters[2] = y1
+        parameters[1] = a
+        parameters[2] = b
         parameters[3] = width // width
         parameters[4] = height // heigth
         // Si j'ai : 10, 10 -> 10, 120
         // le mesh doit fait au mini w = 1 / h = 121
-        parameters[5] = x2
-        parameters[6] = y2
+        parameters[5] = c
+        parameters[6] = d
         return this
     }
 

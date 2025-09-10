@@ -372,7 +372,7 @@ class ShapeLib(
         ): LuaValue {
             if (x0 == x1 && y0 == y1) {
                 return NONE
-            } else if (x0 == x1 || y0 == y1) {
+           /* } else if (x0 == x1 || y0 == y1) {
                 virtualFrameBuffer.drawRect(
                     x = min(x0, x1),
                     y = min(y0, y1),
@@ -380,7 +380,7 @@ class ShapeLib(
                     height = max(1, abs(y1 - y0)),
                     colorIndex = color,
                     filled = true,
-                )
+                ) */
             } else {
                 virtualFrameBuffer.drawLine(x0, y0, x1, y1, color)
             }

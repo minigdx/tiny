@@ -66,6 +66,7 @@ class PrimitiveBatchStage(
                 gameOptions.height.toFloat() * -1,
             )
 
+            // FIXME: rename -> mesh position ; mesh size
             vertexShader.aShapeType.apply(batch.parametersType)
             vertexShader.aShadeParams12.apply(batch.parameters12)
             vertexShader.aShadeParams34.apply(batch.parameters34)
@@ -203,46 +204,60 @@ class PrimitiveBatchStage(
             }
             
             
-            float sdfLine(vec2 p, vec2 a, vec2 b, float thickness) {
-                vec2 pa = p - a;
-                vec2 ba = b - a;
-                float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
-                return length(pa - ba * h) - thickness * 0.5;
+            vec2 sdfLine(vec2 pos, vec2 size, vec2 startLine, vec2 endLine) {
+                // Position of the current pixel
+                vec2 fragCoord = pos * size + startLine;
+                vec2 p = fragCoord + 0.5;
+                
+                // Position of the start of the line in pixel
+                vec2 p0 = startLine + 0.5;
+                // Position of the end of the line in pixel
+                vec2 p1 = endLine + 0.5;
+                
+                // Check if the current pixel is out of the line
+                if (p.x < min(p0.x, p1.x) || p.x > max(p0.x, p1.x) ||
+                    p.y < min(p0.y, p1.y) || p.y > max(p0.y, p1.y)) {
+                    return vec2(2.0);
+                }
+                
+                // Bresenham algorithm
+                // See: https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm#Method
+                vec2 d = p1 - p0;
+               
+                float slope;
+                float a;
+                float b;
+                float c;
+                if(d.x > d.y) {
+                    slope = (d.y / d.x);
+                    a = p.x - p0.x;
+                    b = p0.y;
+                    c = p.y;
+                } else {
+                    slope = (d.x / d.y);
+                    a = p.y - p0.y;
+                    b = p0.x;
+                    c = p.x;
+                }               
+                
+                float expected = slope * a + b;
+               
+                vec2 sdf;
+                 // Is the current y match the expected y of the algo ?
+                if(int(expected) == int(c)) {
+                    // It's on the line
+                    sdf = vec2(0.0);
+                } else {
+                    // It's NOT on the line
+                    sdf = vec2(2.0);
+                } 
+                 return sdf;
             }
             
             void main() {
                 vec2 sdf;
                 if(int(v_shapeType) == T_LINE) {
-                    vec2 lineStart = v_shapeParams12;
-                    vec2 lineEnd = v_shapeParams56;
-                    // Fragment position in pixels
-                    vec2 fragCoord = v_uvs * v_shapeParams34 + v_shapeParams12;
-                    
-                    // Convertir en coordonnées entières de pixels
-                    ivec2 p = ivec2(floor(fragCoord + 0.5));
-                    ivec2 p0 = ivec2(floor(lineStart + 0.5));
-                    ivec2 p1 = ivec2(floor(lineEnd + 0.5));
-                    
-                    // Vérifier les bornes d'abord
-                    if (p.x < min(p0.x, p1.x) || p.x > max(p0.x, p1.x) ||
-                        p.y < min(p0.y, p1.y) || p.y > max(p0.y, p1.y)) {
-                        discard;
-                    }
-                    
-                    // Test de Bresenham
-                    ivec2 d = p1 - p0;
-                    ivec2 pp = p - p0;
-                    
-                    // Condition de Bresenham : le pixel est sur la ligne si
-                    // la distance perpendiculaire est <= 0.5 pixel
-                    int cross = abs(pp.x * d.y - pp.y * d.x);
-                    int threshold = max(abs(d.x), abs(d.y));
-                    
-                    if (float(cross) <= float(threshold) / 2.0) {
-                        sdf = vec2(0.0);
-                    } else {
-                        sdf = vec2(1.5);
-                    }
+                    sdf = sdfLine(v_uvs, v_shapeParams34, v_shapeParams12, v_shapeParams56);        
                 } else if(int(v_shapeType) == T_CIRCLE) {
                     sdf = sdfCircleBorder(v_uvs, vec2(0.5, 0.5), 0.5, 0.0) * v_shapeParams34;
                 } else if(int(v_shapeType) == T_CIRCLEF) {
