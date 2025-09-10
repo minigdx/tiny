@@ -197,22 +197,16 @@ class PrimitiveBatchStage(
             }
             
             float sdfLine(vec2 fragCoord, vec2 startLine, vec2 endLine) {
-                vec2 p = fragCoord + 0.5;
+                vec2 p = fragCoord;
                 
                 // Position of the start of the line in pixel
-                vec2 p0 = startLine + 0.5;
+                vec2 p0 = startLine;
                 // Position of the end of the line in pixel
-                vec2 p1 = endLine + 0.5;
+                vec2 p1 = endLine;
                 
                 // Check for vertical or horizontal line
                 if(int(p0.x) == int(p1.x) || int(p0.y) == int(p1.y)) { 
                     return 0.0;
-                }
-                
-                // Check if the current pixel is out of the line
-                if (p.x < min(p0.x, p1.x) || p.x > max(p0.x, p1.x) ||
-                    p.y < min(p0.y, p1.y) || p.y > max(p0.y, p1.y)) {
-                    return 2.0;
                 }
                 
                 // Bresenham algorithm
@@ -220,8 +214,11 @@ class PrimitiveBatchStage(
                 vec2 d = p1 - p0;
                
                 float slope;
+                // the frag position from the start point (~ progress of the slope)
                 float a;
+                // other axis of the start line
                 float b;
+                // other axis for the frag
                 float c;
                 if(abs(d.x) > abs(d.y)) {
                     slope = (d.y / d.x);
