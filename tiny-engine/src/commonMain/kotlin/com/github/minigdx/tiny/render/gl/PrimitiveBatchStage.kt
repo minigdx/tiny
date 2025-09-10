@@ -204,6 +204,11 @@ class PrimitiveBatchStage(
                 // Position of the end of the line in pixel
                 vec2 p1 = endLine + 0.5;
                 
+                // Check for vertical or horizontal line
+                if(int(p0.x) == int(p1.x) || int(p0.y) == int(p1.y)) { 
+                    return 0.0;
+                }
+                
                 // Check if the current pixel is out of the line
                 if (p.x < min(p0.x, p1.x) || p.x > max(p0.x, p1.x) ||
                     p.y < min(p0.y, p1.y) || p.y > max(p0.y, p1.y)) {
@@ -218,7 +223,7 @@ class PrimitiveBatchStage(
                 float a;
                 float b;
                 float c;
-                if(d.x > d.y) {
+                if(abs(d.x) > abs(d.y)) {
                     slope = (d.y / d.x);
                     a = p.x - p0.x;
                     b = p0.y;
@@ -252,7 +257,7 @@ class PrimitiveBatchStage(
                 float sdf;
                 int type = int(v_shapeType);
                 if(type == T_LINE) {
-                    sdf = sdfLine(v_fragPos, v_shapePosition, v_shapeSize);
+                    sdf = sdfLine(v_fragPos, v_shapeParams12, v_shapeParams34);
                 } else if(type == T_POINT) {
                     sdf = sdfPoint(v_fragPos, v_shapePosition);
                 } else {
