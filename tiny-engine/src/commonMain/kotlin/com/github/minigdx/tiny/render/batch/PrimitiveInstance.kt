@@ -112,7 +112,7 @@ class PrimitiveInstance(
         x: Pixel,
         y: Pixel,
         color: ColorIndex,
-    ) {
+    ): PrimitiveInstance {
         type = 4
         this.color = color
         this.filled = false
@@ -120,6 +120,8 @@ class PrimitiveInstance(
         meshY = y
         meshWidth = 1
         meshHeight = 1
+
+        return this
     }
 
     override fun reset() = Unit

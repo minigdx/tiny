@@ -77,6 +77,12 @@ interface VirtualFrameBuffer {
         filled: Boolean,
     )
 
+    fun drawPoint(
+        x: Pixel,
+        y: Pixel,
+        color: ColorIndex,
+    )
+
     /**
      * Clear the virtual framebuffer.
      */

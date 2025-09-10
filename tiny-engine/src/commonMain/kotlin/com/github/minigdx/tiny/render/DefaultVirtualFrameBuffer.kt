@@ -265,6 +265,20 @@ class DefaultVirtualFrameBuffer(
         primitiveBatchManager.submit(key, instance)
     }
 
+    override fun drawPoint(
+        x: Pixel,
+        y: Pixel,
+        color: ColorIndex,
+    ) {
+        val key = primitiveBatchManager.createKey().set(color)
+        val instance = primitiveBatchManager.createInstance().setPoint(
+            x,
+            y,
+            color = color,
+        )
+        primitiveBatchManager.submit(key, instance)
+    }
+
     private fun renderAllInFrameBuffer() {
         kgl.bindFramebuffer(GL_FRAMEBUFFER, frameBufferContext.frameBuffer)
         kgl.viewport(0, 0, gameOptions.width, gameOptions.height)

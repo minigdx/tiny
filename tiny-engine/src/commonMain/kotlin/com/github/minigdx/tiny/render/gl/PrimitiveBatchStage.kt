@@ -164,8 +164,7 @@ class PrimitiveBatchStage(
             #define T_RECT 0
             #define T_CIRCLE 2
             #define T_LINE 3
-            #define T_RECTF 240
-            #define T_CIRCLEF 242
+            #define T_POINT 4
                 
             int imod(int value, int limit) {
                 return value - limit * (value / limit);
@@ -245,10 +244,17 @@ class PrimitiveBatchStage(
                  return sdf;
             }
             
+            float sdfPoint(vec2 frag, vec2 pos) {
+                return 0.0;
+            }       
+            
             void main() {
                 float sdf;
-                if(int(v_shapeType) == T_LINE) {
-                    sdf = sdfLine(v_fragPos, v_shapePosition, v_shapeSize);        
+                int type = int(v_shapeType);
+                if(type == T_LINE) {
+                    sdf = sdfLine(v_fragPos, v_shapePosition, v_shapeSize);
+                } else if(type == T_POINT) {
+                    sdf = sdfPoint(v_fragPos, v_shapePosition);
                 } else {
                     sdf = sdfRectangleBorder(v_fragPos, v_shapePosition, v_shapeSize);
                 }

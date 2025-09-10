@@ -124,9 +124,7 @@ class GfxLib(
             @TinyArg("y") arg2: LuaValue,
             @TinyArg("color") arg3: LuaValue,
         ): LuaValue {
-            virtualFrameBuffer.drawPrimitive { frameBuffer ->
-                frameBuffer.pixel(arg1.checkint(), arg2.checkint(), arg3.checkint())
-            }
+            virtualFrameBuffer.drawPoint(arg1.toint(), arg2.toint(), arg3.checkColorIndex())
             return NIL
         }
     }
