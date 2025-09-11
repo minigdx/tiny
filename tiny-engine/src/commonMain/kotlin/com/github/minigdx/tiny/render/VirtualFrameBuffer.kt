@@ -41,6 +41,7 @@ interface VirtualFrameBuffer {
     /**
      * Draw a primitive (circle, line, ...) into the [FrameBuffer]
      */
+    @Deprecated("to be removed")
     fun drawPrimitive(block: (FrameBuffer) -> Unit)
 
     /**

@@ -61,8 +61,7 @@ class DefaultVirtualFrameBuffer(
     )
 
     private val primitiveBatchManager = BatchManager(
-        // TODO: for primitive, with instanciating -> one key for all?
-        keyGenerator = { PrimitiveKey() },
+        keyGenerator = { PrimitiveKey },
         instanceGenerator = { PrimitiveInstance() },
         batchGenerator = { PrimitiveBatch() },
     )
@@ -205,6 +204,7 @@ class DefaultVirtualFrameBuffer(
         spriteBatchManager.submit(key, instance)
     }
 
+    @Deprecated("to be removed")
     override fun drawPrimitive(block: (FrameBuffer) -> Unit) {
         // FIXME: TODO
     }
@@ -217,7 +217,7 @@ class DefaultVirtualFrameBuffer(
         colorIndex: ColorIndex,
         filled: Boolean,
     ) {
-        val key = primitiveBatchManager.createKey().set(colorIndex)
+        val key = primitiveBatchManager.createKey()
         val instance = primitiveBatchManager.createInstance().setRect(
             x,
             y,
@@ -236,7 +236,7 @@ class DefaultVirtualFrameBuffer(
         y2: Pixel,
         colorIndex: ColorIndex,
     ) {
-        val key = primitiveBatchManager.createKey().set(colorIndex)
+        val key = primitiveBatchManager.createKey()
         val instance = primitiveBatchManager.createInstance().setLine(
             x1,
             y1,
@@ -254,7 +254,7 @@ class DefaultVirtualFrameBuffer(
         color: ColorIndex,
         filled: Boolean,
     ) {
-        val key = primitiveBatchManager.createKey().set(color)
+        val key = primitiveBatchManager.createKey()
         val instance = primitiveBatchManager.createInstance().setCircle(
             centerX,
             centerY,
@@ -270,7 +270,7 @@ class DefaultVirtualFrameBuffer(
         y: Pixel,
         color: ColorIndex,
     ) {
-        val key = primitiveBatchManager.createKey().set(color)
+        val key = primitiveBatchManager.createKey()
         val instance = primitiveBatchManager.createInstance().setPoint(
             x,
             y,
@@ -289,7 +289,7 @@ class DefaultVirtualFrameBuffer(
         color: ColorIndex,
         filled: Boolean,
     ) {
-        val key = primitiveBatchManager.createKey().set(color)
+        val key = primitiveBatchManager.createKey()
         val instance = primitiveBatchManager.createInstance().setTriangle(
             x1,
             y1,
