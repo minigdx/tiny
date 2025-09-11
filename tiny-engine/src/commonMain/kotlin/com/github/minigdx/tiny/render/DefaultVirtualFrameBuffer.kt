@@ -225,6 +225,7 @@ class DefaultVirtualFrameBuffer(
             height,
             filled = filled,
             color = colorIndex,
+            dither = primitiveBuffer.blender.dithering,
         )
         primitiveBatchManager.submit(key, instance)
     }
@@ -243,6 +244,7 @@ class DefaultVirtualFrameBuffer(
             x2,
             y2,
             color = colorIndex,
+            dither = primitiveBuffer.blender.dithering,
         )
         primitiveBatchManager.submit(key, instance)
     }
@@ -261,6 +263,7 @@ class DefaultVirtualFrameBuffer(
             radius,
             filled = filled,
             color = color,
+            dither = primitiveBuffer.blender.dithering,
         )
         primitiveBatchManager.submit(key, instance)
     }
@@ -275,6 +278,7 @@ class DefaultVirtualFrameBuffer(
             x,
             y,
             color = color,
+            dither = primitiveBuffer.blender.dithering,
         )
         primitiveBatchManager.submit(key, instance)
     }
@@ -298,6 +302,7 @@ class DefaultVirtualFrameBuffer(
             x3,
             y3,
             color,
+            primitiveBuffer.blender.dithering,
             filled,
         )
         primitiveBatchManager.submit(key, instance)
@@ -349,6 +354,12 @@ class DefaultVirtualFrameBuffer(
         val openGLFrame = OpenGLFrame(frameBufferContext.frameBufferData, gameOptions)
 
         return openGLFrame
+    }
+
+    override fun dithering(dither: Int): Int {
+        val actual = primitiveBuffer.blender.dithering
+        primitiveBuffer.blender.dithering = dither
+        return actual
     }
 
     override fun clear(color: ColorIndex) {

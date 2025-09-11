@@ -124,7 +124,11 @@ class GfxLib(
             @TinyArg("y") arg2: LuaValue,
             @TinyArg("color") arg3: LuaValue,
         ): LuaValue {
-            virtualFrameBuffer.drawPoint(arg1.toint(), arg2.toint(), arg3.checkColorIndex())
+            virtualFrameBuffer.drawPoint(
+                arg1.toint(),
+                arg2.toint(),
+                arg3.checkColorIndex(),
+            )
             return NIL
         }
     }
@@ -320,30 +324,15 @@ class GfxLib(
     inner class dither : LibFunction() {
         @TinyCall("Reset dithering pattern. The previous dithering pattern is returned.")
         override fun call(): LuaValue {
-            /*
-
-            resourceAccess.addOp(DitheringOperation)
-            return valueOf(resourceAccess.frameBuffer.blender.dither(0xFFFF))
-             */
-
-            // FIXME:
-
-            TODO("B")
+            return valueOf(virtualFrameBuffer.dithering(0xFFFF))
         }
 
         @TinyCall("Apply dithering pattern. The previous dithering pattern is returned.")
         override fun call(
             @TinyArg("pattern", "Dither pattern. For example: 0xA5A5 or 0x3030") a: LuaValue,
         ): LuaValue {
-            /*
-            resourceAccess.addOp(DitheringOperation)
-            return valueOf(resourceAccess.frameBuffer.blender.dither(a.checkint()))
-
-             */
-
-            // FIXME:
-
-            TODO("C")
+            val actual = virtualFrameBuffer.dithering(a.checkint())
+            return valueOf(actual)
         }
     }
 

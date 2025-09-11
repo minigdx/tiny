@@ -45,6 +45,11 @@ abstract class BaseShader(private val shader: String) {
         flat: Boolean = false,
     ): ShaderParameter.InFloat
 
+    abstract fun inInt(
+        name: String,
+        flat: Boolean = false,
+    ): ShaderParameter.InInt
+
     fun outVec2(
         name: String,
         flat: Boolean = false,
@@ -71,6 +76,13 @@ abstract class BaseShader(private val shader: String) {
         flat: Boolean = false,
     ): ShaderParameter.OutFloat {
         return ShaderParameter.OutFloat(name, flat).also { parameters += it }
+    }
+
+    fun outInt(
+        name: String,
+        flat: Boolean = false,
+    ): ShaderParameter.OutInt {
+        return ShaderParameter.OutInt(name, flat).also { parameters += it }
     }
 
     fun uniformSample2D(
@@ -162,6 +174,16 @@ abstract class VertexShader(shader: String) : BaseShader(shader) {
             inParameters += it
         }
     }
+
+    override fun inInt(
+        name: String,
+        flat: Boolean,
+    ): ShaderParameter.InInt {
+        return ShaderParameter.InInt(name, flat).also {
+            parameters += it
+            inParameters += it
+        }
+    }
 }
 
 abstract class FragmentShader(shader: String) : BaseShader(shader) {
@@ -184,6 +206,14 @@ abstract class FragmentShader(shader: String) : BaseShader(shader) {
     }
 
     class NameOnlyInFloat(name: String, flat: Boolean = false) : ShaderParameter.InFloat(name, flat) {
+        override fun create(program: ShaderProgram<*, *>) = Unit
+
+        override fun bind() = Unit
+
+        override fun unbind() = Unit
+    }
+
+    class NameOnlyInInt(name: String, flat: Boolean = false) : ShaderParameter.InInt(name, flat) {
         override fun create(program: ShaderProgram<*, *>) = Unit
 
         override fun bind() = Unit
@@ -216,6 +246,16 @@ abstract class FragmentShader(shader: String) : BaseShader(shader) {
         flat: Boolean,
     ): ShaderParameter.InFloat {
         return NameOnlyInFloat(name, flat).also {
+            parameters += it
+            inParameters += it
+        }
+    }
+
+    override fun inInt(
+        name: String,
+        flat: Boolean,
+    ): ShaderParameter.InInt {
+        return NameOnlyInInt(name, flat).also {
             parameters += it
             inParameters += it
         }

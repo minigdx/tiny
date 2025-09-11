@@ -13,6 +13,8 @@ class PrimitiveBatch() : Batch<PrimitiveInstance> {
     var parameters34: FloatArray = FloatArray(MAX_INSTANCE * 2) { 0f }
     var parameters56: FloatArray = FloatArray(MAX_INSTANCE * 2) { 0f }
 
+    var dither: FloatArray = FloatArray(MAX_INSTANCE) { 0xFFFF.toFloat() }
+
     override fun canAddInto(): Boolean {
         return (parametersIndex < MAX_INSTANCE)
     }
@@ -27,6 +29,8 @@ class PrimitiveBatch() : Batch<PrimitiveInstance> {
         } else {
             0.0f
         }
+
+        dither[parametersIndex] = instance.dither.toFloat()
 
         val vec2ParametesIndex = parametersIndex * 2
         meshPosition[vec2ParametesIndex + 0] = instance.meshX.toFloat()

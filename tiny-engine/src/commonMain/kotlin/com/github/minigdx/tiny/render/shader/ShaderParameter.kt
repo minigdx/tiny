@@ -5,6 +5,7 @@ import com.danielgergely.kgl.FloatBuffer
 import com.danielgergely.kgl.GL_ARRAY_BUFFER
 import com.danielgergely.kgl.GL_DYNAMIC_DRAW
 import com.danielgergely.kgl.GL_FLOAT
+import com.danielgergely.kgl.GL_INT
 import com.danielgergely.kgl.GL_NEAREST
 import com.danielgergely.kgl.GL_R8
 import com.danielgergely.kgl.GL_RED
@@ -20,6 +21,7 @@ import com.danielgergely.kgl.GL_TEXTURE_WRAP_T
 import com.danielgergely.kgl.GL_UNPACK_ALIGNMENT
 import com.danielgergely.kgl.GL_UNSIGNED_BYTE
 import com.danielgergely.kgl.GlBuffer
+import com.danielgergely.kgl.IntBuffer
 import com.danielgergely.kgl.Texture
 import com.danielgergely.kgl.VertexArrayObject
 import kotlin.jvm.JvmName
@@ -412,6 +414,62 @@ sealed class ShaderParameter(val name: String) {
         override fun toString() = if (flat) "flat in float $name;" else "in float $name;"
     }
 
+    open class InInt(name: String, private val flat: Boolean = false, private var divisor: Int = 0) : ShaderParameter(name), In {
+        private var buffer: GlBuffer? = null
+        private var vao: VertexArrayObject? = null
+
+        private lateinit var program: ShaderProgram<*, *>
+
+        override fun create(program: ShaderProgram<*, *>) {
+            this.program = program
+            program.createAttrib(name)
+            buffer = program.createBuffer()
+            vao = program.createVertexArray()
+        }
+
+        fun apply(
+            data: IntArray,
+            stride: Int = 0,
+        ) {
+            if (!::program.isInitialized) {
+                throw IllegalStateException("create() must be called before apply() for $name")
+            }
+
+            program.bindBuffer(GL_ARRAY_BUFFER, buffer)
+            program.bufferData(GL_ARRAY_BUFFER, IntBuffer(data), data.size * GL_INT, GL_DYNAMIC_DRAW)
+
+            val location = program.getAttrib(name)
+
+            program.vertexAttribPointer(
+                location = location,
+                size = 1,
+                type = GL_INT,
+                normalized = false,
+                stride = stride,
+                offset = 0,
+            )
+            program.vertexAttribDivisor(location, divisor)
+            program.enableVertexAttribArray(location)
+        }
+
+        override fun bind() {
+            program.bindBuffer(GL_ARRAY_BUFFER, buffer)
+            program.enableVertexAttribArray(program.getAttrib(name))
+        }
+
+        override fun unbind() {
+            program.disableVertexAttribArray(program.getAttrib(name))
+            program.bindBuffer(GL_ARRAY_BUFFER, null)
+        }
+
+        fun forEachInstance(divisor: Int = 1): InInt {
+            this.divisor = divisor
+            return this
+        }
+
+        override fun toString() = if (flat) "flat in int $name;" else "in int $name;"
+    }
+
     class UniformSample2D(
         name: String,
         override val index: Int,
@@ -543,15 +601,9 @@ sealed class ShaderParameter(val name: String) {
         override fun toString() = if (flat) "flat out float $name;" else "out float $name;"
     }
 
-    class VaryingFloat(name: String) : ShaderParameter(name), Varying {
+    class OutInt(name: String, private val flat: Boolean = false) : ShaderParameter(name), Varying {
         override fun create(program: ShaderProgram<*, *>) = Unit
 
-        override fun toString() = "out float $name;"
-    }
-
-    class VaryingInt(name: String) : ShaderParameter(name), Varying {
-        override fun create(program: ShaderProgram<*, *>) = Unit
-
-        override fun toString() = "out int $name;"
+        override fun toString() = if (flat) "flat out int $name;" else "out int $name;"
     }
 }

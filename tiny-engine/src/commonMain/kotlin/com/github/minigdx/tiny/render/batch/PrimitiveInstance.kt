@@ -9,6 +9,7 @@ import kotlin.math.min
 class PrimitiveInstance(
     var type: Int = 0,
     var color: ColorIndex = 0,
+    var dither: Int = 0,
     var meshX: Pixel = 0,
     var meshY: Pixel = 0,
     var meshWidth: Pixel = 0,
@@ -22,6 +23,7 @@ class PrimitiveInstance(
         width: Pixel,
         height: Pixel,
         color: ColorIndex,
+        dither: Int,
         filled: Boolean = false,
     ): PrimitiveInstance {
         type = 0
@@ -31,6 +33,7 @@ class PrimitiveInstance(
         meshHeight = height
         this.filled = filled
         this.color = color
+        this.dither = dither
         return this
     }
 
@@ -42,6 +45,7 @@ class PrimitiveInstance(
         x3: Pixel,
         y3: Pixel,
         color: ColorIndex,
+        dither: Int,
         filled: Boolean = false,
     ): PrimitiveInstance {
         type = 1
@@ -65,6 +69,7 @@ class PrimitiveInstance(
 
         this.filled = filled
         this.color = color
+        this.dither = dither
         return this
     }
 
@@ -73,6 +78,7 @@ class PrimitiveInstance(
         y: Pixel,
         radius: Pixel,
         color: ColorIndex,
+        dither: Int,
         filled: Boolean = false,
     ): PrimitiveInstance {
         type = 2
@@ -81,6 +87,7 @@ class PrimitiveInstance(
         meshWidth = 2 * radius + 1
         meshHeight = 2 * radius + 1
         this.color = color
+        this.dither = dither
         this.filled = filled
 
         parameters[0] = x + 1
@@ -94,10 +101,12 @@ class PrimitiveInstance(
         y1: Pixel,
         x2: Pixel,
         y2: Pixel,
+        dither: Int,
         color: ColorIndex,
     ): PrimitiveInstance {
         type = 3
         this.color = color
+        this.dither = dither
         meshX = min(x1, x2)
         meshY = min(y1, y2)
         meshWidth = (1 + abs(x2 - x1))
@@ -119,10 +128,12 @@ class PrimitiveInstance(
     fun setPoint(
         x: Pixel,
         y: Pixel,
+        dither: Int,
         color: ColorIndex,
     ): PrimitiveInstance {
         type = 4
         this.color = color
+        this.dither = dither
         this.filled = false
         meshX = x
         meshY = y

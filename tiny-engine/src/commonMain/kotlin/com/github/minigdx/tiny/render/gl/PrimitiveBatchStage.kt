@@ -65,6 +65,8 @@ class PrimitiveBatchStage(
                 gameOptions.height.toFloat() * -1,
             )
 
+            vertexShader.aDither.apply(batch.dither)
+
             vertexShader.aShapeType.apply(batch.parametersType)
             vertexShader.aShapeColor.apply(batch.parametersColor)
             vertexShader.aShapeFilled.apply(batch.parametersFilled)
@@ -90,6 +92,7 @@ class PrimitiveBatchStage(
             inFloat("a_shapeType").forEachInstance() // Shape type (0=rect, 1=circle, 2=line, 3=rounded rect)
         val aShapeColor = inFloat("a_shapeColor").forEachInstance() // Shape color
         val aShapeFilled = inFloat("a_shapeFilled").forEachInstance() // Shape is filled?
+        val aDither = inFloat("a_dither").forEachInstance() // Dithering pattern
 
         val aShapePosition = inVec2("a_shapePosition").forEachInstance() // Shape position on the screen ; in pixel
         val aShapeSize = inVec2("a_shapeSize").forEachInstance() // Shape size on the screen ; in pixel
@@ -106,6 +109,7 @@ class PrimitiveBatchStage(
 
         val vFragPos = outVec2("v_fragPos")
 
+        val vDither = outFloat("v_dither", flat = true)
         val vShapePosition = outVec2("v_shapePosition", flat = true)
         val vShapeSize = outVec2("v_shapeSize", flat = true)
 
@@ -122,6 +126,8 @@ class PrimitiveBatchStage(
         val paletteColors = uniformSample2D("palette_colors")
 
         val vFragPos = inVec2("v_fragPos")
+
+        val vDither = inFloat("v_dither", flat = true)
 
         val vShapePosition = inVec2("v_shapePosition", flat = true)
         val vShapeSize = inVec2("v_shapeSize", flat = true)
@@ -150,6 +156,7 @@ class PrimitiveBatchStage(
                 gl_Position = vec4(origin_pos, 0.0, 1.0);
                 
                 v_fragPos = vertex_pos;
+                v_dither = a_dither;
                 v_shapeType = a_shapeType;
                 v_shapeSize = a_shapeSize;
                 v_shapePosition = a_shapePosition;
@@ -207,13 +214,7 @@ class PrimitiveBatchStage(
                 vec2 p0 = startLine;
                 // Position of the end of the line in pixel
                 vec2 p1 = endLine;
-            /*
-                // Check if the current pixel is out of the line
-                if (p.x < min(p0.x, p1.x) || p.x > max(p0.x, p1.x) ||
-                    p.y < min(p0.y, p1.y) || p.y > max(p0.y, p1.y)) {
-                    return 2.0;
-                }
-            */
+        
                 // Check for vertical or horizontal line
                 if ((int(p.x) == int(p0.x) && int(p0.x) == int(p1.x)) || 
                      (int(p.y) == int(p0.y) && int(p0.y) == int(p1.y))
@@ -318,7 +319,25 @@ class PrimitiveBatchStage(
                 }
             }
             
+            /**
+            * Return true if the pixel x,y pass the pattern mask
+            */
+            bool dither(int pattern, int x, int y) {
+                  int a = imod(x,  4);
+                  int b = imod(y, 4) * 4;
+                  int bitPosition = a + b;
+                  
+                  float powerOfTwo = pow(2.0, float(bitPosition));
+                  int bit = int(floor(mod(float(pattern) / powerOfTwo, 2.0)));
+                   
+                  return bit > 0;
+            }
+            
             void main() {
+                if(!dither(int(v_dither), int(v_fragPos.x), int(v_fragPos.y))) {
+                    discard;
+                }       
+                
                 float sdf;
                 int type = int(v_shapeType);
                 if (type == T_LINE) {

@@ -95,6 +95,8 @@ interface VirtualFrameBuffer {
         filled: Boolean,
     )
 
+    fun dithering(dither: Int): Int
+
     /**
      * Clear the virtual framebuffer.
      */
