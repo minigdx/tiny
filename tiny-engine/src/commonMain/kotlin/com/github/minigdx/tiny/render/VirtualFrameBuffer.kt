@@ -83,6 +83,17 @@ interface VirtualFrameBuffer {
         color: ColorIndex,
     )
 
+    fun drawTriangle(
+        x1: Pixel,
+        y1: Pixel,
+        x2: Pixel,
+        y2: Pixel,
+        x3: Pixel,
+        y3: Pixel,
+        color: ColorIndex,
+        filled: Boolean,
+    )
+
     /**
      * Clear the virtual framebuffer.
      */

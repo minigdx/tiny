@@ -51,13 +51,17 @@ class PrimitiveInstance(
         meshY = min(min(y1, y2), y3)
         meshWidth = max(max(x1, x2), x3) - meshX
         meshHeight = max(max(y1, y2), y3) - meshY
+
+        // Set the edges the lines are always from left to right
+        val (a, b, c) = listOf(x1 to y1, x2 to y2, x3 to y3).sortedBy { it.first }
+
         // Set the triangle inside the mesh
-        parameters[0] = x1
-        parameters[1] = y1
-        parameters[2] = x2
-        parameters[3] = y2
-        parameters[4] = x3
-        parameters[5] = y3
+        parameters[0] = a.first
+        parameters[1] = a.second
+        parameters[2] = b.first
+        parameters[3] = b.second
+        parameters[4] = c.first
+        parameters[5] = c.second
 
         this.filled = filled
         this.color = color

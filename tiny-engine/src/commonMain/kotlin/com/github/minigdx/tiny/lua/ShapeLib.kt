@@ -436,40 +436,7 @@ class ShapeLib(
             val y3 = args.checkint(6)
             val color = args.arg(7).checkColorIndex()
 
-            // Sort the vertices from top to bottom
-            val vertices = listOf(Pair(x1, y1), Pair(x2, y2), Pair(x3, y3))
-            val sortedVertices = vertices.sortedBy { it.second }
-
-            // Retrieve the sorted vertices
-            val topVertex = sortedVertices[0]
-            val middleVertex = sortedVertices[1]
-            val bottomVertex = sortedVertices[2]
-
-            // Calculate the slopes of the two sides of the triangle
-            val slope1 = (middleVertex.first - topVertex.first).toFloat() / (middleVertex.second - topVertex.second)
-            val slope2 = (bottomVertex.first - topVertex.first).toFloat() / (bottomVertex.second - topVertex.second)
-
-            virtualFrameBuffer.drawPrimitive { frameBuffer ->
-
-                // Draw the upper part of the triangle
-                for (y in topVertex.second until middleVertex.second) {
-                    val xx1 = topVertex.first + ((y - topVertex.second) * slope1).toInt()
-                    val xx2 = topVertex.first + ((y - topVertex.second) * slope2).toInt()
-                    frameBuffer.fill(xx1, xx2, y, color)
-                }
-
-                // Calculate the slopes of the two sides of the bottom part of the triangle
-                val slope3 =
-                    (bottomVertex.first - middleVertex.first).toFloat() / (bottomVertex.second - middleVertex.second)
-                val slope4 = (bottomVertex.first - topVertex.first).toFloat() / (bottomVertex.second - topVertex.second)
-
-                // Draw the lower part of the triangle
-                for (y in middleVertex.second until bottomVertex.second) {
-                    val xx1 = middleVertex.first + ((y - middleVertex.second) * slope3).toInt()
-                    val xx2 = topVertex.first + ((y - topVertex.second) * slope4).toInt()
-                    frameBuffer.fill(xx1, xx2, y, color)
-                }
-            }
+            virtualFrameBuffer.drawTriangle(x1, y1, x2, y2, x3, y3, color, filled = true)
             return NONE
         }
     }
@@ -495,41 +462,7 @@ class ShapeLib(
             val y3 = args.checkint(6)
             val color = args.arg(7).checkColorIndex()
 
-            line.invoke(
-                varargsOf(
-                    arrayOf(
-                        valueOf(x1),
-                        valueOf(y1),
-                        valueOf(x2),
-                        valueOf(y2),
-                        valueOf(color),
-                    ),
-                ),
-            )
-
-            line.invoke(
-                varargsOf(
-                    arrayOf(
-                        valueOf(x2),
-                        valueOf(y2),
-                        valueOf(x3),
-                        valueOf(y3),
-                        valueOf(color),
-                    ),
-                ),
-            )
-
-            line.invoke(
-                varargsOf(
-                    arrayOf(
-                        valueOf(x3),
-                        valueOf(y3),
-                        valueOf(x1),
-                        valueOf(y1),
-                        valueOf(color),
-                    ),
-                ),
-            )
+            virtualFrameBuffer.drawTriangle(x1, y1, x2, y2, x3, y3, color, filled = false)
             return NONE
         }
     }

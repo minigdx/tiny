@@ -86,7 +86,8 @@ class PrimitiveBatchStage(
     override fun endStage() = Unit
 
     class VShader : VertexShader(VERTEX_SHADER) {
-        val aShapeType = inFloat("a_shapeType").forEachInstance() // Shape type (0=rect, 1=circle, 2=line, 3=rounded rect)
+        val aShapeType =
+            inFloat("a_shapeType").forEachInstance() // Shape type (0=rect, 1=circle, 2=line, 3=rounded rect)
         val aShapeColor = inFloat("a_shapeColor").forEachInstance() // Shape color
         val aShapeFilled = inFloat("a_shapeFilled").forEachInstance() // Shape is filled?
 
@@ -94,8 +95,10 @@ class PrimitiveBatchStage(
         val aShapeSize = inVec2("a_shapeSize").forEachInstance() // Shape size on the screen ; in pixel
 
         val aShadeParams12 = inVec2("a_shapeParams12").forEachInstance() // Parameters 1-2 (usually x, y or x1, y1)
-        val aShadeParams34 = inVec2("a_shapeParams34").forEachInstance() // Parameters 3-4 (usually width, height or x2, y2)
-        val aShadeParams56 = inVec2("a_shapeParams56").forEachInstance() // Parameters 5-6 (extra params like thickness, corner radius)
+        val aShadeParams34 =
+            inVec2("a_shapeParams34").forEachInstance() // Parameters 3-4 (usually width, height or x2, y2)
+        val aShadeParams56 =
+            inVec2("a_shapeParams56").forEachInstance() // Parameters 5-6 (extra params like thickness, corner radius)
 
         val aPos = inVec2("a_pos") // Position of the shape with NDC
 
@@ -162,10 +165,11 @@ class PrimitiveBatchStage(
         private val FRAGMENT_SHADER =
             """
             #define T_RECT 0
+            #define T_TRIANGLE 1
             #define T_CIRCLE 2
             #define T_LINE 3
             #define T_POINT 4
-                
+            
             int imod(int value, int limit) {
                 return value - limit * (value / limit);
             }
@@ -189,7 +193,7 @@ class PrimitiveBatchStage(
                 vec2 pos = abs(fragCoord - center);
                 // Distance from the edge to the pos.
                 vec2 d = pos - (size * 0.5);
-                
+            
                 // > 1.0 is outside the rectangle.
                 // < 1.0 is inside the rectangle.
                 // 0 = is on the rectangle.
@@ -198,21 +202,29 @@ class PrimitiveBatchStage(
             
             float sdfLine(vec2 fragCoord, vec2 startLine, vec2 endLine) {
                 vec2 p = fragCoord;
-                
+            
                 // Position of the start of the line in pixel
                 vec2 p0 = startLine;
                 // Position of the end of the line in pixel
                 vec2 p1 = endLine;
-                
+            /*
+                // Check if the current pixel is out of the line
+                if (p.x < min(p0.x, p1.x) || p.x > max(p0.x, p1.x) ||
+                    p.y < min(p0.y, p1.y) || p.y > max(p0.y, p1.y)) {
+                    return 2.0;
+                }
+            */
                 // Check for vertical or horizontal line
-                if(int(p0.x) == int(p1.x) || int(p0.y) == int(p1.y)) { 
+                if ((int(p.x) == int(p0.x) && int(p0.x) == int(p1.x)) || 
+                     (int(p.y) == int(p0.y) && int(p0.y) == int(p1.y))
+                ) {
                     return 0.0;
                 }
                 
                 // Bresenham algorithm
                 // See: https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm#Method
                 vec2 d = p1 - p0;
-               
+            
                 float slope;
                 // the frag position from the start point (~ progress of the slope)
                 float a;
@@ -220,7 +232,7 @@ class PrimitiveBatchStage(
                 float b;
                 // other axis for the frag
                 float c;
-                if(abs(d.x) > abs(d.y)) {
+                if (abs(d.x) > abs(d.y)) {
                     slope = (d.y / d.x);
                     a = p.x - p0.x;
                     b = p0.y;
@@ -230,68 +242,111 @@ class PrimitiveBatchStage(
                     a = p.y - p0.y;
                     b = p0.x;
                     c = p.x;
-                }               
-                
+                }
+            
                 float expected = slope * a + b;
-               
+            
                 float sdf;
-                 // Is the current y match the expected y of the algo ?
-                if(int(expected) == int(c)) {
+                // Is the current y match the expected y of the algo ?
+                if (int(expected) == int(c)) {
                     // It's on the line
                     sdf = 0.0;
                 } else {
                     // It's NOT on the line
                     sdf = 2.0;
-                } 
-                 return sdf;
+                }
+                return sdf;
             }
             
             float sdfPoint(vec2 frag, vec2 pos) {
                 return 0.0;
-            }  
-                 
+            }
+            
             float sdfCircle(vec2 frag, vec2 center, float radius) {
-                 vec2 p = frag - center;
-                
-                // Distance euclidienne simple
+                vec2 p = frag - center;
+            
+                // Distance between the frag and the border of the circle
                 float dist = length(p + vec2(0.5)) - radius;
-                
-                // Pour un rendu pixelisé façon Bresenham
+            
+                // Is on the line?
                 if (abs(dist) < 0.5) {
-                    // On est sur le périmètre du cercle
                     return 0.0;
                 }
-                
+            
                 return dist * 4.0;
+            }
+            
+            
+            /**
+            * Is the point p inside the triangle(a,b,c) ?
+            * @return true if inside the triangle. false otherwise
+            */
+            bool pointInTriangle(vec2 p, vec2 a, vec2 b, vec2 c) {
+                vec2 v0 = c - a;
+                vec2 v1 = b - a;
+                vec2 v2 = p - a;
+            
+                float dot00 = dot(v0, v0);
+                float dot01 = dot(v0, v1);
+                float dot02 = dot(v0, v2);
+                float dot11 = dot(v1, v1);
+                float dot12 = dot(v1, v2);
+            
+                float invDenom = 1.0 / (dot00 * dot11 - dot01 * dot01);
+                float u = (dot11 * dot02 - dot01 * dot12) * invDenom;
+                float v = (dot00 * dot12 - dot01 * dot02) * invDenom;
+            
+                return (u >= 0.0 && v >= 0.0 && u + v <= 1.0);
+            }
+            
+            float sdfTriangle(vec2 frag, vec2 p0, vec2 p1, vec2 p2) {
+            
+                float a = sdfLine(frag, p0, p1);
+                float b = sdfLine(frag, p0, p2);
+                float c = sdfLine(frag, p1, p2);
+                // is the frag on a line?
+                if (a + b + c < 6.0) { 
+                    return 0.0;
+                 }
+                bool isInside = pointInTriangle(frag, p0, p1, p2);
+                if (isInside) {
+                    // is inside the triangle
+                    return -2.0;
+                } else {
+                    // is outside the triangle
+                    return 2.0;
+                }
             }
             
             void main() {
                 float sdf;
                 int type = int(v_shapeType);
-                if(type == T_LINE) {
+                if (type == T_LINE) {
                     sdf = sdfLine(v_fragPos, v_shapeParams12, v_shapeParams34);
-                } else if(type == T_POINT) {
+                } else if (type == T_POINT) {
                     sdf = sdfPoint(v_fragPos, v_shapePosition);
-                } else if(type == T_CIRCLE) {
+                } else if (type == T_CIRCLE) {
                     sdf = sdfCircle(v_fragPos, v_shapeParams12, v_shapeParams34.x);
+                } else if (type == T_TRIANGLE) {
+                    sdf = sdfTriangle(v_fragPos, v_shapeParams12, v_shapeParams34, v_shapeParams56);
                 } else {
                     sdf = sdfRectangleBorder(v_fragPos, v_shapePosition, v_shapeSize);
                 }
-                
+            
                 // The distance is more than one pixel away (ie: it's out of the border)
                 if (sdf >= 1.0) {
                     discard;
                     // If the frag is inside the shape and the shape should NOT be filled.
                 } else if (sdf <= -1.0 && v_shapeFilled < 1.0) {
                     discard;
-                } else {    
+                } else {
                     // If the frag is on the border OR inside the shape AND should be filled
                     // Get color from palette
                     vec4 color = readColor(int(v_shapeColor));
-                
+            
                     fragColor = vec4(color.rgb, 1.0);
                 }
-               
+            
             }
             """.trimIndent()
     }

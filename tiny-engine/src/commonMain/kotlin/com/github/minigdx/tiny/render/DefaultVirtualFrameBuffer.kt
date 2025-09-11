@@ -279,6 +279,30 @@ class DefaultVirtualFrameBuffer(
         primitiveBatchManager.submit(key, instance)
     }
 
+    override fun drawTriangle(
+        x1: Pixel,
+        y1: Pixel,
+        x2: Pixel,
+        y2: Pixel,
+        x3: Pixel,
+        y3: Pixel,
+        color: ColorIndex,
+        filled: Boolean,
+    ) {
+        val key = primitiveBatchManager.createKey().set(color)
+        val instance = primitiveBatchManager.createInstance().setTriangle(
+            x1,
+            y1,
+            x2,
+            y2,
+            x3,
+            y3,
+            color,
+            filled,
+        )
+        primitiveBatchManager.submit(key, instance)
+    }
+
     private fun renderAllInFrameBuffer() {
         kgl.bindFramebuffer(GL_FRAMEBUFFER, frameBufferContext.frameBuffer)
         kgl.viewport(0, 0, gameOptions.width, gameOptions.height)
