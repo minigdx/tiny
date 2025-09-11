@@ -77,6 +77,7 @@ class SpriteBatchStage(
 
             // Fragment shader uniforms
             fragmentShader.paletteColors.applyRGBA(colorPaletteBuffer, 256, 256)
+            fragmentShader.uDither.apply(key.dither)
 
             val textureUnit = key.spriteSheet.textureUnit
             checkNotNull(textureUnit) { "Texture unit should be already initialized!" }
@@ -98,13 +99,16 @@ class SpriteBatchStage(
         val aSpr = inVec2("a_spr")
 
         val vUvs = outVec2("v_uvs")
+        val vPos = outVec2("v_pos")
     }
 
     class FShader : FragmentShader(FRAGMENT_SHADER) {
         val paletteColors = uniformSample2D("palette_colors")
         val spritesheet = uniformSample2D("spritesheet", existingTexture = true) // Spritesheet to be used.
+        val uDither = uniformInt("u_dither")
 
         val vUvs = inVec2("v_uvs") // position of the sprite in the viewport
+        val vPos = inVec2("v_pos")
     }
 
     companion object {
@@ -124,6 +128,7 @@ class SpriteBatchStage(
                 // Convert the texture coordinates to NDC coordinates
                 vec2 ndc_spr = a_spr / u_spritesheet;
                 v_uvs = ndc_spr;
+                v_pos = final_pos;
             }
             """.trimIndent()
 
@@ -158,7 +163,24 @@ class SpriteBatchStage(
                 return int(color.r * 255.0 + 0.5);
             }
             
+            /**
+            * Return true if the pixel x,y pass the pattern mask
+            */
+            bool dither(int pattern, int x, int y) {
+                  int a = imod(x,  4);
+                  int b = imod(y, 4) * 4;
+                  int bitPosition = a + b;
+                  
+                  float powerOfTwo = pow(2.0, float(bitPosition));
+                  int bit = int(floor(mod(float(pattern) / powerOfTwo, 2.0)));
+                   
+                  return bit > 0;
+            }
+            
             void main() {
+                if(!dither(u_dither, int(v_pos.x), int(v_pos.y))) { 
+                    discard;
+                }
                 // Read the index color from the current texture.
                 int pixel = readPixel(v_uvs);
                 // Read the RGBA color from the index color.
