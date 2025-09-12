@@ -42,10 +42,19 @@ interface VirtualFrameBuffer {
      */
     fun draw()
 
+    /**
+     * Bind sprite sheet textures for rendering.
+     */
     fun bindTextures(spritesheetToBind: List<SpriteSheet>)
 
+    /**
+     * Read the current frame buffer contents.
+     */
     fun readFrameBuffer(): RenderFrame
 
+    /**
+     * Draw a rectangle primitive.
+     */
     fun drawRect(
         x: Pixel,
         y: Pixel,
@@ -55,6 +64,9 @@ interface VirtualFrameBuffer {
         filled: Boolean,
     )
 
+    /**
+     * Draw a line primitive.
+     */
     fun drawLine(
         x1: Pixel,
         y1: Pixel,
@@ -63,6 +75,9 @@ interface VirtualFrameBuffer {
         colorIndex: ColorIndex,
     )
 
+    /**
+     * Draw a circle primitive.
+     */
     fun drawCircle(
         centerX: Pixel,
         centerY: Pixel,
@@ -71,12 +86,18 @@ interface VirtualFrameBuffer {
         filled: Boolean,
     )
 
+    /**
+     * Draw a point primitive.
+     */
     fun drawPoint(
         x: Pixel,
         y: Pixel,
         color: ColorIndex,
     )
 
+    /**
+     * Draw a triangle primitive.
+     */
     fun drawTriangle(
         x1: Pixel,
         y1: Pixel,
@@ -88,6 +109,9 @@ interface VirtualFrameBuffer {
         filled: Boolean,
     )
 
+    /**
+     * Configure dithering settings.
+     */
     fun dithering(dither: Int): Int
 
     /**
@@ -95,5 +119,8 @@ interface VirtualFrameBuffer {
      */
     fun clear(color: ColorIndex)
 
+    /**
+     * Initialize the virtual frame buffer with window manager.
+     */
     fun init(windowManager: WindowManager)
 }
