@@ -93,7 +93,7 @@ class SpriteBatchStage(
     override fun endStage() = Unit
 
     class VShader : VertexShader(VERTEX_SHADER) {
-        val aPos = inVec2("a_pos") // position of the sprite in the viewport
+        val aPos = inVec3("a_pos") // position of the sprite in the viewport
         val uViewport = uniformVec2("u_viewport") // Size of the viewport; in pixel.
         val uSpritesheet = uniformVec2("u_spritesheet") // Size of the spritesheet; in pixel.
         val aSpr = inVec2("a_spr")
@@ -116,13 +116,13 @@ class SpriteBatchStage(
         private val VERTEX_SHADER =
             """
             void main() {
-                vec2 final_pos = a_pos;
+                vec2 final_pos = vec2(a_pos.x, a_pos.y);
                 // Convert the pixel coordinates into NDC coordinates
                 vec2 ndc_pos = final_pos / u_viewport ;
                 // Move the origin to the left/up corner
                 vec2 origin_pos = vec2(-1.0, 1.0) + ndc_pos * 2.0;
                 
-                gl_Position = vec4(origin_pos, 0.0, 1.0);
+                gl_Position = vec4(origin_pos, a_pos.z, 1.0);
                 
                 // UV computation
                 // Convert the texture coordinates to NDC coordinates

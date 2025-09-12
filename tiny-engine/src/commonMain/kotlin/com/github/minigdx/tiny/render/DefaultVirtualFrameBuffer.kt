@@ -5,9 +5,12 @@ import com.danielgergely.kgl.GL_BLEND
 import com.danielgergely.kgl.GL_COLOR_ATTACHMENT0
 import com.danielgergely.kgl.GL_COLOR_BUFFER_BIT
 import com.danielgergely.kgl.GL_DEPTH24_STENCIL8
+import com.danielgergely.kgl.GL_DEPTH_ATTACHMENT
 import com.danielgergely.kgl.GL_DEPTH_BUFFER_BIT
+import com.danielgergely.kgl.GL_DEPTH_TEST
 import com.danielgergely.kgl.GL_FRAMEBUFFER
 import com.danielgergely.kgl.GL_FRAMEBUFFER_COMPLETE
+import com.danielgergely.kgl.GL_LEQUAL
 import com.danielgergely.kgl.GL_NEAREST
 import com.danielgergely.kgl.GL_RENDERBUFFER
 import com.danielgergely.kgl.GL_RGBA
@@ -39,10 +42,6 @@ import com.github.minigdx.tiny.render.gl.PrimitiveBatchStage
 import com.github.minigdx.tiny.render.gl.SpriteBatchStage
 import com.github.minigdx.tiny.resources.SpriteSheet
 
-// TODO list:
-// 4. bien tester et comprendre comment ça marche.
-// 5. appliquer instanciacing sur SpriteBatchStage aussi.
-// 6. Appliquer dithering et voilà !!!
 class DefaultVirtualFrameBuffer(
     private val kgl: Kgl,
     private val gameOptions: GameOptions,
@@ -53,6 +52,9 @@ class DefaultVirtualFrameBuffer(
     private val spriteBatchStage = SpriteBatchStage(kgl, gameOptions, performanceMonitor)
     private val primitiveBatchStage = PrimitiveBatchStage(kgl, gameOptions, performanceMonitor)
     private val frameBufferStage = FrameBufferStage(kgl, gameOptions, performanceMonitor)
+
+    private var currentSpritesheet: SpriteSheet? = null
+    private var currentDepth: Float = 1f
 
     private val spriteBatchManager = BatchManager(
         keyGenerator = { SpriteBatchKey() },
@@ -91,6 +93,7 @@ class DefaultVirtualFrameBuffer(
         kgl.bindFramebuffer(GL_FRAMEBUFFER, frameBuffer)
 
         kgl.framebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, stencilBuffer)
+        kgl.framebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, stencilBuffer)
 
         // Prepare the texture used for the FBO
         val frameBufferTexture = kgl.createTexture()
@@ -148,6 +151,7 @@ class DefaultVirtualFrameBuffer(
         flipX: Boolean,
         flipY: Boolean,
     ) {
+        updateDepthIndex(source)
         val key = spriteBatchManager.createKey()
         key.set(
             source,
@@ -166,6 +170,7 @@ class DefaultVirtualFrameBuffer(
             destinationY,
             flipX,
             flipY,
+            currentDepth,
         )
         spriteBatchManager.submit(key, instance)
     }
@@ -181,6 +186,7 @@ class DefaultVirtualFrameBuffer(
         flipX: Boolean,
         flipY: Boolean,
     ) {
+        updateDepthIndex(source)
         val key = spriteBatchManager.createKey()
         key.set(
             source,
@@ -200,6 +206,7 @@ class DefaultVirtualFrameBuffer(
             destinationY,
             flipX,
             flipY,
+            currentDepth,
         )
         spriteBatchManager.submit(key, instance)
     }
@@ -217,6 +224,7 @@ class DefaultVirtualFrameBuffer(
         colorIndex: ColorIndex,
         filled: Boolean,
     ) {
+        updateDepthIndex(null)
         val key = primitiveBatchManager.createKey()
         val instance = primitiveBatchManager.createInstance().setRect(
             x,
@@ -226,6 +234,7 @@ class DefaultVirtualFrameBuffer(
             filled = filled,
             color = colorIndex,
             dither = primitiveBuffer.blender.dithering,
+            depth = currentDepth,
         )
         primitiveBatchManager.submit(key, instance)
     }
@@ -237,6 +246,7 @@ class DefaultVirtualFrameBuffer(
         y2: Pixel,
         colorIndex: ColorIndex,
     ) {
+        updateDepthIndex(null)
         val key = primitiveBatchManager.createKey()
         val instance = primitiveBatchManager.createInstance().setLine(
             x1,
@@ -245,6 +255,7 @@ class DefaultVirtualFrameBuffer(
             y2,
             color = colorIndex,
             dither = primitiveBuffer.blender.dithering,
+            depth = currentDepth,
         )
         primitiveBatchManager.submit(key, instance)
     }
@@ -256,6 +267,7 @@ class DefaultVirtualFrameBuffer(
         color: ColorIndex,
         filled: Boolean,
     ) {
+        updateDepthIndex(null)
         val key = primitiveBatchManager.createKey()
         val instance = primitiveBatchManager.createInstance().setCircle(
             centerX,
@@ -264,6 +276,7 @@ class DefaultVirtualFrameBuffer(
             filled = filled,
             color = color,
             dither = primitiveBuffer.blender.dithering,
+            depth = currentDepth,
         )
         primitiveBatchManager.submit(key, instance)
     }
@@ -273,12 +286,14 @@ class DefaultVirtualFrameBuffer(
         y: Pixel,
         color: ColorIndex,
     ) {
+        updateDepthIndex(null)
         val key = primitiveBatchManager.createKey()
         val instance = primitiveBatchManager.createInstance().setPoint(
             x,
             y,
             color = color,
             dither = primitiveBuffer.blender.dithering,
+            depth = currentDepth,
         )
         primitiveBatchManager.submit(key, instance)
     }
@@ -293,6 +308,7 @@ class DefaultVirtualFrameBuffer(
         color: ColorIndex,
         filled: Boolean,
     ) {
+        updateDepthIndex(null)
         val key = primitiveBatchManager.createKey()
         val instance = primitiveBatchManager.createInstance().setTriangle(
             x1,
@@ -304,6 +320,7 @@ class DefaultVirtualFrameBuffer(
             color,
             primitiveBuffer.blender.dithering,
             filled,
+            depth = currentDepth,
         )
         primitiveBatchManager.submit(key, instance)
     }
@@ -311,6 +328,13 @@ class DefaultVirtualFrameBuffer(
     private fun renderAllInFrameBuffer() {
         kgl.bindFramebuffer(GL_FRAMEBUFFER, frameBufferContext.frameBuffer)
         kgl.viewport(0, 0, gameOptions.width, gameOptions.height)
+        kgl.enable(GL_DEPTH_TEST)
+        // Allow elements with the same depth (ie: same sprite sheet) to be drawn on the previous element.
+        kgl.depthFunc(GL_LEQUAL)
+        // Clear the depth buffer, to not conflict with the previous element that was drawn.
+        kgl.clear(GL_DEPTH_BUFFER_BIT)
+
+        // kgl.depthFunc
 
         spriteBatchStage.startStage()
         spriteBatchManager.consumeAllBatches { key, batch ->
@@ -324,7 +348,11 @@ class DefaultVirtualFrameBuffer(
         }
         primitiveBatchStage.endStage()
 
+        kgl.disable(GL_DEPTH_TEST)
         kgl.bindFramebuffer(GL_FRAMEBUFFER, null)
+
+        currentDepth = 1f
+        currentSpritesheet = null
     }
 
     override fun draw() {
@@ -370,5 +398,19 @@ class DefaultVirtualFrameBuffer(
         kgl.clearColor(r.toInt() / 255f, g.toInt() / 255f, b.toInt() / 255f, 1.0f)
         kgl.clear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
         kgl.bindFramebuffer(GL_FRAMEBUFFER, null)
+    }
+
+    private fun updateDepthIndex(spritesheet: SpriteSheet?) {
+        // increment depth only when switching to another texture.
+        // same texture can use the same depth as the order will
+        // do the job
+        if (spritesheet?.key != currentSpritesheet?.key) {
+            currentDepth -= DEPTH_STEP
+            currentSpritesheet = spritesheet
+        }
+    }
+
+    companion object {
+        private const val DEPTH_STEP = 0.0001f
     }
 }

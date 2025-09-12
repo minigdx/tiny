@@ -17,6 +17,7 @@ class SpriteBatchInstance(
     var destinationY: Pixel = 0,
     var flipX: Boolean = false,
     var flipY: Boolean = false,
+    var depth: Float = 0f,
 ) : Instance {
     fun set(
         sourceX: Pixel,
@@ -27,6 +28,7 @@ class SpriteBatchInstance(
         destinationY: Pixel,
         flipX: Boolean,
         flipY: Boolean,
+        depth: Float,
     ): SpriteBatchInstance {
         this.sourceX = sourceX
         this.sourceY = sourceY
@@ -36,7 +38,7 @@ class SpriteBatchInstance(
         this.destinationY = destinationY
         this.flipX = flipX
         this.flipY = flipY
-
+        this.depth = depth
         return this
     }
 
@@ -49,6 +51,7 @@ class SpriteBatchInstance(
         this.destinationY = 0
         this.flipX = false
         this.flipY = false
+        this.depth = 0f
     }
 
     fun addVertexInto(
@@ -56,23 +59,30 @@ class SpriteBatchInstance(
         vertexData: FloatArray,
     ): Int {
         var indexVertex = vertexIndex
+        // A - Left/Up
         vertexData[indexVertex++] = positionLeft.toFloat()
         vertexData[indexVertex++] = positionUp.toFloat()
+        vertexData[indexVertex++] = depth
         // A - Right/Up
         vertexData[indexVertex++] = positionRight.toFloat()
         vertexData[indexVertex++] = positionUp.toFloat()
+        vertexData[indexVertex++] = depth
         // A - Right/Down
         vertexData[indexVertex++] = positionRight.toFloat()
         vertexData[indexVertex++] = positionDown.toFloat()
+        vertexData[indexVertex++] = depth
         // B - Right/Down
         vertexData[indexVertex++] = positionRight.toFloat()
         vertexData[indexVertex++] = positionDown.toFloat()
+        vertexData[indexVertex++] = depth
         // B - Left/Down
         vertexData[indexVertex++] = positionLeft.toFloat()
         vertexData[indexVertex++] = positionDown.toFloat()
+        vertexData[indexVertex++] = depth
         // B - Left/Up
         vertexData[indexVertex++] = positionLeft.toFloat()
         vertexData[indexVertex++] = positionUp.toFloat()
+        vertexData[indexVertex++] = depth
 
         return indexVertex
     }

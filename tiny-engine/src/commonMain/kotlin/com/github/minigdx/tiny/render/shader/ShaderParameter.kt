@@ -295,32 +295,56 @@ sealed class ShaderParameter(val name: String) {
         override fun toString() = if (flat) "flat in vec2 $name;" else "in vec2 $name;"
     }
 
-    class InVec3(name: String) : ShaderParameter(name), In {
+    open class InVec3(name: String, private val flat: Boolean = false, private var divisor: Int = 0) : ShaderParameter(name), In {
+        private var buffer: GlBuffer? = null
+        private var location: Int = 0
+
         private lateinit var program: ShaderProgram<*, *>
 
         override fun create(program: ShaderProgram<*, *>) {
-            program.createAttrib(name)
             this.program = program
+            location = program.createAttrib(name)
+            buffer = program.createBuffer()
         }
 
-        fun apply(source: GlBuffer) {
+        fun apply(
+            data: FloatArray,
+            stride: Int = 0,
+        ) {
             if (!::program.isInitialized) {
                 throw IllegalStateException("create() must be called before apply() for $name")
             }
-            program.bindBuffer(GL_ARRAY_BUFFER, source)
-            val location = program.getAttrib(name)
+
+            program.bindBuffer(GL_ARRAY_BUFFER, buffer)
+            program.bufferData(GL_ARRAY_BUFFER, FloatBuffer(data), data.size * GL_FLOAT, GL_STATIC_DRAW)
             program.vertexAttribPointer(
                 location = location,
                 size = 3,
                 type = GL_FLOAT,
                 normalized = false,
-                stride = 0,
+                stride = stride,
                 offset = 0,
             )
+            program.vertexAttribDivisor(location, divisor)
             program.enableVertexAttribArray(location)
         }
 
-        override fun toString() = "in vec3 $name;"
+        override fun bind() {
+            program.bindBuffer(GL_ARRAY_BUFFER, buffer)
+            program.enableVertexAttribArray(location)
+        }
+
+        override fun unbind() {
+            program.disableVertexAttribArray(location)
+            program.bindBuffer(GL_ARRAY_BUFFER, null)
+        }
+
+        fun forEachInstance(divisor: Int = 1): InVec3 {
+            this.divisor = divisor
+            return this
+        }
+
+        override fun toString() = if (flat) "flat in vec3 $name;" else "in vec3 $name;"
     }
 
     open class InVec4(name: String, private val flat: Boolean = false, private var divisor: Int = 0) : ShaderParameter(name), In {

@@ -16,6 +16,7 @@ class PrimitiveInstance(
     var meshHeight: Pixel = 0,
     var parameters: Array<Int> = Array(6) { 0 },
     var filled: Boolean = false,
+    var depth: Float = 0f,
 ) : Instance {
     fun setRect(
         x: Pixel,
@@ -25,6 +26,7 @@ class PrimitiveInstance(
         color: ColorIndex,
         dither: Int,
         filled: Boolean = false,
+        depth: Float,
     ): PrimitiveInstance {
         type = 0
         meshX = x
@@ -34,6 +36,7 @@ class PrimitiveInstance(
         this.filled = filled
         this.color = color
         this.dither = dither
+        this.depth = depth
         return this
     }
 
@@ -47,6 +50,7 @@ class PrimitiveInstance(
         color: ColorIndex,
         dither: Int,
         filled: Boolean = false,
+        depth: Float,
     ): PrimitiveInstance {
         type = 1
         // Find the most left x coordinate
@@ -70,6 +74,7 @@ class PrimitiveInstance(
         this.filled = filled
         this.color = color
         this.dither = dither
+        this.depth = depth
         return this
     }
 
@@ -80,6 +85,7 @@ class PrimitiveInstance(
         color: ColorIndex,
         dither: Int,
         filled: Boolean = false,
+        depth: Float,
     ): PrimitiveInstance {
         type = 2
         meshX = x - radius
@@ -93,6 +99,7 @@ class PrimitiveInstance(
         parameters[0] = x + 1
         parameters[1] = y + 1
         parameters[2] = radius
+        this.depth = depth
         return this
     }
 
@@ -103,6 +110,7 @@ class PrimitiveInstance(
         y2: Pixel,
         dither: Int,
         color: ColorIndex,
+        depth: Float,
     ): PrimitiveInstance {
         type = 3
         this.color = color
@@ -122,6 +130,7 @@ class PrimitiveInstance(
         parameters[3] = d
 
         this.filled = false
+        this.depth = depth
         return this
     }
 
@@ -130,6 +139,7 @@ class PrimitiveInstance(
         y: Pixel,
         dither: Int,
         color: ColorIndex,
+        depth: Float,
     ): PrimitiveInstance {
         type = 4
         this.color = color
@@ -139,7 +149,7 @@ class PrimitiveInstance(
         meshY = y
         meshWidth = 1
         meshHeight = 1
-
+        this.depth = depth
         return this
     }
 

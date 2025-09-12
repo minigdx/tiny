@@ -66,7 +66,6 @@ class PrimitiveBatchStage(
             )
 
             vertexShader.aDither.apply(batch.dither)
-
             vertexShader.aShapeType.apply(batch.parametersType)
             vertexShader.aShapeColor.apply(batch.parametersColor)
             vertexShader.aShapeFilled.apply(batch.parametersFilled)
@@ -94,7 +93,7 @@ class PrimitiveBatchStage(
         val aShapeFilled = inFloat("a_shapeFilled").forEachInstance() // Shape is filled?
         val aDither = inFloat("a_dither").forEachInstance() // Dithering pattern
 
-        val aShapePosition = inVec2("a_shapePosition").forEachInstance() // Shape position on the screen ; in pixel
+        val aShapePosition = inVec3("a_shapePosition").forEachInstance() // Shape position on the screen ; in pixel
         val aShapeSize = inVec2("a_shapeSize").forEachInstance() // Shape size on the screen ; in pixel
 
         val aShadeParams12 = inVec2("a_shapeParams12").forEachInstance() // Parameters 1-2 (usually x, y or x1, y1)
@@ -147,19 +146,19 @@ class PrimitiveBatchStage(
             """
             void main() {
                 // Scale the rectangle (mutiply by the size) then translate (add the offset)
-                vec2 vertex_pos =  ((a_pos * a_shapeSize) + a_shapePosition);
+                vec2 vertex_pos =  ((a_pos * a_shapeSize) + vec2(a_shapePosition.x, a_shapePosition.y));
                 // Convert the pixel coordinates into NDC coordinates
                 vec2 ndc_pos = vertex_pos / u_viewport;
                 // Move the origin to the left/up corner
                 vec2 origin_pos = vec2(-1.0, 1.0) + ndc_pos * 2.0;
                 
-                gl_Position = vec4(origin_pos, 0.0, 1.0);
+                gl_Position = vec4(origin_pos, a_shapePosition.z, 1.0);
                 
                 v_fragPos = vertex_pos;
                 v_dither = a_dither;
                 v_shapeType = a_shapeType;
                 v_shapeSize = a_shapeSize;
-                v_shapePosition = a_shapePosition;
+                v_shapePosition = vec2(a_shapePosition.x, a_shapePosition.y);
                 v_shapeColor = a_shapeColor;
                 v_shapeFilled = a_shapeFilled;
                 v_shapeParams12 = a_shapeParams12;
@@ -302,6 +301,7 @@ class PrimitiveBatchStage(
             
             float sdfTriangle(vec2 frag, vec2 p0, vec2 p1, vec2 p2) {
             
+                // BUG: maybe the line should not assume that it's only from left to right 
                 float a = sdfLine(frag, p0, p1);
                 float b = sdfLine(frag, p0, p2);
                 float c = sdfLine(frag, p1, p2);

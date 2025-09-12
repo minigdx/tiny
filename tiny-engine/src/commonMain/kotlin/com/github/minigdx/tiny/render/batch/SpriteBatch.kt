@@ -17,7 +17,7 @@ class SpriteBatch : Batch<SpriteBatchInstance> {
 
     override fun canAddInto(): Boolean {
         // Is there still room to add another sprite in the batch?
-        return ((numberOfVertex + VERTEX_PER_SPRITE) * 2 < VERTEX_ARRAY_SIZE)
+        return ((numberOfVertex + VERTEX_PER_SPRITE) * 3 < VERTEX_ARRAY_SIZE)
     }
 
     override fun add(instance: SpriteBatchInstance) {
@@ -39,7 +39,7 @@ class SpriteBatch : Batch<SpriteBatchInstance> {
         private const val VERTEX_PER_SPRITE = 6
 
         // 2 floats per vertex. So the array is nb sprite * nb vertex * 2
-        private const val VERTEX_ARRAY_SIZE = MAX_SPRITE_PER_BATCH * VERTEX_PER_SPRITE * 2
+        private const val VERTEX_ARRAY_SIZE = MAX_SPRITE_PER_BATCH * VERTEX_PER_SPRITE * 3
         private const val UVS_ARRAY_SIZE = MAX_SPRITE_PER_BATCH * VERTEX_PER_SPRITE * 2
     }
 }

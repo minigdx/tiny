@@ -35,6 +35,11 @@ abstract class BaseShader(private val shader: String) {
         flat: Boolean = false,
     ): ShaderParameter.InVec2
 
+    abstract fun inVec3(
+        name: String,
+        flat: Boolean = false,
+    ): ShaderParameter.InVec3
+
     abstract fun inVec4(
         name: String,
         flat: Boolean = false,
@@ -155,6 +160,16 @@ abstract class VertexShader(shader: String) : BaseShader(shader) {
         }
     }
 
+    override fun inVec3(
+        name: String,
+        flat: Boolean,
+    ): ShaderParameter.InVec3 {
+        return ShaderParameter.InVec3(name, flat).also {
+            parameters += it
+            inParameters += it
+        }
+    }
+
     override fun inVec4(
         name: String,
         flat: Boolean,
@@ -197,6 +212,14 @@ abstract class FragmentShader(shader: String) : BaseShader(shader) {
         override fun unbind() = Unit
     }
 
+    class NameOnlyInVec3(name: String, flat: Boolean = false) : ShaderParameter.InVec3(name, flat) {
+        override fun create(program: ShaderProgram<*, *>) = Unit
+
+        override fun bind() = Unit
+
+        override fun unbind() = Unit
+    }
+
     class NameOnlyInVec4(name: String, flat: Boolean = false) : ShaderParameter.InVec4(name, flat) {
         override fun create(program: ShaderProgram<*, *>) = Unit
 
@@ -226,6 +249,16 @@ abstract class FragmentShader(shader: String) : BaseShader(shader) {
         flat: Boolean,
     ): ShaderParameter.InVec2 {
         return NameOnlyInVec2(name, flat).also {
+            parameters += it
+            inParameters += it
+        }
+    }
+
+    override fun inVec3(
+        name: String,
+        flat: Boolean,
+    ): ShaderParameter.InVec3 {
+        return NameOnlyInVec3(name, flat).also {
             parameters += it
             inParameters += it
         }

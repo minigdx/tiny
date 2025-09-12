@@ -2,7 +2,7 @@ package com.github.minigdx.tiny.render.batch
 
 class PrimitiveBatch() : Batch<PrimitiveInstance> {
     var parametersIndex = 0
-    var meshPosition: FloatArray = FloatArray(MAX_INSTANCE * 2) { 0f }
+    var meshPosition: FloatArray = FloatArray(MAX_INSTANCE * 3) { 0f }
     var meshSize: FloatArray = FloatArray(MAX_INSTANCE * 2) { 0f }
 
     var parametersType: FloatArray = FloatArray(MAX_INSTANCE) { 0f }
@@ -32,10 +32,12 @@ class PrimitiveBatch() : Batch<PrimitiveInstance> {
 
         dither[parametersIndex] = instance.dither.toFloat()
 
-        val vec2ParametesIndex = parametersIndex * 2
-        meshPosition[vec2ParametesIndex + 0] = instance.meshX.toFloat()
-        meshPosition[vec2ParametesIndex + 1] = instance.meshY.toFloat()
+        val vec3ParametesIndex = parametersIndex * 3
+        meshPosition[vec3ParametesIndex + 0] = instance.meshX.toFloat()
+        meshPosition[vec3ParametesIndex + 1] = instance.meshY.toFloat()
+        meshPosition[vec3ParametesIndex + 2] = instance.depth
 
+        val vec2ParametesIndex = parametersIndex * 2
         meshSize[vec2ParametesIndex + 0] = instance.meshWidth.toFloat()
         meshSize[vec2ParametesIndex + 1] = instance.meshHeight.toFloat()
 
