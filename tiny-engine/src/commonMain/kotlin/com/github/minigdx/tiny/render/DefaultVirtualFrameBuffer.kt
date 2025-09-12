@@ -211,11 +211,6 @@ class DefaultVirtualFrameBuffer(
         spriteBatchManager.submit(key, instance)
     }
 
-    @Deprecated("to be removed")
-    override fun drawPrimitive(block: (FrameBuffer) -> Unit) {
-        // FIXME: TODO
-    }
-
     override fun drawRect(
         x: Pixel,
         y: Pixel,

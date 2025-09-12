@@ -2,7 +2,6 @@ package com.github.minigdx.tiny.render
 
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
-import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.resources.SpriteSheet
 
@@ -37,12 +36,6 @@ interface VirtualFrameBuffer {
         flipX: Boolean = false,
         flipY: Boolean = false,
     )
-
-    /**
-     * Draw a primitive (circle, line, ...) into the [FrameBuffer]
-     */
-    @Deprecated("to be removed")
-    fun drawPrimitive(block: (FrameBuffer) -> Unit)
 
     /**
      * Draw the virtual frame buffer on the screen.
