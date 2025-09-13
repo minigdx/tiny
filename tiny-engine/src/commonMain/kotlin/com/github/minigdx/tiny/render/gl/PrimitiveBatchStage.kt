@@ -214,6 +214,16 @@ class PrimitiveBatchStage(
                 // Position of the end of the line in pixel
                 vec2 p1 = endLine;
         
+                // The frag is outsine the line on the horizontal side
+                if (int(fragCoord.x) < int(startLine.x) || int(fragCoord.x) > int(endLine.x)) {
+                    return 2.0;
+                }
+                
+                // The frag is outside the line on the vertical side
+                if(int(fragCoord.y) > (max(startLine.y, endLine.y)) || int(fragCoord.y) < (min(startLine.y, endLine.y))) {
+                    return 2.0;
+                }           
+                
                 // Check for vertical or horizontal line
                 if ((int(p.x) == int(p0.x) && int(p0.x) == int(p1.x)) || 
                      (int(p.y) == int(p0.y) && int(p0.y) == int(p1.y))
