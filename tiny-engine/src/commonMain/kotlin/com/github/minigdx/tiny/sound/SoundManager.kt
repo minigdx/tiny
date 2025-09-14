@@ -8,40 +8,48 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 
 interface VirtualSoundBoard {
-    fun prepare(
-        buffer: FloatArray,
-        numberOfSamples: Long,
-    ): SoundHandler
-
+    /**
+     * Create a sound handler from a [MusicalBar]
+     */
     fun prepare(bar: MusicalBar): SoundHandler
 
+    /**
+     * Create a sound handler from a [MusicalBar]
+     */
     fun prepare(sequence: MusicalSequence): SoundHandler
 
+    /**
+     * Create a sound handler from a [MusicalSequence.Track]
+     */
     fun prepare(track: MusicalSequence.Track): SoundHandler
+
+    /**
+     * Create a sound handler from a chunkGenerator.
+     *
+     * The lambda will be called each time a new chunk needs to be generated/played.
+     */
+    fun prepare(chunkGenerator: Sequence<FloatArray>): SoundHandler
 }
 
 class DefaultSoundBoard(private val soundManager: SoundManager) : VirtualSoundBoard {
-    override fun prepare(
-        buffer: FloatArray,
-        numberOfSamples: Long,
-    ): SoundHandler {
-        return soundManager.createSoundHandler(buffer, numberOfSamples)
-    }
-
     override fun prepare(bar: MusicalBar): SoundHandler {
         val buffer = soundManager.convert(bar)
-        return soundManager.createSoundHandler(buffer, buffer.size.toLong())
+        return soundManager.createSoundHandler(buffer)
     }
 
     override fun prepare(sequence: MusicalSequence): SoundHandler {
         val buffer = soundManager.convert(sequence)
-        return soundManager.createSoundHandler(buffer, buffer.size.toLong())
+        return soundManager.createSoundHandler(buffer)
     }
 
     override fun prepare(track: MusicalSequence.Track): SoundHandler {
         val sequence = MusicalSequence(tracks = arrayOf(track), index = 0)
         val buffer = soundManager.convert(sequence)
-        return soundManager.createSoundHandler(buffer, buffer.size.toLong())
+        return soundManager.createSoundHandler(buffer)
+    }
+
+    override fun prepare(chunkGenerator: Sequence<FloatArray>): SoundHandler {
+        return soundManager.createSoundHandler(chunkGenerator)
     }
 }
 
@@ -53,10 +61,9 @@ abstract class SoundManager {
     /**
      * @param buffer byte array representing the sound. Each sample is represented with a float from -1.0f to 1.0f
      */
-    abstract fun createSoundHandler(
-        buffer: FloatArray,
-        numberOfSamples: Long,
-    ): SoundHandler
+    abstract fun createSoundHandler(buffer: FloatArray): SoundHandler
+
+    abstract fun createSoundHandler(buffer: Sequence<FloatArray>): SoundHandler
 
     /**
      * Convert the MusicBar into a playable sound.

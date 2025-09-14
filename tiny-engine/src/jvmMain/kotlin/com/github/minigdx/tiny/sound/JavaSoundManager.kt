@@ -24,14 +24,15 @@ class JavaSoundManager : SoundManager() {
         soundPort.start()
     }
 
-    override fun createSoundHandler(
-        buffer: FloatArray,
-        numberOfSamples: Long,
-    ): SoundHandler {
+    override fun createSoundHandler(buffer: FloatArray): SoundHandler {
         return JavaSoundHandler(
             data = buffer,
             mixerGateway = mixer,
         )
+    }
+
+    override fun createSoundHandler(buffer: Sequence<FloatArray>): SoundHandler {
+        return JavaSoundHandler(SequencedChunkGenerator(buffer), mixerGateway = mixer)
     }
 
     override fun destroy() {

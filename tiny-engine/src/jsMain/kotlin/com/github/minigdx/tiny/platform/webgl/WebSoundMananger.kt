@@ -31,20 +31,20 @@ class WebSoundMananger : SoundManager() {
         }
     }
 
-    override fun createSoundHandler(
-        buffer: FloatArray,
-        numberOfSamples: Long,
-    ): SoundHandler {
-        val result = convertBuffer(buffer, numberOfSamples)
-        return WebSoundHandler(result, this)
+    override fun createSoundHandler(buffer: FloatArray): SoundHandler {
+        val result = convertBuffer(buffer)
+        // return WebSoundHandler(result, this)
+        TODO()
     }
 
-    private fun convertBuffer(
-        buffer: FloatArray,
-        length: Long,
-    ): Float32Array {
-        val result = Float32Array(length.toInt())
-        (0 until length.toInt()).forEach { index ->
+    override fun createSoundHandler(buffer: Sequence<FloatArray>): SoundHandler {
+        TODO("Not yet implemented")
+    }
+
+    private fun convertBuffer(buffer: FloatArray): Float32Array {
+        val length = buffer.size
+        val result = Float32Array(length)
+        (0 until length).forEach { index ->
             val byte = buffer[index]
             result[index] = byte
         }

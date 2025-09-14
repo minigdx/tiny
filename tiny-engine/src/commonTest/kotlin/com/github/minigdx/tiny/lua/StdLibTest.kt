@@ -9,10 +9,8 @@ import com.github.minigdx.tiny.graphic.PixelFormat
 import com.github.minigdx.tiny.render.VirtualFrameBuffer
 import com.github.minigdx.tiny.resources.ResourceType
 import com.github.minigdx.tiny.resources.SpriteSheet
-import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.every
-import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import org.luaj.vm2.LuaValue.Companion.valueOf
 import org.luaj.vm2.LuaValue.Companion.varargsOf
@@ -35,7 +33,6 @@ class StdLibTest {
         )
 
     private val virtualFrameBuffer = mock<VirtualFrameBuffer> {
-        every { drawPrimitive(any()) } calls { (block: (FrameBuffer) -> Unit) -> block(frameBuffer) }
     }
 
     private val gameResourceAccess = mock<GameResourceAccess> {

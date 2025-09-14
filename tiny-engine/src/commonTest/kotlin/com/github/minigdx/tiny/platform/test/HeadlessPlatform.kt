@@ -20,6 +20,7 @@ import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.render.RenderFrame
 import com.github.minigdx.tiny.sound.SoundHandler
 import com.github.minigdx.tiny.sound.SoundManager
+import com.github.minigdx.tiny.util.FloatData
 import com.github.minigdx.tiny.util.MutableFixedSizeList
 import dev.mokkery.mock
 import kotlinx.coroutines.CoroutineDispatcher
@@ -96,10 +97,7 @@ class HeadlessPlatform(
         return object : SoundManager() {
             override fun initSoundManager(inputHandler: InputHandler) = Unit
 
-            override fun createSoundHandler(
-                buffer: FloatArray,
-                numberOfSamples: Long,
-            ): SoundHandler =
+            override fun createSoundHandler(buffer: FloatArray): SoundHandler =
                 object : SoundHandler {
                     override fun play() {
                         TODO("Not yet implemented")
@@ -112,7 +110,15 @@ class HeadlessPlatform(
                     override fun stop() {
                         TODO("Not yet implemented")
                     }
+
+                    override fun nextChunk(samples: Int): FloatData {
+                        TODO("Not yet implemented")
+                    }
                 }
+
+            override fun createSoundHandler(buffer: Sequence<FloatArray>): SoundHandler {
+                TODO("Not yet implemented")
+            }
         }
     }
 
