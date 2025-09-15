@@ -29,6 +29,8 @@ interface VirtualSoundBoard {
      * The lambda will be called each time a new chunk needs to be generated/played.
      */
     fun prepare(chunkGenerator: Sequence<FloatArray>): SoundHandler
+
+    fun convert(bar: MusicalBar): FloatArray
 }
 
 class DefaultSoundBoard(private val soundManager: SoundManager) : VirtualSoundBoard {
@@ -50,6 +52,11 @@ class DefaultSoundBoard(private val soundManager: SoundManager) : VirtualSoundBo
 
     override fun prepare(chunkGenerator: Sequence<FloatArray>): SoundHandler {
         return soundManager.createSoundHandler(chunkGenerator)
+    }
+
+    override fun convert(bar: MusicalBar): FloatArray {
+        val buffer = soundManager.convert(bar)
+        return buffer
     }
 }
 

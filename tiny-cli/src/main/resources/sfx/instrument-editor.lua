@@ -82,9 +82,18 @@ function _init_vibrato(entities)
 end
 
 function _init_keyboard(entities)
+    local handler
     local playNote = function(_, value)
-        if value then
-            state.instrument.play(value)
+        if value and handler == nil then
+            -- initialise the handler
+            handler = state.instrument.stream(value)
+        elseif value and handler ~= nil then
+            -- update the handler
+            handler.play(value)
+        elseif not value then
+            -- stop the handler
+            handler.stop()
+            handler = nil
         end
     end
 
