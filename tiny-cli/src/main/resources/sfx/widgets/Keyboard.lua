@@ -11,7 +11,7 @@ local function inside_widget(w, x, y, offset)
 end
 
 local Keyboard = {
-
+    value = nil,
 }
 
 Keyboard._update = function(self)
@@ -34,22 +34,24 @@ Keyboard._update = function(self)
         [10] = "B4"
     }
     local pos = ctrl.touch()
-    if (ctrl.touched(0) and inside_widget(self, pos.x, pos.y)) then
+    local value
+    if (ctrl.touching(0) and inside_widget(self, pos.x, pos.y)) then
         local relative_x = pos.x - self.x
         local relative_y = pos.y - self.y
 
         local color = spr.pget(relative_x + spr_x, relative_y + spr_y)
-        local value = color_to_note[color]
-        if value then
-            self.value = value
-            if(self.on_change) then
-                self:on_change()
-            end
-        else
-            self.value = nil
-        end
+        value = color_to_note[color]
+
     else
-        self.value = nil
+        value = nil
+    end
+
+    -- There is a value change.
+    if self.value ~= value then
+        self.value = value
+        if (self.on_change) then
+            self:on_change()
+        end
     end
 end
 

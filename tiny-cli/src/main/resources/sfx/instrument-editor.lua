@@ -83,7 +83,9 @@ end
 
 function _init_keyboard(entities)
     local playNote = function(_, value)
-        state.instrument.play(value)
+        if value then
+            state.instrument.play(value)
+        end
     end
 
     for k in all(entities["Keyboard"]) do
