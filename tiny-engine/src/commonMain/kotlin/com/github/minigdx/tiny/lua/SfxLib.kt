@@ -69,13 +69,13 @@ class SfxLib(
     // When validating the script, don't play sound
     private val playSound: Boolean = true,
 ) : TwoArgFunction() {
-
     companion object {
         private const val STREAM_TEMPO = 200
         private const val STREAM_VOLUME = 0.8f
         private const val NOTE_DURATION = 1f
         private const val NOTE_BEAT = 0f
     }
+
     override fun call(
         arg1: LuaValue,
         arg2: LuaValue,
@@ -355,7 +355,7 @@ class SfxLib(
 
             // Check cache first
             return instrumentWrapperCache[index]
-            // Check music
+                // Check music
                 ?: music.instruments.getOrNull(index)?.toLua()?.also {
                     instrumentWrapperCache[index] = it
                 }
@@ -365,7 +365,7 @@ class SfxLib(
 
         @TinyCall(
             "Access instrument using its index or its name. " +
-                    "Create it if the instrument is missing and the flag is true.",
+                "Create it if the instrument is missing and the flag is true.",
         )
         override fun call(
             a: LuaValue,
@@ -384,35 +384,45 @@ class SfxLib(
             }
         }
 
-        private fun createInfiniteNoteSequence(instrument: Instrument, noteProvider: () -> Note): Sequence<FloatArray> {
+        private fun createInfiniteNoteSequence(
+            instrument: Instrument,
+            noteProvider: () -> Note,
+        ): Sequence<FloatArray> {
             return sequence {
                 while (true) {
-                    val musicalBar = createSingleNoteBar(instrument, noteProvider())
+                    val note = noteProvider()
+                    val musicalBar = createSingleNoteBar(instrument, note)
                     val audioData = soundBoard.convert(musicalBar)
+                    println("SEQUENCE $note")
                     yield(audioData)
                 }
             }
         }
 
-        private fun createSingleNoteBar(instrument: Instrument, note: Note): MusicalBar {
+        private fun createSingleNoteBar(
+            instrument: Instrument,
+            note: Note,
+        ): MusicalBar {
             return MusicalBar(1, instrument, tempo = STREAM_TEMPO).apply {
-                setNotes(listOf(
-                    MusicalNote(
-                        note = note,
-                        beat = NOTE_BEAT,
-                        duration = NOTE_DURATION,
-                        volume = STREAM_VOLUME,
-                    )
-                ))
+                setNotes(
+                    listOf(
+                        MusicalNote(
+                            note = note,
+                            beat = NOTE_BEAT,
+                            duration = NOTE_DURATION,
+                            volume = STREAM_VOLUME,
+                        ),
+                    ),
+                )
             }
         }
 
         private fun createStreamController(
             handler: SoundHandler,
-            noteUpdater: (String) -> Unit
+            noteUpdater: (String) -> Unit,
         ): LuaValue {
             return WrapperLuaTable().apply {
-                function1("play") { noteStr ->
+                function1("update") { noteStr ->
                     noteUpdater(noteStr.tojstring())
                     NONE
                 }
@@ -563,6 +573,22 @@ class SfxLib(
                 }
             }
 
+            val notesOn = mutableSetOf<Note>()
+            val notesOff = mutableSetOf<Note>()
+
+            obj.function1("noteOn") { noteName ->
+                val note = Note.fromName(noteName.tojstring())
+                notesOn.add(note)
+                NONE
+            }
+
+            obj.function1("noteOff") { noteName ->
+                val note = Note.fromName(noteName.tojstring())
+                notesOn.remove(note)
+                notesOff.add(note)
+                NONE
+            }
+
             obj.wrap("harmonics") {
                 WrapperLuaTable().apply {
                     (0 until this@toLua.harmonics.size).forEach { index ->
@@ -687,7 +713,7 @@ class SfxLib(
 
     @TinyFunction(
         "Play the bar by it's index of the current sound. " +
-                "The index of a bar of the current music.",
+            "The index of a bar of the current music.",
     )
     inner class play : OneArgFunction() {
         @TinyCall("Play the sound at the index 0.")
@@ -728,7 +754,7 @@ class SfxLib(
 
     @TinyFunction(
         "Loop the bar by it's index of the current sound. " +
-                "The index of a bar of the current music.",
+            "The index of a bar of the current music.",
     )
     inner class loop : OneArgFunction() {
         @TinyCall("Loop the sound at the index 0.")
@@ -769,7 +795,7 @@ class SfxLib(
 
     @TinyFunction(
         "Stop the bar by it's index of the current sound. " +
-                "The index of a bar of the current music.",
+            "The index of a bar of the current music.",
     )
     inner class stop : OneArgFunction() {
         @TinyCall("Stop the sound at the index 0.")
@@ -795,7 +821,7 @@ class SfxLib(
 
     @TinyFunction(
         "Play the sequence by it's index of the current sound. " +
-                "The index of a sequence of the current music.",
+            "The index of a sequence of the current music.",
     )
     inner class mplay : OneArgFunction() {
         @TinyCall("Play the sequence at the index 0.")
@@ -836,7 +862,7 @@ class SfxLib(
 
     @TinyFunction(
         "Loop the sequence by it's index of the current sound. " +
-                "The index of a sequence of the current music.",
+            "The index of a sequence of the current music.",
     )
     inner class mloop : OneArgFunction() {
         @TinyCall("Loop the sequence at the index 0.")
@@ -877,7 +903,7 @@ class SfxLib(
 
     @TinyFunction(
         "Stop the sequence by it's index of the current sound. " +
-                "The index of a sequence of the current music.",
+            "The index of a sequence of the current music.",
     )
     inner class mstop : OneArgFunction() {
         @TinyCall("Stop the sequence at the index 0.")

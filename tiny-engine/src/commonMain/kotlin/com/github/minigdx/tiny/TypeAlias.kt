@@ -28,3 +28,6 @@ typealias Beats = Float
 
 // Beats Per Minute
 typealias BPM = Int
+
+// Sample index (ie: position in a sound by the index of the sample)
+typealias Sample = Int

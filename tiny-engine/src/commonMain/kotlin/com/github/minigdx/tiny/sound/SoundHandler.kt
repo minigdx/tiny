@@ -55,14 +55,16 @@ class SequencedChunkGenerator(data: Sequence<FloatArray>) : ChunkGenerator {
     private val chunk = FloatData(SAMPLE_RATE * 4)
 
     override fun generateChunk(samples: Int): FloatData {
-        if (position >= currentChunk.size) {
-            if (iterator.hasNext()) {
-                currentChunk = iterator.next()
-            } else {
-                currentChunk = floatArrayOf()
-            }
+        if (iterator.hasNext()) {
+            currentChunk = iterator.next()
             position = 0
+        } else {
+            if (position >= currentChunk.size) {
+                currentChunk = floatArrayOf()
+                position = 0
+            }
         }
+
         chunk.copyFrom(currentChunk, position, position + samples)
 
         position += samples
