@@ -1,6 +1,7 @@
 package com.github.minigdx.tiny.platform.webgl
 
 import com.github.minigdx.tiny.input.InputHandler
+import com.github.minigdx.tiny.sound.ChunkGenerator
 import com.github.minigdx.tiny.sound.SoundHandler
 import com.github.minigdx.tiny.sound.SoundManager
 import org.khronos.webgl.Float32Array
@@ -38,6 +39,10 @@ class WebSoundMananger : SoundManager() {
     }
 
     override fun createSoundHandler(buffer: Sequence<FloatArray>): SoundHandler {
+        TODO("Not yet implemented")
+    }
+
+    override fun createSoundHandler(chunkGenerator: ChunkGenerator): SoundHandler {
         TODO("Not yet implemented")
     }
 

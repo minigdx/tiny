@@ -10,7 +10,8 @@ class InstrumentPlayer(private val instrument: Instrument) {
         // note managed
         var note: Note = Note.C0,
         // progress of the note playing
-        var progress: Sample = 0,
+        var noteOnProgress: Sample = 0,
+        var noteOffProgress: Sample = 0,
     ) {
         override fun equals(other: Any?): Boolean {
             return (other as? NoteProgress)?.note == note
@@ -18,6 +19,10 @@ class InstrumentPlayer(private val instrument: Instrument) {
 
         override fun hashCode(): Int {
             return note.hashCode()
+        }
+
+        fun isCompleted(release: Sample): Boolean {
+            return noteOffProgress > release
         }
     }
 
@@ -41,7 +46,8 @@ class InstrumentPlayer(private val instrument: Instrument) {
         }
 
         override fun destroyInstance(obj: NoteProgress) {
-            obj.progress = 0
+            obj.noteOnProgress = 0
+            obj.noteOffProgress = 0
         }
     }
 
@@ -52,10 +58,10 @@ class InstrumentPlayer(private val instrument: Instrument) {
     }
 
     fun noteOff(note: Note) {
-        val progress = noteProgressPool.obtain()
-        progress.note = note
-        notesOn.remove(progress)
-        notesOff.add(progress)
+        val currentProgress = notesOn.find { it.note == note } ?: return
+
+        notesOn.remove(currentProgress)
+        notesOff.add(currentProgress)
     }
 
     fun isNoteOn(note: Note): Boolean {
@@ -75,30 +81,43 @@ class InstrumentPlayer(private val instrument: Instrument) {
         notesOn.forEach { noteProgress ->
             var sample = harmonizer.generate(
                 noteProgress.note,
-                noteProgress.progress,
+                noteProgress.noteOnProgress,
                 { frequency, progress -> oscillator.emit(frequency, progress) },
             )
-            sample *= envelop.noteOn(noteProgress.progress)
+            sample *= envelop.noteOn(noteProgress.noteOnProgress)
             result += sample
-            noteProgress.progress++
+            noteProgress.noteOnProgress++
         }
 
         notesOff.forEach { noteProgress ->
             var sample = harmonizer.generate(
                 noteProgress.note,
-                noteProgress.progress,
+                noteProgress.noteOnProgress,
                 { frequency, progress -> oscillator.emit(frequency, progress) },
             )
-            sample *= envelop.noteOff(noteProgress.progress)
+            val env = if (noteProgress.noteOnProgress < envelop.attack + envelop.decay) {
+                envelop.noteOn(noteProgress.noteOnProgress).also {
+                    noteProgress.noteOnProgress++
+                }
+            } else {
+                envelop.noteOff(noteProgress.noteOffProgress).also {
+                    noteProgress.noteOffProgress++
+                }
+            }
+            sample *= env
             result += sample
-            noteProgress.progress++
         }
+
+        val toBeRemoved = notesOff.filter { noteProgress -> noteProgress.isCompleted(envelop.release) }
+
+        notesOff.removeAll(toBeRemoved.toSet())
+        noteProgressPool.free(toBeRemoved)
 
         return result
     }
 
     fun close() {
-        notesOn.forEach { it.progress = 0 }
+        notesOn.forEach { it.noteOnProgress = 0 }
         notesOff.addAll(notesOn)
         notesOn.clear()
     }

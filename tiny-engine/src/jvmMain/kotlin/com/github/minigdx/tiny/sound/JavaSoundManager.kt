@@ -35,6 +35,10 @@ class JavaSoundManager : SoundManager() {
         return JavaSoundHandler(SequencedChunkGenerator(buffer), mixerGateway = mixer)
     }
 
+    override fun createSoundHandler(chunkGenerator: ChunkGenerator): SoundHandler {
+        return JavaSoundHandler(chunkGenerator, mixerGateway = mixer)
+    }
+
     override fun destroy() {
         soundPort.alive = false
         mixer.add(JavaSoundHandler(FloatArray(0), mixer)) // unlock the sound port

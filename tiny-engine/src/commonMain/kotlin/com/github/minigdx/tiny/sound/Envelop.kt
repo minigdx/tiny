@@ -4,10 +4,10 @@ import com.github.minigdx.tiny.Percent
 import com.github.minigdx.tiny.Sample
 
 class Envelop(
-    private val attack: Sample,
-    private val decay: Sample,
-    private val sustain: Percent,
-    private val release: Sample,
+    internal val attack: Sample,
+    internal val decay: Sample,
+    internal val sustain: Percent,
+    internal val release: Sample,
 ) {
     /**
      * Return the multiplier to apply to a sample value regarding the progression of the sound.
@@ -48,8 +48,7 @@ class Envelop(
      */
     fun noteOff(progress: Sample): Percent {
         return when {
-            progress <= attack + decay -> noteOn(progress)
-            progress <= attack + decay + release -> {
+            progress <= release -> {
                 // Release phase: sustain to 0.0 over release samples
                 if (release == 0) {
                     0.0f

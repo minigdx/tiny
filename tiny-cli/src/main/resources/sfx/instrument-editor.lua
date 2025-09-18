@@ -82,20 +82,23 @@ function _init_vibrato(entities)
 end
 
 function _init_keyboard(entities)
-    local handler
+    local currentNote
     local playNote = function(_, value)
-        if value and handler == nil then
-            -- initialise the handler
-            handler = state.instrument.stream(value)
-        elseif value and handler ~= nil then
-            -- update the handler
-            handler.play(value)
+        if value and currentNote == nil then
+            state.instrument.noteOn(value)
+            currentNote = value
+        elseif value and currentNote ~= nil then
+            state.instrument.noteOn(value)
+            state.instrument.noteOff(currentNote)
+            currentNote = value
         elseif not value then
-            -- stop the handler
-            handler.stop()
-            handler = nil
+            state.instrument.noteOff(currentNote)
+            currentNote = nil
         end
     end
+
+    -- pas bon -> si je change d'instrument, je dois close instrument courant et stream nouvel instrument
+    state.instrument.stream()
 
     for k in all(entities["Keyboard"]) do
         local label = widgets:create_keyboard(k)

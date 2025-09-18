@@ -16,12 +16,7 @@ interface VirtualSoundBoard {
      */
     fun prepare(track: MusicalSequence.Track): SoundHandler
 
-    /**
-     * Create a sound handler from a chunkGenerator.
-     *
-     * The lambda will be called each time a new chunk needs to be generated/played.
-     */
-    fun prepare(chunkGenerator: Sequence<FloatArray>): SoundHandler
+    fun prepare(chunkGenerator: ChunkGenerator): SoundHandler
 
     fun convert(bar: MusicalBar): FloatArray
 }

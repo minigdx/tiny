@@ -6,10 +6,12 @@ import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.sound.Instrument
+import com.github.minigdx.tiny.sound.InstrumentPlayer
 import com.github.minigdx.tiny.sound.Music
 import com.github.minigdx.tiny.sound.MusicalBar
 import com.github.minigdx.tiny.sound.MusicalNote
 import com.github.minigdx.tiny.sound.MusicalSequence
+import com.github.minigdx.tiny.sound.RealTimeChunkGenerator
 import com.github.minigdx.tiny.sound.SoundHandler
 import com.github.minigdx.tiny.sound.Sweep
 import com.github.minigdx.tiny.sound.Vibrato
@@ -559,33 +561,43 @@ class SfxLib(
                 NONE
             }
 
-            obj.function1("stream") { initialNoteName ->
-                // Create a continuous audio stream that can change notes dynamically
-                var currentStreamingNote = Note.fromName(initialNoteName.tojstring())
+            val instrumentPlayer = InstrumentPlayer(this)
 
-                // Generate infinite sequence of audio chunks using current note
-                val audioStream = createInfiniteNoteSequence(this) { currentStreamingNote }
-                val streamHandler = soundBoard.prepare(audioStream).also { it.play() }
+            obj.function0("stream") {
+                val handler = soundBoard.prepare(
+                    RealTimeChunkGenerator { _, samples ->
+                        val result = FloatArray(samples)
+                        for (i in 0 until samples) {
+                            result[i] = instrumentPlayer.generate()
+                        }
+                        result
+                    },
+                )
 
-                // Return controller to update note and stop stream
-                return@function1 createStreamController(streamHandler) { newNoteName ->
-                    currentStreamingNote = Note.fromName(newNoteName)
+                handler.play()
+
+                WrapperLuaTable().apply {
+                    function0("stop") {
+                        handler.stop()
+                        NONE
+                    }
                 }
             }
 
-            val notesOn = mutableSetOf<Note>()
-            val notesOff = mutableSetOf<Note>()
-
             obj.function1("noteOn") { noteName ->
                 val note = Note.fromName(noteName.tojstring())
-                notesOn.add(note)
+                instrumentPlayer.noteOn(note)
                 NONE
             }
 
             obj.function1("noteOff") { noteName ->
                 val note = Note.fromName(noteName.tojstring())
-                notesOn.remove(note)
-                notesOff.add(note)
+                instrumentPlayer.noteOff(note)
+                NONE
+            }
+
+            obj.function0("close") {
+                instrumentPlayer.close()
                 NONE
             }
 
