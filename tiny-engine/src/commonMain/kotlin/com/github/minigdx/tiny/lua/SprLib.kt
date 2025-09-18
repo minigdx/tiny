@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.lua
 
+import com.github.mingdx.tiny.doc.LuaType
 import com.github.mingdx.tiny.doc.TinyArg
 import com.github.mingdx.tiny.doc.TinyArgs
 import com.github.mingdx.tiny.doc.TinyCall
@@ -48,8 +49,8 @@ class SprLib(
     private inner class pget : TwoArgFunction() {
         @TinyCall("get the color index at the coordinate (x,y) from the current spritesheet.")
         override fun call(
-            @TinyArg("x") arg1: LuaValue,
-            @TinyArg("y") arg2: LuaValue,
+            @TinyArg("x", type = LuaType.NUMBER) arg1: LuaValue,
+            @TinyArg("y", type = LuaType.NUMBER) arg2: LuaValue,
         ): LuaValue {
             val pixelArray = resourceAccess.findSpritesheet(currentSpritesheet)?.pixels ?: return NIL
 

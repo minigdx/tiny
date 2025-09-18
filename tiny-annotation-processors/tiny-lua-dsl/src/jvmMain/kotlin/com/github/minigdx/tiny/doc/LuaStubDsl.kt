@@ -122,6 +122,7 @@ class LuaStubFunction {
 @LuaStubDslMarker
 class LuaStubCall {
     var description: String = ""
+    var returnType: String = "any"
     var args: List<LuaStubArg> = emptyList()
 
     fun arg(block: LuaStubArg.() -> Unit) {
@@ -134,7 +135,7 @@ class LuaStubCall {
         return buildString {
             // ---@overload fun([param: type[, param: type...]]): [return_value[,return_value]] -- description
             val args = args.joinToString(", ") { it.generate() }
-            append(comment("@overload fun($args): any -- $description"))
+            append(comment("@overload fun($args): $returnType -- $description"))
         }
     }
 }

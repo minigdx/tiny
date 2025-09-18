@@ -41,6 +41,16 @@ annotation class TinyFunction(
     val levelPath: String = "",
 )
 
+enum class LuaType(val type: String) {
+    ANY("any"),
+    NIL("nil"),
+    STRING("string"),
+    NUMBER("number"),
+    BOOLEAN("boolean"),
+    DOUBLE("double"),
+    FUNCTION("function"),
+}
+
 @Target(AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.SOURCE)
 @Repeatable
@@ -53,6 +63,10 @@ annotation class TinyArg(
      * Description of the argument.
      */
     val description: String = "",
+    /**
+     * Type of the argument
+     */
+    val type: LuaType = LuaType.ANY
 )
 
 @Target(AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.FUNCTION)
@@ -67,6 +81,10 @@ annotation class TinyArgs(
      * Documentations associated to arguments, in order.
      */
     val documentations: Array<String> = [],
+    /**
+     * Type associated to arguments, in order.
+     */
+    val types: Array<LuaType> = [],
 )
 
 @Target(AnnotationTarget.FUNCTION)

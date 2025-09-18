@@ -3,10 +3,12 @@ package com.github.minigdx.tiny.doc
 class TinyArgDescriptor(
     var name: String,
     var description: String = "",
+    var type: String = "any",
 )
 
 class TinyCallDescriptor(
     var description: String = "",
+    var returnType: String = "any",
     var args: List<TinyArgDescriptor> = emptyList(),
 )
 
