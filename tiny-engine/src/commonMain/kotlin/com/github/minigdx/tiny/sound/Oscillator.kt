@@ -17,7 +17,7 @@ import kotlin.random.Random
  *
  * @param waveType The type of waveform to generate (SINE, TRIANGLE, SQUARE, SAW_TOOTH, PULSE, NOISE)
  */
-class Oscillator(val waveType: Instrument.WaveType) {
+class Oscillator(val waveType0: () -> Instrument.WaveType) {
     // State for NOISE wave type - implements a low-pass filter
     private var lastOutput: Float = 0.0f
     private var lastFrequencyUsed: Float = 0.0f
@@ -39,7 +39,7 @@ class Oscillator(val waveType: Instrument.WaveType) {
     ): Float {
         // Convert sample index to time in seconds
         val time = progress.toFloat() / SAMPLE_RATE.toFloat()
-
+        val waveType = waveType0.invoke()
         return when (waveType) {
             Instrument.WaveType.SINE -> {
                 sin(TWO_PI * frequency * time)

@@ -17,7 +17,7 @@ import com.github.minigdx.tiny.lua.Note
  *                  harmonic (3x fundamental), etc. Values typically range from 0.0 to 1.0.
  */
 class Harmonizer(
-    val harmonics: FloatArray,
+    val harmonics0: () -> FloatArray,
 ) {
     /**
      * Generates a sample value by combining the fundamental frequency with its harmonics.
@@ -37,6 +37,7 @@ class Harmonizer(
     ): Frequency {
         val fundamentalFreq = note.frequency
 
+        val harmonics = harmonics0.invoke()
         var sampleValue = 0f
         harmonics.forEachIndexed { index, relativeAmplitude ->
             // Harmonic numbers start at 1 (fundamental is implied to be 1x)
