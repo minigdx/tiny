@@ -5,7 +5,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class HarmonizerTest {
-
     @Test
     fun generate_with_empty_harmonics_returns_zero() {
         val harmonizer = Harmonizer(floatArrayOf())

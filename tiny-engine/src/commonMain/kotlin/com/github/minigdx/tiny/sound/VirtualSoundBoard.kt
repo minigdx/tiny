@@ -1,7 +1,5 @@
 package com.github.minigdx.tiny.sound
 
-import com.github.minigdx.tiny.lua.Note
-
 interface VirtualSoundBoard {
     /**
      * Create a sound handler from a [MusicalBar]

@@ -19,7 +19,6 @@ import com.github.minigdx.tiny.lua.Note
 class Harmonizer(
     val harmonics: FloatArray,
 ) {
-
     /**
      * Generates a sample value by combining the fundamental frequency with its harmonics.
      * Each harmonic frequency is calculated as a multiple of the fundamental frequency,
@@ -31,7 +30,11 @@ class Harmonizer(
      *                  Takes (frequency, harmonicNumber) and returns the waveform sample value.
      * @return The combined sample value of the fundamental frequency and all its harmonics
      */
-    fun generate(note: Note, sample: Sample, generator: (Float, Sample) -> Float): Frequency {
+    fun generate(
+        note: Note,
+        sample: Sample,
+        generator: (Float, Sample) -> Float,
+    ): Frequency {
         val fundamentalFreq = note.frequency
 
         var sampleValue = 0f

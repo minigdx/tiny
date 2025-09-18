@@ -9,7 +9,6 @@ class Envelop(
     private val sustain: Percent,
     private val release: Sample,
 ) {
-
     /**
      * Return the multiplier to apply to a sample value regarding the progression of the sound.
      * The [noteOn] phase will apply the [attack] then the [decay] then the [sustain]

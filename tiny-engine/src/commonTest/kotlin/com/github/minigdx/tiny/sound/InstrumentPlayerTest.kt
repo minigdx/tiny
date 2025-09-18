@@ -6,7 +6,6 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class InstrumentPlayerTest {
-
     private val instrument = Instrument(index = 0, name = "Test Instrument")
 
     @Test

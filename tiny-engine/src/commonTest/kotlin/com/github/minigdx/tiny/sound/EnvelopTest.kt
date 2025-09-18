@@ -4,7 +4,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class EnvelopTest {
-
     @Test
     fun noteOn_attack_phase_increases_linearly() {
         val envelope = Envelop(attack = 100, decay = 50, sustain = 0.7f, release = 200)
