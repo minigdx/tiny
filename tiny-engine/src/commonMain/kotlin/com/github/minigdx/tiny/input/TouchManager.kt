@@ -140,7 +140,7 @@ class TouchManager(lastKeyCode: KeyCode) {
     }
 
     fun isTouched(touchSignal: TouchSignal): Vector2? {
-        return touch[touchSignal.ordinal]
+        return isJustTouched(touchSignal) ?: touch[touchSignal.ordinal]
     }
 
     fun isJustTouched(touchSignal: TouchSignal): Vector2? {

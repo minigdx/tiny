@@ -103,13 +103,12 @@ class LwjglInput(private val projector: MouseProject) : InputHandler, InputManag
                     action: Int,
                     mods: Int,
                 ) {
-                    val touchSignal =
-                        when (button) {
-                            GLFW_MOUSE_BUTTON_1 -> TouchSignal.TOUCH1
-                            GLFW_MOUSE_BUTTON_2 -> TouchSignal.TOUCH2
-                            GLFW_MOUSE_BUTTON_3 -> TouchSignal.TOUCH3
-                            else -> return
-                        }
+                    val touchSignal = when (button) {
+                        GLFW_MOUSE_BUTTON_1 -> TouchSignal.TOUCH1
+                        GLFW_MOUSE_BUTTON_2 -> TouchSignal.TOUCH2
+                        GLFW_MOUSE_BUTTON_3 -> TouchSignal.TOUCH3
+                        else -> return
+                    }
                     glfwGetCursorPos(window, b1, b2)
                     val gamePosition = projector.project(b1[0].toFloat(), b2[0].toFloat())
 

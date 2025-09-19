@@ -49,6 +49,7 @@ enum class LuaType(val type: String) {
     BOOLEAN("boolean"),
     DOUBLE("double"),
     FUNCTION("function"),
+    TABLE("table"),
 }
 
 @Target(AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.FUNCTION)
@@ -94,6 +95,8 @@ annotation class TinyCall(
      * Description of the call when called with those arguments.
      */
     val description: String = "",
+
+    val returnType: LuaType = LuaType.ANY
 )
 
 @Target(AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.FUNCTION)

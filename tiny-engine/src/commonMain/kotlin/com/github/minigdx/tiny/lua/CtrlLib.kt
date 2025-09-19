@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.lua
 
+import com.github.mingdx.tiny.doc.LuaType
 import com.github.mingdx.tiny.doc.TinyArg
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
@@ -41,10 +42,10 @@ class CtrlLib(
 
     @TinyFunction(
         "Get coordinates of the current touch/mouse. " +
-            "If the mouse/touch is out-of the screen, " +
-            "the coordinates will be the last mouse position/touch. " +
-            "The function return those coordinates as a table {x, y}. " +
-            "A sprite can be draw directly on the mouse position by passing the sprite number. ",
+                "If the mouse/touch is out-of the screen, " +
+                "the coordinates will be the last mouse position/touch. " +
+                "The function return those coordinates as a table {x, y}. " +
+                "A sprite can be draw directly on the mouse position by passing the sprite number. ",
         example = CTRL_TOUCH_EXAMPLE,
     )
     inner class touch : OneArgFunction() {
@@ -77,7 +78,7 @@ class CtrlLib(
 
     @TinyFunction(
         "Return true if the key was pressed during the last frame. " +
-            "If you need to check that the key is still pressed, see `ctrl.pressing` instead.",
+                "If you need to check that the key is still pressed, see `ctrl.pressing` instead.",
         example = CTRL_PRESSING_EXAMPLE,
     )
     inner class pressed : OneArgFunction() {
@@ -116,13 +117,13 @@ class CtrlLib(
 
     @TinyFunction(
         "Return the position of the touch (as `{x, y}`)" +
-            "if the screen was touched or the mouse button was pressed during the last frame. " +
-            "`nil` otherwise.\n" +
-            "The touch can be : \n\n" +
-            "- 0: left click or one finger\n" +
-            "- 1: right click or two fingers\n" +
-            "- 2: middle click or three fingers\n\n" +
-            "If you need to check that the touch/mouse button is still active, see `ctrl.touching` instead.",
+                "if the screen was touched or the mouse button was pressed during the last frame. " +
+                "`nil` otherwise.\n" +
+                "The touch can be : \n\n" +
+                "- 0: left click or one finger\n" +
+                "- 1: right click or two fingers\n" +
+                "- 2: middle click or three fingers\n\n" +
+                "If you need to check that the touch/mouse button is still active, see `ctrl.touching` instead.",
         example = CTRL_TOUCHED_EXAMPLE,
     )
     inner class touched : OneArgFunction() {
@@ -151,33 +152,32 @@ class CtrlLib(
 
     @TinyFunction(
         "Return the position of the touch (as `{x, y}`)" +
-            "if the screen is still touched or the mouse button is still pressed. " +
-            "`nil` otherwise.\n" +
-            "The touch can be : \n\n" +
-            "- 0: left click or one finger\n" +
-            "- 1: right click or two fingers\n" +
-            "- 2: middle click or three fingers\n\n",
+                "if the screen is still touched or the mouse button is still pressed. " +
+                "`nil` otherwise.\n" +
+                "The touch can be : \n\n" +
+                "- 0: left click or one finger\n" +
+                "- 1: right click or two fingers\n" +
+                "- 2: middle click or three fingers\n\n",
         example = CTRL_TOUCHING_EXAMPLE,
     )
     inner class touching : OneArgFunction() {
-        @TinyCall("Is the screen is still touched or mouse button is still pressed?")
+        @TinyCall("Is the screen is still touched or mouse button is still pressed?", returnType = LuaType.TABLE)
         override fun call(
-            @TinyArg("touch") arg: LuaValue,
+            @TinyArg("touch", type = LuaType.NUMBER) arg: LuaValue,
         ): LuaValue {
-            val values = TouchSignal.values()
+            val values = TouchSignal.entries.toTypedArray()
             val int = arg.checkint()
             if (int >= values.size || int < 0) return BFALSE
             // get the key by its ordinal.
-            val touchSignal = TouchSignal.values()[int]
+            val touchSignal = TouchSignal.entries[int]
             val touched = inputHandler.isTouched(touchSignal)
 
-            val coordinates =
-                touched?.let {
-                    val result = LuaTable()
-                    result["x"] = touched.x.toInt()
-                    result["y"] = touched.y.toInt()
-                    result
-                } ?: NIL
+            val coordinates = touched?.let {
+                val result = LuaTable()
+                result["x"] = touched.x.toInt()
+                result["y"] = touched.y.toInt()
+                result
+            } ?: NIL
 
             return coordinates
         }
