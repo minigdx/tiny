@@ -37,6 +37,17 @@ class SoundManagerTest {
         override fun createSoundHandler(chunkGenerator: ChunkGenerator): SoundHandler {
             TODO("Not yet implemented")
         }
+
+        override fun noteOn(
+            note: Note,
+            instrument: Instrument,
+        ) {
+            TODO("Not yet implemented")
+        }
+
+        override fun noteOff(note: Note) {
+            TODO("Not yet implemented")
+        }
     }
 
     /**

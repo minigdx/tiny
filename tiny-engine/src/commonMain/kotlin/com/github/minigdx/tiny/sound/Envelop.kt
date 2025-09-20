@@ -57,33 +57,10 @@ class Envelop(
         return when {
             progress <= release -> {
                 // Release phase: sustain to 0.0 over release samples
-                if (release == 0) {
+                if (release == 0 || progress < 0) {
                     0.0f
                 } else {
                     sustain * (1.0f - progress.toFloat() / release.toFloat())
-                }
-            }
-            else -> {
-                // After release: silence
-                0.0f
-            }
-        }
-    }
-
-    /**
-     * Return the multiplier for release phase starting from a specific amplitude level.
-     * Used when noteOff is called during attack or decay phases.
-     */
-    fun noteOff(progress: Sample, startLevel: Percent): Percent {
-        val release = release0.invoke()
-
-        return when {
-            progress <= release -> {
-                // Release phase: startLevel to 0.0 over release samples
-                if (release == 0) {
-                    0.0f
-                } else {
-                    startLevel * (1.0f - progress.toFloat() / release.toFloat())
                 }
             }
             else -> {

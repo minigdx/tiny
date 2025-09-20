@@ -2,6 +2,10 @@ package com.github.minigdx.tiny.sound
 
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.ConcurrentLinkedQueue
+import javax.sound.sampled.AudioFormat
+import javax.sound.sampled.AudioSystem
+import javax.sound.sampled.DataLine
+import javax.sound.sampled.SourceDataLine
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -17,11 +21,21 @@ class MixerGateway(var alive: Boolean = true, val queue: BlockingQueue<ByteArray
     /** Buffer for mixing audio samples from all active sounds */
     val mixBuffer = FloatArray(CHUNK_SIZE)
 
+    val format = AudioFormat(SAMPLE_RATE.toFloat(), BITS_PER_SAMPLE, CHANNELS, IS_SIGNED, IS_BIG_ENDIAN)
+    val info = DataLine.Info(SourceDataLine::class.java, format)
+
+    val line = (AudioSystem.getLine(info) as SourceDataLine).apply {
+        open(format)
+        start()
+    }
+
     /**
      * Main mixing loop that runs in a separate thread.
      * Continuously processes all active sounds and outputs mixed audio chunks.
      */
     override fun run() {
+        priority = Thread.MAX_PRIORITY
+
         while (alive) {
             // Clear the mix buffer for the next chunk
             mixBuffer.fill(0f)

@@ -67,7 +67,7 @@ annotation class TinyArg(
     /**
      * Type of the argument
      */
-    val type: LuaType = LuaType.ANY
+    val type: LuaType = LuaType.ANY,
 )
 
 @Target(AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.FUNCTION)
@@ -95,8 +95,7 @@ annotation class TinyCall(
      * Description of the call when called with those arguments.
      */
     val description: String = "",
-
-    val returnType: LuaType = LuaType.ANY
+    val returnType: LuaType = LuaType.ANY,
 )
 
 @Target(AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.FUNCTION)

@@ -50,7 +50,7 @@ class RealTimeChunkGenerator(private val generator: (progress: Sample, samples: 
     private var position: Sample = 0
 
     // Up to 4 seconds
-    private val chunk = FloatData(SAMPLE_RATE * 4)
+    private val chunk = FloatData(SAMPLE_RATE)
 
     override fun generateChunk(samples: Int): FloatData {
         val data = generator.invoke(position, samples).also {

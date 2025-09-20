@@ -84,8 +84,8 @@ class TinyToAsciidocKspProcessor(
                                 }
 
                                 val args = func.calls.flatMap { it.args }
-                                        .filter { it.description.isNotBlank() }
-                                        .sortedBy { it.name }
+                                    .filter { it.description.isNotBlank() }
+                                    .sortedBy { it.name }
 
                                 if (args.isNotEmpty()) {
                                     tableArgs(

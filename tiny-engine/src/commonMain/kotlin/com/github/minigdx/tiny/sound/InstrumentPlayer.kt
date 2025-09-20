@@ -3,10 +3,7 @@ package com.github.minigdx.tiny.sound
 import com.github.minigdx.tiny.Sample
 import com.github.minigdx.tiny.input.internal.ObjectPool
 import com.github.minigdx.tiny.lua.Note
-import com.github.minigdx.tiny.sound.SoundManager.Companion.MASTER_VOLUME
 import com.github.minigdx.tiny.sound.SoundManager.Companion.SAMPLE_RATE
-import kotlin.math.max
-import kotlin.math.min
 
 class InstrumentPlayer(private val instrument: Instrument) {
     class NoteProgress(
@@ -15,8 +12,6 @@ class InstrumentPlayer(private val instrument: Instrument) {
         // progress of the note playing
         var noteOnProgress: Sample = 0,
         var noteOffProgress: Sample = 0,
-        // level at the moment noteOff was called
-        var releaseStartLevel: Float = 0f,
     ) {
         override fun equals(other: Any?): Boolean {
             return (other as? NoteProgress)?.note == note
@@ -57,7 +52,6 @@ class InstrumentPlayer(private val instrument: Instrument) {
         override fun destroyInstance(obj: NoteProgress) {
             obj.noteOnProgress = 0
             obj.noteOffProgress = 0
-            obj.releaseStartLevel = 0f
         }
     }
 
@@ -68,10 +62,9 @@ class InstrumentPlayer(private val instrument: Instrument) {
     }
 
     fun noteOff(note: Note) {
-        val currentProgress = notesOn.find { it.note == note } ?: return
-
-        // Capture the current envelope level at the moment noteOff is called
-        currentProgress.releaseStartLevel = envelop.noteOn(currentProgress.noteOnProgress)
+        val currentProgress = notesOn.find { it.note == note } ?: noteProgressPool.obtain().apply {
+            this.note = note
+        }
 
         notesOn.remove(currentProgress)
         notesOff.add(currentProgress)
@@ -94,7 +87,7 @@ class InstrumentPlayer(private val instrument: Instrument) {
         notesOn.forEach { noteProgress ->
             var sample = harmonizer.generate(
                 noteProgress.note,
-                noteProgress.noteOnProgress,
+                noteProgress.noteOnProgress + noteProgress.noteOffProgress,
                 { frequency, progress -> oscillator.emit(frequency, progress) },
             )
             sample *= envelop.noteOn(noteProgress.noteOnProgress)
@@ -108,10 +101,13 @@ class InstrumentPlayer(private val instrument: Instrument) {
                 noteProgress.noteOnProgress + noteProgress.noteOffProgress,
                 { frequency, progress -> oscillator.emit(frequency, progress) },
             )
-            val env = envelop.noteOff(noteProgress.noteOffProgress, noteProgress.releaseStartLevel)
+            val env = if (noteProgress.noteOnProgress <= envelop.attack0() + envelop.decay0()) {
+                envelop.noteOn(noteProgress.noteOnProgress++)
+            } else {
+                envelop.noteOff(noteProgress.noteOffProgress++)
+            }
             sample *= env
             result += sample
-            noteProgress.noteOffProgress++
         }
 
         val release = envelop.release0()
@@ -120,9 +116,7 @@ class InstrumentPlayer(private val instrument: Instrument) {
         notesOff.removeAll(toBeRemoved.toSet())
         noteProgressPool.free(toBeRemoved)
 
-        result *= MASTER_VOLUME
         // Hard limiter
-        result = max(-MASTER_VOLUME, min(MASTER_VOLUME, result))
         return result
     }
 

@@ -359,6 +359,7 @@ class SfxLib(
             return instrumentWrapperCache[index]
                 // Check music
                 ?: music.instruments.getOrNull(index)?.toLua()?.also {
+                    // Cache the result of [toLua].
                     instrumentWrapperCache[index] = it
                 }
                 // Give up
@@ -386,57 +387,7 @@ class SfxLib(
             }
         }
 
-        private fun createInfiniteNoteSequence(
-            instrument: Instrument,
-            noteProvider: () -> Note,
-        ): Sequence<FloatArray> {
-            return sequence {
-                while (true) {
-                    val note = noteProvider()
-                    val musicalBar = createSingleNoteBar(instrument, note)
-                    val audioData = soundBoard.convert(musicalBar)
-                    println("SEQUENCE $note")
-                    yield(audioData)
-                }
-            }
-        }
-
-        private fun createSingleNoteBar(
-            instrument: Instrument,
-            note: Note,
-        ): MusicalBar {
-            return MusicalBar(1, instrument, tempo = STREAM_TEMPO).apply {
-                setNotes(
-                    listOf(
-                        MusicalNote(
-                            note = note,
-                            beat = NOTE_BEAT,
-                            duration = NOTE_DURATION,
-                            volume = STREAM_VOLUME,
-                        ),
-                    ),
-                )
-            }
-        }
-
-        private fun createStreamController(
-            handler: SoundHandler,
-            noteUpdater: (String) -> Unit,
-        ): LuaValue {
-            return WrapperLuaTable().apply {
-                function1("update") { noteStr ->
-                    noteUpdater(noteStr.tojstring())
-                    NONE
-                }
-                function0("stop") {
-                    handler.stop()
-                    NONE
-                }
-            }
-        }
-
         fun Instrument.toLua(): LuaValue {
-            // Create new wrapper and cache it
             val obj = WrapperLuaTable()
 
             obj.wrap(
@@ -586,13 +537,13 @@ class SfxLib(
 
             obj.function1("noteOn") { noteName ->
                 val note = Note.fromName(noteName.tojstring())
-                instrumentPlayer.noteOn(note)
+                soundBoard.noteOn(note, this)
                 NONE
             }
 
             obj.function1("noteOff") { noteName ->
                 val note = Note.fromName(noteName.tojstring())
-                instrumentPlayer.noteOff(note)
+                soundBoard.noteOff(note)
                 NONE
             }
 

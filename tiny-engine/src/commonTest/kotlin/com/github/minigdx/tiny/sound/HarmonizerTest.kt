@@ -7,7 +7,7 @@ import kotlin.test.assertEquals
 class HarmonizerTest {
     @Test
     fun generate_with_empty_harmonics_returns_zero() {
-        val harmonizer = Harmonizer(floatArrayOf())
+        val harmonizer = Harmonizer(harmonics0 = { floatArrayOf() })
         val generator = { freq: Float, sample: Int -> 1.0f }
 
         val result = harmonizer.generate(Note.A4, 0, generator)
@@ -16,7 +16,7 @@ class HarmonizerTest {
 
     @Test
     fun generate_with_single_harmonic_applies_amplitude() {
-        val harmonizer = Harmonizer(floatArrayOf(0.5f))
+        val harmonizer = Harmonizer(harmonics0 = { floatArrayOf(0.5f) })
         val generator = { freq: Float, sample: Int -> 2.0f }
 
         val result = harmonizer.generate(Note.A4, 0, generator)
@@ -26,7 +26,7 @@ class HarmonizerTest {
 
     @Test
     fun generate_with_multiple_harmonics_sums_contributions() {
-        val harmonizer = Harmonizer(floatArrayOf(0.5f, 0.3f, 0.2f))
+        val harmonizer = Harmonizer(harmonics0 = { floatArrayOf(0.5f, 0.3f, 0.2f) })
         val generator = { freq: Float, sample: Int -> 1.0f }
 
         val result = harmonizer.generate(Note.A4, 0, generator)
@@ -36,7 +36,7 @@ class HarmonizerTest {
 
     @Test
     fun generate_calls_generator_with_correct_frequencies() {
-        val harmonizer = Harmonizer(floatArrayOf(1.0f, 1.0f))
+        val harmonizer = Harmonizer(harmonics0 = { floatArrayOf(1.0f, 1.0f) })
         val fundamentalFreq = Note.A4.frequency // 440.0 Hz
         val capturedFrequencies = mutableListOf<Float>()
         val capturedSamples = mutableListOf<Int>()
@@ -58,7 +58,7 @@ class HarmonizerTest {
 
     @Test
     fun generate_harmonic_frequencies_are_multiples_of_fundamental() {
-        val harmonizer = Harmonizer(floatArrayOf(1.0f, 1.0f, 1.0f))
+        val harmonizer = Harmonizer(harmonics0 = { floatArrayOf(1.0f, 1.0f, 1.0f) })
         val capturedFrequencies = mutableListOf<Float>()
         val fundamentalFreq = Note.C0.frequency
 
@@ -77,7 +77,7 @@ class HarmonizerTest {
 
     @Test
     fun generate_with_zero_amplitude_harmonics() {
-        val harmonizer = Harmonizer(floatArrayOf(0.0f, 1.0f, 0.0f))
+        val harmonizer = Harmonizer(harmonics0 = { floatArrayOf(0.0f, 1.0f, 0.0f) })
         val generator = { freq: Float, sample: Int -> 2.0f }
 
         val result = harmonizer.generate(Note.C0, 0, generator)
@@ -87,7 +87,7 @@ class HarmonizerTest {
 
     @Test
     fun generate_with_negative_amplitude_harmonics() {
-        val harmonizer = Harmonizer(floatArrayOf(0.5f, -0.3f))
+        val harmonizer = Harmonizer(harmonics0 = { floatArrayOf(0.5f, -0.3f) })
         val generator = { freq: Float, sample: Int -> 1.0f }
 
         val result = harmonizer.generate(Note.C0, 0, generator)
@@ -97,7 +97,7 @@ class HarmonizerTest {
 
     @Test
     fun generate_frequency_calculation_with_different_notes() {
-        val harmonizer = Harmonizer(floatArrayOf(1.0f))
+        val harmonizer = Harmonizer(harmonics0 = { floatArrayOf(1.0f) })
         val capturedFrequencies = mutableListOf<Float>()
 
         val generator = { freq: Float, sample: Int ->
@@ -118,7 +118,7 @@ class HarmonizerTest {
 
     @Test
     fun generate_with_complex_generator_function() {
-        val harmonizer = Harmonizer(floatArrayOf(0.8f, 0.6f, 0.4f))
+        val harmonizer = Harmonizer(harmonics0 = { floatArrayOf(0.8f, 0.6f, 0.4f) })
         var callCount = 0
 
         // Generator that returns increasing values for each harmonic
@@ -135,7 +135,7 @@ class HarmonizerTest {
     @Test
     fun generate_with_large_harmonics_array() {
         val harmonics = FloatArray(10) { index -> (index + 1) * 0.1f } // [0.1, 0.2, 0.3, ..., 1.0]
-        val harmonizer = Harmonizer(harmonics)
+        val harmonizer = Harmonizer(harmonics0 = { harmonics })
         val generator = { freq: Float, sample: Int -> 1.0f }
 
         val result = harmonizer.generate(Note.C0, 0, generator)
@@ -145,7 +145,7 @@ class HarmonizerTest {
 
     @Test
     fun generate_preserves_generator_return_values() {
-        val harmonizer = Harmonizer(floatArrayOf(1.0f, 1.0f))
+        val harmonizer = Harmonizer(harmonics0 = { floatArrayOf(1.0f, 1.0f) })
         val generatorValues = listOf(3.14f, 2.71f)
         var callIndex = 0
 

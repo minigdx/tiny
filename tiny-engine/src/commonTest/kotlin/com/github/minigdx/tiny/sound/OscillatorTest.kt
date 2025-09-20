@@ -9,7 +9,7 @@ import kotlin.test.assertTrue
 class OscillatorTest {
     @Test
     fun emit_sine_wave_generates_correct_values() {
-        val oscillator = Oscillator(Instrument.WaveType.SINE)
+        val oscillator = Oscillator(waveType0 = { Instrument.WaveType.SINE })
         val frequency = 440.0f // A4
 
         // Test at known sample positions
@@ -29,7 +29,7 @@ class OscillatorTest {
 
     @Test
     fun emit_square_wave_generates_correct_values() {
-        val oscillator = Oscillator(Instrument.WaveType.SQUARE)
+        val oscillator = Oscillator(waveType0 = { Instrument.WaveType.SQUARE })
         val frequency = 1000.0f
 
         // Square wave should be either 1.0 or -1.0
@@ -42,7 +42,7 @@ class OscillatorTest {
 
     @Test
     fun emit_triangle_wave_generates_bounded_values() {
-        val oscillator = Oscillator(Instrument.WaveType.TRIANGLE)
+        val oscillator = Oscillator(waveType0 = { Instrument.WaveType.TRIANGLE })
         val frequency = 880.0f
 
         // Test multiple sample positions
@@ -54,7 +54,7 @@ class OscillatorTest {
 
     @Test
     fun emit_sawtooth_wave_generates_bounded_values() {
-        val oscillator = Oscillator(Instrument.WaveType.SAW_TOOTH)
+        val oscillator = Oscillator(waveType0 = { Instrument.WaveType.SAW_TOOTH })
         val frequency = 220.0f
 
         // Test multiple sample positions
@@ -66,7 +66,7 @@ class OscillatorTest {
 
     @Test
     fun emit_pulse_wave_generates_bounded_values() {
-        val oscillator = Oscillator(Instrument.WaveType.PULSE)
+        val oscillator = Oscillator(waveType0 = { Instrument.WaveType.PULSE })
         val frequency = 330.0f
 
         // Test multiple sample positions
@@ -78,7 +78,7 @@ class OscillatorTest {
 
     @Test
     fun emit_noise_generates_random_bounded_values() {
-        val oscillator = Oscillator(Instrument.WaveType.NOISE)
+        val oscillator = Oscillator(waveType0 = { Instrument.WaveType.NOISE })
         val frequency = 1000.0f
 
         val results = mutableListOf<Float>()
@@ -97,7 +97,7 @@ class OscillatorTest {
 
     @Test
     fun emit_same_frequency_different_samples_produces_different_values() {
-        val oscillator = Oscillator(Instrument.WaveType.SINE)
+        val oscillator = Oscillator(waveType0 = { Instrument.WaveType.SINE })
         val frequency = 440.0f
 
         val result1 = oscillator.emit(frequency, 0)
@@ -111,7 +111,7 @@ class OscillatorTest {
 
     @Test
     fun emit_different_frequencies_produce_different_periods() {
-        val oscillator = Oscillator(Instrument.WaveType.SINE)
+        val oscillator = Oscillator(waveType0 = { Instrument.WaveType.SINE })
 
         // Low frequency should change more slowly
         val lowFreq = 100.0f
@@ -132,7 +132,7 @@ class OscillatorTest {
 
     @Test
     fun emit_zero_frequency_produces_constant_or_near_constant_values() {
-        val oscillator = Oscillator(Instrument.WaveType.SINE)
+        val oscillator = Oscillator(waveType0 = { Instrument.WaveType.SINE })
         val frequency = 0.0f
 
         val results = mutableListOf<Float>()
@@ -149,7 +149,7 @@ class OscillatorTest {
 
     @Test
     fun emit_noise_frequency_affects_filtering() {
-        val oscillator = Oscillator(Instrument.WaveType.NOISE)
+        val oscillator = Oscillator(waveType0 = { Instrument.WaveType.NOISE })
 
         // Test that different frequencies produce different noise characteristics
         val lowFreqResults = mutableListOf<Float>()
@@ -160,7 +160,7 @@ class OscillatorTest {
         }
 
         // Create new oscillator for high frequency to reset internal state
-        val oscillator2 = Oscillator(Instrument.WaveType.NOISE)
+        val oscillator2 = Oscillator(waveType0 = { Instrument.WaveType.NOISE })
         for (sample in 0..50) {
             highFreqResults.add(oscillator2.emit(5000.0f, sample))
         }
@@ -172,8 +172,8 @@ class OscillatorTest {
 
     @Test
     fun emit_consistency_same_inputs_produce_same_outputs() {
-        val oscillator1 = Oscillator(Instrument.WaveType.SINE)
-        val oscillator2 = Oscillator(Instrument.WaveType.SINE)
+        val oscillator1 = Oscillator(waveType0 = { Instrument.WaveType.SINE })
+        val oscillator2 = Oscillator(waveType0 = { Instrument.WaveType.SINE })
 
         val frequency = 440.0f
         val sample = 1000
@@ -198,7 +198,7 @@ class OscillatorTest {
         val frequency = 440.0f
 
         waveTypes.forEach { waveType ->
-            val oscillator = Oscillator(waveType)
+            val oscillator = Oscillator(waveType0 = { waveType })
 
             for (sample in 0..100 step 10) {
                 val result = oscillator.emit(frequency, sample)

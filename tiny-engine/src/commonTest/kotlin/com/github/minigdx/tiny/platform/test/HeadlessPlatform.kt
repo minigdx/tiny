@@ -11,6 +11,7 @@ import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
+import com.github.minigdx.tiny.lua.Note
 import com.github.minigdx.tiny.platform.ImageData
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.SoundData
@@ -18,6 +19,8 @@ import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMetrics
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.render.RenderFrame
+import com.github.minigdx.tiny.sound.ChunkGenerator
+import com.github.minigdx.tiny.sound.Instrument
 import com.github.minigdx.tiny.sound.SoundHandler
 import com.github.minigdx.tiny.sound.SoundManager
 import com.github.minigdx.tiny.util.FloatData
@@ -117,6 +120,21 @@ class HeadlessPlatform(
                 }
 
             override fun createSoundHandler(buffer: Sequence<FloatArray>): SoundHandler {
+                TODO("Not yet implemented")
+            }
+
+            override fun createSoundHandler(chunkGenerator: ChunkGenerator): SoundHandler {
+                TODO("Not yet implemented")
+            }
+
+            override fun noteOn(
+                note: Note,
+                instrument: Instrument,
+            ) {
+                TODO("Not yet implemented")
+            }
+
+            override fun noteOff(note: Note) {
                 TODO("Not yet implemented")
             }
         }

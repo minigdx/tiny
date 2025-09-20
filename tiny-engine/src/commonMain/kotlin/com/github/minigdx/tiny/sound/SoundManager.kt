@@ -3,6 +3,7 @@ package com.github.minigdx.tiny.sound
 import com.github.minigdx.tiny.BPM
 import com.github.minigdx.tiny.Percent
 import com.github.minigdx.tiny.input.InputHandler
+import com.github.minigdx.tiny.lua.Note
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -31,6 +32,17 @@ class DefaultSoundBoard(private val soundManager: SoundManager) : VirtualSoundBo
     override fun convert(bar: MusicalBar): FloatArray {
         val buffer = soundManager.convert(bar)
         return buffer
+    }
+
+    override fun noteOn(
+        note: Note,
+        instrument: Instrument,
+    ) {
+        soundManager.noteOn(note, instrument)
+    }
+
+    override fun noteOff(note: Note) {
+        soundManager.noteOff(note)
     }
 }
 
@@ -250,9 +262,16 @@ abstract class SoundManager {
 
     open fun exportAsSound(sequence: MusicalSequence) = Unit
 
+    abstract fun noteOn(
+        note: Note,
+        instrument: Instrument,
+    )
+
+    abstract fun noteOff(note: Note)
+
     companion object {
         const val SAMPLE_RATE = 44100
-        const val MASTER_VOLUME = 0.8f
+        const val MASTER_VOLUME = 0.5f
         const val PI = (kotlin.math.PI).toFloat()
         const val TWO_PI = 2.0f * PI
     }

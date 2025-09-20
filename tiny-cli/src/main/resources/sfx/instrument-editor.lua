@@ -97,9 +97,6 @@ function _init_keyboard(entities)
         end
     end
 
-    -- pas bon -> si je change d'instrument, je dois close instrument courant et stream nouvel instrument
-    state.instrument.stream()
-
     for k in all(entities["Keyboard"]) do
         local label = widgets:create_keyboard(k)
         wire.listen(label, "value", playNote)

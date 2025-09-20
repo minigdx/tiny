@@ -1,7 +1,9 @@
 package com.github.minigdx.tiny.platform.webgl
 
 import com.github.minigdx.tiny.input.InputHandler
+import com.github.minigdx.tiny.lua.Note
 import com.github.minigdx.tiny.sound.ChunkGenerator
+import com.github.minigdx.tiny.sound.Instrument
 import com.github.minigdx.tiny.sound.SoundHandler
 import com.github.minigdx.tiny.sound.SoundManager
 import org.khronos.webgl.Float32Array
@@ -54,6 +56,17 @@ class WebSoundMananger : SoundManager() {
             result[index] = byte
         }
         return result
+    }
+
+    override fun noteOn(
+        note: Note,
+        instrument: Instrument,
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun noteOff(note: Note) {
+        TODO("Not yet implemented")
     }
 
     internal fun playSfxBuffer(

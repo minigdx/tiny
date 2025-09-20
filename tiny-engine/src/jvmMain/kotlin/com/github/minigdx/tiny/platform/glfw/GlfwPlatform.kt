@@ -360,19 +360,9 @@ class GlfwPlatform(
     }
 
     override fun initSoundManager(inputHandler: InputHandler): SoundManager {
-        return JavaSoundManager().also {
-            it.initSoundManager(inputHandler)
-        }
-    }
-
-    private fun kgl(): Kgl {
-        /*
-        val before = { bf: String -> println("-> $bf") }
-        val afiter = { af: String -> println("<- $af") }
-        return DebugKgl(KglLwjgl, before, afiter)
-
-         */
-        return KglLwjgl
+        val manager = JavaSoundManager()
+        manager.initSoundManager(inputHandler)
+        return manager
     }
 
     override fun createLocalFile(

@@ -8,7 +8,6 @@ import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.processing.SymbolProcessorProvider
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
-import jdk.javadoc.internal.doclets.formats.html.markup.HtmlStyle
 
 class TinyToLuaStubKspProcessor(
     val env: SymbolProcessorEnvironment,

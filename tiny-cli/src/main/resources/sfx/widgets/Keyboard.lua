@@ -34,6 +34,7 @@ Keyboard._update = function(self)
         [10] = "B4"
     }
     local pos = ctrl.touch()
+
     local value
     if (ctrl.touching(0) and inside_widget(self, pos.x, pos.y)) then
         local relative_x = pos.x - self.x
@@ -41,7 +42,6 @@ Keyboard._update = function(self)
 
         local color = spr.pget(relative_x + spr_x, relative_y + spr_y)
         value = color_to_note[color]
-
     else
         value = nil
     end

@@ -1,5 +1,7 @@
 package com.github.minigdx.tiny.sound
 
+import com.github.minigdx.tiny.lua.Note
+
 interface VirtualSoundBoard {
     /**
      * Create a sound handler from a [MusicalBar]
@@ -19,4 +21,11 @@ interface VirtualSoundBoard {
     fun prepare(chunkGenerator: ChunkGenerator): SoundHandler
 
     fun convert(bar: MusicalBar): FloatArray
+
+    fun noteOn(
+        note: Note,
+        instrument: Instrument,
+    )
+
+    fun noteOff(note: Note)
 }
