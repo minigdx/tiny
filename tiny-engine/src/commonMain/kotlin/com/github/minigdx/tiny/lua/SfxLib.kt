@@ -455,7 +455,7 @@ class SfxLib(
                     { (this.modulations[0] as Sweep).acceleration = it.optdouble(0.0).toFloat() },
                 )
                 sweep.wrap(
-                    "frequency",
+                    "sweep",
                     { valueOf((this.modulations[0] as Sweep).sweep.toDouble()) },
                     { (this.modulations[0] as Sweep).sweep = it.optdouble(0.0).toFloat() },
                 )
@@ -488,53 +488,6 @@ class SfxLib(
                 vibrato
             }
 
-            obj.function1("play") { noteAsString ->
-                val hardVolume = 0.8f
-
-                val oneNote = MusicalBar(
-                    1,
-                    this,
-                    tempo = 120,
-                ).apply {
-                    setNotes(
-                        listOf(
-                            MusicalNote(
-                                note = Note.fromName(noteAsString.tojstring()),
-                                beat = 0f,
-                                duration = 1f,
-                                volume = hardVolume,
-                            ),
-                        ),
-                    )
-                }
-
-                soundBoard.prepare(oneNote).play()
-                NONE
-            }
-
-            val instrumentPlayer = InstrumentPlayer(this)
-
-            obj.function0("stream") {
-                val handler = soundBoard.prepare(
-                    RealTimeChunkGenerator { _, samples ->
-                        val result = FloatArray(samples)
-                        for (i in 0 until samples) {
-                            result[i] = instrumentPlayer.generate()
-                        }
-                        result
-                    },
-                )
-
-                handler.play()
-
-                WrapperLuaTable().apply {
-                    function0("stop") {
-                        handler.stop()
-                        NONE
-                    }
-                }
-            }
-
             obj.function1("noteOn") { noteName ->
                 val note = Note.fromName(noteName.tojstring())
                 soundBoard.noteOn(note, this)
@@ -544,11 +497,6 @@ class SfxLib(
             obj.function1("noteOff") { noteName ->
                 val note = Note.fromName(noteName.tojstring())
                 soundBoard.noteOff(note)
-                NONE
-            }
-
-            obj.function0("close") {
-                instrumentPlayer.close()
                 NONE
             }
 

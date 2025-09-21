@@ -88,7 +88,14 @@ class InstrumentPlayer(private val instrument: Instrument) {
             var sample = harmonizer.generate(
                 noteProgress.note,
                 noteProgress.noteOnProgress + noteProgress.noteOffProgress,
-                { frequency, progress -> oscillator.emit(frequency, progress) },
+                { frequency, progress ->
+                    val modulated = instrument.modulations
+                        .filter { it.active }
+                        .fold(frequency) { f, modulation ->
+                        modulation.apply(progress / SAMPLE_RATE.toFloat(), f)
+                    }
+                    oscillator.emit(modulated, progress)
+                },
             )
             sample *= envelop.noteOn(noteProgress.noteOnProgress)
             result += sample
@@ -99,7 +106,14 @@ class InstrumentPlayer(private val instrument: Instrument) {
             var sample = harmonizer.generate(
                 noteProgress.note,
                 noteProgress.noteOnProgress + noteProgress.noteOffProgress,
-                { frequency, progress -> oscillator.emit(frequency, progress) },
+                { frequency, progress ->
+                    val modulated = instrument.modulations
+                        .filter { it.active }
+                        .fold(frequency) { f, modulation ->
+                        modulation.apply(progress / SAMPLE_RATE.toFloat(), f)
+                    }
+                    oscillator.emit(modulated, progress)
+                },
             )
             val env = if (noteProgress.noteOnProgress <= envelop.attack0() + envelop.decay0()) {
                 envelop.noteOn(noteProgress.noteOnProgress++)

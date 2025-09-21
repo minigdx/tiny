@@ -109,6 +109,11 @@ function _init_sweep(entities)
         local acceleration = wire.find_widget(m.widgets, effect.fields.Acceleration)
         local sweep = wire.find_widget(m.widgets, effect.fields.Sweep)
 
+        acceleration.on_press = on_press
+        acceleration.on_release = on_release
+        sweep.on_press = on_press
+        sweep.on_release = on_release
+
         -- Use manual sync with correct modes for checkboxes
         wire.bind(state, "instrument.sweep.active", active, "value")
         wire.bind(state, "instrument.sweep.acceleration", acceleration, "value")
@@ -121,6 +126,11 @@ function _init_vibrato(entities)
         local active = wire.find_widget(m.widgets, effect.fields.Enabled)
         local frequency = wire.find_widget(m.widgets, effect.fields.Frequency)
         local depth = wire.find_widget(m.widgets, effect.fields.Depth)
+
+        frequency.on_press = on_press
+        frequency.on_release = on_release
+        depth.on_press = on_press
+        depth.on_release = on_release
 
         -- Use manual sync with correct modes for checkboxes
         wire.bind(state, "instrument.vibrato.active", active, "value")
