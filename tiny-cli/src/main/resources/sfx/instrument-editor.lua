@@ -8,8 +8,49 @@ local m = {
 }
 
 local state = {
-    instrument = nil
+    instrument = nil,
+    next_note_on = nil,
+    next_note_off = nil
 }
+
+local on_press = function()
+    state.instrument.noteOn("C4")
+end
+
+local on_release = function()
+    state.instrument.noteOff("C4")
+end
+
+local on_press_repeat = function()
+    state.next_note_on = 0
+    state.next_note_off = nil
+end
+
+local on_release_repeat = function()
+    state.next_note_on = nil
+end
+
+local on_repeat_update = function()
+    if state.next_note_off then
+        state.next_note_off = state.next_note_off - tiny.dt
+        if state.next_note_off < 0 then
+            state.instrument.noteOff("C4")
+            state.next_note_off = nil
+
+            if state.next_note_on then
+                state.next_note_on = state.instrument.release + tiny.dt
+            end
+        end
+    end
+
+    if state.next_note_on and state.next_note_on >= 0 then
+        state.next_note_on = state.next_note_on - tiny.dt
+        if state.next_note_on < 0 then
+            state.instrument.noteOn("C4")
+            state.next_note_off = state.instrument.attack + state.instrument.decay
+        end
+    end
+end
 
 function _init_knob(entities)
     for k in all(entities["Knob"]) do
@@ -23,18 +64,26 @@ function _init_envelop(entities)
         local envelop = widgets:create_envelop(k)
 
         local widget = wire.find_widget(m.widgets, envelop.fields.Attack)
+        widget.on_press = on_press_repeat
+        widget.on_release = on_release_repeat
         wire.bind(state, "instrument.attack", widget, "value")
         wire.bind(state, "instrument.attack", envelop, "attack")
 
         widget = wire.find_widget(m.widgets, envelop.fields.Decay)
+        widget.on_press = on_press_repeat
+        widget.on_release = on_release_repeat
         wire.bind(state, "instrument.decay", widget, "value")
         wire.bind(state, "instrument.decay", envelop, "decay")
 
         widget = wire.find_widget(m.widgets, envelop.fields.Sustain)
+        widget.on_press = on_press
+        widget.on_release = on_release
         wire.bind(state, "instrument.sustain", widget, "value")
         wire.bind(state, "instrument.sustain", envelop, "sustain")
 
         widget = wire.find_widget(m.widgets, envelop.fields.Release)
+        widget.on_press = on_press_repeat
+        widget.on_release = on_release_repeat
         wire.bind(state, "instrument.release", widget, "value")
         wire.bind(state, "instrument.release", envelop, "release")
         table.insert(m.widgets, envelop)
@@ -169,9 +218,12 @@ function _init_checkbox(entities)
 end
 
 function _init_harmonics(entities)
+
     for mode in all(entities["Harmonics"]) do
         for index, harmonic in ipairs(mode.fields.Harmonics) do
             local knob = wire.find_widget(m.widgets, harmonic)
+            knob.on_press = on_press
+            knob.on_release = on_release
             wire.bind(state, "instrument.harmonics." .. index, knob, "value")
         end
     end
@@ -218,8 +270,7 @@ function _update()
     end
 
 
-    -- Si modification d'un knob, alors stream un son.
-    -- Comment savoir si un knob est en cours de modification ??
+    on_repeat_update()
 end
 
 function _draw()

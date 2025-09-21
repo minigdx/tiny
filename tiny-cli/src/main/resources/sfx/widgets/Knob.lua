@@ -1,10 +1,3 @@
-local set_value = function(self, value)
-    self.value = value
-    if (self.on_change) then
-        self:on_change()
-    end
-end
-
 local function inside_widget(w, x, y, offset)
     local off = 0
     if (offset) then
@@ -26,10 +19,6 @@ local Knob = {
     height = 16,
     enabled = true,
     color = 0,
-    listeners = {},
-    on_update = on_update,
-    fire_on_update = fire_on_update,
-    set_value = set_value,
 }
 
 Knob._init = function(self)
@@ -60,10 +49,11 @@ Knob._update = function(self)
     if touching ~= nil and inside_widget(self, touching.x, touching.y) then
         if self.start_value == nil then
             self.start_value = self.value
+            if(self.on_press) then
+                self:on_press()
+            end
         end
         local touch = ctrl.touch()
-
-        self.active_color = 11
 
         local dst = self.y + 4 - touch.y
         local percent = math.max(math.min(1, dst / 32), -1)
@@ -82,8 +72,22 @@ Knob._update = function(self)
     end
 
     if touching == nil then
+        if self.start_value and self.on_release then
+            self:on_release()
+        end
         self.start_value = nil
         self.active_color = nil
+    end
+end
+
+Knob.set_value = function(self, value)
+    -- Ignore if the value didn't change
+    if value == self.value then
+        return
+    end
+    self.value = value
+    if self.on_change then
+        self:on_change()
     end
 end
 
