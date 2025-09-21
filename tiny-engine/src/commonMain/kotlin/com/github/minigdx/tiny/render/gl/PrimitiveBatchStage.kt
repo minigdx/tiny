@@ -220,7 +220,7 @@ class PrimitiveBatchStage(
                 }
                 
                 // The frag is outside the line on the vertical side
-                if(int(fragCoord.y) > (max(startLine.y, endLine.y)) || int(fragCoord.y) < (min(startLine.y, endLine.y))) {
+                if(int(fragCoord.y) > int((max(startLine.y, endLine.y))) || int(fragCoord.y) < int((min(startLine.y, endLine.y)))) {
                     return 2.0;
                 }           
                 
