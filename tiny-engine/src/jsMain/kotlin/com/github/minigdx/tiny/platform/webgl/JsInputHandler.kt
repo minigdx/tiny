@@ -251,6 +251,6 @@ class JsInputHandler(
 
     override fun onFirstUserInteraction(callback: () -> Unit) {
         canvas.addEventListener("onClick", { callback() }, false)
-        // firstUserInteractionCallback = callback
+        firstUserInteractionCallback = callback
     }
 }

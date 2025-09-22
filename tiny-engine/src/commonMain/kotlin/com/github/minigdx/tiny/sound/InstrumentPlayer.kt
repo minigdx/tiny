@@ -139,4 +139,8 @@ class InstrumentPlayer(private val instrument: Instrument) {
         notesOff.addAll(notesOn)
         notesOn.clear()
     }
+
+    fun isFinished(): Boolean {
+        return notesOn.isEmpty() && notesOff.isEmpty()
+    }
 }
