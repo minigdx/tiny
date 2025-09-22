@@ -5,80 +5,74 @@ local ModeSwitch = {
     button_height = 16,
     button_margin_right = 8,
     buttons = {
-        {
-            overlay = { x = 0, y = 9*16 },
+        Instrument = {
+            overlay = { x = 16, y = 80 },
             on_change = function()
                 tiny.exit("instrument-editor.lua")
             end,
             help = "Instrument Editor"
         },
-        {
-            overlay = { x = 16, y = 9*16 },
+        Sfx = {
+            overlay = { x = 32, y = 80 },
             on_change = function()
                 tiny.exit("sfx-editor.lua")
             end,
             help = "SFX Editor"
         },
-        {
-            overlay = { x = 32, y = 9*16 },
+        Music = {
+            overlay = { x = 32, y = 9 * 16 },
             on_change = function()
                 tiny.exit("music-editor.lua")
             end,
             help = "Music Editor"
-        }
-    }
+        },
+    },
+    background_unselected = { x = 112, y = 0 },
+    background_hover = { x = 120, y = 0 },
+    background_selected = { x = 112, y = 8 }
 }
 
 ModeSwitch._update = function(self)
     local pos = ctrl.touch()
-    
-    if inside_widget(self, pos.x, pos.y) then
-        local relative_x = pos.x - self.x
-        local button_index = math.floor(relative_x / (self.button_width + self.button_margin_right))
-        local is_hover_button = (relative_x - button_index * (self.button_width + self.button_margin_right)) <= self.button_width
 
-        if is_hover_button and button_index >= 0 and button_index < #self.buttons then
-            self.hover_index = button_index
-            
-            if self.on_hover then
-                self:on_hover()
-            end
-            
-            if ctrl.touched(0) then
-                self.selected_index = button_index
-                local button = self.buttons[button_index + 1]
-                if button.on_change then
-                    button.on_change()
-                end
-                if self.on_change then
-                    self:on_change()
-                end
-            end
-        else
-            self.hover_index = nil
+    if inside_widget(self, pos.x, pos.y) then
+        self.hover = true
+        if ctrl.touched(0) then
+            local button = self.buttons[self.fields.ModeType]
+            button.on_change()
         end
     else
-        self.hover_index = nil
+        self.hover = false
     end
+
 end
 
 ModeSwitch._draw = function(self)
-    for i = 0, #self.buttons - 1 do
-        local button = self.buttons[i + 1]
-        local x = self.x + i * (self.button_width + self.button_margin_right)
-        local y = self.y
-        
-        local background = 0
-        if self.hover_index == i or self.selected_index == i then
-            background = 16
+
+    local button = self.buttons[self.fields.ModeType]
+
+    if self.fields.IsSelected then
+        for i = 0, 8, 8 do
+            for j = 0, 8, 8 do
+                spr.sdraw(self.x + i, self.y + j, self.background_selected.x, self.background_selected.y, 8, 8)
+            end
         end
-        
-        spr.sdraw(x, y, 0 + background, 0, self.button_width, self.button_height)
-        
-        if button.overlay then
-            spr.sdraw(x, y, button.overlay.x, button.overlay.y, self.button_width, self.button_height)
+    elseif self.hover then
+        for i = 0, 8, 8 do
+            for j = 0, 8, 8 do
+                spr.sdraw(self.x + i, self.y + j, self.background_hover.x, self.background_hover.y, 8, 8)
+            end
+        end
+    else
+        for i = 0, 8, 8 do
+            for j = 0, 8, 8 do
+                spr.sdraw(self.x + i, self.y + j, self.background_unselected.x, self.background_unselected.y, 8, 8)
+            end
         end
     end
+
+    spr.sdraw(self.x, self.y, button.overlay.x, button.overlay.y, self.width, self.height)
+
 end
 
 return ModeSwitch

@@ -2738,7 +2738,10 @@
 									"id": "V_String",
 									"params": ["Instrument"]
 								}] },
-								{ "__identifier": "IsSelected", "__type": "Bool", "__value": false, "__tile": null, "defUid": 55, "realEditorValues": [] }
+								{ "__identifier": "IsSelected", "__type": "Bool", "__value": true, "__tile": null, "defUid": 55, "realEditorValues": [{
+									"id": "V_Bool",
+									"params": [ true ]
+								}] }
 							],
 							"__worldX": 24,
 							"__worldY": 0

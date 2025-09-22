@@ -2,6 +2,7 @@ local widgets = require("widgets")
 local mouse = require("mouse")
 local wire = require("wire")
 local MatrixSelector = require("widgets/MatrixSelector")
+local ModeSwitch = require("widgets/ModeSwitch") 
 
 local m = {
     widgets = {}
@@ -239,6 +240,13 @@ function _init_harmonics(entities)
     end
 end
 
+function _init_mode_switch(entities)
+    for mode in all(entities["ModeButton"]) do
+        local button = new(ModeSwitch, mode)
+        table.insert(m.widgets, button)
+    end
+end
+
 function _init()
     map.level("InstrumentEditor")
     local entities = map.entities()
@@ -255,6 +263,7 @@ function _init()
     _init_vibrato(entities)
     _init_keyboard(entities)
     _init_harmonics(entities)
+    _init_mode_switch(entities)
 
     -- force setting correct values
     if (state.on_change) then
