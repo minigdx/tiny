@@ -279,7 +279,7 @@ private fun createGame(
 
     GameEngine(
         gameOptions = gameOptions,
-        platform = EditorWebGlPlatform(WebGlPlatform(canvas as HTMLCanvasElement, logger, gameOptions, rootPath)),
+        platform = EditorWebGlPlatform(WebGlPlatform(canvas as HTMLCanvasElement, gameOptions, rootPath)),
         vfs = CommonVirtualFileSystem(),
         logger = logger,
     ).main()

@@ -13,14 +13,11 @@ import com.github.minigdx.tiny.file.SoundDataSourceStream
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
-import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.ImageData
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
-import com.github.minigdx.tiny.render.gl.FrameBufferStage
-import com.github.minigdx.tiny.render.gl.SpriteBatchStage
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineDispatcher
@@ -32,15 +29,10 @@ import kotlin.math.min
 
 class WebGlPlatform(
     private val canvas: HTMLCanvasElement,
-    private val logger: Logger,
     override val gameOptions: GameOptions,
     val rootUrl: String,
 ) : Platform {
     override val performanceMonitor: PerformanceMonitor = WebGlPerformanceMonitor()
-
-    private lateinit var frameBufferStage: FrameBufferStage
-
-    private lateinit var spriteBatchStage: SpriteBatchStage
 
     private val jsInputHandler = JsInputHandler(canvas, gameOptions)
 
@@ -108,7 +100,7 @@ class WebGlPlatform(
     }
 
     override fun initSoundManager(inputHandler: InputHandler): SoundManager {
-        val soundManager = WebSoundMananger()
+        val soundManager = WebSoundManager()
         soundManager.initSoundManager(inputHandler)
         return soundManager
     }

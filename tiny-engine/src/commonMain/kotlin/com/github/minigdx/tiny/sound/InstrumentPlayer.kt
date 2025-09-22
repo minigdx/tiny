@@ -92,8 +92,8 @@ class InstrumentPlayer(private val instrument: Instrument) {
                     val modulated = instrument.modulations
                         .filter { it.active }
                         .fold(frequency) { f, modulation ->
-                        modulation.apply(progress / SAMPLE_RATE.toFloat(), f)
-                    }
+                            modulation.apply(progress / SAMPLE_RATE.toFloat(), f)
+                        }
                     oscillator.emit(modulated, progress)
                 },
             )
@@ -110,8 +110,8 @@ class InstrumentPlayer(private val instrument: Instrument) {
                     val modulated = instrument.modulations
                         .filter { it.active }
                         .fold(frequency) { f, modulation ->
-                        modulation.apply(progress / SAMPLE_RATE.toFloat(), f)
-                    }
+                            modulation.apply(progress / SAMPLE_RATE.toFloat(), f)
+                        }
                     oscillator.emit(modulated, progress)
                 },
             )

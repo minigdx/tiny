@@ -6,12 +6,9 @@ import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.sound.Instrument
-import com.github.minigdx.tiny.sound.InstrumentPlayer
 import com.github.minigdx.tiny.sound.Music
 import com.github.minigdx.tiny.sound.MusicalBar
-import com.github.minigdx.tiny.sound.MusicalNote
 import com.github.minigdx.tiny.sound.MusicalSequence
-import com.github.minigdx.tiny.sound.RealTimeChunkGenerator
 import com.github.minigdx.tiny.sound.SoundHandler
 import com.github.minigdx.tiny.sound.Sweep
 import com.github.minigdx.tiny.sound.Vibrato

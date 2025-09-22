@@ -138,7 +138,7 @@ fun setupGames(
 
         GameEngine(
             gameOptions = gameOptions,
-            platform = WebGlPlatform(canvas as HTMLCanvasElement, logger, gameOptions, rootPath),
+            platform = WebGlPlatform(canvas as HTMLCanvasElement, gameOptions, rootPath),
             vfs = CommonVirtualFileSystem(),
             logger = logger,
         ).main()

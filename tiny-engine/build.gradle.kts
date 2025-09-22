@@ -41,6 +41,8 @@ dependencies {
     this.jvmMainImplementation(libs.jvm.gifencoder)
 
     jsMainImplementation("org.jetbrains.kotlin:kotlinx-atomicfu-runtime:2.1.20")?.because("https://youtrack.jetbrains.com/issue/KT-57235")
+    jsMainImplementation("org.jetbrains.kotlin-wrappers:kotlin-browser:2025.6.9")
+        ?.because("required to access AudioWorkletNode")
 
     add("kspJvm", project(":tiny-annotation-processors:tiny-lua-stub-generator")) {
         because("KSP will generate all Lua stub methods from all Lua libs from Tiny.")
