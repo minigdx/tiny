@@ -2,6 +2,15 @@ local widgets = require("widgets")
 local mouse = require("mouse")
 local wire = require("wire")
 local MatrixSelector = require("widgets/MatrixSelector")
+local ModeSwitch = require("widgets/ModeSwitch")
+
+local m = {
+    widgets = {}
+}
+
+local green = 8
+local red = 5
+local white = 11
 
 function roundToHalf(num)
     local rounded_step = math.floor(num * 2)
@@ -18,7 +27,8 @@ local State = {
     -- the instrument of the current_bar
     current_instrument = nil,
 
-    on_change = function()  end
+    on_change = function()
+    end
 }
 
 local state = new(State)
@@ -35,7 +45,6 @@ function inside_widget(w, x, y, offset)
             y <= w.y + w.height + off
 end
 
-
 local InstrumentName = {
     index = 0
 }
@@ -51,11 +60,16 @@ InstrumentName._draw = function(self)
     spr.sdraw(self.x, self.y, x + ox, y + oy, 16, 16)
 end
 
-local VolumeEditor = {
-
+local VelocityEditor = {
+    values = {
+        { beat = 1, duration = 1, volume = 1 },
+        { beat = 2, duration = 0.5, volume = 1 },
+        { beat = 2.5, duration = 0.5, volume = 0.5 },
+        { beat = 3.5, duration = 0.5, volume = 0.2 }
+    }
 }
 
-VolumeEditor._update = function(self)
+VelocityEditor._update = function(self)
     local p = ctrl.touch()
     if ctrl.touching(0) and inside_widget(self, p.x, p.y) then
         local local_x = p.x - self.x
@@ -63,32 +77,58 @@ VolumeEditor._update = function(self)
         local beat = roundToHalf((local_x) / 16.0)
 
         if local_y > self.height - 8 then
-            state.current_bar.set_volume(beat, 0)
+            self:set_value(beat, 0)
         else
             local volume = math.clamp(0, 1.0 - (local_y / (self.height - 8)), 1.0)
-            state.current_bar.set_volume(beat, volume)
+            self:set_value(beat, volume)
         end
-
     end
 end
 
-VolumeEditor._draw = function(self)
+VelocityEditor.set_value = function(self, beat, volume)
+    -- code temporaire. normalement, je récupère les valeurs de SfxLib
+    for b in all(self.values) do
+        if(b.beat == beat) then
+            b.volume = volume
+        end
+    end
+    if self.on_change then
+        self.on_change({ beat = beat, volume = volume })
+    end
+end
+
+VelocityEditor._draw = function(self)
     local low = self.y + self.height - 8
 
-    for note in all(state.current_bar.notes()) do
+    local previous_x = nil
+    local previous_y = nil
+
+    -- values -> beat / volume / duration
+    for note in all(self.values) do
         local volume = note.volume * (self.height - 8)
-        for nx = self.x + note.beat * 16, self.x + (note.duration + note.beat) * 16, 8 do
-            shape.rectf(
-                    nx + 1, low - volume,
-                    8 - 2, volume,
-                    9
-            )
+        local y = low - volume
+        local startVelocity = self.x + note.beat * 16
+        local endVelocity = startVelocity + note.duration * 16
+        local x = startVelocity + (endVelocity - startVelocity) * 0.5
+
+        if previous_x then
+            shape.line(x, y, previous_x, previous_y, red)
         end
+
+        previous_x = x
+        previous_y = y
 
     end
 
-    shape.line(self.x, low, self.x + self.width - 1, low, 9)
-    shape.rect(self.x, self.y, self.width, self.height, 9)
+    for note in all(self.values) do
+        local volume = note.volume * (self.height - 8)
+        local y = low - volume
+        local startVelocity = self.x + note.beat * 16
+        local endVelocity = startVelocity + note.duration * 16
+        local x = startVelocity + (endVelocity - startVelocity) * 0.5
+
+        shape.circle(x, y, 2, white)
+    end
 end
 
 local CursorEditor = {
@@ -113,13 +153,13 @@ CursorEditor._update = function(self)
         self.time = 0
 
         if self.play then
-            state.current_bar.play()
+            state.sfx.play()
         end
     end
 
     if self.play then
         self.time = self.time + tiny.dt
-        self.beat = self.time * (state.current_bar.bpm / 60) * 2
+        self.beat = self.time * (state.sfx.bpm / 60) * 2
 
         if (self.beat >= 32) then
             self.play = false
@@ -226,7 +266,7 @@ BarEditor._update = function(self)
         if (self.current_edit.beat ~= current_beat) then
 
             debug.console("set_note", value)
-            state.current_bar.set_note(value)
+            state.sfx.set_note(value)
 
             self.current_edit = {
                 beat = roundToHalf((local_x) / 16.0),
@@ -254,7 +294,7 @@ BarEditor._update = function(self)
 
         debug.console("set_note", value)
 
-        state.current_bar.set_note(value)
+        state.sfx.set_note(value)
 
         self.current_edit = nil
     elseif inside_widget(self, p.x, p.y) and ctrl.touching(1) ~= nil then
@@ -265,7 +305,7 @@ BarEditor._update = function(self)
             note = self.note,
         }
 
-        state.current_bar.remove_note(value)
+        state.sfx.remove_note(value)
     end
 
     -- get the current note regarding the y position.
@@ -301,7 +341,7 @@ BarEditor._draw = function(self)
         shape.line(x, self.y, x, self.y + self.height, 3)
     end
 
-    for note in all(state.current_bar.notes()) do
+    for note in all(state.sfx.notes()) do
 
         local i = note.notei - self.octave * 12
 
@@ -321,7 +361,7 @@ BarEditor._draw = function(self)
     if self.current_edit then
         local t = self.current_edit
 
-        local note = state.current_bar.note_data(t.note)
+        local note = state.sfx.note_data(t.note)
         local i = note.notei - self.octave * 12
         local keys = self.keys_y[1 + #self.keys_y - i]
 
@@ -355,15 +395,45 @@ end
 
 local w = {}
 
+function _init_mode_switch(entities)
+    for mode in all(entities["ModeButton"]) do
+        local button = new(ModeSwitch, mode)
+        table.insert(m.widgets, button)
+    end
+end
+
+function _init_knob(entities)
+    for k in all(entities["Knob"]) do
+        local knob = widgets:create_knob(k)
+        table.insert(m.widgets, knob)
+    end
+end
+
+function _init_matrix_selector(entities)
+    for matrix in all(entities["MatrixSelector"]) do
+        local widget = new(MatrixSelector, matrix)
+        widget:_init()
+        table.insert(m.widgets, widget)
+    end
+end
+
+function _init_volume_editor(entities)
+    for volume in all(entities["VelocityEditor"]) do
+        local widget = new(VelocityEditor, volume)
+        table.insert(m.widgets, widget)
+    end
+end
+
 function _init()
-    w = {}
-    test = {}
+    m.widgets = {}
+
     state = new(State)
 
-    state.current_bar = sfx.bar(0)
-    state.current_instrument = sfx.instrument(state.current_bar.instrument())
+    state.sfx = sfx.bar(0)
+    state.current_instrument = sfx.instrument(state.sfx.instrument())
 
-    map.level("BarEditor")
+    map.level("SfxEditor")
+
     local entities = map.entities()
 
     for b in all(entities["BarEditor"]) do
@@ -376,29 +446,6 @@ function _init()
         table.insert(w, cursor)
     end
 
-    local to_bpm = function(source, target, value)
-        return 80 + 300 * value
-
-    end
-
-    local from_bpm = function(source, target, value)
-        return (value - 80) / 300
-    end
-
-    for k in all(entities["Knob"]) do
-        local knob = widgets:create_knob(k)
-        table.insert(w, knob)
-        if (knob.fields.Label == "BPM") then
-            wire.bind(knob, "value", state, "current_bar.bpm", to_bpm)
-
-        end
-    end
-
-    for b in all(entities["MenuItem"]) do
-        local button = widgets:create_menu_item(b)
-        table.insert(w, button)
-    end
-
     for instrument_name in all(entities["InstrumentName"]) do
         local label = new(InstrumentName, instrument_name)
         wire.sync(state, "current_instrument.index", label, "index", nil, "update")
@@ -406,57 +453,31 @@ function _init()
 
         local prev = wire.find_widget(w, label.fields.Prev)
         wire.listen(prev, "status", function(source, value)
-            state.current_bar.instrument(state.current_bar.instrument() - 1)
-            state.current_instrument = sfx.instrument(state.current_bar.instrument())
+            state.sfx.instrument(state.sfx.instrument() - 1)
+            state.current_instrument = sfx.instrument(state.sfx.instrument())
             if (state.on_change) then
                 state:on_change()
             end
         end)
         local next = wire.find_widget(w, label.fields.Next)
         wire.listen(next, "status", function(source, value)
-            state.current_bar.instrument(state.current_bar.instrument() + 1)
-            state.current_instrument = sfx.instrument(state.current_bar.instrument())
+            state.sfx.instrument(state.sfx.instrument() + 1)
+            state.current_instrument = sfx.instrument(state.sfx.instrument())
             if (state.on_change) then
                 state:on_change()
             end
         end)
     end
 
-    for mode in all(entities["EditorMode"]) do
-        local modeSwitch = widgets:create_mode_switch_component(mode)
-        modeSwitch.selected_index = 1
-        table.insert(w, modeSwitch)
+    _init_matrix_selector(entities)
+    _init_mode_switch(entities)
+    _init_knob(entities)
+    _init_volume_editor(entities)
+
+    -- force setting correct values
+    if (state.on_change) then
+        state:on_change()
     end
-
-    for mode in all(entities["VolumeEditor"]) do
-        local button = new(VolumeEditor, mode)
-        table.insert(w, button)
-    end
-
-    for b in all(entities["Button"]) do
-        if (b.fields.Type == "SAVE") then
-            local button = widgets:create_button(b)
-            button.on_change = function(self)
-                sfx.save("test.sfx")
-            end
-            table.insert(w, button)
-        end
-    end
-
-    for b in all(entities["SfxMatrix"]) do
-        local button = new(MatrixSelector, b)
-
-        wire.sync(state, "current_bar.index", button, "value", nil, "update")
-        wire.listen(button, "value", function(source, value)
-            state.current_bar = sfx.bar(value)
-            if (state.on_change) then
-                state:on_change()
-            end
-        end)
-        table.insert(w, button)
-    end
-
-    state:on_change()
 end
 
 function _update()
@@ -465,15 +486,16 @@ function _update()
     end, function()
     end)
 
-    for widget in all(w) do
-        widget:_update()
+    for w in all(m.widgets) do
+        w:_update()
     end
+
 end
 
 function _draw()
     map.draw()
 
-    for widget in all(w) do
+    for widget in all(m.widgets) do
         widget:_draw()
     end
 
