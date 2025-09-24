@@ -8,9 +8,10 @@ local m = {
     widgets = {}
 }
 
-local green = 8
+local green = 13
 local red = 5
-local white = 11
+local white = 18
+local shadow = 2
 
 function roundToHalf(num)
     local rounded_step = math.floor(num * 2)
@@ -86,9 +87,8 @@ VelocityEditor._update = function(self)
 end
 
 VelocityEditor.set_value = function(self, beat, volume)
-    -- code temporaire. normalement, je récupère les valeurs de SfxLib
     for b in all(self.values) do
-        if(b.beat == beat) then
+        if (b.beat == beat) then
             b.volume = volume
         end
     end
@@ -179,7 +179,7 @@ CursorEditor._draw = function(self)
     spr.sdraw(x - 4, y, 248, 44, 4, 4, true)
 end
 
-local BarEditor = {
+local SfxEditor = {
     -- position of the keys (y only)
     keys_y = {
         { y = 0, h = 8 },
@@ -210,27 +210,49 @@ local BarEditor = {
 
     octave = 4,
     note = 0,
-    hitbox_octaves = {
-        { x = -16, y = -8, width = 8, height = 8 },
-        { x = -16, y = 0, width = 8, height = 8 },
+    values = {
+
+        {
+            beat = 2,
+            note = "C4",
+            notei = 24,
+            octave = 0,
+            duration = 1,
+            unique = true
+        },
+        {
+            beat = 3.5,
+            note = "D4",
+            notei = 9,
+            octave = 0,
+            duration = 0.5,
+            unique = true
+        },
+        {
+            beat = 4,
+            note = "E4",
+            notei = 20,
+            octave = 0,
+            duration = 0.5,
+            unique = true
+        }
+
     }
 }
 
-BarEditor._init = function(self)
+SfxEditor._init = function(self)
 
 end
 
-BarEditor._update = function(self)
+SfxEditor._update = function(self)
     local p = ctrl.touch()
 
     -- octave management
     -- (as the octave buttons is using the default mouse, the mouse position needs to be checked without the offset)
-    local up = self.hitbox_octaves[1]
-    local down = self.hitbox_octaves[2]
     if ctrl.touched(0) then
-        if inside_widget({ x = self.x + up.x, y = self.y + up.y, width = up.width, height = up.height }, p.x, p.y) then
+        if inside_widget(self, p.x, p.y) then
             self.octave = self.octave + 1
-        elseif inside_widget({ x = self.x + down.x, y = self.y + self.height + down.y, width = down.width, height = down.height }, p.x, p.y) then
+        elseif inside_widget(self, p.x, p.y) then
             self.octave = self.octave - 1
         end
 
@@ -266,7 +288,7 @@ BarEditor._update = function(self)
         if (self.current_edit.beat ~= current_beat) then
 
             debug.console("set_note", value)
-            state.sfx.set_note(value)
+            self:set_value(value)
 
             self.current_edit = {
                 beat = roundToHalf((local_x) / 16.0),
@@ -294,7 +316,7 @@ BarEditor._update = function(self)
 
         debug.console("set_note", value)
 
-        state.sfx.set_note(value)
+        self:set_value(value)
 
         self.current_edit = nil
     elseif inside_widget(self, p.x, p.y) and ctrl.touching(1) ~= nil then
@@ -305,7 +327,7 @@ BarEditor._update = function(self)
             note = self.note,
         }
 
-        state.sfx.remove_note(value)
+        self:set_value(value)
     end
 
     -- get the current note regarding the y position.
@@ -335,32 +357,79 @@ BarEditor._update = function(self)
     end
 end
 
-BarEditor._draw = function(self)
+SfxEditor.set_value = function(value)
+    -- new note:
+    --[[
+    local value = {
+        beat = self.current_edit.beat,
+        note = self.note,
+        duration = 0.5,
+        unique = true
+    }
+    ]]--
+    -- note removed:
+    --        local value = {
+    --            beat = roundToHalf((local_x) / 16.0),
+    --            note = self.note,
+    --        }
+
+
+end
+
+SfxEditor._draw = function(self)
     -- line beats
     for x = self.x, self.x + self.width, 16 do
         shape.line(x, self.y, x, self.y + self.height, 3)
     end
 
-    for note in all(state.sfx.notes()) do
+    for index = 1, #self.values - 1 do
+        local note = self.values[index]
+        local next_note = self.values[index + 1]
 
         local i = note.notei - self.octave * 12
+        local y = self.y + i + 4
+        local end_x =  self.x + note.beat * 16 + (note.duration) * 16
 
-        if self.octave <= note.octave and note.octave < self.octave + 2 then
-            local keys = self.keys_y[1 + #self.keys_y - i]
-            local y = keys.y
-            local h = keys.h
+        local center = end_x - 4
 
-            shape.rectf(
-                    self.x + note.beat * 16, self.y + y,
-                    note.duration * 16, h,
-                    9
-            )
+        local i_next = next_note.notei - self.octave * 12
+        local y_next = self.y + i_next + 4
+        local start_x_next = self.x + next_note.beat * 16
+
+        local center_next = start_x_next + 4
+
+        shape.line(center, self.y + y, center_next, self.y + y_next, green)
+    end
+
+    for note in all(self.values) do
+        local i = note.notei - self.octave * 12
+        local y = self.y + i
+        local start_x = self.x + note.beat * 16
+        local end_x =  self.x + note.beat * 16 + (note.duration) * 16
+
+        -- head
+        spr.sdraw(
+                start_x, self.y + y,
+                16, 112, 8, 8)
+
+        -- body
+        for xx = start_x + 3, end_x do
+            spr.sdraw(
+                    xx, self.y + y,
+                    22, 112, 1, 8)
         end
+        -- tail
+        spr.sdraw(
+                end_x, self.y + y,
+                24, 112, 4, 8)
+
     end
 
     if self.current_edit then
         local t = self.current_edit
 
+        -- todo: ça faisait quoi ça??
+        --[[
         local note = state.sfx.note_data(t.note)
         local i = note.notei - self.octave * 12
         local keys = self.keys_y[1 + #self.keys_y - i]
@@ -373,19 +442,11 @@ BarEditor._draw = function(self)
                 t.duration * 16, h,
                 8
         )
+        ]]
     end
 
     -- border
     shape.rect(self.x, self.y, self.width, self.height + 1, 4)
-
-    -- keyboard
-    spr.sdraw(self.x - 3 * 8, self.y, 136, 64, 3 * 8, self.height)
-    -- octave up
-    local up = self.hitbox_octaves[1]
-    spr.sdraw(self.x + up.x, self.y + up.y, 240, 40, up.width, up.height)
-    -- octave down
-    local down = self.hitbox_octaves[2]
-    spr.sdraw(self.x + down.x, self.y + self.height + down.y, 240, 40, down.width, down.height, false, true)
 
     local p = ctrl.touch()
     local x = math.clamp(self.x, p.x, self.x + self.width)
@@ -417,9 +478,16 @@ function _init_matrix_selector(entities)
     end
 end
 
-function _init_volume_editor(entities)
+function _init_velocity_editor(entities)
     for volume in all(entities["VelocityEditor"]) do
         local widget = new(VelocityEditor, volume)
+        table.insert(m.widgets, widget)
+    end
+end
+
+function _init_sfx_editor(entities)
+    for volume in all(entities["SfxEditor"]) do
+        local widget = new(SfxEditor, volume)
         table.insert(m.widgets, widget)
     end
 end
@@ -437,7 +505,7 @@ function _init()
     local entities = map.entities()
 
     for b in all(entities["BarEditor"]) do
-        local editor = new(BarEditor, b)
+        local editor = new(SfxEditor, b)
         local cursor = new(CursorEditor)
         cursor.editor = editor
 
@@ -472,7 +540,8 @@ function _init()
     _init_matrix_selector(entities)
     _init_mode_switch(entities)
     _init_knob(entities)
-    _init_volume_editor(entities)
+    _init_velocity_editor(entities)
+    _init_sfx_editor(entities)
 
     -- force setting correct values
     if (state.on_change) then
@@ -500,7 +569,7 @@ function _draw()
     end
 
     if (state.edit) then
-        mouse._draw(25 + 32)
+        mouse._draw(64)
     else
         mouse._draw()
     end
