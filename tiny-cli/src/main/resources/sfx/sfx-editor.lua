@@ -208,36 +208,9 @@ local SfxEditor = {
         { y = 185, h = 8 },
     },
 
-    octave = 4,
-    note = 0,
-    values = {
-
-        {
-            beat = 2,
-            note = "C4",
-            notei = 24,
-            octave = 0,
-            duration = 1,
-            unique = true
-        },
-        {
-            beat = 3.5,
-            note = "D4",
-            notei = 9,
-            octave = 0,
-            duration = 0.5,
-            unique = true
-        },
-        {
-            beat = 4,
-            note = "E4",
-            notei = 20,
-            octave = 0,
-            duration = 0.5,
-            unique = true
-        }
-
-    }
+    octave = 0,
+    note = "C0",
+    values = {}
 }
 
 SfxEditor._init = function(self)
@@ -247,19 +220,6 @@ end
 SfxEditor._update = function(self)
     local p = ctrl.touch()
 
-    -- octave management
-    -- (as the octave buttons is using the default mouse, the mouse position needs to be checked without the offset)
-    if ctrl.touched(0) then
-        if inside_widget(self, p.x, p.y) then
-            self.octave = self.octave + 1
-        elseif inside_widget(self, p.x, p.y) then
-            self.octave = self.octave - 1
-        end
-
-        self.octave = math.clamp(0, self.octave, 8)
-    end
-
-    p = { x = p.x, y = p.y + 8 }
     if inside_widget(self, p.x, p.y) then
         state.edit = true
     else
@@ -284,10 +244,9 @@ SfxEditor._update = function(self)
         }
 
         local current_beat = roundToHalf((local_x) / 16.0)
-        debug.console("beat -> ", value.beat, " current beat -> ", current_beat)
+
         if (self.current_edit.beat ~= current_beat) then
 
-            debug.console("set_note", value)
             self:set_value(value)
 
             self.current_edit = {
@@ -314,8 +273,6 @@ SfxEditor._update = function(self)
             unique = true
         }
 
-        debug.console("set_note", value)
-
         self:set_value(value)
 
         self.current_edit = nil
@@ -332,48 +289,35 @@ SfxEditor._update = function(self)
 
     -- get the current note regarding the y position.
     -- the note is computed fro the color of the color virtual keyboard
-    local y = math.clamp(0, p.y - self.y, 192)
-    local color = spr.pget(164, 64 + y)
+    local local_y = math.clamp(0, p.y - self.y, self.height)
+    local color = spr.pget(164, 64 + local_y)
 
     local color_to_note = {
-        [16] = "C",
-        [15] = "Cs",
-        [14] = "D",
-        [13] = "Ds",
-        [12] = "E",
-        [11] = "F",
-        [10] = "Fs",
-        [9] = "G",
-        [7] = "Gs",
-        [6] = "A",
-        [5] = "As",
-        [4] = "B"
+        [10] = "C",
+        [7] = "Cs",
+        [17] = "D",
+        [11] = "Ds",
+        [15] = "E",
+        [12] = "F",
+        [13] = "Fs",
+        [8] = "G",
+        [5] = "Gs",
+        [4] = "A",
+        [3] = "As",
+        [1] = "B"
     }
 
-    local octave = (y <= 95 and self.octave + 1) or self.octave
     local note = color_to_note[color]
+    local octave = (local_y <= 95 and 1) or 0
     if note then
         self.note = note .. octave
     end
 end
 
-SfxEditor.set_value = function(value)
-    -- new note:
-    --[[
-    local value = {
-        beat = self.current_edit.beat,
-        note = self.note,
-        duration = 0.5,
-        unique = true
-    }
-    ]]--
-    -- note removed:
-    --        local value = {
-    --            beat = roundToHalf((local_x) / 16.0),
-    --            note = self.note,
-    --        }
-
-
+SfxEditor.set_value = function(self, value)
+    if self.on_change then
+        self:on_change(value)
+    end
 end
 
 SfxEditor._draw = function(self)
@@ -386,24 +330,21 @@ SfxEditor._draw = function(self)
         local note = self.values[index]
         local next_note = self.values[index + 1]
 
-        local i = note.notei - self.octave * 12
-        local y = self.y + i + 4
+        local y = self.y + self.height - (note.notei) * 8 + 4
         local end_x =  self.x + note.beat * 16 + (note.duration) * 16
 
         local center = end_x - 4
 
-        local i_next = next_note.notei - self.octave * 12
-        local y_next = self.y + i_next + 4
+        local y_next = self.y + self.height - (next_note.notei) * 8 + 4
         local start_x_next = self.x + next_note.beat * 16
 
         local center_next = start_x_next + 4
 
-        shape.line(center, self.y + y, center_next, self.y + y_next, green)
+        shape.line(center, y, center_next, y_next, green)
     end
 
     for note in all(self.values) do
-        local i = note.notei - self.octave * 12
-        local y = self.y + i
+        local y = self.y + self.height - (note.notei + 2) * 8
         local start_x = self.x + note.beat * 16
         local end_x =  self.x + note.beat * 16 + (note.duration) * 16
 
@@ -447,11 +388,6 @@ SfxEditor._draw = function(self)
 
     -- border
     shape.rect(self.x, self.y, self.width, self.height + 1, 4)
-
-    local p = ctrl.touch()
-    local x = math.clamp(self.x, p.x, self.x + self.width)
-
-    print(self.note, x, self.y - 8)
 end
 
 local w = {}
@@ -488,6 +424,11 @@ end
 function _init_sfx_editor(entities)
     for volume in all(entities["SfxEditor"]) do
         local widget = new(SfxEditor, volume)
+        wire.sync(state, "sfx.notes", widget, "values")
+        widget.on_change = function(self, value)
+            state.sfx.set_note(value)
+        end
+
         table.insert(m.widgets, widget)
     end
 end
@@ -503,39 +444,6 @@ function _init()
     map.level("SfxEditor")
 
     local entities = map.entities()
-
-    for b in all(entities["BarEditor"]) do
-        local editor = new(SfxEditor, b)
-        local cursor = new(CursorEditor)
-        cursor.editor = editor
-
-        editor:_init()
-        table.insert(w, editor)
-        table.insert(w, cursor)
-    end
-
-    for instrument_name in all(entities["InstrumentName"]) do
-        local label = new(InstrumentName, instrument_name)
-        wire.sync(state, "current_instrument.index", label, "index", nil, "update")
-        table.insert(w, label)
-
-        local prev = wire.find_widget(w, label.fields.Prev)
-        wire.listen(prev, "status", function(source, value)
-            state.sfx.instrument(state.sfx.instrument() - 1)
-            state.current_instrument = sfx.instrument(state.sfx.instrument())
-            if (state.on_change) then
-                state:on_change()
-            end
-        end)
-        local next = wire.find_widget(w, label.fields.Next)
-        wire.listen(next, "status", function(source, value)
-            state.sfx.instrument(state.sfx.instrument() + 1)
-            state.current_instrument = sfx.instrument(state.sfx.instrument())
-            if (state.on_change) then
-                state:on_change()
-            end
-        end)
-    end
 
     _init_matrix_selector(entities)
     _init_mode_switch(entities)

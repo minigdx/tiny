@@ -5841,19 +5841,19 @@
 						},
 						{
 							"__identifier": "SfxEditor",
-							"__grid": [18,6],
+							"__grid": [18,2],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
 							"__smartColor": "#124E89",
 							"iid": "6dc096d0-8560-11f0-96f7-3906a9fbc0b4",
 							"width": 200,
-							"height": 136,
+							"height": 192,
 							"defUid": 84,
-							"px": [144,48],
+							"px": [144,16],
 							"fieldInstances": [],
 							"__worldX": 560,
-							"__worldY": 48
+							"__worldY": 16
 						},
 						{
 							"__identifier": "VelocityEditor",
