@@ -62,12 +62,7 @@ InstrumentName._draw = function(self)
 end
 
 local VelocityEditor = {
-    values = {
-        { beat = 1, duration = 1, volume = 1 },
-        { beat = 2, duration = 0.5, volume = 1 },
-        { beat = 2.5, duration = 0.5, volume = 0.5 },
-        { beat = 3.5, duration = 0.5, volume = 0.2 }
-    }
+    values = {}
 }
 
 VelocityEditor._update = function(self)
@@ -87,13 +82,8 @@ VelocityEditor._update = function(self)
 end
 
 VelocityEditor.set_value = function(self, beat, volume)
-    for b in all(self.values) do
-        if (b.beat == beat) then
-            b.volume = volume
-        end
-    end
     if self.on_change then
-        self.on_change({ beat = beat, volume = volume })
+        self:on_change({ beat = beat, volume = volume })
     end
 end
 
@@ -390,8 +380,6 @@ SfxEditor._draw = function(self)
     shape.rect(self.x, self.y, self.width, self.height + 1, 4)
 end
 
-local w = {}
-
 function _init_mode_switch(entities)
     for mode in all(entities["ModeButton"]) do
         local button = new(ModeSwitch, mode)
@@ -417,6 +405,10 @@ end
 function _init_velocity_editor(entities)
     for volume in all(entities["VelocityEditor"]) do
         local widget = new(VelocityEditor, volume)
+        wire.sync(state, "sfx.notes", widget, "values")
+        widget.on_change = function(self, value)
+            state.sfx.set_volume(value)
+        end
         table.insert(m.widgets, widget)
     end
 end

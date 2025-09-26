@@ -540,8 +540,12 @@ class SfxLib(
                 { this.tempo = it.checkint() },
             )
 
-            obj.function2("set_volume") { beat, volume ->
-                this.setVolume(beat.tofloat(), volume.tofloat())
+            obj.function1("set_volume") { arg ->
+                val beat = arg["beat"].todouble().toFloat()
+                val volume = arg["volume"].todouble().toFloat()
+
+                this.setVolume(beat, volume)
+
                 NONE
             }
 
