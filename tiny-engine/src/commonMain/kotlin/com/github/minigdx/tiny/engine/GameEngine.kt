@@ -88,7 +88,11 @@ class GameEngine(
     override suspend fun advance(delta: Seconds) {
         performanceMonitor.frameStart()
 
-        gameResourceProcessor.processAvailableEvents()
+        try {
+            gameResourceProcessor.processAvailableEvents()
+        } catch (ex: TinyException) {
+            popupError(ex)
+        }
         virtualFrameBuffer.bindTextures(gameResourceProcessor.spritesheetToBind)
 
         val currentGameScript = gameResourceProcessor.currentScript ?: return
@@ -211,7 +215,7 @@ class GameEngine(
         ) {
             val error = "line ${ex.lineNumber}:${ex.line} <-- the \uD83D\uDC1E is around here (${ex.message})"
             "The line ${ex.lineNumber} trigger an execution error (${ex.message}). " +
-                "Please fix the script ${ex.name}!\n" + error
+                    "Please fix the script ${ex.name}!\n" + error
         }
         val msg = "error line ${ex.lineNumber}:${ex.line} (${ex.message})"
         popup(msg, "#FF0000", true)
@@ -254,14 +258,14 @@ class GameEngine(
                     val drawOnScreen = averageMetrics.drawOnScreen.toString().padStart(6)
 
                     "\n┌─────────────────┬────────┐\n" +
-                        "│ FPS             │ $fps │\n" +
-                        "│ Frame Time      │ ${frameTime}ms │\n" +
-                        "│ Update Time     │ ${updateTimeFormatted}ms │\n" +
-                        "│ Memory          │ ${memory}MB │\n" +
-                        "│ Draw Calls      │ $drawCalls │\n" +
-                        "│ Read Pixels     │ $readPixels │\n" +
-                        "│ Draw On Screen  │ $drawOnScreen │\n" +
-                        "└─────────────────┴────────┘"
+                            "│ FPS             │ $fps │\n" +
+                            "│ Frame Time      │ ${frameTime}ms │\n" +
+                            "│ Update Time     │ ${updateTimeFormatted}ms │\n" +
+                            "│ Memory          │ ${memory}MB │\n" +
+                            "│ Draw Calls      │ $drawCalls │\n" +
+                            "│ Read Pixels     │ $readPixels │\n" +
+                            "│ Draw On Screen  │ $drawOnScreen │\n" +
+                            "└─────────────────┴────────┘"
                 }
             }
         }

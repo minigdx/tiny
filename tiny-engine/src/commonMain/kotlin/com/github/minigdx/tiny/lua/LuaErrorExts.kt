@@ -18,11 +18,30 @@ fun LuaError.errorLine(): Pair<Int, String>? {
     }
 }
 
+fun LuaError.fromErrorLine(): Int? {
+    return errorLine()?.first
+}
+
+fun LuaError.fromMessage(): Int? {
+    val msg = message ?: return null
+
+    val pattern = """\[[\s\S]*]:(\d+):.*""".toRegex()
+    val match = pattern.matchEntire(msg)
+    return match?.groupValues?.get(1)?.toIntOrNull()
+}
+
 fun LuaError.toTinyException(content: String): TinyException {
+    val line = line.takeIf { line != -1 }
+    // There is no line information, le's check the fileline
+        ?: fromErrorLine()
+        // The error line might be in the error message
+        ?: fromMessage()
+        // Let's give it up...
+        ?: -1
     return TinyException(
         name = this.script,
         content = content,
-        lineNumber = this.line,
+        lineNumber = line,
         message = this.message,
         cause = this,
     )

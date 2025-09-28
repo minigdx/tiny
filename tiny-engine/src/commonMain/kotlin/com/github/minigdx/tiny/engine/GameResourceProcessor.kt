@@ -1,6 +1,7 @@
 package com.github.minigdx.tiny.engine
 
 import com.github.minigdx.tiny.log.Logger
+import com.github.minigdx.tiny.lua.toTinyException
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.resources.GameLevel
 import com.github.minigdx.tiny.resources.GameResource
@@ -25,6 +26,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.launch
+import org.luaj.vm2.LuaError
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class GameResourceProcessor(
@@ -205,14 +207,6 @@ class GameResourceProcessor(
         spritesheetToBind.add(spriteSheet)
     }
 
-    private fun getNextAvailableTextureUnit(): Int {
-        check(nextAvailableTextureUnit < MAX_TEXTURE_UNIT) {
-            "There is too many textures managed by the engine. " +
-                "The maximum texture allowed is $MAX_TEXTURE_UNIT"
-        }
-        return nextAvailableTextureUnit++
-    }
-
     private suspend fun loadEngineScript(resource: GameResource) {
         // Don't put the engine script in the stack
         engineGameScript = resource as GameScript
@@ -220,9 +214,17 @@ class GameResourceProcessor(
         engineGameScript?.evaluate()
     }
 
-    private fun loadGameScript(resource: GameResource) {
+    private suspend fun loadGameScript(resource: GameResource) {
         resource as GameScript
         resource.resourceAccess = this
+
+        try {
+            if (resource.reload && !resource.isValid()) {
+                return
+            }
+        } catch (ex: LuaError) {
+            throw ex.toTinyException(resource.content.decodeToString())
+        }
         // Game script will be evaluated when the boot script will exit
         scripts[resource.index] = resource
 
