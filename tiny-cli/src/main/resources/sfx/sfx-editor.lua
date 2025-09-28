@@ -233,7 +233,7 @@ SfxEditor._update = function(self)
             unique = true
         }
 
-        local current_beat = roundToHalf((local_x) / 16.0)
+        local current_beat = roundToHalf((local_x - 0.5) / 16.0)
 
         if (self.current_edit.beat ~= current_beat) then
 
@@ -311,11 +311,6 @@ SfxEditor.set_value = function(self, value)
 end
 
 SfxEditor._draw = function(self)
-    -- line beats
-    for x = self.x, self.x + self.width, 16 do
-        shape.line(x, self.y, x, self.y + self.height, 3)
-    end
-
     for index = 1, #self.values - 1 do
         local note = self.values[index]
         local next_note = self.values[index + 1]
@@ -336,12 +331,12 @@ SfxEditor._draw = function(self)
     for note in all(self.values) do
         local y = self.y + self.height - (note.notei + 2) * 8
         local start_x = self.x + note.beat * 16
-        local end_x =  self.x + note.beat * 16 + (note.duration) * 16
+        local end_x =  self.x + note.beat * 16 + (note.duration) * 16 - 3
 
         -- head
         spr.sdraw(
                 start_x, self.y + y,
-                16, 112, 8, 8)
+                16, 112, 3, 8)
 
         -- body
         for xx = start_x + 3, end_x do
@@ -355,29 +350,6 @@ SfxEditor._draw = function(self)
                 24, 112, 4, 8)
 
     end
-
-    if self.current_edit then
-        local t = self.current_edit
-
-        -- todo: ça faisait quoi ça??
-        --[[
-        local note = state.sfx.note_data(t.note)
-        local i = note.notei - self.octave * 12
-        local keys = self.keys_y[1 + #self.keys_y - i]
-
-        local y = keys.y
-        local h = keys.h
-
-        shape.rect(
-                self.x + t.beat * 16, self.y + y,
-                t.duration * 16, h,
-                8
-        )
-        ]]
-    end
-
-    -- border
-    shape.rect(self.x, self.y, self.width, self.height + 1, 4)
 end
 
 function _init_mode_switch(entities)
