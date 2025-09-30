@@ -598,7 +598,13 @@ class SfxLib(
             }
 
             obj.function0("play") {
-                NONE
+                val handler = soundBoard.prepare(this).also { it.play() }
+                val result = WrapperLuaTable()
+                result.function0("stop") {
+                    handler.stop()
+                    NONE
+                }
+                result
             }
 
             obj.function1("instrument") { arg ->
