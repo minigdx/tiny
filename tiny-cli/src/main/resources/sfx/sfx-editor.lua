@@ -46,23 +46,19 @@ function inside_widget(w, x, y, offset)
             y <= w.y + w.height + off
 end
 
-local InstrumentName = {
-    index = 0
-}
-
-InstrumentName._update = function(self)
-
-end
-
-InstrumentName._draw = function(self)
-    local x, y = 0, 160
-    local ox = (self.index % 4) * 16
-    local oy = math.floor(self.index / 4) * 16
-    spr.sdraw(self.x, self.y, x + ox, y + oy, 16, 16)
+function filter(widgetType)
+    for w in all(m.widgets) do
+        local mt = getmetatable(w)
+        if mt and mt._update == widgetType._update then
+            return w
+        end
+    end
+    return nil
 end
 
 local VelocityEditor = {
-    values = {}
+    values = {},
+    current_beat = nil, -- current played beat
 }
 
 VelocityEditor._update = function(self)
@@ -117,24 +113,28 @@ VelocityEditor._draw = function(self)
         local endVelocity = startVelocity + note.duration * 16
         local x = startVelocity + (endVelocity - startVelocity) * 0.5
 
-        shape.circle(x, y, 2, white)
+        local is_active = self.current_beat and note.beat <= self.current_beat and self.current_beat < note.beat + note.duration
+
+        if(is_active) then
+            shape.circlef(x, y, 2, green)
+        else
+            shape.circle(x, y, 2, white)
+        end
     end
 end
 
-local CursorEditor = {
-    editor = nil,
+local Player = {
     beat = 0,
-    note = 0,
-    step_x = 8, -- adjust regarding the size of half of a bit on screen,
+    step_x = 16, -- adjust regarding the size of half of a bit on screen,
     time = 0,
     play = false,
 }
 
-CursorEditor._update = function(self)
+Player._update = function(self)
     if (ctrl.pressed(keys.left)) then
-        self.beat = self.beat - 1
+        self.beat = self.beat - 0.5
     elseif (ctrl.pressed(keys.right)) then
-        self.beat = self.beat + 1
+        self.beat = self.beat + 0.5
     end
 
     if ctrl.pressed(keys.space) then
@@ -142,8 +142,11 @@ CursorEditor._update = function(self)
         self.play = not self.play
         self.time = 0
 
+        if self.handler then
+            self.handler.stop()
+        end
         if self.play then
-            state.sfx.play()
+            self.handler = state.sfx.play()
         end
     end
 
@@ -158,15 +161,23 @@ CursorEditor._update = function(self)
     end
 
     self.beat = math.clamp(0, self.beat, 32)
+
+    self:set_value(self.beat)
 end
 
-CursorEditor._draw = function(self)
+Player._draw = function(self)
     local x = self.editor.x + self.beat * self.step_x
     local y = self.editor.y - 4
     -- right
-    spr.sdraw(x, y, 248, 44, 4, 4)
+    spr.sdraw(x, y, 0, 48, 8, 8)
     -- left
-    spr.sdraw(x - 4, y, 248, 44, 4, 4, true)
+    -- spr.sdraw(x - 4, y, 248, 44, 4, 4, true)
+end
+
+Player.set_value = function(self, value)
+    if self.on_change then
+        self:on_change(value)
+    end
 end
 
 local SfxEditor = {
@@ -200,6 +211,7 @@ local SfxEditor = {
 
     octave = 0,
     note = "C0",
+    current_beat = nil, -- current played beat
     values = {}
 }
 
@@ -333,21 +345,25 @@ SfxEditor._draw = function(self)
         local start_x = self.x + note.beat * 16
         local end_x =  self.x + note.beat * 16 + (note.duration) * 16 - 3
 
+        local is_active = 0
+        if self.current_beat and note.beat <= self.current_beat and self.current_beat < note.beat + note.duration then
+            is_active = 8
+        end
         -- head
         spr.sdraw(
                 start_x, self.y + y,
-                16, 112, 3, 8)
+                16, 112 + is_active, 3, 8)
 
         -- body
         for xx = start_x + 3, end_x do
             spr.sdraw(
                     xx, self.y + y,
-                    22, 112, 1, 8)
+                    22, 112 + is_active, 1, 8)
         end
         -- tail
         spr.sdraw(
                 end_x, self.y + y,
-                24, 112, 4, 8)
+                24, 112 + is_active, 4, 8)
 
     end
 end
@@ -397,6 +413,18 @@ function _init_sfx_editor(entities)
     end
 end
 
+function _init_player(entities)
+    local player = new(Player)
+    local sfxEditor = filter(SfxEditor)
+    player.editor = sfxEditor
+
+    local velocityEditor = filter(VelocityEditor)
+
+    wire.sync(player, "beat", sfxEditor, "current_beat")
+    wire.sync(player, "beat", velocityEditor, "current_beat")
+    table.insert(m.widgets, player)
+end
+
 function _init()
     m.widgets = {}
 
@@ -414,6 +442,7 @@ function _init()
     _init_knob(entities)
     _init_velocity_editor(entities)
     _init_sfx_editor(entities)
+    _init_player(entities)
 
     -- force setting correct values
     if (state.on_change) then

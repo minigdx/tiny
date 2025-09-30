@@ -598,13 +598,7 @@ class SfxLib(
             }
 
             obj.function0("play") {
-                // FIXME:
-                TODO("J")
-                /*
-                                resourceAccess.play(this)
-                                NONE
-
-                 */
+                NONE
             }
 
             obj.function1("instrument") { arg ->
