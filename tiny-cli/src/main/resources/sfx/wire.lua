@@ -16,14 +16,24 @@ end
 local function get_value(obj, path)
     local parts = parse_path(path)
     local current = obj
-    
+
     for i = 1, #parts do
-        current = current[parts[i]]
+        local key = parts[i]
+        if type(current) ~= "table" then
+            debug.console("ERROR: get_value - attempt to index a " .. type(current) .. " value")
+            debug.console("  path:", path)
+            debug.console("  i:", i)
+            debug.console("  key:", key)
+            debug.console("  current:", current)
+            debug.console("  parts:", parts)
+            return nil
+        end
+        current = current[key]
         if current == nil then
             return nil
         end
     end
-    
+
     return current
 end
 

@@ -607,7 +607,7 @@ class SfxLib(
                 result
             }
 
-            obj.function1("instrument") { arg ->
+            obj.function1("set_instrument") { arg ->
                 if (arg.isnil()) {
                     this.instrument?.let { valueOf(it.index) } ?: NIL
                 } else {
@@ -618,6 +618,9 @@ class SfxLib(
                     this.instrumentIndex = instrument.index
                     NONE
                 }
+            }
+            obj.wrap("instrument") {
+                this.instrument?.index?.let { valueOf(it) } ?: NIL
             }
 
             return obj

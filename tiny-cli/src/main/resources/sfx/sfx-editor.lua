@@ -25,9 +25,6 @@ local State = {
     -- the current bar the user is editing
     current_bar = nil,
 
-    -- the instrument of the current_bar
-    current_instrument = nil,
-
     on_change = function()
     end
 }
@@ -386,6 +383,18 @@ function _init_matrix_selector(entities)
     for matrix in all(entities["MatrixSelector"]) do
         local widget = new(MatrixSelector, matrix)
         widget:_init()
+
+        if widget.fields.Label == "Instruments" then
+            -- display the current instrument
+            wire.sync(state, "sfx.instrument", widget, "value")
+            -- set the instrument to the bar
+            wire.listen(widget, "value", function(source, value)
+                state.sfx.set_instrument(value)
+            end)
+            -- set the list of instruments
+            wire.sync(state, "sfx.instrument", widget, "active_indices", function(_, _, id) return sfx.instrument(id).all end)
+        end
+
         table.insert(m.widgets, widget)
     end
 end
@@ -431,7 +440,6 @@ function _init()
     state = new(State)
 
     state.sfx = sfx.bar(0)
-    state.current_instrument = sfx.instrument(state.sfx.instrument())
 
     map.level("SfxEditor")
 
