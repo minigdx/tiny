@@ -11,7 +11,7 @@
 	"iid": "89bab230-5e50-11f0-9e1e-fb2ec5447df7",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 94,
+	"nextUid": 95,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -2150,10 +2150,10 @@
 					"tilesetUid": null
 				},
 				{
-					"identifier": "Volume",
+					"identifier": "Instrument",
 					"doc": null,
 					"__type": "EntityRef",
-					"uid": 92,
+					"uid": 93,
 					"type": "F_EntityRef",
 					"isArray": false,
 					"canBeNull": true,
@@ -2182,15 +2182,15 @@
 					"autoChainRef": true,
 					"allowOutOfLevelRef": true,
 					"allowedRefs": "OnlySpecificEntity",
-					"allowedRefsEntityUid": 44,
+					"allowedRefsEntityUid": 48,
 					"allowedRefTags": [],
 					"tilesetUid": null
 				},
 				{
-					"identifier": "Instrument",
+					"identifier": "Selector",
 					"doc": null,
 					"__type": "EntityRef",
-					"uid": 93,
+					"uid": 94,
 					"type": "F_EntityRef",
 					"isArray": false,
 					"canBeNull": true,
@@ -6120,7 +6120,6 @@
 									"id": "V_String",
 									"params": ["b7fbc610-8560-11f0-96f7-c9f11b238a60"]
 								}] },
-								{ "__identifier": "Volume", "__type": "EntityRef", "__value": null, "__tile": null, "defUid": 92, "realEditorValues": [] },
 								{ "__identifier": "Instrument", "__type": "EntityRef", "__value": {
 									"entityIid": "e29b6760-8560-11f0-96f7-fb3db6e0337a",
 									"layerIid": "7b3b0491-8560-11f0-96f7-8b46d1b6167c",
@@ -6129,6 +6128,15 @@
 								}, "__tile": null, "defUid": 93, "realEditorValues": [{
 									"id": "V_String",
 									"params": ["e29b6760-8560-11f0-96f7-fb3db6e0337a"]
+								}] },
+								{ "__identifier": "Selector", "__type": "EntityRef", "__value": {
+									"entityIid": "7b3b0492-8560-11f0-96f7-1db641e1794e",
+									"layerIid": "7b3b0491-8560-11f0-96f7-8b46d1b6167c",
+									"levelIid": "7b3b0490-8560-11f0-96f7-f3b9d5f9ff28",
+									"worldIid": "89bad940-5e50-11f0-9e1e-717ced9c1339"
+								}, "__tile": null, "defUid": 94, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["7b3b0492-8560-11f0-96f7-1db641e1794e"]
 								}] }
 							],
 							"__worldX": 536,
@@ -6177,7 +6185,7 @@
 						},
 						{
 							"__identifier": "Player",
-							"__grid": [13,9],
+							"__grid": [11,10],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
@@ -6186,7 +6194,7 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 86,
-							"px": [104,72],
+							"px": [88,80],
 							"fieldInstances": [
 								{ "__identifier": "SfxEditor", "__type": "EntityRef", "__value": {
 									"entityIid": "6dc096d0-8560-11f0-96f7-3906a9fbc0b4",
@@ -6216,8 +6224,8 @@
 									"params": ["b7fbc610-8560-11f0-96f7-c9f11b238a60"]
 								}] }
 							],
-							"__worldX": 520,
-							"__worldY": 72
+							"__worldX": 504,
+							"__worldY": 80
 						}
 					]
 				},

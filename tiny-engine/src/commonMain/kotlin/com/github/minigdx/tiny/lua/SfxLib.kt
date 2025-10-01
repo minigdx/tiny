@@ -535,6 +535,17 @@ class SfxLib(
             )
 
             obj.wrap(
+                "all",
+                {
+                    val luaTable = LuaTable()
+                    getCurrentMusic().musicalBars.map { it.index }.forEach {
+                        luaTable.insert(0, valueOf(it))
+                    }
+                    luaTable
+                },
+            )
+
+            obj.wrap(
                 "bpm",
                 { valueOf(this.tempo) },
                 { this.tempo = it.checkint() },

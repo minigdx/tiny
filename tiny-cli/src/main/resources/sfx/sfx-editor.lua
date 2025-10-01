@@ -360,19 +360,6 @@ function _init_matrix_selector(entities)
     for matrix in all(entities["MatrixSelector"]) do
         local widget = new(MatrixSelector, matrix)
         widget:_init()
-
-        -- TODO: move that into _init_sfx_editor
-        if widget.fields.Label == "Instruments" then
-            -- display the current instrument
-            wire.sync(state, "sfx.instrument", widget, "value")
-            -- set the instrument to the bar
-            wire.listen(widget, "value", function(source, value)
-                state.sfx.set_instrument(value)
-            end)
-            -- set the list of instruments
-            wire.sync(state, "sfx.instrument", widget, "active_indices", function(_, _, id) return sfx.instrument(id).all end)
-        end
-
         table.insert(m.widgets, widget)
     end
 end
@@ -412,6 +399,28 @@ function _init_sfx_editor(entities)
         widget.remove_value = function(self, value)
             state.sfx.remove_note(value)
         end
+
+        -- Instrument matrix selector
+        local instrument = wire.find_widget(m.widgets, widget.fields.Instrument)
+        -- display the current instrument
+        wire.sync(state, "sfx.instrument", instrument, "value")
+        -- set the instrument to the bar
+        wire.listen(instrument, "value", function(source, value)
+            state.sfx.set_instrument(value)
+        end)
+        -- set the list of instruments
+        wire.sync(state, "sfx.instrument", instrument, "active_indices", function(_, _, id) return sfx.instrument(id).all end)
+
+        -- Sfx matrix selector
+        local selector = wire.find_widget(m.widgets, widget.fields.Selector)
+        -- display the current instrument
+        wire.sync(state, "sfx.index", selector, "value")
+        -- set the instrument to the bar
+        wire.listen(selector, "value", function(source, value)
+            state.sfx = sfx.bar(value)
+        end)
+        -- set the list of instruments
+        wire.sync(state, "sfx.all", selector, "active_indices")
 
         table.insert(m.widgets, widget)
     end
