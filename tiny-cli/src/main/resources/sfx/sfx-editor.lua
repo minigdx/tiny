@@ -181,36 +181,8 @@ Player.set_value = function(self, value)
 end
 
 local SfxEditor = {
-    -- position of the keys (y only)
-    keys_y = {
-        { y = 0, h = 8 },
-        { y = 9, h = 8 },
-        { y = 17, h = 8 },
-        { y = 25, h = 8 },
-        { y = 33, h = 8 },
-        { y = 41, h = 8 },
-        { y = 49, h = 8 },
-        { y = 57, h = 8 },
-        { y = 65, h = 8 },
-        { y = 73, h = 8 },
-        { y = 81, h = 8 },
-        { y = 89, h = 8 },
-        { y = 97, h = 8 },
-        { y = 105, h = 8 },
-        { y = 113, h = 8 },
-        { y = 121, h = 8 },
-        { y = 129, h = 8 },
-        { y = 137, h = 8 },
-        { y = 145, h = 8 },
-        { y = 153, h = 8 },
-        { y = 161, h = 8 },
-        { y = 169, h = 8 },
-        { y = 177, h = 8 },
-        { y = 185, h = 8 },
-    },
-
-    octave = 0,
-    note = "C0",
+    octave = 2,
+    note = "C2",
     current_beat = nil, -- current played beat
     values = {}
 }
@@ -286,7 +258,9 @@ SfxEditor._update = function(self)
             note = self.note,
         }
 
-        self:set_value(value)
+        if self.remove_value then
+            self:remove_value(value)
+        end
     end
 
     -- get the current note regarding the y position.
@@ -312,7 +286,7 @@ SfxEditor._update = function(self)
     local note = color_to_note[color]
     local octave = (local_y <= 95 and 1) or 0
     if note then
-        self.note = note .. octave
+        self.note = note .. (self.octave + octave)
     end
 end
 
@@ -327,12 +301,12 @@ SfxEditor._draw = function(self)
         local note = self.values[index]
         local next_note = self.values[index + 1]
 
-        local y = self.y + self.height - (note.notei) * 8 + 4
+        local y = self.y + self.height - (note.notei - self.octave * 12) * 8 + 4
         local end_x =  self.x + note.beat * 16 + (note.duration) * 16
 
         local center = end_x - 4
 
-        local y_next = self.y + self.height - (next_note.notei) * 8 + 4
+        local y_next = self.y + self.height - (next_note.notei - self.octave * 12) * 8 + 4
         local start_x_next = self.x + next_note.beat * 16
 
         local center_next = start_x_next + 4
@@ -341,7 +315,7 @@ SfxEditor._draw = function(self)
     end
 
     for note in all(self.values) do
-        local y = self.y + self.height - (note.notei + 2) * 8
+        local y = self.y + self.height - (note.notei + 2 - self.octave * 12) * 8
         local start_x = self.x + note.beat * 16
         local end_x =  self.x + note.beat * 16 + (note.duration) * 16 - 3
 
@@ -418,7 +392,6 @@ function _init_sfx_editor(entities)
     for editor in all(entities["SfxEditor"]) do
         local widget = new(SfxEditor, editor)
         local bpm = wire.find_widget(m.widgets, widget.fields.BPM)
-        local volume = wire.find_widget(m.widgets, widget.fields.Volume)
 
         -- wire.bind(state, "sfx.volume", volume, "value")
         local transform = {
@@ -435,6 +408,9 @@ function _init_sfx_editor(entities)
         wire.sync(state, "sfx.notes", widget, "values")
         widget.on_change = function(self, value)
             state.sfx.set_note(value)
+        end
+        widget.remove_value = function(self, value)
+            state.sfx.remove_note(value)
         end
 
         table.insert(m.widgets, widget)
