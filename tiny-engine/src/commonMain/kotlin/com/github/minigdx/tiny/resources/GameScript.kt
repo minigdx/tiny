@@ -145,7 +145,7 @@ class GameScript(
             if (luaCause is Exit) {
                 exited = luaCause.script
             } else {
-                throw ex.toTinyException(content.decodeToString())
+                throw ex
             }
         }
     }
