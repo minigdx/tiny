@@ -123,6 +123,7 @@ end
 local Player = {
     beat = 0,
     step_x = 16, -- adjust regarding the size of half of a bit on screen,
+    bpm = 0, -- BPM on the current SFX
     time = 0,
     play = false,
 }
@@ -143,13 +144,15 @@ Player._update = function(self)
             self.handler.stop()
         end
         if self.play then
+            -- TODO: introduce on_play and on_stop
             self.handler = state.sfx.play()
         end
     end
 
     if self.play then
         self.time = self.time + tiny.dt
-        self.beat = self.time * (state.sfx.bpm / 60) * 2
+        -- TODO: use self.bpm instead and wire it
+        self.beat = self.time * (state.sfx.bpm / 60)
 
         if (self.beat >= 32) then
             self.play = false
@@ -384,6 +387,7 @@ function _init_matrix_selector(entities)
         local widget = new(MatrixSelector, matrix)
         widget:_init()
 
+        -- TODO: move that into _init_sfx_editor
         if widget.fields.Label == "Instruments" then
             -- display the current instrument
             wire.sync(state, "sfx.instrument", widget, "value")
@@ -411,8 +415,23 @@ function _init_velocity_editor(entities)
 end
 
 function _init_sfx_editor(entities)
-    for volume in all(entities["SfxEditor"]) do
-        local widget = new(SfxEditor, volume)
+    for editor in all(entities["SfxEditor"]) do
+        local widget = new(SfxEditor, editor)
+        local bpm = wire.find_widget(m.widgets, widget.fields.BPM)
+        local volume = wire.find_widget(m.widgets, widget.fields.Volume)
+
+        -- wire.bind(state, "sfx.volume", volume, "value")
+        local transform = {
+            to_widget = function(to, from, value)
+                return (value - 60) / 360
+            end,
+
+            from_widget = function(to, from, value)
+                return 60 + value * 360
+            end
+        }
+        wire.bind(state, "sfx.bpm", bpm, "value", transform)
+
         wire.sync(state, "sfx.notes", widget, "values")
         widget.on_change = function(self, value)
             state.sfx.set_note(value)
@@ -423,15 +442,21 @@ function _init_sfx_editor(entities)
 end
 
 function _init_player(entities)
-    local player = new(Player)
-    local sfxEditor = filter(SfxEditor)
-    player.editor = sfxEditor
+    for volume in all(entities["Player"]) do
+        local widget = new(Player, volume)
 
-    local velocityEditor = filter(VelocityEditor)
+        local sfxEditor = wire.find_widget(m.widgets, widget.fields.SfxEditor)
+        widget.editor = sfxEditor
 
-    wire.sync(player, "beat", sfxEditor, "current_beat")
-    wire.sync(player, "beat", velocityEditor, "current_beat")
-    table.insert(m.widgets, player)
+        local velocityEditor = wire.find_widget(m.widgets, widget.fields.VelocityEditor)
+        local bpm = wire.find_widget(m.widgets, widget.fields.BPM)
+
+        wire.sync(widget, "beat", sfxEditor, "current_beat")
+        wire.sync(widget, "beat", velocityEditor, "current_beat")
+        wire.sync(widget, "bpm", bpm, "value")
+
+        table.insert(m.widgets, widget)
+    end
 end
 
 function _init()
