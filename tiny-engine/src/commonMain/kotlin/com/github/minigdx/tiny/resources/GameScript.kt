@@ -7,6 +7,7 @@ import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.lua.CtrlLib
 import com.github.minigdx.tiny.lua.DebugLib
+import com.github.minigdx.tiny.lua.FloppyLib
 import com.github.minigdx.tiny.lua.GfxLib
 import com.github.minigdx.tiny.lua.JuiceLib
 import com.github.minigdx.tiny.lua.KeysLib
@@ -22,7 +23,6 @@ import com.github.minigdx.tiny.lua.TestResult
 import com.github.minigdx.tiny.lua.TinyBaseLib
 import com.github.minigdx.tiny.lua.TinyLib
 import com.github.minigdx.tiny.lua.Vec2Lib
-import com.github.minigdx.tiny.lua.WorkspaceLib
 import com.github.minigdx.tiny.lua.toTinyException
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.render.VirtualFrameBuffer
@@ -108,7 +108,7 @@ class GameScript(
             load(sprLib)
             load(JuiceLib())
             load(NotesLib())
-            load(WorkspaceLib(platform = platform))
+            load(FloppyLib(platform = platform))
             load(TestLib(this@GameScript))
 
             LoadState.install(this)

@@ -5,7 +5,6 @@ import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.graphic.PixelArray
@@ -170,19 +169,6 @@ class HeadlessPlatform(
         return ObjectStream(data)
     }
 
-    override fun createLocalFile(
-        name: String,
-        parentDirectory: String?,
-    ): LocalFile =
-        object : LocalFile {
-            override val name: String = "name"
-            override val extension: String = ""
-
-            override fun readAll(): ByteArray = ByteArray(0)
-
-            override fun save(content: ByteArray) = Unit
-        }
-
     override fun writeImage(buffer: ByteArray) {
         TODO("Not yet implemented")
     }
@@ -205,5 +191,16 @@ class HeadlessPlatform(
         ): ColorIndex {
             return frameBuffer.pixel(x, y)
         }
+    }
+
+    override fun saveIntoHome(
+        name: String,
+        content: String,
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun getFromHome(name: String): String? {
+        TODO("Not yet implemented")
     }
 }

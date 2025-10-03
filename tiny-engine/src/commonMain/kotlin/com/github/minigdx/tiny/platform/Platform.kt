@@ -4,7 +4,6 @@ import com.danielgergely.kgl.Kgl
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
@@ -120,12 +119,15 @@ interface Platform {
     ): SourceStream<SoundData>
 
     /**
-     * Create a file using the name.
-     *
-     * @param: name of the file, with the extension, if any.
+     * Save a file with [content] into the home directory.
      */
-    fun createLocalFile(
+    fun saveIntoHome(
         name: String,
-        parentDirectory: String? = "data",
-    ): LocalFile
+        content: String,
+    )
+
+    /**
+     * Get the content from a file contained in the home directory
+     */
+    fun getFromHome(name: String): String?
 }

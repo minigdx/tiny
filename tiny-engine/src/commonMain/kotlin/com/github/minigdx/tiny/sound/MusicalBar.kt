@@ -58,7 +58,6 @@ class MusicalBar(
         duration: Beats,
         uniqueOnBeat: Boolean = false,
     ) {
-
         // Remove notes that are during this new note
         val toRemoveBeats = notesOnTheBeat(beat, duration)
             .filter { n -> uniqueOnBeat || n.note == note }

@@ -65,6 +65,8 @@ class SfxCommand : CliktCommand(name = "sfx") {
             val commandOptions = commandParameters.toGameOptions()
                 .copy(sounds = listOf(filename.name))
 
+            val homeDirectory = findHomeDirectory(commandParameters)
+
             val gameEngine = GameEngine(
                 gameOptions = commandOptions,
                 platform = GlfwPlatform(
@@ -72,6 +74,7 @@ class SfxCommand : CliktCommand(name = "sfx") {
                     logger,
                     vfs,
                     File("."),
+                    homeDirectory,
                     jarResourcePrefix = "/sfx",
                 ),
                 vfs = vfs,

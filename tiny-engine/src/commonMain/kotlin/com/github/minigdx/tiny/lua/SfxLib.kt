@@ -48,6 +48,11 @@ import org.luaj.vm2.lib.ZeroArgFunction
  * sfx.save("toto") // save actual music
  *
  *
+ *
+ * snd.sfx(1)
+ * snd.music(1)
+ * snd.instrument(1)
+ *
  */
 
 @TinyLib(
@@ -354,7 +359,7 @@ class SfxLib(
 
             // Check cache first
             return instrumentWrapperCache[index]
-            // Check music
+                // Check music
                 ?: music.instruments.getOrNull(index)?.toLua()?.also {
                     // Cache the result of [toLua].
                     instrumentWrapperCache[index] = it
@@ -365,7 +370,7 @@ class SfxLib(
 
         @TinyCall(
             "Access instrument using its index or its name. " +
-                    "Create it if the instrument is missing and the flag is true.",
+                "Create it if the instrument is missing and the flag is true.",
         )
         override fun call(
             a: LuaValue,
@@ -640,7 +645,7 @@ class SfxLib(
 
     @TinyFunction(
         "Play the bar by it's index of the current sound. " +
-                "The index of a bar of the current music.",
+            "The index of a bar of the current music.",
     )
     inner class play : OneArgFunction() {
         @TinyCall("Play the sound at the index 0.")
@@ -681,7 +686,7 @@ class SfxLib(
 
     @TinyFunction(
         "Loop the bar by it's index of the current sound. " +
-                "The index of a bar of the current music.",
+            "The index of a bar of the current music.",
     )
     inner class loop : OneArgFunction() {
         @TinyCall("Loop the sound at the index 0.")
@@ -722,7 +727,7 @@ class SfxLib(
 
     @TinyFunction(
         "Stop the bar by it's index of the current sound. " +
-                "The index of a bar of the current music.",
+            "The index of a bar of the current music.",
     )
     inner class stop : OneArgFunction() {
         @TinyCall("Stop the sound at the index 0.")
@@ -748,7 +753,7 @@ class SfxLib(
 
     @TinyFunction(
         "Play the sequence by it's index of the current sound. " +
-                "The index of a sequence of the current music.",
+            "The index of a sequence of the current music.",
     )
     inner class mplay : OneArgFunction() {
         @TinyCall("Play the sequence at the index 0.")
@@ -789,7 +794,7 @@ class SfxLib(
 
     @TinyFunction(
         "Loop the sequence by it's index of the current sound. " +
-                "The index of a sequence of the current music.",
+            "The index of a sequence of the current music.",
     )
     inner class mloop : OneArgFunction() {
         @TinyCall("Loop the sequence at the index 0.")
@@ -830,7 +835,7 @@ class SfxLib(
 
     @TinyFunction(
         "Stop the sequence by it's index of the current sound. " +
-                "The index of a sequence of the current music.",
+            "The index of a sequence of the current music.",
     )
     inner class mstop : OneArgFunction() {
         @TinyCall("Stop the sequence at the index 0.")

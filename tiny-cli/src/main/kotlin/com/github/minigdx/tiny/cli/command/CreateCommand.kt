@@ -22,6 +22,7 @@ import kotlinx.serialization.json.encodeToStream
 import org.intellij.lang.annotations.Language
 import java.io.File
 import java.io.FileOutputStream
+import java.util.UUID
 
 @Language("Lua")
 private const val DEFAULT_GAME_SCRIPT = """
@@ -102,6 +103,7 @@ ${
 
         val configuration = GameParametersV1(
             name = gameName,
+            id = UUID.randomUUID().toString(),
             resolution = gameResolution.toSize(),
             sprites = spriteSize.toSize(),
             zoom = zoom,

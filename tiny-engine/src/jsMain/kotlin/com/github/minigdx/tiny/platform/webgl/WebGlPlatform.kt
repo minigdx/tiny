@@ -7,8 +7,6 @@ import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.file.AjaxStream
 import com.github.minigdx.tiny.file.ImageDataStream
-import com.github.minigdx.tiny.file.JsLocalFile
-import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SoundDataSourceStream
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.input.InputHandler
@@ -19,6 +17,7 @@ import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.sound.SoundManager
+import kotlinx.browser.localStorage
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -30,6 +29,7 @@ import kotlin.math.min
 class WebGlPlatform(
     private val canvas: HTMLCanvasElement,
     override val gameOptions: GameOptions,
+    val localStoragePrefix: String,
     val rootUrl: String,
 ) : Platform {
     override val performanceMonitor: PerformanceMonitor = WebGlPerformanceMonitor()
@@ -112,11 +112,15 @@ class WebGlPlatform(
         return SoundDataSourceStream(name, soundManager, createByteArrayStream(name))
     }
 
-    override fun createLocalFile(
+    override fun saveIntoHome(
         name: String,
-        parentDirectory: String?,
-    ): LocalFile {
-        return JsLocalFile(name, parentDirectory?.let { "tiny-$parentDirectory" } ?: "tiny")
+        content: String,
+    ) {
+        localStorage.setItem("$localStoragePrefix-$name", content)
+    }
+
+    override fun getFromHome(name: String): String? {
+        return localStorage.getItem("$localStoragePrefix-$name")
     }
 
     override fun writeImage(buffer: ByteArray) = Unit

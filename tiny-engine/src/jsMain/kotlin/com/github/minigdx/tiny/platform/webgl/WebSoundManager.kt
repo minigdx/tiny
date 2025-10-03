@@ -62,7 +62,7 @@ class WebSoundManager : SoundManager() {
         generateSound()
 
         soundContext.async {
-            while(true) {
+            while (true) {
                 // Generate next buffer when we're getting close to needing it
                 val timeUntilNextBuffer = (nextStartTime - audioContext.currentTime) * 1000.0
 
@@ -143,7 +143,7 @@ class WebSoundManager : SoundManager() {
     }
 
     companion object {
-        private const val BUFFER = 4096  // Larger buffer for better stability
+        private const val BUFFER = 4096 // Larger buffer for better stability
         private const val MAX_INSTRUMENTS = 8
     }
 }

@@ -63,12 +63,15 @@ class PaletteCommand : CliktCommand(name = "palette") {
             return
         }
 
+        val homeDirectory = findHomeDirectory(gameParameters)
+
         // Image provided - extract colors and process
         val platform = GlfwPlatform(
             gameOptions = gameOptions,
             logger = StdOutLogger("whatever"),
             vfs = CommonVirtualFileSystem(),
-            workdirectory = gameDirectory,
+            gameDirectory = gameDirectory,
+            homeDirectory = homeDirectory,
         )
         val imageData = runBlocking {
             platform.createImageStream(image!!.relativeTo(gameDirectory).path).read()

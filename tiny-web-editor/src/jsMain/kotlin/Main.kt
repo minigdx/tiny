@@ -2,7 +2,6 @@ import com.github.minigdx.tiny.engine.GameEngine
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.file.CommonVirtualFileSystem
-import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.forEachIndexed
 import com.github.minigdx.tiny.getRootPath
@@ -279,7 +278,14 @@ private fun createGame(
 
     GameEngine(
         gameOptions = gameOptions,
-        platform = EditorWebGlPlatform(WebGlPlatform(canvas as HTMLCanvasElement, gameOptions, rootPath)),
+        platform = EditorWebGlPlatform(
+            WebGlPlatform(
+                canvas as HTMLCanvasElement,
+                gameOptions,
+                "tiny-editor-$index",
+                rootPath,
+            ),
+        ),
         vfs = CommonVirtualFileSystem(),
         logger = logger,
     ).main()
@@ -338,13 +344,10 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
             soundManager,
         )
 
-    override fun createLocalFile(
+    override fun saveIntoHome(
         name: String,
-        parentDirectory: String?,
-    ): LocalFile {
-        return delegate.createLocalFile(
-            name = name,
-            parentDirectory = parentDirectory,
-        )
-    }
+        content: String,
+    ) = delegate.saveIntoHome(name, content)
+
+    override fun getFromHome(name: String): String? = delegate.getFromHome(name)
 }

@@ -3,12 +3,9 @@ package com.github.minigdx.tiny
 import com.github.minigdx.tiny.engine.GameEngine
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.file.CommonVirtualFileSystem
-import com.github.minigdx.tiny.file.JsLocalFile
 import com.github.minigdx.tiny.log.StdOutLogger
-import com.github.minigdx.tiny.lua.WorkspaceLib
 import com.github.minigdx.tiny.platform.webgl.WebGlPlatform
 import kotlinx.browser.document
-import kotlinx.browser.localStorage
 import kotlinx.browser.window
 import kotlinx.dom.appendText
 import org.w3c.dom.Element
@@ -69,6 +66,7 @@ fun setupGames(
 
     tinyGameTag.forEachIndexed { index, game ->
 
+        val gameId = game.getAttribute("id")!!
         val gameWidth = game.getAttribute("width")?.toInt() ?: 128
         val gameHeight = game.getAttribute("height")?.toInt() ?: 128
         val gameZoom = game.getAttribute("zoom")?.toInt() ?: 1
@@ -77,25 +75,21 @@ fun setupGames(
         val sprWidth = game.getAttribute("spritew")?.toInt() ?: 16
         val sprHeight = game.getAttribute("spriteh")?.toInt() ?: 16
 
-        val scripts =
-            game.getElementsByTagName("tiny-script").map { script ->
-                script.getAttribute("name")
-            }.filterNotNull()
+        val scripts = game.getElementsByTagName("tiny-script").map { script ->
+            script.getAttribute("name")
+        }.filterNotNull()
 
-        val levels =
-            game.getElementsByTagName("tiny-level").map { level ->
-                level.getAttribute("name")
-            }.filterNotNull()
+        val levels = game.getElementsByTagName("tiny-level").map { level ->
+            level.getAttribute("name")
+        }.filterNotNull()
 
-        val sounds =
-            game.getElementsByTagName("tiny-sound").map { level ->
-                level.getAttribute("name")
-            }.filterNotNull()
+        val sounds = game.getElementsByTagName("tiny-sound").map { level ->
+            level.getAttribute("name")
+        }.filterNotNull()
 
-        val spritesheets =
-            game.getElementsByTagName("tiny-spritesheet").map { spritesheet ->
-                spritesheet.getAttribute("name")
-            }.filterNotNull()
+        val spritesheets = game.getElementsByTagName("tiny-spritesheet").map { spritesheet ->
+            spritesheet.getAttribute("name")
+        }.filterNotNull()
 
         val colors =
             game.getElementsByTagName("tiny-colors")[0]?.getAttribute("name")?.split(",")?.toList() ?: emptyList()
@@ -107,16 +101,6 @@ fun setupGames(
             canvas.setAttribute("style", "cursor: none;")
         }
         game.appendChild(canvas)
-
-        WorkspaceLib.DEFAULT =
-            (0 until localStorage.length).mapNotNull { index ->
-                val key = localStorage.key(index)
-                if (key != null && key.startsWith("tiny")) {
-                    JsLocalFile(key.replaceFirst("tiny-", ""))
-                } else {
-                    null
-                }
-            }
 
         val gameOptions =
             GameOptions(
@@ -138,7 +122,7 @@ fun setupGames(
 
         GameEngine(
             gameOptions = gameOptions,
-            platform = WebGlPlatform(canvas as HTMLCanvasElement, gameOptions, rootPath),
+            platform = WebGlPlatform(canvas as HTMLCanvasElement, gameOptions, gameId, rootPath),
             vfs = CommonVirtualFileSystem(),
             logger = logger,
         ).main()

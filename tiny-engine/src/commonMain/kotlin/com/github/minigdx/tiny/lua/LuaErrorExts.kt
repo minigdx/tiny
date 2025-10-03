@@ -32,7 +32,7 @@ fun LuaError.fromMessage(): Int? {
 
 fun LuaError.toTinyException(content: String): TinyException {
     val line = line.takeIf { line != -1 }
-    // There is no line information, le's check the fileline
+        // There is no line information, le's check the fileline
         ?: fromErrorLine()
         // The error line might be in the error message
         ?: fromMessage()

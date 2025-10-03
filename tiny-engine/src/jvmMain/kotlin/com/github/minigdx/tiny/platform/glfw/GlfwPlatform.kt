@@ -7,8 +7,6 @@ import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.file.FileStream
 import com.github.minigdx.tiny.file.InputStreamStream
-import com.github.minigdx.tiny.file.JvmLocalFile
-import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SoundDataSourceStream
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.file.VirtualFileSystem
@@ -49,7 +47,8 @@ class GlfwPlatform(
     override val gameOptions: GameOptions,
     private val logger: Logger,
     private val vfs: VirtualFileSystem,
-    private val workdirectory: File,
+    private val gameDirectory: File,
+    private val homeDirectory: File,
     private val jarResourcePrefix: String = "",
 ) : Platform {
     override val performanceMonitor: PerformanceMonitor = LwjglPerformanceMonitor()
@@ -247,7 +246,7 @@ class GlfwPlatform(
         extension: String,
     ): File {
         var index = 0
-        var origin = workdirectory.resolve("output_${index.toString().padStart(3, '0')}.$extension")
+        var origin = gameDirectory.resolve("output_${index.toString().padStart(3, '0')}.$extension")
         while (origin.exists()) {
             index++
             if (index >= 999) {
@@ -256,7 +255,7 @@ class GlfwPlatform(
                         "You might need to delete some",
                 )
             }
-            origin = workdirectory.resolve("output_${index.toString().padStart(3, '0')}.$extension")
+            origin = gameDirectory.resolve("output_${index.toString().padStart(3, '0')}.$extension")
         }
         return origin
     }
@@ -331,7 +330,7 @@ class GlfwPlatform(
         return if (fromJar != null) {
             InputStreamStream(fromJar)
         } else {
-            FileStream(workdirectory.resolve(name))
+            FileStream(homeDirectory.resolve(name))
         }
     }
 
@@ -365,14 +364,25 @@ class GlfwPlatform(
         return manager
     }
 
-    override fun createLocalFile(
+    override fun saveIntoHome(
         name: String,
-        parentDirectory: String?,
-    ): LocalFile =
-        JvmLocalFile(
-            name,
-            parentDirectory?.let { workdirectory.resolve(it) } ?: workdirectory,
-        )
+        content: String,
+    ) {
+        if (!homeDirectory.exists()) {
+            homeDirectory.mkdirs()
+        }
+        val file = homeDirectory.resolve(name)
+        file.writeText(content)
+    }
+
+    override fun getFromHome(name: String): String? {
+        val file = homeDirectory.resolve(name)
+        return if (file.exists()) {
+            file.readText()
+        } else {
+            null
+        }
+    }
 
     companion object {
         private const val FPS = 60
