@@ -108,7 +108,10 @@ class FloppyLib(
         }
     }
 
-    private fun luaValueToJson(value: LuaValue, visited: MutableSet<LuaValue>): JsonElement {
+    private fun luaValueToJson(
+        value: LuaValue,
+        visited: MutableSet<LuaValue>,
+    ): JsonElement {
         return when {
             value.isnil() -> JsonPrimitive(null as String?)
             value.isboolean() -> JsonPrimitive(value.toboolean())
@@ -120,9 +123,9 @@ class FloppyLib(
                 if (value in visited) {
                     logger.warn("FLOPPY") {
                         "Circular reference found in the data used by floppy.put. " +
-                                "The circular reference will be removed from the object and " +
-                                "will not be present using floppy.get. " +
-                                "Please fix it in your game to avoid unexpected behaviour."
+                            "The circular reference will be removed from the object and " +
+                            "will not be present using floppy.get. " +
+                            "Please fix it in your game to avoid unexpected behaviour."
                     }
                     JsonNull
                 } else {
@@ -130,7 +133,7 @@ class FloppyLib(
                     // Check if it's an array (consecutive integer keys starting from 1)
                     val keys = table.keys()
                     val isArray = keys.all { it.isint() } &&
-                            keys.map { it.toint() }.sorted() == (1..keys.size).toList()
+                        keys.map { it.toint() }.sorted() == (1..keys.size).toList()
 
                     // Save the actual value as visited to avoid circular dependencies.
                     visited.add(value)

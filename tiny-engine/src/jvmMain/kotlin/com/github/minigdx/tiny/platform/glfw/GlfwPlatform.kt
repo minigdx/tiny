@@ -19,7 +19,6 @@ import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
-import com.github.minigdx.tiny.render.gl.FrameBufferStage
 import com.github.minigdx.tiny.sound.JavaSoundManager
 import com.github.minigdx.tiny.sound.SoundManager
 import com.github.minigdx.tiny.util.MutableFixedSizeList
@@ -65,8 +64,6 @@ class GlfwPlatform(
     private val lwjglInputHandler = LwjglInput(gameOptions)
 
     private val recordScope = CoroutineScope(Dispatchers.IO)
-
-    private val frameBufferStage = FrameBufferStage(KglLwjgl, gameOptions, performanceMonitor)
 
     /**
      * Get the time in milliseconds
@@ -319,18 +316,17 @@ class GlfwPlatform(
         name: String,
         canUseJarPrefix: Boolean,
     ): SourceStream<ByteArray> {
-        val resourceName =
-            if (canUseJarPrefix) {
-                "$jarResourcePrefix/$name"
-            } else {
-                "/$name"
-            }
+        val resourceName = if (canUseJarPrefix) {
+            "$jarResourcePrefix/$name"
+        } else {
+            "/$name"
+        }
 
         val fromJar = GlfwPlatform::class.java.getResourceAsStream(resourceName)
         return if (fromJar != null) {
             InputStreamStream(fromJar)
         } else {
-            FileStream(homeDirectory.resolve(name))
+            FileStream(gameDirectory.resolve(name))
         }
     }
 
