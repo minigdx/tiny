@@ -4,10 +4,12 @@ import com.github.mingdx.tiny.doc.TinyArg
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
+import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.Platform
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.boolean
@@ -26,6 +28,7 @@ import org.luaj.vm2.lib.TwoArgFunction
 @TinyLib("floppy", "Floppy allow you to get or save user Lua structure.")
 class FloppyLib(
     private val platform: Platform,
+    private val logger: Logger,
 ) : TwoArgFunction() {
     override fun call(
         arg1: LuaValue,
@@ -51,7 +54,7 @@ class FloppyLib(
             @TinyArg("content") arg2: LuaValue,
         ): LuaValue {
             val filename = arg1.checkjstring() ?: return NIL
-            val jsonElement = luaValueToJson(arg2)
+            val jsonElement = luaValueToJson(arg2, mutableSetOf())
             val json = Json.encodeToString(JsonElement.serializer(), jsonElement)
             platform.saveIntoHome(filename, json)
             return NIL
@@ -105,7 +108,7 @@ class FloppyLib(
         }
     }
 
-    private fun luaValueToJson(value: LuaValue): JsonElement {
+    private fun luaValueToJson(value: LuaValue, visited: MutableSet<LuaValue>): JsonElement {
         return when {
             value.isnil() -> JsonPrimitive(null as String?)
             value.isboolean() -> JsonPrimitive(value.toboolean())
@@ -114,27 +117,40 @@ class FloppyLib(
             value.isnumber() -> JsonPrimitive(value.todouble())
             value.isstring() -> JsonPrimitive(value.tojstring())
             value.istable() -> {
-                val table = value.checktable() ?: return JsonPrimitive(value.tojstring())
-                // Check if it's an array (consecutive integer keys starting from 1)
-                val keys = table.keys()
-                val isArray = keys.all { it.isint() } &&
-                    keys.map { it.toint() }.sorted() == (1..keys.size).toList()
-
-                if (isArray) {
-                    // Convert as JSON array
-                    val array = mutableListOf<JsonElement>()
-                    for (i in 1..table.length()) {
-                        array.add(luaValueToJson(table.get(i)))
+                if (value in visited) {
+                    logger.warn("FLOPPY") {
+                        "Circular reference found in the data used by floppy.put. " +
+                                "The circular reference will be removed from the object and " +
+                                "will not be present using floppy.get. " +
+                                "Please fix it in your game to avoid unexpected behaviour."
                     }
-                    JsonArray(array)
+                    JsonNull
                 } else {
-                    // Convert as JSON object
-                    val map = mutableMapOf<String, JsonElement>()
-                    keys.forEach { key ->
-                        val keyString = key.tojstring()
-                        map[keyString] = luaValueToJson(table.get(key))
+                    val table = value.checktable() ?: return JsonPrimitive(value.tojstring())
+                    // Check if it's an array (consecutive integer keys starting from 1)
+                    val keys = table.keys()
+                    val isArray = keys.all { it.isint() } &&
+                            keys.map { it.toint() }.sorted() == (1..keys.size).toList()
+
+                    // Save the actual value as visited to avoid circular dependencies.
+                    visited.add(value)
+
+                    if (isArray) {
+                        // Convert as JSON array
+                        val array = mutableListOf<JsonElement>()
+                        for (i in 1..table.length()) {
+                            array.add(luaValueToJson(table.get(i), visited))
+                        }
+                        JsonArray(array)
+                    } else {
+                        // Convert as JSON object
+                        val map = mutableMapOf<String, JsonElement>()
+                        keys.forEach { key ->
+                            val keyString = key.tojstring()
+                            map[keyString] = luaValueToJson(table.get(key), visited)
+                        }
+                        JsonObject(map)
                     }
-                    JsonObject(map)
                 }
             }
             else -> JsonPrimitive(value.tojstring())

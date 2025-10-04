@@ -69,6 +69,8 @@ class HeadlessPlatform(
 
     override val performanceMonitor: PerformanceMonitor = HeadlessPerformanceMonitor()
 
+    private val storage = mutableMapOf<String, String>()
+
     override fun initWindowManager(): WindowManager {
         return WindowManager(
             gameOptions.width,
@@ -197,10 +199,10 @@ class HeadlessPlatform(
         name: String,
         content: String,
     ) {
-        TODO("Not yet implemented")
+        storage[name] = content
     }
 
     override fun getFromHome(name: String): String? {
-        TODO("Not yet implemented")
+        return storage[name]
     }
 }

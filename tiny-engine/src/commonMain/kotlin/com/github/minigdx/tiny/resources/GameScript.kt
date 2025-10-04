@@ -108,7 +108,7 @@ class GameScript(
             load(sprLib)
             load(JuiceLib())
             load(NotesLib())
-            load(FloppyLib(platform = platform))
+            load(FloppyLib(platform = platform, logger = logger))
             load(TestLib(this@GameScript))
 
             LoadState.install(this)
