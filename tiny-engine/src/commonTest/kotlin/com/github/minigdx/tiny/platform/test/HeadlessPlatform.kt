@@ -74,6 +74,10 @@ class HeadlessPlatform(
         TODO("Not yet implemented")
     }
 
+    override fun saveWave(sound: FloatArray) {
+        TODO("Not yet implemented")
+    }
+
     override val performanceMonitor: PerformanceMonitor = HeadlessPerformanceMonitor()
 
     private val storage = mutableMapOf<String, String>()

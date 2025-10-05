@@ -19,8 +19,13 @@ import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
+import com.github.minigdx.tiny.sound.BITS_PER_SAMPLE
+import com.github.minigdx.tiny.sound.CHANNELS
+import com.github.minigdx.tiny.sound.IS_BIG_ENDIAN
+import com.github.minigdx.tiny.sound.IS_SIGNED
 import com.github.minigdx.tiny.sound.JavaSoundManager
 import com.github.minigdx.tiny.sound.SoundManager
+import com.github.minigdx.tiny.sound.SoundManager.Companion.SAMPLE_RATE
 import com.github.minigdx.tiny.util.MutableFixedSizeList
 import com.squareup.gifencoder.FastGifEncoder
 import com.squareup.gifencoder.ImageOptions
@@ -40,7 +45,13 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.imageio.ImageIO
+import javax.sound.sampled.AudioFileFormat
+import javax.sound.sampled.AudioFormat
+import javax.sound.sampled.AudioInputStream
+import javax.sound.sampled.AudioSystem
+import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToInt
 
 class GlfwPlatform(
     override val gameOptions: GameOptions,
@@ -243,7 +254,7 @@ class GlfwPlatform(
         extension: String,
     ): File {
         var index = 0
-        var origin = gameDirectory.resolve("output_${index.toString().padStart(3, '0')}.$extension")
+        var origin = gameDirectory.resolve("${prefixName}_${index.toString().padStart(3, '0')}.$extension")
         while (origin.exists()) {
             index++
             if (index >= 999) {
@@ -252,7 +263,7 @@ class GlfwPlatform(
                         "You might need to delete some",
                 )
             }
-            origin = gameDirectory.resolve("output_${index.toString().padStart(3, '0')}.$extension")
+            origin = gameDirectory.resolve("${prefixName}_${index.toString().padStart(3, '0')}.$extension")
         }
         return origin
     }
@@ -361,6 +372,42 @@ class GlfwPlatform(
         gameDirectory.resolve(name).outputStream().use {
             it.write(data.toByteArray())
         }
+    }
+
+    override fun saveWave(sound: FloatArray) {
+        val output = newFile("sfx", "wav")
+
+        val audioFormat = AudioFormat(SAMPLE_RATE.toFloat(), BITS_PER_SAMPLE, CHANNELS, IS_SIGNED, IS_BIG_ENDIAN)
+
+        val bytesPerSample = audioFormat.sampleSizeInBits / 8
+        val byteAudioData = ByteArray(sound.size * bytesPerSample * audioFormat.channels)
+        var byteIndex = 0
+
+        for (floatSample in sound) {
+            val clippedSample = max(-1.0f, min(1.0f, floatSample))
+            val pcmValue = (clippedSample * Short.MAX_VALUE).roundToInt().toShort()
+
+            if (audioFormat.isBigEndian) {
+                byteAudioData[byteIndex++] = ((pcmValue.toInt() shr 8) and 0xFF).toByte() // High byte
+                byteAudioData[byteIndex++] = (pcmValue.toInt() and 0xFF).toByte() // Low byte
+            } else {
+                byteAudioData[byteIndex++] = (pcmValue.toInt() and 0xFF).toByte() // Low byte
+                byteAudioData[byteIndex++] = ((pcmValue.toInt() shr 8) and 0xFF).toByte() // High byte
+            }
+        }
+
+        val inputStream = ByteArrayInputStream(byteAudioData)
+
+        val frameSize = audioFormat.frameSize
+        val numberOfFrames = (byteAudioData.size / frameSize).toLong()
+
+        val audioInputStream = AudioInputStream(inputStream, audioFormat, numberOfFrames)
+
+        val fileType = AudioFileFormat.Type.WAVE
+
+        AudioSystem.write(audioInputStream, fileType, output)
+
+        logger.info("GLFW") { "Sound exported using the name ${output.name}."}
     }
 
     override fun initSoundManager(inputHandler: InputHandler): SoundManager {

@@ -647,6 +647,8 @@ class SfxLib(
             }
 
             obj.function0("export") {
+                val sound = soundBoard.convert(this)
+                platform.saveWave(sound)
                 NONE
             }
 

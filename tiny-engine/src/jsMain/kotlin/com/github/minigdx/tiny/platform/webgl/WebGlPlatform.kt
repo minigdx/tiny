@@ -131,5 +131,10 @@ class WebGlPlatform(
         data: String,
     ) = Unit
 
+    /**
+     * Not available in the web platform
+     */
+    override fun saveWave(sound: FloatArray) = Unit
+
     override fun writeImage(buffer: ByteArray) = Unit
 }

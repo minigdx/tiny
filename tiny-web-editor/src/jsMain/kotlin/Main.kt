@@ -355,4 +355,8 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
         name: String,
         data: String,
     ) = delegate.saveIntoGameDirectory(name, data)
+
+    override fun saveWave(sound: FloatArray) {
+        TODO("Not yet implemented")
+    }
 }

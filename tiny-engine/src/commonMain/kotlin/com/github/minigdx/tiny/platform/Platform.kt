@@ -138,4 +138,6 @@ interface Platform {
         name: String,
         data: String,
     )
+
+    fun saveWave(sound: FloatArray)
 }

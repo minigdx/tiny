@@ -260,8 +260,6 @@ abstract class SoundManager {
         return max(0.0f, min(1.0f, multiplier))
     }
 
-    open fun exportAsSound(sequence: MusicalSequence) = Unit
-
     abstract fun noteOn(
         note: Note,
         instrument: Instrument,
