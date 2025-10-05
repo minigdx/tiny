@@ -5,6 +5,7 @@ import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.engine.GameResourceAccess
+import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.sound.Instrument
 import com.github.minigdx.tiny.sound.Music
 import com.github.minigdx.tiny.sound.MusicalBar
@@ -70,16 +71,10 @@ or by starting the sound as soon as the player is moving.
 class SfxLib(
     private val resourceAccess: GameResourceAccess,
     private val soundBoard: VirtualSoundBoard,
+    private val platform: Platform,
     // When validating the script, don't play sound
     private val playSound: Boolean = true,
 ) : TwoArgFunction() {
-    companion object {
-        private const val STREAM_TEMPO = 200
-        private const val STREAM_VOLUME = 0.8f
-        private const val NOTE_DURATION = 1f
-        private const val NOTE_BEAT = 0f
-    }
-
     override fun call(
         arg1: LuaValue,
         arg2: LuaValue,
@@ -637,6 +632,22 @@ class SfxLib(
             }
             obj.wrap("instrument") {
                 this.instrument?.index?.let { valueOf(it) } ?: NIL
+            }
+
+            obj.function0("save") {
+                val sound = resourceAccess.findSound(0) ?: return@function0 NIL
+                val currentMusic = getCurrentMusic()
+                val data = Music.serialize(currentMusic)
+
+                platform.saveIntoGameDirectory(
+                    sound.name,
+                    data,
+                )
+                NONE
+            }
+
+            obj.function0("export") {
+                NONE
             }
 
             return obj

@@ -67,6 +67,13 @@ class HeadlessPlatform(
 
     private var gameLoop: GameLoop? = null
 
+    override fun saveIntoGameDirectory(
+        name: String,
+        data: String,
+    ) {
+        TODO("Not yet implemented")
+    }
+
     override val performanceMonitor: PerformanceMonitor = HeadlessPerformanceMonitor()
 
     private val storage = mutableMapOf<String, String>()

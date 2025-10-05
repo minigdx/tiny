@@ -98,7 +98,7 @@ class GameScript(
             load(MapLib(resourceAccess, gameOptions, virtualFrameBuffer))
             load(GfxLib(resourceAccess, gameOptions, virtualFrameBuffer))
             load(CtrlLib(inputHandler, sprLib))
-            load(SfxLib(resourceAccess, virtualSoundBoard, playSound = !forValidation))
+            load(SfxLib(resourceAccess, virtualSoundBoard, platform, playSound = !forValidation))
             load(ShapeLib(gameOptions, virtualFrameBuffer))
             load(DebugLib(logger))
             load(KeysLib())

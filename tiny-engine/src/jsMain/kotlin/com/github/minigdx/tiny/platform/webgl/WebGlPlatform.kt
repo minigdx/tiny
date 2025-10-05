@@ -123,5 +123,13 @@ class WebGlPlatform(
         return localStorage.getItem("$localStoragePrefix-$name")
     }
 
+    /**
+     * Not available in the web platform
+     */
+    override fun saveIntoGameDirectory(
+        name: String,
+        data: String,
+    ) = Unit
+
     override fun writeImage(buffer: ByteArray) = Unit
 }

@@ -350,4 +350,9 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
     ) = delegate.saveIntoHome(name, content)
 
     override fun getFromHome(name: String): String? = delegate.getFromHome(name)
+
+    override fun saveIntoGameDirectory(
+        name: String,
+        data: String,
+    ) = delegate.saveIntoGameDirectory(name, data)
 }

@@ -130,4 +130,12 @@ interface Platform {
      * Get the content from a file contained in the home directory
      */
     fun getFromHome(name: String): String?
+
+    /**
+     * Save data in the game directory
+     */
+    fun saveIntoGameDirectory(
+        name: String,
+        data: String,
+    )
 }

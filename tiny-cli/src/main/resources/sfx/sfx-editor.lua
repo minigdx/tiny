@@ -112,12 +112,40 @@ VelocityEditor._draw = function(self)
 
         local is_active = self.current_beat and note.beat <= self.current_beat and self.current_beat < note.beat + note.duration
 
-        if(is_active) then
+        if (is_active) then
             shape.circlef(x, y, 2, green)
         else
             shape.circle(x, y, 2, white)
         end
     end
+end
+
+local MiniButton = {
+    overlay = {
+        Play = { x = 48, y = 40 },
+        Save = { x = 56, y = 40 },
+        Export = { x = 64, y = 40 }
+    }
+}
+
+MiniButton._update = function(self)
+    local p = ctrl.touch()
+    self.is_hover = inside_widget(self, p.x, p.y)
+
+    if self.is_hover and ctrl.touched(0) then
+        self:on_change()
+    end
+end
+
+MiniButton._draw = function(self)
+    if self.is_hover then
+        spr.sdraw(self.x, self.y, 56, 32, 8, 8)
+    else
+        spr.sdraw(self.x, self.y, 48, 32, 8, 8)
+    end
+
+    local overlay =  self.overlay[self.fields.Type]
+    spr.sdraw(self.x, self.y, overlay.x, overlay.y, 8, 8)
 end
 
 local Player = {
@@ -136,17 +164,7 @@ Player._update = function(self)
     end
 
     if ctrl.pressed(keys.space) then
-        self.beat = 0
-        self.play = not self.play
-        self.time = 0
-
-        if self.handler then
-            self.handler.stop()
-        end
-        if self.play then
-            -- TODO: introduce on_play and on_stop
-            self.handler = state.sfx.play()
-        end
+        self:playSfx()
     end
 
     if self.play then
@@ -168,10 +186,21 @@ end
 Player._draw = function(self)
     local x = self.editor.x + self.beat * self.step_x
     local y = self.editor.y - 4
-    -- right
     spr.sdraw(x, y, 0, 48, 8, 8)
-    -- left
-    -- spr.sdraw(x - 4, y, 248, 44, 4, 4, true)
+end
+
+Player.playSfx = function(self)
+    self.beat = 0
+    self.play = not self.play
+    self.time = 0
+
+    if self.handler then
+        self.handler.stop()
+    end
+
+    if self.play then
+        self.handler = state.sfx.play()
+    end
 end
 
 Player.set_value = function(self, value)
@@ -302,7 +331,7 @@ SfxEditor._draw = function(self)
         local next_note = self.values[index + 1]
 
         local y = self.y + self.height - (note.notei - self.octave * 12) * 8 + 4
-        local end_x =  self.x + note.beat * 16 + (note.duration) * 16
+        local end_x = self.x + note.beat * 16 + (note.duration) * 16
 
         local center = end_x - 4
 
@@ -317,7 +346,7 @@ SfxEditor._draw = function(self)
     for note in all(self.values) do
         local y = self.y + self.height - (note.notei + 2 - self.octave * 12) * 8
         local start_x = self.x + note.beat * 16
-        local end_x =  self.x + note.beat * 16 + (note.duration) * 16 - 3
+        local end_x = self.x + note.beat * 16 + (note.duration) * 16 - 3
 
         local is_active = 0
         if self.current_beat and note.beat <= self.current_beat and self.current_beat < note.beat + note.duration then
@@ -409,7 +438,9 @@ function _init_sfx_editor(entities)
             state.sfx.set_instrument(value)
         end)
         -- set the list of instruments
-        wire.sync(state, "sfx.instrument", instrument, "active_indices", function(_, _, id) return sfx.instrument(id).all end)
+        wire.sync(state, "sfx.instrument", instrument, "active_indices", function(_, _, id)
+            return sfx.instrument(id).all
+        end)
 
         -- Sfx matrix selector
         local selector = wire.find_widget(m.widgets, widget.fields.Selector)
@@ -440,6 +471,28 @@ function _init_player(entities)
         wire.sync(widget, "beat", velocityEditor, "current_beat")
         wire.sync(widget, "bpm", bpm, "value")
 
+        local playButton = wire.find_widget(m.widgets, widget.fields.PlayButton)
+        playButton.on_change = function()
+           widget:playSfx()
+        end
+
+        local saveButton = wire.find_widget(m.widgets, widget.fields.SaveButton)
+        saveButton.on_change = function()
+            state.sfx.save()
+        end
+
+        local exportButton = wire.find_widget(m.widgets, widget.fields.ExportButton)
+        exportButton.on_change = function()
+            state.sfx.export()
+        end
+
+        table.insert(m.widgets, widget)
+    end
+end
+
+function _init_mini_button(entities)
+    for button in all(entities["MiniButton"]) do
+        local widget = new(MiniButton, button)
         table.insert(m.widgets, widget)
     end
 end
@@ -460,6 +513,7 @@ function _init()
     _init_knob(entities)
     _init_velocity_editor(entities)
     _init_sfx_editor(entities)
+    _init_mini_button(entities)
     _init_player(entities)
 
     -- force setting correct values

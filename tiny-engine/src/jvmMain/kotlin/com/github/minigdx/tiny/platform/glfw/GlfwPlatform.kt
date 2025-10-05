@@ -354,6 +354,15 @@ class GlfwPlatform(
         return SoundDataSourceStream(name, soundManager, createByteArrayStream(name))
     }
 
+    override fun saveIntoGameDirectory(
+        name: String,
+        data: String,
+    ) {
+        gameDirectory.resolve(name).outputStream().use {
+            it.write(data.toByteArray())
+        }
+    }
+
     override fun initSoundManager(inputHandler: InputHandler): SoundManager {
         val manager = JavaSoundManager()
         manager.initSoundManager(inputHandler)
