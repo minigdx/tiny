@@ -137,7 +137,3 @@ artifacts {
         builtBy(tinyResourcesZip)
     }
 }
-
-tasks.named<Test>("jvmTest") {
-    jvmArgs("-XstartOnFirstThread")
-}

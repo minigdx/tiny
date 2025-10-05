@@ -5,22 +5,15 @@ import com.github.minigdx.tiny.input.internal.ObjectPool
 import com.github.minigdx.tiny.lua.Note
 import com.github.minigdx.tiny.sound.SoundManager.Companion.MASTER_VOLUME
 import com.github.minigdx.tiny.util.MutableFixedSizeList
-import java.io.ByteArrayInputStream
-import java.io.File
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.ConcurrentLinkedQueue
-import javax.sound.sampled.AudioFileFormat
 import javax.sound.sampled.AudioFormat
-import javax.sound.sampled.AudioInputStream
 import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.DataLine
 import javax.sound.sampled.SourceDataLine
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.roundToInt
 
 enum class NoteEventType {
     NOTE_ON,

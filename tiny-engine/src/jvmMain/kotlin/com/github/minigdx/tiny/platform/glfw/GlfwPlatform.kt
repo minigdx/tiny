@@ -407,7 +407,7 @@ class GlfwPlatform(
 
         AudioSystem.write(audioInputStream, fileType, output)
 
-        logger.info("GLFW") { "Sound exported using the name ${output.name}."}
+        logger.info("GLFW") { "Sound exported using the name ${output.name}." }
     }
 
     override fun initSoundManager(inputHandler: InputHandler): SoundManager {
