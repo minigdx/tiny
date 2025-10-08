@@ -528,6 +528,7 @@ class GameExporter(private val withSourceMap: Boolean = false) {
                 // Add index.html
                 val content = ExportCommand::class.java.getResourceAsStream("/templates/index.html")!!.readAllBytes()
                 var template = content.decodeToString()
+                template = template.replace("{GAME_ID}", gameParameters.id)
                 template = template.replace("{GAME_NAME}", gameParameters.name)
                 template = template.replace("{GAME_WIDTH}", gameParameters.resolution.width.toString())
                 template = template.replace("{GAME_HEIGHT}", gameParameters.resolution.height.toString())
@@ -587,6 +588,7 @@ class GameExporter(private val withSourceMap: Boolean = false) {
                 "_boot.png",
                 "_engine.lua",
                 "tiny-engine.js",
+                "tiny-worklet.js",
             )
     }
 }
