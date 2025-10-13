@@ -588,7 +588,8 @@ class GameExporter(private val withSourceMap: Boolean = false) {
                 "_boot.png",
                 "_engine.lua",
                 "tiny-engine.js",
-                "tiny-worklet.js",
+                // FIXME: test
+                "6b29e02b526a97cb47fa.mjs",
             )
     }
 }

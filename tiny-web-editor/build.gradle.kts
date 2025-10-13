@@ -3,6 +3,10 @@ import org.gradle.api.internal.artifacts.transform.UnzipTransform
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.minigdx.mpp)
+
+    id("io.github.turansky.seskar") version "4.25.0"
+    id("org.jetbrains.kotlin.plugin.js-plain-objects") version "2.2.20"
+    id("io.github.turansky.kfc.application") version "14.12.0"
 }
 
 configurations.create("tinyWebEditorEngine") {

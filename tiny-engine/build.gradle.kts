@@ -4,6 +4,9 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.mokkery)
+    id("io.github.turansky.seskar") version "4.25.0"
+    id("org.jetbrains.kotlin.plugin.js-plain-objects") version "2.2.20"
+    id("io.github.turansky.kfc.application") version "14.12.0"
 }
 
 dependencies {
@@ -40,8 +43,8 @@ dependencies {
 
     this.jvmMainImplementation(libs.jvm.gifencoder)
 
-    jsMainImplementation("org.jetbrains.kotlin:kotlinx-atomicfu-runtime:2.1.20")?.because("https://youtrack.jetbrains.com/issue/KT-57235")
-    jsMainImplementation("org.jetbrains.kotlin-wrappers:kotlin-browser:2025.6.9")
+    jsMainImplementation("org.jetbrains.kotlin:kotlinx-atomicfu-runtime:2.2.20")?.because("https://youtrack.jetbrains.com/issue/KT-57235")
+    jsMainImplementation("org.jetbrains.kotlin-wrappers:kotlin-browser:2025.10.3")
         ?.because("required to access AudioWorkletNode")
 
     add("kspJvm", project(":tiny-annotation-processors:tiny-lua-stub-generator")) {
