@@ -226,9 +226,7 @@ private fun createGame(
 
         oninput = { event ->
             val pos = getCaretPosition(this)
-            console.log("html", this.innerHTML)
             this.innerHTML = highlight(extractText(this))
-            console.log("html highlight", this.innerHTML)
             setCaret(pos, this)
         }
     }

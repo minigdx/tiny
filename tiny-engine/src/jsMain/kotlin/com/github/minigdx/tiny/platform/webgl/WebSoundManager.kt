@@ -1,6 +1,5 @@
 package com.github.minigdx.tiny.platform.webgl
 
-import HissGeneratorWorkletModule
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.lua.Note
 import com.github.minigdx.tiny.sound.ChunkGenerator
@@ -21,15 +20,6 @@ import web.events.EventHandler
 import web.worklets.addModule
 import kotlin.js.json
 import kotlin.math.pow
-
-// Import the worklet URL using Vite's worker syntax
-// This will be bundled properly by Vite with all imports resolved
-@JsModule("./worklet-loader.js")
-@JsNonModule
-external val workletLoaderModule: dynamic
-
-private val workletUrl: String
-    get() = workletLoaderModule.default as String
 
 class WebSoundManager : SoundManager() {
     lateinit var audioContext: AudioContext
@@ -70,21 +60,16 @@ class WebSoundManager : SoundManager() {
     private val soundContext = CoroutineScope(Dispatchers.Main)
 
     private fun initializeAudioWorklet() {
-        println("initializeAudioWorklet()")
         ready = true
         nextStartTime = audioContext.currentTime
 
         soundContext.launch {
-            println("add module()")
             // Load the bundled worklet from Vite assets
-            println(HissGeneratorWorkletModule.toString())
-            audioContext.audioWorklet.addModule(HissGeneratorWorkletModule)
+            audioContext.audioWorklet.addModule(SynthesizerAudioWorklet)
 
             audioWorkletNode = AudioWorkletNode(audioContext, AudioWorkletProcessorName("TODO"))
             audioWorkletNode.connect(audioContext.destination)
-            println("connected !!!!")
             ready = true
-            println("READY")
         }
     }
 
@@ -92,6 +77,7 @@ class WebSoundManager : SoundManager() {
         note: Note,
         instrument: Instrument,
     ) {
+        println("noteOn is ready + $ready")
         if (!ready) return
 
         // Get or create instrument player for this note
@@ -103,6 +89,8 @@ class WebSoundManager : SoundManager() {
 
         // Send noteOn event to audio worklet
         val frequency = noteToFrequency(note)
+
+        println("Prepare to post message to worklet")
         audioWorkletNode.port.postMessage(
             json(
                 "type" to "noteOn",

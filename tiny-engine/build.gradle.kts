@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.mokkery)
-    id("io.github.turansky.seskar") version "4.25.0"
+    id("io.github.turansky.seskar") version "4.27.0"
     id("org.jetbrains.kotlin.plugin.js-plain-objects") version "2.2.20"
     id("io.github.turansky.kfc.application") version "14.12.0"
 }
@@ -57,32 +57,32 @@ dependencies {
 }
 
 // Create the tiny engine javascript version as a Zip file
-val tinyEngineJsJar =
-    project.tasks.register(
-        "tinyEngineJsJar",
-        Jar::class.java,
-    ) {
-        from(tasks.getByName("jsBrowserDistribution"))
-        this.into("tiny-engine-js")
-        this.destinationDirectory.set(project.layout.buildDirectory.dir("tiny-distributions"))
+val tinyEngineJsJar = project.tasks.register(
+    "tinyEngineJsJar",
+    Zip::class.java,
+) {
+    from(tasks.named("jsBundleProduction").map { zipTree(it.outputs.files.singleFile) })
+    this.into("tiny-engine-js")
+    this.destinationDirectory.set(project.layout.buildDirectory.dir("tiny-distributions"))
+    this.archiveBaseName.set("tiny-engine")
+    this.archiveExtension.set("jar")
 
-        group = "tiny"
-        description = "Build a jar containing all resources to run the Tiny engine in a web application."
-    }
+    group = "tiny"
+    description = "Build a jar containing all resources to run the Tiny engine in a web application."
+}
 
-val tinyResourcesZip =
-    project.tasks.register(
-        "tinyResourcesZip",
-        Zip::class.java,
-    ) {
-        from(tasks.getByName("jvmProcessResources"))
-        this.into("")
-        this.destinationDirectory.set(project.layout.buildDirectory.dir("tiny-distributions"))
-        this.archiveBaseName.set("tiny-resources")
+val tinyResourcesZip = project.tasks.register(
+    "tinyResourcesZip",
+    Zip::class.java,
+) {
+    from(tasks.named("jvmProcessResources"))
+    this.into("")
+    this.destinationDirectory.set(project.layout.buildDirectory.dir("tiny-distributions"))
+    this.archiveBaseName.set("tiny-resources")
 
-        group = "tiny"
-        description = "Build a zip containing resources from the Tiny Engine (_boot.lua, ...)."
-    }
+    group = "tiny"
+    description = "Build a zip containing resources from the Tiny Engine (_boot.lua, ...)."
+}
 
 // Create the configuration that will contain the tiny engine javascript as artifact
 configurations.create("tinyWebEngine") {
