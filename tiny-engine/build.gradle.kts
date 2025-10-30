@@ -56,19 +56,22 @@ dependencies {
     }
 }
 
-// Create the tiny engine javascript version as a Zip file
+// Copy the tiny engine javascript JAR file
 val tinyEngineJsJar = project.tasks.register(
     "tinyEngineJsJar",
-    Zip::class.java,
+    Jar::class.java,
 ) {
-    from(tasks.named("jsBundleProduction").map { zipTree(it.outputs.files.singleFile) })
-    this.into("tiny-engine-js")
-    this.destinationDirectory.set(project.layout.buildDirectory.dir("tiny-distributions"))
-    this.archiveBaseName.set("tiny-engine")
-    this.archiveExtension.set("jar")
+    // Generate a jar with the content of the result of this task as content
+    from(tasks.named("jsBundleProduction"))
+    this.destinationDirectory = project.layout.buildDirectory.dir("tiny-distributions")
+
+    // Set the output file name
+    this.archiveFileName.set("tiny-engine-js.jar")
+    // Set the file name of the file included in the jar
+    this.rename { "tiny-engine-js.zip" }
 
     group = "tiny"
-    description = "Build a jar containing all resources to run the Tiny engine in a web application."
+    description = "Copy the Tiny engine JS bundle JAR to the distributions directory."
 }
 
 val tinyResourcesZip = project.tasks.register(

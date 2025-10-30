@@ -40,7 +40,7 @@ class ServeCommand : CliktCommand(name = "serve") {
     override fun run() {
         // Get the zip
         val zipFile = if (gameDirectory.isDirectory) {
-            GameExporter(withSourceMap = true).export(gameDirectory, "tiny-export.zip")
+            GameExporter().export(gameDirectory, "tiny-export.zip")
             gameDirectory.resolve("tiny-export.zip")
         } else {
             gameDirectory

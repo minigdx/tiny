@@ -7,6 +7,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 export default defineConfig({
     root: "kotlin",
     build: {
+        sourcemap: true,
         rollupOptions: {
             input: {
                 main: resolve(__dirname, 'kotlin/index.html'),

@@ -8,14 +8,32 @@ import web.audio.AudioWorkletProcessor
 import web.audio.AudioWorkletProcessorReference
 import web.events.EventHandler
 
-class SynthesizerProcessor : AudioWorkletProcessor {
+class SynthesizerProcessor : AudioWorkletProcessor() {
 
     init {
-
+        println("SynthesizerProcessor initialized!")
         port.onmessage = EventHandler { event ->
-            println("EVENT RECEIVED: $event")
+            val data = event.data.unsafeCast<dynamic>()
+            val type = data.type as? String
+            println("EVENT RECEIVED - Type: $type, Data: $data")
+
+            when (type) {
+                "noteOn" -> {
+                    val note = data.note as? Int
+                    val frequency = data.frequency as? Double
+                    println("Note ON: note=$note, frequency=$frequency Hz")
+                }
+                "noteOff" -> {
+                    val note = data.note as? Int
+                    println("Note OFF: note=$note")
+                }
+                else -> {
+                    println("Unknown message type: $type")
+                }
+            }
         }
     }
+
 
     override fun process(
         inputs: ReadonlyArray<ReadonlyArray<Float32Array<*>>>,
@@ -27,7 +45,7 @@ class SynthesizerProcessor : AudioWorkletProcessor {
     }
 
     companion object : AudioWorkletProcessorReference(
-        value = AudioWorkletProcessor::class.js,
+        value = SynthesizerProcessor::class.js,
         parameterDescriptors = arrayOf(),
     ) {
         init {

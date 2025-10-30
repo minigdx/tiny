@@ -60,15 +60,20 @@ class WebSoundManager : SoundManager() {
     private val soundContext = CoroutineScope(Dispatchers.Main)
 
     private fun initializeAudioWorklet() {
-        ready = true
         nextStartTime = audioContext.currentTime
 
         soundContext.launch {
             // Load the bundled worklet from Vite assets
-            audioContext.audioWorklet.addModule(SynthesizerAudioWorklet)
+            println("Loading audio worklet module...")
+            val result = audioContext.audioWorklet.addModule(SynthesizerAudioWorklet)
+            println("Audio worklet module loaded successfully $result")
 
-            audioWorkletNode = AudioWorkletNode(audioContext, AudioWorkletProcessorName("TODO"))
-            audioWorkletNode.connect(audioContext.destination)
+            println("Creating AudioWorkletNode for SynthesizerProcessor")
+            audioWorkletNode = AudioWorkletNode(audioContext, AudioWorkletProcessorName("SynthesizerProcessor"))
+            val destinationNode = audioContext.destination
+            println("Connecting worklet to destination node: $destinationNode")
+            audioWorkletNode.connect(destinationNode)
+            println("Audio worklet ready!")
             ready = true
         }
     }

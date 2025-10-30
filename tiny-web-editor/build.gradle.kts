@@ -49,20 +49,19 @@ dependencies {
     )
 }
 
-val tinyWebEditor =
-    tasks.register("tinyWebEditor", Zip::class) {
-        val tinyResources =
-            tinyResources.incoming.artifactView {
-                attributes {
-                    attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "unzip")
-                }
-            }.files
+val tinyWebEditor = tasks.register("tinyWebEditor", Zip::class) {
+    val tinyResources =
+        tinyResources.incoming.artifactView {
+            attributes {
+                attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "unzip")
+            }
+        }.files
 
-        group = "tiny"
-        from(tasks.getByName("jsBrowserDistribution"), tinyResources)
-        this.destinationDirectory.set(project.layout.buildDirectory.dir("tiny-dist"))
-        this.archiveVersion.set("")
-    }
+    group = "tiny"
+    from(tasks.getByName("jsBrowserDistribution"), tinyResources)
+    this.destinationDirectory.set(project.layout.buildDirectory.dir("tiny-dist"))
+    this.archiveVersion.set("")
+}
 
 artifacts {
     add("tinyWebEditorEngine", tinyWebEditor)
