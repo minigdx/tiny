@@ -11,6 +11,8 @@ import com.github.minigdx.tiny.util.MutableFixedSizeList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import web.audio.AudioContext
 import web.audio.AudioContextState
 import web.audio.AudioWorkletNode
@@ -94,6 +96,7 @@ class WebSoundManager : SoundManager() {
 
         // Send noteOn event to audio worklet
         val frequency = noteToFrequency(note)
+        val instrumentJson = Json.encodeToString(instrument)
 
         println("Prepare to post message to worklet")
         audioWorkletNode.port.postMessage(
@@ -101,6 +104,7 @@ class WebSoundManager : SoundManager() {
                 "type" to "noteOn",
                 "note" to note.ordinal,
                 "frequency" to frequency,
+                "instrument" to instrumentJson,
             ),
         )
     }
