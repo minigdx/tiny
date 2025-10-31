@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
+    base: './',
     root: "kotlin",
     build: {
         sourcemap: true,
@@ -16,7 +17,7 @@ export default defineConfig({
             output: {
                 entryFileNames: (chunkInfo) => {
                     if (chunkInfo.name === 'main') {
-                        return 'tiny-engine.js';
+                        return 'tiny-web-editor.js';
                     }
                     // Default pattern for other entries
                     return '[name]-[hash].js';

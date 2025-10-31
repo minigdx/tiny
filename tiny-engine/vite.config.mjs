@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
+    base: './',
     root: "kotlin",
     build: {
         sourcemap: true,
