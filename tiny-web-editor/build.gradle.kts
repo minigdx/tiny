@@ -50,15 +50,17 @@ dependencies {
 }
 
 val tinyWebEditor = tasks.register("tinyWebEditor", Zip::class) {
-    val tinyResources =
-        tinyResources.incoming.artifactView {
+    val tinyResources = tinyResources.incoming.artifactView {
             attributes {
                 attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "unzip")
             }
         }.files
 
+    val jsBundleArchive = tasks.named<Jar>("jsBundleProduction").flatMap { it.archiveFile }
+
     group = "tiny"
-    from(tasks.getByName("jsBrowserDistribution"), tinyResources)
+    from(jsBundleArchive.map { zipTree(it) }, tinyResources)
+    exclude("index.html")
     this.destinationDirectory.set(project.layout.buildDirectory.dir("tiny-dist"))
     this.archiveVersion.set("")
 }
