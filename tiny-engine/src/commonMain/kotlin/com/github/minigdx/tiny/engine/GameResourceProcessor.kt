@@ -149,6 +149,7 @@ class GameResourceProcessor(
             logger.debug("GAME_ENGINE") { "All resources are loaded. Notify the boot script." }
             // Force to notify the boot script
             scripts[0]!!.resourcesLoaded()
+            println("NAME???" + scripts[0]?.name)
         }
     }
 
@@ -231,9 +232,11 @@ class GameResourceProcessor(
         // Update the current script, if the loaded script is the current script.
         if (currentScriptIndex == resource.index) {
             currentScript = resource
+        } else if (currentScriptIndex > 0) {
+            // If the current script is not the boot scrpit,
+            // Force the reload of the current script, as the script just updated might be used by the current script.
+            currentScript?.reload = true
         }
-        // Force the reload of the current script, as the script just updated might be used by the current script.
-        currentScript?.reload = true
     }
 
     private suspend fun loadBootScript(resource: GameResource) {
