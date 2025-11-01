@@ -3,7 +3,7 @@ bricks = {}
 balls = {}
 
 local draw_stencil = 2
-local draw_in_stencil = 3
+local draw_inside_stencil = 3
 local draw_outside_stencil = 4
 
 -- TRANSITIONS --
@@ -83,15 +83,16 @@ EndOut.update = function(self)
 end
 
 EndOut.draw_start = function(self)
-    --  gfx.cls(1)
-    --  shape.circlef(256 * 0.5, 212, self.radius, 0)
-    --  spr.sheet(0)
-    --  spr.sdraw(0, 100, 0, 208, 256, 3 * 16)
-
-    --  gfx.to_sheet(2)
+    gfx.cls(1)
+    gfx.draw_mode(draw_stencil)
+    shape.circlef(player.x, player.y, self.radius, 3)
+    gfx.draw_mode(draw_inside_stencil)
+    -- fake cls
+    shape.rectf(0, 0, 256, 256, 13)
 end
 
 EndOut.draw_end = function(self)
+    gfx.draw_mode()
 end
 
 -- Transition when the player just lost.
@@ -116,9 +117,9 @@ end
 EndIn.draw_start = function(self)
     gfx.cls(1)
     gfx.draw_mode(draw_stencil)
-    shape.circlef(256 * 0.5, 212, 70, 1)
-    gfx.draw_mode(draw_in_stencil)
-    -- simulate a gfx.cls(13)...
+    shape.circlef(player.x, player.y, self.radius, 3)
+    gfx.draw_mode(draw_inside_stencil)
+    -- fake cls
     shape.rectf(0, 0, 256, 256, 13)
 end
 
@@ -503,42 +504,11 @@ function _update()
     end
 end
 
-local test = false
-
 function _draw()
-    if ctrl.pressed(keys.space) then
-        test = not test
-    end
-
-    gfx.cls(4)
-    gfx.draw_mode(draw_stencil)
-    -- draw a circle in the midle of the screen
-    shape.circlef(128, 128, 128, 1)
-
-    if test then
-        gfx.draw_mode(draw_in_stencil)
-    else
-        gfx.draw_mode(draw_outside_stencil)
-    end
-
-    -- draw the sprite sheet. only in the circle
-    for i = 0, 256, 16 do
-        for j = 0, 256, 16 do
-            spr.draw(0, i, j)
-        end
-    end
-    gfx.draw_mode(1) -- erase
-    shape.circlef(32, 32, 64, 8)
-    gfx.draw_mode()
-
-end
-
-function _draw2()
     -- game
     gfx.cls(13)
-    spr.sheet()
-
     transition:draw_start()
+
     for b in all(bricks) do
         spr.sdraw(b.x, b.y, 16, b.color * 8, 16, 8)
         if b.hit then

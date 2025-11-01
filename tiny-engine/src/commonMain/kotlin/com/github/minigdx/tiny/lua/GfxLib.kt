@@ -146,8 +146,9 @@ class GfxLib(
             val x = min(max(0, arg1.checkint()), gameOptions.width - 1)
             val y = min(max(0, arg2.checkint()), gameOptions.height - 1)
 
-            // FIXME: cache the frame to avoid creating a new one each time
-            val index = virtualFrameBuffer.readFrameBuffer().getPixel(x, y)
+            val frame = virtualFrameBuffer.readFrameBuffer()
+
+            val index = frame.getPixel(x, y)
             return valueOf(index)
         }
     }

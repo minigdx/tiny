@@ -67,7 +67,8 @@ class DefaultVirtualFrameBuffer(
 
     private var currentSpritesheet: SpriteSheet? = null
     private var currentDepth: Float = 1f
-    private var currentDrawMode: DrawingMode = DrawingMode.DEFAULT
+
+    private var cachedReadFrame: RenderFrame? = null
 
     private val spriteBatchManager = BatchManager(
         keyGenerator = { SpriteBatchKey() },
@@ -164,6 +165,7 @@ class DefaultVirtualFrameBuffer(
         flipX: Boolean,
         flipY: Boolean,
     ) {
+        invalidateCachedReadFrame()
         updateDepthIndex(source)
         val key = spriteBatchManager.createKey()
         key.set(
@@ -199,6 +201,7 @@ class DefaultVirtualFrameBuffer(
         flipX: Boolean,
         flipY: Boolean,
     ) {
+        invalidateCachedReadFrame()
         updateDepthIndex(source)
         val key = spriteBatchManager.createKey()
         key.set(
@@ -232,6 +235,7 @@ class DefaultVirtualFrameBuffer(
         colorIndex: ColorIndex,
         filled: Boolean,
     ) {
+        invalidateCachedReadFrame()
         updateDepthIndex(null)
         val key = primitiveBatchManager.createKey()
         val instance = primitiveBatchManager.createInstance().setRect(
@@ -254,6 +258,7 @@ class DefaultVirtualFrameBuffer(
         y2: Pixel,
         colorIndex: ColorIndex,
     ) {
+        invalidateCachedReadFrame()
         updateDepthIndex(null)
         val key = primitiveBatchManager.createKey()
         val instance = primitiveBatchManager.createInstance().setLine(
@@ -275,6 +280,7 @@ class DefaultVirtualFrameBuffer(
         color: ColorIndex,
         filled: Boolean,
     ) {
+        invalidateCachedReadFrame()
         updateDepthIndex(null)
         val key = primitiveBatchManager.createKey()
         val instance = primitiveBatchManager.createInstance().setCircle(
@@ -294,6 +300,7 @@ class DefaultVirtualFrameBuffer(
         y: Pixel,
         color: ColorIndex,
     ) {
+        invalidateCachedReadFrame()
         updateDepthIndex(null)
         val key = primitiveBatchManager.createKey()
         val instance = primitiveBatchManager.createInstance().setPoint(
@@ -316,6 +323,7 @@ class DefaultVirtualFrameBuffer(
         color: ColorIndex,
         filled: Boolean,
     ) {
+        invalidateCachedReadFrame()
         updateDepthIndex(null)
         val key = primitiveBatchManager.createKey()
         val instance = primitiveBatchManager.createInstance().setTriangle(
@@ -373,23 +381,29 @@ class DefaultVirtualFrameBuffer(
     }
 
     override fun readFrameBuffer(): RenderFrame {
-        kgl.bindFramebuffer(GL_FRAMEBUFFER, frameBufferContext.frameBuffer)
+        fun read(): RenderFrame {
+            renderAllInFrameBuffer()
 
-        kgl.readPixels(
-            0,
-            0,
-            gameOptions.width,
-            gameOptions.height,
-            GL_RGBA,
-            GL_UNSIGNED_BYTE,
-            frameBufferContext.frameBufferData,
-        )
+            kgl.bindFramebuffer(GL_FRAMEBUFFER, frameBufferContext.frameBuffer)
+            kgl.readPixels(
+                0,
+                0,
+                gameOptions.width,
+                gameOptions.height,
+                GL_RGBA,
+                GL_UNSIGNED_BYTE,
+                frameBufferContext.frameBufferData,
+            )
 
-        kgl.bindFramebuffer(GL_FRAMEBUFFER, null)
+            kgl.bindFramebuffer(GL_FRAMEBUFFER, null)
 
-        val openGLFrame = OpenGLFrame(frameBufferContext.frameBufferData, gameOptions)
+            return OpenGLFrame(frameBufferContext.frameBufferData, gameOptions)
+        }
 
-        return openGLFrame
+        // return the cached frame. Otherwise, read it again.
+        val frame = cachedReadFrame ?: read()
+        cachedReadFrame = frame
+        return frame
     }
 
     override fun dithering(dither: Int): Int {
@@ -399,6 +413,8 @@ class DefaultVirtualFrameBuffer(
     }
 
     override fun clear(color: ColorIndex) {
+        invalidateCachedReadFrame()
+
         spriteBatchManager.clear()
         primitiveBatchManager.clear()
         kgl.bindFramebuffer(GL_FRAMEBUFFER, frameBufferContext.frameBuffer)
@@ -406,6 +422,11 @@ class DefaultVirtualFrameBuffer(
         kgl.clearColor(r.toUByte().toInt() / 255f, g.toUByte().toInt() / 255f, b.toUByte().toInt() / 255f, 1.0f)
         kgl.clear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
         kgl.bindFramebuffer(GL_FRAMEBUFFER, null)
+    }
+
+    private fun invalidateCachedReadFrame() {
+        // Invalidate the cached frame
+        cachedReadFrame = null
     }
 
     private fun updateDepthIndex(spritesheet: SpriteSheet?) {

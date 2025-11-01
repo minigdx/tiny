@@ -206,15 +206,6 @@ class GlfwPlatform(
         GLFW.glfwTerminate()
     }
 
-    private fun convert(data: ByteArray): IntArray {
-        val result = IntArray(data.size)
-        val colorPalette = gameOptions.colors()
-        data.forEachIndexed { index, byte ->
-            result[index] = colorPalette.getRGAasInt(byte.toInt())
-        }
-        return result
-    }
-
     override fun endGameLoop() = Unit
 
     override fun record() {

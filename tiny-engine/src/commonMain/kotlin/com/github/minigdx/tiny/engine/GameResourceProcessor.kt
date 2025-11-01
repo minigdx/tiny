@@ -111,8 +111,6 @@ class GameResourceProcessor(
     }
 
     suspend fun processAvailableEvents() {
-        spritesheetToBind.clear()
-
         // Process all available events from the channel without blocking
         while (true) {
             val result = eventChannel.tryReceive()

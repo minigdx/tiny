@@ -89,9 +89,12 @@ class SprLib(
         ): LuaValue {
             val x = arg1.checkint()
             val y = arg2.checkint()
-            val pixels = resourceAccess.findSpritesheet(currentSpritesheet)?.pixels ?: return NIL
+            val spritesheet = resourceAccess.findSpritesheet(currentSpritesheet)
+            val pixels = spritesheet?.pixels ?: return NIL
             return if (isInPixelArray(pixels, x, y)) {
                 pixels.set(x, y, arg3.checkint())
+                // The spritesheet has beed updated in-place. Rebind it.
+                resourceAccess.saveSpritesheet(spritesheet)
                 arg3
             } else {
                 NIL

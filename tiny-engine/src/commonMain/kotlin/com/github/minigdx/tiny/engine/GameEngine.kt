@@ -94,6 +94,7 @@ class GameEngine(
             popupError(ex)
         }
         virtualFrameBuffer.bindTextures(gameResourceProcessor.spritesheetToBind)
+        gameResourceProcessor.spritesheetToBind.clear()
 
         val currentGameScript = gameResourceProcessor.currentScript ?: return
 
@@ -118,6 +119,7 @@ class GameEngine(
             currentMetrics?.run { storeFrameMetrics(this) }
 
             inputManager.reset()
+
             val updateTime = performanceMonitor.operationEnd("game_update")
             // End performance monitoring for game update
             logPerformanceMetrics(updateTime)
