@@ -104,6 +104,9 @@ class GlfwPlatform(
         GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE)
         GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_FORWARD_COMPAT, GLFW.GLFW_TRUE)
         GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_DEBUG_CONTEXT, GLFW.GLFW_TRUE)
+        // Request depth and stencil bits for proper framebuffer support
+        GLFW.glfwWindowHint(GLFW.GLFW_DEPTH_BITS, 24)
+        GLFW.glfwWindowHint(GLFW.GLFW_STENCIL_BITS, 8)
 
         GLFW.glfwWindowHint(
             GLFW.GLFW_VISIBLE,

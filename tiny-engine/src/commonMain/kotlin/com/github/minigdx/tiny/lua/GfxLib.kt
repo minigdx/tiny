@@ -51,13 +51,14 @@ class GfxLib(
 
     @TinyFunction(
         "Switch to another draw mode. \n\n" +
-        "- 0: default.\n "+
-        "- 1: drawing with transparent (ie: can erase part of the screen)\n  "+
-        "- 2: drawing a stencil that will be use with the next mode\n  "+
-        "- 3: drawing using a stencil test (ie: drawing only in the stencil)\n  "+
-        "- 4: drawing using a stencil test (ie: drawing everywhere except in the stencil)\n"
-    ,
+            "- 0: default.\n " +
+            "- 1: drawing with transparent (ie: can erase part of the screen)\n  " +
+            "- 2: drawing a stencil that will be use with the next mode\n  " +
+            "- 3: drawing using a stencil test (ie: drawing only in the stencil)\n  " +
+            "- 4: drawing using a stencil test (ie: drawing everywhere except in the stencil)\n",
         "draw_mode",
+        GFX_DRAW_MODE_EXAMPLE,
+        spritePath = "resources/tiny-town.png",
     )
     internal inner class drawMode : LibFunction() {
         private var current: Int = 0
@@ -74,6 +75,7 @@ class GfxLib(
         override fun call(): LuaValue {
             return valueOf(current).also {
                 current = 0
+                virtualFrameBuffer.setDrawMode(DrawingMode.DEFAULT)
             }
         }
 

@@ -67,6 +67,7 @@ class DefaultVirtualFrameBuffer(
 
     private var currentSpritesheet: SpriteSheet? = null
     private var currentDepth: Float = 1f
+    private var currentDrawMode: DrawingMode = DrawingMode.DEFAULT
 
     private val spriteBatchManager = BatchManager(
         keyGenerator = { SpriteBatchKey() },
@@ -459,55 +460,63 @@ class DefaultVirtualFrameBuffer(
     override fun setDrawMode(mode: DrawingMode) {
         // Render everything to start the new mode with a fresh and clean state.
         renderAllInFrameBuffer()
-
+        kgl.bindFramebuffer(GL_FRAMEBUFFER, frameBufferContext.frameBuffer)
         when (mode) {
             DrawingMode.DEFAULT -> {
-                kgl.enable(GL_BLEND)
                 kgl.disable(GL_STENCIL_TEST)
+                kgl.enable(GL_BLEND)
+                kgl.stencilMask(0x00)
                 kgl.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
                 kgl.colorMask(red = true, green = true, blue = true, alpha = true)
             }
 
             DrawingMode.ALPHA_BLEND -> {
-                kgl.enable(GL_BLEND)
                 kgl.disable(GL_STENCIL_TEST)
+                kgl.enable(GL_BLEND)
                 kgl.blendFuncSeparate(GL_ZERO, GL_ONE, GL_ZERO, GL_ONE_MINUS_SRC_ALPHA)
                 kgl.colorMask(red = true, green = true, blue = true, alpha = true)
             }
 
             DrawingMode.STENCIL_WRITE -> {
                 kgl.enable(GL_STENCIL_TEST)
+                kgl.disable(GL_BLEND)
 
+                // Clear the stencil before writing inside.
                 kgl.stencilMask(0xFF)
-                kgl.clearStencil(0)
                 kgl.clear(GL_STENCIL_BUFFER_BIT)
 
-                kgl.stencilOp(GL_KEEP, GL_KEEP, GL_REPLACE)
                 kgl.stencilFunc(GL_ALWAYS, 1, 0xFF)
+                kgl.stencilOp(GL_KEEP, GL_KEEP, GL_REPLACE)
                 // Don't write the actual sprite in the color buffer
                 kgl.colorMask(red = false, green = false, blue = false, alpha = false)
             }
 
             DrawingMode.STENCIL_TEST -> {
                 kgl.enable(GL_STENCIL_TEST)
-                kgl.stencilFunc(GL_EQUAL, 1, 0xFF)
-                kgl.stencilMask(0x00)
-                kgl.stencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
                 kgl.enable(GL_BLEND)
-                kgl.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+
+                kgl.stencilMask(0x00)
+                kgl.stencilFunc(GL_EQUAL, 1, 0xFF)
+                kgl.stencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
                 kgl.colorMask(red = true, green = true, blue = true, alpha = true)
+
+                kgl.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
             }
 
             DrawingMode.STENCIL_NOT_TEST -> {
                 kgl.enable(GL_STENCIL_TEST)
-                kgl.stencilFunc(GL_NOTEQUAL, 1, 0xFF)
-                kgl.stencilMask(0x00)
-                kgl.stencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
                 kgl.enable(GL_BLEND)
-                kgl.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+
+                kgl.stencilMask(0x00)
+                kgl.stencilFunc(GL_NOTEQUAL, 1, 0xFF)
+                kgl.stencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
                 kgl.colorMask(red = true, green = true, blue = true, alpha = true)
+                // kgl.stencilMask(0x00)
+
+                kgl.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
             }
         }
+        kgl.bindFramebuffer(GL_FRAMEBUFFER, null)
     }
 
     companion object {

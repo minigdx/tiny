@@ -2,22 +2,64 @@ player = nil
 bricks = {}
 balls = {}
 
+local draw_stencil = 2
+local draw_in_stencil = 3
+local draw_outside_stencil = 4
+
 -- TRANSITIONS --
 local Nope = {
     update = function()
-
     end,
-    draw = function()
-
+    draw_start = function()
+    end,
+    draw_end = function()
     end
 }
 
+
+-- Transition when the game start.
+-- It will erase the title screen using a growing circle
 local GameOut = {
-    radius = 0,
+    progress = 0,
     speed = 5,
     start = false,
     y = 0
 }
+
+GameOut.update = function(self)
+    if (self.start) then
+        self.progress = self.progress + self.speed
+
+        if (self.progress > 300) then
+            transition = new(Nope)
+        end
+        self.y = juice.powIn2(self.y, -200, self.progress / 500)
+    end
+end
+
+GameOut.draw_start = function(self)
+end
+
+GameOut.draw_end = function(self)
+    gfx.draw_mode(draw_stencil)
+    shape.circlef(128, 128, self.progress, 0)
+    gfx.draw_mode(draw_outside_stencil)
+
+    local y = 0 -- self.y
+
+    -- title
+    spr.sdraw(0, 100 + y, 0, 208, 256, 3 * 16)
+    -- space
+    spr.sdraw(80, 150 + y, 0, 128, 3 * 16, 16)
+    -- left and right
+    spr.sdraw(88, 150 + 16 + y, 4 * 16, 128, 16, 16)
+    spr.sdraw(88 + 16, 150 + 16 + y, 3 * 16, 128, 16, 16)
+    print("launch the ball", 80 + 3 * 16, 154 + y, 2)
+    print("move the paddle", 80 + 3 * 16, 154 + 16 + y, 2)
+
+    -- go back to normal drawing mode
+    gfx.draw_mode()
+end
 
 local EndOut = {
     start_radius = 40,
@@ -40,15 +82,20 @@ EndOut.update = function(self)
     end
 end
 
-EndOut.draw = function(self)
-    gfx.cls(1)
-    shape.circlef(256 * 0.5, 212, self.radius, 0)
-    spr.sheet(0)
-    spr.sdraw(0, 100, 0, 208, 256, 3 * 16)
+EndOut.draw_start = function(self)
+    --  gfx.cls(1)
+    --  shape.circlef(256 * 0.5, 212, self.radius, 0)
+    --  spr.sheet(0)
+    --  spr.sdraw(0, 100, 0, 208, 256, 3 * 16)
 
-    gfx.to_sheet(2)
+    --  gfx.to_sheet(2)
 end
 
+EndOut.draw_end = function(self)
+end
+
+-- Transition when the player just lost.
+-- Will draw a circle that will close on the player position
 local EndIn = {
     start_radius = 256,
     radius = 256,
@@ -62,43 +109,23 @@ EndIn.update = function(self)
     self.radius = juice.powOut5(self.start_radius, self.target_radius, self.t / self.duration)
 
     if (self.radius <= 40) then
-        transition = new(EndOut)
+        transition = new(EndOut, { start_radius = self.radius })
     end
 end
 
-EndIn.draw = function(self)
+EndIn.draw_start = function(self)
     gfx.cls(1)
-
-    shape.circlef(256 * 0.5, 212, self.radius, 0)
-    gfx.to_sheet(2)
+    gfx.draw_mode(draw_stencil)
+    shape.circlef(256 * 0.5, 212, 70, 1)
+    gfx.draw_mode(draw_in_stencil)
+    -- simulate a gfx.cls(13)...
+    shape.rectf(0, 0, 256, 256, 13)
 end
 
-GameOut.update = function(self)
-    if (self.start) then
-        self.radius = self.radius + self.speed
-
-        if (self.radius > 300) then
-            transition = new(Nope)
-        end
-        self.y = juice.powIn2(self.y, -200, self.radius / 500)
-    end
+EndIn.draw_end = function(self)
+    gfx.draw_mode()
 end
 
-GameOut.draw = function(self)
-    local y = self.y
-
-    spr.sheet(0)
-    -- title
-    spr.sdraw(0, 100 + y, 0, 208, 256, 3 * 16)
-    -- space
-    spr.sdraw(80, 150 + y, 0, 128, 3 * 16, 16)
-    -- left and right
-    spr.sdraw(88, 150 + 16 + y, 4 * 16, 128, 16, 16)
-    spr.sdraw(88 + 16, 150 + 16 + y, 3 * 16, 128, 16, 16)
-    print("launch the ball", 80 + 3 * 16, 154 + y, 2)
-    print("move the paddle", 80 + 3 * 16, 154 + 16 + y, 2)
-
-end
 
 -- PARTICLES --
 local Particle = {
@@ -476,11 +503,42 @@ function _update()
     end
 end
 
+local test = false
+
 function _draw()
+    if ctrl.pressed(keys.space) then
+        test = not test
+    end
+
+    gfx.cls(4)
+    gfx.draw_mode(draw_stencil)
+    -- draw a circle in the midle of the screen
+    shape.circlef(128, 128, 128, 1)
+
+    if test then
+        gfx.draw_mode(draw_in_stencil)
+    else
+        gfx.draw_mode(draw_outside_stencil)
+    end
+
+    -- draw the sprite sheet. only in the circle
+    for i = 0, 256, 16 do
+        for j = 0, 256, 16 do
+            spr.draw(0, i, j)
+        end
+    end
+    gfx.draw_mode(1) -- erase
+    shape.circlef(32, 32, 64, 8)
+    gfx.draw_mode()
+
+end
+
+function _draw2()
     -- game
     gfx.cls(13)
     spr.sheet()
 
+    transition:draw_start()
     for b in all(bricks) do
         spr.sdraw(b.x, b.y, 16, b.color * 8, 16, 8)
         if b.hit then
@@ -492,7 +550,6 @@ function _draw()
         p:draw()
     end
 
-    transition:draw()
     for b in all(balls) do
         if b.glue_to then
             local x = math.sign(b.speed.x) * 8
@@ -507,5 +564,5 @@ function _draw()
 
     player:draw()
 
-
+    transition:draw_end()
 end
