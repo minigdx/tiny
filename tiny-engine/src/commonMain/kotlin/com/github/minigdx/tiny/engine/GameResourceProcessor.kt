@@ -142,7 +142,6 @@ class GameResourceProcessor(
             logger.debug("GAME_ENGINE") { "All resources are loaded. Notify the boot script." }
             // Force to notify the boot script
             scripts[0]!!.resourcesLoaded()
-            println("NAME???" + scripts[0]?.name)
         }
     }
 

@@ -192,7 +192,7 @@ class PrimitiveBatchStage(
                 return readData(palette_colors, icolor, 255, 255);
             }
             
-            float sdfRectangleBorder(vec2 fragCoord, vec2 position, vec2 size) {
+            float sdfRectangle(vec2 fragCoord, vec2 position, vec2 size) {
                 // Position of the center of the rectangle
                 vec2 center = position + size * 0.5;
                 // Position of the frag regarding the center
@@ -359,7 +359,7 @@ class PrimitiveBatchStage(
                 } else if (type == T_TRIANGLE) {
                     sdf = sdfTriangle(v_fragPos, v_shapeParams12, v_shapeParams34, v_shapeParams56);
                 } else {
-                    sdf = sdfRectangleBorder(v_fragPos, v_shapePosition, v_shapeSize);
+                    sdf = sdfRectangle(v_fragPos, v_shapePosition, v_shapeSize);
                 }
             
                 // The distance is more than one pixel away (ie: it's out of the border)

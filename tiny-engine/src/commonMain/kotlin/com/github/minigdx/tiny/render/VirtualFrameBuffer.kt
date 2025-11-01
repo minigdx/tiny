@@ -2,6 +2,7 @@ package com.github.minigdx.tiny.render
 
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
+import com.github.minigdx.tiny.platform.DrawingMode
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.resources.SpriteSheet
 
@@ -170,4 +171,9 @@ interface VirtualFrameBuffer {
      * Reset the clipping to full screen.
      */
     fun resetClip()
+
+    /**
+     * Set the current draw mode
+     */
+    fun setDrawMode(mode: DrawingMode)
 }

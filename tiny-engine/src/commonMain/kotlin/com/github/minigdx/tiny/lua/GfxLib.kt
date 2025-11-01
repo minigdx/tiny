@@ -6,8 +6,11 @@ import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
+import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.platform.DrawingMode
 import com.github.minigdx.tiny.render.VirtualFrameBuffer
+import com.github.minigdx.tiny.resources.ResourceType
+import com.github.minigdx.tiny.resources.SpriteSheet
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.LibFunction
@@ -47,13 +50,13 @@ class GfxLib(
     }
 
     @TinyFunction(
-        """Switch to another draw mode.
-        |- 0: default. 
-        |- 1: drawing with transparent (ie: can erase part of the screen)
-        |- 2: drawing a stencil that will be use with the next mode
-        |- 3: drawing using a stencil test (ie: drawing only in the stencil) 
-        |- 4: drawing using a stencil test (ie: drawing everywhere except in the stencil) 
-    """,
+        "Switch to another draw mode. \n\n" +
+        "- 0: default.\n "+
+        "- 1: drawing with transparent (ie: can erase part of the screen)\n  "+
+        "- 2: drawing a stencil that will be use with the next mode\n  "+
+        "- 3: drawing using a stencil test (ie: drawing only in the stencil)\n  "+
+        "- 4: drawing using a stencil test (ie: drawing everywhere except in the stencil)\n"
+    ,
         "draw_mode",
     )
     internal inner class drawMode : LibFunction() {
@@ -71,8 +74,6 @@ class GfxLib(
         override fun call(): LuaValue {
             return valueOf(current).also {
                 current = 0
-                // FIXME:
-                // resourceAccess.addOp(DrawingModeOperation(modes[current]))
             }
         }
 
@@ -88,8 +89,8 @@ class GfxLib(
             }
             current = index
             val f = modes[current]
-            // FIXME:
-            // resourceAccess.addOp(DrawingModeOperation(f))
+
+            virtualFrameBuffer.setDrawMode(f)
 
             return valueOf(before)
         }
@@ -164,54 +165,23 @@ class GfxLib(
             @TinyArg("sheet") a: LuaValue,
         ): LuaValue {
             val (index, name) = getIndexAndName(a)
-// FIXME:
 
-            /*
-            val frameBuffer = resourceAccess.readFrame()
-            val sheet = SpriteSheet(
+            val sprite = resourceAccess.findSpritesheet(index) ?: SpriteSheet(
                 0,
                 index,
                 name,
                 ResourceType.GAME_SPRITESHEET,
-                frameBuffer.colorIndexBuffer,
-                frameBuffer.width,
-                frameBuffer.height,
+                PixelArray(gameOptions.width, gameOptions.height),
+                gameOptions.width,
+                gameOptions.height,
             )
 
-            resourceAccess.spritesheet(sheet)
+            val frameBuffer = virtualFrameBuffer.readFrameBuffer()
 
-             */
-            return valueOf(index)
-        }
+            frameBuffer.copyInto(sprite.pixels)
 
-        @TinyCall(
-            "Create a blank spritesheet. " +
-                "Execute the operation from the closure on the blank spritesheet and " +
-                "copy it to an new or existing sheet index.",
-        )
-        override fun call(
-            @TinyArg("sheet") a: LuaValue,
-            @TinyArg("closure") b: LuaValue,
-        ): LuaValue {
-            val (index, name) = getIndexAndName(a)
-            val closure = b.checkclosure() ?: return call(a)
+            resourceAccess.saveSpritesheet(sprite)
 
-            // FIXME:
-
-            /*
-
-            val frameBuffer = resourceAccess.renderAsBuffer { closure.invoke() }
-            val sheet = SpriteSheet(
-                0,
-                index,
-                name,
-                ResourceType.GAME_SPRITESHEET,
-                frameBuffer.colorIndexBuffer,
-                frameBuffer.width,
-                frameBuffer.height,
-            )
-            resourceAccess.spritesheet(sheet)
-             */
             return valueOf(index)
         }
 

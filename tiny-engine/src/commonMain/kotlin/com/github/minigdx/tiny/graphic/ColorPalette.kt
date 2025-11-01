@@ -90,6 +90,12 @@ class ColorPalette(colors: List<HexColor>) {
 
     /**
      * Get the RGBA value attached to this color index.
+     * Each byte is signed bytes.
+     *
+     * ie: for red color (255, 0, 0)
+     * color[0].toInt() will NOT return 255 but -1.
+     * color[0].toInt() and 0XFF will return 255.
+     * color[0].toUByte().toInt() will return 255.
      */
     fun getRGBA(index: ColorIndex): ByteArray {
         return rgba[check(index)]

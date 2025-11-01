@@ -1,6 +1,7 @@
 package com.github.minigdx.tiny.render
 
 import com.danielgergely.kgl.ByteBuffer
+import com.danielgergely.kgl.GL_ALWAYS
 import com.danielgergely.kgl.GL_BLEND
 import com.danielgergely.kgl.GL_COLOR_ATTACHMENT0
 import com.danielgergely.kgl.GL_COLOR_BUFFER_BIT
@@ -8,24 +9,35 @@ import com.danielgergely.kgl.GL_DEPTH24_STENCIL8
 import com.danielgergely.kgl.GL_DEPTH_ATTACHMENT
 import com.danielgergely.kgl.GL_DEPTH_BUFFER_BIT
 import com.danielgergely.kgl.GL_DEPTH_TEST
+import com.danielgergely.kgl.GL_EQUAL
 import com.danielgergely.kgl.GL_FRAMEBUFFER
 import com.danielgergely.kgl.GL_FRAMEBUFFER_COMPLETE
+import com.danielgergely.kgl.GL_KEEP
 import com.danielgergely.kgl.GL_LEQUAL
 import com.danielgergely.kgl.GL_NEAREST
+import com.danielgergely.kgl.GL_NOTEQUAL
+import com.danielgergely.kgl.GL_ONE
+import com.danielgergely.kgl.GL_ONE_MINUS_SRC_ALPHA
 import com.danielgergely.kgl.GL_RENDERBUFFER
+import com.danielgergely.kgl.GL_REPLACE
 import com.danielgergely.kgl.GL_RGBA
 import com.danielgergely.kgl.GL_SCISSOR_TEST
+import com.danielgergely.kgl.GL_SRC_ALPHA
 import com.danielgergely.kgl.GL_STENCIL_ATTACHMENT
+import com.danielgergely.kgl.GL_STENCIL_BUFFER_BIT
+import com.danielgergely.kgl.GL_STENCIL_TEST
 import com.danielgergely.kgl.GL_TEXTURE_2D
 import com.danielgergely.kgl.GL_TEXTURE_MAG_FILTER
 import com.danielgergely.kgl.GL_TEXTURE_MIN_FILTER
 import com.danielgergely.kgl.GL_UNSIGNED_BYTE
+import com.danielgergely.kgl.GL_ZERO
 import com.danielgergely.kgl.Kgl
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.graphic.PixelFormat
+import com.github.minigdx.tiny.platform.DrawingMode
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.render.batch.BatchManager
@@ -390,7 +402,7 @@ class DefaultVirtualFrameBuffer(
         primitiveBatchManager.clear()
         kgl.bindFramebuffer(GL_FRAMEBUFFER, frameBufferContext.frameBuffer)
         val (r, g, b) = gameOptions.colors().getRGBA(color)
-        kgl.clearColor(r.toInt() / 255f, g.toInt() / 255f, b.toInt() / 255f, 1.0f)
+        kgl.clearColor(r.toUByte().toInt() / 255f, g.toUByte().toInt() / 255f, b.toUByte().toInt() / 255f, 1.0f)
         kgl.clear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
         kgl.bindFramebuffer(GL_FRAMEBUFFER, null)
     }
@@ -442,6 +454,60 @@ class DefaultVirtualFrameBuffer(
 
     override fun resetClip() {
         primitiveBuffer.clipper.reset()
+    }
+
+    override fun setDrawMode(mode: DrawingMode) {
+        // Render everything to start the new mode with a fresh and clean state.
+        renderAllInFrameBuffer()
+
+        when (mode) {
+            DrawingMode.DEFAULT -> {
+                kgl.enable(GL_BLEND)
+                kgl.disable(GL_STENCIL_TEST)
+                kgl.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+                kgl.colorMask(red = true, green = true, blue = true, alpha = true)
+            }
+
+            DrawingMode.ALPHA_BLEND -> {
+                kgl.enable(GL_BLEND)
+                kgl.disable(GL_STENCIL_TEST)
+                kgl.blendFuncSeparate(GL_ZERO, GL_ONE, GL_ZERO, GL_ONE_MINUS_SRC_ALPHA)
+                kgl.colorMask(red = true, green = true, blue = true, alpha = true)
+            }
+
+            DrawingMode.STENCIL_WRITE -> {
+                kgl.enable(GL_STENCIL_TEST)
+
+                kgl.stencilMask(0xFF)
+                kgl.clearStencil(0)
+                kgl.clear(GL_STENCIL_BUFFER_BIT)
+
+                kgl.stencilOp(GL_KEEP, GL_KEEP, GL_REPLACE)
+                kgl.stencilFunc(GL_ALWAYS, 1, 0xFF)
+                // Don't write the actual sprite in the color buffer
+                kgl.colorMask(red = false, green = false, blue = false, alpha = false)
+            }
+
+            DrawingMode.STENCIL_TEST -> {
+                kgl.enable(GL_STENCIL_TEST)
+                kgl.stencilFunc(GL_EQUAL, 1, 0xFF)
+                kgl.stencilMask(0x00)
+                kgl.stencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
+                kgl.enable(GL_BLEND)
+                kgl.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+                kgl.colorMask(red = true, green = true, blue = true, alpha = true)
+            }
+
+            DrawingMode.STENCIL_NOT_TEST -> {
+                kgl.enable(GL_STENCIL_TEST)
+                kgl.stencilFunc(GL_NOTEQUAL, 1, 0xFF)
+                kgl.stencilMask(0x00)
+                kgl.stencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
+                kgl.enable(GL_BLEND)
+                kgl.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+                kgl.colorMask(red = true, green = true, blue = true, alpha = true)
+            }
+        }
     }
 
     companion object {
