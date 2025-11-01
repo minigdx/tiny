@@ -403,7 +403,10 @@ entity.fields -- access custom field of the entity
                     is TilesetRect -> value.toLua()
                     is List<*> -> LuaValue.listOf(value.map { toLua(it) }.toTypedArray())
                     null -> NIL
-                    else -> TODO("MapLib")
+                    else -> throw IllegalArgumentException(
+                        "Field of type ${value::class} cannot be converted to LuaValue. " +
+                            "It's a missing feature: the game engine needs to be updated.",
+                    )
                 }
             }
             return listOf(

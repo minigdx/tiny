@@ -405,6 +405,45 @@ class DefaultVirtualFrameBuffer(
         }
     }
 
+    override fun resetPalette() {
+        primitiveBuffer.blender.pal()
+    }
+
+    override fun swapPalette(
+        source: Int,
+        target: Int,
+    ) {
+        primitiveBuffer.blender.pal(source, target)
+    }
+
+    override fun setCamera(
+        x: Int,
+        y: Int,
+    ) {
+        primitiveBuffer.camera.set(x, y)
+    }
+
+    override fun getCamera(): Pair<Int, Int> {
+        return primitiveBuffer.camera.x to primitiveBuffer.camera.y
+    }
+
+    override fun resetCamera() {
+        primitiveBuffer.camera.set(0, 0)
+    }
+
+    override fun setClip(
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+    ) {
+        primitiveBuffer.clipper.set(x, y, width, height)
+    }
+
+    override fun resetClip() {
+        primitiveBuffer.clipper.reset()
+    }
+
     companion object {
         private const val DEPTH_STEP = 0.0001f
     }

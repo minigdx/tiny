@@ -216,20 +216,16 @@ class GfxLib(
         }
 
         private fun getIndexAndName(arg: LuaValue): Pair<Int, String> {
-            /*
             return if (arg.isstring()) {
-                val index = resourceAccess.spritesheet(arg.tojstring()) ?: resourceAccess.newSpritesheetIndex()
-                index to arg.tojstring()
+                val name = arg.tojstring()
+                val existing = resourceAccess.findSpritesheet(name)
+                val index = existing?.index ?: resourceAccess.newSpritesheetIndex()
+                index to name
             } else {
-                val spriteSheet = resourceAccess.spritesheet(arg.checkint())
-                arg.toint() to (spriteSheet?.name ?: "frame_buffer_${arg.toint()}")
+                val index = arg.toint()
+                val spriteSheet = resourceAccess.findSpritesheet(index)
+                index to (spriteSheet?.name ?: "frame_buffer_$index")
             }
-
-             */
-
-            // FIXME:
-
-            TODO("A")
         }
     }
 
@@ -240,14 +236,7 @@ class GfxLib(
     inner class pal : LibFunction() {
         @TinyCall("Reset all previous color changes.")
         override fun call(): LuaValue {
-            /*
-            resourceAccess.addOp(PaletteOperation)
-            resourceAccess.frameBuffer.blender.pal()
-
-             */
-
-            // FIXME:
-
+            virtualFrameBuffer.resetPalette()
             return NONE
         }
 
@@ -256,14 +245,7 @@ class GfxLib(
             a: LuaValue,
             b: LuaValue,
         ): LuaValue {
-            // FIXME:
-
-            /*
-            resourceAccess.addOp(PaletteOperation)
-            resourceAccess.frameBuffer.blender.pal(a.checkint(), b.checkint())
-
-             */
-
+            virtualFrameBuffer.swapPalette(a.checkint(), b.checkint())
             return NONE
         }
     }
@@ -272,16 +254,8 @@ class GfxLib(
     inner class camera : TwoArgFunction() {
         @TinyCall("Reset the game camera to it's default position (0,0).")
         override fun call(): LuaValue {
-            /*
-            resourceAccess.addOp(CameraOperation)
             val previous = coordinates()
-            resourceAccess.frameBuffer.camera.set(0, 0)
-
-             */
-
-            // FIXME:
-
-            val previous = coordinates()
+            virtualFrameBuffer.resetCamera()
             return previous
         }
 
@@ -290,25 +264,16 @@ class GfxLib(
             @TinyArg("x") arg1: LuaValue,
             @TinyArg("y") arg2: LuaValue,
         ): LuaValue {
-            /*
-            resourceAccess.addOp(CameraOperation)
             val previous = coordinates()
-            resourceAccess.frameBuffer.camera.set(arg1.toint(), arg2.toint())
-
-             */
-
-            // FIXME:
-
-            val previous = coordinates()
+            virtualFrameBuffer.setCamera(arg1.toint(), arg2.toint())
             return previous
         }
 
         private fun coordinates(): LuaTable {
+            val (x, y) = virtualFrameBuffer.getCamera()
             return LuaTable().apply {
-                // FIXME:
-
-                // set("x", resourceAccess.frameBuffer.camera.x)
-                // set("y", resourceAccess.frameBuffer.camera.y)
+                set("x", x)
+                set("y", y)
             }
         }
     }
@@ -343,14 +308,7 @@ class GfxLib(
     inner class clip : LibFunction() {
         @TinyCall("Reset the clip and draw on the fullscreen.")
         override fun call(): LuaValue {
-            /*
-            resourceAccess.addOp(ClipOperation)
-            resourceAccess.frameBuffer.clipper.reset()
-
-             */
-
-            // FIXME:
-
+            virtualFrameBuffer.resetClip()
             return NONE
         }
 
@@ -361,14 +319,7 @@ class GfxLib(
             @TinyArg("width") c: LuaValue,
             @TinyArg("height") d: LuaValue,
         ): LuaValue {
-            /*
-
-            resourceAccess.addOp(ClipOperation)
-            resourceAccess.frameBuffer.clipper.set(a.checkint(), b.checkint(), c.checkint(), d.checkint())
-             */
-
-            // FIXME:
-
+            virtualFrameBuffer.setClip(a.checkint(), b.checkint(), c.checkint(), d.checkint())
             return NONE
         }
     }

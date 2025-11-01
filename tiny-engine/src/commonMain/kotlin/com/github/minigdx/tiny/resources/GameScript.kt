@@ -18,8 +18,6 @@ import com.github.minigdx.tiny.lua.SfxLib
 import com.github.minigdx.tiny.lua.ShapeLib
 import com.github.minigdx.tiny.lua.SprLib
 import com.github.minigdx.tiny.lua.StdLib
-import com.github.minigdx.tiny.lua.TestLib
-import com.github.minigdx.tiny.lua.TestResult
 import com.github.minigdx.tiny.lua.TinyBaseLib
 import com.github.minigdx.tiny.lua.TinyLib
 import com.github.minigdx.tiny.lua.Vec2Lib
@@ -76,8 +74,6 @@ class GameScript(
 
     private val tinyLib: TinyLib = TinyLib(gameOptions.gameScripts, gameOptions)
 
-    internal val testResults = mutableListOf<TestResult>()
-
     class State(val args: LuaValue)
 
     private fun createLuaGlobals(forValidation: Boolean = false): Globals =
@@ -109,7 +105,6 @@ class GameScript(
             load(JuiceLib())
             load(NotesLib())
             load(FloppyLib(platform = platform, logger = logger))
-            load(TestLib(this@GameScript))
 
             LoadState.install(this)
             LuaC.install(this)

@@ -123,4 +123,51 @@ interface VirtualFrameBuffer {
      * Initialize the virtual frame buffer with window manager.
      */
     fun init(windowManager: WindowManager)
+
+    /**
+     * Reset all palette color swaps to default.
+     */
+    fun resetPalette()
+
+    /**
+     * Swap a source color index for a target color index in rendering.
+     */
+    fun swapPalette(
+        source: Int,
+        target: Int,
+    )
+
+    /**
+     * Set the camera position (rendering offset).
+     */
+    fun setCamera(
+        x: Int,
+        y: Int,
+    )
+
+    /**
+     * Get the current camera position.
+     * @return Pair of (x, y) coordinates
+     */
+    fun getCamera(): Pair<Int, Int>
+
+    /**
+     * Reset the camera to default position (0, 0).
+     */
+    fun resetCamera()
+
+    /**
+     * Set the clipping rectangle to limit the drawing area.
+     */
+    fun setClip(
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+    )
+
+    /**
+     * Reset the clipping to full screen.
+     */
+    fun resetClip()
 }

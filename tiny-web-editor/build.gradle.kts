@@ -51,10 +51,10 @@ dependencies {
 
 val tinyWebEditor = tasks.register("tinyWebEditor", Zip::class) {
     val tinyResources = tinyResources.incoming.artifactView {
-            attributes {
-                attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "unzip")
-            }
-        }.files
+        attributes {
+            attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "unzip")
+        }
+    }.files
 
     val jsBundleArchive = tasks.named<Jar>("jsBundleProduction").flatMap { it.archiveFile }
 

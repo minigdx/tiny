@@ -18,7 +18,6 @@ import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
 import com.github.minigdx.tiny.resources.ResourceType.PRIMITIVE_SPRITESHEET
 import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.resources.SpriteSheet
-import com.github.minigdx.tiny.resources.SpriteSheet.SpriteSheetKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -58,12 +57,6 @@ class GameResourceProcessor(
     private var currentScriptIndex: Int = 0
 
     val spritesheetToBind = mutableListOf<SpriteSheet>()
-
-    // next available texture unit
-    // The unit 0 is reserved for the primitive texture.
-    private var nextAvailableTextureUnit = 1
-
-    private val textureUnitPerSpriteSheet = mutableMapOf<SpriteSheetKey, Int>()
 
     private val eventChannel = Channel<GameResource>(Channel.UNLIMITED)
     private val gameResourceCollector = GameResourceCollector(eventChannel)
@@ -265,13 +258,12 @@ class GameResourceProcessor(
     }
 
     override fun newSpritesheetIndex(): Int {
-        TODO("Not yet implemented ???")
+        return spriteSheets.size
     }
 
     override fun saveSpritesheet(sheet: SpriteSheet) {
-        // TODO: set the spritesheet texture unit?
-        // TODO: add it into the texture to bind
-        TODO("Not yet implemented COUCUO")
+        spritesheetToBind.add(sheet)
+        spriteSheets[sheet.index] = sheet
     }
 
     override fun findLevel(index: Int): GameLevel? {
@@ -297,12 +289,5 @@ class GameResourceProcessor(
     private fun <T> Array<T>.atIndex(index: Int): T? {
         if (this.isEmpty()) return null
         return this[index % this.size]
-    }
-
-    companion object {
-        // Number of total texture managed by the game engine
-        // (game engine + spritesheets + primitives + levels spritesheets)
-        // It needs to be sync with the number of texture unit in [com.github.minigdx.tiny.render.gl.SpriteBatchStage]
-        private const val MAX_TEXTURE_UNIT = 17
     }
 }
