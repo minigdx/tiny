@@ -35,7 +35,7 @@ import com.danielgergely.kgl.Kgl
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.graphic.FrameBuffer
+import com.github.minigdx.tiny.graphic.FrameBufferParameters
 import com.github.minigdx.tiny.graphic.PixelFormat
 import com.github.minigdx.tiny.platform.DrawingMode
 import com.github.minigdx.tiny.platform.WindowManager
@@ -82,7 +82,7 @@ class DefaultVirtualFrameBuffer(
         batchGenerator = { PrimitiveBatch() },
     )
 
-    private val primitiveBuffer = FrameBuffer(
+    private val parameters = FrameBufferParameters(
         gameOptions.width,
         gameOptions.height,
         gameOptions.colors(),
@@ -167,13 +167,16 @@ class DefaultVirtualFrameBuffer(
     ) {
         invalidateCachedReadFrame()
         updateDepthIndex(source)
+
+        val palColor = parameters.blender.palette()[color]
+
         val key = spriteBatchManager.createKey()
         key.set(
             source,
-            primitiveBuffer.blender.dithering,
-            monocolors[color],
-            primitiveBuffer.camera,
-            primitiveBuffer.clipper,
+            parameters.blender.dithering,
+            monocolors[palColor],
+            parameters.camera,
+            parameters.clipper,
         )
         val instance = spriteBatchManager.createInstance()
         instance.set(
@@ -206,11 +209,10 @@ class DefaultVirtualFrameBuffer(
         val key = spriteBatchManager.createKey()
         key.set(
             source,
-            primitiveBuffer.blender.dithering,
-            // TODO: changing pal might not be working as the array is the same.
-            primitiveBuffer.blender.switch,
-            primitiveBuffer.camera,
-            primitiveBuffer.clipper,
+            parameters.blender.dithering,
+            parameters.blender.palette(),
+            parameters.camera,
+            parameters.clipper,
         )
         val instance = spriteBatchManager.createInstance()
         instance.set(
@@ -232,7 +234,7 @@ class DefaultVirtualFrameBuffer(
         y: Pixel,
         width: Pixel,
         height: Pixel,
-        colorIndex: ColorIndex,
+        color: ColorIndex,
         filled: Boolean,
     ) {
         invalidateCachedReadFrame()
@@ -244,8 +246,8 @@ class DefaultVirtualFrameBuffer(
             width,
             height,
             filled = filled,
-            color = colorIndex,
-            dither = primitiveBuffer.blender.dithering,
+            color = parameters.blender.palette()[color],
+            dither = parameters.blender.dithering,
             depth = currentDepth,
         )
         primitiveBatchManager.submit(key, instance)
@@ -256,7 +258,7 @@ class DefaultVirtualFrameBuffer(
         y1: Pixel,
         x2: Pixel,
         y2: Pixel,
-        colorIndex: ColorIndex,
+        color: ColorIndex,
     ) {
         invalidateCachedReadFrame()
         updateDepthIndex(null)
@@ -266,8 +268,8 @@ class DefaultVirtualFrameBuffer(
             y1,
             x2,
             y2,
-            color = colorIndex,
-            dither = primitiveBuffer.blender.dithering,
+            color = parameters.blender.palette()[color],
+            dither = parameters.blender.dithering,
             depth = currentDepth,
         )
         primitiveBatchManager.submit(key, instance)
@@ -288,8 +290,8 @@ class DefaultVirtualFrameBuffer(
             centerY,
             radius,
             filled = filled,
-            color = color,
-            dither = primitiveBuffer.blender.dithering,
+            color = parameters.blender.palette()[color],
+            dither = parameters.blender.dithering,
             depth = currentDepth,
         )
         primitiveBatchManager.submit(key, instance)
@@ -306,8 +308,8 @@ class DefaultVirtualFrameBuffer(
         val instance = primitiveBatchManager.createInstance().setPoint(
             x,
             y,
-            color = color,
-            dither = primitiveBuffer.blender.dithering,
+            color = parameters.blender.palette()[color],
+            dither = parameters.blender.dithering,
             depth = currentDepth,
         )
         primitiveBatchManager.submit(key, instance)
@@ -333,8 +335,8 @@ class DefaultVirtualFrameBuffer(
             y2,
             x3,
             y3,
-            color,
-            primitiveBuffer.blender.dithering,
+            parameters.blender.palette()[color],
+            parameters.blender.dithering,
             filled,
             depth = currentDepth,
         )
@@ -407,8 +409,8 @@ class DefaultVirtualFrameBuffer(
     }
 
     override fun dithering(dither: Int): Int {
-        val actual = primitiveBuffer.blender.dithering
-        primitiveBuffer.blender.dithering = dither
+        val actual = parameters.blender.dithering
+        parameters.blender.dithering = dither
         return actual
     }
 
@@ -440,29 +442,29 @@ class DefaultVirtualFrameBuffer(
     }
 
     override fun resetPalette() {
-        primitiveBuffer.blender.pal()
+        parameters.blender.pal()
     }
 
     override fun swapPalette(
         source: Int,
         target: Int,
     ) {
-        primitiveBuffer.blender.pal(source, target)
+        parameters.blender.pal(source, target)
     }
 
     override fun setCamera(
         x: Int,
         y: Int,
     ) {
-        primitiveBuffer.camera.set(x, y)
+        parameters.camera.set(x, y)
     }
 
     override fun getCamera(): Pair<Int, Int> {
-        return primitiveBuffer.camera.x to primitiveBuffer.camera.y
+        return parameters.camera.x to parameters.camera.y
     }
 
     override fun resetCamera() {
-        primitiveBuffer.camera.set(0, 0)
+        parameters.camera.set(0, 0)
     }
 
     override fun setClip(
@@ -471,11 +473,11 @@ class DefaultVirtualFrameBuffer(
         width: Int,
         height: Int,
     ) {
-        primitiveBuffer.clipper.set(x, y, width, height)
+        parameters.clipper.set(x, y, width, height)
     }
 
     override fun resetClip() {
-        primitiveBuffer.clipper.reset()
+        parameters.clipper.reset()
     }
 
     override fun setDrawMode(mode: DrawingMode) {
