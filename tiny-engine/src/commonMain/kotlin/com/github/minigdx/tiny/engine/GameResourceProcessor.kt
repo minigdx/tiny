@@ -35,7 +35,7 @@ class GameResourceProcessor(
     private val logger: Logger,
 ) : GameResourceAccess {
     private val scripts: Array<GameScript?>
-    private val spriteSheets: Array<SpriteSheet?>
+    private var spriteSheets: Array<SpriteSheet?>
     private val levels: Array<GameLevel?>
     private val sounds: Array<Sound?>
 
@@ -260,6 +260,9 @@ class GameResourceProcessor(
 
     override fun saveSpritesheet(sheet: SpriteSheet) {
         spritesheetToBind.add(sheet)
+        if (sheet.index >= spriteSheets.size) {
+            spriteSheets = spriteSheets.copyOf(sheet.index + 1)
+        }
         spriteSheets[sheet.index] = sheet
     }
 

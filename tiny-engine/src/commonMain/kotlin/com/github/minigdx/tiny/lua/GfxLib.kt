@@ -169,7 +169,7 @@ class GfxLib(
         ): LuaValue {
             val (index, name) = getIndexAndName(a)
 
-            val sprite = resourceAccess.findSpritesheet(index) ?: SpriteSheet(
+            val sprite = SpriteSheet(
                 0,
                 index,
                 name,

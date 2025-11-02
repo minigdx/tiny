@@ -114,7 +114,7 @@ function _draw()
 end"""
 
 //language=Lua
-const val GFX_DRAW_MODE_EXAMPLE = """-- Update the code to update the game!
+const val GFX_DRAW_MODE_EXAMPLE = """
 local draw_stencil = 2
 local draw_inside_stencil = 3
 local draw_outside_stencil = 4

@@ -93,8 +93,6 @@ class GameEngine(
         } catch (ex: TinyException) {
             popupError(ex)
         }
-        virtualFrameBuffer.bindTextures(gameResourceProcessor.spritesheetToBind)
-        gameResourceProcessor.spritesheetToBind.clear()
 
         val currentGameScript = gameResourceProcessor.currentScript ?: return
 
@@ -131,6 +129,9 @@ class GameEngine(
      */
     override fun draw() {
         performanceMonitor.operationStart("draw")
+
+        virtualFrameBuffer.bindTextures(gameResourceProcessor.spritesheetToBind)
+        gameResourceProcessor.spritesheetToBind.clear()
 
         virtualFrameBuffer.draw()
         performanceMonitor.operationEnd("draw")
