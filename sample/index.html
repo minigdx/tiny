@@ -3,10 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Tiny - Platform game</title>
+  <script type="module" crossorigin src="./tiny-engine.js"></script>
+  <link rel="modulepreload" crossorigin href="./chunks/kotlin-stdlib-CRdMVpU4.js">
+  <link rel="modulepreload" crossorigin href="./chunks/kotlin-coroutines-CF_EUD0A.js">
+  <link rel="modulepreload" crossorigin href="./chunks/lua-BeJeYfYo.js">
 </head>
 <body style="margin: 0">
 <div style="text-align:center;">
-    <tiny-game name="Platform game" mouse="false" width="256" height="256" zoom="2" spritew="16" spriteh="16">
+    <tiny-game id="tiny-game-71c3108e-090b-4d8a-b3fe-0974db6a82bc" name="Platform game" mouse="false" width="256" height="256" zoom="2" spritew="16" spriteh="16">
         <!-- GAME_SCRIPT -->
         <tiny-script name="pong.lua"></tiny-script>
         <!-- GAME_SCRIPT_END -->
@@ -19,5 +23,4 @@
     </tiny-game>
 </div>
 </body>
-<script src="tiny-engine.js"></script>
 </html>

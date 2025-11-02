@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.10">
+<meta name="generator" content="Asciidoctor 2.0.18">
 <link rel="icon" type="image/png" href="./sample/favicon.png">
 <title>Tiny 🧸</title>
 <style>
@@ -676,6 +676,221 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+pre.rouge table td { padding: 5px; }
+pre.rouge table pre { margin: 0; }
+pre.rouge .cm {
+  color: #999988;
+  font-style: italic;
+}
+pre.rouge .cp {
+  color: #999999;
+  font-weight: bold;
+}
+pre.rouge .c1 {
+  color: #999988;
+  font-style: italic;
+}
+pre.rouge .cs {
+  color: #999999;
+  font-weight: bold;
+  font-style: italic;
+}
+pre.rouge .c, pre.rouge .ch, pre.rouge .cd, pre.rouge .cpf {
+  color: #999988;
+  font-style: italic;
+}
+pre.rouge .err {
+  color: #a61717;
+  background-color: #e3d2d2;
+}
+pre.rouge .gd {
+  color: #000000;
+  background-color: #ffdddd;
+}
+pre.rouge .ge {
+  color: #000000;
+  font-style: italic;
+}
+pre.rouge .gr {
+  color: #aa0000;
+}
+pre.rouge .gh {
+  color: #999999;
+}
+pre.rouge .gi {
+  color: #000000;
+  background-color: #ddffdd;
+}
+pre.rouge .go {
+  color: #888888;
+}
+pre.rouge .gp {
+  color: #555555;
+}
+pre.rouge .gs {
+  font-weight: bold;
+}
+pre.rouge .gu {
+  color: #aaaaaa;
+}
+pre.rouge .gt {
+  color: #aa0000;
+}
+pre.rouge .kc {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .kd {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .kn {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .kp {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .kr {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .kt {
+  color: #445588;
+  font-weight: bold;
+}
+pre.rouge .k, pre.rouge .kv {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .mf {
+  color: #009999;
+}
+pre.rouge .mh {
+  color: #009999;
+}
+pre.rouge .il {
+  color: #009999;
+}
+pre.rouge .mi {
+  color: #009999;
+}
+pre.rouge .mo {
+  color: #009999;
+}
+pre.rouge .m, pre.rouge .mb, pre.rouge .mx {
+  color: #009999;
+}
+pre.rouge .sa {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .sb {
+  color: #d14;
+}
+pre.rouge .sc {
+  color: #d14;
+}
+pre.rouge .sd {
+  color: #d14;
+}
+pre.rouge .s2 {
+  color: #d14;
+}
+pre.rouge .se {
+  color: #d14;
+}
+pre.rouge .sh {
+  color: #d14;
+}
+pre.rouge .si {
+  color: #d14;
+}
+pre.rouge .sx {
+  color: #d14;
+}
+pre.rouge .sr {
+  color: #009926;
+}
+pre.rouge .s1 {
+  color: #d14;
+}
+pre.rouge .ss {
+  color: #990073;
+}
+pre.rouge .s, pre.rouge .dl {
+  color: #d14;
+}
+pre.rouge .na {
+  color: #008080;
+}
+pre.rouge .bp {
+  color: #999999;
+}
+pre.rouge .nb {
+  color: #0086B3;
+}
+pre.rouge .nc {
+  color: #445588;
+  font-weight: bold;
+}
+pre.rouge .no {
+  color: #008080;
+}
+pre.rouge .nd {
+  color: #3c5d5d;
+  font-weight: bold;
+}
+pre.rouge .ni {
+  color: #800080;
+}
+pre.rouge .ne {
+  color: #990000;
+  font-weight: bold;
+}
+pre.rouge .nf, pre.rouge .fm {
+  color: #990000;
+  font-weight: bold;
+}
+pre.rouge .nl {
+  color: #990000;
+  font-weight: bold;
+}
+pre.rouge .nn {
+  color: #555555;
+}
+pre.rouge .nt {
+  color: #000080;
+}
+pre.rouge .vc {
+  color: #008080;
+}
+pre.rouge .vg {
+  color: #008080;
+}
+pre.rouge .vi {
+  color: #008080;
+}
+pre.rouge .nv, pre.rouge .vm {
+  color: #008080;
+}
+pre.rouge .ow {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .o {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .w {
+  color: #bbbbbb;
+}
+pre.rouge {
+  background-color: #f8f8f8;
+}
+</style>
 </head>
 <body class="article toc2 toc-left">
 <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
@@ -797,12 +1012,17 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <div id="header">
 <h1>Tiny 🧸</h1>
 <div class="details">
-<span id="revnumber">version 1.4.0-alpha3</span>
+<span id="revnumber">version 2.0.0-alpha0</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
 <li><a href="#_tiny_engine">Tiny Engine</a></li>
+<li><a href="#_quick_navigation">Quick Navigation</a>
+<ul class="sectlevel2">
+<li><a href="#_resources">Resources</a></li>
+</ul>
+</li>
 <li><a href="#_tiny_playground">Tiny Playground</a></li>
 <li><a href="#_tiny_is_open_source">Tiny is open source</a></li>
 <li><a href="#_tiny_install">Tiny Install</a></li>
@@ -815,50 +1035,31 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 </li>
 <li><a href="#_tiny_showcase">Tiny Showcase</a></li>
 <li><a href="#_tiny_cli_commands">Tiny CLI Commands</a>
-<ul class="sectlevel3">
+<ul class="sectlevel2">
 <li><a href="#_add">add</a></li>
 <li><a href="#_create">create</a></li>
 <li><a href="#_debug">debug</a></li>
 <li><a href="#_export">export</a></li>
 <li><a href="#_palette">palette</a></li>
+<li><a href="#_resources_2">resources</a></li>
 <li><a href="#_run">run</a></li>
 <li><a href="#_serve">serve</a></li>
 <li><a href="#_sfx">sfx</a></li>
+<li><a href="#_update">update</a></li>
 </ul>
 </li>
 <li><a href="#_tiny_api">Tiny API</a>
 <ul class="sectlevel2">
-<li><a href="#_ctrl">ctrl</a>
+<li><a href="#_vec2">vec2</a>
 <ul class="sectlevel3">
-<li><a href="#_ctrl_touch">ctrl.touch()</a></li>
-<li><a href="#_ctrl_pressed">ctrl.pressed()</a></li>
-<li><a href="#_ctrl_pressing">ctrl.pressing()</a></li>
-<li><a href="#_ctrl_touched">ctrl.touched()</a></li>
-<li><a href="#_ctrl_touching">ctrl.touching()</a></li>
-</ul>
-</li>
-<li><a href="#_debug_2">debug</a>
-<ul class="sectlevel3">
-<li><a href="#_debug_enabled">debug.enabled()</a></li>
-<li><a href="#_debug_table">debug.table()</a></li>
-<li><a href="#_debug_log">debug.log()</a></li>
-<li><a href="#_debug_console">debug.console()</a></li>
-<li><a href="#_debug_rect">debug.rect()</a></li>
-<li><a href="#_debug_point">debug.point()</a></li>
-<li><a href="#_debug_line">debug.line()</a></li>
-</ul>
-</li>
-<li><a href="#_gfx">gfx</a>
-<ul class="sectlevel3">
-<li><a href="#_gfx_drawmode">gfx.drawMode()</a></li>
-<li><a href="#_gfx_cls">gfx.cls()</a></li>
-<li><a href="#_gfx_pset">gfx.pset()</a></li>
-<li><a href="#_gfx_pget">gfx.pget()</a></li>
-<li><a href="#_gfx_to_sheet">gfx.to_sheet()</a></li>
-<li><a href="#_gfx_pal">gfx.pal()</a></li>
-<li><a href="#_gfx_camera">gfx.camera()</a></li>
-<li><a href="#_gfx_dither">gfx.dither()</a></li>
-<li><a href="#_gfx_clip">gfx.clip()</a></li>
+<li><a href="#_vec2_create">vec2.create()</a></li>
+<li><a href="#_vec2_add">vec2.add()</a></li>
+<li><a href="#_vec2_sub">vec2.sub()</a></li>
+<li><a href="#_vec2_dot">vec2.dot()</a></li>
+<li><a href="#_vec2_mag">vec2.mag()</a></li>
+<li><a href="#_vec2_nor">vec2.nor()</a></li>
+<li><a href="#_vec2_crs">vec2.crs()</a></li>
+<li><a href="#_vec2_scl">vec2.scl()</a></li>
 </ul>
 </li>
 <li><a href="#_juice">juice</a>
@@ -899,7 +1100,6 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <li><a href="#_juice_linear">juice.linear()</a></li>
 </ul>
 </li>
-<li><a href="#_keys">keys</a></li>
 <li><a href="#_map">map</a>
 <ul class="sectlevel3">
 <li><a href="#_map_level">map.level()</a></li>
@@ -910,6 +1110,27 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <li><a href="#_map_flag">map.flag()</a></li>
 <li><a href="#_map_entities">map.entities()</a></li>
 <li><a href="#_map_draw">map.draw()</a></li>
+</ul>
+</li>
+<li><a href="#_notes">notes</a>
+<ul class="sectlevel3">
+<li><a href="#_notes_note">notes.note()</a></li>
+</ul>
+</li>
+<li><a href="#_debug_2">debug</a>
+<ul class="sectlevel3">
+<li><a href="#_debug_console">debug.console()</a></li>
+</ul>
+</li>
+<li><a href="#_tiny">tiny</a>
+<ul class="sectlevel3">
+<li><a href="#_tiny_dt">tiny.dt</a></li>
+<li><a href="#_tiny_t">tiny.t</a></li>
+<li><a href="#_tiny_frame">tiny.frame</a></li>
+<li><a href="#_tiny_width">tiny.width</a></li>
+<li><a href="#_tiny_height">tiny.height</a></li>
+<li><a href="#_tiny_platform">tiny.platform</a></li>
+<li><a href="#_tiny_exit">tiny.exit()</a></li>
 </ul>
 </li>
 <li><a href="#_math">math</a>
@@ -926,9 +1147,15 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <li><a href="#_math_perlin">math.perlin()</a></li>
 </ul>
 </li>
-<li><a href="#_notes">notes</a>
+<li><a href="#_keys">keys</a></li>
+<li><a href="#_std">std</a>
 <ul class="sectlevel3">
-<li><a href="#_notes_note">notes.note()</a></li>
+<li><a href="#_new">new()</a></li>
+<li><a href="#_merge">merge()</a></li>
+<li><a href="#_append">append()</a></li>
+<li><a href="#_all">all()</a></li>
+<li><a href="#_rpairs">rpairs()</a></li>
+<li><a href="#_print">print()</a></li>
 </ul>
 </li>
 <li><a href="#_sfx_2">sfx</a>
@@ -946,18 +1173,32 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <li><a href="#_sfx_mstop">sfx.mstop()</a></li>
 </ul>
 </li>
-<li><a href="#_shape">shape</a>
+<li><a href="#_gfx">gfx</a>
 <ul class="sectlevel3">
-<li><a href="#_shape_rect">shape.rect()</a></li>
-<li><a href="#_shape_oval">shape.oval()</a></li>
-<li><a href="#_shape_ovalf">shape.ovalf()</a></li>
-<li><a href="#_shape_rectf">shape.rectf()</a></li>
-<li><a href="#_shape_circlef">shape.circlef()</a></li>
-<li><a href="#_shape_line">shape.line()</a></li>
-<li><a href="#_shape_circle">shape.circle()</a></li>
-<li><a href="#_shape_trianglef">shape.trianglef()</a></li>
-<li><a href="#_shape_triangle">shape.triangle()</a></li>
-<li><a href="#_shape_gradient">shape.gradient()</a></li>
+<li><a href="#_gfx_draw_mode">gfx.draw_mode()</a></li>
+<li><a href="#_gfx_cls">gfx.cls()</a></li>
+<li><a href="#_gfx_pset">gfx.pset()</a></li>
+<li><a href="#_gfx_pget">gfx.pget()</a></li>
+<li><a href="#_gfx_to_sheet">gfx.to_sheet()</a></li>
+<li><a href="#_gfx_pal">gfx.pal()</a></li>
+<li><a href="#_gfx_camera">gfx.camera()</a></li>
+<li><a href="#_gfx_dither">gfx.dither()</a></li>
+<li><a href="#_gfx_clip">gfx.clip()</a></li>
+</ul>
+</li>
+<li><a href="#_floppy">floppy</a>
+<ul class="sectlevel3">
+<li><a href="#_floppy_put">floppy.put()</a></li>
+<li><a href="#_floppy_get">floppy.get()</a></li>
+</ul>
+</li>
+<li><a href="#_ctrl">ctrl</a>
+<ul class="sectlevel3">
+<li><a href="#_ctrl_touch">ctrl.touch()</a></li>
+<li><a href="#_ctrl_pressed">ctrl.pressed()</a></li>
+<li><a href="#_ctrl_pressing">ctrl.pressing()</a></li>
+<li><a href="#_ctrl_touched">ctrl.touched()</a></li>
+<li><a href="#_ctrl_touching">ctrl.touching()</a></li>
 </ul>
 </li>
 <li><a href="#_spr">spr</a>
@@ -969,51 +1210,16 @@ table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-
 <li><a href="#_spr_draw">spr.draw()</a></li>
 </ul>
 </li>
-<li><a href="#_std">std</a>
+<li><a href="#_shape">shape</a>
 <ul class="sectlevel3">
-<li><a href="#_new">new()</a></li>
-<li><a href="#_merge">merge()</a></li>
-<li><a href="#_append">append()</a></li>
-<li><a href="#_all">all()</a></li>
-<li><a href="#_rpairs">rpairs()</a></li>
-<li><a href="#_print">print()</a></li>
-</ul>
-</li>
-<li><a href="#_test">test</a>
-<ul class="sectlevel3">
-<li><a href="#_test_eq">test.eq()</a></li>
-<li><a href="#_test_neq">test.neq()</a></li>
-<li><a href="#_test_t">test.t()</a></li>
-<li><a href="#_test_t_2">test.t()</a></li>
-<li><a href="#_test_create">test.create()</a></li>
-</ul>
-</li>
-<li><a href="#_tiny">tiny</a>
-<ul class="sectlevel3">
-<li><a href="#_tiny_dt">tiny.dt</a></li>
-<li><a href="#_tiny_t">tiny.t</a></li>
-<li><a href="#_tiny_frame">tiny.frame</a></li>
-<li><a href="#_tiny_exit">tiny.exit()</a></li>
-</ul>
-</li>
-<li><a href="#_vec2">vec2</a>
-<ul class="sectlevel3">
-<li><a href="#_vec2_create">vec2.create()</a></li>
-<li><a href="#_vec2_add">vec2.add()</a></li>
-<li><a href="#_vec2_sub">vec2.sub()</a></li>
-<li><a href="#_vec2_dot">vec2.dot()</a></li>
-<li><a href="#_vec2_mag">vec2.mag()</a></li>
-<li><a href="#_vec2_nor">vec2.nor()</a></li>
-<li><a href="#_vec2_crs">vec2.crs()</a></li>
-<li><a href="#_vec2_scl">vec2.scl()</a></li>
-</ul>
-</li>
-<li><a href="#_ws">ws</a>
-<ul class="sectlevel3">
-<li><a href="#_ws_save">ws.save()</a></li>
-<li><a href="#_ws_load">ws.load()</a></li>
-<li><a href="#_ws_create">ws.create()</a></li>
-<li><a href="#_ws_list">ws.list()</a></li>
+<li><a href="#_shape_rect">shape.rect()</a></li>
+<li><a href="#_shape_rectf">shape.rectf()</a></li>
+<li><a href="#_shape_circlef">shape.circlef()</a></li>
+<li><a href="#_shape_line">shape.line()</a></li>
+<li><a href="#_shape_circle">shape.circle()</a></li>
+<li><a href="#_shape_trianglef">shape.trianglef()</a></li>
+<li><a href="#_shape_triangle">shape.triangle()</a></li>
+<li><a href="#_shape_gradient">shape.gradient()</a></li>
 </ul>
 </li>
 </ul>
@@ -1059,6 +1265,43 @@ The code source of this sample is available in the <a href="https://github.com/m
 </td>
 </tr>
 </table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_quick_navigation">Quick Navigation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>New to Tiny? Start here:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong><a href="#_tiny_install">Installation</a></strong> - Get Tiny up and running</p>
+</li>
+<li>
+<p><strong><a href="#_tiny_tutorial">Tutorial</a></strong> - Build a complete Pong game</p>
+</li>
+<li>
+<p><strong><a href="#_tiny_api">API Reference</a></strong> - Complete function documentation</p>
+</li>
+<li>
+<p><strong><a href="#_tiny_cli_commands">CLI Commands</a></strong> - Command-line tools</p>
+</li>
+</ol>
+</div>
+<div class="sect2">
+<h3 id="_resources">Resources</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/minigdx/tiny">GitHub Repository</a></p>
+</li>
+<li>
+<p><a href="https://github.com/minigdx/tiny/releases">Download Latest Release</a></p>
+</li>
+</ul>
+</div>
 </div>
 </div>
 </div>
@@ -1120,7 +1363,7 @@ Once installed, you can start creating and developing games in no time!</p>
 </ul>
 </div>
 <div class="paragraph">
-<p>What&#8217;s next? You can check the <a href="#_tiny_tutorial">Tiny Tutorial</a>, <a href="#_tiny_api">Tiny API</a> or get more information about the <a href="#Tiny CLI">[Tiny CLI]</a>.</p>
+<p>What&#8217;s next? You can check the <a href="#_tiny_tutorial">Tiny Tutorial</a>, <a href="#_tiny_api">Tiny API</a> or get more information about the <a href="#_tiny_cli_commands">Tiny CLI</a>.</p>
 </div>
 </div>
 </div>
@@ -1335,8 +1578,8 @@ Want your game to appear here? Create a post about it in <a href="https://github
 <div class="sect1">
 <h2 id="_tiny_cli_commands">Tiny CLI Commands</h2>
 <div class="sectionbody">
-<div class="sect3">
-<h4 id="_add">add</h4>
+<div class="sect2">
+<h3 id="_add">add</h3>
 <div class="paragraph">
 <p>Add a resource to your game.</p>
 </div>
@@ -1356,24 +1599,41 @@ Want your game to appear here? Create a post about it in <a href="https://github
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">gameDirectory</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The directory containing all game information. (default: File("."))</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">resources</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The resource to add to the game. The kind of resource will be deducted from the file extension.</p></td>
 </tr>
 </tbody>
 </table>
+<div class="paragraph">
+<p><strong>Options:</strong></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--gameDirectory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The directory containing all game information. (default: File("."))</p></td>
+</tr>
+</tbody>
+</table>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="o">#</span> <span class="n">Usage</span>
-<span class="n">tiny</span><span class="o">-</span><span class="n">cli</span> <span class="n">add</span> <span class="o">&lt;</span><span class="n">gameDirectory</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">resources</span><span class="o">&gt;</span></code></pre>
+<pre class="rouge highlight"><code data-lang="bash"><span class="c"># Usage</span>
+tiny-cli add &lt;resources&gt; <span class="o">[</span>options]</code></pre>
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_create">create</h4>
+<div class="sect2">
+<h3 id="_create">create</h3>
 <div class="paragraph">
 <p>Create a new game with the help of a wizard 🧙.</p>
 </div>
@@ -1449,37 +1709,16 @@ Want your game to appear here? Create a post about it in <a href="https://github
 </table>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="o">#</span> <span class="n">Usage</span>
-<span class="n">tiny</span><span class="o">-</span><span class="n">cli</span> <span class="n">create</span> <span class="o">&lt;</span><span class="n">gameDirectory</span><span class="o">&gt;</span> <span class="p">[</span><span class="n">options</span><span class="p">]</span></code></pre>
+<pre class="rouge highlight"><code data-lang="bash"><span class="c"># Usage</span>
+tiny-cli create &lt;gameDirectory&gt; <span class="o">[</span>options]</code></pre>
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_debug">debug</h4>
+<div class="sect2">
+<h3 id="_debug">debug</h3>
 <div class="paragraph">
 <p>Debug the current game</p>
 </div>
-<div class="paragraph">
-<p><strong>Arguments:</strong></p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">gameDirectory</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The directory containing all game information. (default: File("."))</p></td>
-</tr>
-</tbody>
-</table>
 <div class="paragraph">
 <p><strong>Options:</strong></p>
 </div>
@@ -1496,6 +1735,10 @@ Want your game to appear here? Create a post about it in <a href="https://github
 </thead>
 <tbody>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--gameDirectory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The directory containing all game information. (default: File("."))</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">--debug</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Debug port used by the game. (default: 8081)</p></td>
 </tr>
@@ -1503,13 +1746,13 @@ Want your game to appear here? Create a post about it in <a href="https://github
 </table>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="o">#</span> <span class="n">Usage</span>
-<span class="n">tiny</span><span class="o">-</span><span class="n">cli</span> <span class="n">debug</span> <span class="o">&lt;</span><span class="n">gameDirectory</span><span class="o">&gt;</span> <span class="p">[</span><span class="n">options</span><span class="p">]</span></code></pre>
+<pre class="rouge highlight"><code data-lang="bash"><span class="c"># Usage</span>
+tiny-cli debug <span class="o">[</span>options]</code></pre>
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_export">export</h4>
+<div class="sect2">
+<h3 id="_export">export</h3>
 <div class="paragraph">
 <p>Export your game for web or desktop platforms.</p>
 </div>
@@ -1559,7 +1802,7 @@ Want your game to appear here? Create a post about it in <a href="https://github
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">--outputDirectory</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Output directory for the exported application (desktop only) (default: File("exported-game"))</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No description</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">--desktopPlatform</p></td>
@@ -1585,15 +1828,15 @@ Want your game to appear here? Create a post about it in <a href="https://github
 </table>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="o">#</span> <span class="n">Usage</span>
-<span class="n">tiny</span><span class="o">-</span><span class="n">cli</span> <span class="n">export</span> <span class="o">&lt;</span><span class="n">gameDirectory</span><span class="o">&gt;</span> <span class="p">[</span><span class="n">options</span><span class="p">]</span></code></pre>
+<pre class="rouge highlight"><code data-lang="bash"><span class="c"># Usage</span>
+tiny-cli <span class="nb">export</span> &lt;gameDirectory&gt; <span class="o">[</span>options]</code></pre>
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_palette">palette</h4>
+<div class="sect2">
+<h3 id="_palette">palette</h3>
 <div class="paragraph">
-<p>Extract the color palette from an image.</p>
+<p>Extract the color palette from an image or display current colors.</p>
 </div>
 <div class="paragraph">
 <p><strong>Arguments:</strong></p>
@@ -1610,10 +1853,6 @@ Want your game to appear here? Create a post about it in <a href="https://github
 </tr>
 </thead>
 <tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">gameDirectory</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The directory containing your game to be update. (default: File("."))</p></td>
-</tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">image</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The image used to extract the palette.</p></td>
@@ -1636,6 +1875,10 @@ Want your game to appear here? Create a post about it in <a href="https://github
 </thead>
 <tbody>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--gameDirectory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The directory containing your game to be update. (default: File("."))</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">--append</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Append, instead of replacing, the palette information in the game file.</p></td>
 </tr>
@@ -1643,17 +1886,58 @@ Want your game to appear here? Create a post about it in <a href="https://github
 <td class="tableblock halign-left valign-top"><p class="tableblock">--print</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Print in the console the palette information, without updating the game.</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--palette</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Generate a palette.png image file with all colors from the palette.</p></td>
+</tr>
 </tbody>
 </table>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="o">#</span> <span class="n">Usage</span>
-<span class="n">tiny</span><span class="o">-</span><span class="n">cli</span> <span class="n">palette</span> <span class="o">&lt;</span><span class="n">gameDirectory</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">image</span><span class="o">&gt;</span> <span class="p">[</span><span class="n">options</span><span class="p">]</span></code></pre>
+<pre class="rouge highlight"><code data-lang="bash"><span class="c"># Usage</span>
+tiny-cli palette &lt;image&gt; <span class="o">[</span>options]</code></pre>
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_run">run</h4>
+<div class="sect2">
+<h3 id="_resources_2">resources</h3>
+<div class="paragraph">
+<p>Inspect and manage categorized resources in the game.</p>
+</div>
+<div class="paragraph">
+<p><strong>Options:</strong></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--gameDirectory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The directory containing all game information. (default: File("."))</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--categoryFilter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Filter categories by name or pattern</p></td>
+</tr>
+</tbody>
+</table>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash"><span class="c"># Usage</span>
+tiny-cli resources <span class="o">[</span>options]</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_run">run</h3>
 <div class="paragraph">
 <p>Run your game.</p>
 </div>
@@ -1694,10 +1978,6 @@ Want your game to appear here? Create a post about it in <a href="https://github
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">--test</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Run tests before running the game.</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">--debug</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Port used for debugging (default: 8081)</p></td>
 </tr>
@@ -1709,13 +1989,13 @@ Want your game to appear here? Create a post about it in <a href="https://github
 </table>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="o">#</span> <span class="n">Usage</span>
-<span class="n">tiny</span><span class="o">-</span><span class="n">cli</span> <span class="n">run</span> <span class="o">&lt;</span><span class="n">gameDirectory</span><span class="o">&gt;</span> <span class="p">[</span><span class="n">options</span><span class="p">]</span></code></pre>
+<pre class="rouge highlight"><code data-lang="bash"><span class="c"># Usage</span>
+tiny-cli run &lt;gameDirectory&gt; <span class="o">[</span>options]</code></pre>
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_serve">serve</h4>
+<div class="sect2">
+<h3 id="_serve">serve</h3>
 <div class="paragraph">
 <p>Run your game as a web game, by default on <a href="http://localhost:8080" class="bare">http://localhost:8080</a>.</p>
 </div>
@@ -1763,13 +2043,13 @@ Want your game to appear here? Create a post about it in <a href="https://github
 </table>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="o">#</span> <span class="n">Usage</span>
-<span class="n">tiny</span><span class="o">-</span><span class="n">cli</span> <span class="n">serve</span> <span class="o">&lt;</span><span class="n">gameDirectory</span><span class="o">&gt;</span> <span class="p">[</span><span class="n">options</span><span class="p">]</span></code></pre>
+<pre class="rouge highlight"><code data-lang="bash"><span class="c"># Usage</span>
+tiny-cli serve &lt;gameDirectory&gt; <span class="o">[</span>options]</code></pre>
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_sfx">sfx</h4>
+<div class="sect2">
+<h3 id="_sfx">sfx</h3>
 <div class="paragraph">
 <p>Start the SFX Editor</p>
 </div>
@@ -1796,8 +2076,41 @@ Want your game to appear here? Create a post about it in <a href="https://github
 </table>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="o">#</span> <span class="n">Usage</span>
-<span class="n">tiny</span><span class="o">-</span><span class="n">cli</span> <span class="n">sfx</span> <span class="o">&lt;</span><span class="n">filename</span><span class="o">&gt;</span></code></pre>
+<pre class="rouge highlight"><code data-lang="bash"><span class="c"># Usage</span>
+tiny-cli sfx &lt;filename&gt;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_update">update</h3>
+<div class="paragraph">
+<p>Interactively view and update game parameters.</p>
+</div>
+<div class="paragraph">
+<p><strong>Options:</strong></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">--gameDirectory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The directory containing your game to be updated. (default: File("."))</p></td>
+</tr>
+</tbody>
+</table>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash"><span class="c"># Usage</span>
+tiny-cli update <span class="o">[</span>options]</code></pre>
 </div>
 </div>
 </div>
@@ -1807,473 +2120,31 @@ Want your game to appear here? Create a post about it in <a href="https://github
 <h2 id="_tiny_api">Tiny API</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_ctrl">ctrl</h3>
+<h3 id="_vec2">vec2</h3>
 <div class="paragraph">
-<p>Access to controllers like touch/mouse events or accessing which key is pressed by the user.</p>
+<p>Vector2 manipulation library.</p>
 </div>
 <div class="sect3">
-<h4 id="_ctrl_touch">ctrl.touch()</h4>
+<h4 id="_vec2_create">vec2.create()</h4>
 <div class="paragraph">
-<p>Get coordinates of the current touch/mouse. If the mouse/touch is out-of the screen, the coordinates will be the last mouse position/touch. The function return those coordinates as a table {x, y}. A sprite can be draw directly on the mouse position by passing the sprite number.</p>
+<p>Create a vector 2 as a table { x, y }.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">ctrl</span><span class="p">.</span><span class="n">touch</span><span class="p">()</span> <span class="c1">-- Get the mouse coordinates.</span>
-<span class="n">ctrl</span><span class="p">.</span><span class="n">touch</span><span class="p">(</span><span class="n">sprN</span><span class="p">)</span> <span class="c1">-- Get the mouse coordinate and draw a sprite on those coordinates.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">vec2</span><span class="p">.</span><span class="n">create</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- Create a vector 2 as a table { x, y }.</span>
+<span class="n">vec2</span><span class="p">.</span><span class="n">create</span><span class="p">(</span><span class="n">vec2</span><span class="p">)</span> <span class="c1">-- Create a vector 2 as a table { x, y } using another vector 2.</span></code></pre>
 </div>
 </div>
-<tiny-editor style="display: none;"  >
-
-function _draw()
-  gfx.cls(2)
-  p = ctrl.touch()
-  print("coordinates: "..p.x .. "x"..p.y, 1, 1, 4)
-  shape.rectf(p.x, p.y, 5,5, p.x + p.y)
-end
-
-</tiny-editor>
 </div>
 <div class="sect3">
-<h4 id="_ctrl_pressed">ctrl.pressed()</h4>
+<h4 id="_vec2_add">vec2.add()</h4>
 <div class="paragraph">
-<p>Return true if the key was pressed during the last frame. If you need to check that the key is still pressed, see <code>ctrl.pressing</code> instead.</p>
+<p>Add vector2 to another vector2</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">ctrl</span><span class="p">.</span><span class="n">pressed</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="c1">-- Is the key was pressed?</span></code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-local percent_a = 1
-local percent_b = 1
-
-function _update()
-    percent_a = math.min(percent_a + 0.05, 1)
-    percent_b = math.min(percent_b + 0.05, 1)
-
-    if ctrl.pressed(keys.space) then
-        percent_a = 0
-    end
-
-    if ctrl.pressing(keys.space) then
-        percent_b = 0
-    end
-
-    local offset_a = juice.powIn2(0, 8, percent_a)
-    local offset_b = juice.powIn2(0, 8, percent_b)
-
-    gfx.cls()
-    shape.rectf(64, 128 - 16, 32, 32, 7)
-    shape.rectf(64, 128 - 32 + offset_a, 32, 32, 8)
-
-    shape.rectf(32 + 128, 128 - 16, 32, 32, 7)
-    shape.rectf(32 + 128, 128 - 32 + offset_b, 32, 32, 8)
-
-    print("pressed", 64, 128 + 32)
-    print("pressing", 32 + 128, 128 + 32)
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_ctrl_pressing">ctrl.pressing()</h4>
-<div class="paragraph">
-<p>Return true if the key is still pressed.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">ctrl</span><span class="p">.</span><span class="n">pressing</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="c1">-- Is the key is still pressed?</span></code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-local percent_a = 1
-local percent_b = 1
-
-function _update()
-    percent_a = math.min(percent_a + 0.05, 1)
-    percent_b = math.min(percent_b + 0.05, 1)
-
-    if ctrl.pressed(keys.space) then
-        percent_a = 0
-    end
-
-    if ctrl.pressing(keys.space) then
-        percent_b = 0
-    end
-
-    local offset_a = juice.powIn2(0, 8, percent_a)
-    local offset_b = juice.powIn2(0, 8, percent_b)
-
-    gfx.cls()
-    shape.rectf(64, 128 - 16, 32, 32, 7)
-    shape.rectf(64, 128 - 32 + offset_a, 32, 32, 8)
-
-    shape.rectf(32 + 128, 128 - 16, 32, 32, 7)
-    shape.rectf(32 + 128, 128 - 32 + offset_b, 32, 32, 8)
-
-    print("pressed", 64, 128 + 32)
-    print("pressing", 32 + 128, 128 + 32)
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_ctrl_touched">ctrl.touched()</h4>
-<div class="paragraph">
-<p>Return the position of the touch (as <code>{x, y}</code>)if the screen was touched or the mouse button was pressed during the last frame. <code>nil</code> otherwise.
-The touch can be :</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>0: left click or one finger</p>
-</li>
-<li>
-<p>1: right click or two fingers</p>
-</li>
-<li>
-<p>2: middle click or three fingers</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>If you need to check that the touch/mouse button is still active, see <code>ctrl.touching</code> instead.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">ctrl</span><span class="p">.</span><span class="n">touched</span><span class="p">(</span><span class="n">touch</span><span class="p">)</span> <span class="c1">-- Is the screen was touched or mouse button was pressed?</span></code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-local circles = {}
-
-function _update()
-    local pos = ctrl.touched(0)
-    if pos ~= nil then
-        table.insert(circles, pos)
-    end
-end
-
-function _draw()
-    gfx.cls()
-    local p = ctrl.touch()
-    shape.circlef(p.x, p.y, 4, 8)
-    for pos in all(circles) do
-        shape.circlef(pos.x, pos.y, 4, 9)
-        print("("..pos.x .. ", "..pos.y..")", pos.x + 3, pos.y + 3)
-    end
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_ctrl_touching">ctrl.touching()</h4>
-<div class="paragraph">
-<p>Return the position of the touch (as <code>{x, y}</code>)if the screen is still touched or the mouse button is still pressed. <code>nil</code> otherwise.
-The touch can be :</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>0: left click or one finger</p>
-</li>
-<li>
-<p>1: right click or two fingers</p>
-</li>
-<li>
-<p>2: middle click or three fingers</p>
-</li>
-</ul>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">ctrl</span><span class="p">.</span><span class="n">touching</span><span class="p">(</span><span class="n">touch</span><span class="p">)</span> <span class="c1">-- Is the screen is still touched or mouse button is still pressed?</span></code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-function _draw()
-    gfx.cls()
-    local p = ctrl.touch()
-    shape.circlef(p.x, p.y, 4, 8)
-
-    local start = ctrl.touching(0)
-    if start ~= nil then
-        local pos = ctrl.touch()
-        shape.line(start.x, start.y, pos.x, pos.y, 1)
-        print("("..start.x .. ", "..start.y..")", start.x, start.y)
-        print("("..pos.x .. ", "..pos.y..")", pos.x, pos.y)
-    end
-end
-
-</tiny-editor>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_debug_2">debug</h3>
-<div class="paragraph">
-<p>Helpers to debug your game by drawing or printing information on screen.</p>
-</div>
-<div class="sect3">
-<h4 id="_debug_enabled">debug.enabled()</h4>
-<div class="paragraph">
-<p>Enable or disable debug feature.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">debug</span><span class="p">.</span><span class="n">enabled</span><span class="p">(</span><span class="n">enabled</span><span class="p">)</span> <span class="c1">-- Enable or disable debug by passing true to enable, false to disable.</span>
-<span class="n">debug</span><span class="p">.</span><span class="n">enabled</span><span class="p">()</span> <span class="c1">-- Return true if debug is enabled. False otherwise.</span></code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-function _init()
-   switch = true
-end
-
-function _update()
-    local pos = ctrl.touch()
-
-    debug.rect(pos.x, pos.y, 16, 16)
-
-    if ctrl.touched(0) then
-       switch = not switch
-
-       debug.enabled(switch)
-    end
-
-    debug.log("debug ".. tostring(switch))
-end
-
-function _draw()
-    gfx.cls()
-    -- draw the mouse position.
-    local pos = ctrl.touch()
-
-    shape.line(pos.x - 2, pos.y, pos.x + 2, pos.y, 3)
-    shape.line(pos.x, pos.y - 2, pos.x, pos.y + 2, 3)
-
-    if switch then
-      print("debug enabled", 10, 40)
-    else
-     print("debug disabled", 10, 40)
-    end
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_debug_table">debug.table()</h4>
-<div class="paragraph">
-<p>Display a table.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">debug</span><span class="p">.</span><span class="n">table</span><span class="p">(</span><span class="n">table</span><span class="p">)</span> <span class="c1">-- Display a table.</span></code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-function _update()
-    local pos = ctrl.touch()
-
-    debug.table(pos)
-    debug.log("frame "..tiny.frame)
-    debug.console("hello from the console")
-end
-
-function _draw()
-    gfx.cls()
-    -- draw the mouse position.
-    local pos = ctrl.touch()
-
-    shape.line(pos.x - 2, pos.y, pos.x + 2, pos.y, 3)
-    shape.line(pos.x, pos.y - 2, pos.x, pos.y + 2, 3)
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_debug_log">debug.log()</h4>
-<div class="paragraph">
-<p>Log a message on the screen.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">debug</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="n">str</span><span class="p">)</span> <span class="c1">-- Log a message on the screen.</span></code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-function _update()
-    local pos = ctrl.touch()
-
-    debug.table(pos)
-    debug.log("frame "..tiny.frame)
-    debug.console("hello from the console")
-end
-
-function _draw()
-    gfx.cls()
-    -- draw the mouse position.
-    local pos = ctrl.touch()
-
-    shape.line(pos.x - 2, pos.y, pos.x + 2, pos.y, 3)
-    shape.line(pos.x, pos.y - 2, pos.x, pos.y + 2, 3)
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_debug_console">debug.console()</h4>
-<div class="paragraph">
-<p>Log a message into the console.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">debug</span><span class="p">.</span><span class="n">console</span><span class="p">(</span><span class="n">str</span><span class="p">)</span> <span class="c1">-- Log a message into the console.</span></code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-function _update()
-    local pos = ctrl.touch()
-
-    debug.table(pos)
-    debug.log("frame "..tiny.frame)
-    debug.console("hello from the console")
-end
-
-function _draw()
-    gfx.cls()
-    -- draw the mouse position.
-    local pos = ctrl.touch()
-
-    shape.line(pos.x - 2, pos.y, pos.x + 2, pos.y, 3)
-    shape.line(pos.x, pos.y - 2, pos.x, pos.y + 2, 3)
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_debug_rect">debug.rect()</h4>
-<div class="paragraph">
-<p>Draw a rectangle on the screen</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">debug</span><span class="p">.</span><span class="n">rect</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a debug rectangle.</span>
-<span class="n">debug</span><span class="p">.</span><span class="n">rect</span><span class="p">(</span><span class="n">rect</span><span class="p">)</span> <span class="c1">-- Draw a debug rectangle.</span>
-<span class="n">debug</span><span class="p">.</span><span class="n">rect</span><span class="p">(</span><span class="n">rect</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a debug rectangle using a rectangle and a color.</span></code></pre>
-</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">rect</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A rectangle {x, y, width, height, color}</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">rect</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A rectangle {x, y, width, height}</p></td>
-</tr>
-</tbody>
-</table>
-<tiny-editor style="display: none;"  >
-
-function _init()
-   switch = true
-end
-
-function _update()
-    local pos = ctrl.touch()
-
-    debug.rect(pos.x, pos.y, 16, 16)
-
-    if ctrl.touched(0) then
-       switch = not switch
-
-       debug.enabled(switch)
-    end
-
-    debug.log("debug ".. tostring(switch))
-end
-
-function _draw()
-    gfx.cls()
-    -- draw the mouse position.
-    local pos = ctrl.touch()
-
-    shape.line(pos.x - 2, pos.y, pos.x + 2, pos.y, 3)
-    shape.line(pos.x, pos.y - 2, pos.x, pos.y + 2, 3)
-
-    if switch then
-      print("debug enabled", 10, 40)
-    else
-     print("debug disabled", 10, 40)
-    end
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_debug_point">debug.point()</h4>
-<div class="paragraph">
-<p>Draw a point on the screen</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">debug</span><span class="p">.</span><span class="n">point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a debug point.</span>
-<span class="n">debug</span><span class="p">.</span><span class="n">point</span><span class="p">(</span><span class="n">point</span><span class="p">)</span> <span class="c1">-- Draw a debug point.</span>
-<span class="n">debug</span><span class="p">.</span><span class="n">point</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a debug point.</span></code></pre>
-</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">point</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A point {x, y, color}</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">point</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A point {x, y}</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_debug_line">debug.line()</h4>
-<div class="paragraph">
-<p>Draw a point on the screen</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">debug</span><span class="p">.</span><span class="n">line</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a debug line.</span>
-<span class="n">debug</span><span class="p">.</span><span class="n">line</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span> <span class="c1">-- Draw a debug line.</span>
-<span class="n">debug</span><span class="p">.</span><span class="n">line</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a debug line.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">vec2</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span> <span class="c1">-- Add a vector 2 {x, y} to another vector 2 {x, y}</span>
+<span class="n">vec2</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">)</span> <span class="c1">-- Add a destructured vector 2 to another destructured vector 2</span></code></pre>
 </div>
 </div>
 <table class="tableblock frame-all grid-all stretch">
@@ -2290,313 +2161,316 @@ end
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A point {x, y}</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A point {x, y}</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">v2</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A point {x, y}</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">v2</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A point {x, y}</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_gfx">gfx</h3>
-<div class="paragraph">
-<p>Access to graphical API like updating the color palette or applying a dithering pattern.</p>
-</div>
-<div class="sect3">
-<h4 id="_gfx_drawmode">gfx.drawMode()</h4>
-<div class="paragraph">
-<p>Switch to another draw mode.
-        |- 0: default.
-        |- 1: drawing with transparent (ie: can erase part of the screen)
-        |- 2: drawing a stencil that will be use with the next mode
-        |- 3: drawing using a stencil test (ie: drawing only in the stencil)
-        |- 4: drawing using a stencil test (ie: drawing everywhere except in the stencil)</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">drawMode</span><span class="p">()</span> <span class="c1">-- Return the actual mode. Switch back to the default mode.</span>
-<span class="n">gfx</span><span class="p">.</span><span class="n">drawMode</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span> <span class="c1">-- Switch to another draw mode. Return the previous mode.</span></code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_gfx_cls">gfx.cls()</h4>
-<div class="paragraph">
-<p>clear the screen</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">cls</span><span class="p">()</span> <span class="c1">-- Clear the screen with a default color.</span>
-<span class="n">gfx</span><span class="p">.</span><span class="n">cls</span><span class="p">(</span><span class="n">color</span><span class="p">)</span> <span class="c1">-- Clear the screen with a color.</span></code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-function _draw()
-    if ctrl.pressed(keys.space) then
-       gfx.cls()
-    end
-
-    print("Press space to clear the screen")
-    local pos = ctrl.touch()
-    shape.circlef(pos.x, pos.y, 4, math.rnd())
-end
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_gfx_pset">gfx.pset()</h4>
-<div class="paragraph">
-<p>Set the color index at the coordinate (x,y).</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">pset</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- set the color index at the coordinate (x,y).</span></code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-function _draw()
-   local pos = ctrl.touching(0)
-   if pos ~= nil then
-      -- set the pixel with the color 9 when the mouse is pressed
-      local p = ctrl.touch()
-      gfx.pset(p.x, p.y, 9)
-   end
-end
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_gfx_pget">gfx.pget()</h4>
-<div class="paragraph">
-<p>Get the color index at the coordinate (x,y).</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">pget</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- get the color index at the coordinate (x,y).</span></code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-function _draw()
-   gfx.cls()
-   local index = 0
-   for x=0, 240, 16 do
-     for y=0, 240, 16 do
-        shape.rectf(x, y, 16, 16, index)
-        index = index + 1
-     end
-   end
-
-   local pos = ctrl.touch()
-   local color = gfx.pget(pos.x, pos.y)
-   if color ~= nil then
-     shape.rectf(0, 0, 80, 6, 13)
-     print("color index: "..color)
-   end
-
-
-   shape.circlef(pos.x - 2, pos.y - 2, 4, 0)
-end
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_gfx_to_sheet">gfx.to_sheet()</h4>
-<div class="paragraph">
-<p>Transform the current frame buffer into a spritesheeet.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>If the index of the spritesheet already exist, the spritesheet will be replaced</p>
-</li>
-<li>
-<p>If the index of the spritesheet doesn&#8217;t exist, a new spritesheet at this index will be created</p>
-</li>
-<li>
-<p>If the index of the spritesheet is negative, a new spritesheet will be created at the last positive index.</p>
-</li>
-</ul>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">to_sheet</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span> <span class="c1">-- Copy the current frame buffer to an new or existing sheet index.</span>
-<span class="n">gfx</span><span class="p">.</span><span class="n">to_sheet</span><span class="p">(</span><span class="n">sheet</span><span class="p">,</span> <span class="n">closure</span><span class="p">)</span> <span class="c1">-- Create a blank spritesheet. Execute the operation from the closure on the blank spritesheet and copy it to an new or existing sheet index.</span></code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-function _draw()
-    gfx.cls(1)
-    -- draw a transparent circle (like a hole)
-    shape.circlef(64, 128, 20, 0)
-    -- keep the result as spritesheet 0
-    gfx.to_sheet(0)
-
-    gfx.cls(1)
-    -- draw some circles
-    shape.circlef(64, 108, 20, 8)
-    shape.circlef(44, 128, 20, 9)
-    shape.circlef(64, 148, 20, 10)
-    shape.circlef(84, 128, 20, 11)
-
-    -- draw over the circles
-    -- the mask generated before.
-    spr.sheet(0)
-    spr.sdraw()
-end
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_gfx_pal">gfx.pal()</h4>
-<div class="paragraph">
-<p>Change a color from the palette to another color.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">pal</span><span class="p">()</span> <span class="c1">-- Reset all previous color changes.</span>
-<span class="n">gfx</span><span class="p">.</span><span class="n">pal</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="c1">-- Replace the color a for the color b.</span></code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-function _draw()
-    gfx.cls()
-    print("example", 10, 10, 2) -- print using the color index 2
-    gfx.pal(2, 3) -- switch the text color to another color
-    print("example", 10, 20, 2) -- print using the color index 2
-    gfx.pal() -- reset the palette
-    print("example", 10, 30, 2) -- print using the color index 2
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_gfx_camera">gfx.camera()</h4>
-<div class="paragraph">
-<p>Move the game camera.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">camera</span><span class="p">()</span> <span class="c1">-- Reset the game camera to it's default position (0,0).</span>
-<span class="n">gfx</span><span class="p">.</span><span class="n">camera</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- Set game camera to the position x, y.</span></code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-local x = 0
-local y = 0
-
-function _update()
-    if ctrl.pressing(keys.left) then
-        x = x - 0.5
-    elseif ctrl.pressing(keys.right) then
-        x = x + 0.5
-    end
-
-    if ctrl.pressing(keys.up) then
-        y = y - 0.5
-    elseif ctrl.pressing(keys.down) then
-        y = y + 0.5
-    end
-    gfx.camera(math.floor(x), math.floor(y))
-end
-
-function _draw()
-    gfx.cls(2)
-    for x = 0 - 64, 256 + 64, 16 do
-        for y = 0 - 64, 256 + 64, 16 do
-            shape.line(x - 2, y, x + 2, y, 9)
-            shape.line(x, y - 2, x, y + 2, 9)
-        end
-    end
-    print("camera: ("..x..", "..y..")", 6, 6)
-
-    shape.rect(0, 0, 256, 256, 1)
-end
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_gfx_dither">gfx.dither()</h4>
-<div class="paragraph">
-<p>Apply a dithering pattern on every new draw call. The pattern is using the bits value of a 2 octet value. The first bits is the one on the far left and represent the pixel of the top left of a 4x4 matrix. The last bit is the pixel from the bottom right of this matrix.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">dither</span><span class="p">()</span> <span class="c1">-- Reset dithering pattern. The previous dithering pattern is returned.</span>
-<span class="n">gfx</span><span class="p">.</span><span class="n">dither</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span> <span class="c1">-- Apply dithering pattern. The previous dithering pattern is returned.</span></code></pre>
-</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">pattern</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Dither pattern. For example: 0xA5A5 or 0x3030</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
 </tr>
 </tbody>
 </table>
 <tiny-editor style="display: none;"  >
 
-function _draw()
+function _init()
+    gfx.camera(-128, -128)
+
+    local v1 = vec2.create(32, 38)
+    local v2 = vec2.create(20, 2)
+
     gfx.cls()
+    print("v1", 2, 15, 10)
+    shape.line(0, 0, v1.x, v1.y, 10)
+    print("v2", 23, 3, 9)
+    shape.line(0, 0, v2.x, v2.y, 9)
+
+    local v3 = vec2.add(v1, v2)
+
+    print("v1 + v2", 30, 15, 11)
+    gfx.dither(0xAAAA)
+    shape.line(0, 0, v3.x, v3.y, 11)
     gfx.dither()
-    shape.circlef(30, 30, 30, 2)
-    gfx.dither(0xA5A5) -- set a dithering pattern
-    shape.circlef(50, 50, 30, 3)
-    gfx.dither(0x0842) -- set another dithering pattern
-    shape.circlef(70, 70, 30, 2)
 end
 
 </tiny-editor>
 </div>
 <div class="sect3">
-<h4 id="_gfx_clip">gfx.clip()</h4>
+<h4 id="_vec2_sub">vec2.sub()</h4>
 <div class="paragraph">
-<p>Clip the draw surface (ie: limit the drawing area).</p>
+<p>Subtract another vector from another vector</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">clip</span><span class="p">()</span> <span class="c1">-- Reset the clip and draw on the fullscreen.</span>
-<span class="n">gfx</span><span class="p">.</span><span class="n">clip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span> <span class="c1">-- Clip and limit the drawing area.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">vec2</span><span class="p">.</span><span class="n">sub</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span> <span class="c1">-- Subtract a vector 2 {x, y} from another vector 2 {x, y}</span>
+<span class="n">vec2</span><span class="p">.</span><span class="n">sub</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">)</span> <span class="c1">-- Subtract a destructured vector 2 from another destructured vector 2</span></code></pre>
 </div>
 </div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+</tbody>
+</table>
 <tiny-editor style="display: none;"  >
 
 function _init()
-  c = {}
-  for i=1,100 do
-    table.insert(c, {x=math.rnd(256), y=math.rnd(256), c = math.rnd(1,12)})
+    gfx.camera(-128, -128)
+
+    local v1 = vec2.create(32, 38)
+    local v2 = vec2.create(20, 2)
+
+    gfx.cls()
+    print("v1", 18, 15, 10)
+    shape.line(0, 0, v1.x, v1.y, 10)
+    print("v2", 23, 3, 9)
+    shape.line(0, 0, v2.x, v2.y, 9)
+
+    local v3 = vec2.sub(v1, v2)
+
+    print("v1 - v2", 0, 40, 11)
+    gfx.dither(0xAAAA)
+    shape.line(0, 0, v3.x, v3.y, 11)
+    gfx.dither()
 end
 
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_vec2_dot">vec2.dot()</h4>
+<div class="paragraph">
+<p>Dot product between two vectors</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">vec2</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span> <span class="c1">-- Dot product between a vector 2 {x, y} and another vector 2 {x, y}</span>
+<span class="n">vec2</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">)</span> <span class="c1">-- Dot product between a destructured vector 2 and another destructured vector 2</span></code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+</tbody>
+</table>
+<tiny-editor style="display: none;"  >
+
+function _init()
+    angle = 0
 end
-function _draw()
-  gfx.cls()
-  local pos = ctrl.touch()
-  -- set a clip area to crop circles
-  gfx.clip(pos.x - 20, pos.y - 20, 40, 40)
-  for circle in all(c) do
-    shape.circlef(circle.x, circle.y, 10, circle.c)
-  end
+function _update()
+
+    if ctrl.pressing(keys.space) then
+        angle = angle + 0.1
+    end
+
+    gfx.camera(-128, -128)
+
+    local v1 = vec2.create(1, 0)
+    local v2 = vec2.create(math.cos(angle), math.sin(angle))
+    local dot = vec2.dot(v1, v2)
+
+    local scl = vec2.scl(v1, dot)
+
+    gfx.cls()
+
+    local scaledv1 = vec2.scl(v1, 64)
+    local scaledv2 = vec2.scl(v2, 64)
+    local scaledv3 = vec2.scl(scl, 64)
+
+    print("v1", 18, 5, 10)
+    shape.line(0, 0, scaledv1.x, scaledv1.y, 10)
+    print("v2", scaledv2.x + 5, scaledv2.y + 5, 11)
+    shape.line(0, 0, scaledv2.x, scaledv2.y, 11)
+
+    print("dot", scaledv3.x, 5, 9)
+    shape.line(0, 0, scaledv3.x, scaledv3.y, 9)
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_vec2_mag">vec2.mag()</h4>
+<div class="paragraph">
+<p>Calculate the magnitude (length) of a vector</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">vec2</span><span class="p">.</span><span class="n">mag</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- Calculate the magnitude (length) of a vector 2 {x, y}</span>
+<span class="n">vec2</span><span class="p">.</span><span class="n">mag</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span> <span class="c1">-- Calculate the magnitude (length) of a vector 2 {x, y}</span></code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_vec2_nor">vec2.nor()</h4>
+<div class="paragraph">
+<p>Normalize a vector</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">vec2</span><span class="p">.</span><span class="n">nor</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- Normalize a vector 2 {x, y}</span>
+<span class="n">vec2</span><span class="p">.</span><span class="n">nor</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span> <span class="c1">-- Normalize a vector 2 {x, y}</span></code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+</tbody>
+</table>
+<tiny-editor style="display: none;"  >
+
+function _update()
+    gfx.cls()
+
+    local v0 = vec2.create(43, 64)
+    local v1 = vec2.nor(v0)
+
+
+    print("vector     x: " .. v0.x .. " y: " .. v0.y)
+    print("normalized x: " .. v1.x .. " y: " .. v1.y, 0, 8)
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_vec2_crs">vec2.crs()</h4>
+<div class="paragraph">
+<p>Cross product</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">vec2</span><span class="p">.</span><span class="n">crs</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span> <span class="c1">-- Cross product between a vector 2 {x, y} and another vector 2 {x, y}</span>
+<span class="n">vec2</span><span class="p">.</span><span class="n">crs</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">)</span> <span class="c1">-- Cross product between a destructured vector 2 and another destructured vector 2</span></code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_vec2_scl">vec2.scl()</h4>
+<div class="paragraph">
+<p>Scale a vector</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">vec2</span><span class="p">.</span><span class="n">scl</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">scl</span><span class="p">)</span> <span class="c1">-- Scale a vector 2 {x, y} using the factor scl</span>
+<span class="n">vec2</span><span class="p">.</span><span class="n">scl</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">scl</span><span class="p">)</span> <span class="c1">-- Scale a vector 2 {x, y} using the factor scl</span></code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+</tbody>
+</table>
+<tiny-editor style="display: none;"  >
+
+function _init()
+    gfx.camera(-128, -128)
+
+    local v1 = vec2.create(32, 38)
+    local v2 = vec2.scl(v1, 2)
+
+    gfx.cls()
+    print("v1 scaled", 8, 60, 11)
+    gfx.dither(0xAAAA)
+    shape.line(0, 0, v2.x, v2.y, 11)
+    gfx.dither()
+    print("v1", 18, 15, 10)
+    shape.line(0, 0, v1.x, v1.y, 10)
 end
 
 </tiny-editor>
@@ -4619,25 +4493,6 @@ end
 </div>
 </div>
 <div class="sect2">
-<h3 id="_keys">keys</h3>
-<div class="paragraph">
-<p>List of the available keys. To be used with ctrl.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><code>keys.up</code>, <code>keys.down</code>, <code>keys.left</code>, <code>keys.right</code> for directions.</p>
-</li>
-<li>
-<p><code>keys.a</code> to <code>keys.z</code> and <code>keys.0</code> to <code>keys.9</code> for letters and numbers.</p>
-</li>
-<li>
-<p><code>keys.space</code> and <code>keys.enter</code> for other keys.</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect2">
 <h3 id="_map">map</h3>
 <div class="paragraph">
 <p>Access map created with LDTk ( <a href="https://ldtk.io/" class="bare">https://ldtk.io/</a> ).</p>
@@ -4674,20 +4529,20 @@ end
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">map</span><span class="p">.</span><span class="n">from</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">)</span> <span class="c1">-- Convert the cell coordinates into coordinates as a table [x,y].</span>
-<span class="n">map</span><span class="p">.</span><span class="n">from</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span> <span class="c1">-- Convert the cell coordinates from a table [cx,cy] into screen coordinates as a table [x,y].</span></code></pre>
+<span class="n">map</span><span class="p">.</span><span class="n">from</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span> <span class="c1">-- Convert the cell coordinates from a table {cx,cy} into screen coordinates as a table {x,y}.</span></code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
 <h4 id="_map_to">map.to()</h4>
 <div class="paragraph">
-<p>Convert screen coordinates x, y into map cell coordinates cx, cy.
+<p>Convert screen coordinates x, y into map cell coordinates {cx, cy}.
 For example, coordinates of the player can be converted to cell coordinates to access the flag of the tile matching the player coordinates.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">map</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- Convert the coordinates into cell coordinates as a table [cx,cy].</span>
-<span class="n">map</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span> <span class="c1">-- Convert the coordinates from a table [x,y] into cell coordinates as a table [cx,cy].</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">map</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- Convert the coordinates into cell coordinates as a table {cx = cx,cy = cy}.</span>
+<span class="n">map</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span> <span class="c1">-- Convert the coordinates from a table {x,y} into cell coordinates as a table {cx,cy}.</span></code></pre>
 </div>
 </div>
 </div>
@@ -4747,6 +4602,149 @@ entity.fields -- access custom field of the entity</code></pre>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="lua"><span class="n">map</span><span class="p">.</span><span class="n">draw</span><span class="p">()</span> <span class="c1">-- Draw all active layers on the screen.</span>
 <span class="n">map</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="c1">-- Draw the layer with the name or the index on the screen.</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_notes">notes</h3>
+<div class="paragraph">
+<p>List all notes from C0 to B8. Please note that bemols are the note with b (ie: Gb2) while sharps are the note with s (ie: As3).</p>
+</div>
+<div class="sect3">
+<h4 id="_notes_note">notes.note()</h4>
+<div class="paragraph">
+<p>Get the name of a note regarding the note index (ie: C0 = 0, Cs0 = 1, &#8230;&#8203;)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">notes</span><span class="p">.</span><span class="n">note</span><span class="p">(</span><span class="n">note_index</span><span class="p">)</span> <span class="c1">-- Get the name of a note regarding the note index (ie: C0 = 0, Cs0 = 1, ...)</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_debug_2">debug</h3>
+<div class="paragraph">
+<p>Helpers to debug your game by drawing or printing information on screen.</p>
+</div>
+<div class="sect3">
+<h4 id="_debug_console">debug.console()</h4>
+<div class="paragraph">
+<p>Log a message into the console.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">debug</span><span class="p">.</span><span class="n">console</span><span class="p">(</span><span class="n">str</span><span class="p">)</span> <span class="c1">-- Log a message into the console.</span></code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+function _update()
+    local pos = ctrl.touch()
+
+    debug.table(pos)
+    debug.log("frame "..tiny.frame)
+    debug.console("hello from the console")
+end
+
+function _draw()
+    gfx.cls()
+    -- draw the mouse position.
+    local pos = ctrl.touch()
+
+    shape.line(pos.x - 2, pos.y, pos.x + 2, pos.y, 3)
+    shape.line(pos.x, pos.y - 2, pos.x, pos.y + 2, 3)
+end
+
+</tiny-editor>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_tiny">tiny</h3>
+<div class="paragraph">
+<p>Tiny Lib which offer offer the current frame (<code>tiny.frame</code>), the current time (<code>tiny.time</code>), delta time (<code>tiny.dt</code>), game dimensions (<code>tiny.width</code>, <code>tiny.height</code>), platform information (<code>tiny.platform</code>) and to switch to another script using <code>exit</code>.</p>
+</div>
+<div class="sect3">
+<h4 id="_tiny_dt">tiny.dt</h4>
+<div class="paragraph">
+<p>Delta time between two frame. As Tiny is a fixed frame engine, it&#8217;s always equal to 1/60</p>
+</div>
+<tiny-editor style="display: none;"  >
+function _update()
+    gfx.cls()
+    print(tiny.dt, 10, 10) -- Delta time between two frame. As Tiny is a fixed frame engine, it's always equal to 1/60
+end
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_tiny_t">tiny.t</h4>
+<div class="paragraph">
+<p>Time elapsed since the start of the game.</p>
+</div>
+<tiny-editor style="display: none;"  >
+function _update()
+    gfx.cls()
+    print(tiny.t, 10, 10) -- Time elapsed since the start of the game.
+end
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_tiny_frame">tiny.frame</h4>
+<div class="paragraph">
+<p>Number of frames elapsed since the start of the game.</p>
+</div>
+<tiny-editor style="display: none;"  >
+function _update()
+    gfx.cls()
+    print(tiny.frame, 10, 10) -- Number of frames elapsed since the start of the game.
+end
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_tiny_width">tiny.width</h4>
+<div class="paragraph">
+<p>Width of the game in pixels.</p>
+</div>
+<tiny-editor style="display: none;"  >
+function _update()
+    gfx.cls()
+    print(tiny.width, 10, 10) -- Width of the game in pixels.
+end
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_tiny_height">tiny.height</h4>
+<div class="paragraph">
+<p>Height of the game in pixels.</p>
+</div>
+<tiny-editor style="display: none;"  >
+function _update()
+    gfx.cls()
+    print(tiny.height, 10, 10) -- Height of the game in pixels.
+end
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_tiny_platform">tiny.platform</h4>
+<div class="paragraph">
+<p>Current platform: 1 for desktop, 2 for web.</p>
+</div>
+<tiny-editor style="display: none;"  >
+function _update()
+    gfx.cls()
+    print(tiny.platform, 10, 10) -- Current platform: 1 for desktop, 2 for web.
+end
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_tiny_exit">tiny.exit()</h4>
+<div class="paragraph">
+<p>Exit the actual script to switch to another one. The next script to use is identified by it&#8217;s index. The index of the script is the index of it in the list of scripts from the <code>_tiny.json</code> file.The first script is at the index 0.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">tiny</span><span class="p">.</span><span class="n">exit</span><span class="p">(</span><span class="n">scriptIndex</span><span class="p">)</span> <span class="c1">-- Exit the actual script to switch to another one.</span></code></pre>
 </div>
 </div>
 </div>
@@ -5060,20 +5058,190 @@ end
 </div>
 </div>
 <div class="sect2">
-<h3 id="_notes">notes</h3>
+<h3 id="_keys">keys</h3>
 <div class="paragraph">
-<p>List all notes from C0 to B8. Please note that bemols are the note with b (ie: Gb2) while sharps are the note with s (ie: As3).</p>
+<p>List of the available keys. To be used with ctrl.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>keys.up</code>, <code>keys.down</code>, <code>keys.left</code>, <code>keys.right</code> for directions.</p>
+</li>
+<li>
+<p><code>keys.a</code> to <code>keys.z</code> and <code>keys.0</code> to <code>keys.9</code> for letters and numbers.</p>
+</li>
+<li>
+<p><code>keys.space</code> and <code>keys.enter</code> for other keys.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_std">std</h3>
+<div class="paragraph">
+<p>Standard library.</p>
 </div>
 <div class="sect3">
-<h4 id="_notes_note">notes.note()</h4>
+<h4 id="_new">new()</h4>
 <div class="paragraph">
-<p>Get the name of a note regarding the note index (ie: C0 = 0, Cs0 = 1, &#8230;&#8203;)</p>
+<p>Create new instance of a class by creating a new table and setting the metatable. It allow to create kind of Object Oriented Programming.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">notes</span><span class="p">.</span><span class="n">note</span><span class="p">(</span><span class="n">note_index</span><span class="p">)</span> <span class="c1">-- Get the name of a note regarding the note index (ie: C0 = 0, Cs0 = 1, ...)</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">new</span><span class="p">(</span><span class="n">class</span><span class="p">)</span> <span class="c1">-- Create new instance of class.</span>
+<span class="n">new</span><span class="p">(</span><span class="n">class</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span> <span class="c1">-- Create new instance of class using default values.</span></code></pre>
 </div>
 </div>
+<tiny-editor style="display: none;"  >
+
+local Player = {
+    x = 128,
+    y = 128,
+    color = 8
+}
+
+function Player:draw()
+    shape.rectf(self.x, self.y, 10, 10, self.color)
+end
+
+function _init()
+    -- create a new player
+    player = new(Player)
+    -- create a new player with default vaules
+    player2 = new(Player, {x = 200, y = 200, color = 9})
+end
+
+function _draw()
+    gfx.cls()
+    player:draw() -- call the draw method on the player instance.
+    player2:draw() -- call the draw method on the player2 instance.
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_merge">merge()</h4>
+<div class="paragraph">
+<p>Add <strong>all key/value</strong> from the table <code>source</code> to the table <code>dest</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">merge</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">dest</span><span class="p">)</span> <span class="c1">-- Merge source into dest.</span></code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+    local src = {x = 1, y = 2, z = 3}
+    local dst = {a = 4, b = 5}
+    local result = merge(src, dst)
+    debug.table(result)
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_append">append()</h4>
+<div class="paragraph">
+<p>Append <strong>all values</strong> from the table <code>source</code> to the table <code>dest</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">append</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">dest</span><span class="p">)</span> <span class="c1">-- Copy source into dest.</span></code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+    local src = {1, 2, 3}
+    local dst = {4, 5}
+    local result = append(src, dst)
+    debug.table(result)
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_all">all()</h4>
+<div class="paragraph">
+<p>Iterate over values of a table.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>If you want to iterate over keys, use <code>pairs(table)</code>.</p>
+</li>
+<li>
+<p>If you want to iterate over index, use <code>ipairs(table)</code>.</p>
+</li>
+<li>
+<p>If you want to iterate in reverse, use <code>rpairs(table)</code>.</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">all</span><span class="p">(</span><span class="n">table</span><span class="p">)</span> <span class="c1">-- Iterate over the values of the table</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_rpairs">rpairs()</h4>
+<div class="paragraph">
+<p>Iterate over values of a table in reverse order. The iterator return an index and the value. The method is useful to remove elements from a table while iterating on it.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">rpairs</span><span class="p">(</span><span class="n">table</span><span class="p">)</span> <span class="c1">-- Iterate over the values of the table</span></code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+    local data = {
+        { name = "riri" },
+        { name = "fifi" },
+        { name = "loulou" }
+    }
+
+    local y = 0
+    for index, key in rpairs(data) do
+        print(index .. " - " .. key.name, 10, y)
+        y = y + 10
+    end
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_print">print()</h4>
+<div class="paragraph">
+<p>Print on the screen a string.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="nb">print</span><span class="p">(</span><span class="n">str</span><span class="p">)</span> <span class="c1">-- print on the screen a string at (0,0) with a default color.</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- print on the screen a string with a default color.</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- print on the screen a string with a specific color.</span></code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+    -- every character is a sprite 4x4 pixels.
+    print("hello")
+    print("world", 10, 10)
+    print("how", 10, 20, 4)
+    print("are", 26, 20, 5)
+    print("you", 42, 20, 6)
+    print("...", 58, 20, math.rnd(10))
+end
+
+</tiny-editor>
 </div>
 </div>
 <div class="sect2">
@@ -5129,7 +5297,8 @@ or by starting the sound as soon as the player is moving.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">sfx</span><span class="p">.</span><span class="n">instrument</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="c1">-- Access instrument using its index or its name.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">sfx</span><span class="p">.</span><span class="n">instrument</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="c1">-- Access instrument using its index or its name.</span>
+<span class="n">sfx</span><span class="p">.</span><span class="n">instrument</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="c1">-- Access instrument using its index or its name. Create it if the instrument is missing and the flag is true.</span></code></pre>
 </div>
 </div>
 </div>
@@ -5218,20 +5387,277 @@ or by starting the sound as soon as the player is moving.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_shape">shape</h3>
+<h3 id="_gfx">gfx</h3>
 <div class="paragraph">
-<p>Shape API to draw&#8230;&#8203;shapes. Those shapes can be circle, rectangle, line or oval.All shapes can be draw filed or not filed.</p>
+<p>Access to graphical API like updating the color palette or applying a dithering pattern.</p>
 </div>
 <div class="sect3">
-<h4 id="_shape_rect">shape.rect()</h4>
+<h4 id="_gfx_draw_mode">gfx.draw_mode()</h4>
 <div class="paragraph">
-<p>Draw a rectangle.</p>
+<p>Switch to another draw mode.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>0: default.</p>
+</li>
+<li>
+<p>1: drawing with transparent (ie: can erase part of the screen)</p>
+</li>
+<li>
+<p>2: drawing a stencil that will be use with the next mode</p>
+</li>
+<li>
+<p>3: drawing using a stencil test (ie: drawing only in the stencil)</p>
+</li>
+<li>
+<p>4: drawing using a stencil test (ie: drawing everywhere except in the stencil)</p>
+</li>
+</ul>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">rect</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a rectangle.</span>
-<span class="n">shape</span><span class="p">.</span><span class="n">rect</span><span class="p">(</span><span class="n">rect</span><span class="p">)</span> <span class="c1">-- Draw a rectangle.</span>
-<span class="n">shape</span><span class="p">.</span><span class="n">rect</span><span class="p">(</span><span class="n">rect</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a rectangle using a rectangle and a color.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">draw_mode</span><span class="p">()</span> <span class="c1">-- Return the actual mode. Switch back to the default mode.</span>
+<span class="n">gfx</span><span class="p">.</span><span class="n">draw_mode</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span> <span class="c1">-- Switch to another draw mode. Return the previous mode.</span></code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;" sprite="resources/tiny-town.png" >
+
+local draw_stencil = 2
+local draw_inside_stencil = 3
+local draw_outside_stencil = 4
+
+local outside = false
+
+function _draw()
+    if ctrl.pressed(keys.space) then
+        outside = not outside
+    end
+
+    gfx.cls(3)
+
+    gfx.draw_mode(draw_stencil)
+
+    -- draw a circle in the middle of the screen
+    shape.circlef(128, 128, 64, 1)
+
+    if outside then
+        gfx.draw_mode(draw_inside_stencil)
+    else
+        gfx.draw_mode(draw_outside_stencil)
+    end
+
+    -- draw the sprite sheet. only in the circle
+    spr.sdraw()
+    gfx.draw_mode()
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_gfx_cls">gfx.cls()</h4>
+<div class="paragraph">
+<p>clear the screen</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">cls</span><span class="p">()</span> <span class="c1">-- Clear the screen with a default color.</span>
+<span class="n">gfx</span><span class="p">.</span><span class="n">cls</span><span class="p">(</span><span class="n">color</span><span class="p">)</span> <span class="c1">-- Clear the screen with a color.</span></code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    if ctrl.pressed(keys.space) then
+       gfx.cls()
+    end
+
+    print("Press space to clear the screen")
+    local pos = ctrl.touch()
+    shape.circlef(pos.x, pos.y, 4, math.rnd())
+end
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_gfx_pset">gfx.pset()</h4>
+<div class="paragraph">
+<p>Set the color index at the coordinate (x,y).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">pset</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- set the color index at the coordinate (x,y).</span></code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+   local pos = ctrl.touching(0)
+   if pos ~= nil then
+      -- set the pixel with the color 9 when the mouse is pressed
+      local p = ctrl.touch()
+      gfx.pset(p.x, p.y, 9)
+   end
+end
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_gfx_pget">gfx.pget()</h4>
+<div class="paragraph">
+<p>Get the color index at the coordinate (x,y).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">pget</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- get the color index at the coordinate (x,y).</span></code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+   gfx.cls()
+   local index = 0
+   for x=0, 240, 16 do
+     for y=0, 240, 16 do
+        shape.rectf(x, y, 16, 16, index)
+        index = index + 1
+     end
+   end
+
+   local pos = ctrl.touch()
+   local color = gfx.pget(pos.x, pos.y)
+   if color ~= nil then
+     shape.rectf(0, 0, 80, 6, 13)
+     print("color index: "..color)
+   end
+
+
+   shape.circlef(pos.x - 2, pos.y - 2, 4, 0)
+end
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_gfx_to_sheet">gfx.to_sheet()</h4>
+<div class="paragraph">
+<p>Transform the current frame buffer into a spritesheeet.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>If the index of the spritesheet already exist, the spritesheet will be replaced</p>
+</li>
+<li>
+<p>If the index of the spritesheet doesn&#8217;t exist, a new spritesheet at this index will be created</p>
+</li>
+<li>
+<p>If the index of the spritesheet is negative, a new spritesheet will be created at the last positive index.</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">to_sheet</span><span class="p">(</span><span class="n">sheet</span><span class="p">)</span> <span class="c1">-- Copy the current frame buffer to an new or existing sheet index.</span></code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls(1)
+    -- draw a transparent circle (like a hole)
+    shape.circlef(64, 128, 20, 0)
+    -- keep the result as spritesheet 0
+    gfx.to_sheet(0)
+
+    gfx.cls(1)
+    -- draw some circles
+    shape.circlef(64, 108, 20, 8)
+    shape.circlef(44, 128, 20, 9)
+    shape.circlef(64, 148, 20, 10)
+    shape.circlef(84, 128, 20, 11)
+
+    -- draw over the circles
+    -- the mask generated before.
+    spr.sheet(0)
+    spr.sdraw()
+end
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_gfx_pal">gfx.pal()</h4>
+<div class="paragraph">
+<p>Change a color from the palette to another color.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">pal</span><span class="p">()</span> <span class="c1">-- Reset all previous color changes.</span>
+<span class="n">gfx</span><span class="p">.</span><span class="n">pal</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="c1">-- Replace the color a for the color b.</span></code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+    print("example", 10, 10, 2) -- print using the color index 2
+    gfx.pal(2, 3) -- switch the text color to another color
+    print("example", 10, 20, 2) -- print using the color index 2
+    gfx.pal() -- reset the palette
+    print("example", 10, 30, 2) -- print using the color index 2
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_gfx_camera">gfx.camera()</h4>
+<div class="paragraph">
+<p>Move the game camera.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">camera</span><span class="p">()</span> <span class="c1">-- Reset the game camera to it's default position (0,0).</span>
+<span class="n">gfx</span><span class="p">.</span><span class="n">camera</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- Set game camera to the position x, y.</span></code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+local x = 0
+local y = 0
+
+function _update()
+    if ctrl.pressing(keys.left) then
+        x = x - 0.5
+    elseif ctrl.pressing(keys.right) then
+        x = x + 0.5
+    end
+
+    if ctrl.pressing(keys.up) then
+        y = y - 0.5
+    elseif ctrl.pressing(keys.down) then
+        y = y + 0.5
+    end
+    gfx.camera(math.floor(x), math.floor(y))
+end
+
+function _draw()
+    gfx.cls(2)
+    for x = 0 - 64, 256 + 64, 16 do
+        for y = 0 - 64, 256 + 64, 16 do
+            shape.line(x - 2, y, x + 2, y, 9)
+            shape.line(x, y - 2, x, y + 2, 9)
+        end
+    end
+    print("camera: ("..x..", "..y..")", 6, 6)
+
+    shape.rect(0, 0, 256, 256, 1)
+end
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_gfx_dither">gfx.dither()</h4>
+<div class="paragraph">
+<p>Apply a dithering pattern on every new draw call. The pattern is using the bits value of a 2 octet value. The first bits is the one on the far left and represent the pixel of the top left of a 4x4 matrix. The last bit is the pixel from the bottom right of this matrix.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">dither</span><span class="p">()</span> <span class="c1">-- Reset dithering pattern. The previous dithering pattern is returned.</span>
+<span class="n">gfx</span><span class="p">.</span><span class="n">dither</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span> <span class="c1">-- Apply dithering pattern. The previous dithering pattern is returned.</span></code></pre>
 </div>
 </div>
 <table class="tableblock frame-all grid-all stretch">
@@ -5247,360 +5673,287 @@ or by starting the sound as soon as the player is moving.</p>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">rect</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A rectangle {x, y, width, height, color}</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">rect</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A rectangle {x, y, width, height}</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">pattern</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Dither pattern. For example: 0xA5A5 or 0x3030</p></td>
 </tr>
 </tbody>
 </table>
 <tiny-editor style="display: none;"  >
 
 function _draw()
-  gfx.cls()
-
-  -- filled rectangle
-  print("filled rectangle", 20, 10)
-  shape.rectf(20, 20, 20, 20, 4)
-  shape.rectf(30, 30, 20, 20, 5)
-  shape.rectf(40, 40, 20, 20, 6)
-
-  print("non filled rectangle", 20, 65)
-  -- non filled rectangle
-  shape.rect(50, 70, 20, 20, 7)
-  shape.rect(60, 80, 20, 20, 8)
-  shape.rect(70, 90, 20, 20, 9)
-
-  print("rectangle with different width", 20, 115)
-  shape.rect(20, 120, 30, 20, 10)
-  shape.rect(20, 140, 40, 20, 12)
-  shape.rect(20, 160, 60, 20, 13)
-
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_shape_oval">shape.oval()</h4>
-<div class="paragraph">
-<p>Draw an oval.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">oval</span><span class="p">(</span><span class="n">centerX</span><span class="p">,</span> <span class="n">centerY</span><span class="p">,</span> <span class="n">radiusX</span><span class="p">,</span> <span class="n">radiusY</span><span class="p">)</span> <span class="c1">-- Draw an oval using the default color.</span>
-<span class="n">shape</span><span class="p">.</span><span class="n">oval</span><span class="p">(</span><span class="n">centerX</span><span class="p">,</span> <span class="n">centerY</span><span class="p">,</span> <span class="n">radiusX</span><span class="p">,</span> <span class="n">radiusY</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw an oval using the specified color.</span></code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-function _draw()
     gfx.cls()
-
-    local pos = ctrl.touch()
-    local w = math.max(0, pos.x)
-    local h = math.max(0, pos.y)
-
-    shape.ovalf(w, h, w, h, 5)
-    shape.oval(256 - w, 256 - h, w, h, 1)
-
-
-    print("size w: "..w.." h: "..h)
+    gfx.dither()
+    shape.circlef(30, 30, 30, 2)
+    gfx.dither(0xA5A5) -- set a dithering pattern
+    shape.circlef(50, 50, 30, 3)
+    gfx.dither(0x0842) -- set another dithering pattern
+    shape.circlef(70, 70, 30, 2)
 end
 
 </tiny-editor>
 </div>
 <div class="sect3">
-<h4 id="_shape_ovalf">shape.ovalf()</h4>
+<h4 id="_gfx_clip">gfx.clip()</h4>
 <div class="paragraph">
-<p>Draw an oval filled.</p>
+<p>Clip the draw surface (ie: limit the drawing area).</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">ovalf</span><span class="p">(</span><span class="n">centerX</span><span class="p">,</span> <span class="n">centerY</span><span class="p">,</span> <span class="n">radiusX</span><span class="p">,</span> <span class="n">radiusY</span><span class="p">)</span> <span class="c1">-- Draw a filled oval using the default color.</span>
-<span class="n">shape</span><span class="p">.</span><span class="n">ovalf</span><span class="p">(</span><span class="n">centerX</span><span class="p">,</span> <span class="n">centerY</span><span class="p">,</span> <span class="n">radiusX</span><span class="p">,</span> <span class="n">radiusY</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a filled oval using the specified color.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">gfx</span><span class="p">.</span><span class="n">clip</span><span class="p">()</span> <span class="c1">-- Reset the clip and draw on the fullscreen.</span>
+<span class="n">gfx</span><span class="p">.</span><span class="n">clip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span> <span class="c1">-- Clip and limit the drawing area.</span></code></pre>
 </div>
 </div>
 <tiny-editor style="display: none;"  >
 
-function _draw()
-    gfx.cls()
-
-    local pos = ctrl.touch()
-    local w = math.max(0, pos.x)
-    local h = math.max(0, pos.y)
-
-    shape.ovalf(w, h, w, h, 5)
-    shape.oval(256 - w, 256 - h, w, h, 1)
-
-
-    print("size w: "..w.." h: "..h)
+function _init()
+  c = {}
+  for i=1,100 do
+    table.insert(c, {x=math.rnd(256), y=math.rnd(256), c = math.rnd(1,12)})
 end
 
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_shape_rectf">shape.rectf()</h4>
-<div class="paragraph">
-<p>Draw a filled rectangle.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">rectf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a filled rectangle.</span>
-<span class="n">shape</span><span class="p">.</span><span class="n">rectf</span><span class="p">(</span><span class="n">rect</span><span class="p">)</span> <span class="c1">-- Draw a filled rectangle.</span>
-<span class="n">shape</span><span class="p">.</span><span class="n">rectf</span><span class="p">(</span><span class="n">rect</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a filled rectangle using a rectangle and a color.</span></code></pre>
-</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">rect</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A rectangle {x, y, width, height, color}</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">rect</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A rectangle {x, y, width, height}</p></td>
-</tr>
-</tbody>
-</table>
-<tiny-editor style="display: none;"  >
-
+end
 function _draw()
   gfx.cls()
-
-  -- filled rectangle
-  print("filled rectangle", 20, 10)
-  shape.rectf(20, 20, 20, 20, 4)
-  shape.rectf(30, 30, 20, 20, 5)
-  shape.rectf(40, 40, 20, 20, 6)
-
-  print("non filled rectangle", 20, 65)
-  -- non filled rectangle
-  shape.rect(50, 70, 20, 20, 7)
-  shape.rect(60, 80, 20, 20, 8)
-  shape.rect(70, 90, 20, 20, 9)
-
-  print("rectangle with different width", 20, 115)
-  shape.rect(20, 120, 30, 20, 10)
-  shape.rect(20, 140, 40, 20, 12)
-  shape.rect(20, 160, 60, 20, 13)
-
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_shape_circlef">shape.circlef()</h4>
-<div class="paragraph">
-<p>Draw a filled circle.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">circlef</span><span class="p">(</span><span class="n">centerX</span><span class="p">,</span> <span class="n">centerY</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a circle at the coordinate (centerX, centerY) with the radius and the color.</span></code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-function _draw()
-    gfx.cls()
-
-    -- filled circle
-    shape.circlef(20, 20, 20, 4)
-    shape.circlef(30, 30, 20, 5)
-    shape.circlef(40, 40, 20, 6)
-    print("filled circle", 20, 10)
-
-    -- non filled circle
-    shape.circle(50, 70, 10, 7)
-    shape.circle(60, 80, 10, 8)
-    shape.circle(70, 90, 10, 9)
-    print("non filled circle", 20, 65)
-
-    shape.circle(80, 120, 15, 10)
-    shape.circle(80, 140, 20, 16)
-    shape.circle(80, 160, 30, 14)
-    print("circle with different radius", 20, 115)
-
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_shape_line">shape.line()</h4>
-<div class="paragraph">
-<p>Draw a line.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">line</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a line.</span>
-<span class="n">shape</span><span class="p">.</span><span class="n">line</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">)</span> <span class="c1">-- Draw a line with a default color.</span></code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-function _draw()
-  gfx.cls()
-
-  local i =0
-  for x =16, 240, 16 do
-    for y =16, 240, 16 do
-      shape.line(x, y, 256 - x, 256 - y, i)
-      i = i + 1
-    end
+  local pos = ctrl.touch()
+  -- set a clip area to crop circles
+  gfx.clip(pos.x - 20, pos.y - 20, 40, 40)
+  for circle in all(c) do
+    shape.circlef(circle.x, circle.y, 10, circle.c)
   end
 end
 
 </tiny-editor>
 </div>
-<div class="sect3">
-<h4 id="_shape_circle">shape.circle()</h4>
+</div>
+<div class="sect2">
+<h3 id="_floppy">floppy</h3>
 <div class="paragraph">
-<p>Draw a circle.</p>
+<p>Floppy allow you to get or save user Lua structure.</p>
+</div>
+<div class="sect3">
+<h4 id="_floppy_put">floppy.put()</h4>
+<div class="paragraph">
+<p>Save the content into a local file, on desktop or in the local storage on the web platform.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">circle</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="c1">-- Draw a circle with the default color.</span>
-<span class="n">shape</span><span class="p">.</span><span class="n">circle</span><span class="p">(</span><span class="n">centerX</span><span class="p">,</span> <span class="n">centerY</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a circle.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">floppy</span><span class="p">.</span><span class="n">put</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span> <span class="c1">-- Save the content into the file name.</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_floppy_get">floppy.get()</h4>
+<div class="paragraph">
+<p>Load and get the content of the file name</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">floppy</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="c1">-- Load and get the content of the file name</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ctrl">ctrl</h3>
+<div class="paragraph">
+<p>Access to controllers like touch/mouse events or accessing which key is pressed by the user.</p>
+</div>
+<div class="sect3">
+<h4 id="_ctrl_touch">ctrl.touch()</h4>
+<div class="paragraph">
+<p>Get coordinates of the current touch/mouse. If the mouse/touch is out-of the screen, the coordinates will be the last mouse position/touch. The function return those coordinates as a table {x, y}. A sprite can be draw directly on the mouse position by passing the sprite number.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">ctrl</span><span class="p">.</span><span class="n">touch</span><span class="p">()</span> <span class="c1">-- Get the mouse coordinates.</span>
+<span class="n">ctrl</span><span class="p">.</span><span class="n">touch</span><span class="p">(</span><span class="n">sprN</span><span class="p">)</span> <span class="c1">-- Get the mouse coordinate and draw a sprite on those coordinates.</span></code></pre>
 </div>
 </div>
 <tiny-editor style="display: none;"  >
 
 function _draw()
-    gfx.cls()
-
-    -- filled circle
-    shape.circlef(20, 20, 20, 4)
-    shape.circlef(30, 30, 20, 5)
-    shape.circlef(40, 40, 20, 6)
-    print("filled circle", 20, 10)
-
-    -- non filled circle
-    shape.circle(50, 70, 10, 7)
-    shape.circle(60, 80, 10, 8)
-    shape.circle(70, 90, 10, 9)
-    print("non filled circle", 20, 65)
-
-    shape.circle(80, 120, 15, 10)
-    shape.circle(80, 140, 20, 16)
-    shape.circle(80, 160, 30, 14)
-    print("circle with different radius", 20, 115)
-
+  gfx.cls(2)
+  p = ctrl.touch()
+  print("coordinates: "..p.x .. "x"..p.y, 1, 1, 4)
+  shape.rectf(p.x, p.y, 5,5, p.x + p.y)
 end
 
 </tiny-editor>
 </div>
 <div class="sect3">
-<h4 id="_shape_trianglef">shape.trianglef()</h4>
+<h4 id="_ctrl_pressed">ctrl.pressed()</h4>
 <div class="paragraph">
-<p>Draw a filled triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3) and color.</p>
+<p>Return true if the key was pressed during the last frame. If you need to check that the key is still pressed, see <code>ctrl.pressing</code> instead.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">trianglef</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">x3</span><span class="p">,</span> <span class="n">y3</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a filled triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">ctrl</span><span class="p">.</span><span class="n">pressed</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="c1">-- Is the key was pressed?</span></code></pre>
 </div>
 </div>
 <tiny-editor style="display: none;"  >
 
-function tri(f, fill)
-  local x1 = 128 + math.cos(f) * 64
-  local y1 = 128 + math.sin(f) * 64
+local percent_a = 1
+local percent_b = 1
 
-  local x2 = 128 + math.cos(f + math.pi * 1/3) * 64
-  local y2 = 128 + math.sin(f + math.pi * 1/3) * 64
+function _update()
+    percent_a = math.min(percent_a + 0.05, 1)
+    percent_b = math.min(percent_b + 0.05, 1)
 
-  local x3 = 128 + math.cos(f+ math.pi * 2/3) * 64
-  local y3 = 128 + math.sin(f +math.pi * 2/3) * 64
-
-  if fill then
-    shape.trianglef(x3, y3, x2, y2, x1, y1, 8)
-  else
-    shape.triangle(x1, y1, x2, y2, x3, y3, 8)
-  end
-end
-
-function _draw()
-  gfx.cls()
-  local f = tiny.frame * 0.01
-
-  tri(f, false)
-  tri(f*2, true)
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_shape_triangle">shape.triangle()</h4>
-<div class="paragraph">
-<p>Draw a triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3) and color.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">triangle</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">x3</span><span class="p">,</span> <span class="n">y3</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).</span></code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-function tri(f, fill)
-  local x1 = 128 + math.cos(f) * 64
-  local y1 = 128 + math.sin(f) * 64
-
-  local x2 = 128 + math.cos(f + math.pi * 1/3) * 64
-  local y2 = 128 + math.sin(f + math.pi * 1/3) * 64
-
-  local x3 = 128 + math.cos(f+ math.pi * 2/3) * 64
-  local y3 = 128 + math.sin(f +math.pi * 2/3) * 64
-
-  if fill then
-    shape.trianglef(x3, y3, x2, y2, x1, y1, 8)
-  else
-    shape.triangle(x1, y1, x2, y2, x3, y3, 8)
-  end
-end
-
-function _draw()
-  gfx.cls()
-  local f = tiny.frame * 0.01
-
-  tri(f, false)
-  tri(f*2, true)
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_shape_gradient">shape.gradient()</h4>
-<div class="paragraph">
-<p>Draw a gradient using dithering, only from color c1 to color c2.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">color1</span><span class="p">,</span> <span class="n">color2</span><span class="p">,</span> <span class="n">is_horizontal</span><span class="p">)</span> <span class="c1">-- Draw a gradient using dithering, only from color c1 to color c2.</span></code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-function _draw()
-
- local c1 = 2
- local c2 = 3
-
-    gfx.cls(c1)
-    shape.rectf(0, 256 - 16, 256, 16, c2)
-    for x=0,240,16 do
-        shape.gradient(x, 16 * math.cos(2 * 3.14 * (x / 256) + tiny.t * 2), 16, 256, c1, c2, false)
+    if ctrl.pressed(keys.space) then
+        percent_a = 0
     end
 
+    if ctrl.pressing(keys.space) then
+        percent_b = 0
+    end
+
+    local offset_a = juice.powIn2(0, 8, percent_a)
+    local offset_b = juice.powIn2(0, 8, percent_b)
+
+    gfx.cls()
+    shape.rectf(64, 128 - 16, 32, 32, 7)
+    shape.rectf(64, 128 - 32 + offset_a, 32, 32, 8)
+
+    shape.rectf(32 + 128, 128 - 16, 32, 32, 7)
+    shape.rectf(32 + 128, 128 - 32 + offset_b, 32, 32, 8)
+
+    print("pressed", 64, 128 + 32)
+    print("pressing", 32 + 128, 128 + 32)
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_ctrl_pressing">ctrl.pressing()</h4>
+<div class="paragraph">
+<p>Return true if the key is still pressed.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">ctrl</span><span class="p">.</span><span class="n">pressing</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="c1">-- Is the key is still pressed?</span></code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+local percent_a = 1
+local percent_b = 1
+
+function _update()
+    percent_a = math.min(percent_a + 0.05, 1)
+    percent_b = math.min(percent_b + 0.05, 1)
+
+    if ctrl.pressed(keys.space) then
+        percent_a = 0
+    end
+
+    if ctrl.pressing(keys.space) then
+        percent_b = 0
+    end
+
+    local offset_a = juice.powIn2(0, 8, percent_a)
+    local offset_b = juice.powIn2(0, 8, percent_b)
+
+    gfx.cls()
+    shape.rectf(64, 128 - 16, 32, 32, 7)
+    shape.rectf(64, 128 - 32 + offset_a, 32, 32, 8)
+
+    shape.rectf(32 + 128, 128 - 16, 32, 32, 7)
+    shape.rectf(32 + 128, 128 - 32 + offset_b, 32, 32, 8)
+
+    print("pressed", 64, 128 + 32)
+    print("pressing", 32 + 128, 128 + 32)
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_ctrl_touched">ctrl.touched()</h4>
+<div class="paragraph">
+<p>Return the position of the touch (as <code>{x, y}</code>)if the screen was touched or the mouse button was pressed during the last frame. <code>nil</code> otherwise.
+The touch can be :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>0: left click or one finger</p>
+</li>
+<li>
+<p>1: right click or two fingers</p>
+</li>
+<li>
+<p>2: middle click or three fingers</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>If you need to check that the touch/mouse button is still active, see <code>ctrl.touching</code> instead.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">ctrl</span><span class="p">.</span><span class="n">touched</span><span class="p">(</span><span class="n">touch</span><span class="p">)</span> <span class="c1">-- Is the screen was touched or mouse button was pressed?</span></code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+local circles = {}
+
+function _update()
+    local pos = ctrl.touched(0)
+    if pos ~= nil then
+        table.insert(circles, pos)
+    end
+end
+
+function _draw()
+    gfx.cls()
+    local p = ctrl.touch()
+    shape.circlef(p.x, p.y, 4, 8)
+    for pos in all(circles) do
+        shape.circlef(pos.x, pos.y, 4, 9)
+        print("("..pos.x .. ", "..pos.y..")", pos.x + 3, pos.y + 3)
+    end
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_ctrl_touching">ctrl.touching()</h4>
+<div class="paragraph">
+<p>Return the position of the touch (as <code>{x, y}</code>)if the screen is still touched or the mouse button is still pressed. <code>nil</code> otherwise.
+The touch can be :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>0: left click or one finger</p>
+</li>
+<li>
+<p>1: right click or two fingers</p>
+</li>
+<li>
+<p>2: middle click or three fingers</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">ctrl</span><span class="p">.</span><span class="n">touching</span><span class="p">(</span><span class="n">touch</span><span class="p">)</span> <span class="c1">-- Is the screen is still touched or mouse button is still pressed?</span></code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+    local p = ctrl.touch()
+    shape.circlef(p.x, p.y, 4, 8)
+
+    local start = ctrl.touching(0)
+    if start ~= nil then
+        local pos = ctrl.touch()
+        shape.line(start.x, start.y, pos.x, pos.y, 1)
+        print("("..start.x .. ", "..start.y..")", start.x, start.y)
+        print("("..pos.x .. ", "..pos.y..")", pos.x, pos.y)
+    end
 end
 
 </tiny-editor>
@@ -5828,715 +6181,334 @@ end
 </div>
 </div>
 <div class="sect2">
-<h3 id="_std">std</h3>
+<h3 id="_shape">shape</h3>
 <div class="paragraph">
-<p>Standard library.</p>
+<p>Shape API to draw&#8230;&#8203;shapes. Those shapes can be circle, rectangle, line or oval.All shapes can be draw filed or not filed.</p>
 </div>
 <div class="sect3">
-<h4 id="_new">new()</h4>
+<h4 id="_shape_rect">shape.rect()</h4>
 <div class="paragraph">
-<p>Create new instance of a class by creating a new table and setting the metatable. It allow to create kind of Object Oriented Programming.</p>
+<p>Draw a rectangle.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">new</span><span class="p">(</span><span class="n">class</span><span class="p">)</span> <span class="c1">-- Create new instance of class.</span>
-<span class="n">new</span><span class="p">(</span><span class="n">class</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span> <span class="c1">-- Create new instance of class using default values.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">rect</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a rectangle.</span>
+<span class="n">shape</span><span class="p">.</span><span class="n">rect</span><span class="p">(</span><span class="n">rect</span><span class="p">)</span> <span class="c1">-- Draw a rectangle.</span>
+<span class="n">shape</span><span class="p">.</span><span class="n">rect</span><span class="p">(</span><span class="n">rect</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a rectangle using a rectangle and a color.</span></code></pre>
 </div>
 </div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">rect</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A rectangle {x, y, width, height, color}</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">rect</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A rectangle {x, y, width, height}</p></td>
+</tr>
+</tbody>
+</table>
 <tiny-editor style="display: none;"  >
 
-local Player = {
-    x = 128,
-    y = 128,
-    color = 8
-}
-
-function Player:draw()
-    shape.rectf(self.x, self.y, 10, 10, self.color)
-end
-
-function _init()
-    -- create a new player
-    player = new(Player)
-    -- create a new player with default vaules
-    player2 = new(Player, {x = 200, y = 200, color = 9})
-end
-
 function _draw()
-    gfx.cls()
-    player:draw() -- call the draw method on the player instance.
-    player2:draw() -- call the draw method on the player2 instance.
+  gfx.cls()
+
+  -- filled rectangle
+  print("filled rectangle", 20, 10)
+  shape.rectf(20, 20, 20, 20, 4)
+  shape.rectf(30, 30, 20, 20, 5)
+  shape.rectf(40, 40, 20, 20, 6)
+
+  print("non filled rectangle", 20, 65)
+  -- non filled rectangle
+  shape.rect(50, 70, 20, 20, 7)
+  shape.rect(60, 80, 20, 20, 8)
+  shape.rect(70, 90, 20, 20, 9)
+
+  print("rectangle with different width", 20, 115)
+  shape.rect(20, 120, 30, 20, 10)
+  shape.rect(20, 140, 40, 20, 12)
+  shape.rect(20, 160, 60, 20, 13)
+
 end
 
 </tiny-editor>
 </div>
 <div class="sect3">
-<h4 id="_merge">merge()</h4>
+<h4 id="_shape_rectf">shape.rectf()</h4>
 <div class="paragraph">
-<p>Add <strong>all key/value</strong> from the table <code>source</code> to the table <code>dest</code>.</p>
+<p>Draw a filled rectangle.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">merge</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">dest</span><span class="p">)</span> <span class="c1">-- Merge source into dest.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">rectf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a filled rectangle.</span>
+<span class="n">shape</span><span class="p">.</span><span class="n">rectf</span><span class="p">(</span><span class="n">rect</span><span class="p">)</span> <span class="c1">-- Draw a filled rectangle.</span>
+<span class="n">shape</span><span class="p">.</span><span class="n">rectf</span><span class="p">(</span><span class="n">rect</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a filled rectangle using a rectangle and a color.</span></code></pre>
 </div>
 </div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">rect</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A rectangle {x, y, width, height, color}</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">rect</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A rectangle {x, y, width, height}</p></td>
+</tr>
+</tbody>
+</table>
 <tiny-editor style="display: none;"  >
 
 function _draw()
-    gfx.cls()
-    local src = {x = 1, y = 2, z = 3}
-    local dst = {a = 4, b = 5}
-    local result = merge(src, dst)
-    debug.table(result)
+  gfx.cls()
+
+  -- filled rectangle
+  print("filled rectangle", 20, 10)
+  shape.rectf(20, 20, 20, 20, 4)
+  shape.rectf(30, 30, 20, 20, 5)
+  shape.rectf(40, 40, 20, 20, 6)
+
+  print("non filled rectangle", 20, 65)
+  -- non filled rectangle
+  shape.rect(50, 70, 20, 20, 7)
+  shape.rect(60, 80, 20, 20, 8)
+  shape.rect(70, 90, 20, 20, 9)
+
+  print("rectangle with different width", 20, 115)
+  shape.rect(20, 120, 30, 20, 10)
+  shape.rect(20, 140, 40, 20, 12)
+  shape.rect(20, 160, 60, 20, 13)
+
 end
 
 </tiny-editor>
 </div>
 <div class="sect3">
-<h4 id="_append">append()</h4>
+<h4 id="_shape_circlef">shape.circlef()</h4>
 <div class="paragraph">
-<p>Append <strong>all values</strong> from the table <code>source</code> to the table <code>dest</code>.</p>
+<p>Draw a filled circle.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">append</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">dest</span><span class="p">)</span> <span class="c1">-- Copy source into dest.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">circlef</span><span class="p">(</span><span class="n">centerX</span><span class="p">,</span> <span class="n">centerY</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a circle at the coordinate (centerX, centerY) with the radius and the color.</span></code></pre>
 </div>
 </div>
 <tiny-editor style="display: none;"  >
 
 function _draw()
     gfx.cls()
-    local src = {1, 2, 3}
-    local dst = {4, 5}
-    local result = append(src, dst)
-    debug.table(result)
+
+    -- filled circle
+    shape.circlef(20, 20, 20, 4)
+    shape.circlef(30, 30, 20, 5)
+    shape.circlef(40, 40, 20, 6)
+    print("filled circle", 20, 10)
+
+    -- non filled circle
+    shape.circle(50, 70, 10, 7)
+    shape.circle(60, 80, 10, 8)
+    shape.circle(70, 90, 10, 9)
+    print("non filled circle", 20, 65)
+
+    shape.circle(80, 120, 15, 10)
+    shape.circle(80, 140, 20, 16)
+    shape.circle(80, 160, 30, 14)
+    print("circle with different radius", 20, 115)
+
 end
 
 </tiny-editor>
 </div>
 <div class="sect3">
-<h4 id="_all">all()</h4>
+<h4 id="_shape_line">shape.line()</h4>
 <div class="paragraph">
-<p>Iterate over values of a table.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>If you want to iterate over keys, use <code>pairs(table)</code>.</p>
-</li>
-<li>
-<p>If you want to iterate over index, use <code>ipairs(table)</code>.</p>
-</li>
-<li>
-<p>If you want to iterate in reverse, use <code>rpairs(table)</code>.</p>
-</li>
-</ul>
+<p>Draw a line.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">all</span><span class="p">(</span><span class="n">table</span><span class="p">)</span> <span class="c1">-- Iterate over the values of the table</span></code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_rpairs">rpairs()</h4>
-<div class="paragraph">
-<p>Iterate over values of a table in reverse order. The iterator return an index and the value. The method is useful to remove elements from a table while iterating on it.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">rpairs</span><span class="p">(</span><span class="n">table</span><span class="p">)</span> <span class="c1">-- Iterate over the values of the table</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">line</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a line.</span>
+<span class="n">shape</span><span class="p">.</span><span class="n">line</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">)</span> <span class="c1">-- Draw a line with a default color.</span></code></pre>
 </div>
 </div>
 <tiny-editor style="display: none;"  >
 
 function _draw()
-    gfx.cls()
-    local data = {
-        { name = "riri" },
-        { name = "fifi" },
-        { name = "loulou" }
-    }
+  gfx.cls()
 
-    local y = 0
-    for index, key in rpairs(data) do
-        print(index .. " - " .. key.name, 10, y)
-        y = y + 10
+  local i =0
+  for x =16, 240, 16 do
+    for y =16, 240, 16 do
+      shape.line(x, y, 256 - x, 256 - y, i)
+      i = i + 1
     end
+  end
 end
 
 </tiny-editor>
 </div>
 <div class="sect3">
-<h4 id="_print">print()</h4>
+<h4 id="_shape_circle">shape.circle()</h4>
 <div class="paragraph">
-<p>Print on the screen a string.</p>
+<p>Draw a circle.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="nb">print</span><span class="p">(</span><span class="n">str</span><span class="p">)</span> <span class="c1">-- print on the screen a string at (0,0) with a default color.</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- print on the screen a string with a default color.</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- print on the screen a string with a specific color.</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">circle</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="c1">-- Draw a circle with the default color.</span>
+<span class="n">shape</span><span class="p">.</span><span class="n">circle</span><span class="p">(</span><span class="n">centerX</span><span class="p">,</span> <span class="n">centerY</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a circle.</span></code></pre>
 </div>
 </div>
 <tiny-editor style="display: none;"  >
 
 function _draw()
     gfx.cls()
-    -- every character is a sprite 4x4 pixels.
-    print("hello")
-    print("world", 10, 10)
-    print("how", 10, 20, 4)
-    print("are", 26, 20, 5)
-    print("you", 42, 20, 6)
-    print("...", 58, 20, math.rnd(10))
-end
 
-</tiny-editor>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_test">test</h3>
-<div class="paragraph">
-<p>Test method utilities used when tests are run. See <a href="#_the_tiny_cli_run_command">Run command</a></p>
-</div>
-<div class="sect3">
-<h4 id="_test_eq">test.eq()</h4>
-<div class="paragraph">
-<p>Assert that <code>expected</code> and <code>actual</code> are equals</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">test</span><span class="p">.</span><span class="n">eq</span><span class="p">(</span><span class="n">expected</span><span class="p">,</span> <span class="n">actual</span><span class="p">)</span> <span class="c1">-- Assert that `expected` and `actual` are equals</span></code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_test_neq">test.neq()</h4>
-<div class="paragraph">
-<p>Assert that <code>expected</code> and <code>actual</code> are <em>not</em> equals</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">test</span><span class="p">.</span><span class="n">neq</span><span class="p">(</span><span class="n">expected</span><span class="p">,</span> <span class="n">actual</span><span class="p">)</span> <span class="c1">-- Assert that `expected` and `actual` are not equals</span></code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_test_t">test.t()</h4>
-<div class="paragraph">
-<p>Assert that <code>actual</code> is true</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">test</span><span class="p">.</span><span class="n">t</span><span class="p">(</span><span class="n">actual</span><span class="p">)</span> <span class="c1">-- Assert that `actual` is true</span></code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_test_t_2">test.t()</h4>
-<div class="paragraph">
-<p>Assert that <code>actual</code> is false</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">test</span><span class="p">.</span><span class="n">t</span><span class="p">(</span><span class="n">actual</span><span class="p">)</span> <span class="c1">-- Assert that `actual` is false</span></code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_test_create">test.create()</h4>
-<div class="paragraph">
-<p>Create a new <code>test</code> named <code>name</code></p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">test</span><span class="p">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="c1">-- Create a new `test` named `name`</span></code></pre>
-</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the test</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">test</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The test: it has to be a function</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_tiny">tiny</h3>
-<div class="paragraph">
-<p>Tiny Lib which offer offer the current frame (<code>tiny.frame</code>), the current time (<code>tiny.time</code>), delta time (<code>tiny.dt</code>) and to switch to another script using <code>exit</code>.</p>
-</div>
-<div class="sect3">
-<h4 id="_tiny_dt">tiny.dt</h4>
-<div class="paragraph">
-<p>Delta time between two frame. As Tiny is a fixed frame engine, it&#8217;s always equal to 1/60</p>
-</div>
-<tiny-editor style="display: none;"  >
-function _update()
-    gfx.cls()
-    print(tiny.dt, 10, 10) -- Delta time between two frame. As Tiny is a fixed frame engine, it's always equal to 1/60
-end
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_tiny_t">tiny.t</h4>
-<div class="paragraph">
-<p>Time elapsed since the start of the game.</p>
-</div>
-<tiny-editor style="display: none;"  >
-function _update()
-    gfx.cls()
-    print(tiny.t, 10, 10) -- Time elapsed since the start of the game.
-end
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_tiny_frame">tiny.frame</h4>
-<div class="paragraph">
-<p>Number of frames elapsed since the start of the game.</p>
-</div>
-<tiny-editor style="display: none;"  >
-function _update()
-    gfx.cls()
-    print(tiny.frame, 10, 10) -- Number of frames elapsed since the start of the game.
-end
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_tiny_exit">tiny.exit()</h4>
-<div class="paragraph">
-<p>Exit the actual script to switch to another one. The next script to use is identified by it&#8217;s index. The index of the script is the index of it in the list of scripts from the <code>_tiny.json</code> file.The first script is at the index 0.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">tiny</span><span class="p">.</span><span class="n">exit</span><span class="p">(</span><span class="n">scriptIndex</span><span class="p">)</span> <span class="c1">-- Exit the actual script to switch to another one.</span></code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_vec2">vec2</h3>
-<div class="paragraph">
-<p>Vector2 manipulation library.</p>
-</div>
-<div class="sect3">
-<h4 id="_vec2_create">vec2.create()</h4>
-<div class="paragraph">
-<p>Create a vector 2 as a table { x, y }.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">vec2</span><span class="p">.</span><span class="n">create</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- Create a vector 2 as a table { x, y }.</span>
-<span class="n">vec2</span><span class="p">.</span><span class="n">create</span><span class="p">(</span><span class="n">vec2</span><span class="p">)</span> <span class="c1">-- Create a vector 2 as a table { x, y } using another vector 2.</span></code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_vec2_add">vec2.add()</h4>
-<div class="paragraph">
-<p>Add vector2 to another vector2</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">vec2</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span> <span class="c1">-- Add a vector 2 {x, y} to another vector 2 {x, y}</span>
-<span class="n">vec2</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">)</span> <span class="c1">-- Add a destructured vector 2 to another destructured vector 2</span></code></pre>
-</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">v2</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
-</tr>
-</tbody>
-</table>
-<tiny-editor style="display: none;"  >
+    -- filled circle
+    shape.circlef(20, 20, 20, 4)
+    shape.circlef(30, 30, 20, 5)
+    shape.circlef(40, 40, 20, 6)
+    print("filled circle", 20, 10)
 
-function _init()
-    gfx.camera(-128, -128)
+    -- non filled circle
+    shape.circle(50, 70, 10, 7)
+    shape.circle(60, 80, 10, 8)
+    shape.circle(70, 90, 10, 9)
+    print("non filled circle", 20, 65)
 
-    local v1 = vec2.create(32, 38)
-    local v2 = vec2.create(20, 2)
+    shape.circle(80, 120, 15, 10)
+    shape.circle(80, 140, 20, 16)
+    shape.circle(80, 160, 30, 14)
+    print("circle with different radius", 20, 115)
 
-    gfx.cls()
-    print("v1", 2, 15, 10)
-    shape.line(0, 0, v1.x, v1.y, 10)
-    print("v2", 23, 3, 9)
-    shape.line(0, 0, v2.x, v2.y, 9)
-
-    local v3 = vec2.add(v1, v2)
-
-    print("v1 + v2", 30, 15, 11)
-    gfx.dither(0xAAAA)
-    shape.line(0, 0, v3.x, v3.y, 11)
-    gfx.dither()
 end
 
 </tiny-editor>
 </div>
 <div class="sect3">
-<h4 id="_vec2_sub">vec2.sub()</h4>
+<h4 id="_shape_trianglef">shape.trianglef()</h4>
 <div class="paragraph">
-<p>Subtract another vector from another vector</p>
+<p>Draw a filled triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3) and color.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">vec2</span><span class="p">.</span><span class="n">sub</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span> <span class="c1">-- Subtract a vector 2 {x, y} from another vector 2 {x, y}</span>
-<span class="n">vec2</span><span class="p">.</span><span class="n">sub</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">)</span> <span class="c1">-- Subtract a destructured vector 2 from another destructured vector 2</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">trianglef</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">x3</span><span class="p">,</span> <span class="n">y3</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a filled triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).</span></code></pre>
 </div>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">v2</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
-</tr>
-</tbody>
-</table>
 <tiny-editor style="display: none;"  >
 
-function _init()
-    gfx.camera(-128, -128)
+function tri(f, fill)
+  local x1 = 128 + math.cos(f) * 64
+  local y1 = 128 + math.sin(f) * 64
 
-    local v1 = vec2.create(32, 38)
-    local v2 = vec2.create(20, 2)
+  local x2 = 128 + math.cos(f + math.pi * 1/3) * 64
+  local y2 = 128 + math.sin(f + math.pi * 1/3) * 64
 
-    gfx.cls()
-    print("v1", 18, 15, 10)
-    shape.line(0, 0, v1.x, v1.y, 10)
-    print("v2", 23, 3, 9)
-    shape.line(0, 0, v2.x, v2.y, 9)
+  local x3 = 128 + math.cos(f+ math.pi * 2/3) * 64
+  local y3 = 128 + math.sin(f +math.pi * 2/3) * 64
 
-    local v3 = vec2.sub(v1, v2)
+  if fill then
+    shape.trianglef(x3, y3, x2, y2, x1, y1, 8)
+  else
+    shape.triangle(x1, y1, x2, y2, x3, y3, 8)
+  end
+end
 
-    print("v1 - v2", 0, 40, 11)
-    gfx.dither(0xAAAA)
-    shape.line(0, 0, v3.x, v3.y, 11)
-    gfx.dither()
+function _draw()
+  gfx.cls()
+  local f = tiny.frame * 0.01
+
+  tri(f, false)
+  tri(f*2, true)
 end
 
 </tiny-editor>
 </div>
 <div class="sect3">
-<h4 id="_vec2_dot">vec2.dot()</h4>
+<h4 id="_shape_triangle">shape.triangle()</h4>
 <div class="paragraph">
-<p>Dot product between two vectors</p>
+<p>Draw a triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3) and color.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">vec2</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span> <span class="c1">-- Dot product between a vector 2 {x, y} and another vector 2 {x, y}</span>
-<span class="n">vec2</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">)</span> <span class="c1">-- Dot product between a destructured vector 2 and another destructured vector 2</span></code></pre>
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">triangle</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">x3</span><span class="p">,</span> <span class="n">y3</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="c1">-- Draw a triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).</span></code></pre>
 </div>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">v2</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
-</tr>
-</tbody>
-</table>
 <tiny-editor style="display: none;"  >
 
-function _init()
-    angle = 0
-end
-function _update()
+function tri(f, fill)
+  local x1 = 128 + math.cos(f) * 64
+  local y1 = 128 + math.sin(f) * 64
 
-    if ctrl.pressing(keys.space) then
-        angle = angle + 0.1
+  local x2 = 128 + math.cos(f + math.pi * 1/3) * 64
+  local y2 = 128 + math.sin(f + math.pi * 1/3) * 64
+
+  local x3 = 128 + math.cos(f+ math.pi * 2/3) * 64
+  local y3 = 128 + math.sin(f +math.pi * 2/3) * 64
+
+  if fill then
+    shape.trianglef(x3, y3, x2, y2, x1, y1, 8)
+  else
+    shape.triangle(x1, y1, x2, y2, x3, y3, 8)
+  end
+end
+
+function _draw()
+  gfx.cls()
+  local f = tiny.frame * 0.01
+
+  tri(f, false)
+  tri(f*2, true)
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_shape_gradient">shape.gradient()</h4>
+<div class="paragraph">
+<p>Draw a gradient using dithering, only from color c1 to color c2.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="lua"><span class="n">shape</span><span class="p">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">color1</span><span class="p">,</span> <span class="n">color2</span><span class="p">,</span> <span class="n">is_horizontal</span><span class="p">)</span> <span class="c1">-- Draw a gradient using dithering, only from color c1 to color c2.</span></code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+
+ local c1 = 2
+ local c2 = 3
+
+    gfx.cls(c1)
+    shape.rectf(0, 256 - 16, 256, 16, c2)
+    for x=0,240,16 do
+        shape.gradient(x, 16 * math.cos(2 * 3.14 * (x / 256) + tiny.t * 2), 16, 256, c1, c2, false)
     end
 
-    gfx.camera(-128, -128)
-
-    local v1 = vec2.create(1, 0)
-    local v2 = vec2.create(math.cos(angle), math.sin(angle))
-    local dot = vec2.dot(v1, v2)
-
-    local scl = vec2.scl(v1, dot)
-
-    gfx.cls()
-
-    local scaledv1 = vec2.scl(v1, 64)
-    local scaledv2 = vec2.scl(v2, 64)
-    local scaledv3 = vec2.scl(scl, 64)
-
-    print("v1", 18, 5, 10)
-    shape.line(0, 0, scaledv1.x, scaledv1.y, 10)
-    print("v2", scaledv2.x + 5, scaledv2.y + 5, 11)
-    shape.line(0, 0, scaledv2.x, scaledv2.y, 11)
-
-    print("dot", scaledv3.x, 5, 9)
-    shape.line(0, 0, scaledv3.x, scaledv3.y, 9)
 end
 
 </tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_vec2_mag">vec2.mag()</h4>
-<div class="paragraph">
-<p>Calculate the magnitude (length) of a vector</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">vec2</span><span class="p">.</span><span class="n">mag</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- Calculate the magnitude (length) of a vector 2 {x, y}</span>
-<span class="n">vec2</span><span class="p">.</span><span class="n">mag</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span> <span class="c1">-- Calculate the magnitude (length) of a vector 2 {x, y}</span></code></pre>
-</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_vec2_nor">vec2.nor()</h4>
-<div class="paragraph">
-<p>Normalize a vector</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">vec2</span><span class="p">.</span><span class="n">nor</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1">-- Normalize a vector 2 {x, y}</span>
-<span class="n">vec2</span><span class="p">.</span><span class="n">nor</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span> <span class="c1">-- Normalize a vector 2 {x, y}</span></code></pre>
-</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
-</tr>
-</tbody>
-</table>
-<tiny-editor style="display: none;"  >
-
-function _update()
-    gfx.cls()
-
-    local v0 = vec2.create(43, 64)
-    local v1 = vec2.nor(v0)
-
-
-    print("vector     x: " .. v0.x .. " y: " .. v0.y)
-    print("normalized x: " .. v1.x .. " y: " .. v1.y, 0, 8)
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_vec2_crs">vec2.crs()</h4>
-<div class="paragraph">
-<p>Cross product</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">vec2</span><span class="p">.</span><span class="n">crs</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span> <span class="c1">-- Cross product between a vector 2 {x, y} and another vector 2 {x, y}</span>
-<span class="n">vec2</span><span class="p">.</span><span class="n">crs</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">)</span> <span class="c1">-- Cross product between a destructured vector 2 and another destructured vector 2</span></code></pre>
-</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">v2</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_vec2_scl">vec2.scl()</h4>
-<div class="paragraph">
-<p>Scale a vector</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">vec2</span><span class="p">.</span><span class="n">scl</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">scl</span><span class="p">)</span> <span class="c1">-- Scale a vector 2 {x, y} using the factor scl</span>
-<span class="n">vec2</span><span class="p">.</span><span class="n">scl</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">scl</span><span class="p">)</span> <span class="c1">-- Scale a vector 2 {x, y} using the factor scl</span></code></pre>
-</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
-</tr>
-</tbody>
-</table>
-<tiny-editor style="display: none;"  >
-
-function _init()
-    gfx.camera(-128, -128)
-
-    local v1 = vec2.create(32, 38)
-    local v2 = vec2.scl(v1, 2)
-
-    gfx.cls()
-    print("v1 scaled", 8, 60, 11)
-    gfx.dither(0xAAAA)
-    shape.line(0, 0, v2.x, v2.y, 11)
-    gfx.dither()
-    print("v1", 18, 15, 10)
-    shape.line(0, 0, v1.x, v1.y, 10)
-end
-
-</tiny-editor>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_ws">ws</h3>
-<div class="paragraph">
-<p>Workspace manipulation library. It allows you to save/load/download files</p>
-</div>
-<div class="sect3">
-<h4 id="_ws_save">ws.save()</h4>
-<div class="paragraph">
-<p>Save the content into a local file, on desktop or in the local storage on the web platform.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">ws</span><span class="p">.</span><span class="n">save</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span> <span class="c1">-- Save the content into the file name.</span></code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_ws_load">ws.load()</h4>
-<div class="paragraph">
-<p>Load and get the content of the file name</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">ws</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="c1">-- Load and get the content of the file name</span></code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_ws_create">ws.create()</h4>
-<div class="paragraph">
-<p>Create a local file. The name is generated so the name is unique.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">ws</span><span class="p">.</span><span class="n">create</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">extension</span><span class="p">)</span> <span class="c1">-- Create a local file with the prefix and the extension. The name of the file created.</span></code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_ws_list">ws.list()</h4>
-<div class="paragraph">
-<p>List all files available in the workspace.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="lua"><span class="n">ws</span><span class="p">.</span><span class="n">list</span><span class="p">()</span> <span class="c1">-- List all files available in the workspace.</span>
-<span class="n">ws</span><span class="p">.</span><span class="n">list</span><span class="p">(</span><span class="n">extension</span><span class="p">)</span> <span class="c1">-- List all files available in the workspace and filter by the file extension.</span></code></pre>
-</div>
-</div>
 </div>
 </div>
 </div>
@@ -6594,221 +6566,10 @@ Support us by crediting Kenney or www.kenney.nl (this is not mandatory)</pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 1.4.0-alpha3<br>
-Last updated 2025-07-03 14:26:56 UTC
+Version 2.0.0-alpha0<br>
+Last updated 2025-11-02 21:20:36 UTC
 </div>
 </div>
-<style>
-pre.rouge table td { padding: 5px; }
-pre.rouge table pre { margin: 0; }
-pre.rouge .cm {
-  color: #999988;
-  font-style: italic;
-}
-pre.rouge .cp {
-  color: #999999;
-  font-weight: bold;
-}
-pre.rouge .c1 {
-  color: #999988;
-  font-style: italic;
-}
-pre.rouge .cs {
-  color: #999999;
-  font-weight: bold;
-  font-style: italic;
-}
-pre.rouge .c, pre.rouge .ch, pre.rouge .cd, pre.rouge .cpf {
-  color: #999988;
-  font-style: italic;
-}
-pre.rouge .err {
-  color: #a61717;
-  background-color: #e3d2d2;
-}
-pre.rouge .gd {
-  color: #000000;
-  background-color: #ffdddd;
-}
-pre.rouge .ge {
-  color: #000000;
-  font-style: italic;
-}
-pre.rouge .gr {
-  color: #aa0000;
-}
-pre.rouge .gh {
-  color: #999999;
-}
-pre.rouge .gi {
-  color: #000000;
-  background-color: #ddffdd;
-}
-pre.rouge .go {
-  color: #888888;
-}
-pre.rouge .gp {
-  color: #555555;
-}
-pre.rouge .gs {
-  font-weight: bold;
-}
-pre.rouge .gu {
-  color: #aaaaaa;
-}
-pre.rouge .gt {
-  color: #aa0000;
-}
-pre.rouge .kc {
-  color: #000000;
-  font-weight: bold;
-}
-pre.rouge .kd {
-  color: #000000;
-  font-weight: bold;
-}
-pre.rouge .kn {
-  color: #000000;
-  font-weight: bold;
-}
-pre.rouge .kp {
-  color: #000000;
-  font-weight: bold;
-}
-pre.rouge .kr {
-  color: #000000;
-  font-weight: bold;
-}
-pre.rouge .kt {
-  color: #445588;
-  font-weight: bold;
-}
-pre.rouge .k, pre.rouge .kv {
-  color: #000000;
-  font-weight: bold;
-}
-pre.rouge .mf {
-  color: #009999;
-}
-pre.rouge .mh {
-  color: #009999;
-}
-pre.rouge .il {
-  color: #009999;
-}
-pre.rouge .mi {
-  color: #009999;
-}
-pre.rouge .mo {
-  color: #009999;
-}
-pre.rouge .m, pre.rouge .mb, pre.rouge .mx {
-  color: #009999;
-}
-pre.rouge .sb {
-  color: #d14;
-}
-pre.rouge .sc {
-  color: #d14;
-}
-pre.rouge .sd {
-  color: #d14;
-}
-pre.rouge .s2 {
-  color: #d14;
-}
-pre.rouge .se {
-  color: #d14;
-}
-pre.rouge .sh {
-  color: #d14;
-}
-pre.rouge .si {
-  color: #d14;
-}
-pre.rouge .sx {
-  color: #d14;
-}
-pre.rouge .sr {
-  color: #009926;
-}
-pre.rouge .s1 {
-  color: #d14;
-}
-pre.rouge .ss {
-  color: #990073;
-}
-pre.rouge .s, pre.rouge .sa, pre.rouge .dl {
-  color: #d14;
-}
-pre.rouge .na {
-  color: #008080;
-}
-pre.rouge .bp {
-  color: #999999;
-}
-pre.rouge .nb {
-  color: #0086B3;
-}
-pre.rouge .nc {
-  color: #445588;
-  font-weight: bold;
-}
-pre.rouge .no {
-  color: #008080;
-}
-pre.rouge .nd {
-  color: #3c5d5d;
-  font-weight: bold;
-}
-pre.rouge .ni {
-  color: #800080;
-}
-pre.rouge .ne {
-  color: #990000;
-  font-weight: bold;
-}
-pre.rouge .nf, pre.rouge .fm {
-  color: #990000;
-  font-weight: bold;
-}
-pre.rouge .nl {
-  color: #990000;
-  font-weight: bold;
-}
-pre.rouge .nn {
-  color: #555555;
-}
-pre.rouge .nt {
-  color: #000080;
-}
-pre.rouge .vc {
-  color: #008080;
-}
-pre.rouge .vg {
-  color: #008080;
-}
-pre.rouge .vi {
-  color: #008080;
-}
-pre.rouge .nv, pre.rouge .vm {
-  color: #008080;
-}
-pre.rouge .ow {
-  color: #000000;
-  font-weight: bold;
-}
-pre.rouge .o {
-  color: #000000;
-  font-weight: bold;
-}
-pre.rouge .w {
-  color: #bbbbbb;
-}
-pre.rouge {
-  background-color: #f8f8f8;
-}
-</style>
-<script src="tiny-web-editor.js"></script>
+<script type="module" crossorigin src="./tiny-web-editor.js"></script>
 </body>
 </html>

@@ -1,720 +1,264 @@
 == Tiny API
 
-=== ctrl
+=== vec2
 
-Access to controllers like touch/mouse events or accessing which key is pressed by the user.
+Vector2 manipulation library.
 
-==== ctrl.touch()
+==== vec2.create()
 
-Get coordinates of the current touch/mouse. If the mouse/touch is out-of the screen, the coordinates will be the last mouse position/touch. The function return those coordinates as a table {x, y}. A sprite can be draw directly on the mouse position by passing the sprite number. 
+Create a vector 2 as a table { x, y }.
 
 ```lua
-ctrl.touch() -- Get the mouse coordinates.
-ctrl.touch(sprN) -- Get the mouse coordinate and draw a sprite on those coordinates.
+vec2.create(x, y) -- Create a vector 2 as a table { x, y }.
+vec2.create(vec2) -- Create a vector 2 as a table { x, y } using another vector 2.
 ```
 
-++++
-<tiny-editor style="display: none;"  >
 
-function _draw()
-  gfx.cls(2)
-  p = ctrl.touch()
-  print("coordinates: "..p.x .. "x"..p.y, 1, 1, 4)
-  shape.rectf(p.x, p.y, 5,5, p.x + p.y)
-end
+==== vec2.add()
 
-</tiny-editor>
-++++
-
-
-==== ctrl.pressed()
-
-Return true if the key was pressed during the last frame. If you need to check that the key is still pressed, see `ctrl.pressing` instead.
+Add vector2 to another vector2
 
 ```lua
-ctrl.pressed(key) -- Is the key was pressed?
-```
-
-++++
-<tiny-editor style="display: none;"  >
-
-local percent_a = 1
-local percent_b = 1
-
-function _update()
-    percent_a = math.min(percent_a + 0.05, 1)
-    percent_b = math.min(percent_b + 0.05, 1)
-
-    if ctrl.pressed(keys.space) then
-        percent_a = 0
-    end
-    
-    if ctrl.pressing(keys.space) then
-        percent_b = 0
-    end
-
-    local offset_a = juice.powIn2(0, 8, percent_a)
-    local offset_b = juice.powIn2(0, 8, percent_b)
-
-    gfx.cls()
-    shape.rectf(64, 128 - 16, 32, 32, 7)
-    shape.rectf(64, 128 - 32 + offset_a, 32, 32, 8)
-
-    shape.rectf(32 + 128, 128 - 16, 32, 32, 7)
-    shape.rectf(32 + 128, 128 - 32 + offset_b, 32, 32, 8)
-
-    print("pressed", 64, 128 + 32)
-    print("pressing", 32 + 128, 128 + 32)
-end
-
-</tiny-editor>
-++++
-
-
-==== ctrl.pressing()
-
-Return true if the key is still pressed. 
-
-```lua
-ctrl.pressing(key) -- Is the key is still pressed?
-```
-
-++++
-<tiny-editor style="display: none;"  >
-
-local percent_a = 1
-local percent_b = 1
-
-function _update()
-    percent_a = math.min(percent_a + 0.05, 1)
-    percent_b = math.min(percent_b + 0.05, 1)
-
-    if ctrl.pressed(keys.space) then
-        percent_a = 0
-    end
-    
-    if ctrl.pressing(keys.space) then
-        percent_b = 0
-    end
-
-    local offset_a = juice.powIn2(0, 8, percent_a)
-    local offset_b = juice.powIn2(0, 8, percent_b)
-
-    gfx.cls()
-    shape.rectf(64, 128 - 16, 32, 32, 7)
-    shape.rectf(64, 128 - 32 + offset_a, 32, 32, 8)
-
-    shape.rectf(32 + 128, 128 - 16, 32, 32, 7)
-    shape.rectf(32 + 128, 128 - 32 + offset_b, 32, 32, 8)
-
-    print("pressed", 64, 128 + 32)
-    print("pressing", 32 + 128, 128 + 32)
-end
-
-</tiny-editor>
-++++
-
-
-==== ctrl.touched()
-
-Return the position of the touch (as `{x, y}`)if the screen was touched or the mouse button was pressed during the last frame. `nil` otherwise.
-The touch can be : 
-
-- 0: left click or one finger
-- 1: right click or two fingers
-- 2: middle click or three fingers
-
-If you need to check that the touch/mouse button is still active, see `ctrl.touching` instead.
-
-```lua
-ctrl.touched(touch) -- Is the screen was touched or mouse button was pressed?
-```
-
-++++
-<tiny-editor style="display: none;"  >
-
-local circles = {}
-
-function _update()
-    local pos = ctrl.touched(0)
-    if pos ~= nil then
-        table.insert(circles, pos)
-    end
-end
-
-function _draw()
-    gfx.cls()
-    local p = ctrl.touch()
-    shape.circlef(p.x, p.y, 4, 8)
-    for pos in all(circles) do 
-        shape.circlef(pos.x, pos.y, 4, 9)
-        print("("..pos.x .. ", "..pos.y..")", pos.x + 3, pos.y + 3)
-    end
-end
-
-</tiny-editor>
-++++
-
-
-==== ctrl.touching()
-
-Return the position of the touch (as `{x, y}`)if the screen is still touched or the mouse button is still pressed. `nil` otherwise.
-The touch can be : 
-
-- 0: left click or one finger
-- 1: right click or two fingers
-- 2: middle click or three fingers
-
-
-
-```lua
-ctrl.touching(touch) -- Is the screen is still touched or mouse button is still pressed?
-```
-
-++++
-<tiny-editor style="display: none;"  >
-
-function _draw()
-    gfx.cls()
-    local p = ctrl.touch()
-    shape.circlef(p.x, p.y, 4, 8)
-
-    local start = ctrl.touching(0)
-    if start ~= nil then
-        local pos = ctrl.touch()
-        shape.line(start.x, start.y, pos.x, pos.y, 1)
-        print("("..start.x .. ", "..start.y..")", start.x, start.y)
-        print("("..pos.x .. ", "..pos.y..")", pos.x, pos.y)
-    end
-end
-
-</tiny-editor>
-++++
-
-
-
-=== debug
-
-Helpers to debug your game by drawing or printing information on screen.
-
-==== debug.enabled()
-
-Enable or disable debug feature.
-
-```lua
-debug.enabled(enabled) -- Enable or disable debug by passing true to enable, false to disable.
-debug.enabled() -- Return true if debug is enabled. False otherwise.
-```
-
-++++
-<tiny-editor style="display: none;"  >
-
-function _init()
-   switch = true
-end
-
-function _update()
-    local pos = ctrl.touch()
-
-    debug.rect(pos.x, pos.y, 16, 16)
-
-    if ctrl.touched(0) then
-       switch = not switch
-    
-       debug.enabled(switch)
-    end   
-
-    debug.log("debug ".. tostring(switch))
-end
-  
-function _draw()
-    gfx.cls()
-    -- draw the mouse position.
-    local pos = ctrl.touch()
-
-    shape.line(pos.x - 2, pos.y, pos.x + 2, pos.y, 3)
-    shape.line(pos.x, pos.y - 2, pos.x, pos.y + 2, 3) 
-
-    if switch then
-      print("debug enabled", 10, 40)
-    else
-     print("debug disabled", 10, 40)
-    end
-end
-
-</tiny-editor>
-++++
-
-
-==== debug.table()
-
-Display a table.
-
-```lua
-debug.table(table) -- Display a table.
-```
-
-++++
-<tiny-editor style="display: none;"  >
-
-function _update()
-    local pos = ctrl.touch()
-
-    debug.table(pos)
-    debug.log("frame "..tiny.frame)
-    debug.console("hello from the console")
-end
-  
-function _draw()
-    gfx.cls()
-    -- draw the mouse position.
-    local pos = ctrl.touch()
-
-    shape.line(pos.x - 2, pos.y, pos.x + 2, pos.y, 3)
-    shape.line(pos.x, pos.y - 2, pos.x, pos.y + 2, 3) 
-end
-
-</tiny-editor>
-++++
-
-
-==== debug.log()
-
-Log a message on the screen.
-
-```lua
-debug.log(str) -- Log a message on the screen.
-```
-
-++++
-<tiny-editor style="display: none;"  >
-
-function _update()
-    local pos = ctrl.touch()
-
-    debug.table(pos)
-    debug.log("frame "..tiny.frame)
-    debug.console("hello from the console")
-end
-  
-function _draw()
-    gfx.cls()
-    -- draw the mouse position.
-    local pos = ctrl.touch()
-
-    shape.line(pos.x - 2, pos.y, pos.x + 2, pos.y, 3)
-    shape.line(pos.x, pos.y - 2, pos.x, pos.y + 2, 3) 
-end
-
-</tiny-editor>
-++++
-
-
-==== debug.console()
-
-Log a message into the console.
-
-```lua
-debug.console(str) -- Log a message into the console.
-```
-
-++++
-<tiny-editor style="display: none;"  >
-
-function _update()
-    local pos = ctrl.touch()
-
-    debug.table(pos)
-    debug.log("frame "..tiny.frame)
-    debug.console("hello from the console")
-end
-  
-function _draw()
-    gfx.cls()
-    -- draw the mouse position.
-    local pos = ctrl.touch()
-
-    shape.line(pos.x - 2, pos.y, pos.x + 2, pos.y, 3)
-    shape.line(pos.x, pos.y - 2, pos.x, pos.y + 2, 3) 
-end
-
-</tiny-editor>
-++++
-
-
-==== debug.rect()
-
-Draw a rectangle on the screen
-
-```lua
-debug.rect(x, y, width, height, color) -- Draw a debug rectangle.
-debug.rect(rect) -- Draw a debug rectangle.
-debug.rect(rect, color) -- Draw a debug rectangle using a rectangle and a color.
+vec2.add(v1, v2) -- Add a vector 2 {x, y} to another vector 2 {x, y}
+vec2.add(x1, y1, x2, y2) -- Add a destructured vector 2 to another destructured vector 2
 ```
 
 [cols="1,1"]
 |===
 |Argument name |Argument description
 
-|rect |A rectangle {x, y, width, height, color}
-|rect |A rectangle {x, y, width, height}      
+|v1 |vector 2 as a table {x, y}
+|v2 |vector 2 as a table {x, y}      
 |===
 
 ++++
 <tiny-editor style="display: none;"  >
 
 function _init()
-   switch = true
-end
+    gfx.camera(-128, -128)
 
-function _update()
-    local pos = ctrl.touch()
+    local v1 = vec2.create(32, 38)
+    local v2 = vec2.create(20, 2)
 
-    debug.rect(pos.x, pos.y, 16, 16)
-
-    if ctrl.touched(0) then
-       switch = not switch
-    
-       debug.enabled(switch)
-    end   
-
-    debug.log("debug ".. tostring(switch))
-end
-  
-function _draw()
     gfx.cls()
-    -- draw the mouse position.
-    local pos = ctrl.touch()
-
-    shape.line(pos.x - 2, pos.y, pos.x + 2, pos.y, 3)
-    shape.line(pos.x, pos.y - 2, pos.x, pos.y + 2, 3) 
-
-    if switch then
-      print("debug enabled", 10, 40)
-    else
-     print("debug disabled", 10, 40)
-    end
-end
-
-</tiny-editor>
-++++
-
-
-==== debug.point()
-
-Draw a point on the screen
-
-```lua
-debug.point(x, y, color) -- Draw a debug point.
-debug.point(point) -- Draw a debug point.
-debug.point(point, color) -- Draw a debug point.
-```
-
-[cols="1,1"]
-|===
-|Argument name |Argument description
-
-|point |A point {x, y, color}
-|point |A point {x, y}      
-|===
-
-
-==== debug.line()
-
-Draw a point on the screen
-
-```lua
-debug.line(x1, y1, x2, y2, color) -- Draw a debug line.
-debug.line(v1, v2) -- Draw a debug line.
-debug.line(v1, v2, color) -- Draw a debug line.
-```
-
-[cols="1,1"]
-|===
-|Argument name |Argument description
-
-|v1 |A point {x, y}
-|v1 |A point {x, y}
-|v2 |A point {x, y}
-|v2 |A point {x, y}      
-|===
-
-
-
-=== gfx
-
-Access to graphical API like updating the color palette or applying a dithering pattern.
-
-==== gfx.drawMode()
-
-Switch to another draw mode.
-        |- 0: default. 
-        |- 1: drawing with transparent (ie: can erase part of the screen)
-        |- 2: drawing a stencil that will be use with the next mode
-        |- 3: drawing using a stencil test (ie: drawing only in the stencil) 
-        |- 4: drawing using a stencil test (ie: drawing everywhere except in the stencil) 
-    
-
-```lua
-gfx.drawMode() -- Return the actual mode. Switch back to the default mode.
-gfx.drawMode(mode) -- Switch to another draw mode. Return the previous mode.
-```
-
-
-==== gfx.cls()
-
-clear the screen
-
-```lua
-gfx.cls() -- Clear the screen with a default color.
-gfx.cls(color) -- Clear the screen with a color.
-```
-
-++++
-<tiny-editor style="display: none;"  >
-
-function _draw()
-    if ctrl.pressed(keys.space) then
-       gfx.cls()
-    end
-
-    print("Press space to clear the screen") 
-    local pos = ctrl.touch()
-    shape.circlef(pos.x, pos.y, 4, math.rnd())
-end
-</tiny-editor>
-++++
-
-
-==== gfx.pset()
-
-Set the color index at the coordinate (x,y).
-
-```lua
-gfx.pset(x, y, color) -- set the color index at the coordinate (x,y).
-```
-
-++++
-<tiny-editor style="display: none;"  >
-
-function _draw()
-   local pos = ctrl.touching(0)
-   if pos ~= nil then
-      -- set the pixel with the color 9 when the mouse is pressed
-      local p = ctrl.touch()
-      gfx.pset(p.x, p.y, 9)
-   end
-end
-</tiny-editor>
-++++
-
-
-==== gfx.pget()
-
-Get the color index at the coordinate (x,y).
-
-```lua
-gfx.pget(x, y) -- get the color index at the coordinate (x,y).
-```
-
-++++
-<tiny-editor style="display: none;"  >
-
-function _draw()
-   gfx.cls()
-   local index = 0
-   for x=0, 240, 16 do
-     for y=0, 240, 16 do
-        shape.rectf(x, y, 16, 16, index)
-        index = index + 1
-     end
-   end
-
-   local pos = ctrl.touch()
-   local color = gfx.pget(pos.x, pos.y)
-   if color ~= nil then 
-     shape.rectf(0, 0, 80, 6, 13)
-     print("color index: "..color)
-   end
-
-
-   shape.circlef(pos.x - 2, pos.y - 2, 4, 0)
-end
-</tiny-editor>
-++++
-
-
-==== gfx.to_sheet()
-
-Transform the current frame buffer into a spritesheeet. 
-
-- If the index of the spritesheet already exist, the spritesheet will be replaced
-- If the index of the spritesheet doesn't exist, a new spritesheet at this index will be created
-- If the index of the spritesheet is negative, a new spritesheet will be created at the last positive index.
-
-
-```lua
-gfx.to_sheet(sheet) -- Copy the current frame buffer to an new or existing sheet index.
-gfx.to_sheet(sheet, closure) -- Create a blank spritesheet. Execute the operation from the closure on the blank spritesheet and copy it to an new or existing sheet index.
-```
-
-++++
-<tiny-editor style="display: none;"  >
-
-function _draw()
-    gfx.cls(1)
-    -- draw a transparent circle (like a hole)
-    shape.circlef(64, 128, 20, 0)
-    -- keep the result as spritesheet 0
-    gfx.to_sheet(0)
-
-    gfx.cls(1)
-    -- draw some circles
-    shape.circlef(64, 108, 20, 8)
-    shape.circlef(44, 128, 20, 9)
-    shape.circlef(64, 148, 20, 10)
-    shape.circlef(84, 128, 20, 11)
-
-    -- draw over the circles
-    -- the mask generated before.
-    spr.sheet(0)
-    spr.sdraw()
-end
-</tiny-editor>
-++++
-
-
-==== gfx.pal()
-
-Change a color from the palette to another color.
-
-```lua
-gfx.pal() -- Reset all previous color changes.
-gfx.pal(a, b) -- Replace the color a for the color b.
-```
-
-++++
-<tiny-editor style="display: none;"  >
-
-function _draw()
-    gfx.cls()
-    print("example", 10, 10, 2) -- print using the color index 2
-    gfx.pal(2, 3) -- switch the text color to another color
-    print("example", 10, 20, 2) -- print using the color index 2
-    gfx.pal() -- reset the palette
-    print("example", 10, 30, 2) -- print using the color index 2
-end
-
-</tiny-editor>
-++++
-
-
-==== gfx.camera()
-
-Move the game camera.
-
-```lua
-gfx.camera() -- Reset the game camera to it's default position (0,0).
-gfx.camera(x, y) -- Set game camera to the position x, y.
-```
-
-++++
-<tiny-editor style="display: none;"  >
-
-local x = 0
-local y = 0
-
-function _update()
-    if ctrl.pressing(keys.left) then
-        x = x - 0.5
-    elseif ctrl.pressing(keys.right) then
-        x = x + 0.5
-    end
-
-    if ctrl.pressing(keys.up) then
-        y = y - 0.5
-    elseif ctrl.pressing(keys.down) then
-        y = y + 0.5
-    end
-    gfx.camera(math.floor(x), math.floor(y))
-end
-
-function _draw()
-    gfx.cls(2)
-    for x = 0 - 64, 256 + 64, 16 do
-        for y = 0 - 64, 256 + 64, 16 do
-            shape.line(x - 2, y, x + 2, y, 9)
-            shape.line(x, y - 2, x, y + 2, 9)
-        end
-    end
-    print("camera: ("..x..", "..y..")", 6, 6)
-    
-    shape.rect(0, 0, 256, 256, 1)
-end
-</tiny-editor>
-++++
-
-
-==== gfx.dither()
-
-Apply a dithering pattern on every new draw call. The pattern is using the bits value of a 2 octet value. The first bits is the one on the far left and represent the pixel of the top left of a 4x4 matrix. The last bit is the pixel from the bottom right of this matrix.
-
-```lua
-gfx.dither() -- Reset dithering pattern. The previous dithering pattern is returned.
-gfx.dither(pattern) -- Apply dithering pattern. The previous dithering pattern is returned.
-```
-
-[cols="1,1"]
-|===
-|Argument name |Argument description
-
-|pattern |Dither pattern. For example: 0xA5A5 or 0x3030      
-|===
-
-++++
-<tiny-editor style="display: none;"  >
-
-function _draw()
-    gfx.cls()
+    print("v1", 2, 15, 10)
+    shape.line(0, 0, v1.x, v1.y, 10)
+    print("v2", 23, 3, 9)
+    shape.line(0, 0, v2.x, v2.y, 9)
+
+    local v3 = vec2.add(v1, v2)
+
+    print("v1 + v2", 30, 15, 11)
+    gfx.dither(0xAAAA)
+    shape.line(0, 0, v3.x, v3.y, 11)
     gfx.dither()
-    shape.circlef(30, 30, 30, 2)
-    gfx.dither(0xA5A5) -- set a dithering pattern
-    shape.circlef(50, 50, 30, 3)
-    gfx.dither(0x0842) -- set another dithering pattern
-    shape.circlef(70, 70, 30, 2)
 end
 
 </tiny-editor>
 ++++
 
 
-==== gfx.clip()
+==== vec2.sub()
 
-Clip the draw surface (ie: limit the drawing area).
+Subtract another vector from another vector
 
 ```lua
-gfx.clip() -- Reset the clip and draw on the fullscreen.
-gfx.clip(x, y, width, height) -- Clip and limit the drawing area.
+vec2.sub(v1, v2) -- Subtract a vector 2 {x, y} from another vector 2 {x, y}
+vec2.sub(x1, y1, x2, y2) -- Subtract a destructured vector 2 from another destructured vector 2
 ```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|v1 |vector 2 as a table {x, y}
+|v2 |vector 2 as a table {x, y}      
+|===
 
 ++++
 <tiny-editor style="display: none;"  >
 
 function _init()
-  c = {}
-  for i=1,100 do
-    table.insert(c, {x=math.rnd(256), y=math.rnd(256), c = math.rnd(1,12)})
+    gfx.camera(-128, -128)
+
+    local v1 = vec2.create(32, 38)
+    local v2 = vec2.create(20, 2)
+
+    gfx.cls()
+    print("v1", 18, 15, 10)
+    shape.line(0, 0, v1.x, v1.y, 10)
+    print("v2", 23, 3, 9)
+    shape.line(0, 0, v2.x, v2.y, 9)
+
+    local v3 = vec2.sub(v1, v2)
+
+    print("v1 - v2", 0, 40, 11)
+    gfx.dither(0xAAAA)
+    shape.line(0, 0, v3.x, v3.y, 11)
+    gfx.dither()
 end
 
+</tiny-editor>
+++++
+
+
+==== vec2.dot()
+
+Dot product between two vectors
+
+```lua
+vec2.dot(v1, v2) -- Dot product between a vector 2 {x, y} and another vector 2 {x, y}
+vec2.dot(x1, y1, x2, y2) -- Dot product between a destructured vector 2 and another destructured vector 2
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|v1 |vector 2 as a table {x, y}
+|v2 |vector 2 as a table {x, y}      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _init()
+    angle = 0
 end
-function _draw()
-  gfx.cls()
-  local pos = ctrl.touch()
-  -- set a clip area to crop circles
-  gfx.clip(pos.x - 20, pos.y - 20, 40, 40)
-  for circle in all(c) do
-    shape.circlef(circle.x, circle.y, 10, circle.c)
-  end
+function _update()
+
+    if ctrl.pressing(keys.space) then
+        angle = angle + 0.1
+    end
+
+    gfx.camera(-128, -128)
+
+    local v1 = vec2.create(1, 0)
+    local v2 = vec2.create(math.cos(angle), math.sin(angle))
+    local dot = vec2.dot(v1, v2)
+    
+    local scl = vec2.scl(v1, dot)
+    
+    gfx.cls()
+    
+    local scaledv1 = vec2.scl(v1, 64)
+    local scaledv2 = vec2.scl(v2, 64)
+    local scaledv3 = vec2.scl(scl, 64)
+
+    print("v1", 18, 5, 10)
+    shape.line(0, 0, scaledv1.x, scaledv1.y, 10)
+    print("v2", scaledv2.x + 5, scaledv2.y + 5, 11)
+    shape.line(0, 0, scaledv2.x, scaledv2.y, 11)
+    
+    print("dot", scaledv3.x, 5, 9)
+    shape.line(0, 0, scaledv3.x, scaledv3.y, 9)
+end    
+
+</tiny-editor>
+++++
+
+
+==== vec2.mag()
+
+Calculate the magnitude (length) of a vector
+
+```lua
+vec2.mag(x, y) -- Calculate the magnitude (length) of a vector 2 {x, y}
+vec2.mag(v1) -- Calculate the magnitude (length) of a vector 2 {x, y}
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|v1 |vector 2 as a table {x, y}      
+|===
+
+
+==== vec2.nor()
+
+Normalize a vector
+
+```lua
+vec2.nor(x, y) -- Normalize a vector 2 {x, y}
+vec2.nor(v1) -- Normalize a vector 2 {x, y}
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|v1 |vector 2 as a table {x, y}      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _update()
+    gfx.cls()
+
+    local v0 = vec2.create(43, 64)
+    local v1 = vec2.nor(v0)
+    
+    
+    print("vector     x: " .. v0.x .. " y: " .. v0.y)
+    print("normalized x: " .. v1.x .. " y: " .. v1.y, 0, 8)
+end 
+
+</tiny-editor>
+++++
+
+
+==== vec2.crs()
+
+Cross product
+
+```lua
+vec2.crs(v1, v2) -- Cross product between a vector 2 {x, y} and another vector 2 {x, y}
+vec2.crs(x1, y1, x2, y2) -- Cross product between a destructured vector 2 and another destructured vector 2
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|v1 |vector 2 as a table {x, y}
+|v2 |vector 2 as a table {x, y}      
+|===
+
+
+==== vec2.scl()
+
+Scale a vector
+
+```lua
+vec2.scl(x, y, scl) -- Scale a vector 2 {x, y} using the factor scl
+vec2.scl(v1, scl) -- Scale a vector 2 {x, y} using the factor scl
+```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|v1 |vector 2 as a table {x, y}      
+|===
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _init()
+    gfx.camera(-128, -128)
+
+    local v1 = vec2.create(32, 38)
+    local v2 = vec2.scl(v1, 2)
+
+    gfx.cls()
+    print("v1 scaled", 8, 60, 11)
+    gfx.dither(0xAAAA)
+    shape.line(0, 0, v2.x, v2.y, 11)
+    gfx.dither()
+    print("v1", 18, 15, 10)
+    shape.line(0, 0, v1.x, v1.y, 10)
 end
 
 </tiny-editor>
@@ -2474,16 +2018,6 @@ end
 
 
 
-=== keys
-
-List of the available keys. To be used with ctrl.
-
-- `keys.up`, `keys.down`, `keys.left`, `keys.right` for directions.
-- `keys.a` to `keys.z` and `keys.0` to `keys.9` for letters and numbers.
-- `keys.space` and `keys.enter` for other keys.
-
-
-
 === map
 
 Access map created with LDTk ( https://ldtk.io/ ).
@@ -2514,18 +2048,18 @@ Convert cell coordinates cx, cy into map screen coordinates x, y.
 
 ```lua
 map.from(arg1, arg2) -- Convert the cell coordinates into coordinates as a table [x,y].
-map.from(cell) -- Convert the cell coordinates from a table [cx,cy] into screen coordinates as a table [x,y].
+map.from(cell) -- Convert the cell coordinates from a table {cx,cy} into screen coordinates as a table {x,y}.
 ```
 
 
 ==== map.to()
 
-Convert screen coordinates x, y into map cell coordinates cx, cy.
+Convert screen coordinates x, y into map cell coordinates {cx, cy}.
 For example, coordinates of the player can be converted to cell coordinates to access the flag of the tile matching the player coordinates.
 
 ```lua
-map.to(x, y) -- Convert the coordinates into cell coordinates as a table [cx,cy].
-map.to(coordinates) -- Convert the coordinates from a table [x,y] into cell coordinates as a table [cx,cy].
+map.to(x, y) -- Convert the coordinates into cell coordinates as a table {cx = cx,cy = cy}.
+map.to(coordinates) -- Convert the coordinates from a table {x,y} into cell coordinates as a table {cx,cy}.
 ```
 
 
@@ -2577,6 +2111,155 @@ Draw map tiles on the screen.
 ```lua
 map.draw() -- Draw all active layers on the screen.
 map.draw(index) -- Draw the layer with the name or the index on the screen.
+```
+
+
+
+=== notes
+
+List all notes from C0 to B8. Please note that bemols are the note with b (ie: Gb2) while sharps are the note with s (ie: As3).
+
+==== notes.note()
+
+Get the name of a note regarding the note index (ie: C0 = 0, Cs0 = 1, ...)
+
+```lua
+notes.note(note_index) -- Get the name of a note regarding the note index (ie: C0 = 0, Cs0 = 1, ...)
+```
+
+
+
+=== debug
+
+Helpers to debug your game by drawing or printing information on screen.
+
+==== debug.console()
+
+Log a message into the console.
+
+```lua
+debug.console(str) -- Log a message into the console.
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _update()
+    local pos = ctrl.touch()
+
+    debug.table(pos)
+    debug.log("frame "..tiny.frame)
+    debug.console("hello from the console")
+end
+  
+function _draw()
+    gfx.cls()
+    -- draw the mouse position.
+    local pos = ctrl.touch()
+
+    shape.line(pos.x - 2, pos.y, pos.x + 2, pos.y, 3)
+    shape.line(pos.x, pos.y - 2, pos.x, pos.y + 2, 3) 
+end
+
+</tiny-editor>
+++++
+
+
+
+=== tiny
+
+Tiny Lib which offer offer the current frame (`tiny.frame`), the current time (`tiny.time`), delta time (`tiny.dt`), game dimensions (`tiny.width`, `tiny.height`), platform information (`tiny.platform`) and to switch to another script using `exit`.
+
+==== tiny.dt
+
+Delta time between two frame. As Tiny is a fixed frame engine, it's always equal to 1/60
+
+++++
+<tiny-editor style="display: none;"  >
+function _update()
+    gfx.cls()
+    print(tiny.dt, 10, 10) -- Delta time between two frame. As Tiny is a fixed frame engine, it's always equal to 1/60
+end
+</tiny-editor>
+++++
+
+
+==== tiny.t
+
+Time elapsed since the start of the game.
+
+++++
+<tiny-editor style="display: none;"  >
+function _update()
+    gfx.cls()
+    print(tiny.t, 10, 10) -- Time elapsed since the start of the game.
+end
+</tiny-editor>
+++++
+
+
+==== tiny.frame
+
+Number of frames elapsed since the start of the game.
+
+++++
+<tiny-editor style="display: none;"  >
+function _update()
+    gfx.cls()
+    print(tiny.frame, 10, 10) -- Number of frames elapsed since the start of the game.
+end
+</tiny-editor>
+++++
+
+
+==== tiny.width
+
+Width of the game in pixels.
+
+++++
+<tiny-editor style="display: none;"  >
+function _update()
+    gfx.cls()
+    print(tiny.width, 10, 10) -- Width of the game in pixels.
+end
+</tiny-editor>
+++++
+
+
+==== tiny.height
+
+Height of the game in pixels.
+
+++++
+<tiny-editor style="display: none;"  >
+function _update()
+    gfx.cls()
+    print(tiny.height, 10, 10) -- Height of the game in pixels.
+end
+</tiny-editor>
+++++
+
+
+==== tiny.platform
+
+Current platform: 1 for desktop, 2 for web.
+
+++++
+<tiny-editor style="display: none;"  >
+function _update()
+    gfx.cls()
+    print(tiny.platform, 10, 10) -- Current platform: 1 for desktop, 2 for web.
+end
+</tiny-editor>
+++++
+
+
+==== tiny.exit()
+
+Exit the actual script to switch to another one. The next script to use is identified by it's index. The index of the script is the index of it in the list of scripts from the `_tiny.json` file.The first script is at the index 0.
+
+```lua
+tiny.exit(scriptIndex) -- Exit the actual script to switch to another one.
 ```
 
 
@@ -2846,17 +2529,177 @@ end
 
 
 
-=== notes
+=== keys
 
-List all notes from C0 to B8. Please note that bemols are the note with b (ie: Gb2) while sharps are the note with s (ie: As3).
+List of the available keys. To be used with ctrl.
 
-==== notes.note()
+- `keys.up`, `keys.down`, `keys.left`, `keys.right` for directions.
+- `keys.a` to `keys.z` and `keys.0` to `keys.9` for letters and numbers.
+- `keys.space` and `keys.enter` for other keys.
 
-Get the name of a note regarding the note index (ie: C0 = 0, Cs0 = 1, ...)
+
+
+=== std
+
+Standard library.
+
+==== new()
+
+Create new instance of a class by creating a new table and setting the metatable. It allow to create kind of Object Oriented Programming.
+
+ 
 
 ```lua
-notes.note(note_index) -- Get the name of a note regarding the note index (ie: C0 = 0, Cs0 = 1, ...)
+new(class) -- Create new instance of class.
+new(class, default) -- Create new instance of class using default values.
 ```
+
+++++
+<tiny-editor style="display: none;"  >
+
+local Player = {
+    x = 128,
+    y = 128,
+    color = 8
+}
+
+function Player:draw()
+    shape.rectf(self.x, self.y, 10, 10, self.color)
+end
+
+function _init()
+    -- create a new player
+    player = new(Player)
+    -- create a new player with default vaules
+    player2 = new(Player, {x = 200, y = 200, color = 9})
+end
+
+function _draw()
+    gfx.cls()
+    player:draw() -- call the draw method on the player instance.
+    player2:draw() -- call the draw method on the player2 instance.
+end
+
+</tiny-editor>
+++++
+
+
+==== merge()
+
+Add *all key/value* from the table `source` to the table `dest`.
+
+```lua
+merge(source, dest) -- Merge source into dest.
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+    local src = {x = 1, y = 2, z = 3}
+    local dst = {a = 4, b = 5}
+    local result = merge(src, dst)
+    debug.table(result)
+end
+
+</tiny-editor>
+++++
+
+
+==== append()
+
+Append *all values* from the table `source` to the table `dest`.
+
+```lua
+append(source, dest) -- Copy source into dest.
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+    local src = {1, 2, 3}
+    local dst = {4, 5}
+    local result = append(src, dst)
+    debug.table(result)
+end
+
+</tiny-editor>
+++++
+
+
+==== all()
+
+Iterate over values of a table.
+
+- If you want to iterate over keys, use `pairs(table)`.
+ - If you want to iterate over index, use `ipairs(table)`.
+ - If you want to iterate in reverse, use `rpairs(table)`.
+
+
+```lua
+all(table) -- Iterate over the values of the table
+```
+
+
+==== rpairs()
+
+Iterate over values of a table in reverse order. The iterator return an index and the value. The method is useful to remove elements from a table while iterating on it.
+
+```lua
+rpairs(table) -- Iterate over the values of the table
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+    local data = {
+        { name = "riri" },
+        { name = "fifi" },
+        { name = "loulou" }
+    }
+
+    local y = 0
+    for index, key in rpairs(data) do
+        print(index .. " - " .. key.name, 10, y)
+        y = y + 10
+    end
+end
+
+</tiny-editor>
+++++
+
+
+==== print()
+
+Print on the screen a string.
+
+```lua
+print(str) -- print on the screen a string at (0,0) with a default color.
+print(str, x, y) -- print on the screen a string with a default color.
+print(str, x, y, color) -- print on the screen a string with a specific color.
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+    -- every character is a sprite 4x4 pixels.
+    print("hello")
+    print("world", 10, 10)
+    print("how", 10, 20, 4)
+    print("are", 26, 20, 5)
+    print("you", 42, 20, 6)
+    print("...", 58, 20, math.rnd(10))
+end
+
+</tiny-editor>
+++++
 
 
 
@@ -2864,11 +2707,11 @@ notes.note(note_index) -- Get the name of a note regarding the note index (ie: C
 
 Sound API to play/loop/stop a sound.
 A sound can be created using the sound editor, using the command line `tiny-cli sfx <filename>`.
-WARNING: Because of browser behaviour, a sound can *only* be played only after the first 
-user interaction. 
+WARNING: Because of browser behaviour, a sound can *only* be played only after the first
+user interaction.
 
 Avoid to start a music or a sound at the beginning of the game.
-Before it, force the player to hit a key or click by adding an interactive menu 
+Before it, force the player to hit a key or click by adding an interactive menu
 or by starting the sound as soon as the player is moving.
 
 
@@ -2904,7 +2747,8 @@ sfx.track(arg) -- Access instrument using its index or its name.
 Access instrument using its index or its name.
 
 ```lua
-sfx.instrument(arg) -- Access instrument using its index or its name.
+sfx.instrument(a) -- Access instrument using its index or its name.
+sfx.instrument(a, b) -- Access instrument using its index or its name. Create it if the instrument is missing and the flag is true.
 ```
 
 
@@ -2978,236 +2822,514 @@ sfx.mstop(sequence) -- Stop the sequence by it's index.
 
 
 
-=== shape
+=== gfx
 
-Shape API to draw...shapes. Those shapes can be circle, rectangle, line or oval.All shapes can be draw filed or not filed.
+Access to graphical API like updating the color palette or applying a dithering pattern.
 
-==== shape.rect()
+==== gfx.draw_mode()
 
-Draw a rectangle.
+Switch to another draw mode. 
+
+- 0: default.
+ - 1: drawing with transparent (ie: can erase part of the screen)
+  - 2: drawing a stencil that will be use with the next mode
+  - 3: drawing using a stencil test (ie: drawing only in the stencil)
+  - 4: drawing using a stencil test (ie: drawing everywhere except in the stencil)
+
 
 ```lua
-shape.rect(x, y, width, height, color) -- Draw a rectangle.
-shape.rect(rect) -- Draw a rectangle.
-shape.rect(rect, color) -- Draw a rectangle using a rectangle and a color.
+gfx.draw_mode() -- Return the actual mode. Switch back to the default mode.
+gfx.draw_mode(mode) -- Switch to another draw mode. Return the previous mode.
+```
+
+++++
+<tiny-editor style="display: none;" sprite="resources/tiny-town.png" >
+
+local draw_stencil = 2
+local draw_inside_stencil = 3
+local draw_outside_stencil = 4
+
+local outside = false
+
+function _draw()
+    if ctrl.pressed(keys.space) then
+        outside = not outside
+    end
+
+    gfx.cls(3)
+
+    gfx.draw_mode(draw_stencil)
+
+    -- draw a circle in the middle of the screen
+    shape.circlef(128, 128, 64, 1)
+    
+    if outside then
+        gfx.draw_mode(draw_inside_stencil)
+    else
+        gfx.draw_mode(draw_outside_stencil)
+    end
+    
+    -- draw the sprite sheet. only in the circle
+    spr.sdraw()
+    gfx.draw_mode()
+end
+
+</tiny-editor>
+++++
+
+
+==== gfx.cls()
+
+clear the screen
+
+```lua
+gfx.cls() -- Clear the screen with a default color.
+gfx.cls(color) -- Clear the screen with a color.
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    if ctrl.pressed(keys.space) then
+       gfx.cls()
+    end
+
+    print("Press space to clear the screen") 
+    local pos = ctrl.touch()
+    shape.circlef(pos.x, pos.y, 4, math.rnd())
+end
+</tiny-editor>
+++++
+
+
+==== gfx.pset()
+
+Set the color index at the coordinate (x,y).
+
+```lua
+gfx.pset(x, y, color) -- set the color index at the coordinate (x,y).
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+   local pos = ctrl.touching(0)
+   if pos ~= nil then
+      -- set the pixel with the color 9 when the mouse is pressed
+      local p = ctrl.touch()
+      gfx.pset(p.x, p.y, 9)
+   end
+end
+</tiny-editor>
+++++
+
+
+==== gfx.pget()
+
+Get the color index at the coordinate (x,y).
+
+```lua
+gfx.pget(x, y) -- get the color index at the coordinate (x,y).
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+   gfx.cls()
+   local index = 0
+   for x=0, 240, 16 do
+     for y=0, 240, 16 do
+        shape.rectf(x, y, 16, 16, index)
+        index = index + 1
+     end
+   end
+
+   local pos = ctrl.touch()
+   local color = gfx.pget(pos.x, pos.y)
+   if color ~= nil then 
+     shape.rectf(0, 0, 80, 6, 13)
+     print("color index: "..color)
+   end
+
+
+   shape.circlef(pos.x - 2, pos.y - 2, 4, 0)
+end
+</tiny-editor>
+++++
+
+
+==== gfx.to_sheet()
+
+Transform the current frame buffer into a spritesheeet. 
+
+- If the index of the spritesheet already exist, the spritesheet will be replaced
+- If the index of the spritesheet doesn't exist, a new spritesheet at this index will be created
+- If the index of the spritesheet is negative, a new spritesheet will be created at the last positive index.
+
+
+```lua
+gfx.to_sheet(sheet) -- Copy the current frame buffer to an new or existing sheet index.
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls(1)
+    -- draw a transparent circle (like a hole)
+    shape.circlef(64, 128, 20, 0)
+    -- keep the result as spritesheet 0
+    gfx.to_sheet(0)
+
+    gfx.cls(1)
+    -- draw some circles
+    shape.circlef(64, 108, 20, 8)
+    shape.circlef(44, 128, 20, 9)
+    shape.circlef(64, 148, 20, 10)
+    shape.circlef(84, 128, 20, 11)
+
+    -- draw over the circles
+    -- the mask generated before.
+    spr.sheet(0)
+    spr.sdraw()
+end
+</tiny-editor>
+++++
+
+
+==== gfx.pal()
+
+Change a color from the palette to another color.
+
+```lua
+gfx.pal() -- Reset all previous color changes.
+gfx.pal(a, b) -- Replace the color a for the color b.
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+    print("example", 10, 10, 2) -- print using the color index 2
+    gfx.pal(2, 3) -- switch the text color to another color
+    print("example", 10, 20, 2) -- print using the color index 2
+    gfx.pal() -- reset the palette
+    print("example", 10, 30, 2) -- print using the color index 2
+end
+
+</tiny-editor>
+++++
+
+
+==== gfx.camera()
+
+Move the game camera.
+
+```lua
+gfx.camera() -- Reset the game camera to it's default position (0,0).
+gfx.camera(x, y) -- Set game camera to the position x, y.
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+local x = 0
+local y = 0
+
+function _update()
+    if ctrl.pressing(keys.left) then
+        x = x - 0.5
+    elseif ctrl.pressing(keys.right) then
+        x = x + 0.5
+    end
+
+    if ctrl.pressing(keys.up) then
+        y = y - 0.5
+    elseif ctrl.pressing(keys.down) then
+        y = y + 0.5
+    end
+    gfx.camera(math.floor(x), math.floor(y))
+end
+
+function _draw()
+    gfx.cls(2)
+    for x = 0 - 64, 256 + 64, 16 do
+        for y = 0 - 64, 256 + 64, 16 do
+            shape.line(x - 2, y, x + 2, y, 9)
+            shape.line(x, y - 2, x, y + 2, 9)
+        end
+    end
+    print("camera: ("..x..", "..y..")", 6, 6)
+    
+    shape.rect(0, 0, 256, 256, 1)
+end
+</tiny-editor>
+++++
+
+
+==== gfx.dither()
+
+Apply a dithering pattern on every new draw call. The pattern is using the bits value of a 2 octet value. The first bits is the one on the far left and represent the pixel of the top left of a 4x4 matrix. The last bit is the pixel from the bottom right of this matrix.
+
+```lua
+gfx.dither() -- Reset dithering pattern. The previous dithering pattern is returned.
+gfx.dither(pattern) -- Apply dithering pattern. The previous dithering pattern is returned.
 ```
 
 [cols="1,1"]
 |===
 |Argument name |Argument description
 
-|rect |A rectangle {x, y, width, height, color}
-|rect |A rectangle {x, y, width, height}      
+|pattern |Dither pattern. For example: 0xA5A5 or 0x3030      
 |===
 
 ++++
 <tiny-editor style="display: none;"  >
 
 function _draw()
-  gfx.cls()
-
-  -- filled rectangle
-  print("filled rectangle", 20, 10)
-  shape.rectf(20, 20, 20, 20, 4)
-  shape.rectf(30, 30, 20, 20, 5)
-  shape.rectf(40, 40, 20, 20, 6)
-
-  print("non filled rectangle", 20, 65)
-  -- non filled rectangle
-  shape.rect(50, 70, 20, 20, 7)
-  shape.rect(60, 80, 20, 20, 8)
-  shape.rect(70, 90, 20, 20, 9)
-
-  print("rectangle with different width", 20, 115)
-  shape.rect(20, 120, 30, 20, 10)
-  shape.rect(20, 140, 40, 20, 12)
-  shape.rect(20, 160, 60, 20, 13)
-
-end
-
-</tiny-editor>
-++++
-
-
-==== shape.oval()
-
-Draw an oval.
-
-```lua
-shape.oval(centerX, centerY, radiusX, radiusY) -- Draw an oval using the default color.
-shape.oval(centerX, centerY, radiusX, radiusY, color) -- Draw an oval using the specified color.
-```
-
-++++
-<tiny-editor style="display: none;"  >
-
-function _draw()
     gfx.cls()
-
-    local pos = ctrl.touch()
-    local w = math.max(0, pos.x)
-    local h = math.max(0, pos.y)
-   
-    shape.ovalf(w, h, w, h, 5)
-    shape.oval(256 - w, 256 - h, w, h, 1)
-    
-
-    print("size w: "..w.." h: "..h)
+    gfx.dither()
+    shape.circlef(30, 30, 30, 2)
+    gfx.dither(0xA5A5) -- set a dithering pattern
+    shape.circlef(50, 50, 30, 3)
+    gfx.dither(0x0842) -- set another dithering pattern
+    shape.circlef(70, 70, 30, 2)
 end
 
 </tiny-editor>
 ++++
 
 
-==== shape.ovalf()
+==== gfx.clip()
 
-Draw an oval filled.
+Clip the draw surface (ie: limit the drawing area).
 
 ```lua
-shape.ovalf(centerX, centerY, radiusX, radiusY) -- Draw a filled oval using the default color.
-shape.ovalf(centerX, centerY, radiusX, radiusY, color) -- Draw a filled oval using the specified color.
+gfx.clip() -- Reset the clip and draw on the fullscreen.
+gfx.clip(x, y, width, height) -- Clip and limit the drawing area.
 ```
 
 ++++
 <tiny-editor style="display: none;"  >
 
-function _draw()
-    gfx.cls()
-
-    local pos = ctrl.touch()
-    local w = math.max(0, pos.x)
-    local h = math.max(0, pos.y)
-   
-    shape.ovalf(w, h, w, h, 5)
-    shape.oval(256 - w, 256 - h, w, h, 1)
-    
-
-    print("size w: "..w.." h: "..h)
+function _init()
+  c = {}
+  for i=1,100 do
+    table.insert(c, {x=math.rnd(256), y=math.rnd(256), c = math.rnd(1,12)})
 end
 
-</tiny-editor>
-++++
-
-
-==== shape.rectf()
-
-Draw a filled rectangle.
-
-```lua
-shape.rectf(x, y, width, height, color) -- Draw a filled rectangle.
-shape.rectf(rect) -- Draw a filled rectangle.
-shape.rectf(rect, color) -- Draw a filled rectangle using a rectangle and a color.
-```
-
-[cols="1,1"]
-|===
-|Argument name |Argument description
-
-|rect |A rectangle {x, y, width, height, color}
-|rect |A rectangle {x, y, width, height}      
-|===
-
-++++
-<tiny-editor style="display: none;"  >
-
+end
 function _draw()
   gfx.cls()
-
-  -- filled rectangle
-  print("filled rectangle", 20, 10)
-  shape.rectf(20, 20, 20, 20, 4)
-  shape.rectf(30, 30, 20, 20, 5)
-  shape.rectf(40, 40, 20, 20, 6)
-
-  print("non filled rectangle", 20, 65)
-  -- non filled rectangle
-  shape.rect(50, 70, 20, 20, 7)
-  shape.rect(60, 80, 20, 20, 8)
-  shape.rect(70, 90, 20, 20, 9)
-
-  print("rectangle with different width", 20, 115)
-  shape.rect(20, 120, 30, 20, 10)
-  shape.rect(20, 140, 40, 20, 12)
-  shape.rect(20, 160, 60, 20, 13)
-
+  local pos = ctrl.touch()
+  -- set a clip area to crop circles
+  gfx.clip(pos.x - 20, pos.y - 20, 40, 40)
+  for circle in all(c) do
+    shape.circlef(circle.x, circle.y, 10, circle.c)
+  end
 end
 
 </tiny-editor>
 ++++
 
 
-==== shape.circlef()
 
-Draw a filled circle.
+=== floppy
+
+Floppy allow you to get or save user Lua structure.
+
+==== floppy.put()
+
+Save the content into a local file, on desktop or in the local storage on the web platform.
 
 ```lua
-shape.circlef(centerX, centerY, radius, color) -- Draw a circle at the coordinate (centerX, centerY) with the radius and the color.
+floppy.put(name, content) -- Save the content into the file name.
+```
+
+
+==== floppy.get()
+
+Load and get the content of the file name
+
+```lua
+floppy.get(name) -- Load and get the content of the file name
+```
+
+
+
+=== ctrl
+
+Access to controllers like touch/mouse events or accessing which key is pressed by the user.
+
+==== ctrl.touch()
+
+Get coordinates of the current touch/mouse. If the mouse/touch is out-of the screen, the coordinates will be the last mouse position/touch. The function return those coordinates as a table {x, y}. A sprite can be draw directly on the mouse position by passing the sprite number. 
+
+```lua
+ctrl.touch() -- Get the mouse coordinates.
+ctrl.touch(sprN) -- Get the mouse coordinate and draw a sprite on those coordinates.
 ```
 
 ++++
 <tiny-editor style="display: none;"  >
 
 function _draw()
-    gfx.cls()
-
-    -- filled circle
-    shape.circlef(20, 20, 20, 4)
-    shape.circlef(30, 30, 20, 5)
-    shape.circlef(40, 40, 20, 6)
-    print("filled circle", 20, 10)
-
-    -- non filled circle
-    shape.circle(50, 70, 10, 7)
-    shape.circle(60, 80, 10, 8)
-    shape.circle(70, 90, 10, 9)
-    print("non filled circle", 20, 65)
-
-    shape.circle(80, 120, 15, 10)
-    shape.circle(80, 140, 20, 16)
-    shape.circle(80, 160, 30, 14)
-    print("circle with different radius", 20, 115)
-
+  gfx.cls(2)
+  p = ctrl.touch()
+  print("coordinates: "..p.x .. "x"..p.y, 1, 1, 4)
+  shape.rectf(p.x, p.y, 5,5, p.x + p.y)
 end
 
 </tiny-editor>
 ++++
 
 
-==== shape.line()
+==== ctrl.pressed()
 
-Draw a line.
+Return true if the key was pressed during the last frame. If you need to check that the key is still pressed, see `ctrl.pressing` instead.
 
 ```lua
-shape.line(x0, y0, x1, y2, color) -- Draw a line.
-shape.line(x0, y0, x1, y1) -- Draw a line with a default color.
+ctrl.pressed(key) -- Is the key was pressed?
 ```
 
 ++++
 <tiny-editor style="display: none;"  >
 
-function _draw()
-  gfx.cls()
-  
-  local i =0
-  for x =16, 240, 16 do
-    for y =16, 240, 16 do
-      shape.line(x, y, 256 - x, 256 - y, i)
-      i = i + 1
+local percent_a = 1
+local percent_b = 1
+
+function _update()
+    percent_a = math.min(percent_a + 0.05, 1)
+    percent_b = math.min(percent_b + 0.05, 1)
+
+    if ctrl.pressed(keys.space) then
+        percent_a = 0
     end
-  end
+    
+    if ctrl.pressing(keys.space) then
+        percent_b = 0
+    end
+
+    local offset_a = juice.powIn2(0, 8, percent_a)
+    local offset_b = juice.powIn2(0, 8, percent_b)
+
+    gfx.cls()
+    shape.rectf(64, 128 - 16, 32, 32, 7)
+    shape.rectf(64, 128 - 32 + offset_a, 32, 32, 8)
+
+    shape.rectf(32 + 128, 128 - 16, 32, 32, 7)
+    shape.rectf(32 + 128, 128 - 32 + offset_b, 32, 32, 8)
+
+    print("pressed", 64, 128 + 32)
+    print("pressing", 32 + 128, 128 + 32)
 end
 
 </tiny-editor>
 ++++
 
 
-==== shape.circle()
+==== ctrl.pressing()
 
-Draw a circle.
+Return true if the key is still pressed. 
 
 ```lua
-shape.circle(a, b, c) -- Draw a circle with the default color.
-shape.circle(centerX, centerY, radius, color) -- Draw a circle.
+ctrl.pressing(key) -- Is the key is still pressed?
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+local percent_a = 1
+local percent_b = 1
+
+function _update()
+    percent_a = math.min(percent_a + 0.05, 1)
+    percent_b = math.min(percent_b + 0.05, 1)
+
+    if ctrl.pressed(keys.space) then
+        percent_a = 0
+    end
+    
+    if ctrl.pressing(keys.space) then
+        percent_b = 0
+    end
+
+    local offset_a = juice.powIn2(0, 8, percent_a)
+    local offset_b = juice.powIn2(0, 8, percent_b)
+
+    gfx.cls()
+    shape.rectf(64, 128 - 16, 32, 32, 7)
+    shape.rectf(64, 128 - 32 + offset_a, 32, 32, 8)
+
+    shape.rectf(32 + 128, 128 - 16, 32, 32, 7)
+    shape.rectf(32 + 128, 128 - 32 + offset_b, 32, 32, 8)
+
+    print("pressed", 64, 128 + 32)
+    print("pressing", 32 + 128, 128 + 32)
+end
+
+</tiny-editor>
+++++
+
+
+==== ctrl.touched()
+
+Return the position of the touch (as `{x, y}`)if the screen was touched or the mouse button was pressed during the last frame. `nil` otherwise.
+The touch can be : 
+
+- 0: left click or one finger
+- 1: right click or two fingers
+- 2: middle click or three fingers
+
+If you need to check that the touch/mouse button is still active, see `ctrl.touching` instead.
+
+```lua
+ctrl.touched(touch) -- Is the screen was touched or mouse button was pressed?
+```
+
+++++
+<tiny-editor style="display: none;"  >
+
+local circles = {}
+
+function _update()
+    local pos = ctrl.touched(0)
+    if pos ~= nil then
+        table.insert(circles, pos)
+    end
+end
+
+function _draw()
+    gfx.cls()
+    local p = ctrl.touch()
+    shape.circlef(p.x, p.y, 4, 8)
+    for pos in all(circles) do 
+        shape.circlef(pos.x, pos.y, 4, 9)
+        print("("..pos.x .. ", "..pos.y..")", pos.x + 3, pos.y + 3)
+    end
+end
+
+</tiny-editor>
+++++
+
+
+==== ctrl.touching()
+
+Return the position of the touch (as `{x, y}`)if the screen is still touched or the mouse button is still pressed. `nil` otherwise.
+The touch can be : 
+
+- 0: left click or one finger
+- 1: right click or two fingers
+- 2: middle click or three fingers
+
+
+
+```lua
+ctrl.touching(touch) -- Is the screen is still touched or mouse button is still pressed?
 ```
 
 ++++
@@ -3215,132 +3337,16 @@ shape.circle(centerX, centerY, radius, color) -- Draw a circle.
 
 function _draw()
     gfx.cls()
+    local p = ctrl.touch()
+    shape.circlef(p.x, p.y, 4, 8)
 
-    -- filled circle
-    shape.circlef(20, 20, 20, 4)
-    shape.circlef(30, 30, 20, 5)
-    shape.circlef(40, 40, 20, 6)
-    print("filled circle", 20, 10)
-
-    -- non filled circle
-    shape.circle(50, 70, 10, 7)
-    shape.circle(60, 80, 10, 8)
-    shape.circle(70, 90, 10, 9)
-    print("non filled circle", 20, 65)
-
-    shape.circle(80, 120, 15, 10)
-    shape.circle(80, 140, 20, 16)
-    shape.circle(80, 160, 30, 14)
-    print("circle with different radius", 20, 115)
-
-end
-
-</tiny-editor>
-++++
-
-
-==== shape.trianglef()
-
-Draw a filled triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3) and color.
-
-```lua
-shape.trianglef(x1, y1, x2, y2, x3, y3, color) -- Draw a filled triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).
-```
-
-++++
-<tiny-editor style="display: none;"  >
-
-function tri(f, fill)
-  local x1 = 128 + math.cos(f) * 64
-  local y1 = 128 + math.sin(f) * 64
-
-  local x2 = 128 + math.cos(f + math.pi * 1/3) * 64
-  local y2 = 128 + math.sin(f + math.pi * 1/3) * 64
-
-  local x3 = 128 + math.cos(f+ math.pi * 2/3) * 64
-  local y3 = 128 + math.sin(f +math.pi * 2/3) * 64
-
-  if fill then
-    shape.trianglef(x3, y3, x2, y2, x1, y1, 8)
-  else
-    shape.triangle(x1, y1, x2, y2, x3, y3, 8)
-  end
-end
-
-function _draw()
-  gfx.cls()
-  local f = tiny.frame * 0.01
-
-  tri(f, false)
-  tri(f*2, true)
-end
-
-</tiny-editor>
-++++
-
-
-==== shape.triangle()
-
-Draw a triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3) and color.
-
-```lua
-shape.triangle(x1, y1, x2, y2, x3, y3, color) -- Draw a triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).
-```
-
-++++
-<tiny-editor style="display: none;"  >
-
-function tri(f, fill)
-  local x1 = 128 + math.cos(f) * 64
-  local y1 = 128 + math.sin(f) * 64
-
-  local x2 = 128 + math.cos(f + math.pi * 1/3) * 64
-  local y2 = 128 + math.sin(f + math.pi * 1/3) * 64
-
-  local x3 = 128 + math.cos(f+ math.pi * 2/3) * 64
-  local y3 = 128 + math.sin(f +math.pi * 2/3) * 64
-
-  if fill then
-    shape.trianglef(x3, y3, x2, y2, x1, y1, 8)
-  else
-    shape.triangle(x1, y1, x2, y2, x3, y3, 8)
-  end
-end
-
-function _draw()
-  gfx.cls()
-  local f = tiny.frame * 0.01
-
-  tri(f, false)
-  tri(f*2, true)
-end
-
-</tiny-editor>
-++++
-
-
-==== shape.gradient()
-
-Draw a gradient using dithering, only from color c1 to color c2.
-
-```lua
-shape.gradient(x, y, width, height, color1, color2, is_horizontal) -- Draw a gradient using dithering, only from color c1 to color c2.
-```
-
-++++
-<tiny-editor style="display: none;"  >
-
-function _draw()
-    
- local c1 = 2
- local c2 = 3   
-
-    gfx.cls(c1)
-    shape.rectf(0, 256 - 16, 256, 16, c2)
-    for x=0,240,16 do
-        shape.gradient(x, 16 * math.cos(2 * 3.14 * (x / 256) + tiny.t * 2), 16, 256, c1, c2, false)
+    local start = ctrl.touching(0)
+    if start ~= nil then
+        local pos = ctrl.touch()
+        shape.line(start.x, start.y, pos.x, pos.y, 1)
+        print("("..start.x .. ", "..start.y..")", start.x, start.y)
+        print("("..pos.x .. ", "..pos.y..")", pos.x, pos.y)
     end
-      
 end
 
 </tiny-editor>
@@ -3541,80 +3547,110 @@ end
 
 
 
-=== std
+=== shape
 
-Standard library.
+Shape API to draw...shapes. Those shapes can be circle, rectangle, line or oval.All shapes can be draw filed or not filed.
 
-==== new()
+==== shape.rect()
 
-Create new instance of a class by creating a new table and setting the metatable. It allow to create kind of Object Oriented Programming.
-
- 
+Draw a rectangle.
 
 ```lua
-new(class) -- Create new instance of class.
-new(class, default) -- Create new instance of class using default values.
+shape.rect(x, y, width, height, color) -- Draw a rectangle.
+shape.rect(rect) -- Draw a rectangle.
+shape.rect(rect, color) -- Draw a rectangle using a rectangle and a color.
 ```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|rect |A rectangle {x, y, width, height, color}
+|rect |A rectangle {x, y, width, height}      
+|===
 
 ++++
 <tiny-editor style="display: none;"  >
 
-local Player = {
-    x = 128,
-    y = 128,
-    color = 8
-}
-
-function Player:draw()
-    shape.rectf(self.x, self.y, 10, 10, self.color)
-end
-
-function _init()
-    -- create a new player
-    player = new(Player)
-    -- create a new player with default vaules
-    player2 = new(Player, {x = 200, y = 200, color = 9})
-end
-
 function _draw()
-    gfx.cls()
-    player:draw() -- call the draw method on the player instance.
-    player2:draw() -- call the draw method on the player2 instance.
+  gfx.cls()
+
+  -- filled rectangle
+  print("filled rectangle", 20, 10)
+  shape.rectf(20, 20, 20, 20, 4)
+  shape.rectf(30, 30, 20, 20, 5)
+  shape.rectf(40, 40, 20, 20, 6)
+
+  print("non filled rectangle", 20, 65)
+  -- non filled rectangle
+  shape.rect(50, 70, 20, 20, 7)
+  shape.rect(60, 80, 20, 20, 8)
+  shape.rect(70, 90, 20, 20, 9)
+
+  print("rectangle with different width", 20, 115)
+  shape.rect(20, 120, 30, 20, 10)
+  shape.rect(20, 140, 40, 20, 12)
+  shape.rect(20, 160, 60, 20, 13)
+
 end
 
 </tiny-editor>
 ++++
 
 
-==== merge()
+==== shape.rectf()
 
-Add *all key/value* from the table `source` to the table `dest`.
+Draw a filled rectangle.
 
 ```lua
-merge(source, dest) -- Merge source into dest.
+shape.rectf(x, y, width, height, color) -- Draw a filled rectangle.
+shape.rectf(rect) -- Draw a filled rectangle.
+shape.rectf(rect, color) -- Draw a filled rectangle using a rectangle and a color.
 ```
+
+[cols="1,1"]
+|===
+|Argument name |Argument description
+
+|rect |A rectangle {x, y, width, height, color}
+|rect |A rectangle {x, y, width, height}      
+|===
 
 ++++
 <tiny-editor style="display: none;"  >
 
 function _draw()
-    gfx.cls()
-    local src = {x = 1, y = 2, z = 3}
-    local dst = {a = 4, b = 5}
-    local result = merge(src, dst)
-    debug.table(result)
+  gfx.cls()
+
+  -- filled rectangle
+  print("filled rectangle", 20, 10)
+  shape.rectf(20, 20, 20, 20, 4)
+  shape.rectf(30, 30, 20, 20, 5)
+  shape.rectf(40, 40, 20, 20, 6)
+
+  print("non filled rectangle", 20, 65)
+  -- non filled rectangle
+  shape.rect(50, 70, 20, 20, 7)
+  shape.rect(60, 80, 20, 20, 8)
+  shape.rect(70, 90, 20, 20, 9)
+
+  print("rectangle with different width", 20, 115)
+  shape.rect(20, 120, 30, 20, 10)
+  shape.rect(20, 140, 40, 20, 12)
+  shape.rect(20, 160, 60, 20, 13)
+
 end
 
 </tiny-editor>
 ++++
 
 
-==== append()
+==== shape.circlef()
 
-Append *all values* from the table `source` to the table `dest`.
+Draw a filled circle.
 
 ```lua
-append(source, dest) -- Copy source into dest.
+shape.circlef(centerX, centerY, radius, color) -- Draw a circle at the coordinate (centerX, centerY) with the radius and the color.
 ```
 
 ++++
@@ -3622,68 +3658,65 @@ append(source, dest) -- Copy source into dest.
 
 function _draw()
     gfx.cls()
-    local src = {1, 2, 3}
-    local dst = {4, 5}
-    local result = append(src, dst)
-    debug.table(result)
+
+    -- filled circle
+    shape.circlef(20, 20, 20, 4)
+    shape.circlef(30, 30, 20, 5)
+    shape.circlef(40, 40, 20, 6)
+    print("filled circle", 20, 10)
+
+    -- non filled circle
+    shape.circle(50, 70, 10, 7)
+    shape.circle(60, 80, 10, 8)
+    shape.circle(70, 90, 10, 9)
+    print("non filled circle", 20, 65)
+
+    shape.circle(80, 120, 15, 10)
+    shape.circle(80, 140, 20, 16)
+    shape.circle(80, 160, 30, 14)
+    print("circle with different radius", 20, 115)
+
 end
 
 </tiny-editor>
 ++++
 
 
-==== all()
+==== shape.line()
 
-Iterate over values of a table.
-
-- If you want to iterate over keys, use `pairs(table)`.
- - If you want to iterate over index, use `ipairs(table)`.
- - If you want to iterate in reverse, use `rpairs(table)`.
-
+Draw a line.
 
 ```lua
-all(table) -- Iterate over the values of the table
-```
-
-
-==== rpairs()
-
-Iterate over values of a table in reverse order. The iterator return an index and the value. The method is useful to remove elements from a table while iterating on it.
-
-```lua
-rpairs(table) -- Iterate over the values of the table
+shape.line(x0, y0, x1, y1, color) -- Draw a line.
+shape.line(x0, y0, x1, y1) -- Draw a line with a default color.
 ```
 
 ++++
 <tiny-editor style="display: none;"  >
 
 function _draw()
-    gfx.cls()
-    local data = {
-        { name = "riri" },
-        { name = "fifi" },
-        { name = "loulou" }
-    }
-
-    local y = 0
-    for index, key in rpairs(data) do
-        print(index .. " - " .. key.name, 10, y)
-        y = y + 10
+  gfx.cls()
+  
+  local i =0
+  for x =16, 240, 16 do
+    for y =16, 240, 16 do
+      shape.line(x, y, 256 - x, 256 - y, i)
+      i = i + 1
     end
+  end
 end
 
 </tiny-editor>
 ++++
 
 
-==== print()
+==== shape.circle()
 
-Print on the screen a string.
+Draw a circle.
 
 ```lua
-print(str) -- print on the screen a string at (0,0) with a default color.
-print(str, x, y) -- print on the screen a string with a default color.
-print(str, x, y, color) -- print on the screen a string with a specific color.
+shape.circle(a, b, c) -- Draw a circle with the default color.
+shape.circle(centerX, centerY, radius, color) -- Draw a circle.
 ```
 
 ++++
@@ -3691,439 +3724,136 @@ print(str, x, y, color) -- print on the screen a string with a specific color.
 
 function _draw()
     gfx.cls()
-    -- every character is a sprite 4x4 pixels.
-    print("hello")
-    print("world", 10, 10)
-    print("how", 10, 20, 4)
-    print("are", 26, 20, 5)
-    print("you", 42, 20, 6)
-    print("...", 58, 20, math.rnd(10))
+
+    -- filled circle
+    shape.circlef(20, 20, 20, 4)
+    shape.circlef(30, 30, 20, 5)
+    shape.circlef(40, 40, 20, 6)
+    print("filled circle", 20, 10)
+
+    -- non filled circle
+    shape.circle(50, 70, 10, 7)
+    shape.circle(60, 80, 10, 8)
+    shape.circle(70, 90, 10, 9)
+    print("non filled circle", 20, 65)
+
+    shape.circle(80, 120, 15, 10)
+    shape.circle(80, 140, 20, 16)
+    shape.circle(80, 160, 30, 14)
+    print("circle with different radius", 20, 115)
+
 end
 
 </tiny-editor>
 ++++
 
 
+==== shape.trianglef()
 
-=== test
-
-Test method utilities used when tests are run. See link:#_the_tiny_cli_run_command[Run command]
-
-==== test.eq()
-
-Assert that `expected` and `actual` are equals
+Draw a filled triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3) and color.
 
 ```lua
-test.eq(expected, actual) -- Assert that `expected` and `actual` are equals
+shape.trianglef(x1, y1, x2, y2, x3, y3, color) -- Draw a filled triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).
 ```
-
-
-==== test.neq()
-
-Assert that `expected` and `actual` are __not__ equals
-
-```lua
-test.neq(expected, actual) -- Assert that `expected` and `actual` are not equals
-```
-
-
-==== test.t()
-
-Assert that `actual` is true
-
-```lua
-test.t(actual) -- Assert that `actual` is true
-```
-
-
-==== test.t()
-
-Assert that `actual` is false
-
-```lua
-test.t(actual) -- Assert that `actual` is false
-```
-
-
-==== test.create()
-
-Create a new `test` named `name`
-
-```lua
-test.create(name, test) -- Create a new `test` named `name`
-```
-
-[cols="1,1"]
-|===
-|Argument name |Argument description
-
-|name |The name of the test
-|test |The test: it has to be a function      
-|===
-
-
-
-=== tiny
-
-Tiny Lib which offer offer the current frame (`tiny.frame`), the current time (`tiny.time`), delta time (`tiny.dt`) and to switch to another script using `exit`.
-
-==== tiny.dt
-
-Delta time between two frame. As Tiny is a fixed frame engine, it's always equal to 1/60
 
 ++++
 <tiny-editor style="display: none;"  >
-function _update()
-    gfx.cls()
-    print(tiny.dt, 10, 10) -- Delta time between two frame. As Tiny is a fixed frame engine, it's always equal to 1/60
+
+function tri(f, fill)
+  local x1 = 128 + math.cos(f) * 64
+  local y1 = 128 + math.sin(f) * 64
+
+  local x2 = 128 + math.cos(f + math.pi * 1/3) * 64
+  local y2 = 128 + math.sin(f + math.pi * 1/3) * 64
+
+  local x3 = 128 + math.cos(f+ math.pi * 2/3) * 64
+  local y3 = 128 + math.sin(f +math.pi * 2/3) * 64
+
+  if fill then
+    shape.trianglef(x3, y3, x2, y2, x1, y1, 8)
+  else
+    shape.triangle(x1, y1, x2, y2, x3, y3, 8)
+  end
 end
-</tiny-editor>
-++++
 
+function _draw()
+  gfx.cls()
+  local f = tiny.frame * 0.01
 
-==== tiny.t
-
-Time elapsed since the start of the game.
-
-++++
-<tiny-editor style="display: none;"  >
-function _update()
-    gfx.cls()
-    print(tiny.t, 10, 10) -- Time elapsed since the start of the game.
-end
-</tiny-editor>
-++++
-
-
-==== tiny.frame
-
-Number of frames elapsed since the start of the game.
-
-++++
-<tiny-editor style="display: none;"  >
-function _update()
-    gfx.cls()
-    print(tiny.frame, 10, 10) -- Number of frames elapsed since the start of the game.
-end
-</tiny-editor>
-++++
-
-
-==== tiny.exit()
-
-Exit the actual script to switch to another one. The next script to use is identified by it's index. The index of the script is the index of it in the list of scripts from the `_tiny.json` file.The first script is at the index 0.
-
-```lua
-tiny.exit(scriptIndex) -- Exit the actual script to switch to another one.
-```
-
-
-
-=== vec2
-
-Vector2 manipulation library.
-
-==== vec2.create()
-
-Create a vector 2 as a table { x, y }.
-
-```lua
-vec2.create(x, y) -- Create a vector 2 as a table { x, y }.
-vec2.create(vec2) -- Create a vector 2 as a table { x, y } using another vector 2.
-```
-
-
-==== vec2.add()
-
-Add vector2 to another vector2
-
-```lua
-vec2.add(v1, v2) -- Add a vector 2 {x, y} to another vector 2 {x, y}
-vec2.add(x1, y1, x2, y2) -- Add a destructured vector 2 to another destructured vector 2
-```
-
-[cols="1,1"]
-|===
-|Argument name |Argument description
-
-|v1 |vector 2 as a table {x, y}
-|v2 |vector 2 as a table {x, y}      
-|===
-
-++++
-<tiny-editor style="display: none;"  >
-
-function _init()
-    gfx.camera(-128, -128)
-
-    local v1 = vec2.create(32, 38)
-    local v2 = vec2.create(20, 2)
-
-    gfx.cls()
-    print("v1", 2, 15, 10)
-    shape.line(0, 0, v1.x, v1.y, 10)
-    print("v2", 23, 3, 9)
-    shape.line(0, 0, v2.x, v2.y, 9)
-
-    local v3 = vec2.add(v1, v2)
-
-    print("v1 + v2", 30, 15, 11)
-    gfx.dither(0xAAAA)
-    shape.line(0, 0, v3.x, v3.y, 11)
-    gfx.dither()
+  tri(f, false)
+  tri(f*2, true)
 end
 
 </tiny-editor>
 ++++
 
 
-==== vec2.sub()
+==== shape.triangle()
 
-Subtract another vector from another vector
+Draw a triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3) and color.
 
 ```lua
-vec2.sub(v1, v2) -- Subtract a vector 2 {x, y} from another vector 2 {x, y}
-vec2.sub(x1, y1, x2, y2) -- Subtract a destructured vector 2 from another destructured vector 2
+shape.triangle(x1, y1, x2, y2, x3, y3, color) -- Draw a triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).
 ```
-
-[cols="1,1"]
-|===
-|Argument name |Argument description
-
-|v1 |vector 2 as a table {x, y}
-|v2 |vector 2 as a table {x, y}      
-|===
 
 ++++
 <tiny-editor style="display: none;"  >
 
-function _init()
-    gfx.camera(-128, -128)
+function tri(f, fill)
+  local x1 = 128 + math.cos(f) * 64
+  local y1 = 128 + math.sin(f) * 64
 
-    local v1 = vec2.create(32, 38)
-    local v2 = vec2.create(20, 2)
+  local x2 = 128 + math.cos(f + math.pi * 1/3) * 64
+  local y2 = 128 + math.sin(f + math.pi * 1/3) * 64
 
-    gfx.cls()
-    print("v1", 18, 15, 10)
-    shape.line(0, 0, v1.x, v1.y, 10)
-    print("v2", 23, 3, 9)
-    shape.line(0, 0, v2.x, v2.y, 9)
+  local x3 = 128 + math.cos(f+ math.pi * 2/3) * 64
+  local y3 = 128 + math.sin(f +math.pi * 2/3) * 64
 
-    local v3 = vec2.sub(v1, v2)
+  if fill then
+    shape.trianglef(x3, y3, x2, y2, x1, y1, 8)
+  else
+    shape.triangle(x1, y1, x2, y2, x3, y3, 8)
+  end
+end
 
-    print("v1 - v2", 0, 40, 11)
-    gfx.dither(0xAAAA)
-    shape.line(0, 0, v3.x, v3.y, 11)
-    gfx.dither()
+function _draw()
+  gfx.cls()
+  local f = tiny.frame * 0.01
+
+  tri(f, false)
+  tri(f*2, true)
 end
 
 </tiny-editor>
 ++++
 
 
-==== vec2.dot()
+==== shape.gradient()
 
-Dot product between two vectors
+Draw a gradient using dithering, only from color c1 to color c2.
 
 ```lua
-vec2.dot(v1, v2) -- Dot product between a vector 2 {x, y} and another vector 2 {x, y}
-vec2.dot(x1, y1, x2, y2) -- Dot product between a destructured vector 2 and another destructured vector 2
+shape.gradient(x, y, width, height, color1, color2, is_horizontal) -- Draw a gradient using dithering, only from color c1 to color c2.
 ```
-
-[cols="1,1"]
-|===
-|Argument name |Argument description
-
-|v1 |vector 2 as a table {x, y}
-|v2 |vector 2 as a table {x, y}      
-|===
 
 ++++
 <tiny-editor style="display: none;"  >
 
-function _init()
-    angle = 0
-end
-function _update()
+function _draw()
+    
+ local c1 = 2
+ local c2 = 3   
 
-    if ctrl.pressing(keys.space) then
-        angle = angle + 0.1
+    gfx.cls(c1)
+    shape.rectf(0, 256 - 16, 256, 16, c2)
+    for x=0,240,16 do
+        shape.gradient(x, 16 * math.cos(2 * 3.14 * (x / 256) + tiny.t * 2), 16, 256, c1, c2, false)
     end
-
-    gfx.camera(-128, -128)
-
-    local v1 = vec2.create(1, 0)
-    local v2 = vec2.create(math.cos(angle), math.sin(angle))
-    local dot = vec2.dot(v1, v2)
-    
-    local scl = vec2.scl(v1, dot)
-    
-    gfx.cls()
-    
-    local scaledv1 = vec2.scl(v1, 64)
-    local scaledv2 = vec2.scl(v2, 64)
-    local scaledv3 = vec2.scl(scl, 64)
-
-    print("v1", 18, 5, 10)
-    shape.line(0, 0, scaledv1.x, scaledv1.y, 10)
-    print("v2", scaledv2.x + 5, scaledv2.y + 5, 11)
-    shape.line(0, 0, scaledv2.x, scaledv2.y, 11)
-    
-    print("dot", scaledv3.x, 5, 9)
-    shape.line(0, 0, scaledv3.x, scaledv3.y, 9)
-end    
-
-</tiny-editor>
-++++
-
-
-==== vec2.mag()
-
-Calculate the magnitude (length) of a vector
-
-```lua
-vec2.mag(x, y) -- Calculate the magnitude (length) of a vector 2 {x, y}
-vec2.mag(v1) -- Calculate the magnitude (length) of a vector 2 {x, y}
-```
-
-[cols="1,1"]
-|===
-|Argument name |Argument description
-
-|v1 |vector 2 as a table {x, y}      
-|===
-
-
-==== vec2.nor()
-
-Normalize a vector
-
-```lua
-vec2.nor(x, y) -- Normalize a vector 2 {x, y}
-vec2.nor(v1) -- Normalize a vector 2 {x, y}
-```
-
-[cols="1,1"]
-|===
-|Argument name |Argument description
-
-|v1 |vector 2 as a table {x, y}      
-|===
-
-++++
-<tiny-editor style="display: none;"  >
-
-function _update()
-    gfx.cls()
-
-    local v0 = vec2.create(43, 64)
-    local v1 = vec2.nor(v0)
-    
-    
-    print("vector     x: " .. v0.x .. " y: " .. v0.y)
-    print("normalized x: " .. v1.x .. " y: " .. v1.y, 0, 8)
-end 
-
-</tiny-editor>
-++++
-
-
-==== vec2.crs()
-
-Cross product
-
-```lua
-vec2.crs(v1, v2) -- Cross product between a vector 2 {x, y} and another vector 2 {x, y}
-vec2.crs(x1, y1, x2, y2) -- Cross product between a destructured vector 2 and another destructured vector 2
-```
-
-[cols="1,1"]
-|===
-|Argument name |Argument description
-
-|v1 |vector 2 as a table {x, y}
-|v2 |vector 2 as a table {x, y}      
-|===
-
-
-==== vec2.scl()
-
-Scale a vector
-
-```lua
-vec2.scl(x, y, scl) -- Scale a vector 2 {x, y} using the factor scl
-vec2.scl(v1, scl) -- Scale a vector 2 {x, y} using the factor scl
-```
-
-[cols="1,1"]
-|===
-|Argument name |Argument description
-
-|v1 |vector 2 as a table {x, y}      
-|===
-
-++++
-<tiny-editor style="display: none;"  >
-
-function _init()
-    gfx.camera(-128, -128)
-
-    local v1 = vec2.create(32, 38)
-    local v2 = vec2.scl(v1, 2)
-
-    gfx.cls()
-    print("v1 scaled", 8, 60, 11)
-    gfx.dither(0xAAAA)
-    shape.line(0, 0, v2.x, v2.y, 11)
-    gfx.dither()
-    print("v1", 18, 15, 10)
-    shape.line(0, 0, v1.x, v1.y, 10)
+      
 end
 
 </tiny-editor>
 ++++
-
-
-
-=== ws
-
-Workspace manipulation library. It allows you to save/load/download files
-
-==== ws.save()
-
-Save the content into a local file, on desktop or in the local storage on the web platform.
-
-```lua
-ws.save(name, content) -- Save the content into the file name.
-```
-
-
-==== ws.load()
-
-Load and get the content of the file name
-
-```lua
-ws.load(name) -- Load and get the content of the file name
-```
-
-
-==== ws.create()
-
-Create a local file. The name is generated so the name is unique.
-
-```lua
-ws.create(prefix, extension) -- Create a local file with the prefix and the extension. The name of the file created.
-```
-
-
-==== ws.list()
-
-List all files available in the workspace.
-
-```lua
-ws.list() -- List all files available in the workspace.
-ws.list(extension) -- List all files available in the workspace and filter by the file extension.
-```
 
 
 

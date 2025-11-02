@@ -1,4 +1,3 @@
--- coucouc
 function _init()
     ready = false
     dt = 0
