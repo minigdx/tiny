@@ -1,29 +1,60 @@
 package com.github.minigdx.tiny.platform.test
 
+import com.danielgergely.kgl.Kgl
 import com.github.minigdx.tiny.ColorIndex
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.graphic.FrameBuffer
 import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
+import com.github.minigdx.tiny.lua.Note
 import com.github.minigdx.tiny.platform.ImageData
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
-import com.github.minigdx.tiny.render.NopRenderContext
-import com.github.minigdx.tiny.render.RenderContext
+import com.github.minigdx.tiny.platform.performance.PerformanceMetrics
+import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.render.RenderFrame
-import com.github.minigdx.tiny.render.operations.DrawSprite
-import com.github.minigdx.tiny.render.operations.RenderOperation
+import com.github.minigdx.tiny.sound.ChunkGenerator
+import com.github.minigdx.tiny.sound.Instrument
 import com.github.minigdx.tiny.sound.SoundHandler
 import com.github.minigdx.tiny.sound.SoundManager
+import com.github.minigdx.tiny.util.FloatData
 import com.github.minigdx.tiny.util.MutableFixedSizeList
+import dev.mokkery.mock
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+
+class HeadlessPerformanceMonitor : PerformanceMonitor {
+    override fun frameStart() = Unit
+
+    override fun frameEnd(): PerformanceMetrics = PerformanceMetrics(0.0, 0.0, 0, 0)
+
+    override fun drawCall(nbVertex: Int) = Unit
+
+    override fun readPixels() = Unit
+
+    override fun drawOnScreen() = Unit
+
+    override fun operationStart(name: String) = Unit
+
+    override fun operationEnd(name: String): Double = 0.0
+
+    override fun getCurrentMemoryUsage(): Long = 0
+
+    override fun getAllocatedMemorySinceLastCheck(): Long = 0
+
+    override fun reset() = Unit
+
+    override fun getAverageMetrics(frameCount: Int): PerformanceMetrics? = null
+
+    override fun now(): Long = 0
+
+    override var isEnabled: Boolean = false
+}
 
 class HeadlessPlatform(
     override val gameOptions: GameOptions,
@@ -36,6 +67,21 @@ class HeadlessPlatform(
 
     private var gameLoop: GameLoop? = null
 
+    override fun saveIntoGameDirectory(
+        name: String,
+        data: String,
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun saveWave(sound: FloatArray) {
+        TODO("Not yet implemented")
+    }
+
+    override val performanceMonitor: PerformanceMonitor = HeadlessPerformanceMonitor()
+
+    private val storage = mutableMapOf<String, String>()
+
     override fun initWindowManager(): WindowManager {
         return WindowManager(
             gameOptions.width,
@@ -45,9 +91,7 @@ class HeadlessPlatform(
         )
     }
 
-    override fun initRenderManager(windowManager: WindowManager): RenderContext {
-        return NopRenderContext
-    }
+    override fun initRenderManager(windowManager: WindowManager) = mock<Kgl> { }
 
     suspend fun advance() {
         gameLoop?.advance(1f)
@@ -68,10 +112,7 @@ class HeadlessPlatform(
         return object : SoundManager() {
             override fun initSoundManager(inputHandler: InputHandler) = Unit
 
-            override fun createSoundHandler(
-                buffer: FloatArray,
-                numberOfSamples: Long,
-            ): SoundHandler =
+            override fun createSoundHandler(buffer: FloatArray): SoundHandler =
                 object : SoundHandler {
                     override fun play() {
                         TODO("Not yet implemented")
@@ -84,7 +125,30 @@ class HeadlessPlatform(
                     override fun stop() {
                         TODO("Not yet implemented")
                     }
+
+                    override fun nextChunk(samples: Int): FloatData {
+                        TODO("Not yet implemented")
+                    }
                 }
+
+            override fun createSoundHandler(buffer: Sequence<FloatArray>): SoundHandler {
+                TODO("Not yet implemented")
+            }
+
+            override fun createSoundHandler(chunkGenerator: ChunkGenerator): SoundHandler {
+                TODO("Not yet implemented")
+            }
+
+            override fun noteOn(
+                note: Note,
+                instrument: Instrument,
+            ) {
+                TODO("Not yet implemented")
+            }
+
+            override fun noteOff(note: Note) {
+                TODO("Not yet implemented")
+            }
         }
     }
 
@@ -110,63 +174,16 @@ class HeadlessPlatform(
         return ObjectStream(data)
     }
 
-    override fun createSoundStream(name: String): SourceStream<SoundData> {
+    override fun createSoundStream(
+        name: String,
+        soundManager: SoundManager,
+    ): SourceStream<SoundData> {
         val data = resources[name] as? SoundData ?: throw IllegalStateException("$name is not a valid SoundData.")
         return ObjectStream(data)
     }
 
-    override fun createLocalFile(
-        name: String,
-        parentDirectory: String?,
-    ): LocalFile =
-        object : LocalFile {
-            override val name: String = "name"
-            override val extension: String = ""
-
-            override fun readAll(): ByteArray = ByteArray(0)
-
-            override fun save(content: ByteArray) = Unit
-        }
-
-    /**
-     * Render of GPU operation is not supported yet
-     */
-    override fun render(
-        renderContext: RenderContext,
-        ops: List<RenderOperation>,
-    ) {
-        val pixels =
-            ops.firstOrNull { op -> (op as? DrawSprite)?.source?.name == "framebuffer" }
-                ?.let { drawSprite -> (drawSprite as DrawSprite).source?.pixels }
-
-        if (pixels != null) {
-            val frameBuffer = FrameBuffer(gameOptions.width, gameOptions.height, gameOptions.colors())
-            frameBuffer.copyFrom(pixels)
-            frames.add(frameBuffer)
-        }
-    }
-
-    override fun readRender(renderContext: RenderContext): RenderFrame {
-        if (frames.isEmpty()) {
-            // Force to generate at least one frame.
-            draw(renderContext)
-        }
-        return FrameBufferFrame(frames.last())
-    }
-
-    override fun draw(renderContext: RenderContext) = Unit
-
-    override fun executeOffScreen(
-        renderContext: RenderContext,
-        block: () -> Unit,
-    ): RenderFrame {
-        draw(renderContext)
-        // Render the frame
-        block.invoke()
-        val frame = FrameBufferFrame(frames.last())
-        // Drop the rendered frame
-        frames.removeLast()
-        return frame
+    override fun writeImage(buffer: ByteArray) {
+        TODO("Not yet implemented")
     }
 
     fun saveAnimation(name: String) = toGif(name, frames)
@@ -187,5 +204,16 @@ class HeadlessPlatform(
         ): ColorIndex {
             return frameBuffer.pixel(x, y)
         }
+    }
+
+    override fun saveIntoHome(
+        name: String,
+        content: String,
+    ) {
+        storage[name] = content
+    }
+
+    override fun getFromHome(name: String): String? {
+        return storage[name]
     }
 }

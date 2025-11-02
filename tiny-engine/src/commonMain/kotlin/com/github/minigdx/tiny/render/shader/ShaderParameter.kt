@@ -5,11 +5,13 @@ import com.danielgergely.kgl.FloatBuffer
 import com.danielgergely.kgl.GL_ARRAY_BUFFER
 import com.danielgergely.kgl.GL_DYNAMIC_DRAW
 import com.danielgergely.kgl.GL_FLOAT
+import com.danielgergely.kgl.GL_INT
 import com.danielgergely.kgl.GL_NEAREST
 import com.danielgergely.kgl.GL_R8
 import com.danielgergely.kgl.GL_RED
 import com.danielgergely.kgl.GL_REPEAT
 import com.danielgergely.kgl.GL_RGBA
+import com.danielgergely.kgl.GL_STATIC_DRAW
 import com.danielgergely.kgl.GL_TEXTURE0
 import com.danielgergely.kgl.GL_TEXTURE_2D
 import com.danielgergely.kgl.GL_TEXTURE_MAG_FILTER
@@ -19,7 +21,9 @@ import com.danielgergely.kgl.GL_TEXTURE_WRAP_T
 import com.danielgergely.kgl.GL_UNPACK_ALIGNMENT
 import com.danielgergely.kgl.GL_UNSIGNED_BYTE
 import com.danielgergely.kgl.GlBuffer
+import com.danielgergely.kgl.IntBuffer
 import com.danielgergely.kgl.Texture
+import com.danielgergely.kgl.VertexArrayObject
 import kotlin.jvm.JvmName
 
 sealed class ShaderParameter(val name: String) {
@@ -29,10 +33,10 @@ sealed class ShaderParameter(val name: String) {
 
     interface Uniform
 
-    interface Attribute {
-        fun bind(): Unit = TODO()
+    interface In {
+        fun bind(): Unit = TODO("Missing bind implementation for In shader parameter.")
 
-        fun unbind(): Unit = TODO()
+        fun unbind(): Unit = TODO("Missing unbind implementation for In shader parameter.")
     }
 
     interface Sampler {
@@ -56,6 +60,9 @@ sealed class ShaderParameter(val name: String) {
         }
 
         fun apply(vararg value: Int) {
+            if (!::program.isInitialized) {
+                throw IllegalStateException("create() must be called before apply() for $name")
+            }
             when (value.size) {
                 0 -> throw IllegalArgumentException("At least one int is expected")
                 1 -> program.uniform1i(program.getUniform(name), value[0])
@@ -76,6 +83,9 @@ sealed class ShaderParameter(val name: String) {
         }
 
         fun apply(vararg vec2: Float) {
+            if (!::program.isInitialized) {
+                throw IllegalStateException("create() must be called before apply() for $name")
+            }
             when (vec2.size) {
                 2 -> program.uniform2f(program.getUniform(name), vec2[0], vec2[1])
                 else -> throw IllegalArgumentException("2 values are expected. ${vec2.size} received")
@@ -86,14 +96,17 @@ sealed class ShaderParameter(val name: String) {
     }
 
     class UniformVec3(name: String) : ShaderParameter(name), Uniform {
+        private lateinit var program: ShaderProgram<*, *>
+
         override fun create(program: ShaderProgram<*, *>) {
             program.createUniform(name)
+            this.program = program
         }
 
-        fun apply(
-            program: ShaderProgram<*, *>,
-            vararg vec3: Float,
-        ) {
+        fun apply(vararg vec3: Float) {
+            if (!::program.isInitialized) {
+                throw IllegalStateException("create() must be called before apply() for $name")
+            }
             when (vec3.size) {
                 3 -> program.uniform3f(program.getUniform(name), vec3[0], vec3[1], vec3[2])
                 else -> throw IllegalArgumentException("3 values are expected. ${vec3.size} received")
@@ -104,14 +117,17 @@ sealed class ShaderParameter(val name: String) {
     }
 
     class UniformVec4(name: String) : ShaderParameter(name), Uniform {
+        private lateinit var program: ShaderProgram<*, *>
+
         override fun create(program: ShaderProgram<*, *>) {
             program.createUniform(name)
+            this.program = program
         }
 
-        fun apply(
-            program: ShaderProgram<*, *>,
-            vararg vec4: Float,
-        ) {
+        fun apply(vararg vec4: Float) {
+            if (!::program.isInitialized) {
+                throw IllegalStateException("create() must be called before apply() for $name")
+            }
             when (vec4.size) {
                 4 -> program.uniform4f(program.getUniform(name), vec4[0], vec4[1], vec4[2], vec4[3])
                 else -> throw IllegalArgumentException("4 values are expected. ${vec4.size} received")
@@ -122,16 +138,19 @@ sealed class ShaderParameter(val name: String) {
     }
 
     class UniformFloat(name: String) : ShaderParameter(name), Uniform {
+        private lateinit var program: ShaderProgram<*, *>
+
         override fun create(program: ShaderProgram<*, *>) {
             program.createUniform(name)
+            this.program = program
         }
 
-        fun apply(
-            program: ShaderProgram<*, *>,
-            vararg value: Float,
-        ) {
+        fun apply(vararg value: Float) {
+            if (!::program.isInitialized) {
+                throw IllegalStateException("create() must be called before apply() for $name")
+            }
             when (value.size) {
-                0 -> throw IllegalArgumentException("At least one int is expected")
+                0 -> throw IllegalArgumentException("At least one float is expected")
                 1 -> program.uniform1f(program.getUniform(name), value[0])
                 2 -> program.uniform2f(program.getUniform(name), value[0], value[1])
                 3 -> program.uniform3f(program.getUniform(name), value[0], value[1], value[2])
@@ -143,95 +162,96 @@ sealed class ShaderParameter(val name: String) {
     }
 
     class UniformArrayFloat(name: String, override val size: Int) : ShaderParameter(name), ArrayParameter, Uniform {
+        private lateinit var program: ShaderProgram<*, *>
+
         override fun create(program: ShaderProgram<*, *>) {
             program.createUniform(name)
+            this.program = program
         }
 
-        fun apply(
-            program: ShaderProgram<*, *>,
-            f: FloatArray,
-        ) {
+        fun apply(f: FloatArray) {
+            if (!::program.isInitialized) {
+                throw IllegalStateException("create() must be called before apply() for $name")
+            }
             program.uniform1fv(program.getUniform(name), f)
         }
 
-        fun apply(
-            program: ShaderProgram<*, *>,
-            f: List<Float>,
-        ) = apply(program, f.toFloatArray())
+        fun apply(f: List<Float>) = apply(f.toFloatArray())
 
         override fun toString() = "uniform float $name[$size];"
     }
 
     class UniformArrayVec2(name: String, override val size: Int) : ShaderParameter(name), ArrayParameter, Uniform {
+        private lateinit var program: ShaderProgram<*, *>
+
         override fun create(program: ShaderProgram<*, *>) {
             program.createUniform(name)
+            this.program = program
         }
 
-        fun apply(
-            program: ShaderProgram<*, *>,
-            f: FloatArray,
-        ) {
+        fun apply(f: FloatArray) {
+            if (!::program.isInitialized) {
+                throw IllegalStateException("create() must be called before apply() for $name")
+            }
             program.uniform2fv(program.getUniform(name), f)
         }
 
-        fun apply(
-            program: ShaderProgram<*, *>,
-            f: List<Float>,
-        ) = apply(program, f.toFloatArray())
+        fun apply(f: List<Float>) = apply(f.toFloatArray())
 
         override fun toString() = "uniform vec2 $name[$size];"
     }
 
     class UniformArrayVec3(name: String, override val size: Int) : ShaderParameter(name), ArrayParameter, Uniform {
+        private lateinit var program: ShaderProgram<*, *>
+
         override fun create(program: ShaderProgram<*, *>) {
             program.createUniform(name)
+            this.program = program
         }
 
         @JvmName("applyArray")
-        fun apply(
-            program: ShaderProgram<*, *>,
-            f: FloatArray,
-        ) {
+        fun apply(f: FloatArray) {
+            if (!::program.isInitialized) {
+                throw IllegalStateException("create() must be called before apply() for $name")
+            }
             program.uniform3fv(program.getUniform(name), f)
         }
 
-        fun apply(
-            program: ShaderProgram<*, *>,
-            f: List<Float>,
-        ) = apply(program, f.toFloatArray())
+        fun apply(f: List<Float>) = apply(f.toFloatArray())
 
         override fun toString() = "uniform vec3 $name[$size];"
     }
 
     class UniformArrayVec4(name: String, override val size: Int) : ShaderParameter(name), ArrayParameter, Uniform {
+        private lateinit var program: ShaderProgram<*, *>
+
         override fun create(program: ShaderProgram<*, *>) {
             program.createUniform(name)
+            this.program = program
         }
 
         @JvmName("applyArray")
-        fun apply(
-            program: ShaderProgram<*, *>,
-            f: FloatArray,
-        ) {
+        fun apply(f: FloatArray) {
+            if (!::program.isInitialized) {
+                throw IllegalStateException("create() must be called before apply() for $name")
+            }
             program.uniform4fv(program.getUniform(name), f)
         }
 
-        fun apply(
-            program: ShaderProgram<*, *>,
-            f: List<Float>,
-        ) = apply(program, f.toFloatArray())
+        fun apply(f: List<Float>) = apply(f.toFloatArray())
 
         override fun toString() = "uniform vec4 $name[$size];"
     }
 
-    class AttributeVec2(name: String) : ShaderParameter(name), Attribute {
+    open class InVec2(name: String, private val flat: Boolean = false, private var divisor: Int = 0) : ShaderParameter(name), In {
         private var buffer: GlBuffer? = null
+        private var location: Int = 0
 
         private lateinit var program: ShaderProgram<*, *>
 
         override fun create(program: ShaderProgram<*, *>) {
             this.program = program
-            program.createAttrib(name)
+            location = program.createAttrib(name)
             buffer = program.createBuffer()
         }
 
@@ -239,18 +259,221 @@ sealed class ShaderParameter(val name: String) {
             data: FloatArray,
             stride: Int = 0,
         ) {
+            if (!::program.isInitialized) {
+                throw IllegalStateException("create() must be called before apply() for $name")
+            }
+
             program.bindBuffer(GL_ARRAY_BUFFER, buffer)
-            program.bufferData(GL_ARRAY_BUFFER, FloatBuffer(data), data.size * GL_FLOAT, GL_DYNAMIC_DRAW)
+            program.bufferData(GL_ARRAY_BUFFER, FloatBuffer(data), data.size * GL_FLOAT, GL_STATIC_DRAW)
             program.vertexAttribPointer(
-                location = program.getAttrib(name),
+                location = location,
                 size = 2,
                 type = GL_FLOAT,
                 normalized = false,
                 stride = stride,
                 offset = 0,
             )
-            program.enableVertexAttribArray(program.getAttrib(name))
+            program.vertexAttribDivisor(location, divisor)
+            program.enableVertexAttribArray(location)
+        }
+
+        override fun bind() {
+            program.bindBuffer(GL_ARRAY_BUFFER, buffer)
+            program.enableVertexAttribArray(location)
+        }
+
+        override fun unbind() {
+            program.disableVertexAttribArray(location)
             program.bindBuffer(GL_ARRAY_BUFFER, null)
+        }
+
+        fun forEachInstance(divisor: Int = 1): InVec2 {
+            this.divisor = divisor
+            return this
+        }
+
+        override fun toString() = if (flat) "flat in vec2 $name;" else "in vec2 $name;"
+    }
+
+    open class InVec3(name: String, private val flat: Boolean = false, private var divisor: Int = 0) : ShaderParameter(name), In {
+        private var buffer: GlBuffer? = null
+        private var location: Int = 0
+
+        private lateinit var program: ShaderProgram<*, *>
+
+        override fun create(program: ShaderProgram<*, *>) {
+            this.program = program
+            location = program.createAttrib(name)
+            buffer = program.createBuffer()
+        }
+
+        fun apply(
+            data: FloatArray,
+            stride: Int = 0,
+        ) {
+            if (!::program.isInitialized) {
+                throw IllegalStateException("create() must be called before apply() for $name")
+            }
+
+            program.bindBuffer(GL_ARRAY_BUFFER, buffer)
+            program.bufferData(GL_ARRAY_BUFFER, FloatBuffer(data), data.size * GL_FLOAT, GL_STATIC_DRAW)
+            program.vertexAttribPointer(
+                location = location,
+                size = 3,
+                type = GL_FLOAT,
+                normalized = false,
+                stride = stride,
+                offset = 0,
+            )
+            program.vertexAttribDivisor(location, divisor)
+            program.enableVertexAttribArray(location)
+        }
+
+        override fun bind() {
+            program.bindBuffer(GL_ARRAY_BUFFER, buffer)
+            program.enableVertexAttribArray(location)
+        }
+
+        override fun unbind() {
+            program.disableVertexAttribArray(location)
+            program.bindBuffer(GL_ARRAY_BUFFER, null)
+        }
+
+        fun forEachInstance(divisor: Int = 1): InVec3 {
+            this.divisor = divisor
+            return this
+        }
+
+        override fun toString() = if (flat) "flat in vec3 $name;" else "in vec3 $name;"
+    }
+
+    open class InVec4(name: String, private val flat: Boolean = false, private var divisor: Int = 0) : ShaderParameter(name), In {
+        private lateinit var program: ShaderProgram<*, *>
+
+        override fun create(program: ShaderProgram<*, *>) {
+            program.createAttrib(name)
+            this.program = program
+        }
+
+        fun apply(source: GlBuffer) {
+            if (!::program.isInitialized) {
+                throw IllegalStateException("create() must be called before apply() for $name")
+            }
+            program.bindBuffer(GL_ARRAY_BUFFER, source)
+            val location = program.getAttrib(name)
+            program.vertexAttribPointer(
+                location = location,
+                size = 4,
+                type = GL_FLOAT,
+                normalized = false,
+                stride = 0,
+                offset = 0,
+            )
+            program.vertexAttribDivisor(location, divisor)
+            program.enableVertexAttribArray(location)
+        }
+
+        fun forEachInstance(divisor: Int = 1): InVec4 {
+            this.divisor = divisor
+            return this
+        }
+
+        override fun toString() = if (flat) "flat in vec4 $name;" else "in vec4 $name;"
+    }
+
+    open class InFloat(name: String, private val flat: Boolean = false, private var divisor: Int = 0) : ShaderParameter(name), In {
+        private var buffer: GlBuffer? = null
+        private var vao: VertexArrayObject? = null
+
+        private lateinit var program: ShaderProgram<*, *>
+
+        override fun create(program: ShaderProgram<*, *>) {
+            this.program = program
+            program.createAttrib(name)
+            buffer = program.createBuffer()
+            vao = program.createVertexArray()
+        }
+
+        fun apply(
+            data: FloatArray,
+            stride: Int = 0,
+        ) {
+            if (!::program.isInitialized) {
+                throw IllegalStateException("create() must be called before apply() for $name")
+            }
+
+            program.bindBuffer(GL_ARRAY_BUFFER, buffer)
+            program.bufferData(GL_ARRAY_BUFFER, FloatBuffer(data), data.size * GL_FLOAT, GL_DYNAMIC_DRAW)
+
+            val location = program.getAttrib(name)
+
+            program.vertexAttribPointer(
+                location = location,
+                size = 1,
+                type = GL_FLOAT,
+                normalized = false,
+                stride = stride,
+                offset = 0,
+            )
+            program.vertexAttribDivisor(location, divisor)
+            program.enableVertexAttribArray(location)
+        }
+
+        override fun bind() {
+            // program.bindVertexArray(vao)
+            program.bindBuffer(GL_ARRAY_BUFFER, buffer)
+            program.enableVertexAttribArray(program.getAttrib(name))
+        }
+
+        override fun unbind() {
+            program.disableVertexAttribArray(program.getAttrib(name))
+            program.bindBuffer(GL_ARRAY_BUFFER, null)
+        }
+
+        fun forEachInstance(divisor: Int = 1): InFloat {
+            this.divisor = divisor
+            return this
+        }
+
+        override fun toString() = if (flat) "flat in float $name;" else "in float $name;"
+    }
+
+    open class InInt(name: String, private val flat: Boolean = false, private var divisor: Int = 0) : ShaderParameter(name), In {
+        private var buffer: GlBuffer? = null
+        private var vao: VertexArrayObject? = null
+
+        private lateinit var program: ShaderProgram<*, *>
+
+        override fun create(program: ShaderProgram<*, *>) {
+            this.program = program
+            program.createAttrib(name)
+            buffer = program.createBuffer()
+            vao = program.createVertexArray()
+        }
+
+        fun apply(
+            data: IntArray,
+            stride: Int = 0,
+        ) {
+            if (!::program.isInitialized) {
+                throw IllegalStateException("create() must be called before apply() for $name")
+            }
+
+            program.bindBuffer(GL_ARRAY_BUFFER, buffer)
+            program.bufferData(GL_ARRAY_BUFFER, IntBuffer(data), data.size * GL_INT, GL_DYNAMIC_DRAW)
+
+            val location = program.getAttrib(name)
+
+            program.vertexAttribPointer(
+                location = location,
+                size = 1,
+                type = GL_INT,
+                normalized = false,
+                stride = stride,
+                offset = 0,
+            )
+            program.vertexAttribDivisor(location, divisor)
+            program.enableVertexAttribArray(location)
         }
 
         override fun bind() {
@@ -263,59 +486,19 @@ sealed class ShaderParameter(val name: String) {
             program.bindBuffer(GL_ARRAY_BUFFER, null)
         }
 
-        override fun toString() = "attribute vec2 $name;"
+        fun forEachInstance(divisor: Int = 1): InInt {
+            this.divisor = divisor
+            return this
+        }
+
+        override fun toString() = if (flat) "flat in int $name;" else "in int $name;"
     }
 
-    class AttributeVec3(name: String) : ShaderParameter(name), Attribute {
-        override fun create(program: ShaderProgram<*, *>) {
-            program.createAttrib(name)
-        }
-
-        fun apply(
-            program: ShaderProgram<*, *>,
-            source: GlBuffer,
-        ) {
-            program.bindBuffer(GL_ARRAY_BUFFER, source)
-            program.vertexAttribPointer(
-                location = program.getAttrib(name),
-                size = 3,
-                type = GL_FLOAT,
-                normalized = false,
-                stride = 0,
-                offset = 0,
-            )
-            program.enableVertexAttribArray(program.getAttrib(name))
-        }
-
-        override fun toString() = "attribute vec3 $name;"
-    }
-
-    class AttributeVec4(name: String) : ShaderParameter(name), Attribute {
-        override fun create(program: ShaderProgram<*, *>) {
-            program.createAttrib(name)
-        }
-
-        fun apply(
-            program: ShaderProgram<*, *>,
-            source: GlBuffer,
-        ) {
-            program.bindBuffer(GL_ARRAY_BUFFER, source)
-            program.vertexAttribPointer(
-                location = program.getAttrib(name),
-                size = 4,
-                type = GL_FLOAT,
-                normalized = false,
-                stride = 0,
-                offset = 0,
-            )
-            program.enableVertexAttribArray(program.getAttrib(name))
-        }
-
-        override fun toString() = "attribute vec3 $name;"
-    }
-
-    class UniformSample2D(name: String, override val index: Int, private val existingTexture: Boolean = false) :
-        ShaderParameter(name), Uniform, Sampler {
+    class UniformSample2D(
+        name: String,
+        override val index: Int,
+        private val existingTexture: Boolean = false,
+    ) : ShaderParameter(name), Uniform, Sampler {
         private var texture: Texture? = null
 
         private lateinit var program: ShaderProgram<*, *>
@@ -365,8 +548,15 @@ sealed class ShaderParameter(val name: String) {
             image: ByteArray,
             width: Int,
             height: Int,
+            texture: Texture? = this.texture,
         ) {
             program.bindTexture(GL_TEXTURE_2D, texture)
+
+            program.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+            program.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
+
+            program.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+            program.texParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
 
             program.pixelStorei(GL_UNPACK_ALIGNMENT, 1)
             program.texImage2D(
@@ -411,33 +601,33 @@ sealed class ShaderParameter(val name: String) {
         override fun toString() = "uniform sampler2D $name;"
     }
 
-    class VaryingVec2(name: String) : ShaderParameter(name), Varying {
+    class OutVec2(name: String, private val flat: Boolean = false) : ShaderParameter(name), Varying {
         override fun create(program: ShaderProgram<*, *>) = Unit
 
-        override fun toString() = "varying vec2 $name;"
+        override fun toString() = if (flat) "flat out vec2 $name;" else "out vec2 $name;"
     }
 
-    class VaryingVec3(name: String) : ShaderParameter(name), Varying {
+    class OutVec3(name: String, private val flat: Boolean = false) : ShaderParameter(name), Varying {
         override fun create(program: ShaderProgram<*, *>) = Unit
 
-        override fun toString() = "varying vec3 $name;"
+        override fun toString() = if (flat) "flat out vec3 $name;" else "out vec3 $name;"
     }
 
-    class VaryingVec4(name: String) : ShaderParameter(name), Varying {
+    class OutVec4(name: String, private val flat: Boolean = false) : ShaderParameter(name), Varying {
         override fun create(program: ShaderProgram<*, *>) = Unit
 
-        override fun toString() = "varying vec4 $name;"
+        override fun toString() = if (flat) "flat out vec4 $name;" else "out vec4 $name;"
     }
 
-    class VaryingFloat(name: String) : ShaderParameter(name), Varying {
+    class OutFloat(name: String, private val flat: Boolean = false) : ShaderParameter(name), Varying {
         override fun create(program: ShaderProgram<*, *>) = Unit
 
-        override fun toString() = "varying float $name;"
+        override fun toString() = if (flat) "flat out float $name;" else "out float $name;"
     }
 
-    class VaryingInt(name: String) : ShaderParameter(name), Varying {
+    class OutInt(name: String, private val flat: Boolean = false) : ShaderParameter(name), Varying {
         override fun create(program: ShaderProgram<*, *>) = Unit
 
-        override fun toString() = "varying int $name;"
+        override fun toString() = if (flat) "flat out int $name;" else "out int $name;"
     }
 }

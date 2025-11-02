@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.lua
 
+import com.github.mingdx.tiny.doc.LuaType
 import com.github.mingdx.tiny.doc.TinyArg
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
@@ -160,24 +161,23 @@ class CtrlLib(
         example = CTRL_TOUCHING_EXAMPLE,
     )
     inner class touching : OneArgFunction() {
-        @TinyCall("Is the screen is still touched or mouse button is still pressed?")
+        @TinyCall("Is the screen is still touched or mouse button is still pressed?", returnType = LuaType.TABLE)
         override fun call(
-            @TinyArg("touch") arg: LuaValue,
+            @TinyArg("touch", type = LuaType.NUMBER) arg: LuaValue,
         ): LuaValue {
-            val values = TouchSignal.values()
+            val values = TouchSignal.entries.toTypedArray()
             val int = arg.checkint()
             if (int >= values.size || int < 0) return BFALSE
             // get the key by its ordinal.
-            val touchSignal = TouchSignal.values()[int]
+            val touchSignal = TouchSignal.entries[int]
             val touched = inputHandler.isTouched(touchSignal)
 
-            val coordinates =
-                touched?.let {
-                    val result = LuaTable()
-                    result["x"] = touched.x.toInt()
-                    result["y"] = touched.y.toInt()
-                    result
-                } ?: NIL
+            val coordinates = touched?.let {
+                val result = LuaTable()
+                result["x"] = touched.x.toInt()
+                result["y"] = touched.y.toInt()
+                result
+            } ?: NIL
 
             return coordinates
         }

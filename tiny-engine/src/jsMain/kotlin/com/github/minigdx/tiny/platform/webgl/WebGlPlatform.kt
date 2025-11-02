@@ -1,27 +1,23 @@
 package com.github.minigdx.tiny.platform.webgl
 
+import com.danielgergely.kgl.Kgl
 import com.danielgergely.kgl.KglJs
 import com.danielgergely.kgl.WebGL2RenderingContext
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.file.AjaxStream
 import com.github.minigdx.tiny.file.ImageDataStream
-import com.github.minigdx.tiny.file.JsLocalFile
-import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SoundDataSourceStream
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
-import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.ImageData
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
-import com.github.minigdx.tiny.render.RenderContext
-import com.github.minigdx.tiny.render.RenderFrame
-import com.github.minigdx.tiny.render.gl.OpenGLRender
-import com.github.minigdx.tiny.render.operations.RenderOperation
+import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.sound.SoundManager
+import kotlinx.browser.localStorage
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -32,11 +28,11 @@ import kotlin.math.min
 
 class WebGlPlatform(
     private val canvas: HTMLCanvasElement,
-    private val logger: Logger,
     override val gameOptions: GameOptions,
+    val localStoragePrefix: String,
     val rootUrl: String,
 ) : Platform {
-    private lateinit var render: OpenGLRender
+    override val performanceMonitor: PerformanceMonitor = WebGlPerformanceMonitor()
 
     private val jsInputHandler = JsInputHandler(canvas, gameOptions)
 
@@ -53,16 +49,15 @@ class WebGlPlatform(
         )
     }
 
-    override fun initRenderManager(windowManager: WindowManager): RenderContext {
-        val context =
-            canvas.getContext("webgl2") as? WebGL2RenderingContext
-                ?: throw IllegalStateException(
-                    "The canvas context is expected to be a webgl2 context. " +
-                        "WebGL2 doesn't seems to be supported by your browser. " +
-                        "Please update to a compatible browser to run the game in WebGL2.",
-                )
-        render = OpenGLRender(KglJs(context), logger, gameOptions)
-        return render.init(windowManager)
+    override fun initRenderManager(windowManager: WindowManager): Kgl {
+        val context = canvas.getContext("webgl2") as? WebGL2RenderingContext
+            ?: throw IllegalStateException(
+                "The canvas context is expected to be a webgl2 context. " +
+                    "WebGL2 doesn't seems to be supported by your browser. " +
+                    "Please update to a compatible browser to run the game in WebGL2.",
+            )
+
+        return KglJs(context)
     }
 
     override fun gameLoop(gameLoop: GameLoop) {
@@ -104,44 +99,42 @@ class WebGlPlatform(
         return ImageDataStream("$rootUrl/$name")
     }
 
-    private lateinit var soundManager: SoundManager
-
     override fun initSoundManager(inputHandler: InputHandler): SoundManager {
-        soundManager = WebSoundMananger()
+        val soundManager = WebSoundManager()
         soundManager.initSoundManager(inputHandler)
         return soundManager
     }
 
-    override fun createSoundStream(name: String): SourceStream<SoundData> {
+    override fun createSoundStream(
+        name: String,
+        soundManager: SoundManager,
+    ): SourceStream<SoundData> {
         return SoundDataSourceStream(name, soundManager, createByteArrayStream(name))
     }
 
-    override fun createLocalFile(
+    override fun saveIntoHome(
         name: String,
-        parentDirectory: String?,
-    ): LocalFile {
-        return JsLocalFile(name, parentDirectory?.let { "tiny-$parentDirectory" } ?: "tiny")
-    }
-
-    override fun draw(renderContext: RenderContext) {
-        render.drawOnScreen(renderContext)
-    }
-
-    override fun render(
-        renderContext: RenderContext,
-        ops: List<RenderOperation>,
+        content: String,
     ) {
-        render.render(renderContext, ops)
+        localStorage.setItem("$localStoragePrefix-$name", content)
     }
 
-    override fun executeOffScreen(
-        renderContext: RenderContext,
-        block: () -> Unit,
-    ): RenderFrame {
-        return render.executeOffScreen(renderContext, block)
+    override fun getFromHome(name: String): String? {
+        return localStorage.getItem("$localStoragePrefix-$name")
     }
 
-    override fun readRender(renderContext: RenderContext): RenderFrame {
-        return render.readRender(renderContext)
-    }
+    /**
+     * Not available in the web platform
+     */
+    override fun saveIntoGameDirectory(
+        name: String,
+        data: String,
+    ) = Unit
+
+    /**
+     * Not available in the web platform
+     */
+    override fun saveWave(sound: FloatArray) = Unit
+
+    override fun writeImage(buffer: ByteArray) = Unit
 }

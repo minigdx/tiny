@@ -114,6 +114,38 @@ function _draw()
 end"""
 
 //language=Lua
+const val GFX_DRAW_MODE_EXAMPLE = """
+local draw_stencil = 2
+local draw_inside_stencil = 3
+local draw_outside_stencil = 4
+
+local outside = false
+
+function _draw()
+    if ctrl.pressed(keys.space) then
+        outside = not outside
+    end
+
+    gfx.cls(3)
+
+    gfx.draw_mode(draw_stencil)
+
+    -- draw a circle in the middle of the screen
+    shape.circlef(128, 128, 64, 1)
+    
+    if outside then
+        gfx.draw_mode(draw_inside_stencil)
+    else
+        gfx.draw_mode(draw_outside_stencil)
+    end
+    
+    -- draw the sprite sheet. only in the circle
+    spr.sdraw()
+    gfx.draw_mode()
+end
+"""
+
+//language=Lua
 const val GFX_CAMERA_EXAMPLE = """
 local x = 0
 local y = 0

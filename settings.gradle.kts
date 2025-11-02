@@ -14,8 +14,21 @@ pluginManagement {
     }
 }
 
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+    }
+
+    versionCatalogs {
+        create("kotlinWrappers") {
+            val wrappersVersion = "2025.10.4"
+            from("org.jetbrains.kotlin-wrappers:kotlin-wrappers-catalog:$wrappersVersion")
+        }
+    }
+}
+
 plugins {
-    id("com.gradle.develocity") version ("4.0")
+    id("com.gradle.develocity") version ("4.1")
 }
 
 include("tiny-cli")

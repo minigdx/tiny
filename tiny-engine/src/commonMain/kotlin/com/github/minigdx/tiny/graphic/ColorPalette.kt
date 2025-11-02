@@ -29,20 +29,18 @@ class ColorPalette(colors: List<HexColor>) {
         val rgbaColors = listOf(TRANSPARENT) + colors.map { str -> hexStringToByteArray(str) }
 
         rgba = Array(rgbaColors.size) { index -> rgbaColors[index] }
-        rgb =
-            Array(rgbaColors.size) { index ->
-                val bytes = rgbaColors[index]
-                byteArrayOf(bytes[0], bytes[1], bytes[2])
-            }
+        rgb = Array(rgbaColors.size) { index ->
+            val bytes = rgbaColors[index]
+            byteArrayOf(bytes[0], bytes[1], bytes[2])
+        }
 
-        rgbForGif =
-            rgb.map { color ->
-                val r = color[0].toInt()
-                val g = color[1].toInt()
-                val b = color[2].toInt()
-                val rgb = ((r and 0xFF) shl 16) or ((g and 0xFF) shl 8) or (b and 0xFF)
-                rgb
-            }.toTypedArray()
+        rgbForGif = rgb.map { color ->
+            val r = color[0].toInt()
+            val g = color[1].toInt()
+            val b = color[2].toInt()
+            val rgb = ((r and 0xFF) shl 16) or ((g and 0xFF) shl 8) or (b and 0xFF)
+            rgb
+        }.toTypedArray()
 
         val rgbaToColor = rgbaColors.mapIndexed { index, color -> rgbaToInt(color) to index }.sortedBy { it.first }
         indexOfRgba = List(rgbaToColor.size) { index -> rgbaToColor[index].first }
@@ -92,6 +90,12 @@ class ColorPalette(colors: List<HexColor>) {
 
     /**
      * Get the RGBA value attached to this color index.
+     * Each byte is signed bytes.
+     *
+     * ie: for red color (255, 0, 0)
+     * color[0].toInt() will NOT return 255 but -1.
+     * color[0].toInt() and 0XFF will return 255.
+     * color[0].toUByte().toInt() will return 255.
      */
     fun getRGBA(index: ColorIndex): ByteArray {
         return rgba[check(index)]
@@ -119,19 +123,10 @@ class ColorPalette(colors: List<HexColor>) {
     }
 
     /**
-     * Return the color index of the color. Throw exception if the color
-     * is not part of the color palette.
+     * Return the color index of the color.
+     * Return transparent color if the color is not part of the palette.
      */
     fun getColorIndex(color: ByteArray): ColorIndex {
-        fun rgbaBytesToString(colorBytes: ByteArray): String {
-            val r = colorBytes[0].toInt() and 0xFF
-            val g = colorBytes[1].toInt() and 0xFF
-            val b = colorBytes[2].toInt() and 0xFF
-            val a = colorBytes[3].toInt() and 0xFF
-
-            return "R: $r, G: $g, B: $b, A: $a"
-        }
-
         val a = color[3].toInt() and 0xFF
         // The color is transparent. We do know already the result.
         if (a == 0) {
@@ -140,9 +135,7 @@ class ColorPalette(colors: List<HexColor>) {
 
         val index = indexOfRgba.binarySearch(rgbaToInt(color))
         if (index < 0) {
-            throw IllegalArgumentException(
-                "Color ${rgbaBytesToString(color)} is not part of the color palette",
-            )
+            return TRANSPARENT_INDEX
         }
         return indexOfColor[index]
     }
@@ -161,17 +154,16 @@ class ColorPalette(colors: List<HexColor>) {
         var index = 0
         // Look for the index with the closest color.
         rgba.forEachIndexed { i, palette ->
-            val d =
-                dst(
-                    palette[0],
-                    palette[1],
-                    palette[2],
-                    palette[3],
-                    color[0],
-                    color[1],
-                    color[2],
-                    color[3],
-                )
+            val d = dst(
+                palette[0],
+                palette[1],
+                palette[2],
+                palette[3],
+                color[0],
+                color[1],
+                color[2],
+                color[3],
+            )
             if (d < current) {
                 index = i
                 current = d

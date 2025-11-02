@@ -25,6 +25,20 @@ With `🧸 Tiny`, you'll be able to get started right away and see your progress
 
 NOTE: The code source of this sample is available in the https://github.com/minigdx/tiny/tree/main/tiny-sample[Tiny git repository].
 
+
+== Quick Navigation
+
+New to Tiny? Start here:
+
+ 1. **<<_tiny_install,Installation>>** - Get Tiny up and running
+ 2. **<<_tiny_tutorial,Tutorial>>** - Build a complete Pong game
+ 3. **<<_tiny_api,API Reference>>** - Complete function documentation
+ 4. **<<_tiny_cli_commands,CLI Commands>>** - Command-line tools
+
+=== Resources
+ - https://github.com/minigdx/tiny[GitHub Repository]
+ - https://github.com/minigdx/tiny/releases[Download Latest Release]
+
 == Tiny Playground
 
 You can try creating a game right away with `🧸 Tiny` using link:playground.html?game=[the Playground], or you can experiment by updating the examples available on this page.

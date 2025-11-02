@@ -1,13 +1,14 @@
 package com.github.minigdx.tiny.sound
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
 /**
  *
  */
 @Serializable
 class Music(
-    val instruments: Array<Instrument> =
+    var instruments: Array<Instrument?> =
         arrayOf(
             clarinet,
             violon,
@@ -17,6 +18,14 @@ class Music(
             custom2,
             custom3,
             custom4,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
         ),
     val musicalBars: Array<MusicalBar> = Array(32) {
         MusicalBar(it, clarinet, clarinet.index)
@@ -24,7 +33,21 @@ class Music(
     val sequences: Array<MusicalSequence> = Array(8) {
         MusicalSequence(it)
     },
-)
+) {
+    companion object {
+        private val json = Json { ignoreUnknownKeys = true }
+
+        fun serialize(music: Music): String {
+            val json = json.encodeToString(music)
+            return json
+        }
+
+        fun deserialize(data: String): Music {
+            val music: Music = json.decodeFromString(data)
+            return music
+        }
+    }
+}
 
 val clarinet =
     Instrument(

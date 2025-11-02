@@ -67,10 +67,11 @@ class TinyToLuaStubKspProcessor(
                                 function.calls.forEach { call ->
                                     call {
                                         description = call.description
+                                        returnType = call.returnType
                                         call.args.forEach { arg ->
                                             arg {
                                                 name = arg.name
-                                                type = "any"
+                                                type = arg.type
                                                 description = arg.description
                                             }
                                         }

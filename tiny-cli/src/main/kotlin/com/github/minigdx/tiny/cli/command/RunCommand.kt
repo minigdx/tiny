@@ -19,13 +19,10 @@ import com.github.minigdx.tiny.engine.GameEngine
 import com.github.minigdx.tiny.engine.GameEngineListener
 import com.github.minigdx.tiny.engine.TinyException
 import com.github.minigdx.tiny.file.CommonVirtualFileSystem
-import com.github.minigdx.tiny.file.JvmLocalFile
 import com.github.minigdx.tiny.log.LogLevel
 import com.github.minigdx.tiny.log.StdOutLogger
-import com.github.minigdx.tiny.lua.WorkspaceLib
 import com.github.minigdx.tiny.lua.errorLine
 import com.github.minigdx.tiny.platform.glfw.GlfwPlatform
-import com.github.minigdx.tiny.render.LwjglGLRender
 import com.github.minigdx.tiny.resources.GameScript
 import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
@@ -48,9 +45,6 @@ class RunCommand : CliktCommand(name = "run") {
     val gameDirectory by argument(help = "The directory containing your game to be run.")
         .file(mustExist = true, canBeDir = true, canBeFile = false)
         .default(File("."))
-
-    val test by option(help = "Run tests before running the game.")
-        .flag()
 
     val debug by option(help = "Port used for debugging")
         .int()
@@ -143,43 +137,48 @@ class RunCommand : CliktCommand(name = "run") {
 
             val logger = StdOutLogger("tiny-cli", level = LogLevel.DEBUG)
 
+            val homeDirectory = findHomeDirectory(gameParameters)
+
             val vfs = CommonVirtualFileSystem()
-            val gameOption =
-                gameParameters.toGameOptions()
-                    .copy(runTests = test)
+            val gameOption = gameParameters.toGameOptions()
 
             val debugListener = DebuggerExecutionListener(debugCommandReceiver, engineCommandSender)
 
-            val gameEngine =
-                GameEngine(
-                    gameOptions = gameOption,
-                    platform = GlfwPlatform(gameOption, logger, vfs, effectiveGameDirectory, LwjglGLRender(logger, gameOption)),
-                    vfs = vfs,
-                    logger = logger,
-                    listener =
-                        object : GameEngineListener {
-                            override fun switchScript(
-                                before: GameScript?,
-                                after: GameScript?,
-                            ) {
-                                if (after != null) {
-                                    debugListener.globals = after.globals!!
-                                    debugListener.globals.debuglib = debugListener
+            val gameEngine = GameEngine(
+                gameOptions = gameOption,
+                platform = GlfwPlatform(
+                    gameOption,
+                    logger,
+                    vfs,
+                    gameDirectory,
+                    homeDirectory,
+                ),
+                vfs = vfs,
+                logger = logger,
+                listener =
+                    object : GameEngineListener {
+                        override fun switchScript(
+                            before: GameScript?,
+                            after: GameScript?,
+                        ) {
+                            if (after != null) {
+                                debugListener.globals = after.globals!!
+                                debugListener.globals.debuglib = debugListener
+                            }
+                        }
+
+                        override fun reload(gameScript: GameScript?) {
+                            gameScript?.run {
+                                debugListener.globals = gameScript.globals!!
+                                debugListener.globals.debuglib = debugListener
+
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    engineCommandSender.send(Reload(gameScript.name))
                                 }
                             }
-
-                            override fun reload(gameScript: GameScript?) {
-                                gameScript?.run {
-                                    debugListener.globals = gameScript.globals!!
-                                    debugListener.globals.debuglib = debugListener
-
-                                    CoroutineScope(Dispatchers.IO).launch {
-                                        engineCommandSender.send(Reload(gameScript.name))
-                                    }
-                                }
-                            }
-                        },
-                )
+                        }
+                    },
+            )
             Runtime.getRuntime().addShutdownHook(
                 Thread {
                     gameEngine.end()
@@ -187,14 +186,6 @@ class RunCommand : CliktCommand(name = "run") {
                 },
             )
 
-            val data = effectiveGameDirectory.resolve("data")
-            echo("\uD83D\uDC1F === Looking for data directory at: ${data.absolutePath} ===")
-            if (data.exists() && data.isDirectory) {
-                echo("\uD83D\uDC1F === Data directory found with ${data.listFiles()?.size ?: 0} files ===")
-                WorkspaceLib.DEFAULT = data.listFiles()?.map { JvmLocalFile(it.name, data) } ?: emptyList()
-            } else {
-                echo("\uD83D\uDC1F === Data directory not found at: ${data.absolutePath} ===")
-            }
             gameEngine.main()
         } catch (ex: Exception) {
             echo(
@@ -216,4 +207,20 @@ class RunCommand : CliktCommand(name = "run") {
             ex.printStackTrace()
         }
     }
+}
+
+internal fun findHomeDirectory(gameParameters: GameParameters): File {
+    val appDataDir = when {
+        System.getProperty("os.name").lowercase().contains("mac") ||
+            System.getProperty("os.name").lowercase().contains("darwin") ->
+            File(System.getProperty("user.home")).resolve("Library/Application Support")
+
+        System.getProperty("os.name").lowercase().contains("win") ->
+            File(System.getenv("APPDATA") ?: System.getProperty("user.home"))
+
+        else -> // Linux and other Unix-like systems
+            File(System.getProperty("user.home")).resolve(".local/share")
+    }
+    val homeDirectory = appDataDir.resolve("tiny/${gameParameters.id}")
+    return homeDirectory
 }

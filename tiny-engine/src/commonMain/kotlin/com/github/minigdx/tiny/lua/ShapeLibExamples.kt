@@ -51,23 +51,6 @@ end
 """
 
 //language=Lua
-const val SHAPE_OVALF_EXAMPLE = """
-function _draw()
-    gfx.cls()
-
-    local pos = ctrl.touch()
-    local w = math.max(0, pos.x)
-    local h = math.max(0, pos.y)
-   
-    shape.ovalf(w, h, w, h, 5)
-    shape.oval(256 - w, 256 - h, w, h, 1)
-    
-
-    print("size w: "..w.." h: "..h)
-end
-"""
-
-//language=Lua
 const val SHAPE_GRADIENT_EXAMPLE = """
 function _draw()
     

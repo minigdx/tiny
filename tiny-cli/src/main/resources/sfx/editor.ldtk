@@ -3630,11 +3630,11 @@
 			"doc": null,
 			"width": 16,
 			"height": 16,
-			"resizableX": false,
-			"resizableY": false,
-			"minWidth": null,
+			"resizableX": true,
+			"resizableY": true,
+			"minWidth": 16,
 			"maxWidth": null,
-			"minHeight": null,
+			"minHeight": 16,
 			"maxHeight": null,
 			"keepAspectRatio": false,
 			"tileOpacity": 1,
@@ -3654,45 +3654,7 @@
 			"limitBehavior": "MoveLastOne",
 			"pivotX": 0,
 			"pivotY": 0,
-			"fieldDefs": [
-				{
-					"identifier": "EditorType",
-					"doc": null,
-					"__type": "LocalEnum.EditorType",
-					"uid": 121,
-					"type": "F_Enum(108)",
-					"isArray": false,
-					"canBeNull": false,
-					"arrayMinLength": null,
-					"arrayMaxLength": null,
-					"editorDisplayMode": "EntityTile",
-					"editorDisplayScale": 1,
-					"editorDisplayPos": "Above",
-					"editorLinkStyle": "StraightArrow",
-					"editorDisplayColor": null,
-					"editorAlwaysShow": true,
-					"editorShowInWorld": true,
-					"editorCutLongValues": true,
-					"editorTextSuffix": null,
-					"editorTextPrefix": null,
-					"useForSmartColor": false,
-					"exportToToc": false,
-					"searchable": false,
-					"min": null,
-					"max": null,
-					"regex": null,
-					"acceptFileTypes": null,
-					"defaultOverride": null,
-					"textLanguageMode": null,
-					"symmetricalRef": false,
-					"autoChainRef": true,
-					"allowOutOfLevelRef": true,
-					"allowedRefs": "OnlySame",
-					"allowedRefsEntityUid": null,
-					"allowedRefTags": [],
-					"tilesetUid": null
-				}
-			]
+			"fieldDefs": []
 		},
 		{
 			"identifier": "BarEditor",
@@ -4194,7 +4156,7 @@
 						},
 						{
 							"__identifier": "Button",
-							"__grid": [3,6],
+							"__grid": [3,9],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": { "tilesetUid": 1, "x": 0, "y": 16, "w": 16, "h": 16 },
@@ -4203,7 +4165,7 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 17,
-							"px": [24,48],
+							"px": [24,72],
 							"fieldInstances": [
 								{ "__identifier": "Type", "__type": "LocalEnum.ButtonType", "__value": "SINE", "__tile": { "tilesetUid": 1, "x": 0, "y": 16, "w": 16, "h": 16 }, "defUid": 20, "realEditorValues": [{
 									"id": "V_String",
@@ -4214,7 +4176,7 @@
 						},
 						{
 							"__identifier": "Button",
-							"__grid": [9,6],
+							"__grid": [9,9],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": { "tilesetUid": 1, "x": 16, "y": 16, "w": 16, "h": 16 },
@@ -4223,7 +4185,7 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 17,
-							"px": [72,48],
+							"px": [72,72],
 							"fieldInstances": [
 								{ "__identifier": "Type", "__type": "LocalEnum.ButtonType", "__value": "NOISE", "__tile": { "tilesetUid": 1, "x": 16, "y": 16, "w": 16, "h": 16 }, "defUid": 20, "realEditorValues": [{
 									"id": "V_String",
@@ -4234,7 +4196,7 @@
 						},
 						{
 							"__identifier": "Button",
-							"__grid": [6,6],
+							"__grid": [6,9],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": { "tilesetUid": 1, "x": 32, "y": 16, "w": 16, "h": 16 },
@@ -4243,7 +4205,7 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 17,
-							"px": [48,48],
+							"px": [48,72],
 							"fieldInstances": [
 								{ "__identifier": "Type", "__type": "LocalEnum.ButtonType", "__value": "PULSE", "__tile": { "tilesetUid": 1, "x": 32, "y": 16, "w": 16, "h": 16 }, "defUid": 20, "realEditorValues": [{
 									"id": "V_String",
@@ -4254,7 +4216,7 @@
 						},
 						{
 							"__identifier": "Button",
-							"__grid": [6,9],
+							"__grid": [6,12],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": { "tilesetUid": 1, "x": 48, "y": 16, "w": 16, "h": 16 },
@@ -4263,7 +4225,7 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 17,
-							"px": [48,72],
+							"px": [48,96],
 							"fieldInstances": [
 								{ "__identifier": "Type", "__type": "LocalEnum.ButtonType", "__value": "TRIANGLE", "__tile": { "tilesetUid": 1, "x": 48, "y": 16, "w": 16, "h": 16 }, "defUid": 20, "realEditorValues": [{
 									"id": "V_String",
@@ -4274,7 +4236,7 @@
 						},
 						{
 							"__identifier": "Button",
-							"__grid": [3,9],
+							"__grid": [3,12],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": { "tilesetUid": 1, "x": 64, "y": 16, "w": 16, "h": 16 },
@@ -4283,7 +4245,7 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 17,
-							"px": [24,72],
+							"px": [24,96],
 							"fieldInstances": [
 								{ "__identifier": "Type", "__type": "LocalEnum.ButtonType", "__value": "SAW_TOOTH", "__tile": { "tilesetUid": 1, "x": 64, "y": 16, "w": 16, "h": 16 }, "defUid": 20, "realEditorValues": [{
 									"id": "V_String",
@@ -4294,7 +4256,7 @@
 						},
 						{
 							"__identifier": "Button",
-							"__grid": [9,9],
+							"__grid": [9,12],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": { "tilesetUid": 1, "x": 80, "y": 16, "w": 16, "h": 16 },
@@ -4303,7 +4265,7 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 17,
-							"px": [72,72],
+							"px": [72,96],
 							"fieldInstances": [
 								{ "__identifier": "Type", "__type": "LocalEnum.ButtonType", "__value": "SQUARE", "__tile": { "tilesetUid": 1, "x": 80, "y": 16, "w": 16, "h": 16 }, "defUid": 20, "realEditorValues": [{
 									"id": "V_String",
@@ -4328,7 +4290,7 @@
 						},
 						{
 							"__identifier": "Knob",
-							"__grid": [3,15],
+							"__grid": [3,16],
 							"__pivot": [0,0],
 							"__tags": ["floatWidget"],
 							"__tile": { "tilesetUid": 1, "x": 0, "y": 64, "w": 16, "h": 16 },
@@ -4337,7 +4299,7 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 9,
-							"px": [24,120],
+							"px": [24,128],
 							"fieldInstances": [
 								{ "__identifier": "Label", "__type": "String", "__value": "Harm1", "__tile": null, "defUid": 10, "realEditorValues": [{
 									"id": "V_String",
@@ -4348,7 +4310,7 @@
 						},
 						{
 							"__identifier": "Knob",
-							"__grid": [6,15],
+							"__grid": [6,16],
 							"__pivot": [0,0],
 							"__tags": ["floatWidget"],
 							"__tile": { "tilesetUid": 1, "x": 0, "y": 64, "w": 16, "h": 16 },
@@ -4357,7 +4319,7 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 9,
-							"px": [48,120],
+							"px": [48,128],
 							"fieldInstances": [
 								{ "__identifier": "Label", "__type": "String", "__value": "Harm2", "__tile": null, "defUid": 10, "realEditorValues": [{
 									"id": "V_String",
@@ -4368,7 +4330,7 @@
 						},
 						{
 							"__identifier": "Knob",
-							"__grid": [3,20],
+							"__grid": [3,21],
 							"__pivot": [0,0],
 							"__tags": ["floatWidget"],
 							"__tile": { "tilesetUid": 1, "x": 0, "y": 64, "w": 16, "h": 16 },
@@ -4377,7 +4339,7 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 9,
-							"px": [24,160],
+							"px": [24,168],
 							"fieldInstances": [
 								{ "__identifier": "Label", "__type": "String", "__value": "Harm4", "__tile": null, "defUid": 10, "realEditorValues": [{
 									"id": "V_String",
@@ -4388,7 +4350,7 @@
 						},
 						{
 							"__identifier": "Knob",
-							"__grid": [9,15],
+							"__grid": [9,16],
 							"__pivot": [0,0],
 							"__tags": ["floatWidget"],
 							"__tile": { "tilesetUid": 1, "x": 0, "y": 64, "w": 16, "h": 16 },
@@ -4397,7 +4359,7 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 9,
-							"px": [72,120],
+							"px": [72,128],
 							"fieldInstances": [
 								{ "__identifier": "Label", "__type": "String", "__value": "Harm3", "__tile": null, "defUid": 10, "realEditorValues": [{
 									"id": "V_String",
@@ -4408,7 +4370,7 @@
 						},
 						{
 							"__identifier": "Knob",
-							"__grid": [9,20],
+							"__grid": [9,21],
 							"__pivot": [0,0],
 							"__tags": ["floatWidget"],
 							"__tile": { "tilesetUid": 1, "x": 0, "y": 64, "w": 16, "h": 16 },
@@ -4417,7 +4379,7 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 9,
-							"px": [72,160],
+							"px": [72,168],
 							"fieldInstances": [
 								{ "__identifier": "Label", "__type": "String", "__value": "Harm6", "__tile": null, "defUid": 10, "realEditorValues": [{
 									"id": "V_String",
@@ -4428,7 +4390,7 @@
 						},
 						{
 							"__identifier": "Knob",
-							"__grid": [6,20],
+							"__grid": [6,21],
 							"__pivot": [0,0],
 							"__tags": ["floatWidget"],
 							"__tile": { "tilesetUid": 1, "x": 0, "y": 64, "w": 16, "h": 16 },
@@ -4437,7 +4399,7 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 9,
-							"px": [48,160],
+							"px": [48,168],
 							"fieldInstances": [
 								{ "__identifier": "Label", "__type": "String", "__value": "Harm5", "__tile": null, "defUid": 10, "realEditorValues": [{
 									"id": "V_String",
@@ -4448,7 +4410,7 @@
 						},
 						{
 							"__identifier": "Knob",
-							"__grid": [3,25],
+							"__grid": [3,26],
 							"__pivot": [0,0],
 							"__tags": ["floatWidget"],
 							"__tile": { "tilesetUid": 1, "x": 0, "y": 64, "w": 16, "h": 16 },
@@ -4457,7 +4419,7 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 9,
-							"px": [24,200],
+							"px": [24,208],
 							"fieldInstances": [
 								{ "__identifier": "Label", "__type": "String", "__value": "Harm7", "__tile": null, "defUid": 10, "realEditorValues": [{
 									"id": "V_String",
@@ -4465,23 +4427,6 @@
 								}] },
 								{ "__identifier": "Help", "__type": "String", "__value": null, "__tile": null, "defUid": 22, "realEditorValues": [] }
 							]
-						},
-						{
-							"__identifier": "EditorMode",
-							"__grid": [29,0],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": { "tilesetUid": 1, "x": 16, "y": 144, "w": 16, "h": 16 },
-							"__smartColor": "#5A6988",
-							"iid": "7abf3440-1030-11f0-a6b8-97331f0ab111",
-							"width": 16,
-							"height": 16,
-							"defUid": 120,
-							"px": [232,0],
-							"fieldInstances": [{ "__identifier": "EditorType", "__type": "LocalEnum.EditorType", "__value": "MusicalBarEditor", "__tile": { "tilesetUid": 1, "x": 16, "y": 144, "w": 16, "h": 16 }, "defUid": 121, "realEditorValues": [{
-								"id": "V_String",
-								"params": ["MusicalBarEditor"]
-							}] }]
 						},
 						{
 							"__identifier": "Button",
@@ -4708,95 +4653,32 @@
 							]
 						},
 						{
-							"__identifier": "InstrumentName",
-							"__grid": [6,0],
+							"__identifier": "EditorMode",
+							"__grid": [29,0],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
-							"__smartColor": "#C0CBDC",
-							"iid": "f0e8c320-1030-11f0-bdb2-67b94c64df62",
-							"width": 16,
-							"height": 16,
-							"defUid": 104,
-							"px": [48,0],
-							"fieldInstances": [
-								{ "__identifier": "Title", "__type": "String", "__value": null, "__tile": null, "defUid": 105, "realEditorValues": [] },
-								{ "__identifier": "Prev", "__type": "EntityRef", "__value": {
-									"entityIid": "fd1537a0-1030-11f0-bdb2-ffdeb3b374fd",
-									"layerIid": "43e17231-1030-11f0-a6b8-a9eb7918d8fb",
-									"levelIid": "43e17230-1030-11f0-a6b8-b54a8538405e",
-									"worldIid": "d3199781-d7b0-11ee-9c45-11db300be03a"
-								}, "__tile": null, "defUid": 123, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["fd1537a0-1030-11f0-bdb2-ffdeb3b374fd"]
-								}] },
-								{ "__identifier": "Next", "__type": "EntityRef", "__value": {
-									"entityIid": "fdaf54c0-1030-11f0-bdb2-dfeb35f8e631",
-									"layerIid": "43e17231-1030-11f0-a6b8-a9eb7918d8fb",
-									"levelIid": "43e17230-1030-11f0-a6b8-b54a8538405e",
-									"worldIid": "d3199781-d7b0-11ee-9c45-11db300be03a"
-								}, "__tile": null, "defUid": 124, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["fdaf54c0-1030-11f0-bdb2-dfeb35f8e631"]
-								}] }
-							]
-						},
-						{
-							"__identifier": "MenuItem",
-							"__grid": [3,1],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": { "tilesetUid": 1, "x": 168, "y": 0, "w": 8, "h": 8 },
-							"__smartColor": "#BE4A2F",
-							"iid": "fd1537a0-1030-11f0-bdb2-ffdeb3b374fd",
-							"width": 8,
-							"height": 8,
-							"defUid": 2,
-							"px": [24,8],
-							"fieldInstances": [
-								{ "__identifier": "Item", "__type": "LocalEnum.Item", "__value": "Prev", "__tile": { "tilesetUid": 1, "x": 168, "y": 0, "w": 8, "h": 8 }, "defUid": 6, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["Prev"]
-								}] },
-								{ "__identifier": "Help", "__type": "String", "__value": "", "__tile": null, "defUid": 21, "realEditorValues": [] }
-							]
-						},
-						{
-							"__identifier": "MenuItem",
-							"__grid": [10,1],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": { "tilesetUid": 1, "x": 176, "y": 0, "w": 8, "h": 8 },
-							"__smartColor": "#BE4A2F",
-							"iid": "fdaf54c0-1030-11f0-bdb2-dfeb35f8e631",
-							"width": 8,
-							"height": 8,
-							"defUid": 2,
-							"px": [80,8],
-							"fieldInstances": [
-								{ "__identifier": "Item", "__type": "LocalEnum.Item", "__value": "Next", "__tile": { "tilesetUid": 1, "x": 176, "y": 0, "w": 8, "h": 8 }, "defUid": 6, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["Next"]
-								}] },
-								{ "__identifier": "Help", "__type": "String", "__value": "", "__tile": null, "defUid": 21, "realEditorValues": [] }
-							]
-						},
-						{
-							"__identifier": "EditorMode",
-							"__grid": [32,0],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": { "tilesetUid": 1, "x": 32, "y": 144, "w": 16, "h": 16 },
 							"__smartColor": "#5A6988",
-							"iid": "976fce90-3740-11f0-8560-691b1d6d49da",
-							"width": 16,
+							"iid": "ff65fc40-5e50-11f0-9375-4978931f3cb5",
+							"width": 104,
 							"height": 16,
 							"defUid": 120,
-							"px": [256,0],
-							"fieldInstances": [{ "__identifier": "EditorType", "__type": "LocalEnum.EditorType", "__value": "MusicalEditor", "__tile": { "tilesetUid": 1, "x": 32, "y": 144, "w": 16, "h": 16 }, "defUid": 121, "realEditorValues": [{
-								"id": "V_String",
-								"params": ["MusicalEditor"]
-							}] }]
+							"px": [232,0],
+							"fieldInstances": []
+						},
+						{
+							"__identifier": "SfxMatrix",
+							"__grid": [3,0],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#265C42",
+							"iid": "c6b04720-5e50-11f0-8dd7-354851877fce",
+							"width": 64,
+							"height": 64,
+							"defUid": 127,
+							"px": [24,0],
+							"fieldInstances": []
 						}
 					]
 				},
@@ -7757,17 +7639,14 @@
 							"__grid": [22,0],
 							"__pivot": [0,0],
 							"__tags": [],
-							"__tile": { "tilesetUid": 1, "x": 0, "y": 144, "w": 16, "h": 16 },
+							"__tile": null,
 							"__smartColor": "#5A6988",
 							"iid": "66f79330-1030-11f0-a6b8-f9a5e236cdf4",
-							"width": 16,
+							"width": 120,
 							"height": 16,
 							"defUid": 120,
 							"px": [176,0],
-							"fieldInstances": [{ "__identifier": "EditorType", "__type": "LocalEnum.EditorType", "__value": "InstrumentEditor", "__tile": { "tilesetUid": 1, "x": 0, "y": 144, "w": 16, "h": 16 }, "defUid": 121, "realEditorValues": [{
-								"id": "V_String",
-								"params": ["InstrumentEditor"]
-							}] }]
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "BarEditor",
@@ -7924,23 +7803,6 @@
 							"defUid": 127,
 							"px": [16,160],
 							"fieldInstances": []
-						},
-						{
-							"__identifier": "EditorMode",
-							"__grid": [26,0],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": { "tilesetUid": 1, "x": 32, "y": 144, "w": 16, "h": 16 },
-							"__smartColor": "#5A6988",
-							"iid": "3457f570-3740-11f0-8560-594cc079aece",
-							"width": 16,
-							"height": 16,
-							"defUid": 120,
-							"px": [208,0],
-							"fieldInstances": [{ "__identifier": "EditorType", "__type": "LocalEnum.EditorType", "__value": "MusicalEditor", "__tile": { "tilesetUid": 1, "x": 32, "y": 144, "w": 16, "h": 16 }, "defUid": 121, "realEditorValues": [{
-								"id": "V_String",
-								"params": ["MusicalEditor"]
-							}] }]
 						}
 					]
 				},
@@ -9979,17 +9841,14 @@
 							"__grid": [22,0],
 							"__pivot": [0,0],
 							"__tags": [],
-							"__tile": { "tilesetUid": 1, "x": 0, "y": 144, "w": 16, "h": 16 },
+							"__tile": null,
 							"__smartColor": "#5A6988",
 							"iid": "4179c672-3740-11f0-8560-39d8c0b1c722",
-							"width": 16,
+							"width": 80,
 							"height": 16,
 							"defUid": 120,
 							"px": [176,0],
-							"fieldInstances": [{ "__identifier": "EditorType", "__type": "LocalEnum.EditorType", "__value": "InstrumentEditor", "__tile": { "tilesetUid": 1, "x": 0, "y": 144, "w": 16, "h": 16 }, "defUid": 121, "realEditorValues": [{
-								"id": "V_String",
-								"params": ["InstrumentEditor"]
-							}] }]
+							"fieldInstances": []
 						},
 						{
 							"__identifier": "Button",
@@ -10010,23 +9869,6 @@
 								}] },
 								{ "__identifier": "Help", "__type": "String", "__value": "", "__tile": null, "defUid": 23, "realEditorValues": [] }
 							]
-						},
-						{
-							"__identifier": "EditorMode",
-							"__grid": [26,0],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": { "tilesetUid": 1, "x": 16, "y": 144, "w": 16, "h": 16 },
-							"__smartColor": "#5A6988",
-							"iid": "4179c67b-3740-11f0-8560-672b611071c4",
-							"width": 16,
-							"height": 16,
-							"defUid": 120,
-							"px": [208,0],
-							"fieldInstances": [{ "__identifier": "EditorType", "__type": "LocalEnum.EditorType", "__value": "MusicalBarEditor", "__tile": { "tilesetUid": 1, "x": 16, "y": 144, "w": 16, "h": 16 }, "defUid": 121, "realEditorValues": [{
-								"id": "V_String",
-								"params": ["MusicalBarEditor"]
-							}] }]
 						},
 						{
 							"__identifier": "TrackEditor",

@@ -5,12 +5,15 @@ import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.Pixel
+import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
-import com.github.minigdx.tiny.render.operations.DrawSprite
+import com.github.minigdx.tiny.render.VirtualFrameBuffer
 import com.github.minigdx.tiny.resources.GameLevel
+import com.github.minigdx.tiny.resources.SpriteSheet
 import com.github.minigdx.tiny.resources.ldtk.CustomField
 import com.github.minigdx.tiny.resources.ldtk.Entity
 import com.github.minigdx.tiny.resources.ldtk.EntityRef
+import com.github.minigdx.tiny.resources.ldtk.GridInt
 import com.github.minigdx.tiny.resources.ldtk.GridPoint
 import com.github.minigdx.tiny.resources.ldtk.Layer
 import com.github.minigdx.tiny.resources.ldtk.Level
@@ -50,8 +53,10 @@ import kotlin.math.floor
 )
 class MapLib(
     private val resourceAccess: GameResourceAccess,
-    private val spriteSize: Pair<Pixel, Pixel>,
+    private val gameOptions: GameOptions,
+    private val virtualFrameBuffer: VirtualFrameBuffer,
 ) : TwoArgFunction() {
+    private val spriteSize: Pair<Pixel, Pixel> = gameOptions.spriteSize
     private var currentWorld: Int = 0
     private var currentLevel: Int = 0
 
@@ -96,7 +101,7 @@ class MapLib(
             // The parameter is an index. Let's check if the index is valid.
             if (a.isint()) {
                 val index = a.checkint()
-                val world = resourceAccess.level(currentWorld) ?: return NIL
+                val world = resourceAccess.findLevel(currentWorld) ?: return NIL
                 if (index in (0..world.ldtk.levels.size)) {
                     val previous = valueOf(currentLevel)
                     currentLevel = index
@@ -106,7 +111,7 @@ class MapLib(
                 }
             } else {
                 val id = a.tojstring() // can be an identifier of an uuid
-                val world = resourceAccess.level(currentWorld) ?: return NIL
+                val world = resourceAccess.findLevel(currentWorld) ?: return NIL
                 val index = world
                     .ldtk
                     .levels
@@ -188,19 +193,19 @@ class MapLib(
             }
         }
 
-        @TinyCall("Convert the cell coordinates from a table [cx,cy] into screen coordinates as a table [x,y].")
+        @TinyCall("Convert the cell coordinates from a table {cx,cy} into screen coordinates as a table {x,y}.")
         override fun call(
             @TinyArg("cell") arg: LuaValue,
         ): LuaValue = super.call(arg)
     }
 
     @TinyFunction(
-        "Convert screen coordinates x, y into map cell coordinates cx, cy.\n" +
+        "Convert screen coordinates x, y into map cell coordinates {cx, cy}.\n" +
             "For example, coordinates of the player can be converted to cell coordinates to access the flag " +
             "of the tile matching the player coordinates.",
     )
     inner class to : TwoArgFunction() {
-        @TinyCall("Convert the coordinates into cell coordinates as a table [cx,cy].")
+        @TinyCall("Convert the coordinates into cell coordinates as a table {cx = cx,cy = cy}.")
         override fun call(
             @TinyArg("x") arg1: LuaValue,
             @TinyArg("y") arg2: LuaValue,
@@ -218,7 +223,7 @@ class MapLib(
             }
         }
 
-        @TinyCall("Convert the coordinates from a table [x,y] into cell coordinates as a table [cx,cy].")
+        @TinyCall("Convert the coordinates from a table {x,y} into cell coordinates as a table {cx,cy}.")
         override fun call(
             @TinyArg("coordinates") arg: LuaValue,
         ) = super.call(arg)
@@ -319,11 +324,11 @@ entity.fields -- access custom field of the entity
                 cache == null ||
                 // Any change occurs on the current level used.
                 currentWorldIndex != currentWorld ||
-                currentWorldVersion != resourceAccess.level(currentWorld)?.version ||
+                currentWorldVersion != resourceAccess.findLevel(currentWorld)?.version ||
                 currentLevelIndex != currentLevel
             ) {
                 currentWorldIndex = currentWorld
-                currentWorldVersion = resourceAccess.level(currentWorld)?.version ?: -1
+                currentWorldVersion = resourceAccess.findLevel(currentWorld)?.version ?: -1
                 currentLevelIndex = currentLevel
                 // Create the entities and cache it.
                 factory().also { cachedEntities.put(name, it) }
@@ -398,7 +403,10 @@ entity.fields -- access custom field of the entity
                     is TilesetRect -> value.toLua()
                     is List<*> -> LuaValue.listOf(value.map { toLua(it) }.toTypedArray())
                     null -> NIL
-                    else -> TODO()
+                    else -> throw IllegalArgumentException(
+                        "Field of type ${value::class} cannot be converted to LuaValue. " +
+                            "It's a missing feature: the game engine needs to be updated.",
+                    )
                 }
             }
             return listOf(
@@ -414,7 +422,7 @@ entity.fields -- access custom field of the entity
     }
 
     private fun activeLevel(): Level? {
-        val world = resourceAccess.level(currentWorld)
+        val world = resourceAccess.findLevel(currentWorld)
         return world
             ?.ldtk
             ?.levels
@@ -438,20 +446,19 @@ entity.fields -- access custom field of the entity
             description = "Draw all active layers on the screen.",
         )
         override fun call(): LuaValue {
-            val world = resourceAccess.level(currentWorld) ?: return NIL
+            val world = resourceAccess.findLevel(currentWorld) ?: return NIL
             val level = activeLevel() ?: return NIL
 
-            val layers =
-                level.layerInstances
-                    // Select only actives layers
-                    .filterIndexed { index, layer -> isActiveLayer(index) && layer.__tilesetRelPath != null }
-                    // Layers will be drawn in the reverse order (from the back to the front)
-                    .asReversed()
-                    .asSequence()
+            val layers = level.layerInstances
+                // Select only actives layers
+                .filterIndexed { index, layer -> isActiveLayer(index) && layer.__tilesetRelPath != null }
+                // Layers will be drawn in the reverse order (from the back to the front)
+                .asReversed()
+                .asSequence()
 
-            layers.flatMap { layer -> toDrawSprite(world, layer) }
-                .forEach { opcode -> resourceAccess.addOp(opcode) }
-
+            layers.forEach { layer ->
+                drawLayer(world, layer)
+            }
             return NONE
         }
 
@@ -466,59 +473,58 @@ entity.fields -- access custom field of the entity
                 return NIL
             }
             val layer = activeLevel()?.layerInstances?.getOrNull(layerIndex) ?: return NIL
+
             // Not a drawable layer.
             if (layer.__tilesetRelPath == null) {
                 return NIL
             }
 
-            val world = resourceAccess.level(currentWorld) ?: return NIL
-            toDrawSprite(world, layer).forEach {
-                resourceAccess.addOp(it)
-            }
+            val world = resourceAccess.findLevel(currentWorld) ?: return NIL
+
+            drawLayer(world, layer)
+
             return NONE
         }
 
-        fun toAttribute(
-            size: Int,
-            tile: Tile,
-        ): DrawSprite.DrawSpriteAttribute {
-            fun Int.toFlip(): Pair<Boolean, Boolean> {
-                return ((this and 0x01) == 0x01) to ((this and 0x02) == 0x02)
-            }
-            val (srcX, srcY) = tile.src
-            val (destX, destY) = tile.px
-            val (flipX, flipY) = tile.f.toFlip()
-
-            return DrawSprite.DrawSpriteAttribute(
-                srcX,
-                srcY,
-                size,
-                size,
-                destX,
-                destY,
-                flipX,
-                flipY,
-            )
-        }
-
-        fun toDrawSprite(
+        private fun drawLayer(
             world: GameLevel,
             layer: Layer,
-        ): List<DrawSprite> {
+        ) {
             val tileset = world.tilesset[layer.__tilesetRelPath!!]!!
 
-            val attributesGrid = layer.gridTiles?.map { tile -> toAttribute(layer.__gridSize, tile) } ?: emptyList()
-            val attributesAutoLayer =
-                layer.autoLayerTiles?.map { tile -> toAttribute(layer.__gridSize, tile) } ?: emptyList()
-            val attributes = attributesGrid + attributesAutoLayer
+            layer.gridTiles?.forEach { tile ->
+                drawTile(tileset, layer.__gridSize, tile)
+            }
 
-            return DrawSprite.from(
-                resourceAccess = resourceAccess,
-                name = layer.__identifier,
-                tileset = tileset,
-                attributes = attributes,
-            )
+            layer.autoLayerTiles?.forEach { tile ->
+                drawTile(tileset, layer.__gridSize, tile)
+            }
         }
+    }
+
+    private fun drawTile(
+        tileset: SpriteSheet,
+        tileSize: GridInt,
+        tile: Tile,
+    ) {
+        fun Int.toFlip(): Pair<Boolean, Boolean> {
+            return ((this and 0x01) == 0x01) to ((this and 0x02) == 0x02)
+        }
+        val (srcX, srcY) = tile.src
+        val (destX, destY) = tile.px
+        val (flipX, flipY) = tile.f.toFlip()
+
+        virtualFrameBuffer.draw(
+            tileset,
+            srcX,
+            srcY,
+            tileSize,
+            tileSize,
+            destX,
+            destY,
+            flipX,
+            flipY,
+        )
     }
 
     private fun EntityRef.toLua(): LuaTable {

@@ -3,6 +3,10 @@ import org.gradle.api.internal.artifacts.transform.UnzipTransform
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.minigdx.mpp)
+
+    id("io.github.turansky.seskar") version "4.27.0"
+    id("org.jetbrains.kotlin.plugin.js-plain-objects") version "2.2.20"
+    id("io.github.turansky.kfc.application") version "14.12.0"
 }
 
 configurations.create("tinyWebEditorEngine") {
@@ -45,20 +49,21 @@ dependencies {
     )
 }
 
-val tinyWebEditor =
-    tasks.register("tinyWebEditor", Zip::class) {
-        val tinyResources =
-            tinyResources.incoming.artifactView {
-                attributes {
-                    attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "unzip")
-                }
-            }.files
+val tinyWebEditor = tasks.register("tinyWebEditor", Zip::class) {
+    val tinyResources = tinyResources.incoming.artifactView {
+        attributes {
+            attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "unzip")
+        }
+    }.files
 
-        group = "tiny"
-        from(tasks.getByName("jsBrowserDistribution"), tinyResources)
-        this.destinationDirectory.set(project.layout.buildDirectory.dir("tiny-dist"))
-        this.archiveVersion.set("")
-    }
+    val jsBundleArchive = tasks.named<Jar>("jsBundleProduction").flatMap { it.archiveFile }
+
+    group = "tiny"
+    from(jsBundleArchive.map { zipTree(it) }, tinyResources)
+    exclude("index.html")
+    this.destinationDirectory.set(project.layout.buildDirectory.dir("tiny-dist"))
+    this.archiveVersion.set("")
+}
 
 artifacts {
     add("tinyWebEditorEngine", tinyWebEditor)

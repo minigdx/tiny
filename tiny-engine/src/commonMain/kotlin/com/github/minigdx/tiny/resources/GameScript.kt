@@ -7,6 +7,7 @@ import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.lua.CtrlLib
 import com.github.minigdx.tiny.lua.DebugLib
+import com.github.minigdx.tiny.lua.FloppyLib
 import com.github.minigdx.tiny.lua.GfxLib
 import com.github.minigdx.tiny.lua.JuiceLib
 import com.github.minigdx.tiny.lua.KeysLib
@@ -17,14 +18,13 @@ import com.github.minigdx.tiny.lua.SfxLib
 import com.github.minigdx.tiny.lua.ShapeLib
 import com.github.minigdx.tiny.lua.SprLib
 import com.github.minigdx.tiny.lua.StdLib
-import com.github.minigdx.tiny.lua.TestLib
-import com.github.minigdx.tiny.lua.TestResult
 import com.github.minigdx.tiny.lua.TinyBaseLib
 import com.github.minigdx.tiny.lua.TinyLib
 import com.github.minigdx.tiny.lua.Vec2Lib
-import com.github.minigdx.tiny.lua.WorkspaceLib
 import com.github.minigdx.tiny.lua.toTinyException
 import com.github.minigdx.tiny.platform.Platform
+import com.github.minigdx.tiny.render.VirtualFrameBuffer
+import com.github.minigdx.tiny.sound.VirtualSoundBoard
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LoadState
 import org.luaj.vm2.LuaError
@@ -48,6 +48,8 @@ class GameScript(
      */
     override val name: String,
     val gameOptions: GameOptions,
+    val virtualFrameBuffer: VirtualFrameBuffer,
+    val virtualSoundBoard: VirtualSoundBoard,
     val inputHandler: InputHandler,
     val platform: Platform,
     val logger: Logger,
@@ -70,32 +72,31 @@ class GameScript(
 
     var globals: Globals? = null
 
-    private val tinyLib: TinyLib = TinyLib(gameOptions.gameScripts)
-
-    internal val testResults = mutableListOf<TestResult>()
+    private val tinyLib: TinyLib = TinyLib(gameOptions.gameScripts, gameOptions)
 
     class State(val args: LuaValue)
 
-    private fun createLuaGlobals(
-        customizeLuaGlobal: GameResourceAccess.(Globals) -> Unit,
-        forValidation: Boolean = false,
-    ): Globals =
+    private fun createLuaGlobals(forValidation: Boolean = false): Globals =
         Globals().apply {
-            val sprLib = SprLib(this@GameScript.gameOptions, this@GameScript.resourceAccess)
+            val sprLib = SprLib(
+                virtualFrameBuffer,
+                resourceAccess,
+                gameOptions,
+            )
 
-            load(TinyBaseLib(this@GameScript.resourceAccess))
+            load(TinyBaseLib(resourceAccess))
             load(PackageLib())
             load(Bit32Lib())
             load(TableLib())
             load(StringLib())
             load(CoroutineLib())
-            load(StdLib(gameOptions, resourceAccess))
-            load(MapLib(this@GameScript.resourceAccess, gameOptions.spriteSize))
-            load(GfxLib(this@GameScript.resourceAccess, gameOptions))
+            load(StdLib(gameOptions, resourceAccess, virtualFrameBuffer))
+            load(MapLib(resourceAccess, gameOptions, virtualFrameBuffer))
+            load(GfxLib(resourceAccess, gameOptions, virtualFrameBuffer))
             load(CtrlLib(inputHandler, sprLib))
-            load(SfxLib(this@GameScript.resourceAccess, playSound = !forValidation))
-            load(ShapeLib(this@GameScript.resourceAccess, gameOptions))
-            load(DebugLib(this@GameScript.resourceAccess, this@GameScript.logger))
+            load(SfxLib(resourceAccess, virtualSoundBoard, platform, playSound = !forValidation))
+            load(ShapeLib(gameOptions, virtualFrameBuffer))
+            load(DebugLib(logger))
             load(KeysLib())
             load(MathLib())
             load(Vec2Lib())
@@ -103,48 +104,22 @@ class GameScript(
             load(sprLib)
             load(JuiceLib())
             load(NotesLib())
-            load(WorkspaceLib(platform = platform))
-            load(TestLib(this@GameScript))
-
-            this@GameScript.resourceAccess.customizeLuaGlobal(this)
+            load(FloppyLib(platform = platform, logger = logger))
 
             LoadState.install(this)
             LuaC.install(this)
         }
 
-    suspend fun isValid(customizeLuaGlobal: GameResourceAccess.(Globals) -> Unit): Boolean {
-        with(createLuaGlobals(customizeLuaGlobal, forValidation = true)) {
+    suspend fun isValid(): Boolean {
+        with(createLuaGlobals(forValidation = true)) {
             load(content.decodeToString()).call()
             get("_init").nullIfNil()?.callSuspend(valueOf(gameOptions.width), valueOf(gameOptions.height))
-            if (gameOptions.runTests) {
-                gameOptions.gameScripts.map { name ->
-                    // use the new content for the game script evaluated
-                    if (name == this@GameScript.name) {
-                        content.decodeToString()
-                    } else {
-                        // use the cached content for the script not updated.
-                        resourceAccess.script(name)?.content!!.decodeToString()
-                    }
-                }.forEach { scriptContent ->
-                    val globalForTest = createLuaGlobals(customizeLuaGlobal, forValidation = true)
-                    globalForTest.load(scriptContent).call()
-                    globalForTest.get("_test").callSuspend()
-                }
-                logger.info("TEST") { "⚙\uFE0F === Ran ${testResults.size} tests ===" }
-                testResults.forEach {
-                    if (it.passed) {
-                        logger.info("TEST") { "✅ ${it.script} - ${it.test}" }
-                    } else {
-                        logger.info("TEST") { "\uD83D\uDD34 ${it.script} - ${it.test}: ${it.reason}" }
-                    }
-                }
-            }
         }
         return true
     }
 
-    suspend fun evaluate(customizeLuaGlobal: GameResourceAccess.(Globals) -> Unit) {
-        globals = createLuaGlobals(customizeLuaGlobal)
+    suspend fun evaluate() {
+        globals = createLuaGlobals()
 
         evaluated = true
         exited = -1
@@ -165,7 +140,7 @@ class GameScript(
             if (luaCause is Exit) {
                 exited = luaCause.script
             } else {
-                throw ex.toTinyException(content.decodeToString())
+                throw ex
             }
         }
     }
@@ -213,7 +188,13 @@ class GameScript(
             if (luaCause is Exit) {
                 exited = luaCause.script
             } else {
-                throw ex.toTinyException(content.decodeToString())
+                val content = if (ex.script.isNotBlank()) {
+                    val script = this.resourceAccess.findGameScript(ex.script.replaceFirst("@", ""))
+                    script?.content?.decodeToString() ?: content.decodeToString()
+                } else {
+                    content.decodeToString()
+                }
+                throw ex.toTinyException(content)
             }
         }
     }

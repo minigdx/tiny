@@ -3,9 +3,48 @@ package com.github.minigdx.tiny.sound
 import com.github.minigdx.tiny.BPM
 import com.github.minigdx.tiny.Percent
 import com.github.minigdx.tiny.input.InputHandler
+import com.github.minigdx.tiny.lua.Note
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
+
+class DefaultSoundBoard(private val soundManager: SoundManager) : VirtualSoundBoard {
+    override fun prepare(bar: MusicalBar): SoundHandler {
+        val buffer = soundManager.convert(bar)
+        return soundManager.createSoundHandler(buffer)
+    }
+
+    override fun prepare(sequence: MusicalSequence): SoundHandler {
+        val buffer = soundManager.convert(sequence)
+        return soundManager.createSoundHandler(buffer)
+    }
+
+    override fun prepare(track: MusicalSequence.Track): SoundHandler {
+        val sequence = MusicalSequence(tracks = arrayOf(track), index = 0)
+        val buffer = soundManager.convert(sequence)
+        return soundManager.createSoundHandler(buffer)
+    }
+
+    override fun prepare(chunkGenerator: ChunkGenerator): SoundHandler {
+        return soundManager.createSoundHandler(chunkGenerator)
+    }
+
+    override fun convert(bar: MusicalBar): FloatArray {
+        val buffer = soundManager.convert(bar)
+        return buffer
+    }
+
+    override fun noteOn(
+        note: Note,
+        instrument: Instrument,
+    ) {
+        soundManager.noteOn(note, instrument)
+    }
+
+    override fun noteOff(note: Note) {
+        soundManager.noteOff(note)
+    }
+}
 
 abstract class SoundManager {
     abstract fun initSoundManager(inputHandler: InputHandler)
@@ -15,27 +54,11 @@ abstract class SoundManager {
     /**
      * @param buffer byte array representing the sound. Each sample is represented with a float from -1.0f to 1.0f
      */
-    abstract fun createSoundHandler(
-        buffer: FloatArray,
-        numberOfSamples: Long,
-    ): SoundHandler
+    abstract fun createSoundHandler(buffer: FloatArray): SoundHandler
 
-    fun createSoundHandler(bar: MusicalBar): SoundHandler {
-        val buffer = convert(bar)
-        return createSoundHandler(buffer, buffer.size.toLong())
-    }
+    abstract fun createSoundHandler(buffer: Sequence<FloatArray>): SoundHandler
 
-    fun createSoundHandler(sequence: MusicalSequence): SoundHandler {
-        val buffer = convert(sequence)
-        return createSoundHandler(buffer, buffer.size.toLong())
-    }
-
-    fun createSoundHandler(bar: MusicalSequence.Track): SoundHandler {
-        // TODO: pass tempo
-        val sequence = MusicalSequence(tracks = arrayOf(bar), index = 0)
-        val buffer = convert(sequence)
-        return createSoundHandler(buffer, buffer.size.toLong())
-    }
+    abstract fun createSoundHandler(chunkGenerator: ChunkGenerator): SoundHandler
 
     /**
      * Convert the MusicBar into a playable sound.
@@ -237,11 +260,16 @@ abstract class SoundManager {
         return max(0.0f, min(1.0f, multiplier))
     }
 
-    open fun exportAsSound(sequence: MusicalSequence) = Unit
+    abstract fun noteOn(
+        note: Note,
+        instrument: Instrument,
+    )
+
+    abstract fun noteOff(note: Note)
 
     companion object {
         const val SAMPLE_RATE = 44100
-        const val MASTER_VOLUME = 0.8f
+        const val MASTER_VOLUME = 0.5f
         const val PI = (kotlin.math.PI).toFloat()
         const val TWO_PI = 2.0f * PI
     }

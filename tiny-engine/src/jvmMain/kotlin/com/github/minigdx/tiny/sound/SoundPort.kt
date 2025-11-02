@@ -11,11 +11,10 @@ class SoundPort(var alive: Boolean = true, val queue: BlockingQueue<ByteArray>) 
         val format = AudioFormat(SAMPLE_RATE.toFloat(), BITS_PER_SAMPLE, CHANNELS, IS_SIGNED, IS_BIG_ENDIAN)
         val info = DataLine.Info(SourceDataLine::class.java, format)
 
-        val line =
-            (AudioSystem.getLine(info) as SourceDataLine).apply {
-                open(format)
-                start()
-            }
+        val line = (AudioSystem.getLine(info) as SourceDataLine).apply {
+            open(format)
+            start()
+        }
 
         while (alive) {
             val buffer = queue.take()

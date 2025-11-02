@@ -20,6 +20,7 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
+import java.util.jar.JarInputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
@@ -37,7 +38,11 @@ class ExportCommand : CliktCommand(name = "export") {
         .default("tiny-export.zip")
 
     // Desktop-specific options
-    val outputDirectory by option("-o", "--output", help = "Output directory for the exported application (desktop only)")
+    val outputDirectory by option(
+        "-o",
+        "--output",
+        help = "Output directory for the exported application (desktop only)",
+    )
         .file(canBeDir = true, canBeFile = false)
         .default(File("exported-game"))
 
@@ -183,6 +188,7 @@ class ExportCommand : CliktCommand(name = "export") {
                 // Add macOS-specific JVM options
                 jpackageCommand.addAll(listOf("--java-options", "-XstartOnFirstThread"))
             }
+
             "windows" -> {
                 // For Windows, use a relative path from the executable location
                 jpackageCommand.addAll(
@@ -197,6 +203,7 @@ class ExportCommand : CliktCommand(name = "export") {
                 // Add Windows-specific options
                 jpackageCommand.addAll(listOf("--win-dir-chooser", "--win-menu", "--win-shortcut"))
             }
+
             "linux" -> {
                 // For Linux, use a relative path from the executable location
                 jpackageCommand.addAll(
@@ -211,6 +218,7 @@ class ExportCommand : CliktCommand(name = "export") {
                 // Add Linux-specific options
                 jpackageCommand.addAll(listOf("--linux-shortcut"))
             }
+
             else -> {
                 // Default case
                 jpackageCommand.addAll(
@@ -433,7 +441,7 @@ class ExportCommand : CliktCommand(name = "export") {
     }
 }
 
-class GameExporter(private val withSourceMap: Boolean = false) {
+class GameExporter {
     fun export(
         gameDirectory: File,
         archive: String,
@@ -444,22 +452,35 @@ class GameExporter(private val withSourceMap: Boolean = false) {
         val exportedGame = ZipOutputStream(FileOutputStream(gameDirectory.resolve(archive)))
 
         val exportedFile = mutableSetOf<String>()
-        // Add all engine files into the zip
-        ENGINE_FILES.forEach { name ->
-            val content = ExportCommand::class.java.getResourceAsStream("/tiny-engine-js/$name")
-            exportedGame.putNextEntry(ZipEntry(name))
-            exportedGame.write(content!!.readAllBytes())
-            exportedGame.closeEntry()
+        // Extract all engine files from the tiny-engine-js.jar
+        val engineJarStream = ExportCommand::class.java
+            .getResourceAsStream("/tiny-engine-js.zip")
+            ?: throw IllegalStateException("Could not find tiny-engine-js.zip in classpath")
 
-            exportedFile += name
+        lateinit var indexContent: String
+
+        JarInputStream(engineJarStream).use { jarInput ->
+            var entry = jarInput.nextJarEntry
+            while (entry != null) {
+                if (!entry.isDirectory && !entry.name.startsWith("META-INF/") && entry.name != "index.html") {
+                    exportedGame.putNextEntry(ZipEntry(entry.name))
+                    jarInput.copyTo(exportedGame)
+                    exportedGame.closeEntry()
+                    exportedFile += entry.name
+                } else if (entry.name == "index.html") {
+                    indexContent = jarInput.readAllBytes().decodeToString()
+                }
+                jarInput.closeEntry()
+                entry = jarInput.nextJarEntry
+            }
         }
 
-        if (withSourceMap) {
-            val content = ExportCommand::class.java.getResourceAsStream("/tiny-engine-js/tiny-engine.js.map")
-            val name = "tiny-engine.js.map"
-
+        // Add all engine files into the zip
+        ENGINE_FILES.forEach { name ->
+            val content = ExportCommand::class.java.getResourceAsStream("/$name")
+            val bytes = content?.readAllBytes() ?: throw IllegalStateException("Could not read engine files '$name'")
             exportedGame.putNextEntry(ZipEntry(name))
-            exportedGame.write(content!!.readAllBytes())
+            exportedGame.write(bytes)
             exportedGame.closeEntry()
 
             exportedFile += name
@@ -526,8 +547,9 @@ class GameExporter(private val withSourceMap: Boolean = false) {
                     }
 
                 // Add index.html
-                val content = ExportCommand::class.java.getResourceAsStream("/templates/index.html")!!.readAllBytes()
-                var template = content.decodeToString()
+
+                var template = indexContent
+                template = template.replace("{GAME_ID}", gameParameters.id)
                 template = template.replace("{GAME_NAME}", gameParameters.name)
                 template = template.replace("{GAME_WIDTH}", gameParameters.resolution.width.toString())
                 template = template.replace("{GAME_HEIGHT}", gameParameters.resolution.height.toString())
@@ -536,20 +558,18 @@ class GameExporter(private val withSourceMap: Boolean = false) {
                 template = template.replace("{GAME_SPRH}", gameParameters.sprites.height.toString())
                 template = template.replace("{GAME_HIDE_MOUSE}", gameParameters.hideMouseCursor.toString())
 
-                template =
-                    replaceList(
-                        template,
-                        (gameParameters.scripts + gameParameters.libraries.map { "$it.lua" }),
-                        "{GAME_SCRIPT}",
-                        "GAME_SCRIPT",
-                    )
-                template =
-                    replaceList(
-                        template,
-                        gameParameters.spritesheets,
-                        "{GAME_SPRITESHEET}",
-                        "GAME_SPRITESHEET",
-                    )
+                template = replaceList(
+                    template,
+                    (gameParameters.scripts + gameParameters.libraries.map { "$it.lua" }),
+                    "{GAME_SCRIPT}",
+                    "GAME_SCRIPT",
+                )
+                template = replaceList(
+                    template,
+                    gameParameters.spritesheets,
+                    "{GAME_SPRITESHEET}",
+                    "GAME_SPRITESHEET",
+                )
                 template = replaceList(template, gameParameters.levels, "{GAME_LEVEL}", "GAME_LEVEL")
                 template = replaceList(template, gameParameters.sounds, "{GAME_SOUND}", "GAME_SOUND")
 
@@ -586,7 +606,6 @@ class GameExporter(private val withSourceMap: Boolean = false) {
                 "_boot.lua",
                 "_boot.png",
                 "_engine.lua",
-                "tiny-engine.js",
             )
     }
 }

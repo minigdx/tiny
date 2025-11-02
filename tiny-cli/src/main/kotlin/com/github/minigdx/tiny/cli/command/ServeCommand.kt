@@ -8,6 +8,7 @@ import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.ajalt.clikt.parameters.types.int
+import com.github.ajalt.mordant.rendering.TextStyles
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
@@ -39,7 +40,7 @@ class ServeCommand : CliktCommand(name = "serve") {
     override fun run() {
         // Get the zip
         val zipFile = if (gameDirectory.isDirectory) {
-            GameExporter(withSourceMap = true).export(gameDirectory, "tiny-export.zip")
+            GameExporter().export(gameDirectory, "tiny-export.zip")
             gameDirectory.resolve("tiny-export.zip")
         } else {
             gameDirectory
@@ -105,7 +106,10 @@ class ServeCommand : CliktCommand(name = "serve") {
         // Creates a Netty server
         val server = embeddedServer(Netty, port = port, module = method)
 
-        echo("\uD83D\uDE80 Try your game on http://localhost:$port with your browser.")
+        val address = "http://localhost:$port"
+        val url = TextStyles.hyperlink(address).invoke(address)
+
+        echo("\uD83D\uDE80 Try your game on $url with your browser.")
 
         Runtime.getRuntime().addShutdownHook(
             Thread {

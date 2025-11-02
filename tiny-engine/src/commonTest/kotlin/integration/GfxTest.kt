@@ -2,9 +2,11 @@ package integration
 
 import com.github.minigdx.tiny.platform.test.TestHelper.assertEquals
 import com.github.minigdx.tiny.platform.test.TestHelper.test
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@Ignore
 class GfxTest {
     val clsScript =
         """

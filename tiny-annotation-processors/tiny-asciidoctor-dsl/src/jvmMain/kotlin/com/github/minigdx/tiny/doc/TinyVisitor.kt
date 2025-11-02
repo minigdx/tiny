@@ -102,9 +102,7 @@ class TinyFunctionVisitor :
                             if (multiArg != null) {
                                 val documentation = multiArg.documentations
                                 val docs = if (documentation.size < multiArg.names.size) {
-                                    documentation +
-                                        (0 until multiArg.names.size - documentation.size).map { "" }
-                                            .toTypedArray()
+                                    documentation + (0 until multiArg.names.size - documentation.size).map { "" }.toTypedArray()
                                 } else {
                                     documentation
                                 }
@@ -116,9 +114,13 @@ class TinyFunctionVisitor :
                                         }
                                     }
                             } else {
-                                val args = p.getAnnotationsByType(TinyArg::class)
-                                val arg = args.firstOrNull()?.name ?: p.name?.asString() ?: ""
-                                call.args += TinyArgDescriptor(arg, args.firstOrNull()?.description ?: "")
+                                val args = p.getAnnotationsByType(TinyArg::class).firstOrNull()
+                                val arg = args?.name ?: p.name?.asString() ?: ""
+                                call.args += TinyArgDescriptor(
+                                    arg,
+                                    args?.description ?: "",
+                                    args?.type?.type ?: "any",
+                                )
                             }
                         }
                         calls.add(call)

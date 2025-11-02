@@ -9,15 +9,19 @@ import com.danielgergely.kgl.Kgl
 import com.danielgergely.kgl.Program
 import com.danielgergely.kgl.Shader
 import com.danielgergely.kgl.UniformLocation
+import com.danielgergely.kgl.VertexArrayObject
 
 class ShaderProgram<V : VertexShader, F : FragmentShader>(
-    val gl: Kgl,
-    val vertexShader: V,
-    val fragmentShader: F,
+    private val gl: Kgl,
+    private val vertexShader: V,
+    private val fragmentShader: F,
 ) : Kgl by gl {
     private val attributes = mutableMapOf<String, Int>()
 
     private val uniforms = mutableMapOf<String, UniformLocation>()
+
+    // Assume that for each Shader program, the geometry is different.
+    private var vao: VertexArrayObject? = null
 
     private var program: Program? = null
     private var vertexShaderId: Shader? = null
@@ -47,12 +51,33 @@ class ShaderProgram<V : VertexShader, F : FragmentShader>(
 
         gl.useProgram(program!!)
 
+        vao = gl.createVertexArray()
+        gl.bindVertexArray(vao)
         vertexShader.parameters.forEach { parameter ->
             parameter.create(this)
         }
         fragmentShader.parameters.forEach { parameter ->
             parameter.create(this)
         }
+
+        val outParameterNames = vertexShader.parameters.filter { it is ShaderParameter.Varying }
+            .map { it.name }
+            .toSet()
+
+        val inParametersNames = fragmentShader.parameters.filter { it is ShaderParameter.In }
+            .map { it.name }
+            .toSet()
+
+        val missingOutParameters = outParameterNames - inParametersNames
+        val missingInParameters = inParametersNames - outParameterNames
+
+        if (missingOutParameters.isNotEmpty()) {
+            throw IllegalStateException("$missingOutParameters are missing as in parameters from Fragment shader")
+        }
+        if (missingInParameters.isNotEmpty()) {
+            throw IllegalStateException("$missingInParameters are missing as out parameters from Vertex shader")
+        }
+        gl.bindVertexArray(null)
     }
 
     private fun createShader(
@@ -84,13 +109,19 @@ class ShaderProgram<V : VertexShader, F : FragmentShader>(
         return vertexShaderId
     }
 
-    fun createAttrib(name: String) {
-        attributes[name] = gl.getAttribLocation(program!!, name)
+    fun createAttrib(name: String): Int {
+        val programId = checkNotNull(program) { "Program shader needs to be compiled first" }
+        val attribLocation = gl.getAttribLocation(programId, name)
+        if (attribLocation == -1) {
+            throw IllegalArgumentException("Attrib location $name not found")
+        }
+        attributes[name] = attribLocation
+        return attribLocation
     }
 
     fun createUniform(name: String) {
-        uniforms[name] =
-            gl.getUniformLocation(program!!, name) ?: throw IllegalArgumentException("Uniform $name not found")
+        val uniformLocation = gl.getUniformLocation(program!!, name)
+        uniforms[name] = uniformLocation ?: throw IllegalArgumentException("Uniform $name not found")
     }
 
     fun getAttrib(name: String): Int = attributes[name] ?: throw IllegalStateException("Attributes '$name' not created!")
@@ -100,11 +131,21 @@ class ShaderProgram<V : VertexShader, F : FragmentShader>(
     }
 
     fun use() {
-        useProgram(program!!)
+        with(program) {
+            checkNotNull(this) { "Shader program needs to be compiled first." }
+            useProgram(this)
+        }
+    }
+
+    fun setup(block: (vertexShader: V, fragmentShader: F) -> Unit) {
+        gl.bindVertexArray(vao)
+        block(vertexShader, fragmentShader)
+        gl.bindVertexArray(null)
     }
 
     fun bind() {
-        for (attribute in vertexShader.attributes) {
+        gl.bindVertexArray(vao)
+        for (attribute in vertexShader.inParameters) {
             attribute.bind()
         }
 
@@ -118,8 +159,9 @@ class ShaderProgram<V : VertexShader, F : FragmentShader>(
             sampler.unbind()
         }
 
-        for (attribute in vertexShader.attributes) {
+        for (attribute in vertexShader.inParameters) {
             attribute.unbind()
         }
+        gl.bindVertexArray(null)
     }
 }

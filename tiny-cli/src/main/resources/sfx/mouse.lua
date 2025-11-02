@@ -27,7 +27,7 @@ mouse._update = function(on_update, on_click, on_clicked)
 end
 
 mouse._draw = function(override)
-    local index = 25
+    local index = 0
     if(override) then
         index = override
     end

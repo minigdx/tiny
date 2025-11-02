@@ -1,13 +1,12 @@
 package com.github.minigdx.tiny.platform.glfw
 
+import com.danielgergely.kgl.Kgl
 import com.danielgergely.kgl.KglLwjgl
 import com.github.minigdx.tiny.Seconds
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.file.FileStream
 import com.github.minigdx.tiny.file.InputStreamStream
-import com.github.minigdx.tiny.file.JvmLocalFile
-import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SoundDataSourceStream
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.file.VirtualFileSystem
@@ -19,13 +18,14 @@ import com.github.minigdx.tiny.platform.ImageData
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
-import com.github.minigdx.tiny.render.Render
-import com.github.minigdx.tiny.render.RenderContext
-import com.github.minigdx.tiny.render.RenderFrame
-import com.github.minigdx.tiny.render.gl.OpenGLRender
-import com.github.minigdx.tiny.render.operations.RenderOperation
+import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
+import com.github.minigdx.tiny.sound.BITS_PER_SAMPLE
+import com.github.minigdx.tiny.sound.CHANNELS
+import com.github.minigdx.tiny.sound.IS_BIG_ENDIAN
+import com.github.minigdx.tiny.sound.IS_SIGNED
 import com.github.minigdx.tiny.sound.JavaSoundManager
 import com.github.minigdx.tiny.sound.SoundManager
+import com.github.minigdx.tiny.sound.SoundManager.Companion.SAMPLE_RATE
 import com.github.minigdx.tiny.util.MutableFixedSizeList
 import com.squareup.gifencoder.FastGifEncoder
 import com.squareup.gifencoder.ImageOptions
@@ -45,16 +45,24 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.imageio.ImageIO
+import javax.sound.sampled.AudioFileFormat
+import javax.sound.sampled.AudioFormat
+import javax.sound.sampled.AudioInputStream
+import javax.sound.sampled.AudioSystem
+import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToInt
 
 class GlfwPlatform(
     override val gameOptions: GameOptions,
     private val logger: Logger,
     private val vfs: VirtualFileSystem,
-    private val workdirectory: File,
-    private val render: Render = OpenGLRender(KglLwjgl, logger, gameOptions),
+    private val gameDirectory: File,
+    private val homeDirectory: File,
     private val jarResourcePrefix: String = "",
 ) : Platform {
+    override val performanceMonitor: PerformanceMonitor = LwjglPerformanceMonitor()
+
     private var window: Long = 0
 
     private var lastFrame: Long = getTime()
@@ -89,13 +97,16 @@ class GlfwPlatform(
             throw IllegalStateException("Unable to initialize GLFW")
         }
 
+        GLFW.glfwDefaultWindowHints() // optional, the current window hints are already the default
+
         GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MAJOR, 3)
         GLFW.glfwWindowHint(GLFW.GLFW_CONTEXT_VERSION_MINOR, 3)
         GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_PROFILE, GLFW.GLFW_OPENGL_CORE_PROFILE)
         GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_FORWARD_COMPAT, GLFW.GLFW_TRUE)
         GLFW.glfwWindowHint(GLFW.GLFW_OPENGL_DEBUG_CONTEXT, GLFW.GLFW_TRUE)
-
-        GLFW.glfwDefaultWindowHints() // optional, the current window hints are already the default
+        // Request depth and stencil bits for proper framebuffer support
+        GLFW.glfwWindowHint(GLFW.GLFW_DEPTH_BITS, 24)
+        GLFW.glfwWindowHint(GLFW.GLFW_STENCIL_BITS, 8)
 
         GLFW.glfwWindowHint(
             GLFW.GLFW_VISIBLE,
@@ -157,6 +168,7 @@ class GlfwPlatform(
         lwjglInputHandler.attachHandler(window)
 
         GL.createCapabilities(true)
+
         return WindowManager(
             windowWidth = tmpWidth.get(),
             windowHeight = tmpHeight.get(),
@@ -165,8 +177,8 @@ class GlfwPlatform(
         )
     }
 
-    override fun initRenderManager(windowManager: WindowManager): RenderContext {
-        return render.init(windowManager)
+    override fun initRenderManager(windowManager: WindowManager): Kgl {
+        return KglLwjgl
     }
 
     override fun initInputManager(): InputManager {
@@ -192,45 +204,6 @@ class GlfwPlatform(
         }
         gameLoop.end()
         GLFW.glfwTerminate()
-    }
-
-    private fun convert(data: ByteArray): IntArray {
-        val result = IntArray(data.size)
-        val colorPalette = gameOptions.colors()
-        data.forEachIndexed { index, byte ->
-            result[index] = colorPalette.getRGAasInt(byte.toInt())
-        }
-        return result
-    }
-
-    override fun draw(renderContext: RenderContext) {
-        render.drawOnScreen(renderContext)
-        val pixels = render.readRenderAsFrameBuffer(renderContext)
-
-        val imageCopy = pixels.pixels.copyOf()
-        recordScope.launch {
-            gifFrameCache.add(convert(imageCopy))
-        }
-
-        lastDraw = imageCopy
-    }
-
-    override fun executeOffScreen(
-        renderContext: RenderContext,
-        block: () -> Unit,
-    ): RenderFrame {
-        return render.executeOffScreen(renderContext, block)
-    }
-
-    override fun render(
-        renderContext: RenderContext,
-        ops: List<RenderOperation>,
-    ) {
-        render.render(renderContext, ops)
-    }
-
-    override fun readRender(renderContext: RenderContext): RenderFrame {
-        return render.readRender(renderContext)
     }
 
     override fun endGameLoop() = Unit
@@ -275,7 +248,7 @@ class GlfwPlatform(
         extension: String,
     ): File {
         var index = 0
-        var origin = workdirectory.resolve("output_${index.toString().padStart(3, '0')}.$extension")
+        var origin = gameDirectory.resolve("${prefixName}_${index.toString().padStart(3, '0')}.$extension")
         while (origin.exists()) {
             index++
             if (index >= 999) {
@@ -284,7 +257,7 @@ class GlfwPlatform(
                         "You might need to delete some",
                 )
             }
-            origin = workdirectory.resolve("output_${index.toString().padStart(3, '0')}.$extension")
+            origin = gameDirectory.resolve("${prefixName}_${index.toString().padStart(3, '0')}.$extension")
         }
         return origin
     }
@@ -293,26 +266,30 @@ class GlfwPlatform(
         val buffer = lastDraw ?: return
 
         recordScope.launch {
-            val origin = newFile("screenshoot", "png")
-            val width = gameOptions.width
-            val height = gameOptions.height
-            val image = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
-
-            for (y in 0 until height) {
-                for (x in 0 until width) {
-                    val colorData = gameOptions.colors().getRGBA(buffer[x + y * width].toInt())
-
-                    val r = colorData[0].toInt() and 0xff
-                    val g = colorData[1].toInt() and 0xff
-                    val b = colorData[2].toInt() and 0xff
-                    val a = colorData[3].toInt() and 0xff
-                    val color = (a shl 24) or (r shl 16) or (g shl 8) or b
-                    image.setRGB(x, y, color)
-                }
-            }
-
-            ImageIO.write(image, "png", origin)
+            writeImage(buffer)
         }
+    }
+
+    override fun writeImage(buffer: ByteArray) {
+        val origin = newFile("screenshoot", "png")
+        val width = gameOptions.width
+        val height = gameOptions.height
+        val image = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
+
+        for (y in 0 until height) {
+            for (x in 0 until width) {
+                val colorData = gameOptions.colors().getRGBA(buffer[x + y * width].toInt())
+
+                val r = colorData[0].toInt() and 0xff
+                val g = colorData[1].toInt() and 0xff
+                val b = colorData[2].toInt() and 0xff
+                val a = colorData[3].toInt() and 0xff
+                val color = (a shl 24) or (r shl 16) or (g shl 8) or b
+                image.setRGB(x, y, color)
+            }
+        }
+
+        ImageIO.write(image, "png", origin)
     }
 
     private fun extractRGBA(imageData: ByteArray): ImageData {
@@ -344,18 +321,17 @@ class GlfwPlatform(
         name: String,
         canUseJarPrefix: Boolean,
     ): SourceStream<ByteArray> {
-        val resourceName =
-            if (canUseJarPrefix) {
-                "$jarResourcePrefix/$name"
-            } else {
-                "/$name"
-            }
+        val resourceName = if (canUseJarPrefix) {
+            "$jarResourcePrefix/$name"
+        } else {
+            "/$name"
+        }
 
         val fromJar = GlfwPlatform::class.java.getResourceAsStream(resourceName)
         return if (fromJar != null) {
             InputStreamStream(fromJar)
         } else {
-            FileStream(workdirectory.resolve(name))
+            FileStream(gameDirectory.resolve(name))
         }
     }
 
@@ -376,28 +352,83 @@ class GlfwPlatform(
         }
     }
 
-    override fun createSoundStream(name: String): SourceStream<SoundData> {
+    override fun createSoundStream(
+        name: String,
+        soundManager: SoundManager,
+    ): SourceStream<SoundData> {
         return SoundDataSourceStream(name, soundManager, createByteArrayStream(name))
     }
 
-    private lateinit var soundManager: SoundManager
-
-    override fun initSoundManager(inputHandler: InputHandler): SoundManager {
-        return JavaSoundManager().also {
-            soundManager = it
-        }.also {
-            it.initSoundManager(inputHandler)
+    override fun saveIntoGameDirectory(
+        name: String,
+        data: String,
+    ) {
+        gameDirectory.resolve(name).outputStream().use {
+            it.write(data.toByteArray())
         }
     }
 
-    override fun createLocalFile(
+    override fun saveWave(sound: FloatArray) {
+        val output = newFile("sfx", "wav")
+
+        val audioFormat = AudioFormat(SAMPLE_RATE.toFloat(), BITS_PER_SAMPLE, CHANNELS, IS_SIGNED, IS_BIG_ENDIAN)
+
+        val bytesPerSample = audioFormat.sampleSizeInBits / 8
+        val byteAudioData = ByteArray(sound.size * bytesPerSample * audioFormat.channels)
+        var byteIndex = 0
+
+        for (floatSample in sound) {
+            val clippedSample = max(-1.0f, min(1.0f, floatSample))
+            val pcmValue = (clippedSample * Short.MAX_VALUE).roundToInt().toShort()
+
+            if (audioFormat.isBigEndian) {
+                byteAudioData[byteIndex++] = ((pcmValue.toInt() shr 8) and 0xFF).toByte() // High byte
+                byteAudioData[byteIndex++] = (pcmValue.toInt() and 0xFF).toByte() // Low byte
+            } else {
+                byteAudioData[byteIndex++] = (pcmValue.toInt() and 0xFF).toByte() // Low byte
+                byteAudioData[byteIndex++] = ((pcmValue.toInt() shr 8) and 0xFF).toByte() // High byte
+            }
+        }
+
+        val inputStream = ByteArrayInputStream(byteAudioData)
+
+        val frameSize = audioFormat.frameSize
+        val numberOfFrames = (byteAudioData.size / frameSize).toLong()
+
+        val audioInputStream = AudioInputStream(inputStream, audioFormat, numberOfFrames)
+
+        val fileType = AudioFileFormat.Type.WAVE
+
+        AudioSystem.write(audioInputStream, fileType, output)
+
+        logger.info("GLFW") { "Sound exported using the name ${output.name}." }
+    }
+
+    override fun initSoundManager(inputHandler: InputHandler): SoundManager {
+        val manager = JavaSoundManager()
+        manager.initSoundManager(inputHandler)
+        return manager
+    }
+
+    override fun saveIntoHome(
         name: String,
-        parentDirectory: String?,
-    ): LocalFile =
-        JvmLocalFile(
-            name,
-            parentDirectory?.let { workdirectory.resolve(it) } ?: workdirectory,
-        )
+        content: String,
+    ) {
+        if (!homeDirectory.exists()) {
+            homeDirectory.mkdirs()
+        }
+        val file = homeDirectory.resolve(name)
+        file.writeText(content)
+    }
+
+    override fun getFromHome(name: String): String? {
+        val file = homeDirectory.resolve(name)
+        return if (file.exists()) {
+            file.readText()
+        } else {
+            null
+        }
+    }
 
     companion object {
         private const val FPS = 60

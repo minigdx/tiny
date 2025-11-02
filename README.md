@@ -34,6 +34,19 @@ end
 
 ---
 
+## ⌨️ CLI Commands
+
+```bash
+tiny-cli create <name>    # Create new game
+tiny-cli run              # Run game
+tiny-cli debug            # Run with debugger
+tiny-cli serve            # Dev server with hot reload
+tiny-cli export           # Export for web
+tiny-cli palette          # Generate color palettes
+tiny-cli sfx              # Sound effect editor
+tiny-cli add              # Add resources to project
+```
+
 ## 📦 Download
 
 Get the latest version from the [Releases Page](https://github.com/minigdx/tiny/releases).
@@ -69,6 +82,18 @@ Want to create games like these? Dive into the docs and start building:
 [![Freezming](./tiny-doc/src/docs/asciidoc/sample/freezming.gif)](https://dwursteisen.itch.io/freezming)
 [![Gravity Balls](./tiny-doc/src/docs/asciidoc/sample/gravity-balls.gif)](https://dwursteisen.itch.io/gravity-balls)
 [![Reflections](./tiny-doc/src/docs/asciidoc/sample/reflections.gif)](https://dwursteisen.itch.io/macro-jams-06-reflections)
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions!
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ---
 

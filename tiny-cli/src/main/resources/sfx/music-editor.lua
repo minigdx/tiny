@@ -239,8 +239,9 @@ function _init()
 
     local entities = map.entities()
     for mode in all(entities["EditorMode"]) do
-        local button = widgets:create_mode_switch(mode)
-        table.insert(m.widgets, button)
+        local modeSwitch = widgets:create_mode_switch_component(mode)
+        modeSwitch.selected_index = 2
+        table.insert(m.widgets, modeSwitch)
     end
 
     for k in all(entities["Knob"]) do
@@ -271,8 +272,7 @@ function _init()
 
         track.track = sfx.track(track.fields.Track)
 
-        wire.produce_to(volume, { "value" }, track, { "track", "volume" })
-        wire.consume_on_update(volume, { "value" }, track, { "track", "volume" })
+        wire.bind(volume, "value", track, "track.volume")
 
         table.insert(m.widgets, track)
         table.insert(tracks, track)

@@ -1,87 +1,177 @@
 local wire = {}
 
---- Set value to an dictionary by traversing the path
-wire.set_nested_value = function(target, path, value)
-    local current_table = target
-
-    for i = 1, #path - 1 do
-        local key = path[i]
-        current_table = current_table[key]
-    end
-
-    local final_key = path[#path]
-    current_table[final_key] = value
-end
-
---- Get value from an dictionary by traversing the path
-wire.get_nested_value = function(source, path)
-    local current_table = source
-
-    for i = 1, #path - 1 do
-        local key = path[i]
-        current_table = current_table[key]
-    end
-
-    local final_key = path[#path]
-    return current_table[final_key]
-end
-
-
--- change a value updated from source, set it to target. The value can be converted using conv.
--- It's the responsibility from the source to call source.on_change to propagate the change.
-wire.produce_to = function(source, spath, target, tpath, conv)
-    local old_on_change = source.on_change
-
-    source.on_change = function(self)
-        local value = wire.get_nested_value(source, spath)
-        if conv then
-            value = conv(source, target, value)
+-- Parse a string path like "a.b.c" into a table {"a", "b", "c"}
+local function parse_path(path)
+    if type(path) == "string" then
+        local parts = {}
+        for part in string.gmatch(path, "[^%.]+") do
+            table.insert(parts, part)
         end
-        wire.set_nested_value(target, tpath, value)
+        return parts
+    end
+    return path -- already a table
+end
+
+-- Get a nested value from an object using a path
+local function get_value(obj, path)
+    local parts = parse_path(path)
+    local current = obj
+
+    for i = 1, #parts do
+        local key = parts[i]
+        if type(current) ~= "table" then
+            debug.console("ERROR: get_value - attempt to index a " .. type(current) .. " value")
+            debug.console("  path:", path)
+            debug.console("  i:", i)
+            debug.console("  key:", key)
+            debug.console("  current:", current)
+            debug.console("  parts:", parts)
+            return nil
+        end
+        current = current[key]
+        if current == nil then
+            return nil
+        end
+    end
+
+    return current
+end
+
+-- Set a nested value in an object using a path
+local function set_value(obj, path, value)
+    -- debug.console("set_value", obj, path, value)
+    local parts = parse_path(path)
+    local current = obj
+    
+    for i = 1, #parts - 1 do
+        current = current[parts[i]]
+        if current == nil then
+            return
+        end
+    end
+    
+    current[parts[#parts]] = value
+end
+
+--- Bind two objects together for bidirectional data flow
+-- When source changes, target is updated and vice versa
+-- @param obj1 First object
+-- @param path1 Path in first object (e.g. "player.health")
+-- @param obj2 Second object
+-- @param path2 Path in second object (e.g. "ui.healthbar.value")
+-- @param transform Optional function to transform values (obj_from, obj_to, value) -> transformed_value
+wire.bind = function(obj1, path1, obj2, path2, transform)
+    -- obj1 -> obj2
+    local to_widget = nil
+    if transform then
+        if type(transform) == "function" then
+            to_widget = transform
+        elseif transform.to_widget then
+            to_widget = transform.to_widget
+        end
+    end
+    wire.sync(obj1, path1, obj2, path2, to_widget, "update")
+
+    -- obj2 -> obj1
+    local from_widget = nil
+    if transform then
+        if type(transform) == "function" then
+            -- Create a reverse transform that swaps the object parameters
+            from_widget = function(from, to, value)
+                return transform(to, from, value)
+            end
+        elseif transform.from_widget then
+            from_widget = transform.from_widget
+        end
+    end
+    wire.sync(obj2, path2, obj1, path1, from_widget, "change")
+end
+
+function guessMode(target)
+    if(target._update ~= nil) then
+        return "update"
+    else
+        return "change"
+    end
+end
+--- Sync data from source to target
+-- Updates target whenever source changes (via on_change) or continuously (via _update)
+-- @param source Source object
+-- @param source_path Path in source object (e.g. "player.score")
+-- @param target Target object
+-- @param target_path Path in target object (e.g. "ui.score.text")
+-- @param transform Optional transformation function (source, target, value) -> transformed_value
+-- @param mode "change" (default) or "update" - how to listen for changes
+wire.sync = function(source, source_path, target, target_path, transform, mode)
+    mode = mode or guessMode(target)
+
+    local update_target = function()
+        local value = get_value(source, source_path)
+        if transform then
+            value = transform(source, target, value)
+        end
+        set_value(target, target_path, value)
+    end
+    
+    if mode == "change" then
+        -- Listen to on_change events
+        local old_on_change = source.on_change
+        source.on_change = function(self)
+            update_target()
+            if old_on_change then
+                old_on_change(self)
+            end
+        end
+    else
+        -- Update continuously in _update loop
+        local old_update = target._update
+        target._update = function(self)
+            update_target()
+            if old_update then
+                old_update(self)
+            end
+        end
+    end
+end
+
+--- Listen to changes in an object and execute a callback
+-- @param source Source object to listen to
+-- @param path Path to watch (e.g. "button.clicked")
+-- @param callback Function to call when value changes (source, value)
+wire.listen = function(source, path, callback)
+    if (not source) then
+        error("missing source in the listen method.")
+    end
+
+    local old_on_change = source.on_change
+    
+    source.on_change = function(self)
+        local value = get_value(source, path)
+        if callback then
+            callback(source, value)
+        end
+        
         if old_on_change then
             old_on_change(self)
         end
     end
 end
 
--- call conv when the source value is changed.
--- It's the responsibility from the source to call source.on_change to propagate the change.
-wire.listen_to = function(source, spath, conv)
-    local old_on_change = source.on_change
+--- Find a widget in a collection by entity ID
+-- @param widgets Collection of widgets
+-- @param ref Reference object with entityIid field
+-- @return The widget with matching iid, or nil
+wire.find_widget = function(widgets, ref)
+    if (not ref) then
+        error("find_widget is called without a valid entity ref")
+    end
 
-    source.on_change = function(self)
-        local value = wire.get_nested_value(source, spath)
-        if conv then
-            conv(source, value)
-        end
-
-        if old_on_change then
-            old_on_change(self)
+    for widget in all(widgets) do
+        if widget.iid == ref.entityIid then
+            return widget
         end
     end
-end
-
-wire.find_widget = function(widgets_set, ref)
-    for wid in all(widgets_set) do
-        if wid.iid == ref.entityIid then
-            return wid
-        end
-    end
-end
-
-
---- Get the latest value from the source.spath in the _update() loop
---- and set in in target.tpath
-wire.consume_on_update = function(target, tpath, source, spath, conv)
-    local old_update = target._update
-    target._update = function(self)
-        local value = wire.get_nested_value(source, spath)
-        if conv then
-            value = conv(source, target, value)
-        end
-        wire.set_nested_value(self, tpath, value)
-        old_update(target)
-    end
+    return nil
 end
 
 return wire

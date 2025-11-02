@@ -93,26 +93,23 @@ class PixelArray(val width: Pixel, val height: Pixel, val pixelFormat: Int = Pix
         }
 
         val minWidth = min(width, min(width - (dstX + width - this.width), width - (sourceX + width - source.width)))
-        val minHeight =
-            min(height, min(height - (dstY + height - this.height), height - (sourceY + height - source.height)))
+        val minHeight = min(height, min(height - (dstY + height - this.height), height - (sourceY + height - source.height)))
 
         for (h in 0 until minHeight) {
-            val offsetY =
-                if (reverseY) {
-                    minHeight - h - 1
-                } else {
-                    h
-                }
+            val offsetY = if (reverseY) {
+                minHeight - h - 1
+            } else {
+                h
+            }
 
             for (w in 0 until minWidth) {
                 val dstPosition = (w + dstX + (h + dstY) * this.width) * pixelFormat
 
-                val offsetX =
-                    if (reverseX) {
-                        minWidth - w - 1
-                    } else {
-                        w
-                    }
+                val offsetX = if (reverseX) {
+                    minWidth - w - 1
+                } else {
+                    w
+                }
 
                 val sourcePosition = (offsetX + sourceX + (offsetY + sourceY) * source.width) * pixelFormat
 

@@ -28,7 +28,17 @@ Tiny is a Kotlin Multiplatform game engine with Lua scripting support that compi
 ```bash
 ./gradlew build                    # Build all modules
 ./gradlew test                     # Run all tests
-./gradlew publishToMavenLocal      # Deploy to local maven
+./gradlew publishToMavenLocal      # Deploy to local maven (also: make deploy)
+./gradlew clean                    # Clean build artifacts
+```
+
+### Testing
+```bash
+./gradlew test                     # Run all tests
+./gradlew :tiny-engine:test        # Run tests for specific module
+./gradlew :tiny-engine:commonTest  # Run common multiplatform tests
+./gradlew :tiny-engine:jvmTest     # Run JVM-specific tests
+./gradlew :tiny-engine:jsTest      # Run JS-specific tests
 ```
 
 ### Linting
@@ -37,22 +47,36 @@ make lint          # or ./gradlew ktlintCheck
 make lintfix       # or ./gradlew ktlintFormat
 ```
 
-### CLI Installation
+### CLI Development
 ```bash
 make install       # Build and install CLI to ~/.bin/tiny-cli
+./gradlew :tiny-cli:assembleDist   # Build CLI distribution
 ```
 
-### Documentation
+### Documentation Generation
 ```bash
-make docs          # Generate documentation (requires CLI install)
+make docs          # Generate full documentation (requires CLI install)
+./gradlew asciidoctor              # Generate docs only
+```
+
+### CLI Commands (after installation)
+```bash
+tiny-cli create <name>    # Create new game project
+tiny-cli run              # Run game in current directory
+tiny-cli debug            # Run with debugger
+tiny-cli serve            # Dev server with hot reload
+tiny-cli export           # Export for web deployment
+tiny-cli sfx              # Sound effect editor
+tiny-cli add              # Add resources to project
+tiny-cli palette          # Generate color palettes
 ```
 
 ## Architecture Details
 
 ### Platform Abstraction
 The engine uses a Platform interface to abstract platform-specific functionality:
-- `GlfwPlatform` for desktop (LWJGL/GLFW)
-- `WebGlPlatform` for web (WebGL)
+- `GlfwPlatform` for desktop (LWJGL/GLFW). It uses OpenGL 3.
+- `WebGlPlatform` for web (WebGL). It uses WebGL 2.0.
 
 ### Resource Management
 Games are structured around:
@@ -69,22 +93,61 @@ The engine exposes functionality through organized Lua libraries:
 - `ctrl`: Input handling
 - `map`: Level/tilemap operations
 
-### Build Artifacts
+### Open GL Organization
+The engine use 2 stages of rendering: 
+- tiny-engine/src/commonMain/kotlin/com/github/minigdx/tiny/render/gl/SpriteBatchStage.kt : it renders everything in a framebuffer at a lower resolution.
+- tiny-engine/src/commonMain/kotlin/com/github/minigdx/tiny/render/gl/FrameBufferStage.kt : it renders the framebuffer from the previous stage at the screen resolution.
+- The OpenGL abstraction is managers by 
+  - tiny-engine/src/commonMain/kotlin/com/github/minigdx/tiny/render/shader/ShaderProgram.kt (manage shader program)
+  - tiny-engine/src/commonMain/kotlin/com/github/minigdx/tiny/render/shader/ShaderParameter.kt (manager shader program parameters)
+  - the shader program is created, alongside the shader program parameters. These parameters are created in Kotlin and added in the shader source code program. 
+  - The shader program parameters can be configured using the method `setup` to access the vertex and fragment shader.
+  - before draw, the `blind` is called. `unbind` is called after. 
+  - fragColor is added automatically as out vec4 in FragmentShader (See tiny-engine/src/commonMain/kotlin/com/github/minigdx/tiny/render/shader/BaseShader.kt)
+  - #version is added automatically in the shader program source code (See tiny-engine/src/commonMain/kotlin/com/github/minigdx/tiny/render/shader/BaseShader.kt)
+
+### Build Artifacts & Tasks
 The build produces several specialized artifacts:
 - `tinyWebEngine`: JS engine for web deployment
-- `tinyApiAsciidoctor`: Generated API documentation
+- `tinyApiAsciidoctor`: Generated API documentation  
 - `tinyApiLuaStub`: Lua API stubs
 - `tinyResources`: Packaged engine resources
 
+Key Gradle tasks:
+- `tiny-web-editor:tinyWebEditor`: Builds web editor interface
+- `assembleDist`: Creates CLI distribution zip
+- `asciidoctor`: Generates documentation using generated content
+
+## Performance Considerations
+
+### Critical Performance Areas
+- **Input handling**: LWJGL input system can be slower than WebGL due to cursor position polling
+- **Lua wrapper creation**: Frequent `WrapperLuaTable` creation in SfxLib can impact performance
+- **Resource loading**: Hot-reload monitors file changes for rapid development iteration
+
+### Platform-Specific Optimizations
+- **Desktop (LWJGL)**: Uses cursor position caching to avoid expensive `glfwGetCursorPos()` calls
+- **Web (WebGL)**: Generally more responsive for UI interactions due to different input handling
+
 ## Development Workflow
 
-1. Engine changes go in `tiny-engine/src/commonMain/kotlin`
-2. CLI commands are in `tiny-cli/src/main/kotlin/com/github/minigdx/tiny/cli/command/`
-3. Lua API libraries are in `tiny-engine/src/commonMain/kotlin/com/github/minigdx/tiny/lua/`
-4. Tests follow the pattern `src/commonTest/kotlin` for shared tests
-5. Platform-specific code uses `src/jvmMain` and `src/jsMain` directories
+### Code Organization
+1. **Engine core**: `tiny-engine/src/commonMain/kotlin` - shared multiplatform logic
+2. **Platform specifics**: `src/jvmMain` (desktop/LWJGL) and `src/jsMain` (web/WebGL)
+3. **CLI commands**: `tiny-cli/src/main/kotlin/com/github/minigdx/tiny/cli/command/`
+4. **Lua API libraries**: `tiny-engine/src/commonMain/kotlin/com/github/minigdx/tiny/lua/`
+5. **Tests**: `src/commonTest/kotlin` for shared tests, platform-specific in `src/jvmTest` and `src/jsTest`
 
-The project uses hot-reload for rapid development - games can be updated without restarting the engine.
+### Development Features
+- **Hot-reload**: Games update without engine restart for rapid iteration
+- **Multi-module build**: Independent module development and testing
+- **Documentation generation**: KSP-based API documentation from code annotations
+
+### Module Dependencies
+- `tiny-engine` is the core with no dependencies on other modules
+- `tiny-cli` depends on `tiny-engine` for game execution
+- `tiny-web-editor` provides browser-based development interface
+- `tiny-doc` modules handle documentation generation pipeline
 
 # AI Instructions
 ## Role and Objective
@@ -95,6 +158,7 @@ You are Coding Copilot, configured to assist in a multi-language codebase (Kotli
 - If a task cannot be completed due to lack of information, respond with a comment indicating the missing context.
 - You MUST interpret the documentation with zero ambiguity — never make assumptions beyond what is explicitly provided.
 - Maintain consistency across languages (e.g., variable naming, file structure) as defined in the guidelines.
+- The code MUST be compatible with Open GL 3 and WebGL 2.0.
 ## Instructions
 1. Read the code context and user intent.
 2. Refer to the documentation attached to this prompt for all formatting, naming, and architecture rules.

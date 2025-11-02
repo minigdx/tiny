@@ -15,6 +15,7 @@ import java.io.FileOutputStream
 @JsonClassDiscriminator("version")
 sealed class GameParameters {
     abstract val name: String
+    abstract val id: String
 
     abstract fun toGameOptions(): GameOptions
 
@@ -63,6 +64,11 @@ data class Size(val width: Int, val height: Int)
 @Serializable
 data class GameParametersV1(
     override val name: String,
+    /**
+     * Unique identifier for this game.
+     * Generated during at the creation time of the game.
+     */
+    override val id: String,
     val resolution: Size,
     val sprites: Size,
     val zoom: Int,

@@ -4,16 +4,20 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.mokkery)
+    id("io.github.turansky.seskar") version "4.27.0"
+    id("org.jetbrains.kotlin.plugin.js-plain-objects") version "2.2.20"
+    id("io.github.turansky.kfc.application") version "14.12.0"
 }
 
 dependencies {
     this.commonTestImplementation(kotlin("test"))
+    this.commonTestImplementation(libs.kotlin.coroutines.test)
 
     // Multiplatform
+    this.commonMainApi(libs.kgl.core)
     this.commonMainImplementation(libs.luak)
     this.commonMainImplementation(libs.kotlin.coroutines)
     this.commonMainImplementation(libs.kotlin.serialization.json)
-    this.commonMainImplementation(libs.kgl.core)
     this.commonMainImplementation(project(":tiny-doc-annotations"))
 
     // JVM Specific
@@ -39,7 +43,9 @@ dependencies {
 
     this.jvmMainImplementation(libs.jvm.gifencoder)
 
-    jsMainImplementation("org.jetbrains.kotlin:kotlinx-atomicfu-runtime:2.1.20")?.because("https://youtrack.jetbrains.com/issue/KT-57235")
+    jsMainImplementation("org.jetbrains.kotlin:kotlinx-atomicfu-runtime:2.2.20")?.because("https://youtrack.jetbrains.com/issue/KT-57235")
+    jsMainImplementation("org.jetbrains.kotlin-wrappers:kotlin-browser:2025.10.3")
+        ?.because("required to access AudioWorkletNode")
 
     add("kspJvm", project(":tiny-annotation-processors:tiny-lua-stub-generator")) {
         because("KSP will generate all Lua stub methods from all Lua libs from Tiny.")
@@ -50,33 +56,36 @@ dependencies {
     }
 }
 
-// Create the tiny engine javascript version as a Zip file
-val tinyEngineJsJar =
-    project.tasks.register(
-        "tinyEngineJsJar",
-        Jar::class.java,
-    ) {
-        from(tasks.getByName("jsBrowserDistribution"))
-        this.into("tiny-engine-js")
-        this.destinationDirectory.set(project.layout.buildDirectory.dir("tiny-distributions"))
+// Copy the tiny engine javascript JAR file
+val tinyEngineJsJar = project.tasks.register(
+    "tinyEngineJsJar",
+    Jar::class.java,
+) {
+    // Generate a jar with the content of the result of this task as content
+    from(tasks.named("jsBundleProduction"))
+    this.destinationDirectory = project.layout.buildDirectory.dir("tiny-distributions")
 
-        group = "tiny"
-        description = "Build a jar containing all resources to run the Tiny engine in a web application."
-    }
+    // Set the output file name
+    this.archiveFileName.set("tiny-engine-js.jar")
+    // Set the file name of the file included in the jar
+    this.rename { "tiny-engine-js.zip" }
 
-val tinyResourcesZip =
-    project.tasks.register(
-        "tinyResourcesZip",
-        Zip::class.java,
-    ) {
-        from(tasks.getByName("jvmProcessResources"))
-        this.into("")
-        this.destinationDirectory.set(project.layout.buildDirectory.dir("tiny-distributions"))
-        this.archiveBaseName.set("tiny-resources")
+    group = "tiny"
+    description = "Copy the Tiny engine JS bundle JAR to the distributions directory."
+}
 
-        group = "tiny"
-        description = "Build a zip containing resources from the Tiny Engine (_boot.lua, ...)."
-    }
+val tinyResourcesZip = project.tasks.register(
+    "tinyResourcesZip",
+    Zip::class.java,
+) {
+    from(tasks.named("jvmProcessResources"))
+    this.into("")
+    this.destinationDirectory.set(project.layout.buildDirectory.dir("tiny-distributions"))
+    this.archiveBaseName.set("tiny-resources")
+
+    group = "tiny"
+    description = "Build a zip containing resources from the Tiny Engine (_boot.lua, ...)."
+}
 
 // Create the configuration that will contain the tiny engine javascript as artifact
 configurations.create("tinyWebEngine") {

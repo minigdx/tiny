@@ -1,6 +1,7 @@
 package com.github.minigdx.tiny.sound
 
 import com.github.minigdx.tiny.lua.Note
+import com.github.minigdx.tiny.util.FloatData
 import kotlin.math.sqrt
 import kotlin.test.Test
 import kotlin.test.assertTrue
@@ -14,10 +15,7 @@ class SoundManagerTest {
             // No-op for testing
         }
 
-        override fun createSoundHandler(
-            buffer: FloatArray,
-            numberOfSamples: Long,
-        ): SoundHandler {
+        override fun createSoundHandler(buffer: FloatArray): SoundHandler {
             // Return a dummy sound handler for testing
             return object : SoundHandler {
                 override fun play() {}
@@ -25,7 +23,30 @@ class SoundManagerTest {
                 override fun loop() {}
 
                 override fun stop() {}
+
+                override fun nextChunk(samples: Int): FloatData {
+                    TODO("Not yet implemented")
+                }
             }
+        }
+
+        override fun createSoundHandler(buffer: Sequence<FloatArray>): SoundHandler {
+            TODO("Not yet implemented")
+        }
+
+        override fun createSoundHandler(chunkGenerator: ChunkGenerator): SoundHandler {
+            TODO("Not yet implemented")
+        }
+
+        override fun noteOn(
+            note: Note,
+            instrument: Instrument,
+        ) {
+            TODO("Not yet implemented")
+        }
+
+        override fun noteOff(note: Note) {
+            TODO("Not yet implemented")
         }
     }
 

@@ -8,4 +8,5 @@ enum class ResourceType {
     GAME_SPRITESHEET,
     GAME_LEVEL,
     GAME_SOUND,
+    PRIMITIVE_SPRITESHEET,
 }

@@ -1,15 +1,13 @@
 package com.github.minigdx.tiny.platform
 
+import com.danielgergely.kgl.Kgl
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
-import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
-import com.github.minigdx.tiny.render.RenderContext
-import com.github.minigdx.tiny.render.RenderFrame
-import com.github.minigdx.tiny.render.operations.RenderOperation
+import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.sound.Music
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.coroutines.CoroutineDispatcher
@@ -26,8 +24,6 @@ class ImageData(
 class SoundData(
     // Name of the file.
     val name: String,
-    // Sound manager to actually play the sound or the music.
-    val soundManager: SoundManager,
     // Deserialized data of the file.
     val music: Music,
     // Ready to play musical bars. (sfx)
@@ -43,6 +39,11 @@ interface Platform {
     val gameOptions: GameOptions
 
     /**
+     * Performance monitor for this platform
+     */
+    val performanceMonitor: PerformanceMonitor
+
+    /**
      * Create the window where the game will render
      */
     fun initWindowManager(): WindowManager
@@ -50,7 +51,7 @@ interface Platform {
     /**
      * Prepare the platform for the game loop
      */
-    fun initRenderManager(windowManager: WindowManager): RenderContext
+    fun initRenderManager(windowManager: WindowManager): Kgl
 
     /**
      * Let's run the game loop
@@ -66,6 +67,11 @@ interface Platform {
      * Generate a screenshoot of the actual frame.
      */
     fun screenshot() = Unit
+
+    /**
+     * Write an image from a frame using index as colors
+     */
+    fun writeImage(buffer: ByteArray)
 
     /**
      * The game loop stopped.
@@ -108,44 +114,33 @@ interface Platform {
     ): SourceStream<ImageData>
 
     /**
-     * Create a SourceStream from a midi file.
+     * Create a SourceStream from a sfx file.
      */
-    fun createSoundStream(name: String): SourceStream<SoundData>
-
-    /**
-     * Create a file using the name.
-     *
-     * @param: name of the file, with the extension, if any.
-     */
-    fun createLocalFile(
+    fun createSoundStream(
         name: String,
-        parentDirectory: String? = "data",
-    ): LocalFile
+        soundManager: SoundManager,
+    ): SourceStream<SoundData>
 
     /**
-     * Render the operations into the frame buffer.
+     * Save a file with [content] into the home directory.
      */
-    fun render(
-        renderContext: RenderContext,
-        ops: List<RenderOperation>,
+    fun saveIntoHome(
+        name: String,
+        content: String,
     )
 
     /**
-     * Read the full rendered screen into a frame.
+     * Get the content from a file contained in the home directory
      */
-    fun readRender(renderContext: RenderContext): RenderFrame
+    fun getFromHome(name: String): String?
 
     /**
-     * Draw the frame buffer on the screen.
+     * Save data in the game directory
      */
-    fun draw(renderContext: RenderContext)
+    fun saveIntoGameDirectory(
+        name: String,
+        data: String,
+    )
 
-    /**
-     * Execute the block using an off-screen buffer.
-     * All drawing operation will use this off-screen buffer instead
-     */
-    fun executeOffScreen(
-        renderContext: RenderContext,
-        block: () -> Unit,
-    ): RenderFrame
+    fun saveWave(sound: FloatArray)
 }

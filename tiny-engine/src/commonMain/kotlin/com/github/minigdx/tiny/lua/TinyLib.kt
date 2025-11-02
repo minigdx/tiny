@@ -6,18 +6,26 @@ import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.mingdx.tiny.doc.TinyVariable
 import com.github.minigdx.tiny.engine.Exit
+import com.github.minigdx.tiny.engine.GameOptions
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 
+internal expect fun platformValue(): Int
+
 @TinyLib(
     "tiny",
     "Tiny Lib which offer offer the current frame (`tiny.frame`), " +
-        "the current time (`tiny.time`), delta time (`tiny.dt`) and " +
+        "the current time (`tiny.time`), delta time (`tiny.dt`), " +
+        "game dimensions (`tiny.width`, `tiny.height`), " +
+        "platform information (`tiny.platform`) and " +
         "to switch to another script using `exit`.",
 )
-class TinyLib(private val gameScript: List<String>) : TwoArgFunction() {
+class TinyLib(
+    private val gameScript: List<String>,
+    private val gameOptions: GameOptions,
+) : TwoArgFunction() {
     private var time: Double = 0.0
     private var frame: Int = 0
     private val tiny = LuaTable()
@@ -37,13 +45,21 @@ class TinyLib(private val gameScript: List<String>) : TwoArgFunction() {
     )
     @TinyVariable("t", "Time elapsed since the start of the game.")
     @TinyVariable("frame", "Number of frames elapsed since the start of the game.")
+    @TinyVariable("width", "Width of the game in pixels.")
+    @TinyVariable("height", "Height of the game in pixels.")
+    @TinyVariable("platform", "Current platform: 1 for desktop, 2 for web.")
     override fun call(
         arg1: LuaValue,
         arg2: LuaValue,
     ): LuaValue {
+        val platformType = platformValue()
+
         tiny["dt"] = valueOf(1 / 60.0)
         tiny["t"] = valueOf(time)
         tiny["frame"] = valueOf(frame)
+        tiny["width"] = valueOf(gameOptions.width)
+        tiny["height"] = valueOf(gameOptions.height)
+        tiny["platform"] = valueOf(platformType)
         tiny["exit"] = exit()
         arg2["tiny"] = tiny
         arg2["package"]["loaded"]["tiny"] = tiny
@@ -62,11 +78,10 @@ class TinyLib(private val gameScript: List<String>) : TwoArgFunction() {
             @TinyArg("scriptIndex") arg: LuaValue,
         ): LuaValue {
             if (arg.isint()) {
-                val index = arg.checkint() % gameScript.size
-                throw Exit(index)
+                throw Exit(arg.toint())
             } else {
                 val scriptName = arg.checkjstring()!!
-                val index = gameScript.indexOfFirst { it == scriptName } % gameScript.size
+                val index = gameScript.indexOfFirst { it == scriptName }
                 throw Exit(index)
             }
         }

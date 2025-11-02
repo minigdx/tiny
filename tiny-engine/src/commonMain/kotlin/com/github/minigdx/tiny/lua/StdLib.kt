@@ -7,7 +7,7 @@ import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
-import com.github.minigdx.tiny.render.operations.FrameBufferOperation
+import com.github.minigdx.tiny.render.VirtualFrameBuffer
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
@@ -19,6 +19,7 @@ import org.luaj.vm2.lib.VarArgFunction
 class StdLib(
     val gameOptions: GameOptions,
     val resourceAccess: GameResourceAccess,
+    val virtualFrameBuffer: VirtualFrameBuffer,
 ) : TwoArgFunction() {
     override fun call(
         arg1: LuaValue,
@@ -158,12 +159,11 @@ class StdLib(
                     }
                 }
             // If the expected table is nil, don't iterate.
-            val table =
-                if (args.isnil(1)) {
-                    LuaTable()
-                } else {
-                    args.checktable(1)!!
-                }
+            val table = if (args.isnil(1)) {
+                LuaTable()
+            } else {
+                args.checktable(1)!!
+            }
             // iterator, object to iterate, seed value.
             return varargsOf(iterator, table)
         }
@@ -233,75 +233,67 @@ class StdLib(
             @TinyArg("y") c: LuaValue,
             @TinyArg("color") d: LuaValue,
         ): LuaValue {
+            val spritesheet = resourceAccess.bootSpritesheet ?: return NONE
             val str = a.tojstring()
             val x = b.checkint()
             val y = c.checkint()
             val color = d.checkColorIndex()
-
-            val spritesheet = resourceAccess.bootSpritesheet ?: return NONE
 
             val space = 4
             var currentX = x
             var currentY = y
             str.forEach { char ->
 
-                val coord =
-                    if (char.isLetter()) {
-                        // The character has an accent. Let's try to get rid of it
-                        val l =
-                            if (char.hasAccent) {
-                                ACCENT_MAP[char.lowercaseChar()] ?: char.lowercaseChar()
-                            } else {
-                                char.lowercaseChar()
-                            }
-                        val index = l - 'a'
-                        index to 0
-                    } else if (char.isDigit()) {
-                        val index = char.lowercaseChar() - '0'
-                        index to 1
-                    } else if (char in '!'..'/') {
-                        val index = char.lowercaseChar() - '!'
-                        index to 2
-                    } else if (char in '['..'`') {
-                        val index = char.lowercaseChar() - '['
-                        index to 3
-                    } else if (char in '{'..'~') {
-                        val index = char.lowercaseChar() - '{'
-                        index to 4
-                    } else if (char in ':'..'@') {
-                        val index = char.lowercaseChar() - ':'
-                        index to 5
-                    } else if (char == '\n') {
-                        currentY += 6
-                        currentX = x - space // compensate the next space
-                        null
+                val coord = if (char.isLetter()) {
+                    // The character has an accent. Let's try to get rid of it
+                    val l = if (char.hasAccent) {
+                        ACCENT_MAP[char.lowercaseChar()] ?: char.lowercaseChar()
                     } else {
-                        // Maybe it's an emoji: try EMOJI MAP conversion
-                        EMOJI_MAP[char]
+                        char.lowercaseChar()
                     }
+                    val index = l - 'a'
+                    index to 0
+                } else if (char.isDigit()) {
+                    val index = char.lowercaseChar() - '0'
+                    index to 1
+                } else if (char in '!'..'/') {
+                    val index = char.lowercaseChar() - '!'
+                    index to 2
+                } else if (char in '['..'`') {
+                    val index = char.lowercaseChar() - '['
+                    index to 3
+                } else if (char in '{'..'~') {
+                    val index = char.lowercaseChar() - '{'
+                    index to 4
+                } else if (char in ':'..'@') {
+                    val index = char.lowercaseChar() - ':'
+                    index to 5
+                } else if (char == '\n') {
+                    currentY += 6
+                    currentX = x - space // compensate the next space
+                    null
+                } else {
+                    // Maybe it's an emoji: try EMOJI MAP conversion
+                    EMOJI_MAP[char]
+                }
                 if (coord != null) {
                     val (indexX, indexY) = coord
-                    resourceAccess.frameBuffer.copyFrom(
-                        spritesheet.pixels,
-                        currentX,
-                        currentY,
+
+                    virtualFrameBuffer.drawMonocolor(
+                        spritesheet,
+                        color,
                         indexX * 4,
                         indexY * 4,
                         4,
                         4,
-                    ) { pixel: ByteArray, _, _ ->
-                        if (pixel[0].toInt() == 0) {
-                            pixel
-                        } else {
-                            pixel[0] = color.toByte()
-                            pixel
-                        }
-                    }
+                        currentX,
+                        currentY,
+                        flipX = false,
+                        flipY = false,
+                    )
                 }
                 currentX += space
             }
-
-            resourceAccess.addOp(FrameBufferOperation)
 
             return NONE
         }
@@ -314,7 +306,7 @@ class StdLib(
         return if (this.isnumber()) {
             this.checkint()
         } else {
-            resourceAccess.frameBuffer.gamePalette.getColorIndex(this.checkjstring()!!)
+            gameOptions.colors().getColorIndex(this.checkjstring()!!)
         }
     }
 

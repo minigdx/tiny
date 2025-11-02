@@ -2,7 +2,6 @@ import com.github.minigdx.tiny.engine.GameEngine
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.file.CommonVirtualFileSystem
-import com.github.minigdx.tiny.file.LocalFile
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.forEachIndexed
 import com.github.minigdx.tiny.getRootPath
@@ -13,10 +12,8 @@ import com.github.minigdx.tiny.platform.ImageData
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
+import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.platform.webgl.WebGlPlatform
-import com.github.minigdx.tiny.render.RenderContext
-import com.github.minigdx.tiny.render.RenderFrame
-import com.github.minigdx.tiny.render.operations.RenderOperation
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.browser.document
 import kotlinx.browser.window
@@ -229,9 +226,7 @@ private fun createGame(
 
         oninput = { event ->
             val pos = getCaretPosition(this)
-            console.log("html", this.innerHTML)
             this.innerHTML = highlight(extractText(this))
-            console.log("html highlight", this.innerHTML)
             setCaret(pos, this)
         }
     }
@@ -281,7 +276,14 @@ private fun createGame(
 
     GameEngine(
         gameOptions = gameOptions,
-        platform = EditorWebGlPlatform(WebGlPlatform(canvas as HTMLCanvasElement, logger, gameOptions, rootPath)),
+        platform = EditorWebGlPlatform(
+            WebGlPlatform(
+                canvas as HTMLCanvasElement,
+                gameOptions,
+                "tiny-editor-$index",
+                rootPath,
+            ),
+        ),
         vfs = CommonVirtualFileSystem(),
         logger = logger,
     ).main()
@@ -290,11 +292,17 @@ private fun createGame(
 class EditorWebGlPlatform(val delegate: Platform) : Platform {
     override val gameOptions: GameOptions = delegate.gameOptions
 
+    override val performanceMonitor: PerformanceMonitor = delegate.performanceMonitor
+
     override fun initWindowManager(): WindowManager = delegate.initWindowManager()
 
-    override fun initRenderManager(windowManager: WindowManager): RenderContext = delegate.initRenderManager(windowManager)
+    override fun initRenderManager(windowManager: WindowManager) = delegate.initRenderManager(windowManager)
 
     override fun gameLoop(gameLoop: GameLoop) = delegate.gameLoop(gameLoop)
+
+    override fun writeImage(buffer: ByteArray) {
+        TODO("Not yet implemented")
+    }
 
     override fun endGameLoop() = delegate.endGameLoop()
 
@@ -325,33 +333,28 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
             name,
         )
 
-    override fun createSoundStream(name: String): SourceStream<SoundData> = delegate.createSoundStream(name)
-
-    override fun createLocalFile(
+    override fun createSoundStream(
         name: String,
-        parentDirectory: String?,
-    ): LocalFile =
-        delegate.createLocalFile(
-            name = name,
-            parentDirectory = parentDirectory,
+        soundManager: SoundManager,
+    ): SourceStream<SoundData> =
+        delegate.createSoundStream(
+            name,
+            soundManager,
         )
 
-    override fun render(
-        renderContext: RenderContext,
-        ops: List<RenderOperation>,
-    ) = delegate.render(
-        renderContext,
-        ops,
-    )
+    override fun saveIntoHome(
+        name: String,
+        content: String,
+    ) = delegate.saveIntoHome(name, content)
 
-    override fun draw(renderContext: RenderContext) = delegate.draw(renderContext)
+    override fun getFromHome(name: String): String? = delegate.getFromHome(name)
 
-    override fun executeOffScreen(
-        renderContext: RenderContext,
-        block: () -> Unit,
-    ): RenderFrame {
-        return delegate.executeOffScreen(renderContext, block)
+    override fun saveIntoGameDirectory(
+        name: String,
+        data: String,
+    ) = delegate.saveIntoGameDirectory(name, data)
+
+    override fun saveWave(sound: FloatArray) {
+        TODO("Not yet implemented")
     }
-
-    override fun readRender(renderContext: RenderContext) = delegate.readRender(renderContext)
 }

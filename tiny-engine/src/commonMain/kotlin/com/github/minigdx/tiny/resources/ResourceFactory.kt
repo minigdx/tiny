@@ -3,12 +3,12 @@ package com.github.minigdx.tiny.resources
 import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.file.VirtualFileSystem
-import com.github.minigdx.tiny.graphic.ColorPalette
 import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.graphic.PixelFormat
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.platform.Platform
+import com.github.minigdx.tiny.render.VirtualFrameBuffer
 import com.github.minigdx.tiny.resources.ResourceType.BOOT_GAMESCRIPT
 import com.github.minigdx.tiny.resources.ResourceType.BOOT_SPRITESHEET
 import com.github.minigdx.tiny.resources.ResourceType.ENGINE_GAMESCRIPT
@@ -17,6 +17,8 @@ import com.github.minigdx.tiny.resources.ResourceType.GAME_LEVEL
 import com.github.minigdx.tiny.resources.ResourceType.GAME_SPRITESHEET
 import com.github.minigdx.tiny.resources.ldtk.Layer
 import com.github.minigdx.tiny.resources.ldtk.Ldtk
+import com.github.minigdx.tiny.sound.SoundManager
+import com.github.minigdx.tiny.sound.VirtualSoundBoard
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapMerge
@@ -28,9 +30,18 @@ import kotlinx.coroutines.flow.onEach
 class ResourceFactory(
     private val vfs: VirtualFileSystem,
     private val platform: Platform,
+    private val inputHandler: InputHandler,
+    private val virtualFrameBuffer: VirtualFrameBuffer,
+    private val virtualSoundBoard: VirtualSoundBoard,
+    private val soundManager: SoundManager,
+    private val gameOptions: GameOptions,
     private val logger: Logger,
-    private val colorPalette: ColorPalette,
 ) {
+    /**
+     * Resource that can be only read from the jar.
+     */
+    private val protectedResources = setOf(BOOT_GAMESCRIPT, ENGINE_GAMESCRIPT, BOOT_SPRITESHEET)
+
     /**
      * Load a SFX file and convert it into a Sound.
      */
@@ -39,7 +50,7 @@ class ResourceFactory(
         name: String,
     ): Flow<Sound> {
         var version = 0
-        return vfs.watch(platform.createSoundStream(name))
+        return vfs.watch(platform.createSoundStream(name, soundManager))
             .map { soundData -> Sound(version++, index, name, soundData) }
             .onEach {
                 logger.debug("RESOURCE_FACTORY") {
@@ -55,7 +66,7 @@ class ResourceFactory(
         index: Int,
         name: String,
     ): Flow<GameLevel> {
-        suspend fun getTilesets(ldtk: Ldtk): Map<String, PixelArray> {
+        suspend fun getTilesets(ldtk: Ldtk): Map<String, SpriteSheet> {
             return ldtk.levels.flatMap { level -> level.layerInstances }
                 .mapNotNull {
                     // Collect all tileset
@@ -69,12 +80,22 @@ class ResourceFactory(
                 .map { file -> file to platform.createImageStream(file).takeIf { it.exists() }?.read() }
                 .filter { it.second != null }
                 .associate { (file, imageData) ->
-                    file to
-                        convertToColorIndex(
-                            imageData!!.data,
-                            imageData.width,
-                            imageData.height,
-                        )
+                    val pixels = convertToColorIndex(
+                        imageData!!.data,
+                        imageData.width,
+                        imageData.height,
+                    )
+
+                    val spritesheet = SpriteSheet(
+                        version = 0,
+                        index = 0,
+                        name = "__level-$name",
+                        type = GAME_SPRITESHEET,
+                        pixels = pixels,
+                        width = pixels.width,
+                        height = pixels.height,
+                    )
+                    file to spritesheet
                 }
         }
 
@@ -105,29 +126,15 @@ class ResourceFactory(
     fun gamescript(
         index: Int,
         name: String,
-        inputHandler: InputHandler,
-        gameOptions: GameOptions,
-    ) = script(index, name, inputHandler, gameOptions, GAME_GAMESCRIPT)
+    ) = script(index, name, GAME_GAMESCRIPT)
 
-    fun enginescript(
-        name: String,
-        inputHandler: InputHandler,
-        gameOptions: GameOptions,
-    ) = script(0, name, inputHandler, gameOptions, ENGINE_GAMESCRIPT)
+    fun enginescript(name: String) = script(0, name, ENGINE_GAMESCRIPT)
 
-    fun bootscript(
-        name: String,
-        inputHandler: InputHandler,
-        gameOptions: GameOptions,
-    ) = script(0, name, inputHandler, gameOptions, BOOT_GAMESCRIPT)
-
-    private val protectedResources = setOf(BOOT_GAMESCRIPT, ENGINE_GAMESCRIPT, BOOT_SPRITESHEET)
+    fun bootscript(name: String) = script(0, name, BOOT_GAMESCRIPT)
 
     private fun script(
         index: Int,
         name: String,
-        inputHandler: InputHandler,
-        gameOptions: GameOptions,
         resourceType: ResourceType,
     ): Flow<GameScript> {
         var version = 0
@@ -137,7 +144,18 @@ class ResourceFactory(
                 canUseJarPrefix = !protectedResources.contains(resourceType),
             ),
         ).map { content ->
-            GameScript(version++, index, name, gameOptions, inputHandler, platform, logger, resourceType).apply {
+            GameScript(
+                version = version++,
+                index = index,
+                name = name,
+                gameOptions = gameOptions,
+                virtualFrameBuffer = virtualFrameBuffer,
+                virtualSoundBoard = virtualSoundBoard,
+                platform = platform,
+                logger = logger,
+                inputHandler = inputHandler,
+                type = resourceType,
+            ).apply {
                 this.content = content
             }
         }.onEach {
@@ -189,15 +207,14 @@ class ResourceFactory(
         (0 until width).forEach { x ->
             (0 until height).forEach { y ->
                 val coord = (x + y * width) * PixelFormat.RGBA
-                val index =
-                    colorPalette.fromRGBA(
-                        byteArrayOf(
-                            data[coord + 0],
-                            data[coord + 1],
-                            data[coord + 2],
-                            data[coord + 3],
-                        ),
-                    )
+                val index = gameOptions.colors().fromRGBA(
+                    byteArrayOf(
+                        data[coord + 0],
+                        data[coord + 1],
+                        data[coord + 2],
+                        data[coord + 3],
+                    ),
+                )
 
                 result.set(x, y, index)
             }

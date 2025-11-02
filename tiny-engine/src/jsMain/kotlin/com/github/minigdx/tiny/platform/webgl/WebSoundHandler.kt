@@ -1,23 +1,40 @@
 package com.github.minigdx.tiny.platform.webgl
 
+import com.github.minigdx.tiny.sound.BufferedChunkGenerator
+import com.github.minigdx.tiny.sound.ChunkGenerator
 import com.github.minigdx.tiny.sound.SoundHandler
-import org.khronos.webgl.Float32Array
+import com.github.minigdx.tiny.util.FloatData
+import web.audio.AudioBufferSourceNode
 
 class WebSoundHandler(
-    val data: Float32Array,
-    private val soundMananger: WebSoundMananger,
+    private val chunkGenerator: ChunkGenerator,
+    private val soundMananger: WebSoundManager,
 ) : SoundHandler {
     private var audioNode: AudioBufferSourceNode? = null
 
+    constructor(
+        data: FloatArray,
+        soundMananger: WebSoundManager,
+    ) : this(
+        BufferedChunkGenerator(data),
+        soundMananger,
+    )
+
     override fun play() {
-        audioNode = soundMananger.playSfxBuffer(data)
+        // FIXME: replace
+        // audioNode = soundMananger.playSfxBuffer(data)
     }
 
     override fun loop() {
-        audioNode = soundMananger.playSfxBuffer(data, loop = true)
+        // FIXME: replace
+        // audioNode = soundMananger.playSfxBuffer(data, loop = true)
     }
 
     override fun stop() {
         audioNode?.stop()
+    }
+
+    override fun nextChunk(samples: Int): FloatData {
+        return chunkGenerator.generateChunk(samples)
     }
 }
