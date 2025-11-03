@@ -49,4 +49,14 @@ class Clipper(private val width: Pixel, private val height: Pixel) {
             left == o.left && right == o.right &&
             top == o.top && bottom == o.bottom
     }
+
+    override fun hashCode(): Int {
+        var result = width
+        result = 31 * result + height
+        result = 31 * result + left
+        result = 31 * result + right
+        result = 31 * result + top
+        result = 31 * result + bottom
+        return result
+    }
 }

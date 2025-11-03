@@ -37,6 +37,7 @@ import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.graphic.FrameBufferParameters
 import com.github.minigdx.tiny.graphic.PixelFormat
+import com.github.minigdx.tiny.input.internal.ObjectPool
 import com.github.minigdx.tiny.platform.DrawingMode
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
@@ -53,6 +54,9 @@ import com.github.minigdx.tiny.render.gl.OpenGLFrame
 import com.github.minigdx.tiny.render.gl.PrimitiveBatchStage
 import com.github.minigdx.tiny.render.gl.SpriteBatchStage
 import com.github.minigdx.tiny.resources.SpriteSheet
+import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 class DefaultVirtualFrameBuffer(
     private val kgl: Kgl,
@@ -89,6 +93,16 @@ class DefaultVirtualFrameBuffer(
     )
 
     private val monocolors = createFontPalettes()
+
+    private val boundingBoxPool = object : ObjectPool<BoundingBox>(100) {
+        override fun newInstance(): BoundingBox {
+            return BoundingBox(0, 0, 0, 0)
+        }
+
+        override fun destroyInstance(obj: BoundingBox) {
+            obj.reset()
+        }
+    }
 
     override fun init(windowManager: WindowManager) {
         spriteBatchStage.init()
@@ -164,7 +178,7 @@ class DefaultVirtualFrameBuffer(
         destinationY: Pixel,
         flipX: Boolean,
         flipY: Boolean,
-    ) {
+    ) = isInFrame(destinationX, destinationY, sourceWidth, sourceHeight) {
         invalidateCachedReadFrame()
         updateDepthIndex(source)
 
@@ -175,8 +189,6 @@ class DefaultVirtualFrameBuffer(
             source,
             parameters.blender.dithering,
             monocolors[palColor],
-            parameters.camera,
-            parameters.clipper,
         )
         val instance = spriteBatchManager.createInstance()
         instance.set(
@@ -184,8 +196,8 @@ class DefaultVirtualFrameBuffer(
             sourceY,
             sourceWidth,
             sourceHeight,
-            destinationX,
-            destinationY,
+            destinationX - parameters.camera.x,
+            destinationY - parameters.camera.y,
             flipX,
             flipY,
             currentDepth,
@@ -203,7 +215,7 @@ class DefaultVirtualFrameBuffer(
         destinationY: Pixel,
         flipX: Boolean,
         flipY: Boolean,
-    ) {
+    ) = isInFrame(destinationX, destinationY, sourceWidth, sourceHeight) {
         invalidateCachedReadFrame()
         updateDepthIndex(source)
         val key = spriteBatchManager.createKey()
@@ -211,8 +223,6 @@ class DefaultVirtualFrameBuffer(
             source,
             parameters.blender.dithering,
             parameters.blender.palette(),
-            parameters.camera,
-            parameters.clipper,
         )
         val instance = spriteBatchManager.createInstance()
         instance.set(
@@ -220,8 +230,8 @@ class DefaultVirtualFrameBuffer(
             sourceY,
             sourceWidth,
             sourceHeight,
-            destinationX,
-            destinationY,
+            destinationX - parameters.camera.x,
+            destinationY - parameters.camera.y,
             flipX,
             flipY,
             currentDepth,
@@ -236,13 +246,13 @@ class DefaultVirtualFrameBuffer(
         height: Pixel,
         color: ColorIndex,
         filled: Boolean,
-    ) {
+    ) = isInFrame(x, y, width, height) {
         invalidateCachedReadFrame()
         updateDepthIndex(null)
         val key = primitiveBatchManager.createKey()
         val instance = primitiveBatchManager.createInstance().setRect(
-            x,
-            y,
+            x - parameters.camera.x,
+            y - parameters.camera.y,
             width,
             height,
             filled = filled,
@@ -259,15 +269,20 @@ class DefaultVirtualFrameBuffer(
         x2: Pixel,
         y2: Pixel,
         color: ColorIndex,
+    ) = isInFrame(
+        x = min(x1, x2),
+        y = min(y1, y2),
+        width = abs(x2 - x1) + 1,
+        height = abs(y2 - y1) + 1,
     ) {
         invalidateCachedReadFrame()
         updateDepthIndex(null)
         val key = primitiveBatchManager.createKey()
         val instance = primitiveBatchManager.createInstance().setLine(
-            x1,
-            y1,
-            x2,
-            y2,
+            x1 - parameters.camera.x,
+            y1 - parameters.camera.y,
+            x2 - parameters.camera.x,
+            y2 - parameters.camera.y,
             color = parameters.blender.palette()[color],
             dither = parameters.blender.dithering,
             depth = currentDepth,
@@ -281,13 +296,13 @@ class DefaultVirtualFrameBuffer(
         radius: Pixel,
         color: ColorIndex,
         filled: Boolean,
-    ) {
+    ) = isInFrame(centerX - radius, centerY - radius, radius * 2, radius * 2) {
         invalidateCachedReadFrame()
         updateDepthIndex(null)
         val key = primitiveBatchManager.createKey()
         val instance = primitiveBatchManager.createInstance().setCircle(
-            centerX,
-            centerY,
+            centerX - parameters.camera.x,
+            centerY - parameters.camera.y,
             radius,
             filled = filled,
             color = parameters.blender.palette()[color],
@@ -301,13 +316,13 @@ class DefaultVirtualFrameBuffer(
         x: Pixel,
         y: Pixel,
         color: ColorIndex,
-    ) {
+    ) = isInFrame(x, y, 1, 1) {
         invalidateCachedReadFrame()
         updateDepthIndex(null)
         val key = primitiveBatchManager.createKey()
         val instance = primitiveBatchManager.createInstance().setPoint(
-            x,
-            y,
+            x - parameters.camera.x,
+            y - parameters.camera.y,
             color = parameters.blender.palette()[color],
             dither = parameters.blender.dithering,
             depth = currentDepth,
@@ -325,22 +340,33 @@ class DefaultVirtualFrameBuffer(
         color: ColorIndex,
         filled: Boolean,
     ) {
-        invalidateCachedReadFrame()
-        updateDepthIndex(null)
-        val key = primitiveBatchManager.createKey()
-        val instance = primitiveBatchManager.createInstance().setTriangle(
-            x1,
-            y1,
-            x2,
-            y2,
-            x3,
-            y3,
-            parameters.blender.palette()[color],
-            parameters.blender.dithering,
-            filled,
-            depth = currentDepth,
-        )
-        primitiveBatchManager.submit(key, instance)
+        val x = min(min(x1, x2), x3)
+        val y = min(min(y1, y2), y3)
+        val width = max(max(x1, x2), x3) - x
+        val height = max(max(y1, y2), y3) - y
+        isInFrame(
+            x = x,
+            y = y,
+            width = width,
+            height = height,
+        ) {
+            invalidateCachedReadFrame()
+            updateDepthIndex(null)
+            val key = primitiveBatchManager.createKey()
+            val instance = primitiveBatchManager.createInstance().setTriangle(
+                x1 - parameters.camera.x,
+                y1 - parameters.camera.y,
+                x2 - parameters.camera.x,
+                y2 - parameters.camera.y,
+                x3 - parameters.camera.x,
+                y3 - parameters.camera.y,
+                parameters.blender.palette()[color],
+                parameters.blender.dithering,
+                filled,
+                depth = currentDepth,
+            )
+            primitiveBatchManager.submit(key, instance)
+        }
     }
 
     private fun renderAllInFrameBuffer() {
@@ -540,6 +566,90 @@ class DefaultVirtualFrameBuffer(
             }
         }
         kgl.bindFramebuffer(GL_FRAMEBUFFER, null)
+    }
+
+    /**
+     * perform the action if the entity describe by the bounding box (x, y, width, height)
+     * is in the clip zone of the camera.
+     *
+     * Do nothing otherwise.
+     */
+    private fun isInFrame(
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        action: () -> Unit,
+    ) {
+        val obj = boundingBoxPool.obtain().set(x, y, width, height)
+        val camera = boundingBoxPool.obtain().set(
+            x = parameters.camera.x,
+            y = parameters.camera.y,
+            width = gameOptions.width,
+            height = gameOptions.height,
+        )
+        val clipper = boundingBoxPool.obtain().set(
+            x = parameters.camera.x + parameters.clipper.left,
+            y = parameters.camera.y + parameters.clipper.top,
+            width = parameters.clipper.right,
+            height = parameters.clipper.bottom,
+        )
+
+        val drawingZone = boundingBoxPool.obtain()
+
+        intersection(camera, clipper, drawingZone)
+
+        if (overlap(obj, drawingZone)) {
+            action()
+        }
+
+        boundingBoxPool.free(obj, camera, clipper, drawingZone)
+    }
+
+    data class BoundingBox(var x: Int, var y: Int, var width: Int, var height: Int) {
+        fun reset() {
+            set(0, 0, 0, 0)
+        }
+
+        fun set(
+            x: Int,
+            y: Int,
+            width: Int,
+            height: Int,
+        ): BoundingBox {
+            this.x = x
+            this.y = y
+            this.width = width
+            this.height = height
+            return this
+        }
+    }
+
+    private fun intersection(
+        a: BoundingBox,
+        b: BoundingBox,
+        result: BoundingBox,
+    ) {
+        val x1 = maxOf(a.x, b.x)
+        val y1 = maxOf(a.y, b.y)
+        val x2 = minOf(a.x + a.width, b.x + b.width)
+        val y2 = minOf(a.y + a.height, b.y + b.height)
+
+        result.x = x1
+        result.y = y1
+        result.width = maxOf(0, x2 - x1)
+        result.height = maxOf(0, y2 - y1)
+    }
+
+    private fun overlap(
+        a: BoundingBox,
+        b: BoundingBox,
+    ): Boolean {
+        val result = boundingBoxPool.obtain()
+        intersection(a, b, result)
+        val isOverlap = result.width > 0 && result.height > 0
+        boundingBoxPool.free(result)
+        return isOverlap
     }
 
     companion object {

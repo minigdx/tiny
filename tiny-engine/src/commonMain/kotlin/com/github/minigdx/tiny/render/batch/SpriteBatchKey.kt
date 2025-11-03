@@ -1,8 +1,6 @@
 package com.github.minigdx.tiny.render.batch
 
 import com.github.minigdx.tiny.ColorIndex
-import com.github.minigdx.tiny.graphic.Camera
-import com.github.minigdx.tiny.graphic.Clipper
 import com.github.minigdx.tiny.resources.SpriteSheet
 
 /**
@@ -15,8 +13,6 @@ class SpriteBatchKey(
     var _spriteSheet: SpriteSheet? = null,
     var dither: Int = 0,
     var palette: Array<ColorIndex> = emptyArray(),
-    var camera: Camera? = null,
-    var clipper: Clipper? = null,
 ) : BatchKey {
     val spriteSheet: SpriteSheet
         get() = _spriteSheet!!
@@ -25,14 +21,10 @@ class SpriteBatchKey(
         spriteSheet: SpriteSheet,
         dither: Int,
         palette: Array<ColorIndex>,
-        camera: Camera?,
-        clipper: Clipper?,
     ): SpriteBatchKey {
         this._spriteSheet = spriteSheet
         this.dither = dither
         this.palette = palette
-        this.camera = camera
-        this.clipper = clipper
 
         return this
     }
@@ -41,8 +33,6 @@ class SpriteBatchKey(
         this._spriteSheet = null
         this.dither = 0
         this.palette = emptyArray()
-        this.camera = null
-        this.clipper = null
     }
 
     override fun equals(other: Any?): Boolean {
@@ -50,17 +40,13 @@ class SpriteBatchKey(
         if (other !is SpriteBatchKey) return false
         return _spriteSheet == other._spriteSheet &&
             dither == other.dither &&
-            palette.contentEquals(other.palette) &&
-            camera == other.camera &&
-            clipper == other.clipper
+            palette.contentEquals(other.palette)
     }
 
     override fun hashCode(): Int {
         var result = dither
         result = 31 * result + (_spriteSheet?.hashCode() ?: 0)
         result = 31 * result + palette.contentHashCode()
-        result = 31 * result + (camera?.hashCode() ?: 0)
-        result = 31 * result + (clipper?.hashCode() ?: 0)
         return result
     }
 }

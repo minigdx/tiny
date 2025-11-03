@@ -21,9 +21,11 @@ abstract class ObjectPool<T>(private val size: Int) {
         return result
     }
 
-    fun free(obj: T) {
-        destroyInstance(obj)
-        pool.add(obj)
+    fun free(vararg objs: T) {
+        objs.forEach { obj ->
+            destroyInstance(obj)
+            pool.add(obj)
+        }
     }
 
     fun free(objs: Iterable<T>) {
