@@ -81,7 +81,7 @@ class DefaultVirtualFrameBuffer(
     )
 
     private val primitiveBatchManager = BatchManager(
-        keyGenerator = { PrimitiveKey },
+        keyGenerator = { PrimitiveKey() },
         instanceGenerator = { PrimitiveInstance() },
         batchGenerator = { PrimitiveBatch() },
     )
@@ -189,6 +189,7 @@ class DefaultVirtualFrameBuffer(
             source,
             parameters.blender.dithering,
             monocolors[palColor],
+            parameters.clipper(),
         )
         val instance = spriteBatchManager.createInstance()
         instance.set(
@@ -223,6 +224,7 @@ class DefaultVirtualFrameBuffer(
             source,
             parameters.blender.dithering,
             parameters.blender.palette(),
+            parameters.clipper(),
         )
         val instance = spriteBatchManager.createInstance()
         instance.set(
@@ -249,7 +251,7 @@ class DefaultVirtualFrameBuffer(
     ) = isInFrame(x, y, width, height) {
         invalidateCachedReadFrame()
         updateDepthIndex(null)
-        val key = primitiveBatchManager.createKey()
+        val key = primitiveBatchManager.createKey().set(parameters.clipper())
         val instance = primitiveBatchManager.createInstance().setRect(
             x - parameters.camera.x,
             y - parameters.camera.y,
@@ -277,7 +279,7 @@ class DefaultVirtualFrameBuffer(
     ) {
         invalidateCachedReadFrame()
         updateDepthIndex(null)
-        val key = primitiveBatchManager.createKey()
+        val key = primitiveBatchManager.createKey().set(parameters.clipper())
         val instance = primitiveBatchManager.createInstance().setLine(
             x1 - parameters.camera.x,
             y1 - parameters.camera.y,
@@ -299,7 +301,7 @@ class DefaultVirtualFrameBuffer(
     ) = isInFrame(centerX - radius, centerY - radius, radius * 2, radius * 2) {
         invalidateCachedReadFrame()
         updateDepthIndex(null)
-        val key = primitiveBatchManager.createKey()
+        val key = primitiveBatchManager.createKey().set(parameters.clipper())
         val instance = primitiveBatchManager.createInstance().setCircle(
             centerX - parameters.camera.x,
             centerY - parameters.camera.y,
@@ -319,7 +321,7 @@ class DefaultVirtualFrameBuffer(
     ) = isInFrame(x, y, 1, 1) {
         invalidateCachedReadFrame()
         updateDepthIndex(null)
-        val key = primitiveBatchManager.createKey()
+        val key = primitiveBatchManager.createKey().set(parameters.clipper())
         val instance = primitiveBatchManager.createInstance().setPoint(
             x - parameters.camera.x,
             y - parameters.camera.y,
@@ -352,7 +354,7 @@ class DefaultVirtualFrameBuffer(
         ) {
             invalidateCachedReadFrame()
             updateDepthIndex(null)
-            val key = primitiveBatchManager.createKey()
+            val key = primitiveBatchManager.createKey().set(parameters.clipper())
             val instance = primitiveBatchManager.createInstance().setTriangle(
                 x1 - parameters.camera.x,
                 y1 - parameters.camera.y,
@@ -589,10 +591,10 @@ class DefaultVirtualFrameBuffer(
             height = gameOptions.height,
         )
         val clipper = boundingBoxPool.obtain().set(
-            x = parameters.camera.x + parameters.clipper.left,
-            y = parameters.camera.y + parameters.clipper.top,
-            width = parameters.clipper.right,
-            height = parameters.clipper.bottom,
+            x = parameters.clipper.left,
+            y = parameters.clipper.top,
+            width = parameters.clipper.width,
+            height = parameters.clipper.height,
         )
 
         val drawingZone = boundingBoxPool.obtain()

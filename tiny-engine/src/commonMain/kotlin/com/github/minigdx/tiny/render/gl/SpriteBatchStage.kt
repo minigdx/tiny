@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.render.gl
 
+import com.danielgergely.kgl.GL_SCISSOR_TEST
 import com.danielgergely.kgl.GL_TRIANGLES
 import com.danielgergely.kgl.Kgl
 import com.github.minigdx.tiny.engine.GameOptions
@@ -42,12 +43,23 @@ class SpriteBatchStage(
 
     override fun startStage() {
         program.use()
+        // Enable scissor test to restrict drawing area
+        program.enable(GL_SCISSOR_TEST)
     }
 
     fun execute(
         key: SpriteBatchKey,
         batch: SpriteBatch,
     ) {
+        val clipper = key.clipper!!
+
+        val scissorX = clipper.left
+        val scissorY = gameOptions.height - clipper.bottom
+        val scissorWidth = clipper.width
+        val scissorHeight = clipper.height
+
+        program.scissor(scissorX, scissorY, scissorWidth, scissorHeight)
+
         val colorsSwitch = key.palette
         val colorPaletteBuffer = ByteArray(256 * 256 * PixelFormat.RGBA)
         var pos = 0
@@ -90,7 +102,10 @@ class SpriteBatchStage(
         program.unbind()
     }
 
-    override fun endStage() = Unit
+    override fun endStage() {
+        // Disable scissor test after rendering
+        program.disable(GL_SCISSOR_TEST)
+    }
 
     class VShader : VertexShader(VERTEX_SHADER) {
         val aPos = inVec3("a_pos") // position of the sprite in the viewport

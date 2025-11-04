@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.render.gl
 
+import com.danielgergely.kgl.GL_SCISSOR_TEST
 import com.danielgergely.kgl.GL_TRIANGLES
 import com.danielgergely.kgl.Kgl
 import com.github.minigdx.tiny.engine.GameOptions
@@ -49,6 +50,9 @@ class PrimitiveBatchStage(
 
             fragmentShader.paletteColors.applyRGBA(colorPaletteBuffer, 256, 256)
         }
+
+        // Enable scissor test to restrict drawing area
+        program.enable(GL_SCISSOR_TEST)
     }
 
     fun execute(
@@ -78,13 +82,24 @@ class PrimitiveBatchStage(
             vertexShader.aShadeParams56.apply(batch.parameters56)
         }
 
+        val clipper = key.clipper!!
+
+        val scissorX = clipper.left
+        val scissorY = gameOptions.height - clipper.bottom
+        val scissorWidth = clipper.width
+        val scissorHeight = clipper.height
+
+        program.scissor(scissorX, scissorY, scissorWidth, scissorHeight)
+
         program.bind()
         program.drawArraysInstanced(GL_TRIANGLES, 0, 6, batch.parametersIndex)
         performanceMonitor.drawCall(6)
         program.unbind()
     }
 
-    override fun endStage() = Unit
+    override fun endStage() {
+        program.disable(GL_SCISSOR_TEST)
+    }
 
     class VShader : VertexShader(VERTEX_SHADER) {
         val aShapeType =

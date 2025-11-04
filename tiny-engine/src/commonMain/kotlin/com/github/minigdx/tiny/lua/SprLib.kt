@@ -83,9 +83,9 @@ class SprLib(
     private inner class pset : ThreeArgFunction() {
         @TinyCall("Set the color index at the coordinate (x,y) in the current spritesheet.")
         override fun call(
-            @TinyArg("x") arg1: LuaValue,
-            @TinyArg("y") arg2: LuaValue,
-            @TinyArg("color") arg3: LuaValue,
+            @TinyArg("x", type = LuaType.NUMBER) arg1: LuaValue,
+            @TinyArg("y", type = LuaType.NUMBER) arg2: LuaValue,
+            @TinyArg("color", type = LuaType.NUMBER) arg3: LuaValue,
         ): LuaValue {
             val x = arg1.checkint()
             val y = arg2.checkint()
@@ -143,18 +143,18 @@ class SprLib(
 
         @TinyCall("Draw the full spritesheet at coordinate (x, y)")
         override fun call(
-            @TinyArg("x") a: LuaValue,
-            @TinyArg("y") b: LuaValue,
+            @TinyArg("x", type = LuaType.NUMBER) a: LuaValue,
+            @TinyArg("y", type = LuaType.NUMBER) b: LuaValue,
         ): LuaValue {
             return invoke(varargsOf(arrayOf(a, b, NIL, NIL, NIL, NIL, NIL, NIL))).arg1()
         }
 
         @TinyCall("Draw the full spritesheet at coordinate (x, y) from the sprite (sprX, sprY)")
         override fun call(
-            @TinyArg("x") a: LuaValue,
-            @TinyArg("y") b: LuaValue,
-            @TinyArg("sprX") c: LuaValue,
-            @TinyArg("sprY") d: LuaValue,
+            @TinyArg("x", type = LuaType.NUMBER) a: LuaValue,
+            @TinyArg("y", type = LuaType.NUMBER) b: LuaValue,
+            @TinyArg("sprX", type = LuaType.NUMBER) c: LuaValue,
+            @TinyArg("sprY", type = LuaType.NUMBER) d: LuaValue,
         ): LuaValue {
             return invoke(varargsOf(arrayOf(a, b, c, d, NIL, NIL, NIL, NIL))).arg1()
         }
@@ -162,27 +162,27 @@ class SprLib(
         @TinyCall("Draw a fragment from the spritesheet at the coordinate (x, y) from the sprite (sprX, sprY) with the width and height.")
         override fun invoke(
             @TinyArgs(
-                arrayOf(
-                    "x",
-                    "y",
-                    "sprX",
-                    "sprY",
-                    "width",
-                    "height",
-                    "flipX",
-                    "flipY",
-                ),
-                documentations =
-                    arrayOf(
-                        "screen x coordinate to draw the sprite (default 0)",
-                        "screen y coordinate to draw the sprite (default 0)",
-                        "x coordinate from the spritesheet (default 0)",
-                        "y coordinate from the spritesheet (default 0)",
-                        "width of the spritesheet to copy (default width of the spritesheet)",
-                        "height of the spritesheet to copy (default height of the spritesheet)",
-                        "flip on the x axis (default: false)",
-                        "flip on the y axis (default: false)",
-                    ),
+                ["x", "y", "sprX", "sprY", "width", "height", "flipX", "flipY"],
+                documentations = [
+                    "screen x coordinate to draw the sprite (default 0)",
+                    "screen y coordinate to draw the sprite (default 0)",
+                    "x coordinate from the spritesheet (default 0)",
+                    "y coordinate from the spritesheet (default 0)",
+                    "width of the spritesheet to copy (default width of the spritesheet)",
+                    "height of the spritesheet to copy (default height of the spritesheet)",
+                    "flip on the x axis (default: false)",
+                    "flip on the y axis (default: false)",
+                ],
+                types = [
+                    LuaType.NUMBER,
+                    LuaType.NUMBER,
+                    LuaType.NUMBER,
+                    LuaType.NUMBER,
+                    LuaType.NUMBER,
+                    LuaType.NUMBER,
+                    LuaType.BOOLEAN,
+                    LuaType.BOOLEAN,
+                ],
             ) args: Varargs,
         ): Varargs {
             val spritesheet = resourceAccess.findSpritesheet(currentSpritesheet) ?: return NIL
