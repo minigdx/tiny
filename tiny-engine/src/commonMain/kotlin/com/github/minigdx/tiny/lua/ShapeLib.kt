@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.lua
 
+import com.github.mingdx.tiny.doc.LuaType
 import com.github.mingdx.tiny.doc.TinyArg
 import com.github.mingdx.tiny.doc.TinyArgs
 import com.github.mingdx.tiny.doc.TinyCall
@@ -101,7 +102,10 @@ class ShapeLib(
     internal inner class rect : LibFunction() {
         @TinyCall("Draw a rectangle.")
         override fun invoke(
-            @TinyArgs(["x", "y", "width", "height", "color"]) args: Varargs,
+            @TinyArgs(
+                names = ["x", "y", "width", "height", "color"],
+                types = [LuaType.NUMBER, LuaType.NUMBER, LuaType.NUMBER, LuaType.NUMBER, LuaType.NUMBER],
+            ) args: Varargs,
         ): Varargs {
             val (x, y, width, height, color) = shape.rectArgs(args) ?: return NIL
 
@@ -136,7 +140,10 @@ class ShapeLib(
         // cornerX: Int, cornerY: Int, width: Int, height: Int, color: Int
         @TinyCall("Draw a filled rectangle.")
         override fun invoke(
-            @TinyArgs(["x", "y", "width", "height", "color"]) args: Varargs,
+            @TinyArgs(
+                names = ["x", "y", "width", "height", "color"],
+                types = [LuaType.NUMBER, LuaType.NUMBER, LuaType.NUMBER, LuaType.NUMBER, LuaType.NUMBER],
+            ) args: Varargs,
         ): Varargs {
             val (x, y, width, height, color) = shape.rectArgs(args) ?: return NIL
 
@@ -190,7 +197,10 @@ class ShapeLib(
     internal inner class line : LibFunction() {
         @TinyCall("Draw a line.")
         override fun invoke(
-            @TinyArgs(["x0", "y0", "x1", "y1", "color"])
+            @TinyArgs(
+                names = ["x0", "y0", "x1", "y1", "color"],
+                types = [LuaType.NUMBER, LuaType.NUMBER, LuaType.NUMBER, LuaType.NUMBER, LuaType.NUMBER],
+            )
             args: Varargs,
         ): Varargs {
             return when (args.narg()) {

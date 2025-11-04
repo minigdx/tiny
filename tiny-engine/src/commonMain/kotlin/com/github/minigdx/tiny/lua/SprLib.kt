@@ -115,7 +115,7 @@ class SprLib(
 
         @TinyCall("Switch to the N spritesheet")
         override fun call(
-            @TinyArg("spritesheetN") arg: LuaValue,
+            @TinyArg("spritesheetN", type = LuaType.ANY) arg: LuaValue,
         ): LuaValue {
             val previousSpriteSheet = currentSpritesheet
             currentSpritesheet = if (arg.isnil()) {
@@ -228,7 +228,10 @@ class SprLib(
 
         @TinyCall("Draw a sprite and allow flip on x or y axis.")
         override fun invoke(
-            @TinyArgs(["sprN", "x", "y", "flipX", "flipY"]) args: Varargs,
+            @TinyArgs(
+                names = ["sprN", "x", "y", "flipX", "flipY"],
+                types = [LuaType.NUMBER, LuaType.NUMBER, LuaType.NUMBER, LuaType.BOOLEAN, LuaType.BOOLEAN],
+            ) args: Varargs,
         ): Varargs {
             if (args.narg() < 1) return NIL
             val sprN = args.arg(1).checkint()

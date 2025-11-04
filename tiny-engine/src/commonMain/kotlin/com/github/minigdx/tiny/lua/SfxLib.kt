@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.lua
 
+import com.github.mingdx.tiny.doc.LuaType
 import com.github.mingdx.tiny.doc.TinyArg
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
@@ -153,7 +154,7 @@ class SfxLib(
     inner class save : OneArgFunction() {
         @TinyCall("Save the actual music using the filename")
         override fun call(
-            @TinyArg("filename") arg: LuaValue,
+            @TinyArg("filename", type = LuaType.STRING) arg: LuaValue,
         ): LuaValue {
             // FIXME:
             TODO("F")
@@ -171,7 +172,7 @@ class SfxLib(
     inner class load : OneArgFunction() {
         @TinyCall("Load the actual SFX sound as the actual music using filename or its index")
         override fun call(
-            @TinyArg("filename") arg: LuaValue,
+            @TinyArg("filename", type = LuaType.ANY) arg: LuaValue,
         ): LuaValue {
             // FIXME:
             TODO()
@@ -666,7 +667,7 @@ class SfxLib(
 
         @TinyCall("Play the sound by it's index.")
         override fun call(
-            @TinyArg("sound") arg: LuaValue,
+            @TinyArg("sound", type = LuaType.NUMBER) arg: LuaValue,
         ): LuaValue {
             val bars = getCurrentMusic().musicalBars
             if (bars.isEmpty()) return NIL
@@ -707,7 +708,7 @@ class SfxLib(
 
         @TinyCall("Loop the sound by it's index.")
         override fun call(
-            @TinyArg("sound") arg: LuaValue,
+            @TinyArg("sound", type = LuaType.NUMBER) arg: LuaValue,
         ): LuaValue {
             val bars = getCurrentMusic().musicalBars
             if (bars.isEmpty()) return NIL
@@ -748,7 +749,7 @@ class SfxLib(
 
         @TinyCall("Stop the sound by it's index.")
         override fun call(
-            @TinyArg("sound") arg: LuaValue,
+            @TinyArg("sound", type = LuaType.NUMBER) arg: LuaValue,
         ): LuaValue {
             val bars = getCurrentMusic().musicalBars
             if (bars.isEmpty()) return NIL

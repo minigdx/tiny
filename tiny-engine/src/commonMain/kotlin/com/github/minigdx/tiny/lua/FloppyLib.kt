@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.lua
 
+import com.github.mingdx.tiny.doc.LuaType
 import com.github.mingdx.tiny.doc.TinyArg
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
@@ -50,8 +51,8 @@ class FloppyLib(
     internal inner class put : TwoArgFunction() {
         @TinyCall("Save the content into the file name.")
         override fun call(
-            @TinyArg("name") arg1: LuaValue,
-            @TinyArg("content") arg2: LuaValue,
+            @TinyArg("name", type = LuaType.STRING) arg1: LuaValue,
+            @TinyArg("content", type = LuaType.ANY) arg2: LuaValue,
         ): LuaValue {
             val filename = arg1.checkjstring() ?: return NIL
             val jsonElement = luaValueToJson(arg2, mutableSetOf())
@@ -65,7 +66,7 @@ class FloppyLib(
     internal inner class get : OneArgFunction() {
         @TinyCall("Load and get the content of the file name")
         override fun call(
-            @TinyArg("name") arg: LuaValue,
+            @TinyArg("name", type = LuaType.STRING) arg: LuaValue,
         ): LuaValue {
             val filename = arg.checkjstring() ?: return NIL
             val content = platform.getFromHome(filename) ?: return NIL

@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.lua
 
+import com.github.mingdx.tiny.doc.LuaType
 import com.github.mingdx.tiny.doc.TinyArg
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
@@ -96,7 +97,7 @@ class MapLib(
                 "Return the previous index level or NIL if the new level is invalid.",
         )
         override fun call(
-            @TinyArg("level") a: LuaValue,
+            @TinyArg("level", type = LuaType.ANY) a: LuaValue,
         ): LuaValue {
             // The parameter is an index. Let's check if the index is valid.
             if (a.isint()) {
@@ -136,7 +137,7 @@ class MapLib(
                 "The layer in the front is 0.",
         )
         override fun call(
-            @TinyArg("layer_index") arg: LuaValue,
+            @TinyArg("layer_index", type = LuaType.ANY) arg: LuaValue,
         ): LuaValue {
             val level = activeLevel()
 
@@ -195,7 +196,7 @@ class MapLib(
 
         @TinyCall("Convert the cell coordinates from a table {cx,cy} into screen coordinates as a table {x,y}.")
         override fun call(
-            @TinyArg("cell") arg: LuaValue,
+            @TinyArg("cell", type = LuaType.TABLE) arg: LuaValue,
         ): LuaValue = super.call(arg)
     }
 
@@ -225,7 +226,7 @@ class MapLib(
 
         @TinyCall("Convert the coordinates from a table {x,y} into cell coordinates as a table {cx,cy}.")
         override fun call(
-            @TinyArg("coordinates") arg: LuaValue,
+            @TinyArg("coordinates", type = LuaType.TABLE) arg: LuaValue,
         ) = super.call(arg)
     }
 
@@ -233,8 +234,8 @@ class MapLib(
     inner class cflag : LibFunction() {
         @TinyCall("Get the flag from the tile at the coordinate cx,cy.")
         override fun call(
-            @TinyArg("cx") a: LuaValue,
-            @TinyArg("cy") b: LuaValue,
+            @TinyArg("cx", type = LuaType.NUMBER) a: LuaValue,
+            @TinyArg("cy", type = LuaType.NUMBER) b: LuaValue,
         ): LuaValue {
             val level = activeLevel() ?: return NIL
             return getCell(level.layerInstances.asSequence(), a.checkint(), b.checkint())
@@ -242,9 +243,9 @@ class MapLib(
 
         @TinyCall("Get the flag from the tile at the coordinate cx,cy from a specific layer.")
         override fun call(
-            @TinyArg("cx") a: LuaValue,
-            @TinyArg("cy") b: LuaValue,
-            @TinyArg("layer") c: LuaValue,
+            @TinyArg("cx", type = LuaType.NUMBER) a: LuaValue,
+            @TinyArg("cy", type = LuaType.NUMBER) b: LuaValue,
+            @TinyArg("layer", type = LuaType.ANY) c: LuaValue,
         ): LuaValue {
             val level = activeLevel() ?: return NIL
             val layer = layerIndex(c) ?: return NIL
@@ -256,8 +257,8 @@ class MapLib(
     inner class flag : LibFunction() {
         @TinyCall("Get the flag from the tile at the coordinate x,y.")
         override fun call(
-            @TinyArg("x") a: LuaValue,
-            @TinyArg("y") b: LuaValue,
+            @TinyArg("x", type = LuaType.NUMBER) a: LuaValue,
+            @TinyArg("y", type = LuaType.NUMBER) b: LuaValue,
         ): LuaValue {
             val level = activeLevel() ?: return NIL
 
@@ -274,9 +275,9 @@ class MapLib(
 
         @TinyCall("Get the flag from the tile at the coordinate x,y from a specific layer.")
         override fun call(
-            @TinyArg("x") a: LuaValue,
-            @TinyArg("y") b: LuaValue,
-            @TinyArg("layer") c: LuaValue,
+            @TinyArg("x", type = LuaType.NUMBER) a: LuaValue,
+            @TinyArg("y", type = LuaType.NUMBER) b: LuaValue,
+            @TinyArg("layer", type = LuaType.ANY) c: LuaValue,
         ): LuaValue {
             val level = activeLevel() ?: return NIL
             val layer = layerIndex(c) ?: return NIL
@@ -466,7 +467,7 @@ entity.fields -- access custom field of the entity
             description = "Draw the layer with the name or the index on the screen.",
         )
         override fun call(
-            @TinyArg("index") a: LuaValue,
+            @TinyArg("index", type = LuaType.ANY) a: LuaValue,
         ): LuaValue {
             val layerIndex = layerIndex(a) ?: return NIL
             if (!isActiveLayer(layerIndex)) {

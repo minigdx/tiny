@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.lua
 
+import com.github.mingdx.tiny.doc.LuaType
 import com.github.mingdx.tiny.doc.TinyArg
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
@@ -41,7 +42,7 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
     internal inner class sign : OneArgFunction() {
         @TinyCall("Return the sign of the number.")
         override fun call(
-            @TinyArg("number") arg: LuaValue,
+            @TinyArg("number", type = LuaType.NUMBER) arg: LuaValue,
         ): LuaValue {
             return if (arg.todouble() >= 0) {
                 ONE
@@ -57,8 +58,8 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
     internal inner class atan2 : TwoArgFunction() {
         @TinyCall("Calculate the angle for the point (x, y). Please note the argument order: y then x.")
         override fun call(
-            @TinyArg("y") arg1: LuaValue,
-            @TinyArg("x") arg2: LuaValue,
+            @TinyArg("y", type = LuaType.NUMBER) arg1: LuaValue,
+            @TinyArg("x", type = LuaType.NUMBER) arg2: LuaValue,
         ): LuaValue {
             val y = arg1.todouble()
             val x = arg2.todouble()
@@ -73,9 +74,9 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
     internal inner class clamp : ThreeArgFunction() {
         @TinyCall("Clamp the value between a and b. If a is greater than b, then b will be returned.")
         override fun call(
-            @TinyArg("a", "The minimum value.") arg1: LuaValue,
-            @TinyArg("value", "The value to be clamped.") arg2: LuaValue,
-            @TinyArg("b", "The maximum value.") arg3: LuaValue,
+            @TinyArg("a", "The minimum value.", type = LuaType.NUMBER) arg1: LuaValue,
+            @TinyArg("value", "The value to be clamped.", type = LuaType.NUMBER) arg2: LuaValue,
+            @TinyArg("b", "The maximum value.", type = LuaType.NUMBER) arg3: LuaValue,
         ): LuaValue {
             val max =
                 if (arg1.todouble() > arg2.todouble()) {
@@ -101,10 +102,10 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
             description = "Distance between (x1, y1) and (x2, y2).",
         )
         override fun call(
-            @TinyArg("x1") a: LuaValue,
-            @TinyArg("y1") b: LuaValue,
-            @TinyArg("x2") c: LuaValue,
-            @TinyArg("y2") d: LuaValue,
+            @TinyArg("x1", type = LuaType.NUMBER) a: LuaValue,
+            @TinyArg("y1", type = LuaType.NUMBER) b: LuaValue,
+            @TinyArg("x2", type = LuaType.NUMBER) c: LuaValue,
+            @TinyArg("y2", type = LuaType.NUMBER) d: LuaValue,
         ): LuaValue {
             val luaValue = dst2.call(a, b, c, d)
             return valueOf(sqrt(luaValue.todouble()))
@@ -121,10 +122,10 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
             description = "Distance not squared between (x1, y1) and (x2, y2).",
         )
         override fun call(
-            @TinyArg("x1") a: LuaValue,
-            @TinyArg("y1") b: LuaValue,
-            @TinyArg("x2") c: LuaValue,
-            @TinyArg("y2") d: LuaValue,
+            @TinyArg("x1", type = LuaType.NUMBER) a: LuaValue,
+            @TinyArg("y1", type = LuaType.NUMBER) b: LuaValue,
+            @TinyArg("x2", type = LuaType.NUMBER) c: LuaValue,
+            @TinyArg("y2", type = LuaType.NUMBER) d: LuaValue,
         ): LuaValue {
             val xDiff = c.todouble() - a.todouble()
             val yDiff = d.todouble() - b.todouble()
@@ -144,7 +145,7 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
                 "If a table is passed, it'll return a random element of the table.",
         )
         override fun call(
-            @TinyArg("until") arg: LuaValue,
+            @TinyArg("until", type = LuaType.ANY) arg: LuaValue,
         ): LuaValue {
             if (arg.isnil()) return call()
             return if (arg.istable()) {
@@ -166,8 +167,8 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
 
         @TinyCall("Generate a random value between a and b.")
         override fun call(
-            @TinyArg("a") arg1: LuaValue,
-            @TinyArg("b") arg2: LuaValue,
+            @TinyArg("a", type = LuaType.NUMBER) arg1: LuaValue,
+            @TinyArg("b", type = LuaType.NUMBER) arg2: LuaValue,
         ): LuaValue {
             if (arg2.isnil()) {
                 return call(arg1)
@@ -186,8 +187,8 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
     inner class roverlap() : TwoArgFunction() {
         @TinyCall("Check if the rectangle rect1 overlaps with the rectangle rect2.")
         override fun call(
-            @TinyArg("rect1", "Rectangle as a table {x, y, with, height}.") arg1: LuaValue,
-            @TinyArg("rect2", "Rectangle as a table {x, y, with, height}.") arg2: LuaValue,
+            @TinyArg("rect1", "Rectangle as a table {x, y, with, height}.", type = LuaType.TABLE) arg1: LuaValue,
+            @TinyArg("rect2", "Rectangle as a table {x, y, with, height}.", type = LuaType.TABLE) arg2: LuaValue,
         ): LuaValue {
             val ax = arg1["x"].toint()
             val ay = arg1["y"].toint()
@@ -291,9 +292,9 @@ class MathLib : org.luaj.vm2.lib.MathLib() {
 
         @TinyCall("Generate a random value regarding the parameters x,y and z.")
         override fun call(
-            @TinyArg("x", description = "A value between 0.0 and 1.0.") arg1: LuaValue,
-            @TinyArg("y", description = "A value between 0.0 and 1.0.") arg2: LuaValue,
-            @TinyArg("z", description = "A value between 0.0 and 1.0.") arg3: LuaValue,
+            @TinyArg("x", description = "A value between 0.0 and 1.0.", type = LuaType.NUMBER) arg1: LuaValue,
+            @TinyArg("y", description = "A value between 0.0 and 1.0.", type = LuaType.NUMBER) arg2: LuaValue,
+            @TinyArg("z", description = "A value between 0.0 and 1.0.", type = LuaType.NUMBER) arg3: LuaValue,
         ): LuaValue {
             return valueOf(noise(arg1.todouble(), arg2.todouble(), arg3.todouble()))
         }

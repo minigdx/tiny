@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.lua
 
+import com.github.mingdx.tiny.doc.LuaType
 import com.github.mingdx.tiny.doc.TinyArg
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
@@ -67,20 +68,21 @@ class JuiceLib : TwoArgFunction() {
     inner class InterpolationLib(private val interpolation: Interpolation) : LibFunction() {
         @TinyCall("Give a percentage (progress) of the interpolation")
         override fun call(
-            @TinyArg("progress") a: LuaValue,
+            @TinyArg("progress", type = LuaType.NUMBER) a: LuaValue,
         ): LuaValue {
             return valueOf(interpolation.interpolate(a.tofloat()).toDouble())
         }
 
         @TinyCall("Interpolate the value given a start and an end value.")
         override fun call(
-            @TinyArg("start") a: LuaValue,
-            @TinyArg("end") b: LuaValue,
+            @TinyArg("start", type = LuaType.NUMBER) a: LuaValue,
+            @TinyArg("end", type = LuaType.NUMBER) b: LuaValue,
             @TinyArg(
                 "progress",
                 "Progress value. " +
                     "Needs to be between 0 (start of the interpolation) " +
                     "and 1 (end of the interpolation)",
+                type = LuaType.NUMBER,
             )
             c: LuaValue,
         ): LuaValue {
