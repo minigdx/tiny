@@ -341,70 +341,63 @@ class ShapeLib(
                 0xEFBF,
                 0xEFFF,
                 0xFFFF,
-            ).map { v -> valueOf(v) }
-
-        private val rectf = rectf()
-
-        // private val dither = GfxLib(resourceAccess, gameOptions).dither()
+            )
 
         @TinyCall("Draw a gradient using dithering, only from color c1 to color c2.")
         override fun invoke(
             @TinyArgs(["x", "y", "width", "height", "color1", "color2", "is_horizontal"]) args: Varargs,
         ): Varargs {
-            // FIXME:
-            TODO("O")
-            /*
-                        if (args.narg() < 6) throw LuaError("Expected 6  args")
+            if (args.narg() < 6) throw LuaError("Expected 6  args")
 
-                        val x = args.checkint(1)
-                        val y = args.checkint(2)
-                        val width = args.checkint(3)
-                        val height = args.checkint(4)
+            val x = args.checkint(1)
+            val y = args.checkint(2)
+            val width = args.checkint(3)
+            val height = args.checkint(4)
 
-                        val color2 = args.arg(6).checkColorIndex()
+            val color2 = args.arg(6).checkColorIndex()
 
-                        val isHorizontal = args.optboolean(7, false)
+            val isHorizontal = args.optboolean(7, false)
 
-                        // Draw the background color
-                        rectf.invoke(arrayOf(args.arg(1), args.arg(2), args.arg(3), args.arg(4), args.arg(5)))
+            // Draw the background color
+            virtualFrameBuffer.drawRect(
+                args.arg(1).checkint(),
+                args.arg(2).checkint(),
+                args.arg(3).checkint(),
+                args.arg(4).checkint(),
+                args.arg(5).checkint(),
+                filled = true,
+            )
 
-                        val previous = dither.call()
-                        dithering.forEachIndexed { index, pattern ->
-                            if (isHorizontal) {
-                                val xx = x + width * index / dithering.size
-                                val xx2 = x + width * (index + 1) / dithering.size
-                                dither.call(pattern)
-                                rectf.invoke(
-                                    arrayOf(
-                                        valueOf(xx),
-                                        valueOf(y),
-                                        valueOf(xx2 - xx),
-                                        valueOf(height),
-                                        valueOf(color2),
-                                    ),
-                                )
-                            } else {
-                                val yy = y + height * index / dithering.size
-                                val yy2 = y + height * (index + 1) / dithering.size
-                                dither.call(pattern)
-                                rectf.invoke(
-                                    arrayOf(
-                                        valueOf(x),
-                                        valueOf(yy),
-                                        valueOf(width),
-                                        valueOf(yy2 - yy),
-                                        valueOf(color2),
-                                    ),
-                                )
-                            }
-                        }
-                        dither.call(previous)
-
-                        resourceAccess.addOp(FrameBufferOperation)
-
-                        return NIL
-
-             */
+            val previous = virtualFrameBuffer.dithering(0xFFFF)
+            dithering.forEachIndexed { index, pattern ->
+                if (isHorizontal) {
+                    val xx = x + width * index / dithering.size
+                    val xx2 = x + width * (index + 1) / dithering.size
+                    virtualFrameBuffer.dithering(pattern)
+                    virtualFrameBuffer.drawRect(
+                        xx,
+                        y,
+                        xx2 - xx,
+                        height,
+                        color2,
+                        filled = true,
+                    )
+                } else {
+                    val yy = y + height * index / dithering.size
+                    val yy2 = y + height * (index + 1) / dithering.size
+                    virtualFrameBuffer.dithering(pattern)
+                    virtualFrameBuffer.drawRect(
+                        x,
+                        yy,
+                        width,
+                        yy2 - yy,
+                        color2,
+                        filled = true,
+                    )
+                }
+            }
+            virtualFrameBuffer.dithering(previous)
+            return NIL
         }
     }
 }
