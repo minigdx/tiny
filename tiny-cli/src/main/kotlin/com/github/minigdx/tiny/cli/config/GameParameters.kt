@@ -1,7 +1,6 @@
 package com.github.minigdx.tiny.cli.config
 
 import com.github.minigdx.tiny.engine.GameOptions
-import io.ktor.utils.io.core.Input
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -46,8 +45,8 @@ sealed class GameParameters {
 
     companion object {
         val JSON = Json {
-                ignoreUnknownKeys = true
-            }
+            ignoreUnknownKeys = true
+        }
 
         @OptIn(ExperimentalSerializationApi::class)
         fun read(inputStream: InputStream): GameParameters {

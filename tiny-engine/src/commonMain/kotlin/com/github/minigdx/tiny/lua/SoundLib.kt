@@ -40,7 +40,8 @@ class SoundLib(
         val ctrl = LuaTable()
 
         ctrl.set("sfx", sfx())
-        ctrl.set("music", music())
+        // TODO later :P
+        // ctrl.set("music", music())
         ctrl.set("note", note())
 
         arg2.set("sound", ctrl)

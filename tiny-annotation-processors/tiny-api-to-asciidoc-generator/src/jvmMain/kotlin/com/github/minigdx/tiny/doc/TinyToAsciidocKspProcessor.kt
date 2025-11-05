@@ -66,7 +66,7 @@ class TinyToAsciidocKspProcessor(
                                         gfx.cls()
                                         print($prefix, 10, 10) -- ${variable.description}
                                     end
-                                    """.trimIndent(),
+                                            """.trimIndent(),
                                         )
                                     }
                                 }
