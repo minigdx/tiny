@@ -16,6 +16,7 @@ import com.github.minigdx.tiny.lua.MathLib
 import com.github.minigdx.tiny.lua.NotesLib
 import com.github.minigdx.tiny.lua.SfxLib
 import com.github.minigdx.tiny.lua.ShapeLib
+import com.github.minigdx.tiny.lua.SoundLib
 import com.github.minigdx.tiny.lua.SprLib
 import com.github.minigdx.tiny.lua.StdLib
 import com.github.minigdx.tiny.lua.TinyBaseLib
@@ -95,6 +96,7 @@ class GameScript(
             load(GfxLib(resourceAccess, gameOptions, virtualFrameBuffer))
             load(CtrlLib(inputHandler, sprLib))
             load(SfxLib(resourceAccess, virtualSoundBoard, platform, playSound = !forValidation))
+            load(SoundLib(resourceAccess, virtualSoundBoard, playSound = !forValidation))
             load(ShapeLib(gameOptions, virtualFrameBuffer))
             load(DebugLib(logger))
             load(KeysLib())

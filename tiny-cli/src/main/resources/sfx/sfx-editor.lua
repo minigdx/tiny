@@ -502,7 +502,7 @@ function _init()
 
     state = new(State)
 
-    state.sfx = sfx.bar(0)
+    state.sfx = sfx.sfx(0)
 
     map.level("SfxEditor")
 

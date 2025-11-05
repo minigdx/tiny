@@ -13,7 +13,7 @@ typealias Setter = (LuaValue) -> Unit
 /**
  * LuaTable that give convenient methods to "wrap" a Kotlin object
  */
-class WrapperLuaTable : LuaTable() {
+open class WrapperLuaTable : LuaTable() {
     private val getters: MutableMap<String, Getter> = mutableMapOf()
     private val setters: MutableMap<String, Setter> = mutableMapOf()
 

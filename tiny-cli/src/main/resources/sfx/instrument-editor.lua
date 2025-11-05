@@ -15,11 +15,11 @@ local state = {
 }
 
 local on_press = function()
-    state.instrument.noteOn("C4")
+    state.instrument.note_on("C4")
 end
 
 local on_release = function()
-    state.instrument.noteOff("C4")
+    state.instrument.note_off("C4")
 end
 
 local on_press_repeat = function()
@@ -35,7 +35,7 @@ local on_repeat_update = function()
     if state.next_note_off then
         state.next_note_off = state.next_note_off - tiny.dt
         if state.next_note_off < 0 then
-            state.instrument.noteOff("C4")
+            state.instrument.note_off("C4")
             state.next_note_off = nil
 
             if state.next_note_on then
@@ -47,7 +47,7 @@ local on_repeat_update = function()
     if state.next_note_on and state.next_note_on >= 0 then
         state.next_note_on = state.next_note_on - tiny.dt
         if state.next_note_on < 0 then
-            state.instrument.noteOn("C4")
+            state.instrument.note_on("C4")
             state.next_note_off = state.instrument.attack + state.instrument.decay
         end
     end
@@ -145,14 +145,14 @@ function _init_keyboard(entities)
     local currentNote
     local playNote = function(_, value)
         if value and currentNote == nil then
-            state.instrument.noteOn(value)
+            state.instrument.note_on(value)
             currentNote = value
         elseif value and currentNote ~= nil then
-            state.instrument.noteOn(value)
-            state.instrument.noteOff(currentNote)
+            state.instrument.note_on(value)
+            state.instrument.note_off(currentNote)
             currentNote = value
         elseif not value then
-            state.instrument.noteOff(currentNote)
+            state.instrument.note_off(currentNote)
             currentNote = nil
         end
     end
