@@ -3,6 +3,7 @@ package com.github.minigdx.tiny.engine
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.lua.toTinyException
 import com.github.minigdx.tiny.platform.Platform
+import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.resources.GameLevel
 import com.github.minigdx.tiny.resources.GameResource
 import com.github.minigdx.tiny.resources.GameScript
@@ -80,16 +81,18 @@ class GameResourceProcessor(
         }
         this.levels = Array(gameLevels.size) { null }
 
-        val sounds = gameOptions.sounds.mapIndexed { index, sound ->
-            resourceFactory.soundEffect(index, sound)
+        val sounds = gameOptions.sound?.let { sound ->
+            resourceFactory.soundEffect(0, sound)
         }
-        this.sounds = Array(sounds.size) { null }
+        this.sounds = Array(1) {
+            Sound(0, 0, "default-sound", SoundData.DEFAULT)
+        }
 
         resources = listOf(
             resourceFactory.bootscript("_boot.lua"),
             resourceFactory.enginescript("_engine.lua"),
             resourceFactory.bootSpritesheet("_boot.png"),
-        ) + gameScripts + spriteSheets + gameLevels + sounds
+        ) + gameScripts + spriteSheets + gameLevels + listOfNotNull(sounds)
 
         toBeLoaded.addAll(
             setOf("_boot.lua", "_engine.lua", "_boot.png"),
@@ -97,7 +100,7 @@ class GameResourceProcessor(
         toBeLoaded.addAll(gameOptions.gameLevels)
         toBeLoaded.addAll(gameOptions.gameScripts)
         toBeLoaded.addAll(gameOptions.spriteSheets)
-        toBeLoaded.addAll(gameOptions.sounds)
+        gameOptions.sound?.let { toBeLoaded.add(it) }
 
         numberOfResources = resources.size
         logger.debug("GAME_ENGINE") { "Number of resources to load: $numberOfResources" }

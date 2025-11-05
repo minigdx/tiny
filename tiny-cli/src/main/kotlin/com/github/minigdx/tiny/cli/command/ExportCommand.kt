@@ -495,15 +495,6 @@ class GameExporter {
 
         when (gameParameters) {
             is GameParametersV1 -> {
-                (gameParameters.scripts + gameParameters.libraries.map { "$it.lua" })
-                    .filterNot { exportedFile.contains(it) }
-                    .forEach { name ->
-                        exportedGame.putNextEntry(ZipEntry(name))
-                        exportedGame.write(gameDirectory.resolve(name).readBytes())
-                        exportedGame.closeEntry()
-
-                        exportedFile += name
-                    }
                 gameParameters.spritesheets
                     .filterNot { exportedFile.contains(it) }
                     .forEach { name ->
@@ -513,7 +504,7 @@ class GameExporter {
 
                         exportedFile += name
                     }
-                gameParameters.sounds
+                listOfNotNull(gameParameters.sound)
                     .filterNot { exportedFile.contains(it) }
                     .forEach { name ->
                         exportedGame.putNextEntry(ZipEntry(name))
@@ -560,7 +551,7 @@ class GameExporter {
 
                 template = replaceList(
                     template,
-                    (gameParameters.scripts + gameParameters.libraries.map { "$it.lua" }),
+                    gameParameters.scripts,
                     "{GAME_SCRIPT}",
                     "GAME_SCRIPT",
                 )
@@ -571,7 +562,7 @@ class GameExporter {
                     "GAME_SPRITESHEET",
                 )
                 template = replaceList(template, gameParameters.levels, "{GAME_LEVEL}", "GAME_LEVEL")
-                template = replaceList(template, gameParameters.sounds, "{GAME_SOUND}", "GAME_SOUND")
+                template = replaceList(template, listOfNotNull(gameParameters.sound), "{GAME_SOUND}", "GAME_SOUND")
 
                 template = template.replace("{GAME_COLORS}", gameParameters.colors.joinToString(","))
 

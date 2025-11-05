@@ -3,7 +3,7 @@ package com.github.minigdx.tiny.cli.command
 import com.github.ajalt.clikt.core.Abort
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.Context
-import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.minigdx.tiny.cli.config.GameParameters
 import com.github.minigdx.tiny.engine.GameEngine
@@ -19,7 +19,7 @@ import org.luaj.vm2.LuaError
 import java.io.File
 
 class SfxCommand : CliktCommand(name = "sfx") {
-    val filename by argument(help = "The sound file to create/edit").file(
+    val filename by option(help = "The sound file to create/edit").file(
         mustExist = false,
         canBeDir = false,
         canBeFile = true,
@@ -53,30 +53,34 @@ class SfxCommand : CliktCommand(name = "sfx") {
                 )
                 throw Abort()
             }
-            val commandParameters = GameParameters.JSON.decodeFromStream<GameParameters>(configFile)
-
-            if (!filename.exists()) {
-                val json = Json.encodeToString(Music())
-                filename.writeBytes(json.encodeToByteArray())
-            }
+            val commandParameters = GameParameters.read(configFile)
 
             val logger = StdOutLogger("tiny-cli")
             val vfs = CommonVirtualFileSystem()
-            val commandOptions = commandParameters.toGameOptions()
-                .copy(sounds = listOf(filename.name))
+            val sfxFileName = filename
 
             val homeDirectory = findHomeDirectory(commandParameters)
 
+            val commandOptions = commandParameters.toGameOptions()
+                .copy(sound = sfxFileName?.name)
+
+            val platform = GlfwPlatform(
+                commandOptions,
+                logger,
+                vfs,
+                File("."),
+                homeDirectory,
+                jarResourcePrefix = "/sfx",
+            )
+
+            if (sfxFileName?.exists() == false) {
+                val json = Json.encodeToString(Music())
+                platform.saveIntoHome(sfxFileName.name, json)
+            }
+
             val gameEngine = GameEngine(
                 gameOptions = commandOptions,
-                platform = GlfwPlatform(
-                    commandOptions,
-                    logger,
-                    vfs,
-                    File("."),
-                    homeDirectory,
-                    jarResourcePrefix = "/sfx",
-                ),
+                platform = platform,
                 vfs = vfs,
                 logger = logger,
             )

@@ -15,7 +15,7 @@ import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.TwoArgFunction
 
 @TinyLib(
-    "sfx",
+    "sound",
     """Sound API to play/loop/stop a sound.
 A sound can be created using the sound editor, using the command line `tiny-cli sfx <filename>`.
 
@@ -117,7 +117,7 @@ class SoundLib(
         }
     }
 
-    @TinyFunction("Play a note by an instrument until it's stopped.")
+    @TinyFunction("Play a note by an instrument until it's stopped", example = NOTE_EXAMPLE)
     inner class note() : TwoArgFunction() {
         @TinyCall("Play the note note_name using the instrument at instrument_index")
         override fun call(

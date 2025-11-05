@@ -119,9 +119,9 @@ class ResourcesCommand : CliktCommand(name = "resources") {
                 parameters.copy(levels = updatedLevels)
             }
             "\uD83D\uDD08 sounds" -> {
-                val updatedSounds = parameters.sounds.toMutableList()
+                val updatedSounds = listOfNotNull(parameters.sound).toMutableList()
                 updatedSounds.removeAt(indexInCategory)
-                parameters.copy(sounds = updatedSounds)
+                parameters.copy(sound = updatedSounds.firstOrNull())
             }
             else -> throw IllegalStateException("Unknown category: $categoryName")
         }
@@ -178,7 +178,7 @@ class ResourcesCommand : CliktCommand(name = "resources") {
             "\uD83D\uDCDD scripts" to gameParameters.scripts,
             "\uD83D\uDDBC\uFE0F spritesheets" to gameParameters.spritesheets,
             "\uD83D\uDDFA\uFE0F levels" to gameParameters.levels,
-            "\uD83D\uDD08 sounds" to gameParameters.sounds,
+            "\uD83D\uDD08 sound" to listOfNotNull(gameParameters.sound),
         ).filter { it.second.isNotEmpty() }
             .toMap()
     }

@@ -8,7 +8,7 @@ function _init()
     local v1 = vec2.create(32, 38)
     local v2 = vec2.create(20, 2)
 
-    gfx.cls()
+    gfx.cls(1)
     print("v1", 2, 15, 10)
     shape.line(0, 0, v1.x, v1.y, 10)
     print("v2", 23, 3, 9)
@@ -31,7 +31,7 @@ function _init()
     local v1 = vec2.create(32, 38)
     local v2 = vec2.create(20, 2)
 
-    gfx.cls()
+    gfx.cls(1)
     print("v1", 18, 15, 10)
     shape.line(0, 0, v1.x, v1.y, 10)
     print("v2", 23, 3, 9)
@@ -54,7 +54,7 @@ function _init()
     local v1 = vec2.create(32, 38)
     local v2 = vec2.scl(v1, 2)
 
-    gfx.cls()
+    gfx.cls(1)
     print("v1 scaled", 8, 60, 11)
     gfx.dither(0xAAAA)
     shape.line(0, 0, v2.x, v2.y, 11)
@@ -83,7 +83,7 @@ function _update()
     
     local scl = vec2.scl(v1, dot)
     
-    gfx.cls()
+    gfx.cls(1)
     
     local scaledv1 = vec2.scl(v1, 64)
     local scaledv2 = vec2.scl(v2, 64)
@@ -102,7 +102,7 @@ end
 //language=Lua
 const val VECTOR_NOR = """
 function _update()
-    gfx.cls()
+    gfx.cls(1)
 
     local v0 = vec2.create(43, 64)
     local v1 = vec2.nor(v0)
