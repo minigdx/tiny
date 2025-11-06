@@ -13,6 +13,7 @@ import com.github.minigdx.tiny.cli.config.GameParameters
 import com.github.minigdx.tiny.cli.config.GameParameters.Companion.JSON
 import com.github.minigdx.tiny.cli.config.GameParametersV1
 import com.github.minigdx.tiny.resources.ldtk.Ldtk
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import java.io.File
@@ -441,6 +442,7 @@ class ExportCommand : CliktCommand(name = "export") {
     }
 }
 
+@OptIn(ExperimentalSerializationApi::class)
 class GameExporter {
     fun export(
         gameDirectory: File,
@@ -495,6 +497,15 @@ class GameExporter {
 
         when (gameParameters) {
             is GameParametersV1 -> {
+                (gameParameters.scripts)
+                    .filterNot { exportedFile.contains(it) }
+                    .forEach { name ->
+                        exportedGame.putNextEntry(ZipEntry(name))
+                        exportedGame.write(gameDirectory.resolve(name).readBytes())
+                        exportedGame.closeEntry()
+
+                        exportedFile += name
+                    }
                 gameParameters.spritesheets
                     .filterNot { exportedFile.contains(it) }
                     .forEach { name ->

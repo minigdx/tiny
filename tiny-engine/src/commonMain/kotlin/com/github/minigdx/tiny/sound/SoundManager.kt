@@ -231,23 +231,21 @@ abstract class SoundManager {
         val attackEndSample = min(attackSamples, releaseStartSample)
         val decayEndSample = min(attackEndSample + decaySamples, releaseStartSample)
 
-        // FIXME: le changement de niveau sonore pourrait ne pas être linéaire. (cf juice)
-        val multiplier =
-            if (currentSample < attackEndSample) {
-                // Attack: going from 0 to 1.0
-                currentSample.toFloat() / attackSamples
-            } else if (currentSample < decayEndSample) {
-                // Decay: going from 1.0 to sustain level
-                val decayProgress = (currentSample - attackEndSample) / decaySamples
-                1.0f - decayProgress * (1.0f - sustainLevel)
-            } else if (currentSample < releaseStartSample) {
-                // Sustain level
-                sustainLevel
-            } else {
-                // Release: going from sustain to 0f
-                val releaseProgress = (currentSample - releaseStartSample) / releaseSamples
-                sustainLevel * (1.0f - min(1.0f, releaseProgress))
-            }
+        val multiplier = if (currentSample < attackEndSample) {
+            // Attack: going from 0 to 1.0
+            currentSample.toFloat() / attackSamples
+        } else if (currentSample < decayEndSample) {
+            // Decay: going from 1.0 to sustain level
+            val decayProgress = (currentSample - attackEndSample) / decaySamples
+            1.0f - decayProgress * (1.0f - sustainLevel)
+        } else if (currentSample < releaseStartSample) {
+            // Sustain level
+            sustainLevel
+        } else {
+            // Release: going from sustain to 0f
+            val releaseProgress = (currentSample - releaseStartSample) / releaseSamples
+            sustainLevel * (1.0f - min(1.0f, releaseProgress))
+        }
 
         return max(0.0f, min(1.0f, multiplier))
     }
@@ -258,6 +256,22 @@ abstract class SoundManager {
     )
 
     abstract fun noteOff(note: Note)
+
+    private val currentHandlers = mutableListOf<SoundHandler>()
+
+    fun stopAll() {
+        val toBeRemoved = currentHandlers.toList()
+        toBeRemoved.forEach { it.stop() }
+        currentHandlers.clear()
+    }
+
+    internal fun addSoundHandler(handler: SoundHandler) {
+        currentHandlers.add(handler)
+    }
+
+    internal fun removeSoundHandler(handler: SoundHandler) {
+        currentHandlers.remove(handler)
+    }
 
     companion object {
         const val SAMPLE_RATE = 44100

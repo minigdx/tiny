@@ -478,7 +478,7 @@ function _init_player(entities)
 
         local saveButton = wire.find_widget(m.widgets, widget.fields.SaveButton)
         saveButton.on_change = function()
-            state.sfx.save()
+            sfx.save()
         end
 
         local exportButton = wire.find_widget(m.widgets, widget.fields.ExportButton)

@@ -12,17 +12,16 @@ class WebSoundHandler(
     private var audioNode: AudioBufferSourceNode? = null
 
     override fun play() {
-        // FIXME: replace
-        // audioNode = soundMananger.playSfxBuffer(data)
+        audioNode = soundManager.playChunkGenerator(chunkGenerator)
     }
 
     override fun loop() {
-        // FIXME: replace
-        // audioNode = soundMananger.playSfxBuffer(data, loop = true)
+        audioNode = soundManager.playChunkGenerator(chunkGenerator, loop = true)
     }
 
     override fun stop() {
         audioNode?.stop()
+        soundManager.removeSoundHandler(this)
     }
 
     override fun nextChunk(samples: Int): FloatData {

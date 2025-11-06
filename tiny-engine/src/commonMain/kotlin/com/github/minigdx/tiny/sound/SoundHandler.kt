@@ -40,6 +40,9 @@ class BufferedChunkGenerator(private val data: FloatArray) : ChunkGenerator {
     override fun generateChunk(samples: Int): FloatData {
         chunk.copyFrom(data, position, position + samples)
         position = min(position + samples, data.size)
+        if (chunk.size == 0) {
+            position = 0
+        }
         return chunk
     }
 }

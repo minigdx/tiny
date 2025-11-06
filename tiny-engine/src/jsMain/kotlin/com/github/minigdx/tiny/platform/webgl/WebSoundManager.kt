@@ -2,6 +2,8 @@ package com.github.minigdx.tiny.platform.webgl
 
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.lua.Note
+import com.github.minigdx.tiny.sound.BufferedChunkGenerator
+import com.github.minigdx.tiny.sound.ChunkGenerator
 import com.github.minigdx.tiny.sound.Instrument
 import com.github.minigdx.tiny.sound.InstrumentPlayer
 import com.github.minigdx.tiny.sound.SoundHandler
@@ -117,8 +119,88 @@ class WebSoundManager : SoundManager() {
         )
     }
 
+    /**
+     * Play audio data from a ChunkGenerator using standard Web Audio API nodes.
+     * This method extracts all audio data from the generator, creates an AudioBuffer,
+     * and plays it using an AudioBufferSourceNode (bypassing the AudioWorklet).
+     *
+     * @param chunkGenerator The generator containing the audio sample data
+     * @param loop Whether to loop the audio playback
+     * @return AudioBufferSourceNode that can be used to control playback (e.g., stop())
+     * @throws IllegalStateException if the AudioContext is not ready
+     * @throws IllegalArgumentException if the ChunkGenerator produces no audio data
+     */
+    fun playChunkGenerator(
+        chunkGenerator: ChunkGenerator,
+        loop: Boolean = false,
+    ): web.audio.AudioBufferSourceNode {
+        if (!ready) {
+            throw IllegalStateException("AudioContext is not ready")
+        }
+
+        // Extract all audio data from the chunk generator
+        val audioData = mutableListOf<Float>()
+        val chunkSizeToRequest = 2205 // ~50ms at 44.1kHz (SAMPLE_RATE * 0.05)
+
+        // Generate chunks until we've extracted all data
+        var continueReading = true
+        while (continueReading) {
+            val chunk = chunkGenerator.generateChunk(chunkSizeToRequest)
+
+            if (chunk.size == 0) {
+                // No more data available
+                continueReading = false
+            } else {
+                // Copy chunk data to our accumulator
+                for (i in 0 until chunk.size) {
+                    audioData.add(chunk[i])
+                }
+
+                // If we got less than requested, we're likely at the end
+                if (chunk.size < chunkSizeToRequest) {
+                    continueReading = false
+                }
+            }
+        }
+
+        if (audioData.isEmpty()) {
+            throw IllegalArgumentException("ChunkGenerator produced no audio data")
+        }
+
+        // Create AudioBuffer
+        val sampleCount = audioData.size
+        val audioBuffer = audioContext.createBuffer(
+            // Mono
+            numberOfChannels = 1,
+            length = sampleCount,
+            // 44.1 kHz
+            sampleRate = SAMPLE_RATE.toFloat(),
+        )
+
+        // Get the channel data and copy our float samples
+        val channelData = audioBuffer.getChannelData(0)
+        for (i in 0 until sampleCount) {
+            channelData[i] = audioData[i]
+        }
+
+        // Create buffer source node
+        val sourceNode = audioContext.createBufferSource()
+        sourceNode.buffer = audioBuffer
+        sourceNode.loop = loop
+
+        // Connect directly to destination (bypass AudioWorklet)
+        sourceNode.connect(audioContext.destination)
+
+        // Start playback immediately
+        sourceNode.start()
+
+        return sourceNode
+    }
+
     override fun createSoundHandler(buffer: FloatArray): SoundHandler {
-        TODO()
+        val handler = WebSoundHandler(BufferedChunkGenerator(buffer), this)
+        addSoundHandler(handler)
+        return handler
     }
 
     companion object {
