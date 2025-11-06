@@ -34,5 +34,6 @@
   ],
   "spritesheets": [
     "game.png"
-  ]
+  ],
+  "sound": "default-sound.sfx"
 }

@@ -195,7 +195,7 @@ Brick.update = function(self)
 
         if collisionX or collisionY then
             self.hit = 6
-
+            sound.sfx(1)
             table.insert(particles, new(Particle,
                     {
                         x = self.x,
@@ -299,6 +299,8 @@ Ball.update = function(self)
             if collision then
                 self.speed.y = -self.speed.y
                 self.accept_move_y = false
+                sound.sfx(0)
+
             end
 
         end

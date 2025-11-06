@@ -54,7 +54,7 @@ class SfxLib(
         override fun call(): LuaValue {
             val soundFile = resourceAccess.findSound(0) ?: return NIL
 
-            val content = Json.encodeToString(soundFile.data)
+            val content = soundFile.data.music.serialize()
             platform.saveIntoGameDirectory(soundFile.name, content)
 
             return NONE

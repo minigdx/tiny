@@ -448,7 +448,7 @@ function _init_sfx_editor(entities)
         wire.sync(state, "sfx.index", selector, "value")
         -- set the instrument to the bar
         wire.listen(selector, "value", function(source, value)
-            state.sfx = sfx.bar(value)
+            state.sfx = sfx.sfx(value)
         end)
         -- set the list of instruments
         wire.sync(state, "sfx.all", selector, "active_indices")
