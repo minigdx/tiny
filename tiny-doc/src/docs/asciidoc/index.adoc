@@ -20,7 +20,7 @@ With `🧸 Tiny`, you'll be able to get started right away and see your progress
 > _Let's get started and unleash your creativity!_
 
 ++++
-<iframe class="no-resize" title="Breakout example" width="516" height="516" src="sample/index.html"></iframe>
+<iframe class="no-resize" title="Breakout example" width="516" height="516" src="sample/game-example/index.html"></iframe>
 ++++
 
 NOTE: The code source of this sample is available in the https://github.com/minigdx/tiny/tree/main/tiny-sample[Tiny git repository].
@@ -63,6 +63,8 @@ include::tiny-tutorial.adoc[]
 include::tiny-showcase.adoc[]
 
 include::dependencies/tiny-cli-commands.adoc[]
+
+include::tiny-sfx-editor.adoc[]
 
 include::dependencies/tiny-api.adoc[]
 

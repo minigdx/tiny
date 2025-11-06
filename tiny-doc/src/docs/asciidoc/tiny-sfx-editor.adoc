@@ -1,0 +1,11 @@
+== Tiny Sfx Editor
+
+`🧸 Tiny` is bundle with a small sfx editor, that you can start using the command `tiny-cli sfx`, within your game directory.
+
+This editor can design an instrument and the notes played by this instrument, that generate a sfx.
+
+The editor can be tested below:
+
+++++
+<iframe class="no-resize" title="SFX Editor " width="768" height="512" src="sample/sfx-editor/index.html"></iframe>
+++++

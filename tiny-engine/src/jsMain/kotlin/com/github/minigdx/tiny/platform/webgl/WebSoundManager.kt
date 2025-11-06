@@ -41,9 +41,8 @@ class WebSoundManager : SoundManager() {
             // Resume the audio context if interrupted, only on iOS
             if (audioContext.state != AudioContextState.running) {
                 audioContext.resumeAsync()
-            } else {
-                ready = true
             }
+            // Note: ready flag is set in initializeAudioWorklet() after audioWorkletNode is initialized
         }
         if (audioContext.state != AudioContextState.running) {
             inputHandler.onFirstUserInteraction {
