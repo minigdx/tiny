@@ -34,6 +34,10 @@ class Music(
         MusicalSequence(it)
     },
 ) {
+    fun serialize(): String {
+        return serialize(this)
+    }
+
     companion object {
         private val json = Json { ignoreUnknownKeys = true }
 

@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.platform
 
+import com.github.minigdx.tiny.lua.Note
 import com.github.minigdx.tiny.sound.Music
 
 class SoundData(
@@ -13,9 +14,18 @@ class SoundData(
     val musicalSequences: List<FloatArray> = emptyList(),
 ) {
     companion object {
-        val DEFAULT = SoundData(
+        val DEFAULT_EMPTY = SoundData(
             "default",
             Music(),
+            emptyList(),
+        )
+
+        val DEFAULT_SFX = SoundData(
+            "default",
+            Music().apply {
+                musicalBars[0].setNote(Note.E4, 0f, 0.5f)
+                musicalBars[0].setNote(Note.G4, 1f, 0.5f)
+            },
             emptyList(),
         )
     }

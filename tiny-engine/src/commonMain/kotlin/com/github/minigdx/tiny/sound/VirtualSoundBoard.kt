@@ -18,8 +18,6 @@ interface VirtualSoundBoard {
      */
     fun prepare(track: MusicalSequence.Track): SoundHandler
 
-    fun prepare(chunkGenerator: ChunkGenerator): SoundHandler
-
     fun convert(bar: MusicalBar): FloatArray
 
     fun noteOn(

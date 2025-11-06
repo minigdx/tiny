@@ -54,14 +54,21 @@ class SfxCommand : CliktCommand(name = "sfx") {
             }
             val commandParameters = GameParameters.read(configFile)
 
+            val defaultFile = File("default-sound.sfx")
+
             val logger = StdOutLogger("tiny-cli")
             val vfs = CommonVirtualFileSystem()
+            // get the file passed as parameter
             val sfxFileName = filename
+                // otherwise try the one from the game
+                ?: commandParameters.toGameOptions().sound?.let { File(it) }
+                // Let's create a file then.
+                ?: defaultFile
 
             val homeDirectory = findHomeDirectory(commandParameters)
 
             val commandOptions = commandParameters.toGameOptions()
-                .copy(sound = sfxFileName?.name)
+                .copy(sound = sfxFileName.name)
 
             val platform = GlfwPlatform(
                 commandOptions,
@@ -72,7 +79,7 @@ class SfxCommand : CliktCommand(name = "sfx") {
                 jarResourcePrefix = "/sfx",
             )
 
-            if (sfxFileName?.exists() == false) {
+            if (!sfxFileName.exists()) {
                 val json = Json.encodeToString(Music())
                 platform.saveIntoHome(sfxFileName.name, json)
             }

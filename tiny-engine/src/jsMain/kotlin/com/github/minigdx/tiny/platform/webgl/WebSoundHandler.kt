@@ -1,6 +1,5 @@
 package com.github.minigdx.tiny.platform.webgl
 
-import com.github.minigdx.tiny.sound.BufferedChunkGenerator
 import com.github.minigdx.tiny.sound.ChunkGenerator
 import com.github.minigdx.tiny.sound.SoundHandler
 import com.github.minigdx.tiny.util.FloatData
@@ -8,17 +7,9 @@ import web.audio.AudioBufferSourceNode
 
 class WebSoundHandler(
     private val chunkGenerator: ChunkGenerator,
-    private val soundMananger: WebSoundManager,
+    private val soundManager: WebSoundManager,
 ) : SoundHandler {
     private var audioNode: AudioBufferSourceNode? = null
-
-    constructor(
-        data: FloatArray,
-        soundMananger: WebSoundManager,
-    ) : this(
-        BufferedChunkGenerator(data),
-        soundMananger,
-    )
 
     override fun play() {
         // FIXME: replace

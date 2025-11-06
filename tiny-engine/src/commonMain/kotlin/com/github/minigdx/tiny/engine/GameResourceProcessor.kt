@@ -85,7 +85,7 @@ class GameResourceProcessor(
             resourceFactory.soundEffect(0, sound)
         }
         this.sounds = Array(1) {
-            Sound(0, 0, "default-sound", SoundData.DEFAULT)
+            Sound(0, 0, "default-sound", SoundData.DEFAULT_EMPTY)
         }
 
         resources = listOf(

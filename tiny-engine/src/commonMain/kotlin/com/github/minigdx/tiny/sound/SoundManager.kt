@@ -25,10 +25,6 @@ class DefaultSoundBoard(private val soundManager: SoundManager) : VirtualSoundBo
         return soundManager.createSoundHandler(buffer)
     }
 
-    override fun prepare(chunkGenerator: ChunkGenerator): SoundHandler {
-        return soundManager.createSoundHandler(chunkGenerator)
-    }
-
     override fun convert(bar: MusicalBar): FloatArray {
         val buffer = soundManager.convert(bar)
         return buffer
@@ -55,10 +51,6 @@ abstract class SoundManager {
      * @param buffer byte array representing the sound. Each sample is represented with a float from -1.0f to 1.0f
      */
     abstract fun createSoundHandler(buffer: FloatArray): SoundHandler
-
-    abstract fun createSoundHandler(buffer: Sequence<FloatArray>): SoundHandler
-
-    abstract fun createSoundHandler(chunkGenerator: ChunkGenerator): SoundHandler
 
     /**
      * Convert the MusicBar into a playable sound.

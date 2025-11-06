@@ -2,7 +2,6 @@ package com.github.minigdx.tiny.platform.webgl
 
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.lua.Note
-import com.github.minigdx.tiny.sound.ChunkGenerator
 import com.github.minigdx.tiny.sound.Instrument
 import com.github.minigdx.tiny.sound.InstrumentPlayer
 import com.github.minigdx.tiny.sound.SoundHandler
@@ -11,7 +10,6 @@ import com.github.minigdx.tiny.util.MutableFixedSizeList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import web.audio.AudioContext
 import web.audio.AudioContextState
@@ -36,9 +34,7 @@ class WebSoundManager : SoundManager() {
 
     override fun initSoundManager(inputHandler: InputHandler) {
         audioContext = AudioContext()
-        println("INIT audio context " + audioContext.state)
         audioContext.onstatechange = EventHandler {
-            println("audio context " + audioContext.state)
             // See: https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/state#resuming_interrupted_play_states_in_ios_safari
             // Resume the audio context if interrupted, only on iOS
             if (audioContext.state != AudioContextState.running) {
@@ -49,12 +45,10 @@ class WebSoundManager : SoundManager() {
         }
         if (audioContext.state != AudioContextState.running) {
             inputHandler.onFirstUserInteraction {
-                println("FIRST USER audio context " + audioContext.state)
                 audioContext.resumeAsync()
                 initializeAudioWorklet()
             }
         } else {
-            println("FIRST USER audio context " + audioContext.state)
             initializeAudioWorklet()
         }
     }
@@ -66,16 +60,10 @@ class WebSoundManager : SoundManager() {
 
         soundContext.launch {
             // Load the bundled worklet from Vite assets
-            println("Loading audio worklet module...")
             val result = audioContext.audioWorklet.addModule(SynthesizerAudioWorklet)
-            println("Audio worklet module loaded successfully $result")
-
-            println("Creating AudioWorkletNode for SynthesizerProcessor")
             audioWorkletNode = AudioWorkletNode(audioContext, AudioWorkletProcessorName("SynthesizerProcessor"))
             val destinationNode = audioContext.destination
-            println("Connecting worklet to destination node: $destinationNode")
             audioWorkletNode.connect(destinationNode)
-            println("Audio worklet ready!")
             ready = true
         }
     }
@@ -84,7 +72,6 @@ class WebSoundManager : SoundManager() {
         note: Note,
         instrument: Instrument,
     ) {
-        println("noteOn is ready + $ready")
         if (!ready) return
 
         // Get or create instrument player for this note
@@ -98,7 +85,6 @@ class WebSoundManager : SoundManager() {
         val frequency = noteToFrequency(note)
         val instrumentJson = Json.encodeToString(instrument)
 
-        println("Prepare to post message to worklet")
         audioWorkletNode.port.postMessage(
             json(
                 "type" to "noteOn",
@@ -135,16 +121,7 @@ class WebSoundManager : SoundManager() {
         TODO()
     }
 
-    override fun createSoundHandler(buffer: Sequence<FloatArray>): SoundHandler {
-        TODO("Not yet implemented")
-    }
-
-    override fun createSoundHandler(chunkGenerator: ChunkGenerator): SoundHandler {
-        TODO("Not yet implemented")
-    }
-
     companion object {
-        private const val BUFFER = 4096 // Larger buffer for better stability
         private const val MAX_INSTRUMENTS = 8
     }
 }

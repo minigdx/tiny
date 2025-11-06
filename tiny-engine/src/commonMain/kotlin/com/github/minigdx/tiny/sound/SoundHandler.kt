@@ -1,7 +1,5 @@
 package com.github.minigdx.tiny.sound
 
-import com.github.minigdx.tiny.Sample
-import com.github.minigdx.tiny.sound.SoundManager.Companion.SAMPLE_RATE
 import com.github.minigdx.tiny.util.FloatData
 import kotlin.math.min
 
@@ -42,50 +40,6 @@ class BufferedChunkGenerator(private val data: FloatArray) : ChunkGenerator {
     override fun generateChunk(samples: Int): FloatData {
         chunk.copyFrom(data, position, position + samples)
         position = min(position + samples, data.size)
-        return chunk
-    }
-}
-
-class RealTimeChunkGenerator(private val generator: (progress: Sample, samples: Int) -> FloatArray) : ChunkGenerator {
-    private var position: Sample = 0
-
-    // Up to 4 seconds
-    private val chunk = FloatData(SAMPLE_RATE)
-
-    override fun generateChunk(samples: Int): FloatData {
-        val data = generator.invoke(position, samples).also {
-            position += samples
-        }
-
-        chunk.copyFrom(data, 0, samples)
-        return chunk
-    }
-}
-
-class SequencedChunkGenerator(data: Sequence<FloatArray>) : ChunkGenerator {
-    private var position: Int = 0
-    private var currentChunk: FloatArray = floatArrayOf()
-
-    private val iterator = data.iterator()
-
-    // Up to 4 seconds
-    private val chunk = FloatData(SAMPLE_RATE * 4)
-
-    override fun generateChunk(samples: Int): FloatData {
-        if (iterator.hasNext()) {
-            currentChunk = iterator.next()
-            position = 0
-        } else {
-            if (position >= currentChunk.size) {
-                currentChunk = floatArrayOf()
-                position = 0
-            }
-        }
-
-        chunk.copyFrom(currentChunk, position, position + samples)
-
-        position += samples
-
         return chunk
     }
 }
