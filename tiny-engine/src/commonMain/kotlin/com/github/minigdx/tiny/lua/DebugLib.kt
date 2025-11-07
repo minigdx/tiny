@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.lua
 
+import com.github.mingdx.tiny.doc.LuaType
 import com.github.mingdx.tiny.doc.TinyArg
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
@@ -54,7 +55,7 @@ class DebugLib(private val logger: Logger) : TwoArgFunction() {
     internal inner class console : VarArgFunction() {
         @TinyCall("Log a message into the console.")
         override fun invoke(
-            @TinyArg("str") args: Varargs,
+            @TinyArg("str", type = LuaType.ANY) args: Varargs,
         ): Varargs {
             val nbArgs = args.narg()
             val message = (1..nbArgs).joinToString(" ") {

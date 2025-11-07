@@ -1,36 +1,14 @@
 package com.github.minigdx.tiny.platform
 
 import com.danielgergely.kgl.Kgl
-import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
-import com.github.minigdx.tiny.sound.Music
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.coroutines.CoroutineDispatcher
-
-class ImageData(
-    // Array of byte of RGBA color
-    val data: ByteArray,
-    // Width of the Image
-    val width: Pixel,
-    // Height of the Image
-    val height: Pixel,
-)
-
-class SoundData(
-    // Name of the file.
-    val name: String,
-    // Deserialized data of the file.
-    val music: Music,
-    // Ready to play musical bars. (sfx)
-    val musicalBars: List<FloatArray>,
-    // Ready to play musical sequences (music)
-    val musicalSequences: List<FloatArray> = emptyList(),
-)
 
 interface Platform {
     /**

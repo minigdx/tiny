@@ -55,21 +55,30 @@ class PrimitiveInstance(
         type = 1
         // Find the most left x coordinate
         meshX = min(min(x1, x2), x3)
-        // Find the most botton coordinate
+        // Find the topmost y coordinate (minimum y value)
         meshY = min(min(y1, y2), y3)
-        meshWidth = max(max(x1, x2), x3) - meshX
-        meshHeight = max(max(y1, y2), y3) - meshY
+        meshWidth = max(max(x1, x2), x3) - meshX + 1
+        meshHeight = max(max(y1, y2), y3) - meshY + 1
 
-        // Set the edges the lines are always from left to right
-        val (a, b, c) = listOf(x1 to y1, x2 to y2, x3 to y3).sortedBy { it.first }
+        // The shader creates three edges from vertices: p0→p1, p0→p2, p1→p2
+        // We need to arrange the original triangle vertices (v1, v2, v3) as (p0, p1, p2)
+        // such that all three shader edges go from left to right
 
-        // Set the triangle inside the mesh
-        parameters[0] = a.first
-        parameters[1] = a.second
-        parameters[2] = b.first
-        parameters[3] = b.second
-        parameters[4] = c.first
-        parameters[5] = c.second
+        // Sort vertices by x-coordinate to get leftmost, middle, rightmost
+        val sortedVertices = listOf(x1 to y1, x2 to y2, x3 to y3).sortedBy { it.first }
+        val left = sortedVertices[0]
+        val middle = sortedVertices[1]
+        val right = sortedVertices[2]
+
+        // Assign p0=leftmost ensures p0→p1 and p0→p2 go left-to-right
+        // Assign p1=middle, p2=right ensures p1→p2 goes left-to-right
+        // All three shader edges (p0→p1, p0→p2, p1→p2) now go left-to-right
+        parameters[0] = left.first
+        parameters[1] = left.second
+        parameters[2] = middle.first
+        parameters[3] = middle.second
+        parameters[4] = right.first
+        parameters[5] = right.second
 
         this.filled = filled
         this.color = color

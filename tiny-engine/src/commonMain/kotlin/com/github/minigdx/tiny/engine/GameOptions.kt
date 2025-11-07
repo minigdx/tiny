@@ -13,7 +13,7 @@ data class GameOptions(
     val gameScripts: List<String>,
     val spriteSheets: List<String>,
     val gameLevels: List<String> = emptyList(),
-    val sounds: List<String> = emptyList(),
+    val sound: String? = null,
     val zoom: Int = 2,
     val record: Seconds = 8f,
     val gutter: Pair<Pixel, Pixel> = 10 to 10,

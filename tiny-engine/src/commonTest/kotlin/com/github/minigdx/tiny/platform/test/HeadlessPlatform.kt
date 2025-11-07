@@ -1,13 +1,10 @@
 package com.github.minigdx.tiny.platform.test
 
 import com.danielgergely.kgl.Kgl
-import com.github.minigdx.tiny.ColorIndex
-import com.github.minigdx.tiny.Pixel
 import com.github.minigdx.tiny.engine.GameLoop
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.file.SourceStream
-import com.github.minigdx.tiny.graphic.FrameBuffer
-import com.github.minigdx.tiny.graphic.PixelArray
+import com.github.minigdx.tiny.graphic.FrameBufferParameters
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.lua.Note
@@ -17,8 +14,6 @@ import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMetrics
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
-import com.github.minigdx.tiny.render.RenderFrame
-import com.github.minigdx.tiny.sound.ChunkGenerator
 import com.github.minigdx.tiny.sound.Instrument
 import com.github.minigdx.tiny.sound.SoundHandler
 import com.github.minigdx.tiny.sound.SoundManager
@@ -63,7 +58,7 @@ class HeadlessPlatform(
 ) : Platform {
     private val input = VirtualInputHandler()
 
-    val frames: MutableFixedSizeList<FrameBuffer> = MutableFixedSizeList(frames)
+    val frames: MutableFixedSizeList<FrameBufferParameters> = MutableFixedSizeList(frames)
 
     private var gameLoop: GameLoop? = null
 
@@ -131,14 +126,6 @@ class HeadlessPlatform(
                     }
                 }
 
-            override fun createSoundHandler(buffer: Sequence<FloatArray>): SoundHandler {
-                TODO("Not yet implemented")
-            }
-
-            override fun createSoundHandler(chunkGenerator: ChunkGenerator): SoundHandler {
-                TODO("Not yet implemented")
-            }
-
             override fun noteOn(
                 note: Note,
                 instrument: Instrument,
@@ -184,26 +171,6 @@ class HeadlessPlatform(
 
     override fun writeImage(buffer: ByteArray) {
         TODO("Not yet implemented")
-    }
-
-    fun saveAnimation(name: String) = toGif(name, frames)
-
-    class FrameBufferFrame(frameBuffer: FrameBuffer) : RenderFrame {
-        private val frameBuffer =
-            FrameBuffer(frameBuffer.width, frameBuffer.height, frameBuffer.gamePalette).apply {
-                this.fastCopyFrom(frameBuffer)
-            }
-
-        override fun copyInto(pixelArray: PixelArray) {
-            pixelArray.copyFrom(frameBuffer.colorIndexBuffer)
-        }
-
-        override fun getPixel(
-            x: Pixel,
-            y: Pixel,
-        ): ColorIndex {
-            return frameBuffer.pixel(x, y)
-        }
     }
 
     override fun saveIntoHome(

@@ -44,62 +44,68 @@ class TinyToAsciidocKspProcessor(
         val result =
             asciidoc {
                 title = "Tiny API"
-                libs.forEach { lib ->
-                    section(lib.name.ifBlank { "std" }, lib.description) {
-                        lib.variables.filterNot { it.hidden }.forEach { variable ->
-                            val prefix =
-                                if (lib.name.isBlank()) {
-                                    variable.name
-                                } else {
-                                    "${lib.name}.${variable.name}"
-                                }
-                            lib(prefix) {
-                                paragraph(variable.description)
-                                example(
-                                    prefix,
-                                    """
+                libs.sortedBy { it.name }
+                    .forEach { lib ->
+                        section(lib.name.ifBlank { "std" }, lib.description) {
+                            lib.variables
+                                .sortedBy { it.name }
+                                .filterNot { it.hidden }
+                                .forEach { variable ->
+                                    val prefix =
+                                        if (lib.name.isBlank()) {
+                                            variable.name
+                                        } else {
+                                            "${lib.name}.${variable.name}"
+                                        }
+                                    lib(prefix) {
+                                        paragraph(variable.description)
+                                        example(
+                                            prefix,
+                                            """
                                     function _update()
                                         gfx.cls()
                                         print($prefix, 10, 10) -- ${variable.description}
                                     end
-                                    """.trimIndent(),
-                                )
-                            }
-                        }
-                        lib.functions.forEach { func ->
-                            val prefix =
-                                if (lib.name.isBlank()) {
-                                    func.name
-                                } else {
-                                    "${lib.name}.${func.name}"
-                                }
-                            lib("$prefix()") {
-                                paragraph(func.description)
-
-                                if (func.calls.isNotEmpty()) {
-                                    val result = func.calls.joinToString("\n") { call ->
-                                        "$prefix(${call.args.joinToString(", ") { it.name }}) -- ${call.description}"
+                                            """.trimIndent(),
+                                        )
                                     }
-                                    code(result)
                                 }
+                            lib.functions
+                                .sortedBy { it.name }
+                                .forEach { func ->
+                                    val prefix =
+                                        if (lib.name.isBlank()) {
+                                            func.name
+                                        } else {
+                                            "${lib.name}.${func.name}"
+                                        }
+                                    lib("$prefix()") {
+                                        paragraph(func.description)
 
-                                val args = func.calls.flatMap { it.args }
-                                    .filter { it.description.isNotBlank() }
-                                    .sortedBy { it.name }
+                                        if (func.calls.isNotEmpty()) {
+                                            val result = func.calls.joinToString("\n") { call ->
+                                                "$prefix(${call.args.joinToString(", ") { it.name }}) -- ${call.description}"
+                                            }
+                                            code(result)
+                                        }
 
-                                if (args.isNotEmpty()) {
-                                    tableArgs(
-                                        args.map {
-                                            it.name to it.description
-                                        },
-                                    )
+                                        val args = func.calls.flatMap { it.args }
+                                            .filter { it.description.isNotBlank() }
+                                            .sortedBy { it.name }
+
+                                        if (args.isNotEmpty()) {
+                                            tableArgs(
+                                                args.map {
+                                                    it.name to it.description
+                                                },
+                                            )
+                                        }
+
+                                        example(func.name, func.example, func.spritePath, func.levelPath)
+                                    }
                                 }
-
-                                example(func.name, func.example, func.spritePath, func.levelPath)
-                            }
                         }
                     }
-                }
             }.generate()
 
         file.write(result.toByteArray())

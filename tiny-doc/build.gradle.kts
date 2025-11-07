@@ -36,16 +36,6 @@ dependencies {
             ),
         ),
     )
-
-    add(
-        asciidoctorDependencies.name,
-        project(
-            mapOf(
-                "path" to ":tiny-cli",
-                "configuration" to "tinyCliApiAsciidoctor",
-            ),
-        ),
-    )
 }
 
 val unzipAsciidoctorResources =

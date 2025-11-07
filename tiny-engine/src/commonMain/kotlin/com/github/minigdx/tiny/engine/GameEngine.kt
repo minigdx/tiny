@@ -99,6 +99,7 @@ class GameEngine(
         if (currentGameScript.exited >= 0) {
             exitCurrentGameScript(currentGameScript)
         } else if (currentGameScript.reload) {
+            soundManager.stopAll()
             reloadCurrentGameScript(currentGameScript)
         }
 

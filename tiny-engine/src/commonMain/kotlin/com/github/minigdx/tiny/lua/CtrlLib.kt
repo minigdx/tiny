@@ -54,7 +54,7 @@ class CtrlLib(
 
         @TinyCall("Get the mouse coordinate and draw a sprite on those coordinates.")
         override fun call(
-            @TinyArg("sprN") arg: LuaValue,
+            @TinyArg("sprN", type = LuaType.NUMBER) arg: LuaValue,
         ): LuaValue {
             val pos = inputHandler.currentTouch
 
@@ -86,7 +86,7 @@ class CtrlLib(
 
         @TinyCall("Is the key was pressed?")
         override fun call(
-            @TinyArg("key") arg: LuaValue,
+            @TinyArg("key", type = LuaType.NUMBER) arg: LuaValue,
         ): LuaValue {
             val int = arg.checkint()
             if (int >= values.size || int < 0) return BFALSE
@@ -104,7 +104,7 @@ class CtrlLib(
     inner class pressing : OneArgFunction() {
         @TinyCall("Is the key is still pressed?")
         override fun call(
-            @TinyArg("key") arg: LuaValue,
+            @TinyArg("key", type = LuaType.NUMBER) arg: LuaValue,
         ): LuaValue {
             val values = Key.values()
             val int = arg.checkint()
@@ -129,7 +129,7 @@ class CtrlLib(
     inner class touched : OneArgFunction() {
         @TinyCall("Is the screen was touched or mouse button was pressed?")
         override fun call(
-            @TinyArg("touch") arg: LuaValue,
+            @TinyArg("touch", type = LuaType.NUMBER) arg: LuaValue,
         ): LuaValue {
             val values = TouchSignal.values()
             val int = arg.checkint()

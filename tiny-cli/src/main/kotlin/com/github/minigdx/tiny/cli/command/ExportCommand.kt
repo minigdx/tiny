@@ -13,6 +13,7 @@ import com.github.minigdx.tiny.cli.config.GameParameters
 import com.github.minigdx.tiny.cli.config.GameParameters.Companion.JSON
 import com.github.minigdx.tiny.cli.config.GameParametersV1
 import com.github.minigdx.tiny.resources.ldtk.Ldtk
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import java.io.File
@@ -441,6 +442,7 @@ class ExportCommand : CliktCommand(name = "export") {
     }
 }
 
+@OptIn(ExperimentalSerializationApi::class)
 class GameExporter {
     fun export(
         gameDirectory: File,
@@ -495,7 +497,7 @@ class GameExporter {
 
         when (gameParameters) {
             is GameParametersV1 -> {
-                (gameParameters.scripts + gameParameters.libraries.map { "$it.lua" })
+                (gameParameters.scripts)
                     .filterNot { exportedFile.contains(it) }
                     .forEach { name ->
                         exportedGame.putNextEntry(ZipEntry(name))
@@ -513,7 +515,7 @@ class GameExporter {
 
                         exportedFile += name
                     }
-                gameParameters.sounds
+                listOfNotNull(gameParameters.sound)
                     .filterNot { exportedFile.contains(it) }
                     .forEach { name ->
                         exportedGame.putNextEntry(ZipEntry(name))
@@ -560,7 +562,7 @@ class GameExporter {
 
                 template = replaceList(
                     template,
-                    (gameParameters.scripts + gameParameters.libraries.map { "$it.lua" }),
+                    gameParameters.scripts,
                     "{GAME_SCRIPT}",
                     "GAME_SCRIPT",
                 )
@@ -571,7 +573,7 @@ class GameExporter {
                     "GAME_SPRITESHEET",
                 )
                 template = replaceList(template, gameParameters.levels, "{GAME_LEVEL}", "GAME_LEVEL")
-                template = replaceList(template, gameParameters.sounds, "{GAME_SOUND}", "GAME_SOUND")
+                template = replaceList(template, listOfNotNull(gameParameters.sound), "{GAME_SOUND}", "GAME_SOUND")
 
                 template = template.replace("{GAME_COLORS}", gameParameters.colors.joinToString(","))
 

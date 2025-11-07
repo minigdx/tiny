@@ -15,13 +15,11 @@ import com.github.minigdx.tiny.cli.command.utils.ColorUtils
 import com.github.minigdx.tiny.cli.command.utils.ColorUtils.brightness
 import com.github.minigdx.tiny.cli.command.utils.PaletteImageGenerator
 import com.github.minigdx.tiny.cli.config.GameParameters
-import com.github.minigdx.tiny.cli.config.GameParameters.Companion.JSON
 import com.github.minigdx.tiny.cli.config.GameParametersV1
 import com.github.minigdx.tiny.cli.config.Size
-import kotlinx.serialization.json.encodeToStream
+import com.github.minigdx.tiny.platform.SoundData
 import org.intellij.lang.annotations.Language
 import java.io.File
-import java.io.FileOutputStream
 import java.util.UUID
 
 @Language("Lua")
@@ -109,15 +107,17 @@ ${
             zoom = zoom,
             colors = GamePalette.ALL[palette - 1].colors.sortedBy { brightness(it) },
             scripts = listOf(gameScript),
+            sound = "default-sound.sfx",
             hideMouseCursor = hideMouseCursor == "yes".lowercase(),
         ) as GameParameters
 
         if (!gameDirectory.exists()) gameDirectory.mkdirs()
 
         val configurationFile = gameDirectory.resolve("_tiny.json")
-        FileOutputStream(configurationFile).use {
-            JSON.encodeToStream(configuration, it)
-        }
+        configuration.write(configurationFile)
+
+        val soundFile = gameDirectory.resolve("default-sound.sfx")
+        soundFile.writeText(SoundData.DEFAULT_SFX.music.serialize())
 
         gameDirectory.resolve(gameScript).writeText(DEFAULT_GAME_SCRIPT)
 

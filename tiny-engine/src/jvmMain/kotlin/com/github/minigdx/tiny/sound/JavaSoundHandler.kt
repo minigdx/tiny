@@ -5,13 +5,15 @@ import com.github.minigdx.tiny.util.FloatData
 class JavaSoundHandler(
     val chunkGenerator: ChunkGenerator,
     private val mixerGateway: MixerGateway,
+    private val soundManager: SoundManager,
 ) : SoundHandler {
     /**
      * Legacy constructor
      */
-    constructor(data: FloatArray, mixerGateway: MixerGateway) : this(
+    constructor(data: FloatArray, mixerGateway: MixerGateway, soundManager: SoundManager) : this(
         BufferedChunkGenerator(data),
         mixerGateway,
+        soundManager,
     )
 
     var loop: Boolean = false
@@ -29,12 +31,15 @@ class JavaSoundHandler(
 
     override fun stop() {
         stop = true
+        soundManager.removeSoundHandler(this)
     }
 
     override fun nextChunk(samples: Int): FloatData {
         val chunk = chunkGenerator.generateChunk(samples)
         if (chunk.size == 0) {
-            stop()
+            if (!loop) {
+                stop()
+            }
         }
         return chunk
     }

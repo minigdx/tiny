@@ -69,8 +69,7 @@ class UpdateCommand : CliktCommand(name = "update") {
         editableParameters.add(EditableParameter("scripts", params.scripts.joinToString(", "), false))
         editableParameters.add(EditableParameter("spritesheets", params.spritesheets.joinToString(", "), false))
         editableParameters.add(EditableParameter("levels", params.levels.joinToString(", "), false))
-        editableParameters.add(EditableParameter("sounds", params.sounds.joinToString(", "), false))
-        editableParameters.add(EditableParameter("libraries", params.libraries.joinToString(", "), false))
+        editableParameters.add(EditableParameter("sounds", listOfNotNull(params.sound).joinToString(", "), false))
         editableParameters.add(EditableParameter("hideMouseCursor", if (params.hideMouseCursor) "Yes" else "No", true))
     }
 

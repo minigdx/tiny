@@ -19,6 +19,9 @@ install:
 
 docs: install
 	./gradlew tiny-web-editor:tinyWebEditor
+	tiny-cli docs --output tiny-doc/src/docs/asciidoc/dependencies/tiny-cli-commands.adoc
 	tiny-cli export tiny-sample
-	unzip -o -d tiny-doc/src/docs/asciidoc/sample tiny-sample/tiny-export.zip
+	unzip -o -d tiny-doc/src/docs/asciidoc/sample/game-example tiny-sample/tiny-export.zip
+	tiny-cli export tiny-cli/src/main/resources/sfx
+	unzip -o -d tiny-doc/src/docs/asciidoc/sample/sfx-editor tiny-cli/src/main/resources/sfx/tiny-export.zip
 	./gradlew asciidoctor -Pversion=$(uuidgen)

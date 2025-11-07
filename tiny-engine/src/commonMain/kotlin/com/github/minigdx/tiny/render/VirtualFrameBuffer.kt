@@ -61,7 +61,7 @@ interface VirtualFrameBuffer {
         y: Pixel,
         width: Pixel,
         height: Pixel,
-        colorIndex: ColorIndex,
+        color: ColorIndex,
         filled: Boolean,
     )
 
@@ -73,7 +73,7 @@ interface VirtualFrameBuffer {
         y1: Pixel,
         x2: Pixel,
         y2: Pixel,
-        colorIndex: ColorIndex,
+        color: ColorIndex,
     )
 
     /**

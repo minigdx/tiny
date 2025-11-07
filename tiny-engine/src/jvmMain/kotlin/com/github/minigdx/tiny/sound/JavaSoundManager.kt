@@ -180,23 +180,18 @@ class JavaSoundManager : SoundManager() {
     }
 
     override fun createSoundHandler(buffer: FloatArray): SoundHandler {
-        return JavaSoundHandler(
+        val handler = JavaSoundHandler(
             data = buffer,
             mixerGateway = mixer,
+            this,
         )
-    }
-
-    override fun createSoundHandler(buffer: Sequence<FloatArray>): SoundHandler {
-        return JavaSoundHandler(SequencedChunkGenerator(buffer), mixerGateway = mixer)
-    }
-
-    override fun createSoundHandler(chunkGenerator: ChunkGenerator): SoundHandler {
-        return JavaSoundHandler(chunkGenerator, mixerGateway = mixer)
+        addSoundHandler(handler)
+        return handler
     }
 
     override fun destroy() {
         soundPort.alive = false
-        mixer.add(JavaSoundHandler(FloatArray(0), mixer)) // unlock the sound port
+        mixer.add(JavaSoundHandler(FloatArray(0), mixer, this)) // unlock the sound port
         mixer.alive = false
     }
 }

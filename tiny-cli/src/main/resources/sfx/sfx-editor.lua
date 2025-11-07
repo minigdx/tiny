@@ -448,7 +448,7 @@ function _init_sfx_editor(entities)
         wire.sync(state, "sfx.index", selector, "value")
         -- set the instrument to the bar
         wire.listen(selector, "value", function(source, value)
-            state.sfx = sfx.bar(value)
+            state.sfx = sfx.sfx(value)
         end)
         -- set the list of instruments
         wire.sync(state, "sfx.all", selector, "active_indices")
@@ -478,7 +478,7 @@ function _init_player(entities)
 
         local saveButton = wire.find_widget(m.widgets, widget.fields.SaveButton)
         saveButton.on_change = function()
-            state.sfx.save()
+            sfx.save()
         end
 
         local exportButton = wire.find_widget(m.widgets, widget.fields.ExportButton)
@@ -502,7 +502,7 @@ function _init()
 
     state = new(State)
 
-    state.sfx = sfx.bar(0)
+    state.sfx = sfx.sfx(0)
 
     map.level("SfxEditor")
 

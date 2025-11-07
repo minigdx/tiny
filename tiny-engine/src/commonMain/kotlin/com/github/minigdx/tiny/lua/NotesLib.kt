@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.lua
 
+import com.github.mingdx.tiny.doc.LuaType
 import com.github.mingdx.tiny.doc.TinyArg
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
@@ -240,7 +241,7 @@ class NotesLib : TwoArgFunction() {
     inner class note : OneArgFunction() {
         @TinyCall("Get the name of a note regarding the note index (ie: C0 = 0, Cs0 = 1, ...)")
         override fun call(
-            @TinyArg("note_index") arg: LuaValue,
+            @TinyArg("note_index", type = LuaType.NUMBER) arg: LuaValue,
         ): LuaValue {
             return valueOf(Note.fromIndex(arg.checkint()).name)
         }

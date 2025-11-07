@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.lua
 
+import com.github.mingdx.tiny.doc.LuaType
 import com.github.mingdx.tiny.doc.TinyArg
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
@@ -81,7 +82,7 @@ class GfxLib(
 
         @TinyCall("Switch to another draw mode. Return the previous mode.")
         override fun call(
-            @TinyArg("mode") a: LuaValue,
+            @TinyArg("mode", type = LuaType.NUMBER) a: LuaValue,
         ): LuaValue {
             val before = current
             val index = a.checkint()
@@ -105,7 +106,7 @@ class GfxLib(
 
         @TinyCall("Clear the screen with a color.")
         override fun call(
-            @TinyArg("color") arg: LuaValue,
+            @TinyArg("color", type = LuaType.NUMBER) arg: LuaValue,
         ): LuaValue {
             val color = if (arg.isnil()) {
                 valueOf("#000000").checkColorIndex()
@@ -123,9 +124,9 @@ class GfxLib(
     internal inner class pset : ThreeArgFunction() {
         @TinyCall("set the color index at the coordinate (x,y).")
         override fun call(
-            @TinyArg("x") arg1: LuaValue,
-            @TinyArg("y") arg2: LuaValue,
-            @TinyArg("color") arg3: LuaValue,
+            @TinyArg("x", type = LuaType.NUMBER) arg1: LuaValue,
+            @TinyArg("y", type = LuaType.NUMBER) arg2: LuaValue,
+            @TinyArg("color", type = LuaType.NUMBER) arg3: LuaValue,
         ): LuaValue {
             virtualFrameBuffer.drawPoint(
                 arg1.toint(),
@@ -140,8 +141,8 @@ class GfxLib(
     internal inner class pget : TwoArgFunction() {
         @TinyCall("get the color index at the coordinate (x,y).")
         override fun call(
-            @TinyArg("x") arg1: LuaValue,
-            @TinyArg("y") arg2: LuaValue,
+            @TinyArg("x", type = LuaType.NUMBER) arg1: LuaValue,
+            @TinyArg("y", type = LuaType.NUMBER) arg2: LuaValue,
         ): LuaValue {
             val x = min(max(0, arg1.checkint()), gameOptions.width - 1)
             val y = min(max(0, arg2.checkint()), gameOptions.height - 1)
@@ -165,7 +166,7 @@ class GfxLib(
     inner class toSheet : LibFunction() {
         @TinyCall("Copy the current frame buffer to an new or existing sheet index.")
         override fun call(
-            @TinyArg("sheet") a: LuaValue,
+            @TinyArg("sheet", type = LuaType.ANY) a: LuaValue,
         ): LuaValue {
             val (index, name) = getIndexAndName(a)
 
@@ -234,8 +235,8 @@ class GfxLib(
 
         @TinyCall("Set game camera to the position x, y.")
         override fun call(
-            @TinyArg("x") arg1: LuaValue,
-            @TinyArg("y") arg2: LuaValue,
+            @TinyArg("x", type = LuaType.NUMBER) arg1: LuaValue,
+            @TinyArg("y", type = LuaType.NUMBER) arg2: LuaValue,
         ): LuaValue {
             val previous = coordinates()
             virtualFrameBuffer.setCamera(arg1.toint(), arg2.toint())
@@ -267,7 +268,7 @@ class GfxLib(
 
         @TinyCall("Apply dithering pattern. The previous dithering pattern is returned.")
         override fun call(
-            @TinyArg("pattern", "Dither pattern. For example: 0xA5A5 or 0x3030") a: LuaValue,
+            @TinyArg("pattern", "Dither pattern. For example: 0xA5A5 or 0x3030", type = LuaType.NUMBER) a: LuaValue,
         ): LuaValue {
             val actual = virtualFrameBuffer.dithering(a.checkint())
             return valueOf(actual)
@@ -287,10 +288,10 @@ class GfxLib(
 
         @TinyCall("Clip and limit the drawing area.")
         override fun call(
-            @TinyArg("x") a: LuaValue,
-            @TinyArg("y") b: LuaValue,
-            @TinyArg("width") c: LuaValue,
-            @TinyArg("height") d: LuaValue,
+            @TinyArg("x", type = LuaType.NUMBER) a: LuaValue,
+            @TinyArg("y", type = LuaType.NUMBER) b: LuaValue,
+            @TinyArg("width", type = LuaType.NUMBER) c: LuaValue,
+            @TinyArg("height", type = LuaType.NUMBER) d: LuaValue,
         ): LuaValue {
             virtualFrameBuffer.setClip(a.checkint(), b.checkint(), c.checkint(), d.checkint())
             return NONE

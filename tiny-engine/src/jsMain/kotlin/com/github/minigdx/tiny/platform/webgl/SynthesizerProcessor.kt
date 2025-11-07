@@ -1,12 +1,12 @@
 package com.github.minigdx.tiny.platform.webgl
 
+import com.github.minigdx.tiny.log.StdOutLogger
 import com.github.minigdx.tiny.lua.Note
 import com.github.minigdx.tiny.sound.Instrument
 import com.github.minigdx.tiny.sound.InstrumentPlayer
 import js.array.ReadonlyArray
 import js.objects.ReadonlyRecord
 import js.typedarrays.Float32Array
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import web.audio.AudioParamName
 import web.audio.AudioWorkletProcessor
@@ -16,19 +16,17 @@ import web.events.EventHandler
 class SynthesizerProcessor : AudioWorkletProcessor() {
     private var currentInstrumentPlayer: InstrumentPlayer? = null
 
+    private val logger = StdOutLogger("SynthesizerProcessor")
+
     init {
-        println("SynthesizerProcessor initialized!")
         port.onmessage = EventHandler { event ->
             val data = event.data.unsafeCast<dynamic>()
             val type = data.type as? String
-            println("EVENT RECEIVED - Type: $type, Data: $data")
 
             when (type) {
                 "noteOn" -> {
                     val note = data.note as? Int
-                    val frequency = data.frequency as? Double
                     val instrumentJson = data.instrument as? String
-                    println("Note ON: note=$note, frequency=$frequency Hz")
 
                     if (instrumentJson != null && note != null) {
                         try {
@@ -38,21 +36,19 @@ class SynthesizerProcessor : AudioWorkletProcessor() {
                             // Create new player and start note
                             currentInstrumentPlayer = InstrumentPlayer(instrument)
                             currentInstrumentPlayer?.noteOn(Note.entries[note])
-                            println("Created InstrumentPlayer and started note")
                         } catch (e: Exception) {
-                            println("Error deserializing instrument: ${e.message}")
+                            logger.error("AUDIO", e) { "Error while processing audio" }
                         }
                     }
                 }
                 "noteOff" -> {
                     val note = data.note as? Int
-                    println("Note OFF: note=$note")
                     if (note != null) {
                         currentInstrumentPlayer?.noteOff(Note.entries[note])
                     }
                 }
                 else -> {
-                    println("Unknown message type: $type")
+                    logger.error("AUDIO") { "Unknown type: $type" }
                 }
             }
         }
@@ -64,7 +60,7 @@ class SynthesizerProcessor : AudioWorkletProcessor() {
         parameters: ReadonlyRecord<AudioParamName, Float32Array<*>>,
     ): Boolean {
         // Get the first output channel (mono output)
-        val output = outputs[0]?.get(0) ?: return true
+        val output = outputs[0][0]
 
         // Generate audio samples
         val player = currentInstrumentPlayer

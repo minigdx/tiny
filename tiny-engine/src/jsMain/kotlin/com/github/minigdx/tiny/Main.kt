@@ -110,7 +110,7 @@ fun setupGames(
                 gameScripts = scripts,
                 spriteSheets = spritesheets,
                 gameLevels = levels,
-                sounds = sounds,
+                sound = sounds.firstOrNull(),
                 zoom = gameZoom,
                 gutter = 0 to 0,
                 spriteSize = sprWidth to sprHeight,

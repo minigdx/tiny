@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.lua
 
+import com.github.mingdx.tiny.doc.LuaType
 import com.github.mingdx.tiny.doc.TinyArg
 import com.github.mingdx.tiny.doc.TinyArgs
 import com.github.mingdx.tiny.doc.TinyCall
@@ -43,15 +44,15 @@ class StdLib(
     inner class new : TwoArgFunction() {
         @TinyCall("Create new instance of class.")
         override fun call(
-            @TinyArg("class") arg: LuaValue,
+            @TinyArg("class", type = LuaType.TABLE) arg: LuaValue,
         ): LuaValue {
             return super.call(arg)
         }
 
         @TinyCall("Create new instance of class using default values.")
         override fun call(
-            @TinyArg("class") arg1: LuaValue,
-            @TinyArg("default") arg2: LuaValue,
+            @TinyArg("class", type = LuaType.TABLE) arg1: LuaValue,
+            @TinyArg("default", type = LuaType.TABLE) arg2: LuaValue,
         ): LuaValue {
             val default =
                 if (arg2.istable()) {
@@ -88,8 +89,8 @@ class StdLib(
     inner class merge : TwoArgFunction() {
         @TinyCall("Merge source into dest.")
         override fun call(
-            @TinyArg("source") arg1: LuaValue,
-            @TinyArg("dest") arg2: LuaValue,
+            @TinyArg("source", type = LuaType.TABLE) arg1: LuaValue,
+            @TinyArg("dest", type = LuaType.TABLE) arg2: LuaValue,
         ): LuaValue {
             return if (arg1.istable() and arg2.istable()) {
                 arg1 as LuaTable
@@ -114,8 +115,8 @@ class StdLib(
     inner class append : TwoArgFunction() {
         @TinyCall("Copy source into dest.")
         override fun call(
-            @TinyArg("source") arg1: LuaValue,
-            @TinyArg("dest") arg2: LuaValue,
+            @TinyArg("source", type = LuaType.TABLE) arg1: LuaValue,
+            @TinyArg("dest", type = LuaType.TABLE) arg2: LuaValue,
         ): LuaValue {
             return if (arg1.istable() and arg2.istable()) {
                 arg1 as LuaTable
@@ -141,7 +142,7 @@ class StdLib(
     internal inner class all : VarArgFunction() {
         @TinyCall("Iterate over the values of the table")
         override fun invoke(
-            @TinyArgs(["table"]) args: Varargs,
+            @TinyArgs(names = ["table"], types = [LuaType.TABLE]) args: Varargs,
         ): Varargs {
             val iterator =
                 object : VarArgFunction() {
@@ -179,7 +180,7 @@ class StdLib(
     internal inner class rpairs : VarArgFunction() {
         @TinyCall("Iterate over the values of the table")
         override fun invoke(
-            @TinyArgs(["table"]) args: Varargs,
+            @TinyArgs(names = ["table"], types = [LuaType.TABLE]) args: Varargs,
         ): Varargs {
             val iterator =
                 object : VarArgFunction() {
@@ -208,7 +209,7 @@ class StdLib(
             description = "print on the screen a string at (0,0) with a default color.",
         )
         override fun call(
-            @TinyArg("str") a: LuaValue,
+            @TinyArg("str", type = LuaType.STRING) a: LuaValue,
         ): LuaValue {
             return call(a, valueOf(0), valueOf(0), valueOf("#FFFFFF"))
         }
@@ -217,9 +218,9 @@ class StdLib(
             description = "print on the screen a string with a default color.",
         )
         override fun call(
-            @TinyArg("str") a: LuaValue,
-            @TinyArg("x") b: LuaValue,
-            @TinyArg("y") c: LuaValue,
+            @TinyArg("str", type = LuaType.STRING) a: LuaValue,
+            @TinyArg("x", type = LuaType.NUMBER) b: LuaValue,
+            @TinyArg("y", type = LuaType.NUMBER) c: LuaValue,
         ): LuaValue {
             return call(a, b, c, valueOf("#FFFFFF"))
         }
@@ -228,10 +229,10 @@ class StdLib(
             description = "print on the screen a string with a specific color.",
         )
         override fun call(
-            @TinyArg("str") a: LuaValue,
-            @TinyArg("x") b: LuaValue,
-            @TinyArg("y") c: LuaValue,
-            @TinyArg("color") d: LuaValue,
+            @TinyArg("str", type = LuaType.STRING) a: LuaValue,
+            @TinyArg("x", type = LuaType.NUMBER) b: LuaValue,
+            @TinyArg("y", type = LuaType.NUMBER) c: LuaValue,
+            @TinyArg("color", type = LuaType.ANY) d: LuaValue,
         ): LuaValue {
             val spritesheet = resourceAccess.bootSpritesheet ?: return NONE
             val str = a.tojstring()

@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.lua
 
+import com.github.mingdx.tiny.doc.LuaType
 import com.github.mingdx.tiny.doc.TinyArg
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
@@ -75,7 +76,7 @@ class TinyLib(
     internal inner class exit : OneArgFunction() {
         @TinyCall("Exit the actual script to switch to another one.")
         override fun call(
-            @TinyArg("scriptIndex") arg: LuaValue,
+            @TinyArg("scriptIndex", type = LuaType.ANY) arg: LuaValue,
         ): LuaValue {
             if (arg.isint()) {
                 throw Exit(arg.toint())

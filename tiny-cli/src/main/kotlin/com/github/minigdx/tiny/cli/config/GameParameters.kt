@@ -1,6 +1,7 @@
 package com.github.minigdx.tiny.cli.config
 
 import com.github.minigdx.tiny.engine.GameOptions
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -10,7 +11,9 @@ import kotlinx.serialization.json.encodeToStream
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.InputStream
 
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 @JsonClassDiscriminator("version")
 sealed class GameParameters {
@@ -19,6 +22,7 @@ sealed class GameParameters {
 
     abstract fun toGameOptions(): GameOptions
 
+    @OptIn(ExperimentalSerializationApi::class)
     fun write(output: File) {
         FileOutputStream(output).use {
             JSON.encodeToStream(this, it)
@@ -40,19 +44,18 @@ sealed class GameParameters {
      */
     abstract fun getAllScripts(): List<String>
 
-    /**
-     * Add library.
-     */
-    abstract fun addLibrary(lib: String): GameParameters
-
     companion object {
-        val JSON =
-            Json {
-                ignoreUnknownKeys = true
-            }
+        val JSON = Json {
+            ignoreUnknownKeys = true
+        }
+
+        @OptIn(ExperimentalSerializationApi::class)
+        fun read(inputStream: InputStream): GameParameters {
+            return JSON.decodeFromStream<GameParameters>(inputStream)
+        }
 
         fun read(file: File): GameParameters {
-            return JSON.decodeFromStream<GameParameters>(FileInputStream(file))
+            return read(FileInputStream(file))
         }
     }
 }
@@ -89,16 +92,9 @@ data class GameParametersV1(
      */
     val levels: List<String> = emptyList(),
     /**
-     * List of MIDI sounds.
+     * List of sounds.
      */
-    val sounds: List<String> = emptyList(),
-    /**
-     * Libraries configured. It will contain the name of the library and the version (optional).
-     * The file name still has to be computed from the name (ie: particules@commitHash -> particules.lua)
-     *
-     * The libraries will be added at the end of the scripts lists.
-     */
-    val libraries: List<String> = emptyList(),
+    val sound: String? = null,
     /**
      * Is the default mouse cursor should be hidden?
      * If true, the mouse cursor will not be displayed.
@@ -116,7 +112,7 @@ data class GameParametersV1(
             spriteSheets = spritesheets,
             gameLevels = levels,
             zoom = zoom,
-            sounds = sounds,
+            sound = sound,
             hideMouseCursor = hideMouseCursor,
         )
     }
@@ -131,10 +127,7 @@ data class GameParametersV1(
             }
         }
 
-        return scripts +
-            libraries.map { lib ->
-                extractName(lib) + ".lua"
-            }
+        return scripts
     }
 
     override fun addLevel(level: String): GameParameters {
@@ -150,11 +143,7 @@ data class GameParametersV1(
     }
 
     override fun addSound(sound: String): GameParameters {
-        return copy(sounds = sounds + sound)
-    }
-
-    override fun addLibrary(lib: String): GameParameters {
-        return copy(libraries = libraries + lib)
+        return copy(sound = this@GameParametersV1.sound + sound)
     }
 
     override fun setPalette(colors: List<String>): GameParameters {
