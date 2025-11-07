@@ -18,6 +18,7 @@ class MainCommand : CliktCommand() {
             SfxCommand(),
             UpdateCommand(),
             ResourcesCommand(),
+            DocsCommand(),
         )
     }
 

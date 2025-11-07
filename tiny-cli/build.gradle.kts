@@ -3,7 +3,6 @@
 plugins {
     alias(libs.plugins.minigdx.jvm)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.kotlin.ksp)
     application
 }
 
@@ -46,10 +45,6 @@ dependencies {
         "Embed the JS engine in the CLI " +
             "so it can be included when the game is exported.",
     )
-
-    add("ksp", project(":tiny-annotation-processors:tiny-cli-to-asciidoc-generator")) {
-        because("KSP will generate the asciidoctor documentation of all Lua libs from Tiny.")
-    }
 }
 
 application {
@@ -78,16 +73,4 @@ project.tasks.withType(JavaExec::class.java).configureEach {
     val runtimeClasspath by configurations.existing
 
     classpath(jar, runtimeClasspath, externalDependencies)
-}
-
-val tinyCliApiAsciidoctor = configurations.create("tinyCliApiAsciidoctor") {
-    isCanBeResolved = false
-    isCanBeConsumed = true
-}
-
-artifacts {
-    // CLI as Asciidoctor.
-    add(tinyCliApiAsciidoctor.name, project.layout.buildDirectory.file("generated/ksp/main/resources/tiny-cli-commands.adoc")) {
-        builtBy("kspKotlin")
-    }
 }
