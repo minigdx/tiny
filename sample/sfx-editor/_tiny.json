@@ -1,0 +1,67 @@
+{
+  "version": "V1",
+  "id": "b9bfec40-57eb-45bb-9e9a-435edb19c17e",
+  "name": "Tiny SFX Sequencer",
+  "resolution": {
+    "width": 384,
+    "height": 256
+  },
+  "sprites": {
+    "width": 8,
+    "height": 8
+  },
+  "zoom": 2,
+  "colors": [
+    "#28282E",
+    "#1D2B53",
+    "#6C5671",
+    "#87A889",
+    "#F98284",
+    "#FFA300",
+    "#B0A9E4",
+    "#DEA38B",
+    "#ACCCE4",
+    "#FEAAE4",
+    "#D9C8BF",
+    "#FFC384",
+    "#B0EB93",
+    "#FFCCAA",
+    "#E9F59D",
+    "#FFE6C6",
+    "#FFF7A0",
+    "#FFF1E8",
+    "#FFF7E4"
+  ],
+  "scripts": [
+    "instrument-editor.lua",
+    "sfx-editor.lua",
+    "wire.lua",
+    "test-game.lua",
+    "game.lua",
+    "mouse.lua",
+    "widgets.lua",
+    "music-editor.lua",
+    "widgets/Envelop.lua",
+    "widgets/MatrixSelector.lua",
+    "widgets/ModeSwitch.lua",
+    "widgets/Knob.lua",
+    "widgets/Checkbox.lua",
+    "widgets/Fader.lua",
+    "widgets/MenuItem.lua",
+    "widgets/Keyboard.lua",
+    "widgets/Help.lua",
+    "widgets/Button.lua"
+  ],
+  "spritesheets": [
+    "sfx-spritesheet.png",
+    "sfx.png"
+  ],
+  "levels": [
+    "sfx-editor.ldtk",
+    "editor.ldtk"
+  ],
+  "sounds": [
+    "test.sfx"
+  ],
+  "hideMouseCursor": true
+}

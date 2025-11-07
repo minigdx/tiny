@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.18">
-<title>Tiny Sfx Editor</title>
+<title>Tiny CLI Commands Reference</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -441,25 +441,421 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_tiny_sfx_editor">Tiny Sfx Editor</h2>
+<h2 id="_tiny_cli_commands_reference">Tiny CLI Commands Reference</h2>
 <div class="sectionbody">
-<div class="paragraph">
-<p><code>🧸 Tiny</code> is bundle with a small sfx editor, that you can start using the command <code>tiny-cli sfx</code>, within your game directory.</p>
+<div class="sect2">
+<h3 id="_commands">Commands</h3>
+
 </div>
+<div class="sect2">
+<h3 id="_create">create</h3>
 <div class="paragraph">
-<p>This editor can design an instrument and the notes played by this instrument, that generate a sfx.</p>
+<p>Create a new game with the help of a wizard 🧙.</p>
 </div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>tiny-cli create --game-name=&lt;value&gt; &lt;gamedirectory&gt;</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_options">Options</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>--game-name=&lt;value&gt;</code></dt>
+<dd>
+<p>🏷 The name of the game</p>
+</dd>
+<dt class="hdlist1"><code>--game-resolution=&lt;value&gt;</code></dt>
+<dd>
+<p>🖥 The game resolution (e.g., 800x600)</p>
+</dd>
+<dt class="hdlist1"><code>--game-script=&lt;value&gt;</code></dt>
+<dd>
+<p>📝 Name of the default game script</p>
+</dd>
+<dt class="hdlist1"><code>--sprite-size=&lt;value&gt;</code></dt>
+<dd>
+<p>📐 The sprite size (e.g., 16x16)</p>
+</dd>
+<dt class="hdlist1"><code>--zoom=&lt;value&gt;</code></dt>
+<dd>
+<p>🔍 Game zoom</p>
+</dd>
+<dt class="hdlist1"><code>--spritesheets=&lt;value&gt;</code></dt>
+<dd>
+<p>🖼️ The filenames of the sprite sheets, separated by a comma (e.g., file1.png, file2.png)</p>
+</dd>
+<dt class="hdlist1"><code>--palette=&lt;value&gt;</code></dt>
+<dd>
+<p>🎨 The Color palette to use</p>
+</dd>
+<dt class="hdlist1"><code>--hide-mouse-cursor=&lt;value&gt;</code></dt>
+<dd>
+<p>🖱️ Hide system cursor mouse</p>
+</dd>
+<dt class="hdlist1"><code>-h, --help=&lt;value&gt;</code></dt>
+<dd>
+<p>Show this message and exit</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_arguments">Arguments</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>&lt;gamedirectory&gt;</code></dt>
+<dd>
+<p>The directory containing all game information</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_run">run</h3>
 <div class="paragraph">
-<p>The editor can be tested below:</p>
+<p>Run your game.</p>
 </div>
-<iframe class="no-resize" title="SFX Editor " width="768" height="512" src="sample/sfx-editor/index.html"></iframe>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>tiny-cli run --debug=&lt;value&gt; &lt;gamedirectory&gt;</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_options_2">Options</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>--debug=&lt;value&gt;</code></dt>
+<dd>
+<p>Port used for debugging</p>
+</dd>
+<dt class="hdlist1"><code>-h, --help=&lt;value&gt;</code></dt>
+<dd>
+<p>Show this message and exit</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_arguments_2">Arguments</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>&lt;gamedirectory&gt;</code></dt>
+<dd>
+<p>The directory containing your game to be run.</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_debug">debug</h3>
+<div class="paragraph">
+<p>Debug the current game</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>tiny-cli debug -d=&lt;value&gt;</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_options_3">Options</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>-d, --directory=&lt;value&gt;</code></dt>
+<dd>
+<p>The directory containing all game information.</p>
+</dd>
+<dt class="hdlist1"><code>--debug=&lt;value&gt;</code></dt>
+<dd>
+<p>Debug port used by the game.</p>
+</dd>
+<dt class="hdlist1"><code>-h, --help=&lt;value&gt;</code></dt>
+<dd>
+<p>Show this message and exit</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_add">add</h3>
+<div class="paragraph">
+<p>Add a resource to your game.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>tiny-cli add -d=&lt;value&gt; &lt;resources&gt;</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_options_4">Options</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>-d, --directory=&lt;value&gt;</code></dt>
+<dd>
+<p>The directory containing all game information.</p>
+</dd>
+<dt class="hdlist1"><code>-h, --help=&lt;value&gt;</code></dt>
+<dd>
+<p>Show this message and exit</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_arguments_3">Arguments</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>&lt;resources&gt;</code></dt>
+<dd>
+<p>The resource to add to the game. The kind of resource will be deducted from the file extension.</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_export">export</h3>
+<div class="paragraph">
+<p>Export your game for web or desktop platforms.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>tiny-cli export -p=&lt;value&gt; &lt;gamedirectory&gt;</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_options_5">Options</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>-p, --platform=&lt;value&gt;</code></dt>
+<dd>
+<p>Target platform</p>
+</dd>
+<dt class="hdlist1"><code>--archive=&lt;value&gt;</code></dt>
+<dd>
+<p>The name of the exported archive (web only)</p>
+</dd>
+<dt class="hdlist1"><code>-o, --output=&lt;value&gt;</code></dt>
+<dd>
+<p>Output directory for the exported application (desktop only)</p>
+</dd>
+<dt class="hdlist1"><code>--desktop-platform=&lt;value&gt;</code></dt>
+<dd>
+<p>Target desktop platform</p>
+</dd>
+<dt class="hdlist1"><code>--include-jdk=&lt;value&gt;</code></dt>
+<dd>
+<p>Include JDK in the package (requires jpackage, desktop only)</p>
+</dd>
+<dt class="hdlist1"><code>-n, --name=&lt;value&gt;</code></dt>
+<dd>
+<p>Application name (defaults to game name, desktop only)</p>
+</dd>
+<dt class="hdlist1"><code>-v, --version=&lt;value&gt;</code></dt>
+<dd>
+<p>Application version (desktop only)</p>
+</dd>
+<dt class="hdlist1"><code>--debug=&lt;value&gt;</code></dt>
+<dd>
+<p>Debug the game (desktop only)</p>
+</dd>
+<dt class="hdlist1"><code>-h, --help=&lt;value&gt;</code></dt>
+<dd>
+<p>Show this message and exit</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_arguments_4">Arguments</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>&lt;gamedirectory&gt;</code></dt>
+<dd>
+<p>The directory containing all game information</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_serve">serve</h3>
+<div class="paragraph">
+<p>Run your game as a web game, by default on <a href="http://localhost:8080" class="bare">http://localhost:8080</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>tiny-cli serve --port=&lt;value&gt; &lt;gamedirectory&gt;</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_options_6">Options</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>--port=&lt;value&gt;</code></dt>
+<dd>
+<p>Port of the local webserver.</p>
+</dd>
+<dt class="hdlist1"><code>-h, --help=&lt;value&gt;</code></dt>
+<dd>
+<p>Show this message and exit</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_arguments_5">Arguments</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>&lt;gamedirectory&gt;</code></dt>
+<dd>
+<p>The game to serve by an embedded web server.</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_palette">palette</h3>
+<div class="paragraph">
+<p>Extract the color palette from an image or display current colors.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>tiny-cli palette -d=&lt;value&gt; &lt;image&gt;</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_options_7">Options</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>-d, --directory=&lt;value&gt;</code></dt>
+<dd>
+<p>The directory containing your game to be update.</p>
+</dd>
+<dt class="hdlist1"><code>--append=&lt;value&gt;</code></dt>
+<dd>
+<p>Append, instead of replacing, the palette information in the game file.</p>
+</dd>
+<dt class="hdlist1"><code>--print=&lt;value&gt;</code></dt>
+<dd>
+<p>Print in the console the palette information, without updating the game.</p>
+</dd>
+<dt class="hdlist1"><code>--palette=&lt;value&gt;</code></dt>
+<dd>
+<p>Generate a palette.png image file with all colors from the palette.</p>
+</dd>
+<dt class="hdlist1"><code>-h, --help=&lt;value&gt;</code></dt>
+<dd>
+<p>Show this message and exit</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_arguments_6">Arguments</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>&lt;image&gt;</code></dt>
+<dd>
+<p>The image used to extract the palette.</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_sfx">sfx</h3>
+<div class="paragraph">
+<p>Start the SFX Editor</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>tiny-cli sfx --filename=&lt;value&gt;</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_options_8">Options</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>--filename=&lt;value&gt;</code></dt>
+<dd>
+<p>The sound file to create/edit</p>
+</dd>
+<dt class="hdlist1"><code>-h, --help=&lt;value&gt;</code></dt>
+<dd>
+<p>Show this message and exit</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_update">update</h3>
+<div class="paragraph">
+<p>Interactively view and update game parameters.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>tiny-cli update -d=&lt;value&gt;</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_options_9">Options</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>-d, --directory=&lt;value&gt;</code></dt>
+<dd>
+<p>The directory containing your game to be updated.</p>
+</dd>
+<dt class="hdlist1"><code>-h, --help=&lt;value&gt;</code></dt>
+<dd>
+<p>Show this message and exit</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_resources">resources</h3>
+<div class="paragraph">
+<p>Inspect and manage categorized resources in the game.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>tiny-cli resources -d=&lt;value&gt;</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_options_10">Options</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>-d, --directory=&lt;value&gt;</code></dt>
+<dd>
+<p>The directory containing all game information.</p>
+</dd>
+<dt class="hdlist1"><code>--category=&lt;value&gt;</code></dt>
+<dd>
+<p>Filter categories by name or pattern</p>
+</dd>
+<dt class="hdlist1"><code>-h, --help=&lt;value&gt;</code></dt>
+<dd>
+<p>Show this message and exit</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
 Version 2.0.0-alpha1<br>
-Last updated 2025-11-07 09:51:48 UTC
+Last updated 2025-11-07 09:53:26 UTC
 </div>
 </div>
 </body>

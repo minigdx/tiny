@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tiny - Tiny SFX Sequencer</title>
+  <script type="module" crossorigin src="./tiny-engine.js"></script>
+  <link rel="modulepreload" crossorigin href="./chunks/kotlin-stdlib-DC6cbFtm.js">
+  <link rel="modulepreload" crossorigin href="./chunks/kotlin-coroutines-BJhAlCrN.js">
+  <link rel="modulepreload" crossorigin href="./chunks/lua-BBcSEoPQ.js">
+</head>
+<body style="margin: 0">
+<div style="text-align:center;">
+    <tiny-game id="tiny-game-b9bfec40-57eb-45bb-9e9a-435edb19c17e" name="Tiny SFX Sequencer" mouse="true" width="384" height="256" zoom="2" spritew="8" spriteh="8">
+        <!-- GAME_SCRIPT -->
+        <tiny-script name="instrument-editor.lua"></tiny-script>
+        
+        <tiny-script name="sfx-editor.lua"></tiny-script>
+        
+        <tiny-script name="wire.lua"></tiny-script>
+        
+        <tiny-script name="test-game.lua"></tiny-script>
+        
+        <tiny-script name="game.lua"></tiny-script>
+        
+        <tiny-script name="mouse.lua"></tiny-script>
+        
+        <tiny-script name="widgets.lua"></tiny-script>
+        
+        <tiny-script name="music-editor.lua"></tiny-script>
+        
+        <tiny-script name="widgets/Envelop.lua"></tiny-script>
+        
+        <tiny-script name="widgets/MatrixSelector.lua"></tiny-script>
+        
+        <tiny-script name="widgets/ModeSwitch.lua"></tiny-script>
+        
+        <tiny-script name="widgets/Knob.lua"></tiny-script>
+        
+        <tiny-script name="widgets/Checkbox.lua"></tiny-script>
+        
+        <tiny-script name="widgets/Fader.lua"></tiny-script>
+        
+        <tiny-script name="widgets/MenuItem.lua"></tiny-script>
+        
+        <tiny-script name="widgets/Keyboard.lua"></tiny-script>
+        
+        <tiny-script name="widgets/Help.lua"></tiny-script>
+        
+        <tiny-script name="widgets/Button.lua"></tiny-script>
+        <!-- GAME_SCRIPT_END -->
+        <!-- GAME_SPRITESHEET -->
+        <tiny-spritesheet name="sfx-spritesheet.png"></tiny-spritesheet>
+        
+        <tiny-spritesheet name="sfx.png"></tiny-spritesheet>
+        <!-- GAME_SPRITESHEET_END -->
+        <!-- GAME_LEVEL -->
+        <tiny-level name="sfx-editor.ldtk"></tiny-level>
+        
+        <tiny-level name="editor.ldtk"></tiny-level>
+        <!-- GAME_LEVEL_END -->
+        <!-- GAME_SOUND --><!-- GAME_SOUND_END -->
+        <tiny-colors name="#28282E,#1D2B53,#6C5671,#87A889,#F98284,#FFA300,#B0A9E4,#DEA38B,#ACCCE4,#FEAAE4,#D9C8BF,#FFC384,#B0EB93,#FFCCAA,#E9F59D,#FFE6C6,#FFF7A0,#FFF1E8,#FFF7E4"></tiny-colors>
+    </tiny-game>
+</div>
+</body>
+</html>
