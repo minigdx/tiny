@@ -444,322 +444,559 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="_tiny_api">Tiny API</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_vec2">vec2</h3>
+<h3 id="_std">std</h3>
 <div class="paragraph">
-<p>Vector2 manipulation library.</p>
+<p>Standard library.</p>
 </div>
 <div class="sect3">
-<h4 id="_vec2_create">vec2.create()</h4>
+<h4 id="_all">all()</h4>
 <div class="paragraph">
-<p>Create a vector 2 as a table { x, y }.</p>
+<p>Iterate over values of a table.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>If you want to iterate over keys, use <code>pairs(table)</code>.</p>
+</li>
+<li>
+<p>If you want to iterate over index, use <code>ipairs(table)</code>.</p>
+</li>
+<li>
+<p>If you want to iterate in reverse, use <code>rpairs(table)</code>.</p>
+</li>
+</ul>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">vec2.create(x, y) -- Create a vector 2 as a table { x, y }.
-vec2.create(vec2) -- Create a vector 2 as a table { x, y } using another vector 2.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">all(table) -- Iterate over the values of the table</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_vec2_add">vec2.add()</h4>
+<h4 id="_append">append()</h4>
 <div class="paragraph">
-<p>Add vector2 to another vector2</p>
+<p>Append <strong>all values</strong> from the table <code>source</code> to the table <code>dest</code>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">vec2.add(v1, v2) -- Add a vector 2 {x, y} to another vector 2 {x, y}
-vec2.add(x1, y1, x2, y2) -- Add a destructured vector 2 to another destructured vector 2</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">append(source, dest) -- Copy source into dest.</code></pre>
 </div>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">v2</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
-</tr>
-</tbody>
-</table>
 <tiny-editor style="display: none;"  >
 
-function _init()
-    gfx.camera(-128, -128)
-
-    local v1 = vec2.create(32, 38)
-    local v2 = vec2.create(20, 2)
-
+function _draw()
     gfx.cls()
-    print("v1", 2, 15, 10)
-    shape.line(0, 0, v1.x, v1.y, 10)
-    print("v2", 23, 3, 9)
-    shape.line(0, 0, v2.x, v2.y, 9)
-
-    local v3 = vec2.add(v1, v2)
-
-    print("v1 + v2", 30, 15, 11)
-    gfx.dither(0xAAAA)
-    shape.line(0, 0, v3.x, v3.y, 11)
-    gfx.dither()
+    local src = {1, 2, 3}
+    local dst = {4, 5}
+    local result = append(src, dst)
+    debug.table(result)
 end
 
 </tiny-editor>
 </div>
 <div class="sect3">
-<h4 id="_vec2_sub">vec2.sub()</h4>
+<h4 id="_merge">merge()</h4>
 <div class="paragraph">
-<p>Subtract another vector from another vector</p>
+<p>Add <strong>all key/value</strong> from the table <code>source</code> to the table <code>dest</code>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">vec2.sub(v1, v2) -- Subtract a vector 2 {x, y} from another vector 2 {x, y}
-vec2.sub(x1, y1, x2, y2) -- Subtract a destructured vector 2 from another destructured vector 2</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">merge(source, dest) -- Merge source into dest.</code></pre>
 </div>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">v2</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
-</tr>
-</tbody>
-</table>
 <tiny-editor style="display: none;"  >
 
-function _init()
-    gfx.camera(-128, -128)
-
-    local v1 = vec2.create(32, 38)
-    local v2 = vec2.create(20, 2)
-
+function _draw()
     gfx.cls()
-    print("v1", 18, 15, 10)
-    shape.line(0, 0, v1.x, v1.y, 10)
-    print("v2", 23, 3, 9)
-    shape.line(0, 0, v2.x, v2.y, 9)
-
-    local v3 = vec2.sub(v1, v2)
-
-    print("v1 - v2", 0, 40, 11)
-    gfx.dither(0xAAAA)
-    shape.line(0, 0, v3.x, v3.y, 11)
-    gfx.dither()
+    local src = {x = 1, y = 2, z = 3}
+    local dst = {a = 4, b = 5}
+    local result = merge(src, dst)
+    debug.table(result)
 end
 
 </tiny-editor>
 </div>
 <div class="sect3">
-<h4 id="_vec2_dot">vec2.dot()</h4>
+<h4 id="_new">new()</h4>
 <div class="paragraph">
-<p>Dot product between two vectors</p>
+<p>Create new instance of a class by creating a new table and setting the metatable. It allow to create kind of Object Oriented Programming.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">vec2.dot(v1, v2) -- Dot product between a vector 2 {x, y} and another vector 2 {x, y}
-vec2.dot(x1, y1, x2, y2) -- Dot product between a destructured vector 2 and another destructured vector 2</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">new(class) -- Create new instance of class.
+new(class, default) -- Create new instance of class using default values.</code></pre>
 </div>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">v2</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
-</tr>
-</tbody>
-</table>
 <tiny-editor style="display: none;"  >
 
-function _init()
-    angle = 0
+local Player = {
+    x = 128,
+    y = 128,
+    color = 8
+}
+
+function Player:draw()
+    shape.rectf(self.x, self.y, 10, 10, self.color)
 end
+
+function _init()
+    -- create a new player
+    player = new(Player)
+    -- create a new player with default vaules
+    player2 = new(Player, {x = 200, y = 200, color = 9})
+end
+
+function _draw()
+    gfx.cls()
+    player:draw() -- call the draw method on the player instance.
+    player2:draw() -- call the draw method on the player2 instance.
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_print">print()</h4>
+<div class="paragraph">
+<p>Print on the screen a string.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">print(str) -- print on the screen a string at (0,0) with a default color.
+print(str, x, y) -- print on the screen a string with a default color.
+print(str, x, y, color) -- print on the screen a string with a specific color.</code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+    -- every character is a sprite 4x4 pixels.
+    print("hello")
+    print("world", 10, 10)
+    print("how", 10, 20, 4)
+    print("are", 26, 20, 5)
+    print("you", 42, 20, 6)
+    print("...", 58, 20, math.rnd(10))
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_rpairs">rpairs()</h4>
+<div class="paragraph">
+<p>Iterate over values of a table in reverse order. The iterator return an index and the value. The method is useful to remove elements from a table while iterating on it.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">rpairs(table) -- Iterate over the values of the table</code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+    local data = {
+        { name = "riri" },
+        { name = "fifi" },
+        { name = "loulou" }
+    }
+
+    local y = 0
+    for index, key in rpairs(data) do
+        print(index .. " - " .. key.name, 10, y)
+        y = y + 10
+    end
+end
+
+</tiny-editor>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ctrl">ctrl</h3>
+<div class="paragraph">
+<p>Access to controllers like touch/mouse events or accessing which key is pressed by the user.</p>
+</div>
+<div class="sect3">
+<h4 id="_ctrl_pressed">ctrl.pressed()</h4>
+<div class="paragraph">
+<p>Return true if the key was pressed during the last frame. If you need to check that the key is still pressed, see <code>ctrl.pressing</code> instead.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">ctrl.pressed(key) -- Is the key was pressed?</code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+local percent_a = 1
+local percent_b = 1
+
 function _update()
+    percent_a = math.min(percent_a + 0.05, 1)
+    percent_b = math.min(percent_b + 0.05, 1)
 
-    if ctrl.pressing(keys.space) then
-        angle = angle + 0.1
+    if ctrl.pressed(keys.space) then
+        percent_a = 0
     end
 
-    gfx.camera(-128, -128)
+    if ctrl.pressing(keys.space) then
+        percent_b = 0
+    end
 
-    local v1 = vec2.create(1, 0)
-    local v2 = vec2.create(math.cos(angle), math.sin(angle))
-    local dot = vec2.dot(v1, v2)
-
-    local scl = vec2.scl(v1, dot)
+    local offset_a = juice.powIn2(0, 8, percent_a)
+    local offset_b = juice.powIn2(0, 8, percent_b)
 
     gfx.cls()
+    shape.rectf(64, 128 - 16, 32, 32, 7)
+    shape.rectf(64, 128 - 32 + offset_a, 32, 32, 8)
 
-    local scaledv1 = vec2.scl(v1, 64)
-    local scaledv2 = vec2.scl(v2, 64)
-    local scaledv3 = vec2.scl(scl, 64)
+    shape.rectf(32 + 128, 128 - 16, 32, 32, 7)
+    shape.rectf(32 + 128, 128 - 32 + offset_b, 32, 32, 8)
 
-    print("v1", 18, 5, 10)
-    shape.line(0, 0, scaledv1.x, scaledv1.y, 10)
-    print("v2", scaledv2.x + 5, scaledv2.y + 5, 11)
-    shape.line(0, 0, scaledv2.x, scaledv2.y, 11)
-
-    print("dot", scaledv3.x, 5, 9)
-    shape.line(0, 0, scaledv3.x, scaledv3.y, 9)
+    print("pressed", 64, 128 + 32)
+    print("pressing", 32 + 128, 128 + 32)
 end
 
 </tiny-editor>
 </div>
 <div class="sect3">
-<h4 id="_vec2_mag">vec2.mag()</h4>
+<h4 id="_ctrl_pressing">ctrl.pressing()</h4>
 <div class="paragraph">
-<p>Calculate the magnitude (length) of a vector</p>
+<p>Return true if the key is still pressed.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">vec2.mag(x, y) -- Calculate the magnitude (length) of a vector 2 {x, y}
-vec2.mag(v1) -- Calculate the magnitude (length) of a vector 2 {x, y}</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">ctrl.pressing(key) -- Is the key is still pressed?</code></pre>
 </div>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
-</tr>
-</tbody>
-</table>
+<tiny-editor style="display: none;"  >
+
+local percent_a = 1
+local percent_b = 1
+
+function _update()
+    percent_a = math.min(percent_a + 0.05, 1)
+    percent_b = math.min(percent_b + 0.05, 1)
+
+    if ctrl.pressed(keys.space) then
+        percent_a = 0
+    end
+
+    if ctrl.pressing(keys.space) then
+        percent_b = 0
+    end
+
+    local offset_a = juice.powIn2(0, 8, percent_a)
+    local offset_b = juice.powIn2(0, 8, percent_b)
+
+    gfx.cls()
+    shape.rectf(64, 128 - 16, 32, 32, 7)
+    shape.rectf(64, 128 - 32 + offset_a, 32, 32, 8)
+
+    shape.rectf(32 + 128, 128 - 16, 32, 32, 7)
+    shape.rectf(32 + 128, 128 - 32 + offset_b, 32, 32, 8)
+
+    print("pressed", 64, 128 + 32)
+    print("pressing", 32 + 128, 128 + 32)
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
-<h4 id="_vec2_nor">vec2.nor()</h4>
+<h4 id="_ctrl_touch">ctrl.touch()</h4>
 <div class="paragraph">
-<p>Normalize a vector</p>
+<p>Get coordinates of the current touch/mouse. If the mouse/touch is out-of the screen, the coordinates will be the last mouse position/touch. The function return those coordinates as a table {x, y}. A sprite can be draw directly on the mouse position by passing the sprite number.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">vec2.nor(x, y) -- Normalize a vector 2 {x, y}
-vec2.nor(v1) -- Normalize a vector 2 {x, y}</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">ctrl.touch() -- Get the mouse coordinates.
+ctrl.touch(sprN) -- Get the mouse coordinate and draw a sprite on those coordinates.</code></pre>
 </div>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
-</tr>
-</tbody>
-</table>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+  gfx.cls(2)
+  p = ctrl.touch()
+  print("coordinates: "..p.x .. "x"..p.y, 1, 1, 4)
+  shape.rectf(p.x, p.y, 5,5, p.x + p.y)
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_ctrl_touched">ctrl.touched()</h4>
+<div class="paragraph">
+<p>Return the position of the touch (as <code>{x, y}</code>)if the screen was touched or the mouse button was pressed during the last frame. <code>nil</code> otherwise.
+The touch can be :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>0: left click or one finger</p>
+</li>
+<li>
+<p>1: right click or two fingers</p>
+</li>
+<li>
+<p>2: middle click or three fingers</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>If you need to check that the touch/mouse button is still active, see <code>ctrl.touching</code> instead.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">ctrl.touched(touch) -- Is the screen was touched or mouse button was pressed?</code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+local circles = {}
+
+function _update()
+    local pos = ctrl.touched(0)
+    if pos ~= nil then
+        table.insert(circles, pos)
+    end
+end
+
+function _draw()
+    gfx.cls()
+    local p = ctrl.touch()
+    shape.circlef(p.x, p.y, 4, 8)
+    for pos in all(circles) do
+        shape.circlef(pos.x, pos.y, 4, 9)
+        print("("..pos.x .. ", "..pos.y..")", pos.x + 3, pos.y + 3)
+    end
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_ctrl_touching">ctrl.touching()</h4>
+<div class="paragraph">
+<p>Return the position of the touch (as <code>{x, y}</code>)if the screen is still touched or the mouse button is still pressed. <code>nil</code> otherwise.
+The touch can be :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>0: left click or one finger</p>
+</li>
+<li>
+<p>1: right click or two fingers</p>
+</li>
+<li>
+<p>2: middle click or three fingers</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">ctrl.touching(touch) -- Is the screen is still touched or mouse button is still pressed?</code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+    local p = ctrl.touch()
+    shape.circlef(p.x, p.y, 4, 8)
+
+    local start = ctrl.touching(0)
+    if start ~= nil then
+        local pos = ctrl.touch()
+        shape.line(start.x, start.y, pos.x, pos.y, 1)
+        print("("..start.x .. ", "..start.y..")", start.x, start.y)
+        print("("..pos.x .. ", "..pos.y..")", pos.x, pos.y)
+    end
+end
+
+</tiny-editor>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_debug">debug</h3>
+<div class="paragraph">
+<p>Helpers to debug your game by drawing or printing information on screen.</p>
+</div>
+<div class="sect3">
+<h4 id="_debug_console">debug.console()</h4>
+<div class="paragraph">
+<p>Log a message into the console.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">debug.console(str) -- Log a message into the console.</code></pre>
+</div>
+</div>
 <tiny-editor style="display: none;"  >
 
 function _update()
+    local pos = ctrl.touch()
+
+    debug.table(pos)
+    debug.log("frame "..tiny.frame)
+    debug.console("hello from the console")
+end
+
+function _draw()
     gfx.cls()
+    -- draw the mouse position.
+    local pos = ctrl.touch()
 
-    local v0 = vec2.create(43, 64)
-    local v1 = vec2.nor(v0)
+    shape.line(pos.x - 2, pos.y, pos.x + 2, pos.y, 3)
+    shape.line(pos.x, pos.y - 2, pos.x, pos.y + 2, 3)
+end
 
+</tiny-editor>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_floppy">floppy</h3>
+<div class="paragraph">
+<p>Floppy allow you to get or save user Lua structure.</p>
+</div>
+<div class="sect3">
+<h4 id="_floppy_get">floppy.get()</h4>
+<div class="paragraph">
+<p>Load and get the content of the file name</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">floppy.get(name) -- Load and get the content of the file name</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_floppy_put">floppy.put()</h4>
+<div class="paragraph">
+<p>Save the content into a local file, on desktop or in the local storage on the web platform.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">floppy.put(name, content) -- Save the content into the file name.</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_gfx">gfx</h3>
+<div class="paragraph">
+<p>Access to graphical API like updating the color palette or applying a dithering pattern.</p>
+</div>
+<div class="sect3">
+<h4 id="_gfx_camera">gfx.camera()</h4>
+<div class="paragraph">
+<p>Move the game camera.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">gfx.camera() -- Reset the game camera to it's default position (0,0).
+gfx.camera(x, y) -- Set game camera to the position x, y.</code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
 
-    print("vector     x: " .. v0.x .. " y: " .. v0.y)
-    print("normalized x: " .. v1.x .. " y: " .. v1.y, 0, 8)
+local x = 0
+local y = 0
+
+function _update()
+    if ctrl.pressing(keys.left) then
+        x = x - 0.5
+    elseif ctrl.pressing(keys.right) then
+        x = x + 0.5
+    end
+
+    if ctrl.pressing(keys.up) then
+        y = y - 0.5
+    elseif ctrl.pressing(keys.down) then
+        y = y + 0.5
+    end
+    gfx.camera(math.floor(x), math.floor(y))
+end
+
+function _draw()
+    gfx.cls(2)
+    for x = 0 - 64, 256 + 64, 16 do
+        for y = 0 - 64, 256 + 64, 16 do
+            shape.line(x - 2, y, x + 2, y, 9)
+            shape.line(x, y - 2, x, y + 2, 9)
+        end
+    end
+    print("camera: ("..x..", "..y..")", 6, 6)
+
+    shape.rect(0, 0, 256, 256, 1)
+end
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_gfx_clip">gfx.clip()</h4>
+<div class="paragraph">
+<p>Clip the draw surface (ie: limit the drawing area).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">gfx.clip() -- Reset the clip and draw on the fullscreen.
+gfx.clip(x, y, width, height) -- Clip and limit the drawing area.</code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+function _init()
+  c = {}
+  for i=1,100 do
+    table.insert(c, {x=math.rnd(256), y=math.rnd(256), c = math.rnd(1,12)})
+end
+
+end
+function _draw()
+  gfx.cls()
+  local pos = ctrl.touch()
+  -- set a clip area to crop circles
+  gfx.clip(pos.x - 20, pos.y - 20, 40, 40)
+  for circle in all(c) do
+    shape.circlef(circle.x, circle.y, 10, circle.c)
+  end
 end
 
 </tiny-editor>
 </div>
 <div class="sect3">
-<h4 id="_vec2_crs">vec2.crs()</h4>
+<h4 id="_gfx_cls">gfx.cls()</h4>
 <div class="paragraph">
-<p>Cross product</p>
+<p>clear the screen</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">vec2.crs(v1, v2) -- Cross product between a vector 2 {x, y} and another vector 2 {x, y}
-vec2.crs(x1, y1, x2, y2) -- Cross product between a destructured vector 2 and another destructured vector 2</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">gfx.cls() -- Clear the screen with a default color.
+gfx.cls(color) -- Clear the screen with a color.</code></pre>
 </div>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">v2</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
-</tr>
-</tbody>
-</table>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    if ctrl.pressed(keys.space) then
+       gfx.cls()
+    end
+
+    print("Press space to clear the screen")
+    local pos = ctrl.touch()
+    shape.circlef(pos.x, pos.y, 4, math.rnd())
+end
+</tiny-editor>
 </div>
 <div class="sect3">
-<h4 id="_vec2_scl">vec2.scl()</h4>
+<h4 id="_gfx_dither">gfx.dither()</h4>
 <div class="paragraph">
-<p>Scale a vector</p>
+<p>Apply a dithering pattern on every new draw call. The pattern is using the bits value of a 2 octet value. The first bits is the one on the far left and represent the pixel of the top left of a 4x4 matrix. The last bit is the pixel from the bottom right of this matrix.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">vec2.scl(x, y, scl) -- Scale a vector 2 {x, y} using the factor scl
-vec2.scl(v1, scl) -- Scale a vector 2 {x, y} using the factor scl</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">gfx.dither() -- Reset dithering pattern. The previous dithering pattern is returned.
+gfx.dither(pattern) -- Apply dithering pattern. The previous dithering pattern is returned.</code></pre>
 </div>
 </div>
 <table class="tableblock frame-all grid-all stretch">
@@ -775,28 +1012,212 @@ vec2.scl(v1, scl) -- Scale a vector 2 {x, y} using the factor scl</code></pre>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">pattern</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Dither pattern. For example: 0xA5A5 or 0x3030</p></td>
 </tr>
 </tbody>
 </table>
 <tiny-editor style="display: none;"  >
 
-function _init()
-    gfx.camera(-128, -128)
-
-    local v1 = vec2.create(32, 38)
-    local v2 = vec2.scl(v1, 2)
-
+function _draw()
     gfx.cls()
-    print("v1 scaled", 8, 60, 11)
-    gfx.dither(0xAAAA)
-    shape.line(0, 0, v2.x, v2.y, 11)
     gfx.dither()
-    print("v1", 18, 15, 10)
-    shape.line(0, 0, v1.x, v1.y, 10)
+    shape.circlef(30, 30, 30, 2)
+    gfx.dither(0xA5A5) -- set a dithering pattern
+    shape.circlef(50, 50, 30, 3)
+    gfx.dither(0x0842) -- set another dithering pattern
+    shape.circlef(70, 70, 30, 2)
 end
 
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_gfx_draw_mode">gfx.draw_mode()</h4>
+<div class="paragraph">
+<p>Switch to another draw mode.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>0: default.</p>
+</li>
+<li>
+<p>1: drawing with transparent (ie: can erase part of the screen)</p>
+</li>
+<li>
+<p>2: drawing a stencil that will be use with the next mode</p>
+</li>
+<li>
+<p>3: drawing using a stencil test (ie: drawing only in the stencil)</p>
+</li>
+<li>
+<p>4: drawing using a stencil test (ie: drawing everywhere except in the stencil)</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">gfx.draw_mode() -- Return the actual mode. Switch back to the default mode.
+gfx.draw_mode(mode) -- Switch to another draw mode. Return the previous mode.</code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;" sprite="resources/tiny-town.png" >
+
+local draw_stencil = 2
+local draw_inside_stencil = 3
+local draw_outside_stencil = 4
+
+local outside = false
+
+function _draw()
+    if ctrl.pressed(keys.space) then
+        outside = not outside
+    end
+
+    gfx.cls(3)
+
+    gfx.draw_mode(draw_stencil)
+
+    -- draw a circle in the middle of the screen
+    shape.circlef(128, 128, 64, 1)
+
+    if outside then
+        gfx.draw_mode(draw_inside_stencil)
+    else
+        gfx.draw_mode(draw_outside_stencil)
+    end
+
+    -- draw the sprite sheet. only in the circle
+    spr.sdraw()
+    gfx.draw_mode()
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_gfx_pal">gfx.pal()</h4>
+<div class="paragraph">
+<p>Change a color from the palette to another color.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">gfx.pal() -- Reset all previous color changes.
+gfx.pal(a, b) -- Replace the color a for the color b.</code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+    print("example", 10, 10, 2) -- print using the color index 2
+    gfx.pal(2, 3) -- switch the text color to another color
+    print("example", 10, 20, 2) -- print using the color index 2
+    gfx.pal() -- reset the palette
+    print("example", 10, 30, 2) -- print using the color index 2
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_gfx_pget">gfx.pget()</h4>
+<div class="paragraph">
+<p>Get the color index at the coordinate (x,y).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">gfx.pget(x, y) -- get the color index at the coordinate (x,y).</code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+   gfx.cls()
+   local index = 0
+   for x=0, 240, 16 do
+     for y=0, 240, 16 do
+        shape.rectf(x, y, 16, 16, index)
+        index = index + 1
+     end
+   end
+
+   local pos = ctrl.touch()
+   local color = gfx.pget(pos.x, pos.y)
+   if color ~= nil then
+     shape.rectf(0, 0, 80, 6, 13)
+     print("color index: "..color)
+   end
+
+
+   shape.circlef(pos.x - 2, pos.y - 2, 4, 0)
+end
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_gfx_pset">gfx.pset()</h4>
+<div class="paragraph">
+<p>Set the color index at the coordinate (x,y).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">gfx.pset(x, y, color) -- set the color index at the coordinate (x,y).</code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+   local pos = ctrl.touching(0)
+   if pos ~= nil then
+      -- set the pixel with the color 9 when the mouse is pressed
+      local p = ctrl.touch()
+      gfx.pset(p.x, p.y, 9)
+   end
+end
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_gfx_to_sheet">gfx.to_sheet()</h4>
+<div class="paragraph">
+<p>Transform the current frame buffer into a spritesheeet.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>If the index of the spritesheet already exist, the spritesheet will be replaced</p>
+</li>
+<li>
+<p>If the index of the spritesheet doesn&#8217;t exist, a new spritesheet at this index will be created</p>
+</li>
+<li>
+<p>If the index of the spritesheet is negative, a new spritesheet will be created at the last positive index.</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">gfx.to_sheet(sheet) -- Copy the current frame buffer to an new or existing sheet index.</code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls(1)
+    -- draw a transparent circle (like a hole)
+    shape.circlef(64, 128, 20, 0)
+    -- keep the result as spritesheet 0
+    gfx.to_sheet(0)
+
+    gfx.cls(1)
+    -- draw some circles
+    shape.circlef(64, 108, 20, 8)
+    shape.circlef(44, 128, 20, 9)
+    shape.circlef(64, 148, 20, 10)
+    shape.circlef(84, 128, 20, 11)
+
+    -- draw over the circles
+    -- the mask generated before.
+    spr.sheet(0)
+    spr.sdraw()
+end
 </tiny-editor>
 </div>
 </div>
@@ -842,6 +1263,934 @@ All interpolations available:</p>
 <p>linear</p>
 </li>
 </ul>
+</div>
+<div class="sect3">
+<h4 id="_juice_bounce">juice.bounce()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.bounce(progress) -- Give a percentage (progress) of the interpolation
+juice.bounce(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
+</tr>
+</tbody>
+</table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.bounce(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.bounce(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "bounce"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_juice_bouncein">juice.bounceIn()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.bounceIn(progress) -- Give a percentage (progress) of the interpolation
+juice.bounceIn(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
+</tr>
+</tbody>
+</table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.bounceIn(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.bounceIn(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "bounceIn"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_juice_bounceout">juice.bounceOut()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.bounceOut(progress) -- Give a percentage (progress) of the interpolation
+juice.bounceOut(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
+</tr>
+</tbody>
+</table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.bounceOut(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.bounceOut(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "bounceOut"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_juice_circle">juice.circle()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.circle(progress) -- Give a percentage (progress) of the interpolation
+juice.circle(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
+</tr>
+</tbody>
+</table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.circle(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.circle(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "circle"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_juice_circlein">juice.circleIn()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.circleIn(progress) -- Give a percentage (progress) of the interpolation
+juice.circleIn(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
+</tr>
+</tbody>
+</table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.circleIn(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.circleIn(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "circleIn"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_juice_circleout">juice.circleOut()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.circleOut(progress) -- Give a percentage (progress) of the interpolation
+juice.circleOut(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
+</tr>
+</tbody>
+</table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.circleOut(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.circleOut(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "circleOut"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_juice_elastic">juice.elastic()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.elastic(progress) -- Give a percentage (progress) of the interpolation
+juice.elastic(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
+</tr>
+</tbody>
+</table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.elastic(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.elastic(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "elastic"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_juice_elasticin">juice.elasticIn()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.elasticIn(progress) -- Give a percentage (progress) of the interpolation
+juice.elasticIn(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
+</tr>
+</tbody>
+</table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.elasticIn(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.elasticIn(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "elasticIn"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_juice_elasticout">juice.elasticOut()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.elasticOut(progress) -- Give a percentage (progress) of the interpolation
+juice.elasticOut(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
+</tr>
+</tbody>
+</table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.elasticOut(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.elasticOut(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "elasticOut"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_juice_exp10">juice.exp10()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.exp10(progress) -- Give a percentage (progress) of the interpolation
+juice.exp10(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
+</tr>
+</tbody>
+</table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.exp10(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.exp10(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "exp10"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_juice_exp5">juice.exp5()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.exp5(progress) -- Give a percentage (progress) of the interpolation
+juice.exp5(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
+</tr>
+</tbody>
+</table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.exp5(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.exp5(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "exp5"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_juice_expin10">juice.expIn10()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.expIn10(progress) -- Give a percentage (progress) of the interpolation
+juice.expIn10(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
+</tr>
+</tbody>
+</table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.expIn10(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.expIn10(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "expIn10"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_juice_expin5">juice.expIn5()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.expIn5(progress) -- Give a percentage (progress) of the interpolation
+juice.expIn5(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
+</tr>
+</tbody>
+</table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.expIn5(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.expIn5(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "expIn5"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_juice_expout10">juice.expOut10()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.expOut10(progress) -- Give a percentage (progress) of the interpolation
+juice.expOut10(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
+</tr>
+</tbody>
+</table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.expOut10(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.expOut10(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "expOut10"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_juice_expout5">juice.expOut5()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.expOut5(progress) -- Give a percentage (progress) of the interpolation
+juice.expOut5(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
+</tr>
+</tbody>
+</table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.expOut5(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.expOut5(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "expOut5"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_juice_linear">juice.linear()</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">juice.linear(progress) -- Give a percentage (progress) of the interpolation
+juice.linear(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
+</tr>
+</tbody>
+</table>
+<tiny-editor style="display: none;"  >
+
+local center_x = 256 * 0.5
+local center_y = 256 * 0.5
+local width = 128
+
+function _update()
+    gfx.cls()
+    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
+    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
+
+
+    for x = 0, width, 2 do
+        local y = juice.linear(0, 128, x / width)
+        gfx.pset(
+            center_x - 64 + x, center_y + 64 - y, 3
+        )
+    end
+
+    local percent = (tiny.frame % 100) / 100
+    local x = width * percent
+    local y = juice.linear(0, 128, percent)
+    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
+    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
+    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
+    local name = "linear"
+    print(name, center_x - #name * 4 * 0.5, center_y + 92)
+end
+
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_juice_pow2">juice.pow2()</h4>
@@ -1714,354 +3063,6 @@ end
 </tiny-editor>
 </div>
 <div class="sect3">
-<h4 id="_juice_circle">juice.circle()</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">juice.circle(progress) -- Give a percentage (progress) of the interpolation
-juice.circle(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
-</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
-</tr>
-</tbody>
-</table>
-<tiny-editor style="display: none;"  >
-
-local center_x = 256 * 0.5
-local center_y = 256 * 0.5
-local width = 128
-
-function _update()
-    gfx.cls()
-    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
-    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
-
-
-    for x = 0, width, 2 do
-        local y = juice.circle(0, 128, x / width)
-        gfx.pset(
-            center_x - 64 + x, center_y + 64 - y, 3
-        )
-    end
-
-    local percent = (tiny.frame % 100) / 100
-    local x = width * percent
-    local y = juice.circle(0, 128, percent)
-    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
-    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
-    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
-    local name = "circle"
-    print(name, center_x - #name * 4 * 0.5, center_y + 92)
-end
-
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_juice_circlein">juice.circleIn()</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">juice.circleIn(progress) -- Give a percentage (progress) of the interpolation
-juice.circleIn(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
-</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
-</tr>
-</tbody>
-</table>
-<tiny-editor style="display: none;"  >
-
-local center_x = 256 * 0.5
-local center_y = 256 * 0.5
-local width = 128
-
-function _update()
-    gfx.cls()
-    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
-    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
-
-
-    for x = 0, width, 2 do
-        local y = juice.circleIn(0, 128, x / width)
-        gfx.pset(
-            center_x - 64 + x, center_y + 64 - y, 3
-        )
-    end
-
-    local percent = (tiny.frame % 100) / 100
-    local x = width * percent
-    local y = juice.circleIn(0, 128, percent)
-    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
-    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
-    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
-    local name = "circleIn"
-    print(name, center_x - #name * 4 * 0.5, center_y + 92)
-end
-
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_juice_circleout">juice.circleOut()</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">juice.circleOut(progress) -- Give a percentage (progress) of the interpolation
-juice.circleOut(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
-</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
-</tr>
-</tbody>
-</table>
-<tiny-editor style="display: none;"  >
-
-local center_x = 256 * 0.5
-local center_y = 256 * 0.5
-local width = 128
-
-function _update()
-    gfx.cls()
-    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
-    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
-
-
-    for x = 0, width, 2 do
-        local y = juice.circleOut(0, 128, x / width)
-        gfx.pset(
-            center_x - 64 + x, center_y + 64 - y, 3
-        )
-    end
-
-    local percent = (tiny.frame % 100) / 100
-    local x = width * percent
-    local y = juice.circleOut(0, 128, percent)
-    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
-    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
-    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
-    local name = "circleOut"
-    print(name, center_x - #name * 4 * 0.5, center_y + 92)
-end
-
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_juice_elastic">juice.elastic()</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">juice.elastic(progress) -- Give a percentage (progress) of the interpolation
-juice.elastic(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
-</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
-</tr>
-</tbody>
-</table>
-<tiny-editor style="display: none;"  >
-
-local center_x = 256 * 0.5
-local center_y = 256 * 0.5
-local width = 128
-
-function _update()
-    gfx.cls()
-    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
-    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
-
-
-    for x = 0, width, 2 do
-        local y = juice.elastic(0, 128, x / width)
-        gfx.pset(
-            center_x - 64 + x, center_y + 64 - y, 3
-        )
-    end
-
-    local percent = (tiny.frame % 100) / 100
-    local x = width * percent
-    local y = juice.elastic(0, 128, percent)
-    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
-    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
-    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
-    local name = "elastic"
-    print(name, center_x - #name * 4 * 0.5, center_y + 92)
-end
-
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_juice_elasticin">juice.elasticIn()</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">juice.elasticIn(progress) -- Give a percentage (progress) of the interpolation
-juice.elasticIn(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
-</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
-</tr>
-</tbody>
-</table>
-<tiny-editor style="display: none;"  >
-
-local center_x = 256 * 0.5
-local center_y = 256 * 0.5
-local width = 128
-
-function _update()
-    gfx.cls()
-    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
-    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
-
-
-    for x = 0, width, 2 do
-        local y = juice.elasticIn(0, 128, x / width)
-        gfx.pset(
-            center_x - 64 + x, center_y + 64 - y, 3
-        )
-    end
-
-    local percent = (tiny.frame % 100) / 100
-    local x = width * percent
-    local y = juice.elasticIn(0, 128, percent)
-    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
-    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
-    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
-    local name = "elasticIn"
-    print(name, center_x - #name * 4 * 0.5, center_y + 92)
-end
-
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_juice_elasticout">juice.elasticOut()</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">juice.elasticOut(progress) -- Give a percentage (progress) of the interpolation
-juice.elasticOut(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
-</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
-</tr>
-</tbody>
-</table>
-<tiny-editor style="display: none;"  >
-
-local center_x = 256 * 0.5
-local center_y = 256 * 0.5
-local width = 128
-
-function _update()
-    gfx.cls()
-    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
-    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
-
-
-    for x = 0, width, 2 do
-        local y = juice.elasticOut(0, 128, x / width)
-        gfx.pset(
-            center_x - 64 + x, center_y + 64 - y, 3
-        )
-    end
-
-    local percent = (tiny.frame % 100) / 100
-    local x = width * percent
-    local y = juice.elasticOut(0, 128, percent)
-    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
-    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
-    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
-    local name = "elasticOut"
-    print(name, center_x - #name * 4 * 0.5, center_y + 92)
-end
-
-
-</tiny-editor>
-</div>
-<div class="sect3">
 <h4 id="_juice_swing">juice.swing()</h4>
 <div class="listingblock">
 <div class="content">
@@ -2235,640 +3236,30 @@ end
 
 </tiny-editor>
 </div>
-<div class="sect3">
-<h4 id="_juice_bounce">juice.bounce()</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">juice.bounce(progress) -- Give a percentage (progress) of the interpolation
-juice.bounce(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
 </div>
+<div class="sect2">
+<h3 id="_keys">keys</h3>
+<div class="paragraph">
+<p>List of the available keys. To be used with ctrl.</p>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
-</tr>
-</tbody>
-</table>
-<tiny-editor style="display: none;"  >
-
-local center_x = 256 * 0.5
-local center_y = 256 * 0.5
-local width = 128
-
-function _update()
-    gfx.cls()
-    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
-    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
-
-
-    for x = 0, width, 2 do
-        local y = juice.bounce(0, 128, x / width)
-        gfx.pset(
-            center_x - 64 + x, center_y + 64 - y, 3
-        )
-    end
-
-    local percent = (tiny.frame % 100) / 100
-    local x = width * percent
-    local y = juice.bounce(0, 128, percent)
-    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
-    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
-    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
-    local name = "bounce"
-    print(name, center_x - #name * 4 * 0.5, center_y + 92)
-end
-
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_juice_bouncein">juice.bounceIn()</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">juice.bounceIn(progress) -- Give a percentage (progress) of the interpolation
-juice.bounceIn(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
-</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
-</tr>
-</tbody>
-</table>
-<tiny-editor style="display: none;"  >
-
-local center_x = 256 * 0.5
-local center_y = 256 * 0.5
-local width = 128
-
-function _update()
-    gfx.cls()
-    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
-    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
-
-
-    for x = 0, width, 2 do
-        local y = juice.bounceIn(0, 128, x / width)
-        gfx.pset(
-            center_x - 64 + x, center_y + 64 - y, 3
-        )
-    end
-
-    local percent = (tiny.frame % 100) / 100
-    local x = width * percent
-    local y = juice.bounceIn(0, 128, percent)
-    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
-    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
-    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
-    local name = "bounceIn"
-    print(name, center_x - #name * 4 * 0.5, center_y + 92)
-end
-
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_juice_bounceout">juice.bounceOut()</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">juice.bounceOut(progress) -- Give a percentage (progress) of the interpolation
-juice.bounceOut(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
-</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
-</tr>
-</tbody>
-</table>
-<tiny-editor style="display: none;"  >
-
-local center_x = 256 * 0.5
-local center_y = 256 * 0.5
-local width = 128
-
-function _update()
-    gfx.cls()
-    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
-    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
-
-
-    for x = 0, width, 2 do
-        local y = juice.bounceOut(0, 128, x / width)
-        gfx.pset(
-            center_x - 64 + x, center_y + 64 - y, 3
-        )
-    end
-
-    local percent = (tiny.frame % 100) / 100
-    local x = width * percent
-    local y = juice.bounceOut(0, 128, percent)
-    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
-    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
-    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
-    local name = "bounceOut"
-    print(name, center_x - #name * 4 * 0.5, center_y + 92)
-end
-
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_juice_exp10">juice.exp10()</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">juice.exp10(progress) -- Give a percentage (progress) of the interpolation
-juice.exp10(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
-</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
-</tr>
-</tbody>
-</table>
-<tiny-editor style="display: none;"  >
-
-local center_x = 256 * 0.5
-local center_y = 256 * 0.5
-local width = 128
-
-function _update()
-    gfx.cls()
-    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
-    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
-
-
-    for x = 0, width, 2 do
-        local y = juice.exp10(0, 128, x / width)
-        gfx.pset(
-            center_x - 64 + x, center_y + 64 - y, 3
-        )
-    end
-
-    local percent = (tiny.frame % 100) / 100
-    local x = width * percent
-    local y = juice.exp10(0, 128, percent)
-    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
-    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
-    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
-    local name = "exp10"
-    print(name, center_x - #name * 4 * 0.5, center_y + 92)
-end
-
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_juice_expin10">juice.expIn10()</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">juice.expIn10(progress) -- Give a percentage (progress) of the interpolation
-juice.expIn10(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
-</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
-</tr>
-</tbody>
-</table>
-<tiny-editor style="display: none;"  >
-
-local center_x = 256 * 0.5
-local center_y = 256 * 0.5
-local width = 128
-
-function _update()
-    gfx.cls()
-    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
-    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
-
-
-    for x = 0, width, 2 do
-        local y = juice.expIn10(0, 128, x / width)
-        gfx.pset(
-            center_x - 64 + x, center_y + 64 - y, 3
-        )
-    end
-
-    local percent = (tiny.frame % 100) / 100
-    local x = width * percent
-    local y = juice.expIn10(0, 128, percent)
-    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
-    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
-    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
-    local name = "expIn10"
-    print(name, center_x - #name * 4 * 0.5, center_y + 92)
-end
-
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_juice_expout10">juice.expOut10()</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">juice.expOut10(progress) -- Give a percentage (progress) of the interpolation
-juice.expOut10(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
-</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
-</tr>
-</tbody>
-</table>
-<tiny-editor style="display: none;"  >
-
-local center_x = 256 * 0.5
-local center_y = 256 * 0.5
-local width = 128
-
-function _update()
-    gfx.cls()
-    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
-    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
-
-
-    for x = 0, width, 2 do
-        local y = juice.expOut10(0, 128, x / width)
-        gfx.pset(
-            center_x - 64 + x, center_y + 64 - y, 3
-        )
-    end
-
-    local percent = (tiny.frame % 100) / 100
-    local x = width * percent
-    local y = juice.expOut10(0, 128, percent)
-    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
-    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
-    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
-    local name = "expOut10"
-    print(name, center_x - #name * 4 * 0.5, center_y + 92)
-end
-
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_juice_exp5">juice.exp5()</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">juice.exp5(progress) -- Give a percentage (progress) of the interpolation
-juice.exp5(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
-</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
-</tr>
-</tbody>
-</table>
-<tiny-editor style="display: none;"  >
-
-local center_x = 256 * 0.5
-local center_y = 256 * 0.5
-local width = 128
-
-function _update()
-    gfx.cls()
-    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
-    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
-
-
-    for x = 0, width, 2 do
-        local y = juice.exp5(0, 128, x / width)
-        gfx.pset(
-            center_x - 64 + x, center_y + 64 - y, 3
-        )
-    end
-
-    local percent = (tiny.frame % 100) / 100
-    local x = width * percent
-    local y = juice.exp5(0, 128, percent)
-    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
-    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
-    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
-    local name = "exp5"
-    print(name, center_x - #name * 4 * 0.5, center_y + 92)
-end
-
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_juice_expin5">juice.expIn5()</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">juice.expIn5(progress) -- Give a percentage (progress) of the interpolation
-juice.expIn5(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
-</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
-</tr>
-</tbody>
-</table>
-<tiny-editor style="display: none;"  >
-
-local center_x = 256 * 0.5
-local center_y = 256 * 0.5
-local width = 128
-
-function _update()
-    gfx.cls()
-    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
-    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
-
-
-    for x = 0, width, 2 do
-        local y = juice.expIn5(0, 128, x / width)
-        gfx.pset(
-            center_x - 64 + x, center_y + 64 - y, 3
-        )
-    end
-
-    local percent = (tiny.frame % 100) / 100
-    local x = width * percent
-    local y = juice.expIn5(0, 128, percent)
-    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
-    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
-    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
-    local name = "expIn5"
-    print(name, center_x - #name * 4 * 0.5, center_y + 92)
-end
-
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_juice_expout5">juice.expOut5()</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">juice.expOut5(progress) -- Give a percentage (progress) of the interpolation
-juice.expOut5(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
-</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
-</tr>
-</tbody>
-</table>
-<tiny-editor style="display: none;"  >
-
-local center_x = 256 * 0.5
-local center_y = 256 * 0.5
-local width = 128
-
-function _update()
-    gfx.cls()
-    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
-    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
-
-
-    for x = 0, width, 2 do
-        local y = juice.expOut5(0, 128, x / width)
-        gfx.pset(
-            center_x - 64 + x, center_y + 64 - y, 3
-        )
-    end
-
-    local percent = (tiny.frame % 100) / 100
-    local x = width * percent
-    local y = juice.expOut5(0, 128, percent)
-    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
-    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
-    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
-    local name = "expOut5"
-    print(name, center_x - #name * 4 * 0.5, center_y + 92)
-end
-
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_juice_linear">juice.linear()</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">juice.linear(progress) -- Give a percentage (progress) of the interpolation
-juice.linear(start, end, progress) -- Interpolate the value given a start and an end value.</code></pre>
-</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">progress</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)</p></td>
-</tr>
-</tbody>
-</table>
-<tiny-editor style="display: none;"  >
-
-local center_x = 256 * 0.5
-local center_y = 256 * 0.5
-local width = 128
-
-function _update()
-    gfx.cls()
-    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)
-    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)
-
-
-    for x = 0, width, 2 do
-        local y = juice.linear(0, 128, x / width)
-        gfx.pset(
-            center_x - 64 + x, center_y + 64 - y, 3
-        )
-    end
-
-    local percent = (tiny.frame % 100) / 100
-    local x = width * percent
-    local y = juice.linear(0, 128, percent)
-    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)
-    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)
-    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)
-    local name = "linear"
-    print(name, center_x - #name * 4 * 0.5, center_y + 92)
-end
-
-
-</tiny-editor>
+<div class="ulist">
+<ul>
+<li>
+<p><code>keys.up</code>, <code>keys.down</code>, <code>keys.left</code>, <code>keys.right</code> for directions.</p>
+</li>
+<li>
+<p><code>keys.a</code> to <code>keys.z</code> and <code>keys.0</code> to <code>keys.9</code> for letters and numbers.</p>
+</li>
+<li>
+<p><code>keys.space</code> and <code>keys.enter</code> for other keys.</p>
+</li>
+</ul>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_map">map</h3>
 <div class="paragraph">
 <p>Access map created with LDTk ( <a href="https://ldtk.io/" class="bare">https://ldtk.io/</a> ).</p>
-</div>
-<div class="sect3">
-<h4 id="_map_level">map.level()</h4>
-<div class="paragraph">
-<p>Set the current level to use.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">map.level() -- Return the index of the current level.
-map.level(level) -- Set the current level to use. The level can be an index, the name or the id defined by LDTK. Return the previous index level or NIL if the new level is invalid.</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_map_layer">map.layer()</h4>
-<div class="paragraph">
-<p>Get the list of layers from the actual level.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">map.layer(layer_index) -- Get the layer at the specified index or name from the actual level. The layer in the front is 0.
-map.layer() -- Get the list of layers from the actual level.</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_map_from">map.from()</h4>
-<div class="paragraph">
-<p>Convert cell coordinates cx, cy into map screen coordinates x, y.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">map.from(arg1, arg2) -- Convert the cell coordinates into coordinates as a table [x,y].
-map.from(cell) -- Convert the cell coordinates from a table {cx,cy} into screen coordinates as a table {x,y}.</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_map_to">map.to()</h4>
-<div class="paragraph">
-<p>Convert screen coordinates x, y into map cell coordinates {cx, cy}.
-For example, coordinates of the player can be converted to cell coordinates to access the flag of the tile matching the player coordinates.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">map.to(x, y) -- Convert the coordinates into cell coordinates as a table {cx = cx,cy = cy}.
-map.to(coordinates) -- Convert the coordinates from a table {x,y} into cell coordinates as a table {cx,cy}.</code></pre>
-</div>
-</div>
 </div>
 <div class="sect3">
 <h4 id="_map_cflag">map.cflag()</h4>
@@ -2883,14 +3274,14 @@ map.cflag(cx, cy, layer) -- Get the flag from the tile at the coordinate cx,cy f
 </div>
 </div>
 <div class="sect3">
-<h4 id="_map_flag">map.flag()</h4>
+<h4 id="_map_draw">map.draw()</h4>
 <div class="paragraph">
-<p>Get the flag from a tile, using screen coordinates.</p>
+<p>Draw map tiles on the screen.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">map.flag(x, y) -- Get the flag from the tile at the coordinate x,y.
-map.flag(x, y, layer) -- Get the flag from the tile at the coordinate x,y from a specific layer.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">map.draw() -- Draw all active layers on the screen.
+map.draw(index) -- Draw the layer with the name or the index on the screen.</code></pre>
 </div>
 </div>
 </div>
@@ -2918,157 +3309,63 @@ map.entities(a) -- Get all entities from the specific layer as a table, with an 
 </div>
 </div>
 <div class="sect3">
-<h4 id="_map_draw">map.draw()</h4>
+<h4 id="_map_flag">map.flag()</h4>
 <div class="paragraph">
-<p>Draw map tiles on the screen.</p>
+<p>Get the flag from a tile, using screen coordinates.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">map.draw() -- Draw all active layers on the screen.
-map.draw(index) -- Draw the layer with the name or the index on the screen.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">map.flag(x, y) -- Get the flag from the tile at the coordinate x,y.
+map.flag(x, y, layer) -- Get the flag from the tile at the coordinate x,y from a specific layer.</code></pre>
 </div>
 </div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_notes">notes</h3>
-<div class="paragraph">
-<p>List all notes from C0 to B8. Please note that bemols are the note with b (ie: Gb2) while sharps are the note with s (ie: As3).</p>
 </div>
 <div class="sect3">
-<h4 id="_notes_note">notes.note()</h4>
+<h4 id="_map_from">map.from()</h4>
 <div class="paragraph">
-<p>Get the name of a note regarding the note index (ie: C0 = 0, Cs0 = 1, &#8230;&#8203;)</p>
+<p>Convert cell coordinates cx, cy into map screen coordinates x, y.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">notes.note(note_index) -- Get the name of a note regarding the note index (ie: C0 = 0, Cs0 = 1, ...)</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">map.from(arg1, arg2) -- Convert the cell coordinates into coordinates as a table [x,y].
+map.from(cell) -- Convert the cell coordinates from a table {cx,cy} into screen coordinates as a table {x,y}.</code></pre>
 </div>
 </div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_debug">debug</h3>
-<div class="paragraph">
-<p>Helpers to debug your game by drawing or printing information on screen.</p>
 </div>
 <div class="sect3">
-<h4 id="_debug_console">debug.console()</h4>
+<h4 id="_map_layer">map.layer()</h4>
 <div class="paragraph">
-<p>Log a message into the console.</p>
+<p>Get the list of layers from the actual level.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">debug.console(str) -- Log a message into the console.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">map.layer(layer_index) -- Get the layer at the specified index or name from the actual level. The layer in the front is 0.
+map.layer() -- Get the list of layers from the actual level.</code></pre>
 </div>
 </div>
-<tiny-editor style="display: none;"  >
-
-function _update()
-    local pos = ctrl.touch()
-
-    debug.table(pos)
-    debug.log("frame "..tiny.frame)
-    debug.console("hello from the console")
-end
-
-function _draw()
-    gfx.cls()
-    -- draw the mouse position.
-    local pos = ctrl.touch()
-
-    shape.line(pos.x - 2, pos.y, pos.x + 2, pos.y, 3)
-    shape.line(pos.x, pos.y - 2, pos.x, pos.y + 2, 3)
-end
-
-</tiny-editor>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_tiny">tiny</h3>
-<div class="paragraph">
-<p>Tiny Lib which offer offer the current frame (<code>tiny.frame</code>), the current time (<code>tiny.time</code>), delta time (<code>tiny.dt</code>), game dimensions (<code>tiny.width</code>, <code>tiny.height</code>), platform information (<code>tiny.platform</code>) and to switch to another script using <code>exit</code>.</p>
 </div>
 <div class="sect3">
-<h4 id="_tiny_dt">tiny.dt</h4>
+<h4 id="_map_level">map.level()</h4>
 <div class="paragraph">
-<p>Delta time between two frame. As Tiny is a fixed frame engine, it&#8217;s always equal to 1/60</p>
-</div>
-<tiny-editor style="display: none;"  >
-function _update()
-    gfx.cls()
-    print(tiny.dt, 10, 10) -- Delta time between two frame. As Tiny is a fixed frame engine, it's always equal to 1/60
-end
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_tiny_t">tiny.t</h4>
-<div class="paragraph">
-<p>Time elapsed since the start of the game.</p>
-</div>
-<tiny-editor style="display: none;"  >
-function _update()
-    gfx.cls()
-    print(tiny.t, 10, 10) -- Time elapsed since the start of the game.
-end
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_tiny_frame">tiny.frame</h4>
-<div class="paragraph">
-<p>Number of frames elapsed since the start of the game.</p>
-</div>
-<tiny-editor style="display: none;"  >
-function _update()
-    gfx.cls()
-    print(tiny.frame, 10, 10) -- Number of frames elapsed since the start of the game.
-end
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_tiny_width">tiny.width</h4>
-<div class="paragraph">
-<p>Width of the game in pixels.</p>
-</div>
-<tiny-editor style="display: none;"  >
-function _update()
-    gfx.cls()
-    print(tiny.width, 10, 10) -- Width of the game in pixels.
-end
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_tiny_height">tiny.height</h4>
-<div class="paragraph">
-<p>Height of the game in pixels.</p>
-</div>
-<tiny-editor style="display: none;"  >
-function _update()
-    gfx.cls()
-    print(tiny.height, 10, 10) -- Height of the game in pixels.
-end
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_tiny_platform">tiny.platform</h4>
-<div class="paragraph">
-<p>Current platform: 1 for desktop, 2 for web.</p>
-</div>
-<tiny-editor style="display: none;"  >
-function _update()
-    gfx.cls()
-    print(tiny.platform, 10, 10) -- Current platform: 1 for desktop, 2 for web.
-end
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_tiny_exit">tiny.exit()</h4>
-<div class="paragraph">
-<p>Exit the actual script to switch to another one. The next script to use is identified by it&#8217;s index. The index of the script is the index of it in the list of scripts from the <code>_tiny.json</code> file.The first script is at the index 0.</p>
+<p>Set the current level to use.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">tiny.exit(scriptIndex) -- Exit the actual script to switch to another one.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">map.level() -- Return the index of the current level.
+map.level(level) -- Set the current level to use. The level can be an index, the name or the id defined by LDTK. Return the previous index level or NIL if the new level is invalid.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_map_to">map.to()</h4>
+<div class="paragraph">
+<p>Convert screen coordinates x, y into map cell coordinates {cx, cy}.
+For example, coordinates of the player can be converted to cell coordinates to access the flag of the tile matching the player coordinates.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">map.to(x, y) -- Convert the coordinates into cell coordinates as a table {cx = cx,cy = cy}.
+map.to(coordinates) -- Convert the coordinates from a table {x,y} into cell coordinates as a table {cx,cy}.</code></pre>
 </div>
 </div>
 </div>
@@ -3077,18 +3374,6 @@ end
 <h3 id="_math">math</h3>
 <div class="paragraph">
 <p>Math functions. Please note that standard Lua math methods are also available.</p>
-</div>
-<div class="sect3">
-<h4 id="_math_pi">math.pi</h4>
-<div class="paragraph">
-<p>value of pi (~3.14)</p>
-</div>
-<tiny-editor style="display: none;"  >
-function _update()
-    gfx.cls()
-    print(math.pi, 10, 10) -- value of pi (~3.14)
-end
-</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_math_huge">math.huge</h4>
@@ -3103,26 +3388,15 @@ end
 </tiny-editor>
 </div>
 <div class="sect3">
-<h4 id="_math_sign">math.sign()</h4>
+<h4 id="_math_pi">math.pi</h4>
 <div class="paragraph">
-<p>Return the sign of the number: -1 if negative. 1 otherwise.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">math.sign(number) -- Return the sign of the number.</code></pre>
-</div>
+<p>value of pi (~3.14)</p>
 </div>
 <tiny-editor style="display: none;"  >
-
-function _draw()
+function _update()
     gfx.cls()
-    local cos = math.cos(tiny.t)
-    print("cos: "..cos)
-    print("sign: "..math.sign(cos), 0, 8)
-
-    shape.line(128, 128, 128 + cos * 128, 128, 9)
+    print(math.pi, 10, 10) -- value of pi (~3.14)
 end
-
 </tiny-editor>
 </div>
 <div class="sect3">
@@ -3265,6 +3539,55 @@ end
 </tiny-editor>
 </div>
 <div class="sect3">
+<h4 id="_math_perlin">math.perlin()</h4>
+<div class="paragraph">
+<p>Perlin noise. The random generated value is between 0.0 and 1.0.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">math.perlin(x, y, z) -- Generate a random value regarding the parameters x,y and z.</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A value between 0.0 and 1.0.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">y</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A value between 0.0 and 1.0.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">z</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A value between 0.0 and 1.0.</p></td>
+</tr>
+</tbody>
+</table>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls(8)
+
+    gfx.dither(0x0001)
+    local x = math.perlin(0.1, 0.2, tiny.frame / 100)
+    local y = math.perlin(0.4, 0.5, tiny.frame / 100)
+    shape.circlef(x * 256, y * 256, 64, 7)
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
 <h4 id="_math_rnd">math.rnd()</h4>
 <div class="paragraph">
 <p>Generate random values</p>
@@ -3332,287 +3655,50 @@ end
 </table>
 </div>
 <div class="sect3">
-<h4 id="_math_perlin">math.perlin()</h4>
+<h4 id="_math_sign">math.sign()</h4>
 <div class="paragraph">
-<p>Perlin noise. The random generated value is between 0.0 and 1.0.</p>
+<p>Return the sign of the number: -1 if negative. 1 otherwise.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">math.perlin(x, y, z) -- Generate a random value regarding the parameters x,y and z.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">math.sign(number) -- Return the sign of the number.</code></pre>
 </div>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A value between 0.0 and 1.0.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">y</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A value between 0.0 and 1.0.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">z</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A value between 0.0 and 1.0.</p></td>
-</tr>
-</tbody>
-</table>
 <tiny-editor style="display: none;"  >
 
 function _draw()
-    gfx.cls(8)
+    gfx.cls()
+    local cos = math.cos(tiny.t)
+    print("cos: "..cos)
+    print("sign: "..math.sign(cos), 0, 8)
 
-    gfx.dither(0x0001)
-    local x = math.perlin(0.1, 0.2, tiny.frame / 100)
-    local y = math.perlin(0.4, 0.5, tiny.frame / 100)
-    shape.circlef(x * 256, y * 256, 64, 7)
+    shape.line(128, 128, 128 + cos * 128, 128, 9)
 end
 
 </tiny-editor>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_keys">keys</h3>
+<h3 id="_notes">notes</h3>
 <div class="paragraph">
-<p>List of the available keys. To be used with ctrl.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><code>keys.up</code>, <code>keys.down</code>, <code>keys.left</code>, <code>keys.right</code> for directions.</p>
-</li>
-<li>
-<p><code>keys.a</code> to <code>keys.z</code> and <code>keys.0</code> to <code>keys.9</code> for letters and numbers.</p>
-</li>
-<li>
-<p><code>keys.space</code> and <code>keys.enter</code> for other keys.</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_std">std</h3>
-<div class="paragraph">
-<p>Standard library.</p>
+<p>List all notes from C0 to B8. Please note that bemols are the note with b (ie: Gb2) while sharps are the note with s (ie: As3).</p>
 </div>
 <div class="sect3">
-<h4 id="_new">new()</h4>
+<h4 id="_notes_note">notes.note()</h4>
 <div class="paragraph">
-<p>Create new instance of a class by creating a new table and setting the metatable. It allow to create kind of Object Oriented Programming.</p>
+<p>Get the name of a note regarding the note index (ie: C0 = 0, Cs0 = 1, &#8230;&#8203;)</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">new(class) -- Create new instance of class.
-new(class, default) -- Create new instance of class using default values.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">notes.note(note_index) -- Get the name of a note regarding the note index (ie: C0 = 0, Cs0 = 1, ...)</code></pre>
 </div>
 </div>
-<tiny-editor style="display: none;"  >
-
-local Player = {
-    x = 128,
-    y = 128,
-    color = 8
-}
-
-function Player:draw()
-    shape.rectf(self.x, self.y, 10, 10, self.color)
-end
-
-function _init()
-    -- create a new player
-    player = new(Player)
-    -- create a new player with default vaules
-    player2 = new(Player, {x = 200, y = 200, color = 9})
-end
-
-function _draw()
-    gfx.cls()
-    player:draw() -- call the draw method on the player instance.
-    player2:draw() -- call the draw method on the player2 instance.
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_merge">merge()</h4>
-<div class="paragraph">
-<p>Add <strong>all key/value</strong> from the table <code>source</code> to the table <code>dest</code>.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">merge(source, dest) -- Merge source into dest.</code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-function _draw()
-    gfx.cls()
-    local src = {x = 1, y = 2, z = 3}
-    local dst = {a = 4, b = 5}
-    local result = merge(src, dst)
-    debug.table(result)
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_append">append()</h4>
-<div class="paragraph">
-<p>Append <strong>all values</strong> from the table <code>source</code> to the table <code>dest</code>.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">append(source, dest) -- Copy source into dest.</code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-function _draw()
-    gfx.cls()
-    local src = {1, 2, 3}
-    local dst = {4, 5}
-    local result = append(src, dst)
-    debug.table(result)
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_all">all()</h4>
-<div class="paragraph">
-<p>Iterate over values of a table.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>If you want to iterate over keys, use <code>pairs(table)</code>.</p>
-</li>
-<li>
-<p>If you want to iterate over index, use <code>ipairs(table)</code>.</p>
-</li>
-<li>
-<p>If you want to iterate in reverse, use <code>rpairs(table)</code>.</p>
-</li>
-</ul>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">all(table) -- Iterate over the values of the table</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_rpairs">rpairs()</h4>
-<div class="paragraph">
-<p>Iterate over values of a table in reverse order. The iterator return an index and the value. The method is useful to remove elements from a table while iterating on it.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">rpairs(table) -- Iterate over the values of the table</code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-function _draw()
-    gfx.cls()
-    local data = {
-        { name = "riri" },
-        { name = "fifi" },
-        { name = "loulou" }
-    }
-
-    local y = 0
-    for index, key in rpairs(data) do
-        print(index .. " - " .. key.name, 10, y)
-        y = y + 10
-    end
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_print">print()</h4>
-<div class="paragraph">
-<p>Print on the screen a string.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">print(str) -- print on the screen a string at (0,0) with a default color.
-print(str, x, y) -- print on the screen a string with a default color.
-print(str, x, y, color) -- print on the screen a string with a specific color.</code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-function _draw()
-    gfx.cls()
-    -- every character is a sprite 4x4 pixels.
-    print("hello")
-    print("world", 10, 10)
-    print("how", 10, 20, 4)
-    print("are", 26, 20, 5)
-    print("you", 42, 20, 6)
-    print("...", 58, 20, math.rnd(10))
-end
-
-</tiny-editor>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_sfx">sfx</h3>
 <div class="paragraph">
-<p>Sound API to play/loop/stop a sound.
-A sound can be created using the sound editor, using the command line <code>tiny-cli sfx &lt;filename&gt;</code>.
-WARNING: Because of browser behaviour, a sound can <strong>only</strong> be played only after the first
-user interaction.</p>
-</div>
-<div class="paragraph">
-<p>Avoid to start a music or a sound at the beginning of the game.
-Before it, force the player to hit a key or click by adding an interactive menu
-or by starting the sound as soon as the player is moving.</p>
-</div>
-<div class="sect3">
-<h4 id="_sfx_save">sfx.save()</h4>
-<div class="paragraph">
-<p>Save the actual music using the filename.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">sfx.save(filename) -- Save the actual music using the filename</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_sfx_load">sfx.load()</h4>
-<div class="paragraph">
-<p>Load the actual SFX sound as the actual music.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">sfx.load(filename) -- Load the actual SFX sound as the actual music using filename or its index</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_sfx_track">sfx.track()</h4>
-<div class="paragraph">
-<p>Access track using its index or its name.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">sfx.track(arg) -- Access instrument using its index or its name.</code></pre>
-</div>
-</div>
+<p>TODO</p>
 </div>
 <div class="sect3">
 <h4 id="_sfx_instrument">sfx.instrument()</h4>
@@ -3627,887 +3713,159 @@ sfx.instrument(a, b) -- Access instrument using its index or its name. Create it
 </div>
 </div>
 <div class="sect3">
-<h4 id="_sfx_bar">sfx.bar()</h4>
+<h4 id="_sfx_save">sfx.save()</h4>
+<div class="paragraph">
+<p>Save the actual music in the current sfx file.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">sfx.save() -- Save the actual music in the current sfx file.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_sfx_sfx">sfx.sfx()</h4>
 <div class="paragraph">
 <p>Access sfx using its index or its name.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">sfx.bar(arg) -- Access sfx using its index or its name.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">sfx.sfx(arg) -- Access sfx using its index or its name.</code></pre>
 </div>
 </div>
-</div>
-<div class="sect3">
-<h4 id="_sfx_play">sfx.play()</h4>
-<div class="paragraph">
-<p>Play the bar by it&#8217;s index of the current sound. The index of a bar of the current music.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">sfx.play() -- Play the sound at the index 0.
-sfx.play(sound) -- Play the sound by it's index.</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_sfx_loop">sfx.loop()</h4>
-<div class="paragraph">
-<p>Loop the bar by it&#8217;s index of the current sound. The index of a bar of the current music.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">sfx.loop() -- Loop the sound at the index 0.
-sfx.loop(sound) -- Loop the sound by it's index.</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_sfx_stop">sfx.stop()</h4>
-<div class="paragraph">
-<p>Stop the bar by it&#8217;s index of the current sound. The index of a bar of the current music.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">sfx.stop() -- Stop the sound at the index 0.
-sfx.stop(sound) -- Stop the sound by it's index.</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_sfx_mplay">sfx.mplay()</h4>
-<div class="paragraph">
-<p>Play the sequence by it&#8217;s index of the current sound. The index of a sequence of the current music.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">sfx.mplay() -- Play the sequence at the index 0.
-sfx.mplay(sequence) -- Play the sequence by it's index.</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_sfx_mloop">sfx.mloop()</h4>
-<div class="paragraph">
-<p>Loop the sequence by it&#8217;s index of the current sound. The index of a sequence of the current music.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">sfx.mloop() -- Loop the sequence at the index 0.
-sfx.mloop(sequence) -- Loop the sequence by it's index.</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_sfx_mstop">sfx.mstop()</h4>
-<div class="paragraph">
-<p>Stop the sequence by it&#8217;s index of the current sound. The index of a sequence of the current music.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">sfx.mstop() -- Stop the sequence at the index 0.
-sfx.mstop(sequence) -- Stop the sequence by it's index.</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_gfx">gfx</h3>
-<div class="paragraph">
-<p>Access to graphical API like updating the color palette or applying a dithering pattern.</p>
-</div>
-<div class="sect3">
-<h4 id="_gfx_draw_mode">gfx.draw_mode()</h4>
-<div class="paragraph">
-<p>Switch to another draw mode.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>0: default.</p>
-</li>
-<li>
-<p>1: drawing with transparent (ie: can erase part of the screen)</p>
-</li>
-<li>
-<p>2: drawing a stencil that will be use with the next mode</p>
-</li>
-<li>
-<p>3: drawing using a stencil test (ie: drawing only in the stencil)</p>
-</li>
-<li>
-<p>4: drawing using a stencil test (ie: drawing everywhere except in the stencil)</p>
-</li>
-</ul>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">gfx.draw_mode() -- Return the actual mode. Switch back to the default mode.
-gfx.draw_mode(mode) -- Switch to another draw mode. Return the previous mode.</code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;" sprite="resources/tiny-town.png" >
-
-local draw_stencil = 2
-local draw_inside_stencil = 3
-local draw_outside_stencil = 4
-
-local outside = false
-
-function _draw()
-    if ctrl.pressed(keys.space) then
-        outside = not outside
-    end
-
-    gfx.cls(3)
-
-    gfx.draw_mode(draw_stencil)
-
-    -- draw a circle in the middle of the screen
-    shape.circlef(128, 128, 64, 1)
-
-    if outside then
-        gfx.draw_mode(draw_inside_stencil)
-    else
-        gfx.draw_mode(draw_outside_stencil)
-    end
-
-    -- draw the sprite sheet. only in the circle
-    spr.sdraw()
-    gfx.draw_mode()
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_gfx_cls">gfx.cls()</h4>
-<div class="paragraph">
-<p>clear the screen</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">gfx.cls() -- Clear the screen with a default color.
-gfx.cls(color) -- Clear the screen with a color.</code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-function _draw()
-    if ctrl.pressed(keys.space) then
-       gfx.cls()
-    end
-
-    print("Press space to clear the screen")
-    local pos = ctrl.touch()
-    shape.circlef(pos.x, pos.y, 4, math.rnd())
-end
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_gfx_pset">gfx.pset()</h4>
-<div class="paragraph">
-<p>Set the color index at the coordinate (x,y).</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">gfx.pset(x, y, color) -- set the color index at the coordinate (x,y).</code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-function _draw()
-   local pos = ctrl.touching(0)
-   if pos ~= nil then
-      -- set the pixel with the color 9 when the mouse is pressed
-      local p = ctrl.touch()
-      gfx.pset(p.x, p.y, 9)
-   end
-end
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_gfx_pget">gfx.pget()</h4>
-<div class="paragraph">
-<p>Get the color index at the coordinate (x,y).</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">gfx.pget(x, y) -- get the color index at the coordinate (x,y).</code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-function _draw()
-   gfx.cls()
-   local index = 0
-   for x=0, 240, 16 do
-     for y=0, 240, 16 do
-        shape.rectf(x, y, 16, 16, index)
-        index = index + 1
-     end
-   end
-
-   local pos = ctrl.touch()
-   local color = gfx.pget(pos.x, pos.y)
-   if color ~= nil then
-     shape.rectf(0, 0, 80, 6, 13)
-     print("color index: "..color)
-   end
-
-
-   shape.circlef(pos.x - 2, pos.y - 2, 4, 0)
-end
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_gfx_to_sheet">gfx.to_sheet()</h4>
-<div class="paragraph">
-<p>Transform the current frame buffer into a spritesheeet.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>If the index of the spritesheet already exist, the spritesheet will be replaced</p>
-</li>
-<li>
-<p>If the index of the spritesheet doesn&#8217;t exist, a new spritesheet at this index will be created</p>
-</li>
-<li>
-<p>If the index of the spritesheet is negative, a new spritesheet will be created at the last positive index.</p>
-</li>
-</ul>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">gfx.to_sheet(sheet) -- Copy the current frame buffer to an new or existing sheet index.</code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-function _draw()
-    gfx.cls(1)
-    -- draw a transparent circle (like a hole)
-    shape.circlef(64, 128, 20, 0)
-    -- keep the result as spritesheet 0
-    gfx.to_sheet(0)
-
-    gfx.cls(1)
-    -- draw some circles
-    shape.circlef(64, 108, 20, 8)
-    shape.circlef(44, 128, 20, 9)
-    shape.circlef(64, 148, 20, 10)
-    shape.circlef(84, 128, 20, 11)
-
-    -- draw over the circles
-    -- the mask generated before.
-    spr.sheet(0)
-    spr.sdraw()
-end
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_gfx_pal">gfx.pal()</h4>
-<div class="paragraph">
-<p>Change a color from the palette to another color.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">gfx.pal() -- Reset all previous color changes.
-gfx.pal(a, b) -- Replace the color a for the color b.</code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-function _draw()
-    gfx.cls()
-    print("example", 10, 10, 2) -- print using the color index 2
-    gfx.pal(2, 3) -- switch the text color to another color
-    print("example", 10, 20, 2) -- print using the color index 2
-    gfx.pal() -- reset the palette
-    print("example", 10, 30, 2) -- print using the color index 2
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_gfx_camera">gfx.camera()</h4>
-<div class="paragraph">
-<p>Move the game camera.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">gfx.camera() -- Reset the game camera to it's default position (0,0).
-gfx.camera(x, y) -- Set game camera to the position x, y.</code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-local x = 0
-local y = 0
-
-function _update()
-    if ctrl.pressing(keys.left) then
-        x = x - 0.5
-    elseif ctrl.pressing(keys.right) then
-        x = x + 0.5
-    end
-
-    if ctrl.pressing(keys.up) then
-        y = y - 0.5
-    elseif ctrl.pressing(keys.down) then
-        y = y + 0.5
-    end
-    gfx.camera(math.floor(x), math.floor(y))
-end
-
-function _draw()
-    gfx.cls(2)
-    for x = 0 - 64, 256 + 64, 16 do
-        for y = 0 - 64, 256 + 64, 16 do
-            shape.line(x - 2, y, x + 2, y, 9)
-            shape.line(x, y - 2, x, y + 2, 9)
-        end
-    end
-    print("camera: ("..x..", "..y..")", 6, 6)
-
-    shape.rect(0, 0, 256, 256, 1)
-end
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_gfx_dither">gfx.dither()</h4>
-<div class="paragraph">
-<p>Apply a dithering pattern on every new draw call. The pattern is using the bits value of a 2 octet value. The first bits is the one on the far left and represent the pixel of the top left of a 4x4 matrix. The last bit is the pixel from the bottom right of this matrix.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">gfx.dither() -- Reset dithering pattern. The previous dithering pattern is returned.
-gfx.dither(pattern) -- Apply dithering pattern. The previous dithering pattern is returned.</code></pre>
-</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">pattern</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Dither pattern. For example: 0xA5A5 or 0x3030</p></td>
-</tr>
-</tbody>
-</table>
-<tiny-editor style="display: none;"  >
-
-function _draw()
-    gfx.cls()
-    gfx.dither()
-    shape.circlef(30, 30, 30, 2)
-    gfx.dither(0xA5A5) -- set a dithering pattern
-    shape.circlef(50, 50, 30, 3)
-    gfx.dither(0x0842) -- set another dithering pattern
-    shape.circlef(70, 70, 30, 2)
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_gfx_clip">gfx.clip()</h4>
-<div class="paragraph">
-<p>Clip the draw surface (ie: limit the drawing area).</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">gfx.clip() -- Reset the clip and draw on the fullscreen.
-gfx.clip(x, y, width, height) -- Clip and limit the drawing area.</code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-function _init()
-  c = {}
-  for i=1,100 do
-    table.insert(c, {x=math.rnd(256), y=math.rnd(256), c = math.rnd(1,12)})
-end
-
-end
-function _draw()
-  gfx.cls()
-  local pos = ctrl.touch()
-  -- set a clip area to crop circles
-  gfx.clip(pos.x - 20, pos.y - 20, 40, 40)
-  for circle in all(c) do
-    shape.circlef(circle.x, circle.y, 10, circle.c)
-  end
-end
-
-</tiny-editor>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_floppy">floppy</h3>
-<div class="paragraph">
-<p>Floppy allow you to get or save user Lua structure.</p>
-</div>
-<div class="sect3">
-<h4 id="_floppy_put">floppy.put()</h4>
-<div class="paragraph">
-<p>Save the content into a local file, on desktop or in the local storage on the web platform.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">floppy.put(name, content) -- Save the content into the file name.</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_floppy_get">floppy.get()</h4>
-<div class="paragraph">
-<p>Load and get the content of the file name</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">floppy.get(name) -- Load and get the content of the file name</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_ctrl">ctrl</h3>
-<div class="paragraph">
-<p>Access to controllers like touch/mouse events or accessing which key is pressed by the user.</p>
-</div>
-<div class="sect3">
-<h4 id="_ctrl_touch">ctrl.touch()</h4>
-<div class="paragraph">
-<p>Get coordinates of the current touch/mouse. If the mouse/touch is out-of the screen, the coordinates will be the last mouse position/touch. The function return those coordinates as a table {x, y}. A sprite can be draw directly on the mouse position by passing the sprite number.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">ctrl.touch() -- Get the mouse coordinates.
-ctrl.touch(sprN) -- Get the mouse coordinate and draw a sprite on those coordinates.</code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-function _draw()
-  gfx.cls(2)
-  p = ctrl.touch()
-  print("coordinates: "..p.x .. "x"..p.y, 1, 1, 4)
-  shape.rectf(p.x, p.y, 5,5, p.x + p.y)
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_ctrl_pressed">ctrl.pressed()</h4>
-<div class="paragraph">
-<p>Return true if the key was pressed during the last frame. If you need to check that the key is still pressed, see <code>ctrl.pressing</code> instead.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">ctrl.pressed(key) -- Is the key was pressed?</code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-local percent_a = 1
-local percent_b = 1
-
-function _update()
-    percent_a = math.min(percent_a + 0.05, 1)
-    percent_b = math.min(percent_b + 0.05, 1)
-
-    if ctrl.pressed(keys.space) then
-        percent_a = 0
-    end
-
-    if ctrl.pressing(keys.space) then
-        percent_b = 0
-    end
-
-    local offset_a = juice.powIn2(0, 8, percent_a)
-    local offset_b = juice.powIn2(0, 8, percent_b)
-
-    gfx.cls()
-    shape.rectf(64, 128 - 16, 32, 32, 7)
-    shape.rectf(64, 128 - 32 + offset_a, 32, 32, 8)
-
-    shape.rectf(32 + 128, 128 - 16, 32, 32, 7)
-    shape.rectf(32 + 128, 128 - 32 + offset_b, 32, 32, 8)
-
-    print("pressed", 64, 128 + 32)
-    print("pressing", 32 + 128, 128 + 32)
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_ctrl_pressing">ctrl.pressing()</h4>
-<div class="paragraph">
-<p>Return true if the key is still pressed.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">ctrl.pressing(key) -- Is the key is still pressed?</code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-local percent_a = 1
-local percent_b = 1
-
-function _update()
-    percent_a = math.min(percent_a + 0.05, 1)
-    percent_b = math.min(percent_b + 0.05, 1)
-
-    if ctrl.pressed(keys.space) then
-        percent_a = 0
-    end
-
-    if ctrl.pressing(keys.space) then
-        percent_b = 0
-    end
-
-    local offset_a = juice.powIn2(0, 8, percent_a)
-    local offset_b = juice.powIn2(0, 8, percent_b)
-
-    gfx.cls()
-    shape.rectf(64, 128 - 16, 32, 32, 7)
-    shape.rectf(64, 128 - 32 + offset_a, 32, 32, 8)
-
-    shape.rectf(32 + 128, 128 - 16, 32, 32, 7)
-    shape.rectf(32 + 128, 128 - 32 + offset_b, 32, 32, 8)
-
-    print("pressed", 64, 128 + 32)
-    print("pressing", 32 + 128, 128 + 32)
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_ctrl_touched">ctrl.touched()</h4>
-<div class="paragraph">
-<p>Return the position of the touch (as <code>{x, y}</code>)if the screen was touched or the mouse button was pressed during the last frame. <code>nil</code> otherwise.
-The touch can be :</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>0: left click or one finger</p>
-</li>
-<li>
-<p>1: right click or two fingers</p>
-</li>
-<li>
-<p>2: middle click or three fingers</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>If you need to check that the touch/mouse button is still active, see <code>ctrl.touching</code> instead.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">ctrl.touched(touch) -- Is the screen was touched or mouse button was pressed?</code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-local circles = {}
-
-function _update()
-    local pos = ctrl.touched(0)
-    if pos ~= nil then
-        table.insert(circles, pos)
-    end
-end
-
-function _draw()
-    gfx.cls()
-    local p = ctrl.touch()
-    shape.circlef(p.x, p.y, 4, 8)
-    for pos in all(circles) do
-        shape.circlef(pos.x, pos.y, 4, 9)
-        print("("..pos.x .. ", "..pos.y..")", pos.x + 3, pos.y + 3)
-    end
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_ctrl_touching">ctrl.touching()</h4>
-<div class="paragraph">
-<p>Return the position of the touch (as <code>{x, y}</code>)if the screen is still touched or the mouse button is still pressed. <code>nil</code> otherwise.
-The touch can be :</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>0: left click or one finger</p>
-</li>
-<li>
-<p>1: right click or two fingers</p>
-</li>
-<li>
-<p>2: middle click or three fingers</p>
-</li>
-</ul>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">ctrl.touching(touch) -- Is the screen is still touched or mouse button is still pressed?</code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-function _draw()
-    gfx.cls()
-    local p = ctrl.touch()
-    shape.circlef(p.x, p.y, 4, 8)
-
-    local start = ctrl.touching(0)
-    if start ~= nil then
-        local pos = ctrl.touch()
-        shape.line(start.x, start.y, pos.x, pos.y, 1)
-        print("("..start.x .. ", "..start.y..")", start.x, start.y)
-        print("("..pos.x .. ", "..pos.y..")", pos.x, pos.y)
-    end
-end
-
-</tiny-editor>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_spr">spr</h3>
-<div class="paragraph">
-<p>Sprite API to draw or update sprites.</p>
-</div>
-<div class="sect3">
-<h4 id="_spr_pget">spr.pget()</h4>
-<div class="paragraph">
-<p>Get the color index at the coordinate (x,y) from the current spritesheet.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">spr.pget(x, y) -- get the color index at the coordinate (x,y) from the current spritesheet.</code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;" sprite="resources/tiny-town.png" >
-
-function _draw()
-    local pos = ctrl.touch()
-
-    gfx.cls()
-
-    spr.sdraw()
-    shape.circlef(pos.x - 4, pos.y - 4, 8, 3)
-    local color = spr.pget(pos.x, pos.y)
-    if(color ~= nil) then
-        print("index color: "..color, 7, 0)
-        shape.rectf(0, 0, 6, 6, color)
-        shape.circlef(pos.x - 4, pos.y - 4, 6, color)
-    end
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_spr_pset">spr.pset()</h4>
-<div class="paragraph">
-<p>Set the color index at the coordinate (x,y) in the current spritesheet.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">spr.pset(x, y, color) -- Set the color index at the coordinate (x,y) in the current spritesheet.</code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;" sprite="resources/tiny-dungeon.png" >
-
-function _draw()
-    local pos = ctrl.touch()
-
-    local touching = ctrl.touching(0)
-    gfx.cls()
-
-   spr.sdraw()
-
-   if touching ~= nil then
-      spr.pset(pos.x, pos.y, 9)
-   end
-   print("click to alter", 45, 96)
-   shape.circle(64 + 8, 128 + 8, 32, 1)
-   shape.circlef(128 + 8, 128 + 8, 32, 1)
-   spr.draw(100, 128, 128)
-
-   shape.circlef(pos.x, pos.y, 2, 3)
-end
-
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_spr_sheet">spr.sheet()</h4>
-<div class="paragraph">
-<p>Switch to another spritesheet. The index of the spritesheet is given by it&#8217;s position in the spritesheets field from the <code>_tiny.json</code> file.The first spritesheet is at the index 0. It retuns the previous spritesheet. The spritesheet can also be referenced by its filename.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">spr.sheet() -- Switch to the first spritesheet
-spr.sheet(spritesheetN) -- Switch to the N spritesheet</code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-local current = 0
-function _update()
-    local x = math.perlin((tiny.frame % 100) / 100, (tiny.frame % 100) / 100, (tiny.frame % 100) / 100)
-    local y = math.perlin((tiny.frame  * 0.5 % 100) / 100, (tiny.frame % 100) / 100, (tiny.frame * 0.5 % 100) / 100)
-
-    gfx.cls()
-    shape.circlef(x * 256, y * 256, 10, 8)
-    gfx.to_sheet("circle.png")
-
-    gfx.cls()
-    shape.rectf(x * 256, y * 256, 20, 20, 8)
-    gfx.to_sheet("rect.png")
-
-    if ctrl.pressed(keys.space) then
-        current = (current + 1) % 2
-    end
-end
-
-function _draw()
-    if current == 0 then
-        spr.sheet("circle.png")
-    else
-        spr.sheet("rect.png")
-    end
-    spr.sdraw()
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_spr_sdraw">spr.sdraw()</h4>
-<div class="paragraph">
-<p>S(uper) Draw a fragment from the spritesheet.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">spr.sdraw() -- Draw the full spritesheet at default coordinate (0, 0)
-spr.sdraw(x, y) -- Draw the full spritesheet at coordinate (x, y)
-spr.sdraw(x, y, sprX, sprY) -- Draw the full spritesheet at coordinate (x, y) from the sprite (sprX, sprY)
-spr.sdraw(x, y, sprX, sprY, width, height, flipX, flipY) -- Draw a fragment from the spritesheet at the coordinate (x, y) from the sprite (sprX, sprY) with the width and height.</code></pre>
-</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Argument name</th>
-<th class="tableblock halign-left valign-top">Argument description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">flipX</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">flip on the x axis (default: false)</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">flipY</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">flip on the y axis (default: false)</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">height</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">height of the spritesheet to copy (default height of the spritesheet)</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">sprX</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">x coordinate from the spritesheet (default 0)</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">sprY</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">y coordinate from the spritesheet (default 0)</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">width</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">width of the spritesheet to copy (default width of the spritesheet)</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">screen x coordinate to draw the sprite (default 0)</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">y</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">screen y coordinate to draw the sprite (default 0)</p></td>
-</tr>
-</tbody>
-</table>
-<tiny-editor style="display: none;" sprite="resources/tiny-town.png" >
-
-function _draw()
-    local pos = ctrl.touch()
-
-    gfx.cls()
-
-    spr.sdraw()
-    shape.circlef(pos.x - 4, pos.y - 4, 8, 3)
-    local color = spr.pget(pos.x, pos.y)
-    if(color ~= nil) then
-        print("index color: "..color, 7, 0)
-        shape.rectf(0, 0, 6, 6, color)
-        shape.circlef(pos.x - 4, pos.y - 4, 6, color)
-    end
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_spr_draw">spr.draw()</h4>
-<div class="paragraph">
-<p>Draw a sprite.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">spr.draw(sprN) -- Draw a sprite at the default coordinate (0, 0).
-spr.draw(sprN, x, y) -- Draw a sprite.
-spr.draw(sprN, x, y, flipX, flipY) -- Draw a sprite and allow flip on x or y axis.</code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;" sprite="resources/tiny-town.png" >
-
-function _init()
-  id = 1
-end
-
-function _draw()
-    if ctrl.pressed(keys.left) then
-      id = id - 1
-    elseif ctrl.pressed(keys.right) then
-      id = id + 1
-    end
-
-    gfx.cls()
-    print("sprite index "..id.. " (press left or right to change)", 50, 112)
-    spr.draw(id, 120, 120)
-end
-
-</tiny-editor>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_shape">shape</h3>
 <div class="paragraph">
 <p>Shape API to draw&#8230;&#8203;shapes. Those shapes can be circle, rectangle, line or oval.All shapes can be draw filed or not filed.</p>
+</div>
+<div class="sect3">
+<h4 id="_shape_circle">shape.circle()</h4>
+<div class="paragraph">
+<p>Draw a circle.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">shape.circle(a, b, c) -- Draw a circle with the default color.
+shape.circle(centerX, centerY, radius, color) -- Draw a circle.</code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+
+    -- filled circle
+    shape.circlef(20, 20, 20, 4)
+    shape.circlef(30, 30, 20, 5)
+    shape.circlef(40, 40, 20, 6)
+    print("filled circle", 20, 10)
+
+    -- non filled circle
+    shape.circle(50, 70, 10, 7)
+    shape.circle(60, 80, 10, 8)
+    shape.circle(70, 90, 10, 9)
+    print("non filled circle", 20, 65)
+
+    shape.circle(80, 120, 15, 10)
+    shape.circle(80, 140, 20, 16)
+    shape.circle(80, 160, 30, 14)
+    print("circle with different radius", 20, 115)
+
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_shape_circlef">shape.circlef()</h4>
+<div class="paragraph">
+<p>Draw a filled circle.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">shape.circlef(centerX, centerY, radius, color) -- Draw a circle at the coordinate (centerX, centerY) with the radius and the color.</code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+    gfx.cls()
+
+    -- filled circle
+    shape.circlef(20, 20, 20, 4)
+    shape.circlef(30, 30, 20, 5)
+    shape.circlef(40, 40, 20, 6)
+    print("filled circle", 20, 10)
+
+    -- non filled circle
+    shape.circle(50, 70, 10, 7)
+    shape.circle(60, 80, 10, 8)
+    shape.circle(70, 90, 10, 9)
+    print("non filled circle", 20, 65)
+
+    shape.circle(80, 120, 15, 10)
+    shape.circle(80, 140, 20, 16)
+    shape.circle(80, 160, 30, 14)
+    print("circle with different radius", 20, 115)
+
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_shape_gradient">shape.gradient()</h4>
+<div class="paragraph">
+<p>Draw a gradient using dithering, only from color c1 to color c2.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">shape.gradient(x, y, width, height, color1, color2, is_horizontal) -- Draw a gradient using dithering, only from color c1 to color c2.</code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+
+ local c1 = 2
+ local c2 = 3
+
+    gfx.cls(c1)
+    shape.rectf(0, 256 - 16, 256, 16, c2)
+    for x=0,240,16 do
+        shape.gradient(x, 16 * math.cos(2 * 3.14 * (x / 256) + tiny.t * 2), 16, 256, c1, c2, false)
+    end
+
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_shape_line">shape.line()</h4>
+<div class="paragraph">
+<p>Draw a line.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">shape.line(x0, y0, x1, y1, color) -- Draw a line.
+shape.line(x0, y0, x1, y1) -- Draw a line with a default color.</code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;"  >
+
+function _draw()
+  gfx.cls()
+
+  local i =0
+  for x =16, 240, 16 do
+    for y =16, 240, 16 do
+      shape.line(x, y, 256 - x, 256 - y, i)
+      i = i + 1
+    end
+  end
+end
+
+</tiny-editor>
 </div>
 <div class="sect3">
 <h4 id="_shape_rect">shape.rect()</h4>
@@ -4630,101 +3988,40 @@ end
 </tiny-editor>
 </div>
 <div class="sect3">
-<h4 id="_shape_circlef">shape.circlef()</h4>
+<h4 id="_shape_triangle">shape.triangle()</h4>
 <div class="paragraph">
-<p>Draw a filled circle.</p>
+<p>Draw a triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3) and color.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">shape.circlef(centerX, centerY, radius, color) -- Draw a circle at the coordinate (centerX, centerY) with the radius and the color.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">shape.triangle(x1, y1, x2, y2, x3, y3, color) -- Draw a triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).</code></pre>
 </div>
 </div>
 <tiny-editor style="display: none;"  >
 
-function _draw()
-    gfx.cls()
+function tri(f, fill)
+  local x1 = 128 + math.cos(f) * 64
+  local y1 = 128 + math.sin(f) * 64
 
-    -- filled circle
-    shape.circlef(20, 20, 20, 4)
-    shape.circlef(30, 30, 20, 5)
-    shape.circlef(40, 40, 20, 6)
-    print("filled circle", 20, 10)
+  local x2 = 128 + math.cos(f + math.pi * 1/3) * 64
+  local y2 = 128 + math.sin(f + math.pi * 1/3) * 64
 
-    -- non filled circle
-    shape.circle(50, 70, 10, 7)
-    shape.circle(60, 80, 10, 8)
-    shape.circle(70, 90, 10, 9)
-    print("non filled circle", 20, 65)
+  local x3 = 128 + math.cos(f+ math.pi * 2/3) * 64
+  local y3 = 128 + math.sin(f +math.pi * 2/3) * 64
 
-    shape.circle(80, 120, 15, 10)
-    shape.circle(80, 140, 20, 16)
-    shape.circle(80, 160, 30, 14)
-    print("circle with different radius", 20, 115)
-
-end
-
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_shape_line">shape.line()</h4>
-<div class="paragraph">
-<p>Draw a line.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">shape.line(x0, y0, x1, y1, color) -- Draw a line.
-shape.line(x0, y0, x1, y1) -- Draw a line with a default color.</code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
-function _draw()
-  gfx.cls()
-
-  local i =0
-  for x =16, 240, 16 do
-    for y =16, 240, 16 do
-      shape.line(x, y, 256 - x, 256 - y, i)
-      i = i + 1
-    end
+  if fill then
+    shape.trianglef(x3, y3, x2, y2, x1, y1, 8)
+  else
+    shape.triangle(x1, y1, x2, y2, x3, y3, 8)
   end
 end
 
-</tiny-editor>
-</div>
-<div class="sect3">
-<h4 id="_shape_circle">shape.circle()</h4>
-<div class="paragraph">
-<p>Draw a circle.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">shape.circle(a, b, c) -- Draw a circle with the default color.
-shape.circle(centerX, centerY, radius, color) -- Draw a circle.</code></pre>
-</div>
-</div>
-<tiny-editor style="display: none;"  >
-
 function _draw()
-    gfx.cls()
+  gfx.cls()
+  local f = tiny.frame * 0.01
 
-    -- filled circle
-    shape.circlef(20, 20, 20, 4)
-    shape.circlef(30, 30, 20, 5)
-    shape.circlef(40, 40, 20, 6)
-    print("filled circle", 20, 10)
-
-    -- non filled circle
-    shape.circle(50, 70, 10, 7)
-    shape.circle(60, 80, 10, 8)
-    shape.circle(70, 90, 10, 9)
-    print("non filled circle", 20, 65)
-
-    shape.circle(80, 120, 15, 10)
-    shape.circle(80, 140, 20, 16)
-    shape.circle(80, 160, 30, 14)
-    print("circle with different radius", 20, 115)
-
+  tri(f, false)
+  tri(f*2, true)
 end
 
 </tiny-editor>
@@ -4768,68 +4065,777 @@ end
 
 </tiny-editor>
 </div>
-<div class="sect3">
-<h4 id="_shape_triangle">shape.triangle()</h4>
+</div>
+<div class="sect2">
+<h3 id="_sound">sound</h3>
 <div class="paragraph">
-<p>Draw a triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3) and color.</p>
+<p>Sound API to play/loop/stop a sound.
+A sound can be created using the sound editor, using the command line <code>tiny-cli sfx &lt;filename&gt;</code>.</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Warning</div>
+</td>
+<td class="content">
+Because of browser behaviour, a sound can <strong>only</strong> be played only after the first
+user interaction.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Avoid to start a music or a sound at the beginning of the game.
+Before it, force the player to hit a key or click by adding an interactive menu
+or by starting the sound as soon as the player is moving.</p>
+</div>
+<div class="sect3">
+<h4 id="_sound_music">sound.music()</h4>
+<div class="paragraph">
+<p>Play a music</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">shape.triangle(x1, y1, x2, y2, x3, y3, color) -- Draw a triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">sound.music(music_index, loop) -- Play the music at the index music_index. The music can be looped.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_sound_note">sound.note()</h4>
+<div class="paragraph">
+<p>Play a note by an instrument until it&#8217;s stopped</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">sound.note(note_name, instrument_index) -- Play the note note_name using the instrument at instrument_index</code></pre>
 </div>
 </div>
 <tiny-editor style="display: none;"  >
 
-function tri(f, fill)
-  local x1 = 128 + math.cos(f) * 64
-  local y1 = 128 + math.sin(f) * 64
+function _init()
+    keys = {
+        {note="E4", x=57, y=100, w=16, h=50},
+        {note="Fs4", x=75, y=100, w=16, h=50},
+        {note="Gs4", x=93, y=100, w=16, h=50},
+        {note="A4", x=111, y=100, w=16, h=50},
+        {note="B4", x=129, y=100, w=16, h=50},
+        {note="Cs5", x=147, y=100, w=16, h=50},
+        {note="Ds5", x=165, y=100, w=16, h=50},
+        {note="E5", x=183, y=100, w=16, h=50}
+    }
+    active_notes = {}
+end
 
-  local x2 = 128 + math.cos(f + math.pi * 1/3) * 64
-  local y2 = 128 + math.sin(f + math.pi * 1/3) * 64
+function _update()
+    local touch = ctrl.touching(0)
 
-  local x3 = 128 + math.cos(f+ math.pi * 2/3) * 64
-  local y3 = 128 + math.sin(f +math.pi * 2/3) * 64
-
-  if fill then
-    shape.trianglef(x3, y3, x2, y2, x1, y1, 8)
-  else
-    shape.triangle(x1, y1, x2, y2, x3, y3, 8)
-  end
+    for i, key in ipairs(keys) do
+        if in_bounds(touch, key) then
+            active_notes[i] = active_notes[i] or sound.note(key.note, 1)
+        else
+            active_notes[i] = active_notes[i] and active_notes[i].stop()
+        end
+    end
 end
 
 function _draw()
-  gfx.cls()
-  local f = tiny.frame * 0.01
+    gfx.cls()
+    print("E MAJOR SCALE", 57, 84, 15)
+    print("Click keys to play", 57, 92, 14)
 
-  tri(f, false)
-  tri(f*2, true)
+    for i, key in ipairs(keys) do
+        if active_notes[i] then
+            shape.rectf(key.x, key.y, key.w, key.h, 15)
+        else
+            shape.rect(key.x, key.y, key.w, key.h, 14)
+        end
+    end
+    local pos = ctrl.touch()
+    shape.circlef(pos.x, pos.y, 2, 2)
+end
+
+function in_bounds(touch, key)
+    return touch and touch.x >= key.x and touch.x < key.x + key.w and
+           touch.y >= key.y and touch.y < key.y + key.h
 end
 
 </tiny-editor>
 </div>
 <div class="sect3">
-<h4 id="_shape_gradient">shape.gradient()</h4>
+<h4 id="_sound_sfx">sound.sfx()</h4>
 <div class="paragraph">
-<p>Draw a gradient using dithering, only from color c1 to color c2.</p>
+<p>Play a sfx.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-lua" data-lang="lua">shape.gradient(x, y, width, height, color1, color2, is_horizontal) -- Draw a gradient using dithering, only from color c1 to color c2.</code></pre>
+<pre class="highlight"><code class="language-lua" data-lang="lua">sound.sfx(sfx_index, loop) -- Play a sfx at sfx_index. The sfx can be looped.</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_spr">spr</h3>
+<div class="paragraph">
+<p>Sprite API to draw or update sprites.</p>
+</div>
+<div class="sect3">
+<h4 id="_spr_draw">spr.draw()</h4>
+<div class="paragraph">
+<p>Draw a sprite.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">spr.draw(sprN) -- Draw a sprite at the default coordinate (0, 0).
+spr.draw(sprN, x, y) -- Draw a sprite.
+spr.draw(sprN, x, y, flipX, flipY) -- Draw a sprite and allow flip on x or y axis.</code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;" sprite="resources/tiny-town.png" >
+
+function _init()
+  id = 1
+end
+
+function _draw()
+    if ctrl.pressed(keys.left) then
+      id = id - 1
+    elseif ctrl.pressed(keys.right) then
+      id = id + 1
+    end
+
+    gfx.cls()
+    print("sprite index "..id.. " (press left or right to change)", 50, 112)
+    spr.draw(id, 120, 120)
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_spr_pget">spr.pget()</h4>
+<div class="paragraph">
+<p>Get the color index at the coordinate (x,y) from the current spritesheet.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">spr.pget(x, y) -- get the color index at the coordinate (x,y) from the current spritesheet.</code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;" sprite="resources/tiny-town.png" >
+
+function _draw()
+    local pos = ctrl.touch()
+
+    gfx.cls()
+
+    spr.sdraw()
+    shape.circlef(pos.x - 4, pos.y - 4, 8, 3)
+    local color = spr.pget(pos.x, pos.y)
+    if(color ~= nil) then
+        print("index color: "..color, 7, 0)
+        shape.rectf(0, 0, 6, 6, color)
+        shape.circlef(pos.x - 4, pos.y - 4, 6, color)
+    end
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_spr_pset">spr.pset()</h4>
+<div class="paragraph">
+<p>Set the color index at the coordinate (x,y) in the current spritesheet.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">spr.pset(x, y, color) -- Set the color index at the coordinate (x,y) in the current spritesheet.</code></pre>
+</div>
+</div>
+<tiny-editor style="display: none;" sprite="resources/tiny-dungeon.png" >
+
+function _draw()
+    local pos = ctrl.touch()
+
+    local touching = ctrl.touching(0)
+    gfx.cls()
+
+   spr.sdraw()
+
+   if touching ~= nil then
+      spr.pset(pos.x, pos.y, 9)
+   end
+   print("click to alter", 45, 96)
+   shape.circle(64 + 8, 128 + 8, 32, 1)
+   shape.circlef(128 + 8, 128 + 8, 32, 1)
+   spr.draw(100, 128, 128)
+
+   shape.circlef(pos.x, pos.y, 2, 3)
+end
+
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_spr_sdraw">spr.sdraw()</h4>
+<div class="paragraph">
+<p>S(uper) Draw a fragment from the spritesheet.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">spr.sdraw() -- Draw the full spritesheet at default coordinate (0, 0)
+spr.sdraw(x, y) -- Draw the full spritesheet at coordinate (x, y)
+spr.sdraw(x, y, sprX, sprY) -- Draw the full spritesheet at coordinate (x, y) from the sprite (sprX, sprY)
+spr.sdraw(x, y, sprX, sprY, width, height, flipX, flipY) -- Draw a fragment from the spritesheet at the coordinate (x, y) from the sprite (sprX, sprY) with the width and height.</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">flipX</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">flip on the x axis (default: false)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">flipY</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">flip on the y axis (default: false)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">height</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">height of the spritesheet to copy (default height of the spritesheet)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">sprX</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x coordinate from the spritesheet (default 0)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">sprY</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">y coordinate from the spritesheet (default 0)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">width</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">width of the spritesheet to copy (default width of the spritesheet)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">screen x coordinate to draw the sprite (default 0)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">y</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">screen y coordinate to draw the sprite (default 0)</p></td>
+</tr>
+</tbody>
+</table>
+<tiny-editor style="display: none;" sprite="resources/tiny-town.png" >
+
+function _draw()
+    local pos = ctrl.touch()
+
+    gfx.cls()
+
+    spr.sdraw()
+    shape.circlef(pos.x - 4, pos.y - 4, 8, 3)
+    local color = spr.pget(pos.x, pos.y)
+    if(color ~= nil) then
+        print("index color: "..color, 7, 0)
+        shape.rectf(0, 0, 6, 6, color)
+        shape.circlef(pos.x - 4, pos.y - 4, 6, color)
+    end
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_spr_sheet">spr.sheet()</h4>
+<div class="paragraph">
+<p>Switch to another spritesheet. The index of the spritesheet is given by it&#8217;s position in the spritesheets field from the <code>_tiny.json</code> file.The first spritesheet is at the index 0. It retuns the previous spritesheet. The spritesheet can also be referenced by its filename.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">spr.sheet() -- Switch to the first spritesheet
+spr.sheet(spritesheetN) -- Switch to the N spritesheet</code></pre>
 </div>
 </div>
 <tiny-editor style="display: none;"  >
 
+local current = 0
+function _update()
+    local x = math.perlin((tiny.frame % 100) / 100, (tiny.frame % 100) / 100, (tiny.frame % 100) / 100)
+    local y = math.perlin((tiny.frame  * 0.5 % 100) / 100, (tiny.frame % 100) / 100, (tiny.frame * 0.5 % 100) / 100)
+
+    gfx.cls()
+    shape.circlef(x * 256, y * 256, 10, 8)
+    gfx.to_sheet("circle.png")
+
+    gfx.cls()
+    shape.rectf(x * 256, y * 256, 20, 20, 8)
+    gfx.to_sheet("rect.png")
+
+    if ctrl.pressed(keys.space) then
+        current = (current + 1) % 2
+    end
+end
+
 function _draw()
+    if current == 0 then
+        spr.sheet("circle.png")
+    else
+        spr.sheet("rect.png")
+    end
+    spr.sdraw()
+end
 
- local c1 = 2
- local c2 = 3
+</tiny-editor>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_tiny">tiny</h3>
+<div class="paragraph">
+<p>Tiny Lib which offer offer the current frame (<code>tiny.frame</code>), the current time (<code>tiny.time</code>), delta time (<code>tiny.dt</code>), game dimensions (<code>tiny.width</code>, <code>tiny.height</code>), platform information (<code>tiny.platform</code>) and to switch to another script using <code>exit</code>.</p>
+</div>
+<div class="sect3">
+<h4 id="_tiny_dt">tiny.dt</h4>
+<div class="paragraph">
+<p>Delta time between two frame. As Tiny is a fixed frame engine, it&#8217;s always equal to 1/60</p>
+</div>
+<tiny-editor style="display: none;"  >
+function _update()
+    gfx.cls()
+    print(tiny.dt, 10, 10) -- Delta time between two frame. As Tiny is a fixed frame engine, it's always equal to 1/60
+end
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_tiny_frame">tiny.frame</h4>
+<div class="paragraph">
+<p>Number of frames elapsed since the start of the game.</p>
+</div>
+<tiny-editor style="display: none;"  >
+function _update()
+    gfx.cls()
+    print(tiny.frame, 10, 10) -- Number of frames elapsed since the start of the game.
+end
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_tiny_height">tiny.height</h4>
+<div class="paragraph">
+<p>Height of the game in pixels.</p>
+</div>
+<tiny-editor style="display: none;"  >
+function _update()
+    gfx.cls()
+    print(tiny.height, 10, 10) -- Height of the game in pixels.
+end
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_tiny_platform">tiny.platform</h4>
+<div class="paragraph">
+<p>Current platform: 1 for desktop, 2 for web.</p>
+</div>
+<tiny-editor style="display: none;"  >
+function _update()
+    gfx.cls()
+    print(tiny.platform, 10, 10) -- Current platform: 1 for desktop, 2 for web.
+end
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_tiny_t">tiny.t</h4>
+<div class="paragraph">
+<p>Time elapsed since the start of the game.</p>
+</div>
+<tiny-editor style="display: none;"  >
+function _update()
+    gfx.cls()
+    print(tiny.t, 10, 10) -- Time elapsed since the start of the game.
+end
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_tiny_width">tiny.width</h4>
+<div class="paragraph">
+<p>Width of the game in pixels.</p>
+</div>
+<tiny-editor style="display: none;"  >
+function _update()
+    gfx.cls()
+    print(tiny.width, 10, 10) -- Width of the game in pixels.
+end
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_tiny_exit">tiny.exit()</h4>
+<div class="paragraph">
+<p>Exit the actual script to switch to another one. The next script to use is identified by it&#8217;s index. The index of the script is the index of it in the list of scripts from the <code>_tiny.json</code> file.The first script is at the index 0.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">tiny.exit(scriptIndex) -- Exit the actual script to switch to another one.</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_vec2">vec2</h3>
+<div class="paragraph">
+<p>Vector2 manipulation library.</p>
+</div>
+<div class="sect3">
+<h4 id="_vec2_add">vec2.add()</h4>
+<div class="paragraph">
+<p>Add vector2 to another vector2</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">vec2.add(v1, v2) -- Add a vector 2 {x, y} to another vector 2 {x, y}
+vec2.add(x1, y1, x2, y2) -- Add a destructured vector 2 to another destructured vector 2</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+</tbody>
+</table>
+<tiny-editor style="display: none;"  >
 
-    gfx.cls(c1)
-    shape.rectf(0, 256 - 16, 256, 16, c2)
-    for x=0,240,16 do
-        shape.gradient(x, 16 * math.cos(2 * 3.14 * (x / 256) + tiny.t * 2), 16, 256, c1, c2, false)
+function _init()
+    gfx.camera(-128, -128)
+
+    local v1 = vec2.create(32, 38)
+    local v2 = vec2.create(20, 2)
+
+    gfx.cls(1)
+    print("v1", 2, 15, 10)
+    shape.line(0, 0, v1.x, v1.y, 10)
+    print("v2", 23, 3, 9)
+    shape.line(0, 0, v2.x, v2.y, 9)
+
+    local v3 = vec2.add(v1, v2)
+
+    print("v1 + v2", 30, 15, 11)
+    gfx.dither(0xAAAA)
+    shape.line(0, 0, v3.x, v3.y, 11)
+    gfx.dither()
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_vec2_create">vec2.create()</h4>
+<div class="paragraph">
+<p>Create a vector 2 as a table { x, y }.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">vec2.create(x, y) -- Create a vector 2 as a table { x, y }.
+vec2.create(vec2) -- Create a vector 2 as a table { x, y } using another vector 2.</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_vec2_crs">vec2.crs()</h4>
+<div class="paragraph">
+<p>Cross product</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">vec2.crs(v1, v2) -- Cross product between a vector 2 {x, y} and another vector 2 {x, y}
+vec2.crs(x1, y1, x2, y2) -- Cross product between a destructured vector 2 and another destructured vector 2</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_vec2_dot">vec2.dot()</h4>
+<div class="paragraph">
+<p>Dot product between two vectors</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">vec2.dot(v1, v2) -- Dot product between a vector 2 {x, y} and another vector 2 {x, y}
+vec2.dot(x1, y1, x2, y2) -- Dot product between a destructured vector 2 and another destructured vector 2</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+</tbody>
+</table>
+<tiny-editor style="display: none;"  >
+
+function _init()
+    angle = 0
+end
+function _update()
+
+    if ctrl.pressing(keys.space) then
+        angle = angle + 0.1
     end
 
+    gfx.camera(-128, -128)
+
+    local v1 = vec2.create(1, 0)
+    local v2 = vec2.create(math.cos(angle), math.sin(angle))
+    local dot = vec2.dot(v1, v2)
+
+    local scl = vec2.scl(v1, dot)
+
+    gfx.cls(1)
+
+    local scaledv1 = vec2.scl(v1, 64)
+    local scaledv2 = vec2.scl(v2, 64)
+    local scaledv3 = vec2.scl(scl, 64)
+
+    print("v1", 18, 5, 10)
+    shape.line(0, 0, scaledv1.x, scaledv1.y, 10)
+    print("v2", scaledv2.x + 5, scaledv2.y + 5, 11)
+    shape.line(0, 0, scaledv2.x, scaledv2.y, 11)
+
+    print("dot", scaledv3.x, 5, 9)
+    shape.line(0, 0, scaledv3.x, scaledv3.y, 9)
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_vec2_mag">vec2.mag()</h4>
+<div class="paragraph">
+<p>Calculate the magnitude (length) of a vector</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">vec2.mag(x, y) -- Calculate the magnitude (length) of a vector 2 {x, y}
+vec2.mag(v1) -- Calculate the magnitude (length) of a vector 2 {x, y}</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_vec2_nor">vec2.nor()</h4>
+<div class="paragraph">
+<p>Normalize a vector</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">vec2.nor(x, y) -- Normalize a vector 2 {x, y}
+vec2.nor(v1) -- Normalize a vector 2 {x, y}</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+</tbody>
+</table>
+<tiny-editor style="display: none;"  >
+
+function _update()
+    gfx.cls(1)
+
+    local v0 = vec2.create(43, 64)
+    local v1 = vec2.nor(v0)
+
+
+    print("vector     x: " .. v0.x .. " y: " .. v0.y)
+    print("normalized x: " .. v1.x .. " y: " .. v1.y, 0, 8)
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_vec2_scl">vec2.scl()</h4>
+<div class="paragraph">
+<p>Scale a vector</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">vec2.scl(x, y, scl) -- Scale a vector 2 {x, y} using the factor scl
+vec2.scl(v1, scl) -- Scale a vector 2 {x, y} using the factor scl</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+</tbody>
+</table>
+<tiny-editor style="display: none;"  >
+
+function _init()
+    gfx.camera(-128, -128)
+
+    local v1 = vec2.create(32, 38)
+    local v2 = vec2.scl(v1, 2)
+
+    gfx.cls(1)
+    print("v1 scaled", 8, 60, 11)
+    gfx.dither(0xAAAA)
+    shape.line(0, 0, v2.x, v2.y, 11)
+    gfx.dither()
+    print("v1", 18, 15, 10)
+    shape.line(0, 0, v1.x, v1.y, 10)
+end
+
+</tiny-editor>
+</div>
+<div class="sect3">
+<h4 id="_vec2_sub">vec2.sub()</h4>
+<div class="paragraph">
+<p>Subtract another vector from another vector</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-lua" data-lang="lua">vec2.sub(v1, v2) -- Subtract a vector 2 {x, y} from another vector 2 {x, y}
+vec2.sub(x1, y1, x2, y2) -- Subtract a destructured vector 2 from another destructured vector 2</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Argument name</th>
+<th class="tableblock halign-left valign-top">Argument description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">vector 2 as a table {x, y}</p></td>
+</tr>
+</tbody>
+</table>
+<tiny-editor style="display: none;"  >
+
+function _init()
+    gfx.camera(-128, -128)
+
+    local v1 = vec2.create(32, 38)
+    local v2 = vec2.create(20, 2)
+
+    gfx.cls(1)
+    print("v1", 18, 15, 10)
+    shape.line(0, 0, v1.x, v1.y, 10)
+    print("v2", 23, 3, 9)
+    shape.line(0, 0, v2.x, v2.y, 9)
+
+    local v3 = vec2.sub(v1, v2)
+
+    print("v1 - v2", 0, 40, 11)
+    gfx.dither(0xAAAA)
+    shape.line(0, 0, v3.x, v3.y, 11)
+    gfx.dither()
 end
 
 </tiny-editor>
@@ -4840,8 +4846,8 @@ end
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 2.0.0-alpha0<br>
-Last updated 2025-11-02 21:22:26 UTC
+Version 2.0.0-alpha1<br>
+Last updated 2025-11-07 09:40:06 UTC
 </div>
 </div>
 </body>

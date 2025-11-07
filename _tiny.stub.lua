@@ -8,37 +8,59 @@
 --- Vector2 manipulation library.
 vec2 = {}
 --- Create a vector 2 as a table { x, y }.
---- @overload fun(x: any, y: any): any -- Create a vector 2 as a table { x, y }.
---- @overload fun(vec2: any): any -- Create a vector 2 as a table { x, y } using another vector 2.
+--- @overload fun(x: number, y: number): any -- Create a vector 2 as a table { x, y }.
+--- @overload fun(vec2: table): any -- Create a vector 2 as a table { x, y } using another vector 2.
 vec2.create = function() end
 --- Add vector2 to another vector2
---- @overload fun(v1: any, v2: any): any -- Add a vector 2 {x, y} to another vector 2 {x, y}
---- @overload fun(x1: any, y1: any, x2: any, y2: any): any -- Add a destructured vector 2 to another destructured vector 2
+--- @overload fun(v1: table, v2: table): any -- Add a vector 2 {x, y} to another vector 2 {x, y}
+--- @overload fun(x1: number, y1: number, x2: number, y2: number): any -- Add a destructured vector 2 to another destructured vector 2
 vec2.add = function() end
 --- Subtract another vector from another vector
---- @overload fun(v1: any, v2: any): any -- Subtract a vector 2 {x, y} from another vector 2 {x, y}
---- @overload fun(x1: any, y1: any, x2: any, y2: any): any -- Subtract a destructured vector 2 from another destructured vector 2
+--- @overload fun(v1: table, v2: table): any -- Subtract a vector 2 {x, y} from another vector 2 {x, y}
+--- @overload fun(x1: number, y1: number, x2: number, y2: number): any -- Subtract a destructured vector 2 from another destructured vector 2
 vec2.sub = function() end
 --- Dot product between two vectors
---- @overload fun(v1: any, v2: any): any -- Dot product between a vector 2 {x, y} and another vector 2 {x, y}
---- @overload fun(x1: any, y1: any, x2: any, y2: any): any -- Dot product between a destructured vector 2 and another destructured vector 2
+--- @overload fun(v1: table, v2: table): any -- Dot product between a vector 2 {x, y} and another vector 2 {x, y}
+--- @overload fun(x1: number, y1: number, x2: number, y2: number): any -- Dot product between a destructured vector 2 and another destructured vector 2
 vec2.dot = function() end
 --- Calculate the magnitude (length) of a vector
---- @overload fun(x: any, y: any): any -- Calculate the magnitude (length) of a vector 2 {x, y}
---- @overload fun(v1: any): any -- Calculate the magnitude (length) of a vector 2 {x, y}
+--- @overload fun(x: number, y: number): any -- Calculate the magnitude (length) of a vector 2 {x, y}
+--- @overload fun(v1: table): any -- Calculate the magnitude (length) of a vector 2 {x, y}
 vec2.mag = function() end
 --- Normalize a vector
---- @overload fun(x: any, y: any): any -- Normalize a vector 2 {x, y}
---- @overload fun(v1: any): any -- Normalize a vector 2 {x, y}
+--- @overload fun(x: number, y: number): any -- Normalize a vector 2 {x, y}
+--- @overload fun(v1: table): any -- Normalize a vector 2 {x, y}
 vec2.nor = function() end
 --- Cross product
---- @overload fun(v1: any, v2: any): any -- Cross product between a vector 2 {x, y} and another vector 2 {x, y}
---- @overload fun(x1: any, y1: any, x2: any, y2: any): any -- Cross product between a destructured vector 2 and another destructured vector 2
+--- @overload fun(v1: table, v2: table): any -- Cross product between a vector 2 {x, y} and another vector 2 {x, y}
+--- @overload fun(x1: number, y1: number, x2: number, y2: number): any -- Cross product between a destructured vector 2 and another destructured vector 2
 vec2.crs = function() end
 --- Scale a vector
---- @overload fun(x: any, y: any, scl: any): any -- Scale a vector 2 {x, y} using the factor scl
---- @overload fun(v1: any, scl: any): any -- Scale a vector 2 {x, y} using the factor scl
+--- @overload fun(x: number, y: number, scl: number): any -- Scale a vector 2 {x, y} using the factor scl
+--- @overload fun(v1: table, scl: number): any -- Scale a vector 2 {x, y} using the factor scl
 vec2.scl = function() end
+
+
+--- Sound API to play/loop/stop a sound.
+--- A sound can be created using the sound editor, using the command line `tiny-cli sfx <filename>`.
+--- 
+--- WARNING: Because of browser behaviour, a sound can *only* be played only after the first
+--- user interaction.
+--- 
+--- Avoid to start a music or a sound at the beginning of the game.
+--- Before it, force the player to hit a key or click by adding an interactive menu
+--- or by starting the sound as soon as the player is moving.
+--- 
+sound = {}
+--- Play a sfx.
+--- @overload fun(sfx_index: number, loop: boolean): any -- Play a sfx at sfx_index. The sfx can be looped.
+sound.sfx = function() end
+--- Play a music
+--- @overload fun(music_index: number, loop: boolean): any -- Play the music at the index music_index. The music can be looped.
+sound.music = function() end
+--- Play a note by an instrument until it's stopped
+--- @overload fun(note_name: string, instrument_index: number): any -- Play the note note_name using the instrument at instrument_index
+sound.note = function() end
 
 
 --- Easing functions to 'juice' a game. Interpolation to juice your game.
@@ -57,140 +79,140 @@ vec2.scl = function() end
 --- - linear 
 juice = {}
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.pow2 = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.pow3 = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.pow4 = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.pow5 = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.powIn2 = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.powIn3 = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.powIn4 = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.powIn5 = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.powOut2 = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.powOut3 = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.powOut4 = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.powOut5 = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.sine = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.sineIn = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.sineOut = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.circle = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.circleIn = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.circleOut = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.elastic = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.elasticIn = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.elasticOut = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.swing = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.swingIn = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.swingOut = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.bounce = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.bounceIn = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.bounceOut = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.exp10 = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.expIn10 = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.expOut10 = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.exp5 = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.expIn5 = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.expOut5 = function() end
 --- 
---- @overload fun(progress: any): any -- Give a percentage (progress) of the interpolation
---- @overload fun(start: any, end: any, progress: any): any -- Interpolate the value given a start and an end value.
+--- @overload fun(progress: number): any -- Give a percentage (progress) of the interpolation
+--- @overload fun(start: number, end: number, progress: number): any -- Interpolate the value given a start and an end value.
 juice.linear = function() end
 
 
@@ -206,20 +228,20 @@ map.level = function() end
 map.layer = function() end
 --- Convert cell coordinates cx, cy into map screen coordinates x, y.
 --- @overload fun(arg1: any, arg2: any): any -- Convert the cell coordinates into coordinates as a table [x,y].
---- @overload fun(cell: any): any -- Convert the cell coordinates from a table {cx,cy} into screen coordinates as a table {x,y}.
+--- @overload fun(cell: table): any -- Convert the cell coordinates from a table {cx,cy} into screen coordinates as a table {x,y}.
 map.from = function() end
 --- Convert screen coordinates x, y into map cell coordinates {cx, cy}.
 --- For example, coordinates of the player can be converted to cell coordinates to access the flag of the tile matching the player coordinates.
 --- @overload fun(x: any, y: any): any -- Convert the coordinates into cell coordinates as a table {cx = cx,cy = cy}.
---- @overload fun(coordinates: any): any -- Convert the coordinates from a table {x,y} into cell coordinates as a table {cx,cy}.
+--- @overload fun(coordinates: table): any -- Convert the coordinates from a table {x,y} into cell coordinates as a table {cx,cy}.
 map.to = function() end
 --- Get the flag from a tile, using cell coordinates.
---- @overload fun(cx: any, cy: any): any -- Get the flag from the tile at the coordinate cx,cy.
---- @overload fun(cx: any, cy: any, layer: any): any -- Get the flag from the tile at the coordinate cx,cy from a specific layer.
+--- @overload fun(cx: number, cy: number): any -- Get the flag from the tile at the coordinate cx,cy.
+--- @overload fun(cx: number, cy: number, layer: any): any -- Get the flag from the tile at the coordinate cx,cy from a specific layer.
 map.cflag = function() end
 --- Get the flag from a tile, using screen coordinates.
---- @overload fun(x: any, y: any): any -- Get the flag from the tile at the coordinate x,y.
---- @overload fun(x: any, y: any, layer: any): any -- Get the flag from the tile at the coordinate x,y from a specific layer.
+--- @overload fun(x: number, y: number): any -- Get the flag from the tile at the coordinate x,y.
+--- @overload fun(x: number, y: number, layer: any): any -- Get the flag from the tile at the coordinate x,y from a specific layer.
 map.flag = function() end
 --- Table with all entities by type (ie: `map.entities["player"]`).
 ---             
@@ -245,7 +267,7 @@ map.draw = function() end
 --- List all notes from C0 to B8. Please note that bemols are the note with b (ie: Gb2) while sharps are the note with s (ie: As3).
 notes = {}
 --- Get the name of a note regarding the note index (ie: C0 = 0, Cs0 = 1, ...)
---- @overload fun(note_index: any): any -- Get the name of a note regarding the note index (ie: C0 = 0, Cs0 = 1, ...)
+--- @overload fun(note_index: number): any -- Get the name of a note regarding the note index (ie: C0 = 0, Cs0 = 1, ...)
 notes.note = function() end
 
 
@@ -282,30 +304,30 @@ math.pi = any
 --- positive infinity value.
 math.huge = any
 --- Return the sign of the number: -1 if negative. 1 otherwise.
---- @overload fun(number: any): any -- Return the sign of the number.
+--- @overload fun(number: number): any -- Return the sign of the number.
 math.sign = function() end
 --- Calculate the angle in radians between the positive x-axis and the point (x, y).
---- @overload fun(y: any, x: any): any -- Calculate the angle for the point (x, y). Please note the argument order: y then x.
+--- @overload fun(y: number, x: number): any -- Calculate the angle for the point (x, y). Please note the argument order: y then x.
 math.atan2 = function() end
 --- Clamp the value between 2 values.
---- @overload fun(a: any, value: any, b: any): any -- Clamp the value between a and b. If a is greater than b, then b will be returned.
+--- @overload fun(a: number, value: number, b: number): any -- Clamp the value between a and b. If a is greater than b, then b will be returned.
 math.clamp = function() end
 --- Compute the distance between two points.
---- @overload fun(x1: any, y1: any, x2: any, y2: any): any -- Distance between (x1, y1) and (x2, y2).
+--- @overload fun(x1: number, y1: number, x2: number, y2: number): any -- Distance between (x1, y1) and (x2, y2).
 math.dst = function() end
 --- Compute the distance between two points not squared. Use this method to know if an coordinate is closer than another.
---- @overload fun(x1: any, y1: any, x2: any, y2: any): any -- Distance not squared between (x1, y1) and (x2, y2).
+--- @overload fun(x1: number, y1: number, x2: number, y2: number): any -- Distance not squared between (x1, y1) and (x2, y2).
 math.dst2 = function() end
 --- Generate random values
 --- @overload fun(): any -- Generate a random int (negative or positive value)
 --- @overload fun(until: any): any -- Generate a random value between 1 until the argument. If a table is passed, it'll return a random element of the table.
---- @overload fun(a: any, b: any): any -- Generate a random value between a and b.
+--- @overload fun(a: number, b: number): any -- Generate a random value between a and b.
 math.rnd = function() end
 --- Check if two (r)ectangles overlaps.
---- @overload fun(rect1: any, rect2: any): any -- Check if the rectangle rect1 overlaps with the rectangle rect2.
+--- @overload fun(rect1: table, rect2: table): any -- Check if the rectangle rect1 overlaps with the rectangle rect2.
 math.roverlap = function() end
 --- Perlin noise. The random generated value is between 0.0 and 1.0.
---- @overload fun(x: any, y: any, z: any): any -- Generate a random value regarding the parameters x,y and z.
+--- @overload fun(x: number, y: number, z: number): any -- Generate a random value regarding the parameters x,y and z.
 math.perlin = function() end
 
 
@@ -394,14 +416,14 @@ keys.delete = any
 --- Create new instance of a class by creating a new table and setting the metatable. It allow to create kind of Object Oriented Programming.
 --- 
 ---  
---- @overload fun(class: any): any -- Create new instance of class.
---- @overload fun(class: any, default: any): any -- Create new instance of class using default values.
+--- @overload fun(class: table): any -- Create new instance of class.
+--- @overload fun(class: table, default: table): any -- Create new instance of class using default values.
 function new() end
 --- Add *all key/value* from the table `source` to the table `dest`.
---- @overload fun(source: any, dest: any): any -- Merge source into dest.
+--- @overload fun(source: table, dest: table): any -- Merge source into dest.
 function merge() end
 --- Append *all values* from the table `source` to the table `dest`.
---- @overload fun(source: any, dest: any): any -- Copy source into dest.
+--- @overload fun(source: table, dest: table): any -- Copy source into dest.
 function append() end
 --- Iterate over values of a table.
 --- 
@@ -415,62 +437,24 @@ function all() end
 --- @overload fun(table: any): any -- Iterate over the values of the table
 function rpairs() end
 --- Print on the screen a string.
---- @overload fun(str: any): any -- print on the screen a string at (0,0) with a default color.
---- @overload fun(str: any, x: any, y: any): any -- print on the screen a string with a default color.
---- @overload fun(str: any, x: any, y: any, color: any): any -- print on the screen a string with a specific color.
+--- @overload fun(str: string): any -- print on the screen a string at (0,0) with a default color.
+--- @overload fun(str: string, x: number, y: number): any -- print on the screen a string with a default color.
+--- @overload fun(str: string, x: number, y: number, color: any): any -- print on the screen a string with a specific color.
 function print() end
 
 
---- Sound API to play/loop/stop a sound.
---- A sound can be created using the sound editor, using the command line `tiny-cli sfx <filename>`.
---- WARNING: Because of browser behaviour, a sound can *only* be played only after the first
---- user interaction.
---- 
---- Avoid to start a music or a sound at the beginning of the game.
---- Before it, force the player to hit a key or click by adding an interactive menu
---- or by starting the sound as soon as the player is moving.
---- 
+--- TODO
 sfx = {}
---- Save the actual music using the filename.
---- @overload fun(filename: any): any -- Save the actual music using the filename
+--- Save the actual music in the current sfx file.
+--- @overload fun(): any -- Save the actual music in the current sfx file.
 sfx.save = function() end
---- Load the actual SFX sound as the actual music.
---- @overload fun(filename: any): any -- Load the actual SFX sound as the actual music using filename or its index
-sfx.load = function() end
---- Access track using its index or its name.
---- @overload fun(arg: any): any -- Access instrument using its index or its name.
-sfx.track = function() end
 --- Access instrument using its index or its name.
 --- @overload fun(a: any): any -- Access instrument using its index or its name.
 --- @overload fun(a: any, b: any): any -- Access instrument using its index or its name. Create it if the instrument is missing and the flag is true.
 sfx.instrument = function() end
 --- Access sfx using its index or its name.
 --- @overload fun(arg: any): any -- Access sfx using its index or its name.
-sfx.bar = function() end
---- Play the bar by it's index of the current sound. The index of a bar of the current music.
---- @overload fun(): any -- Play the sound at the index 0.
---- @overload fun(sound: any): any -- Play the sound by it's index.
-sfx.play = function() end
---- Loop the bar by it's index of the current sound. The index of a bar of the current music.
---- @overload fun(): any -- Loop the sound at the index 0.
---- @overload fun(sound: any): any -- Loop the sound by it's index.
-sfx.loop = function() end
---- Stop the bar by it's index of the current sound. The index of a bar of the current music.
---- @overload fun(): any -- Stop the sound at the index 0.
---- @overload fun(sound: any): any -- Stop the sound by it's index.
-sfx.stop = function() end
---- Play the sequence by it's index of the current sound. The index of a sequence of the current music.
---- @overload fun(): any -- Play the sequence at the index 0.
---- @overload fun(sequence: any): any -- Play the sequence by it's index.
-sfx.mplay = function() end
---- Loop the sequence by it's index of the current sound. The index of a sequence of the current music.
---- @overload fun(): any -- Loop the sequence at the index 0.
---- @overload fun(sequence: any): any -- Loop the sequence by it's index.
-sfx.mloop = function() end
---- Stop the sequence by it's index of the current sound. The index of a sequence of the current music.
---- @overload fun(): any -- Stop the sequence at the index 0.
---- @overload fun(sequence: any): any -- Stop the sequence by it's index.
-sfx.mstop = function() end
+sfx.sfx = function() end
 
 
 --- Access to graphical API like updating the color palette or applying a dithering pattern.
@@ -484,17 +468,17 @@ gfx = {}
 ---   - 4: drawing using a stencil test (ie: drawing everywhere except in the stencil)
 --- 
 --- @overload fun(): any -- Return the actual mode. Switch back to the default mode.
---- @overload fun(mode: any): any -- Switch to another draw mode. Return the previous mode.
+--- @overload fun(mode: number): any -- Switch to another draw mode. Return the previous mode.
 gfx.draw_mode = function() end
 --- clear the screen
 --- @overload fun(): any -- Clear the screen with a default color.
---- @overload fun(color: any): any -- Clear the screen with a color.
+--- @overload fun(color: number): any -- Clear the screen with a color.
 gfx.cls = function() end
 --- Set the color index at the coordinate (x,y).
---- @overload fun(x: any, y: any, color: any): any -- set the color index at the coordinate (x,y).
+--- @overload fun(x: number, y: number, color: number): any -- set the color index at the coordinate (x,y).
 gfx.pset = function() end
 --- Get the color index at the coordinate (x,y).
---- @overload fun(x: any, y: any): any -- get the color index at the coordinate (x,y).
+--- @overload fun(x: number, y: number): any -- get the color index at the coordinate (x,y).
 gfx.pget = function() end
 --- Transform the current frame buffer into a spritesheeet. 
 --- 
@@ -510,25 +494,25 @@ gfx.to_sheet = function() end
 gfx.pal = function() end
 --- Move the game camera.
 --- @overload fun(): any -- Reset the game camera to it's default position (0,0).
---- @overload fun(x: any, y: any): any -- Set game camera to the position x, y.
+--- @overload fun(x: number, y: number): any -- Set game camera to the position x, y.
 gfx.camera = function() end
 --- Apply a dithering pattern on every new draw call. The pattern is using the bits value of a 2 octet value. The first bits is the one on the far left and represent the pixel of the top left of a 4x4 matrix. The last bit is the pixel from the bottom right of this matrix.
 --- @overload fun(): any -- Reset dithering pattern. The previous dithering pattern is returned.
---- @overload fun(pattern: any): any -- Apply dithering pattern. The previous dithering pattern is returned.
+--- @overload fun(pattern: number): any -- Apply dithering pattern. The previous dithering pattern is returned.
 gfx.dither = function() end
 --- Clip the draw surface (ie: limit the drawing area).
 --- @overload fun(): any -- Reset the clip and draw on the fullscreen.
---- @overload fun(x: any, y: any, width: any, height: any): any -- Clip and limit the drawing area.
+--- @overload fun(x: number, y: number, width: number, height: number): any -- Clip and limit the drawing area.
 gfx.clip = function() end
 
 
 --- Floppy allow you to get or save user Lua structure.
 floppy = {}
 --- Save the content into a local file, on desktop or in the local storage on the web platform.
---- @overload fun(name: any, content: any): any -- Save the content into the file name.
+--- @overload fun(name: string, content: any): any -- Save the content into the file name.
 floppy.put = function() end
 --- Load and get the content of the file name
---- @overload fun(name: any): any -- Load and get the content of the file name
+--- @overload fun(name: string): any -- Load and get the content of the file name
 floppy.get = function() end
 
 
@@ -536,13 +520,13 @@ floppy.get = function() end
 ctrl = {}
 --- Get coordinates of the current touch/mouse. If the mouse/touch is out-of the screen, the coordinates will be the last mouse position/touch. The function return those coordinates as a table {x, y}. A sprite can be draw directly on the mouse position by passing the sprite number. 
 --- @overload fun(): any -- Get the mouse coordinates.
---- @overload fun(sprN: any): any -- Get the mouse coordinate and draw a sprite on those coordinates.
+--- @overload fun(sprN: number): any -- Get the mouse coordinate and draw a sprite on those coordinates.
 ctrl.touch = function() end
 --- Return true if the key was pressed during the last frame. If you need to check that the key is still pressed, see `ctrl.pressing` instead.
---- @overload fun(key: any): any -- Is the key was pressed?
+--- @overload fun(key: number): any -- Is the key was pressed?
 ctrl.pressed = function() end
 --- Return true if the key is still pressed. 
---- @overload fun(key: any): any -- Is the key is still pressed?
+--- @overload fun(key: number): any -- Is the key is still pressed?
 ctrl.pressing = function() end
 --- Return the position of the touch (as `{x, y}`)if the screen was touched or the mouse button was pressed during the last frame. `nil` otherwise.
 --- The touch can be : 
@@ -552,7 +536,7 @@ ctrl.pressing = function() end
 --- - 2: middle click or three fingers
 --- 
 --- If you need to check that the touch/mouse button is still active, see `ctrl.touching` instead.
---- @overload fun(touch: any): any -- Is the screen was touched or mouse button was pressed?
+--- @overload fun(touch: number): any -- Is the screen was touched or mouse button was pressed?
 ctrl.touched = function() end
 --- Return the position of the touch (as `{x, y}`)if the screen is still touched or the mouse button is still pressed. `nil` otherwise.
 --- The touch can be : 
@@ -572,7 +556,7 @@ spr = {}
 --- @overload fun(x: number, y: number): any -- get the color index at the coordinate (x,y) from the current spritesheet.
 spr.pget = function() end
 --- Set the color index at the coordinate (x,y) in the current spritesheet.
---- @overload fun(x: any, y: any, color: any): any -- Set the color index at the coordinate (x,y) in the current spritesheet.
+--- @overload fun(x: number, y: number, color: number): any -- Set the color index at the coordinate (x,y) in the current spritesheet.
 spr.pset = function() end
 --- Switch to another spritesheet. The index of the spritesheet is given by it's position in the spritesheets field from the `_tiny.json` file.The first spritesheet is at the index 0. It retuns the previous spritesheet. The spritesheet can also be referenced by its filename.
 --- @overload fun(): any -- Switch to the first spritesheet
@@ -580,8 +564,8 @@ spr.pset = function() end
 spr.sheet = function() end
 --- S(uper) Draw a fragment from the spritesheet.
 --- @overload fun(): any -- Draw the full spritesheet at default coordinate (0, 0)
---- @overload fun(x: any, y: any): any -- Draw the full spritesheet at coordinate (x, y)
---- @overload fun(x: any, y: any, sprX: any, sprY: any): any -- Draw the full spritesheet at coordinate (x, y) from the sprite (sprX, sprY)
+--- @overload fun(x: number, y: number): any -- Draw the full spritesheet at coordinate (x, y)
+--- @overload fun(x: number, y: number, sprX: number, sprY: number): any -- Draw the full spritesheet at coordinate (x, y) from the sprite (sprX, sprY)
 --- @overload fun(x: any, y: any, sprX: any, sprY: any, width: any, height: any, flipX: any, flipY: any): any -- Draw a fragment from the spritesheet at the coordinate (x, y) from the sprite (sprX, sprY) with the width and height.
 spr.sdraw = function() end
 --- Draw a sprite.
