@@ -182,7 +182,7 @@ class DefaultVirtualFrameBuffer(
         invalidateCachedReadFrame()
         updateDepthIndex(source)
 
-        val palColor = parameters.blender.palette()[color]
+        val palColor = parameters.blender.color(color)
 
         val key = spriteBatchManager.createKey()
         key.set(
@@ -258,7 +258,7 @@ class DefaultVirtualFrameBuffer(
             width,
             height,
             filled = filled,
-            color = parameters.blender.palette()[color],
+            color = parameters.blender.color(color),
             dither = parameters.blender.dithering,
             depth = currentDepth,
         )
@@ -285,7 +285,7 @@ class DefaultVirtualFrameBuffer(
             y1 - parameters.camera.y,
             x2 - parameters.camera.x,
             y2 - parameters.camera.y,
-            color = parameters.blender.palette()[color],
+            color = parameters.blender.color(color),
             dither = parameters.blender.dithering,
             depth = currentDepth,
         )
@@ -307,7 +307,7 @@ class DefaultVirtualFrameBuffer(
             centerY - parameters.camera.y,
             radius,
             filled = filled,
-            color = parameters.blender.palette()[color],
+            color = parameters.blender.color(color),
             dither = parameters.blender.dithering,
             depth = currentDepth,
         )
@@ -325,7 +325,7 @@ class DefaultVirtualFrameBuffer(
         val instance = primitiveBatchManager.createInstance().setPoint(
             x - parameters.camera.x,
             y - parameters.camera.y,
-            color = parameters.blender.palette()[color],
+            color = parameters.blender.color(color),
             dither = parameters.blender.dithering,
             depth = currentDepth,
         )
@@ -362,7 +362,7 @@ class DefaultVirtualFrameBuffer(
                 y2 - parameters.camera.y,
                 x3 - parameters.camera.x,
                 y3 - parameters.camera.y,
-                parameters.blender.palette()[color],
+                parameters.blender.color(color),
                 parameters.blender.dithering,
                 filled,
                 depth = currentDepth,
