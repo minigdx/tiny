@@ -10,6 +10,7 @@ import com.github.minigdx.tiny.file.InputStreamStream
 import com.github.minigdx.tiny.file.SoundDataSourceStream
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.file.VirtualFileSystem
+import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.graphic.PixelFormat.RGBA
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
@@ -19,6 +20,7 @@ import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
+import com.github.minigdx.tiny.render.VirtualFrameBuffer
 import com.github.minigdx.tiny.sound.BITS_PER_SAMPLE
 import com.github.minigdx.tiny.sound.CHANNELS
 import com.github.minigdx.tiny.sound.IS_BIG_ENDIAN
@@ -70,7 +72,7 @@ class GlfwPlatform(
     // Keep 30 seconds at 60 frames per seconds
     private val gifFrameCache: MutableFixedSizeList<IntArray> = MutableFixedSizeList(gameOptions.record.toInt() * FPS)
 
-    private var lastDraw: ByteArray? = null
+    private var lastDraw: PixelArray = PixelArray(gameOptions.width, gameOptions.height)
 
     private val lwjglInputHandler = LwjglInput(gameOptions)
 
@@ -208,30 +210,31 @@ class GlfwPlatform(
 
     override fun endGameLoop() = Unit
 
+    override fun newFrameRendered(virtualFrameBuffer: VirtualFrameBuffer) {
+        virtualFrameBuffer.readFrameBuffer().copyInto(lastDraw)
+    }
+
     override fun record() {
         val origin = newFile("video", "gif")
 
         logger.info("GLWF") { "Starting to generate GIF in '${origin.absolutePath}' (Wait for it...)" }
-        val buffer =
-            mutableListOf<IntArray>().apply {
-                addAll(gifFrameCache)
-            }
+        val buffer = mutableListOf<IntArray>().apply {
+            addAll(gifFrameCache)
+        }
 
         recordScope.launch {
             val now = System.currentTimeMillis()
-            val options =
-                ImageOptions().apply {
-                    this.setDelay(20, TimeUnit.MILLISECONDS)
-                }
+            val options = ImageOptions().apply {
+                this.setDelay(20, TimeUnit.MILLISECONDS)
+            }
             ByteArrayOutputStream().use { out ->
-                val encoder =
-                    FastGifEncoder(
-                        out,
-                        gameOptions.width,
-                        gameOptions.height,
-                        0,
-                        gameOptions.colors(),
-                    )
+                val encoder = FastGifEncoder(
+                    out,
+                    gameOptions.width,
+                    gameOptions.height,
+                    0,
+                    gameOptions.colors(),
+                )
 
                 buffer.forEach { img ->
                     encoder.addImage(img, gameOptions.width, options)
@@ -254,7 +257,7 @@ class GlfwPlatform(
             if (index >= 999) {
                 throw IllegalStateException(
                     "Too many file '${prefixName}_xxx.$extension' generated! " +
-                        "You might need to delete some",
+                            "You might need to delete some",
                 )
             }
             origin = gameDirectory.resolve("${prefixName}_${index.toString().padStart(3, '0')}.$extension")
@@ -263,7 +266,7 @@ class GlfwPlatform(
     }
 
     override fun screenshot() {
-        val buffer = lastDraw ?: return
+        val buffer = lastDraw.pixels.copyOf()
 
         recordScope.launch {
             writeImage(buffer)
