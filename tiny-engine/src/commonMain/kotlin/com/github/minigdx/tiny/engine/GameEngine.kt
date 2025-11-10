@@ -31,6 +31,7 @@ class GameEngine(
 
     private var accumulator: Seconds = 0f
     private var currentFrame: Long = 0L
+    private var previousFrame: Long = 0L
     private var currentMetrics: PerformanceMetrics? = null
 
     lateinit var inputHandler: InputHandler
@@ -139,6 +140,11 @@ class GameEngine(
 
         // Complete frame monitoring and get metrics
         currentMetrics = performanceMonitor.frameEnd()
+
+        if(currentFrame != previousFrame) {
+            platform.newFrameRendered(virtualFrameBuffer)
+            previousFrame = currentFrame
+        }
     }
 
     private suspend fun advanceEngineScript() {

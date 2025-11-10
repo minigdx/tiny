@@ -7,6 +7,7 @@ import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
+import com.github.minigdx.tiny.render.VirtualFrameBuffer
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.coroutines.CoroutineDispatcher
 
@@ -121,4 +122,9 @@ interface Platform {
     )
 
     fun saveWave(sound: FloatArray)
+
+    /**
+     * Notify that a new frame has been rendered
+     */
+    fun newFrameRendered(virtualFrameBuffer: VirtualFrameBuffer) = Unit
 }
