@@ -59,10 +59,11 @@ private class Shape(private val gameOptions: GameOptions) {
     }
 
     private fun LuaValue.checkColorIndex(): Int {
+        val colors = gameOptions.colors()
         return if (this.isnumber()) {
-            this.checkint()
+            colors.check(this.checkint())
         } else {
-            gameOptions.colors().getColorIndex(this.checkjstring()!!)
+            colors.getColorIndex(this.checkjstring()!!)
         }
     }
 }
@@ -167,10 +168,11 @@ class ShapeLib(
     }
 
     private fun LuaValue.checkColorIndex(): Int {
+        val colors = gameOptions.colors()
         return if (this.isnumber()) {
-            this.checkint()
+            colors.check(this.checkint())
         } else {
-            gameOptions.colors().getColorIndex(this.checkjstring()!!)
+            colors.getColorIndex(this.checkjstring()!!)
         }
     }
 

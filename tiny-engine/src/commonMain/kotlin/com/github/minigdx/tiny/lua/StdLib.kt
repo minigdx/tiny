@@ -304,10 +304,11 @@ class StdLib(
     }
 
     private fun LuaValue.checkColorIndex(): Int {
+        val colors = gameOptions.colors()
         return if (this.isnumber()) {
-            this.checkint()
+            colors.check(this.checkint())
         } else {
-            gameOptions.colors().getColorIndex(this.checkjstring()!!)
+            colors.getColorIndex(this.checkjstring()!!)
         }
     }
 

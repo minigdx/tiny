@@ -10,11 +10,6 @@ class Blender(internal val gamePalette: ColorPalette) {
 
     internal var dithering: Int = 0xFFFF
 
-    internal val hasDithering: Boolean
-        get() {
-            return dithering != 0xFFFF
-        }
-
     fun palette(): Array<ColorIndex> {
         fun cache(): Array<ColorIndex> {
             val copyOf = switch.copyOf()
@@ -22,6 +17,11 @@ class Blender(internal val gamePalette: ColorPalette) {
             return copyOf
         }
         return cachedPaletteReference ?: cache()
+    }
+
+    fun color(color: ColorIndex): ColorIndex {
+        val currentPalette = palette()
+        return currentPalette[color % currentPalette.size]
     }
 
     fun dither(pattern: Int): Int {
@@ -41,30 +41,6 @@ class Blender(internal val gamePalette: ColorPalette) {
     ) {
         cachedPaletteReference = null
         switch[gamePalette.check(source)] = gamePalette.check(target)
-    }
-
-    fun mix(
-        colors: ByteArray,
-        x: Pixel,
-        y: Pixel,
-        transparency: Array<Int>?,
-    ): ByteArray? {
-        fun dither(pattern: Int): Boolean {
-            val a = x % 4
-            val b = (y % 4) * 4
-
-            return (pattern shr (15 - (a + b))) and 0x01 == 0x01
-        }
-
-        val color = gamePalette.check(colors[0].toInt())
-        colors[0] = switch[color].toByte()
-        // Return null if transparent
-        if (transparency == null && gamePalette.isTransparent(colors[0].toInt())) return null
-        return if (!dither(dithering)) {
-            null
-        } else {
-            colors
-        }
     }
 }
 
