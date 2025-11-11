@@ -9,9 +9,9 @@ import com.github.minigdx.tiny.input.Vector2
 data class GameOptions(
     val width: Pixel,
     val height: Pixel,
-    val palette: List<String>,
-    val gameScripts: List<String>,
-    val spriteSheets: List<String>,
+    val palette: List<String> = emptyList(),
+    val gameScripts: List<String> = emptyList(),
+    val spriteSheets: List<String> = emptyList(),
     val gameLevels: List<String> = emptyList(),
     val sound: String? = null,
     val zoom: Int = 2,
