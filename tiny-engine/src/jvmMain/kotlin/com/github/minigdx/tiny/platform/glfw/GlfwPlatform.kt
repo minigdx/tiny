@@ -257,7 +257,7 @@ class GlfwPlatform(
             if (index >= 999) {
                 throw IllegalStateException(
                     "Too many file '${prefixName}_xxx.$extension' generated! " +
-                            "You might need to delete some",
+                        "You might need to delete some",
                 )
             }
             origin = gameDirectory.resolve("${prefixName}_${index.toString().padStart(3, '0')}.$extension")
