@@ -39,6 +39,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.luaj.vm2.LuaError
 import java.io.File
+import kotlin.system.exitProcess
 import kotlin.time.ExperimentalTime
 
 class RunCommand : CliktCommand(name = "run") {
@@ -101,7 +102,7 @@ class RunCommand : CliktCommand(name = "run") {
         val debugCommandReceiver = Channel<DebugRemoteCommand>()
         val engineCommandSender = Channel<EngineRemoteCommand>()
 
-        embeddedServer(
+        val server = embeddedServer(
             factory = Netty,
             port = debug,
         ) {
@@ -187,6 +188,12 @@ class RunCommand : CliktCommand(name = "run") {
             )
 
             gameEngine.main()
+
+            // Clean shutdown: stop the debug server and exit
+            echo("\uD83D\uDEE1️ Shutting down debug server...")
+            server.stop(1000, 2000)
+            echo("✅ Debug server stopped. Exiting...")
+            exitProcess(0)
         } catch (ex: Exception) {
             echo(
                 "\uD83E\uDDE8 An unexpected exception occurred. " +
@@ -205,6 +212,11 @@ class RunCommand : CliktCommand(name = "run") {
             }
             echo()
             ex.printStackTrace()
+
+            // Clean shutdown even on exception
+            echo("\uD83D\uDEE1️ Shutting down debug server...")
+            server.stop(1000, 2000)
+            exitProcess(1)
         }
     }
 }
