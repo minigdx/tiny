@@ -141,7 +141,7 @@ class GameEngine(
         // Complete frame monitoring and get metrics
         currentMetrics = performanceMonitor.frameEnd()
 
-        if(currentFrame != previousFrame) {
+        if (currentFrame != previousFrame) {
             platform.newFrameRendered(virtualFrameBuffer)
             previousFrame = currentFrame
         }

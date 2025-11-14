@@ -38,7 +38,7 @@ class StdLib(
 
     @TinyFunction(
         "Create new instance of a class by creating a new table and setting the metatable. " +
-                "It allow to create kind of Object Oriented Programming.\n\n ",
+            "It allow to create kind of Object Oriented Programming.\n\n ",
         example = STD_NEW_EXAMPLE,
     )
     inner class new : TwoArgFunction() {
@@ -138,9 +138,9 @@ class StdLib(
 
     @TinyFunction(
         "Iterate over values of a table.\n\n" +
-                "- If you want to iterate over keys, use `pairs(table)`.\n " +
-                "- If you want to iterate over index, use `ipairs(table)`.\n " +
-                "- If you want to iterate in reverse, use `rpairs(table)`.\n",
+            "- If you want to iterate over keys, use `pairs(table)`.\n " +
+            "- If you want to iterate over index, use `ipairs(table)`.\n " +
+            "- If you want to iterate in reverse, use `rpairs(table)`.\n",
     )
     internal inner class all : VarArgFunction() {
         @TinyCall("Iterate over the values of the table")
@@ -175,9 +175,9 @@ class StdLib(
 
     @TinyFunction(
         "Iterate over values of a table in reverse order. " +
-                "The iterator return an index and the value. " +
-                "The method is useful to remove elements from a table while " +
-                "iterating on it.",
+            "The iterator return an index and the value. " +
+            "The method is useful to remove elements from a table while " +
+            "iterating on it.",
         example = STD_RPAIRS_EXAMPLE,
     )
     internal inner class rpairs : VarArgFunction() {
