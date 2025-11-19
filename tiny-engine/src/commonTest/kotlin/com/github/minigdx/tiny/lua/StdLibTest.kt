@@ -11,7 +11,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class StdLibTest {
-
     val gameOptions = GameOptions(100, 100)
     val gameResourceAccess = mock<GameResourceAccess> { }
     val virtualFrameBuffer = mock<VirtualFrameBuffer> { }
