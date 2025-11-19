@@ -186,9 +186,9 @@ class SpriteBatchStage(
                   int b = imod(y, 4) * 4;
                   int bitPosition = a + b;
                   
-                  float powerOfTwo = pow(2.0, float(bitPosition));
-                  int bit = int(floor(mod(float(pattern) / powerOfTwo, 2.0)));
-                   
+                  // Use bitwise shift to extract bit at position
+                  int bit = (pattern >> bitPosition) & 1;
+ 
                   return bit > 0;
             }
             
