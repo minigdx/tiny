@@ -11,7 +11,6 @@ local m = {
 local green = 13
 local red = 5
 local white = 18
-local shadow = 2
 
 function roundToHalf(num)
     local rounded_step = math.floor(num * 2)
@@ -178,7 +177,7 @@ Player._update = function(self)
         end
     end
 
-    self.beat = math.clamp(0, self.beat, 32)
+    self.beat = math.clamp(0, self.beat, 15.5)
 
     self:set_value(self.beat)
 end
@@ -412,11 +411,11 @@ function _init_sfx_editor(entities)
         -- wire.bind(state, "sfx.volume", volume, "value")
         local transform = {
             to_widget = function(to, from, value)
-                return (value - 60) / 360
+                return (value - 60) / 520
             end,
 
             from_widget = function(to, from, value)
-                return 60 + value * 360
+                return 60 + value * 520
             end
         }
         wire.bind(state, "sfx.bpm", bpm, "value", transform)
