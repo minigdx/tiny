@@ -18,10 +18,10 @@ class Music(
             custom2,
             custom3,
             custom4,
-            kick,
-            snare,
-            hihatClosed,
-            hihatOpen,
+            null,
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -89,15 +89,24 @@ val obos =
         harmonics = floatArrayOf(1f, 0.05f, 0.01f),
     )
 
+/**
+ * Drum machine instrument.
+ * The sound changes based on the note played (repeating every octave):
+ * - C (Do) = Kick drum (bass drum)
+ * - D (Ré) = Snare drum
+ * - E (Mi) = Closed hi-hat
+ * - F (Fa) = Open hi-hat
+ * Other notes will produce silence.
+ */
 val drum =
     Instrument(
         index = 3,
         name = "drum",
-        wave = Instrument.WaveType.NOISE,
-        attack = 0.1f,
+        wave = Instrument.WaveType.DRUM,
+        attack = 0.001f, // Very fast attack for percussive sound
         decay = 0.1f,
-        sustain = 0.9f,
-        release = 0.05f,
+        sustain = 0.0f, // No sustain for percussive sound
+        release = 0.1f,
         harmonics = floatArrayOf(1f),
     )
 
@@ -147,72 +156,4 @@ val custom4 =
         sustain = 0.9f,
         release = 0.05f,
         harmonics = floatArrayOf(1f, 0.05f, 0.01f),
-    )
-
-/**
- * Kick drum (bass drum) instrument.
- * Uses the KICK wave type with a punchy envelope.
- * Play with low notes (C1-C2) for best results.
- */
-val kick =
-    Instrument(
-        index = 8,
-        name = "kick",
-        wave = Instrument.WaveType.KICK,
-        attack = 0.001f, // Very fast attack for punch
-        decay = 0.15f, // Short decay
-        sustain = 0.0f, // No sustain
-        release = 0.1f, // Quick release
-        harmonics = floatArrayOf(1f),
-    )
-
-/**
- * Snare drum instrument.
- * Combines a pitched body with noise for snare wires.
- * Play with notes around C3-E3 for best results.
- */
-val snare =
-    Instrument(
-        index = 9,
-        name = "snare",
-        wave = Instrument.WaveType.SNARE,
-        attack = 0.001f, // Very fast attack
-        decay = 0.1f, // Short decay
-        sustain = 0.1f, // Low sustain for snare tail
-        release = 0.15f, // Medium release for snare ring
-        harmonics = floatArrayOf(1f),
-    )
-
-/**
- * Closed hi-hat instrument.
- * High-frequency metallic noise with very short decay.
- * The note pitch controls the brightness.
- */
-val hihatClosed =
-    Instrument(
-        index = 10,
-        name = "hihat_closed",
-        wave = Instrument.WaveType.HIHAT_CLOSED,
-        attack = 0.001f, // Instant attack
-        decay = 0.03f, // Very short decay
-        sustain = 0.0f, // No sustain
-        release = 0.02f, // Very short release
-        harmonics = floatArrayOf(1f),
-    )
-
-/**
- * Open hi-hat instrument.
- * Similar to closed hi-hat but with longer sustain and release.
- * The note pitch controls the brightness.
- */
-val hihatOpen =
-    Instrument(
-        index = 11,
-        name = "hihat_open",
-        wave = Instrument.WaveType.HIHAT_OPEN,
-        attack = 0.001f, // Instant attack
-        decay = 0.1f, // Longer decay than closed
-        sustain = 0.3f, // Some sustain
-        release = 0.3f, // Longer release for open sound
-        harmonics = floatArrayOf(1f),
     )
