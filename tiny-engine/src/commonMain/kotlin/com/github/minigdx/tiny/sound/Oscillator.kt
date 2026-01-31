@@ -23,6 +23,9 @@ class Oscillator(val waveType0: () -> Instrument.WaveType) {
     private var lastFrequencyUsed: Float = 0.0f
     private var cachedAlpha: Float = 0.0f
 
+    // State for drum sounds that use noise
+    private var drumNoiseOutput: Float = 0.0f
+
     /**
      * Generates a single audio sample value for the given frequency at the specified sample position.
      *
@@ -95,6 +98,78 @@ class Oscillator(val waveType0: () -> Instrument.WaveType) {
                 val result = alpha * white + (1.0f - alpha) * lastOutput
                 lastOutput = result
                 result
+            }
+
+            Instrument.WaveType.KICK -> {
+                // Kick drum: sine wave with rapid pitch decay
+                val pitchDecayRate = 40f
+                val minPitchRatio = 0.3f
+                val pitchEnvelope = minPitchRatio + (1f - minPitchRatio) * exp(-pitchDecayRate * time)
+                val currentFreq = frequency * pitchEnvelope
+
+                // Main body is a sine wave
+                val body = sin(TWO_PI * currentFreq * time)
+
+                // Add a subtle click at the start
+                val clickAmount = exp(-200f * time) * 0.3f
+                val click = sin(TWO_PI * frequency * 3f * time) * clickAmount
+
+                body + click
+            }
+
+            Instrument.WaveType.SNARE -> {
+                // Snare drum: pitched body + noise for snare wires
+                val bodyFreq = frequency * 0.5f
+                val bodyDecay = exp(-20f * time)
+                val body = sin(TWO_PI * bodyFreq * time) * bodyDecay * 0.6f
+
+                // Snare wires: high-pass filtered noise
+                val noiseFreq = max(4000f, frequency * 10f)
+                val wc = TWO_PI * noiseFreq / SAMPLE_RATE
+                val alpha = 1.0f - exp(-wc)
+                val seed = (time * 12345.0f + progress * 67890.0f).toLong()
+                val white = Random(seed).nextFloat() * 2f - 1f
+                drumNoiseOutput = alpha * white + (1.0f - alpha) * drumNoiseOutput
+                val noise = drumNoiseOutput * 0.8f
+
+                body + noise
+            }
+
+            Instrument.WaveType.HIHAT_CLOSED -> {
+                // Closed hi-hat: high-frequency filtered noise
+                val cutoff = max(6000f, frequency * 15f)
+                val wc = TWO_PI * cutoff / SAMPLE_RATE
+                val alpha = 1.0f - exp(-wc)
+
+                val seed = (time * 12345.0f + progress * 67890.0f).toLong()
+                val white = Random(seed).nextFloat() * 2f - 1f
+                drumNoiseOutput = alpha * white + (1.0f - alpha) * drumNoiseOutput
+
+                // Metallic resonance
+                val metallic1 = sin(TWO_PI * 6500f * time) * 0.1f
+                val metallic2 = sin(TWO_PI * 8200f * time) * 0.08f
+                val metallic3 = sin(TWO_PI * 11000f * time) * 0.05f
+
+                drumNoiseOutput * 0.7f + metallic1 + metallic2 + metallic3
+            }
+
+            Instrument.WaveType.HIHAT_OPEN -> {
+                // Open hi-hat: similar to closed but with longer sustain
+                val cutoff = max(5000f, frequency * 12f)
+                val wc = TWO_PI * cutoff / SAMPLE_RATE
+                val alpha = 1.0f - exp(-wc)
+
+                val seed = (time * 12345.0f + progress * 67890.0f).toLong()
+                val white = Random(seed).nextFloat() * 2f - 1f
+                drumNoiseOutput = alpha * white + (1.0f - alpha) * drumNoiseOutput
+
+                // More pronounced metallic resonance
+                val metallic1 = sin(TWO_PI * 5500f * time) * 0.15f
+                val metallic2 = sin(TWO_PI * 7800f * time) * 0.12f
+                val metallic3 = sin(TWO_PI * 10500f * time) * 0.08f
+                val metallic4 = sin(TWO_PI * 13000f * time) * 0.04f
+
+                drumNoiseOutput * 0.6f + metallic1 + metallic2 + metallic3 + metallic4
             }
         }
     }
