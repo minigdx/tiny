@@ -20,7 +20,7 @@ local ModeSwitch = {
             help = "SFX Editor"
         },
         Music = {
-            overlay = { x = 32, y = 9 * 16 },
+            overlay = { x = 48, y = 80 },
             on_change = function()
                 tiny.exit("music-editor.lua")
             end,
