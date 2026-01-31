@@ -5,6 +5,7 @@ import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.lua.sfx.InstrumentLuaWrapper
+import com.github.minigdx.tiny.lua.sfx.MusicLuaWrapper
 import com.github.minigdx.tiny.lua.sfx.SfxLuaWrapper
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.sound.Instrument
@@ -36,6 +37,7 @@ class SfxLib(
 
         ctrl.set("instrument", instrument())
         ctrl.set("sfx", sfx())
+        ctrl.set("music", music())
 
         ctrl.set("save", save())
 
@@ -46,6 +48,9 @@ class SfxLib(
 
     // Cache for instrument Lua wrappers
     private val instrumentWrapperCache = mutableMapOf<Int, LuaValue>()
+
+    // Cache for music Lua wrappers
+    private val musicWrapperCache = mutableMapOf<Int, MusicLuaWrapper>()
 
     @TinyFunction("Save the actual music in the current sfx file.")
     inner class save : ZeroArgFunction() {
@@ -121,6 +126,27 @@ class SfxLib(
             return sound.data.music.musicalBars
                 .getOrNull(index)
                 ?.let { SfxLuaWrapper(sound, it, soundBoard, platform) } ?: NIL
+        }
+    }
+
+    @TinyFunction("Access music (multi-track sequence) using its index.")
+    inner class music : OneArgFunction() {
+        @TinyCall("Access music using its index (0-7).")
+        override fun call(arg: LuaValue): LuaValue {
+            val sound = resourceAccess.findSound(0) ?: return NIL
+
+            val index = arg.checkint()
+
+            // Check cache first
+            return musicWrapperCache[index]
+                ?: sound.data.music.sequences
+                    .getOrNull(index)
+                    ?.let { sequence ->
+                        MusicLuaWrapper(sound, sequence, soundBoard).also {
+                            musicWrapperCache[index] = it
+                        }
+                    }
+                ?: NIL
         }
     }
 
