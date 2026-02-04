@@ -14,30 +14,30 @@ import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.ZeroArgFunction
 
 /**
- * SfxLib provides playback capabilities for pre-computed sound effects.
- * Sounds are pre-rendered at startup for optimal playback performance.
+ * MusicLib provides playback capabilities for pre-computed music sequences.
+ * Music sequences are pre-rendered at startup for optimal playback performance.
  */
 @TinyLib(
-    "sfx",
-    """Sound effects API to play/loop/stop pre-computed sound effects.
-Sound effects are pre-rendered at startup for optimal performance.
+    "music",
+    """Music API to play/loop/stop pre-computed music sequences.
+Music sequences are pre-rendered at startup for optimal performance.
 
 WARNING: Because of browser behaviour, a sound can *only* be played after the first
 user interaction.
 
-Avoid to start a sfx at the beginning of the game.
+Avoid to start music at the beginning of the game.
 Before it, force the player to hit a key or click by adding an interactive menu
-or by starting the sound as soon as the player is moving.
+or by starting the music as soon as the player is moving.
 """,
 )
-class SfxLib(
+class MusicLib(
     private val resourceAccess: GameResourceAccess,
     private val soundBoard: VirtualSoundBoard,
     // When validating the script, don't play sound
     private val playSound: Boolean = true,
 ) : TwoArgFunction() {
 
-    // Track all active handlers so they can be stopped with sfx.stop()
+    // Track all active handlers so they can be stopped with music.stop()
     private val activeHandlers = mutableListOf<SoundHandler>()
 
     override fun call(
@@ -49,23 +49,23 @@ class SfxLib(
         ctrl.set("play", play())
         ctrl.set("stop", stop())
 
-        arg2.set("sfx", ctrl)
-        arg2.get("package").get("loaded").set("sfx", ctrl)
+        arg2.set("music", ctrl)
+        arg2.get("package").get("loaded").set("music", ctrl)
         return ctrl
     }
 
-    @TinyFunction("Play a pre-computed sound effect.")
+    @TinyFunction("Play a pre-computed music sequence.")
     inner class play : TwoArgFunction() {
-        @TinyCall("Play a pre-computed sfx at sfx_index. Returns a handler with stop() method. The sfx can be looped.")
+        @TinyCall("Play a pre-computed music at music_index. Returns a handler with stop() method. The music can be looped.")
         override fun call(
-            @TinyArg("sfx_index", type = LuaType.NUMBER)
+            @TinyArg("music_index", type = LuaType.NUMBER)
             arg1: LuaValue,
             @TinyArg("loop", type = LuaType.BOOLEAN)
             arg2: LuaValue,
         ): LuaValue {
             val loop = arg2.optboolean(false)
             val index = arg1.checkint()
-            val buffer = getPrecomputedSfx(index)
+            val buffer = getPrecomputedMusic(index)
 
             val result = WrapperLuaTable()
             if (playSound && buffer != null && buffer.isNotEmpty()) {
@@ -92,9 +92,9 @@ class SfxLib(
         }
     }
 
-    @TinyFunction("Stop all currently playing sound effects.")
+    @TinyFunction("Stop all currently playing music.")
     inner class stop : ZeroArgFunction() {
-        @TinyCall("Stop all currently playing sound effects.")
+        @TinyCall("Stop all currently playing music.")
         override fun call(): LuaValue {
             val toBeRemoved = activeHandlers.toList()
             toBeRemoved.forEach { it.stop() }
@@ -104,15 +104,15 @@ class SfxLib(
     }
 
     /**
-     * Get the pre-computed SFX buffer by index.
+     * Get the pre-computed music buffer by index.
      * The buffer is pre-rendered at startup.
      */
-    private fun getPrecomputedSfx(index: Int): FloatArray? {
+    private fun getPrecomputedMusic(index: Int): FloatArray? {
         val sound = resourceAccess.findSound(0) ?: return null
-        val sfxBuffers = sound.data.musicalBars
+        val musicBuffers = sound.data.musicalSequences
 
-        return if (index in 0 until sfxBuffers.size) {
-            sfxBuffers[index]
+        return if (index in 0 until musicBuffers.size) {
+            musicBuffers[index]
         } else {
             null
         }

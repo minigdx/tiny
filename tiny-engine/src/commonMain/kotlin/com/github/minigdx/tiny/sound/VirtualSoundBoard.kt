@@ -20,6 +20,14 @@ interface VirtualSoundBoard {
 
     fun convert(bar: MusicalBar): FloatArray
 
+    fun convert(sequence: MusicalSequence): FloatArray
+
+    /**
+     * Create a sound handler from a pre-computed audio buffer.
+     * This is used for playing pre-rendered sounds without recomputation.
+     */
+    fun prepareFromBuffer(buffer: FloatArray): SoundHandler
+
     fun noteOn(
         note: Note,
         instrument: Instrument,

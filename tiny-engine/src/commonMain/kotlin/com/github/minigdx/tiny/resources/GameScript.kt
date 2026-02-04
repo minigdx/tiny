@@ -7,16 +7,17 @@ import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.lua.CtrlLib
 import com.github.minigdx.tiny.lua.DebugLib
+import com.github.minigdx.tiny.lua.EditorLib
 import com.github.minigdx.tiny.lua.FloppyLib
 import com.github.minigdx.tiny.lua.GfxLib
 import com.github.minigdx.tiny.lua.JuiceLib
 import com.github.minigdx.tiny.lua.KeysLib
 import com.github.minigdx.tiny.lua.MapLib
 import com.github.minigdx.tiny.lua.MathLib
+import com.github.minigdx.tiny.lua.MusicLib
 import com.github.minigdx.tiny.lua.NotesLib
 import com.github.minigdx.tiny.lua.SfxLib
 import com.github.minigdx.tiny.lua.ShapeLib
-import com.github.minigdx.tiny.lua.SoundLib
 import com.github.minigdx.tiny.lua.SprLib
 import com.github.minigdx.tiny.lua.StdLib
 import com.github.minigdx.tiny.lua.TinyBaseLib
@@ -95,8 +96,9 @@ class GameScript(
             load(MapLib(resourceAccess, gameOptions, virtualFrameBuffer))
             load(GfxLib(resourceAccess, gameOptions, virtualFrameBuffer))
             load(CtrlLib(inputHandler, sprLib))
-            load(SfxLib(resourceAccess, virtualSoundBoard, platform, playSound = !forValidation))
-            load(SoundLib(resourceAccess, virtualSoundBoard, playSound = !forValidation))
+            load(SfxLib(resourceAccess, virtualSoundBoard, playSound = !forValidation))
+            load(MusicLib(resourceAccess, virtualSoundBoard, playSound = !forValidation))
+            load(EditorLib(resourceAccess, virtualSoundBoard, platform, playSound = !forValidation))
             load(ShapeLib(gameOptions, virtualFrameBuffer))
             load(DebugLib(logger))
             load(KeysLib())
