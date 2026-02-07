@@ -20,7 +20,7 @@ import java.io.File
  * and usage examples.
  */
 @CliAnnotation(hidden = true)
-class DocsCommand : CliktCommand(name = "docs") {
+class DocsCommand : CliktCommand(name = "docs", hidden = true) {
     private val outputFile by option(
         "--output",
         "-o",
