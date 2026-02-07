@@ -1,15 +1,12 @@
 package com.github.minigdx.tiny.cli.command
 
+import com.github.ajalt.clikt.core.Abort
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.Context
-import com.github.ajalt.clikt.core.terminal
 import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
-import com.github.ajalt.mordant.input.InputReceiver
-import com.github.ajalt.mordant.input.receiveKeyEvents
-import com.github.ajalt.mordant.rendering.TextStyles
-import com.github.ajalt.mordant.table.table
 import com.github.minigdx.tiny.cli.config.GameParameters
 import com.github.minigdx.tiny.cli.config.GameParametersV1
 import com.github.minigdx.tiny.cli.exception.MissingTinyConfigurationException
@@ -20,166 +17,86 @@ class ResourcesCommand : CliktCommand(name = "resources") {
         .file(mustExist = true, canBeDir = true, canBeFile = false)
         .default(File("."))
 
-    private val categoryFilter by option("--category", help = "Filter categories by name or pattern")
+    private val delete by option("--delete", help = "Remove a resource from the game by filename.")
+        .multiple()
 
-    private var selectedIndex = 0
-
-    override fun help(context: Context) = "Inspect and manage categorized resources in the game."
+    override fun help(context: Context) = "Inspect and manage game resources."
 
     override fun run() {
-        val tiny = gameDirectory.resolve("_tiny.json")
-        if (!tiny.exists()) {
-            throw MissingTinyConfigurationException(tiny)
+        val configFile = gameDirectory.resolve("_tiny.json")
+        if (!configFile.exists()) {
+            throw MissingTinyConfigurationException(configFile)
+        }
+
+        val gameParameters = try {
+            GameParameters.read(configFile)
+        } catch (e: Exception) {
+            echo("❌ Error reading _tiny.json: ${e.message}")
+            throw Abort()
+        }
+
+        if (gameParameters !is GameParametersV1) {
+            echo("❌ Only V1 game configuration is supported.")
+            throw Abort()
+        }
+
+        if (delete.isNotEmpty()) {
+            deleteResources(gameParameters, configFile)
+        } else {
+            displayResources(gameParameters)
+        }
+    }
+
+    private fun deleteResources(params: GameParametersV1, configFile: File) {
+        var updated = params
+
+        for (resource in delete) {
+            val found = resource in updated.scripts ||
+                resource in updated.spritesheets ||
+                resource in updated.levels ||
+                resource == updated.sound
+
+            if (!found) {
+                echo("❌ Resource not found: $resource")
+                continue
+            }
+
+            updated = updated.copy(
+                scripts = updated.scripts.filter { it != resource },
+                spritesheets = updated.spritesheets.filter { it != resource },
+                levels = updated.levels.filter { it != resource },
+                sound = if (updated.sound == resource) null else updated.sound,
+            )
+            echo("✅ Removed: $resource")
         }
 
         try {
-            var gameParameters = GameParameters.read(tiny) as GameParametersV1
-
-            showResourceManager(gameParameters)
-            currentContext.terminal.receiveKeyEvents { event ->
-                val next = when (event.key) {
-                    "ArrowUp" -> {
-                        selectedIndex = (selectedIndex - 1).coerceAtLeast(0)
-                        true
-                    }
-
-                    "ArrowDown" -> {
-                        val maximumValue = getResourceCategories(gameParameters as GameParametersV1).map { it.value.size }.sum() - 1
-                        selectedIndex = (selectedIndex + 1).coerceAtMost(maximumValue)
-                        true
-                    }
-
-                    "d" -> {
-                        gameParameters = deleteSelected(selectedIndex, gameParameters as GameParametersV1)
-                        selectedIndex = (selectedIndex - 1).coerceAtLeast(0)
-                        true
-                    }
-
-                    "q" -> {
-                        save(gameParameters)
-                        false
-                    }
-
-                    else -> true
-                }
-                if (next) {
-                    showResourceManager(gameParameters)
-                    InputReceiver.Status.Continue
-                } else {
-                    InputReceiver.Status.Finished
-                }
-            }
+            updated.write(configFile)
         } catch (e: Exception) {
-            echo("❌ Error reading _tiny.json: ${e.message}")
+            echo("❌ Error saving _tiny.json: ${e.message}")
+            throw Abort()
         }
+
+        echo()
+        displayResources(updated)
     }
 
-    private fun save(configuration: GameParameters) {
-        val configurationFile = gameDirectory.resolve("_tiny.json")
-        configuration.write(configurationFile)
+    private fun displayResources(params: GameParametersV1) {
+        echo("📦 Game resources")
+        echo()
+
+        displayCategory("📝 Scripts", params.scripts)
+        displayCategory("🖼️  Spritesheets", params.spritesheets)
+        displayCategory("🗺️  Levels", params.levels)
+        displayCategory("🔊 Sounds", listOfNotNull(params.sound))
     }
 
-    private fun deleteSelected(
-        selectedIndex: Int,
-        parameters: GameParametersV1,
-    ): GameParametersV1 {
-        val categories = getResourceCategories(parameters)
-
-        // Flatten all resources while keeping track of their category and index within that category
-        val flattenedResources = mutableListOf<Triple<String, String, Int>>() // (categoryName, resourcePath, indexInCategory)
-        categories.forEach { (categoryName, resources) ->
-            resources.forEachIndexed { indexInCategory, resourcePath ->
-                flattenedResources.add(Triple(categoryName, resourcePath, indexInCategory))
-            }
+    private fun displayCategory(label: String, resources: List<String>) {
+        if (resources.isEmpty()) return
+        echo("$label:")
+        resources.forEachIndexed { index, resource ->
+            echo("   ${index + 1}. $resource")
         }
-
-        // Validate selectedIndex
-        if (selectedIndex < 0 || selectedIndex >= flattenedResources.size) {
-            throw IndexOutOfBoundsException("Invalid selectedIndex: $selectedIndex. Valid range: 0-${flattenedResources.size - 1}")
-        }
-
-        // Get the resource to delete
-        val (categoryName, resourceToDelete, indexInCategory) = flattenedResources[selectedIndex]
-
-        // Create a copy of parameters with the resource removed from the appropriate category
-        return when (categoryName) {
-            "\uD83D\uDCDD scripts" -> {
-                val updatedScripts = parameters.scripts.toMutableList()
-                updatedScripts.removeAt(indexInCategory)
-                parameters.copy(scripts = updatedScripts)
-            }
-            "\uD83D\uDDBC\uFE0F spritesheets" -> {
-                val updatedSpritesheets = parameters.spritesheets.toMutableList()
-                updatedSpritesheets.removeAt(indexInCategory)
-                parameters.copy(spritesheets = updatedSpritesheets)
-            }
-            "\uD83D\uDDFA\uFE0F levels" -> {
-                val updatedLevels = parameters.levels.toMutableList()
-                updatedLevels.removeAt(indexInCategory)
-                parameters.copy(levels = updatedLevels)
-            }
-            "\uD83D\uDD08 sounds" -> {
-                val updatedSounds = listOfNotNull(parameters.sound).toMutableList()
-                updatedSounds.removeAt(indexInCategory)
-                parameters.copy(sound = updatedSounds.firstOrNull())
-            }
-            else -> throw IllegalStateException("Unknown category: $categoryName")
-        }
-    }
-
-    private fun showResourceManager(gameParameters: GameParametersV1) {
-        val categories = getResourceCategories(gameParameters)
-
-        if (categories.isEmpty()) {
-            echo("No categories found${if (categoryFilter != null) " matching filter '$categoryFilter'" else ""}")
-            return
-        }
-
-        val table = table {
-            header {
-                row("Category", "Resource")
-            }
-            body {
-                var index = 0
-                categories.forEach { (categorie, resources) ->
-                    resources.forEachIndexed { rindex, resource ->
-                        row {
-                            val isSelected = selectedIndex == index
-                            cell(if (isSelected) TextStyles.bold(categorie) else categorie)
-                            val lineContent = "$rindex $resource"
-                            val content = if (isSelected) {
-                                TextStyles.bold(lineContent)
-                            } else {
-                                lineContent
-                            }
-                            cell(content) {
-                                columnSpan = 4
-                            }
-
-                            index++
-                        }
-                    }
-                }
-            }
-        }
-
-        currentContext.terminal.cursor.move {
-            clearScreen()
-        }
-        echo(table)
-        echo("\nCommands:")
-        echo("• Enter category number to manage resources")
-        echo("• 'q' to quit")
-        echo("• 'd' to delete from the game")
-    }
-
-    private fun getResourceCategories(gameParameters: GameParametersV1): Map<String, List<String>> {
-        return listOf(
-            "\uD83D\uDCDD scripts" to gameParameters.scripts,
-            "\uD83D\uDDBC\uFE0F spritesheets" to gameParameters.spritesheets,
-            "\uD83D\uDDFA\uFE0F levels" to gameParameters.levels,
-            "\uD83D\uDD08 sound" to listOfNotNull(gameParameters.sound),
-        ).filter { it.second.isNotEmpty() }
-            .toMap()
+        echo()
     }
 }
