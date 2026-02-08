@@ -1,5 +1,280 @@
+<link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+
 <style>
+    /* Shared nav bar */
+    .tiny-nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 10000;
+        height: 56px;
+        background: #ffffff;
+        border-bottom: 1px solid #e0e0e0;
+        display: flex;
+        align-items: center;
+        padding: 0 24px;
+        font-family: 'Titillium Web', sans-serif;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    }
+
+    .tiny-nav a {
+        color: #555;
+        text-decoration: none;
+        margin: 0 12px;
+        font-size: 0.9rem;
+        transition: color 0.15s ease;
+    }
+
+    .tiny-nav a:hover {
+        color: #222;
+    }
+
+    .tiny-nav .nav-logo {
+        color: #2a8a6e;
+        font-weight: 700;
+        font-size: 1.1em;
+        margin-right: auto;
+    }
+
+    .tiny-nav .nav-logo:hover {
+        color: #1d6b54;
+    }
+
+    .tiny-nav .nav-cta {
+        background: #2a8a6e;
+        color: #fff;
+        padding: 6px 16px;
+        border-radius: 4px;
+        font-weight: 700;
+    }
+
+    .tiny-nav .nav-cta:hover {
+        background: #1d6b54;
+        color: #fff;
+    }
+
+    /* Landing hero section */
+    .landing-hero {
+        text-align: center;
+        padding: 64px 24px 48px;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .landing-hero h1 {
+        font-family: 'Titillium Web', sans-serif;
+        font-size: 3.2rem;
+        font-weight: 700;
+        color: #222;
+        margin-bottom: 16px;
+        line-height: 1.1;
+    }
+
+    .landing-tags {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+
+    .landing-tag {
+        background: #e8f5f0;
+        color: #2a8a6e;
+        padding: 4px 14px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        border: 1px solid #c5e8dc;
+    }
+
+    .landing-desc {
+        color: #555;
+        font-size: 1.1rem;
+        max-width: 600px;
+        margin: 0 auto 28px;
+        line-height: 1.7;
+    }
+
+    .landing-cta-group {
+        display: flex;
+        justify-content: center;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+    .landing-cta {
+        display: inline-block;
+        padding: 11px 26px;
+        border-radius: 6px;
+        font-family: 'Titillium Web', sans-serif;
+        font-weight: 700;
+        font-size: 1rem;
+        text-decoration: none;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .landing-cta:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .landing-cta-primary {
+        background: #2a8a6e;
+        color: #fff;
+    }
+
+    .landing-cta-primary:hover {
+        background: #1d6b54;
+        color: #fff;
+    }
+
+    .landing-cta-secondary {
+        background: #fff;
+        color: #333;
+        border: 1px solid #ccc;
+    }
+
+    .landing-cta-secondary:hover {
+        border-color: #2a8a6e;
+        color: #2a8a6e;
+    }
+
+    /* Code preview (landing) */
+    .landing-code {
+        max-width: 640px;
+        margin: 0 auto 60px;
+        padding: 0 24px;
+    }
+
+    .landing-code-block {
+        background: #f8f9fa;
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    .landing-code-header {
+        display: flex;
+        align-items: center;
+        padding: 10px 16px;
+        background: #eef0f2;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .landing-code-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-right: 6px;
+    }
+
+    .landing-code-dot.red { background: #ff5f57; }
+    .landing-code-dot.yellow { background: #febc2e; }
+    .landing-code-dot.green { background: #28c840; }
+
+    .landing-code-title {
+        margin-left: 12px;
+        color: #888;
+        font-size: 0.8rem;
+        font-family: 'Source Code Pro', monospace;
+    }
+
+    .landing-code-body {
+        padding: 20px 24px;
+        font-family: 'Source Code Pro', monospace;
+        font-size: 0.88rem;
+        line-height: 1.7;
+        color: #333;
+        overflow-x: auto;
+    }
+
+    .landing-code-body pre {
+        margin: 0;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        color: inherit;
+    }
+
+    /* Shared syntax highlighting (landing + interactive editor) */
+    .code-kw, .code_keyword { color: #7c3aed; }
+    .code-fn { color: #2563eb; }
+    .code-cm, .code_comment { color: #9ca3af; font-style: italic; }
+    .code-st, .code_string { color: #16a34a; }
+    .code-nb, .code_number { color: #ea580c; }
+
+    /* Feature cards */
+    .landing-features {
+        max-width: 900px;
+        margin: 0 auto 60px;
+        padding: 0 24px;
+    }
+
+    .landing-features h2 {
+        text-align: center;
+        font-family: 'Titillium Web', sans-serif;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #222;
+        margin-bottom: 36px;
+    }
+
+    .landing-features-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+    }
+
+    .landing-feature-card {
+        background: #f8f9fa;
+        border: 1px solid #e8e8e8;
+        border-radius: 10px;
+        padding: 24px 18px;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .landing-feature-card:hover {
+        border-color: #2a8a6e;
+        box-shadow: 0 2px 8px rgba(42, 138, 110, 0.1);
+    }
+
+    .landing-feature-icon {
+        font-size: 1.6rem;
+        margin-bottom: 12px;
+        display: block;
+    }
+
+    .landing-feature-card h3 {
+        font-family: 'Titillium Web', sans-serif;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #222;
+        margin-bottom: 6px;
+    }
+
+    .landing-feature-card p {
+        color: #666;
+        font-size: 0.88rem;
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    @media (max-width: 960px) {
+        .landing-features-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 600px) {
+        .landing-hero h1 { font-size: 2rem; }
+        .landing-hero { padding: 40px 16px 32px; }
+        .landing-features-grid { grid-template-columns: 1fr; }
+        .landing-cta-group { flex-direction: column; align-items: center; }
+        .landing-code-body { font-size: 0.78rem; padding: 14px 16px; }
+    }
+
     /** link to start the game **/
     .tiny-button-right {
         margin-left: auto;
@@ -22,33 +297,33 @@
 
         font-family: "Source Code Pro", monospace;
 
-        transition: background-color 0.2s ease-in-out, transform 0.1s ease; /* Transition douce pour les effets */
+        transition: background-color 0.2s ease-in-out, transform 0.1s ease;
 
     }
 
     .tiny-button,
-    .tiny-button:link, /* Pour s'assurer que même non visité, il a le bon style */
-    .tiny-button:visited { /* Pour s'assurer que les liens visités gardent la couleur souhaitée */
-        color: white; /* Couleur du texte pour l'état normal, lien et visité */
-        text-decoration: none; /* Maintenir la suppression du soulignement */
+    .tiny-button:link,
+    .tiny-button:visited {
+        color: white;
+        text-decoration: none;
     }
 
     .tiny-button:hover,
-    .tiny-button:focus { /* :focus pour l'accessibilité clavier */
-        background-color: #0056b3; /* Couleur de fond un peu plus foncée au survol/focus */
-        color: white;              /* Assure que la couleur du texte reste blanche */
-        outline: none;             /* Supprime l'outline par défaut sur :focus si vous le souhaitez,
-                                  mais pour l'accessibilité, il est mieux de le styliser :
-                                  par ex. box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5); */
+    .tiny-button:focus {
+        background-color: #0056b3;
+        color: white;
+        outline: none;
     }
 
     .tiny-toolbar {
         width: calc(100%);
         min-height: 48px;
-        padding: 4px;
-        border-radius: 8px;
-        border: 1px solid #9EC6DF;
-        margin-bottom: 2px;
+        padding: 4px 12px;
+        border-radius: 10px 10px 0 0;
+        background: #eef0f2;
+        border: 1px solid #e0e0e0;
+        border-bottom: none;
+        margin-bottom: 0;
         display: flex;
         align-items: center;
     }
@@ -57,11 +332,16 @@
     .tiny-container {
         display: flex;
         width: calc(100%);
+        border: 1px solid #e0e0e0;
+        border-radius: 0 0 10px 10px;
+        overflow: hidden;
+        background: #f8f9fa;
     }
 
     /** game **/
     .tiny-canvas {
-        border: 1px solid black;
+        border: none;
+        border-right: 1px solid #e0e0e0;
         cursor: none;
 
         flex: 1 1 auto;
@@ -75,10 +355,16 @@
         display: block;
         min-height: 512px;
         padding-left: 48px;
-        counter-reset: line; /* reset the "line" counter */
+        padding-top: 12px;
+        padding-bottom: 12px;
+        counter-reset: line;
         width: 100%;
         font-family: "Source Code Pro", monospace;
-        resize:none;
+        font-size: 0.88rem;
+        line-height: 1.7;
+        color: #333;
+        background: #f8f9fa;
+        resize: none;
     }
 
     .tiny-textarea div {
@@ -89,23 +375,12 @@
     }
 
     .tiny-textarea div::before {
-        color: #bababa;
-        content: counter(line);   /* insert a div with the value of the counter */
-        counter-increment: line;  /* increment the counter */
+        color: #c0c0c0;
+        content: counter(line);
+        counter-increment: line;
         position: absolute;
-        right: calc(100% + 16px); /* add some space between this and the code line next to it */
-    }
-
-    .code_comment {
-        color: #979797
-    }
-
-    .code_keyword {
-        color: #3b66db
-    }
-
-    .code_string {
-        color: #128427
+        right: calc(100% + 16px);
+        font-size: 0.8em;
     }
 
     .no-resize {
@@ -114,3 +389,13 @@
         overflow: hidden;
     }
 </style>
+
+<nav class="tiny-nav">
+    <a href="index.html" class="nav-logo">TINY</a>
+    <a href="index.html#_tiny_showcase">Demos</a>
+    <a href="index.html#_tiny_engine">Documentation</a>
+    <a href="playground.html">Sandbox</a>
+    <a href="index.html#_tiny_api">API</a>
+    <a href="https://github.com/minigdx/tiny">GitHub</a>
+    <a href="index.html#_tiny_install" class="nav-cta">Get Started</a>
+</nav>

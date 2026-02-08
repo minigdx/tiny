@@ -124,7 +124,7 @@ table { border-collapse: collapse; border-spacing: 0; }
 
 html, body { font-size: 100%; }
 
-body { background: white; color: #222222; padding: 0; margin: 0; font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif; font-weight: normal; font-style: normal; line-height: 1; position: relative; cursor: auto; }
+body { background: white; color: #222222; padding: 56px 0 0 0; margin: 0; font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif; font-weight: normal; font-style: normal; line-height: 1; position: relative; cursor: auto; }
 
 a:hover { cursor: pointer; }
 
@@ -322,7 +322,7 @@ p a > code:hover { color: #444444; }
 #toctitle { color: #3c3d3f; }
 
 @media only screen and (min-width: 1280px) { body.toc2 { padding-left: 20em; }
-  #toc.toc2 { position: fixed; width: 20em; left: 0; top: 0; border-right: 1px solid #cccccc; border-bottom: 0; z-index: 1000; padding: 1em; height: 100%; overflow: auto; }
+  #toc.toc2 { position: fixed; width: 20em; left: 0; top: 56px; border-right: 1px solid #cccccc; border-bottom: 0; z-index: 1000; padding: 1em; height: calc(100% - 56px); overflow: auto; }
   #toc.toc2 #toctitle { margin-top: 0; }
   #toc.toc2 > ul { font-size: .95em; }
   #toc.toc2 ul ul { margin-left: 0; padding-left: 1.25em; }

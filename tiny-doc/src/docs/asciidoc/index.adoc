@@ -1,21 +1,86 @@
 :docinfo: shared
-:toc: left
-:toclevels: 5
 :icons: font
 :book:
 :source-highlighter: rouge
 :favicon: ./sample/favicon.png
 :stylesheet: adoc-riak.css
 
-= Tiny 🧸
+= Tiny
 
-Welcome to the documentation for `🧸 Tiny`, a virtual console that makes building games and applications simple and fun! With Lua programming support, hot reloading, and a 256-color palette, you'll have everything you need to bring your ideas to life.
+++++
+<style>#header { display: none; }</style>
+<section class="landing-hero">
+    <h1>Pixel-Perfect Game Engine</h1>
+    <div class="landing-tags">
+        <span class="landing-tag">256 colors</span>
+        <span class="landing-tag">Lua scripted</span>
+        <span class="landing-tag">Desktop &amp; Web</span>
+        <span class="landing-tag">Real-time audio synthesis</span>
+    </div>
+    <p class="landing-desc">
+        A tiny virtual console for building pixel art games with Lua. Hot-reload your scripts, draw sprites, synthesize sounds, and export to desktop or web &mdash; all from a single codebase.
+    </p>
+    <div class="landing-cta-group">
+        <a href="playground.html" class="landing-cta landing-cta-primary">Try the Sandbox</a>
+        <a href="#_tiny_install" class="landing-cta landing-cta-secondary">Get Started</a>
+    </div>
+</section>
+
+<section class="landing-code">
+    <div class="landing-code-block">
+        <div class="landing-code-header">
+            <span class="landing-code-dot red"></span>
+            <span class="landing-code-dot yellow"></span>
+            <span class="landing-code-dot green"></span>
+            <span class="landing-code-title">game.lua</span>
+        </div>
+        <div class="landing-code-body">
+<pre><span class="code-kw">function</span> <span class="code-fn">_draw</span>()
+    <span class="code-cm">-- clear the screen</span>
+    gfx.<span class="code-fn">cls</span>(<span class="code-nb">1</span>)
+
+    <span class="code-cm">-- draw a greeting</span>
+    <span class="code-fn">print</span>(<span class="code-st">"hello tiny!"</span>, <span class="code-nb">96</span>, <span class="code-nb">120</span>, <span class="code-nb">7</span>)
+
+    <span class="code-cm">-- draw the player sprite</span>
+    spr.<span class="code-fn">draw</span>(<span class="code-nb">0</span>, player.x, player.y)
+<span class="code-kw">end</span></pre>
+        </div>
+    </div>
+</section>
+
+<section class="landing-features">
+    <h2>Built for pixel art, designed for creators</h2>
+    <div class="landing-features-grid">
+        <div class="landing-feature-card">
+            <span class="landing-feature-icon">&#x1F3A8;</span>
+            <h3>256-Color Palette</h3>
+            <p>Fixed palette for authentic retro aesthetics. Dithering patterns and gradient fills built in.</p>
+        </div>
+        <div class="landing-feature-card">
+            <span class="landing-feature-icon">&#x1F4DC;</span>
+            <h3>Lua Scripting</h3>
+            <p>Hot-reload your scripts instantly. Simple API for sprites, input, maps, and sound.</p>
+        </div>
+        <div class="landing-feature-card">
+            <span class="landing-feature-icon">&#x1F310;</span>
+            <h3>Desktop &amp; Web</h3>
+            <p>Kotlin Multiplatform engine. Run on JVM desktop or export to WebGL for the browser.</p>
+        </div>
+        <div class="landing-feature-card">
+            <span class="landing-feature-icon">&#x1F3B5;</span>
+            <h3>Audio Synthesis</h3>
+            <p>Real-time waveform synthesis with envelopes, effects, and a built-in SFX editor.</p>
+        </div>
+    </div>
+</section>
+++++
 
 == Tiny Engine
 
-`🧸 Tiny` is designed to help you create and test your ideas quickly and effectively. You can run your games on your desktop computer and export them for the web, making it easy to share your creations with others.
+`Tiny` is designed to help you create and test your ideas quickly and effectively. You can run your games on your desktop computer and export them for the web, making it easy to share your creations with others.
 
-With `🧸 Tiny`, you'll be able to get started right away and see your progress in real-time, thanks to its hot reloading feature. This documentation will guide you through the setup and usage of `🧸 Tiny` as well as provide you with helpful tips and tricks to make the most out of this powerful tool.
+With `Tiny`, you'll be able to get started right away and see your progress in real-time, thanks to its hot reloading feature. This documentation will guide you through the setup and usage of `Tiny` as well as provide you with helpful tips and tricks to make the most out of this powerful tool.
 
 > _Let's get started and unleash your creativity!_
 
@@ -41,15 +106,15 @@ New to Tiny? Start here:
 
 == Tiny Playground
 
-You can try creating a game right away with `🧸 Tiny` using link:playground.html?game=[the Playground], or you can experiment by updating the examples available on this page.
+You can try creating a game right away with `Tiny` using link:playground.html?game=[the Playground], or you can experiment by updating the examples available on this page.
 
 == Tiny is open source
 
-`🧸 Tiny` is an open-source project. Users can contribute to the project by reporting issues, suggesting improvements, and even submitting code changes. https://github.com/minigdx/tiny[Check the code source on Github].
+`Tiny` is an open-source project. Users can contribute to the project by reporting issues, suggesting improvements, and even submitting code changes. https://github.com/minigdx/tiny[Check the code source on Github].
 
 Contributions from the community are welcome, and can help to improve the overall functionality and usability of the game engine!
 
-A presentation about the technologies used behind 🧸 Tiny was also given during the conference https://2024.droidkaigi.jp/en/timetable/683368/[DroidKaigi 2024 @ 東京 Tokyo]. You can check https://speakerdeck.com/dwursteisen/crafting-cross-platform-adventures-building-a-game-engine-with-kotlin-multiplatform[the slides], or you also https://www.youtube.com/watch?v=4_i_Xp96IMM[watch the session].
+A presentation about the technologies used behind Tiny was also given during the conference https://2024.droidkaigi.jp/en/timetable/683368/[DroidKaigi 2024 @ Tokyo]. You can check https://speakerdeck.com/dwursteisen/crafting-cross-platform-adventures-building-a-game-engine-with-kotlin-multiplatform[the slides], or you also https://www.youtube.com/watch?v=4_i_Xp96IMM[watch the session].
 
 image:sample/droidkaigi-tiny-export.gif[https://speakerdeck.com/dwursteisen/crafting-cross-platform-adventures-building-a-game-engine-with-kotlin-multiplatform
 ]
