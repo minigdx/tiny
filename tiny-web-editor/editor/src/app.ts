@@ -509,19 +509,97 @@ export class EditorApp {
   // ===== Quick Open =====
 
   private showQuickOpen(): void {
+    // Remove existing dialog if any
+    document.querySelector('.quick-open-overlay')?.remove();
+
+    const overlay = document.createElement('div');
+    overlay.className = 'quick-open-overlay';
+
+    const dialog = document.createElement('div');
+    dialog.className = 'quick-open-dialog';
+
+    const input = document.createElement('input');
+    input.className = 'quick-open-input';
+    input.placeholder = 'Search files...';
+    input.type = 'text';
+
+    const results = document.createElement('div');
+    results.className = 'quick-open-results';
+
+    dialog.appendChild(input);
+    dialog.appendChild(results);
+    overlay.appendChild(dialog);
+    document.body.appendChild(overlay);
+
     const entries = this.vfs.list();
     const paths = entries.map(e => e.path);
+    let selectedIndex = 0;
 
-    // Simple prompt-based quick open (will be improved in Step 11)
-    const input = prompt('Open file:', '');
-    if (!input) return;
+    const renderResults = (filter: string) => {
+      results.innerHTML = '';
+      const lower = filter.toLowerCase();
+      const matches = filter
+        ? paths.filter(p => p.toLowerCase().includes(lower))
+        : paths;
 
-    const lower = input.toLowerCase();
-    const match = paths.find(p => p.toLowerCase().includes(lower));
-    if (match) {
-      this.tabManager.open(match);
-      this.fileTree.setActive(match);
-    }
+      selectedIndex = 0;
+
+      matches.slice(0, 15).forEach((path, idx) => {
+        const item = document.createElement('div');
+        item.className = `quick-open-item${idx === selectedIndex ? ' selected' : ''}`;
+        item.textContent = path;
+        item.addEventListener('click', () => {
+          close();
+          this.tabManager.open(path);
+          this.fileTree.setActive(path);
+        });
+        results.appendChild(item);
+      });
+    };
+
+    const updateSelection = () => {
+      const items = results.querySelectorAll('.quick-open-item');
+      items.forEach((el, idx) => {
+        el.classList.toggle('selected', idx === selectedIndex);
+      });
+    };
+
+    const close = () => {
+      overlay.remove();
+    };
+
+    input.addEventListener('input', () => renderResults(input.value));
+
+    input.addEventListener('keydown', (e) => {
+      const items = results.querySelectorAll('.quick-open-item');
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+        updateSelection();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        selectedIndex = Math.max(selectedIndex - 1, 0);
+        updateSelection();
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        const selected = items[selectedIndex];
+        if (selected) {
+          close();
+          const path = selected.textContent!;
+          this.tabManager.open(path);
+          this.fileTree.setActive(path);
+        }
+      } else if (e.key === 'Escape') {
+        close();
+      }
+    });
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) close();
+    });
+
+    input.focus();
+    renderResults('');
   }
 
   // ===== Drag & Drop Overlay =====
