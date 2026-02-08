@@ -67,6 +67,8 @@ class GlfwPlatform(
 
     private var window: Long = 0
 
+    private lateinit var windowManager: WindowManager
+
     private var lastFrame: Long = getTime()
 
     // Keep 30 seconds at 60 frames per seconds
@@ -171,12 +173,18 @@ class GlfwPlatform(
 
         GL.createCapabilities(true)
 
-        return WindowManager(
+        windowManager = WindowManager(
             windowWidth = tmpWidth.get(),
             windowHeight = tmpHeight.get(),
             screenWidth = tmpFrameBufferWidth.get(),
             screenHeight = tmpFrameBufferHeight.get(),
         )
+
+        GLFW.glfwSetFramebufferSizeCallback(window) { _, width, height ->
+            windowManager.updateScreenDimensions(width, height)
+        }
+
+        return windowManager
     }
 
     override fun initRenderManager(windowManager: WindowManager): Kgl {

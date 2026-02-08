@@ -15,11 +15,34 @@ class WindowManager(
     /**
      * Width of the window on the screen (resolution dependent)
      */
-    val screenWidth: Int,
+    screenWidth: Int,
     /**
      * Height of the window on the screen (resolution dependent)
      */
-    val screenHeight: Int,
-    val ratioWidth: Int = screenWidth / windowWidth,
-    val ratioHeight: Int = screenHeight / windowHeight,
-)
+    screenHeight: Int,
+) {
+    var screenWidth: Int = screenWidth
+        private set
+
+    var screenHeight: Int = screenHeight
+        private set
+
+    var ratioWidth: Int = screenWidth / windowWidth
+        private set
+
+    var ratioHeight: Int = screenHeight / windowHeight
+        private set
+
+    /**
+     * Update screen dimensions when DPI changes (e.g., moving between Retina and standard displays).
+     */
+    fun updateScreenDimensions(
+        newWidth: Int,
+        newHeight: Int,
+    ) {
+        screenWidth = newWidth
+        screenHeight = newHeight
+        ratioWidth = newWidth / windowWidth
+        ratioHeight = newHeight / windowHeight
+    }
+}

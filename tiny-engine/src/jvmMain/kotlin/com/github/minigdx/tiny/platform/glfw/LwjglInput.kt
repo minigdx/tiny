@@ -21,10 +21,12 @@ import org.lwjgl.glfw.GLFW.glfwSetCursorPosCallback
 import org.lwjgl.glfw.GLFW.glfwSetInputMode
 import org.lwjgl.glfw.GLFW.glfwSetKeyCallback
 import org.lwjgl.glfw.GLFW.glfwSetMouseButtonCallback
+import org.lwjgl.glfw.GLFW.glfwSetWindowFocusCallback
 import org.lwjgl.glfw.GLFWCursorEnterCallback
 import org.lwjgl.glfw.GLFWCursorPosCallback
 import org.lwjgl.glfw.GLFWKeyCallback
 import org.lwjgl.glfw.GLFWMouseButtonCallback
+import org.lwjgl.glfw.GLFWWindowFocusCallback
 import java.nio.DoubleBuffer
 
 class LwjglInput(private val projector: MouseProject) : InputHandler, InputManager {
@@ -124,6 +126,20 @@ class LwjglInput(private val projector: MouseProject) : InputHandler, InputManag
                         gamePosition?.let { (x, y) ->
                             touchManager.onTouchMove(touchSignal, x, y)
                         }
+                    }
+                }
+            },
+        )
+        glfwSetWindowFocusCallback(
+            windowAddress,
+            object : GLFWWindowFocusCallback() {
+                override fun invoke(
+                    window: Long,
+                    focused: Boolean,
+                ) {
+                    if (!focused) {
+                        touchManager.resetAllState()
+                        mousePositionDirty = true
                     }
                 }
             },

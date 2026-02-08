@@ -166,6 +166,35 @@ class TouchManager(lastKeyCode: KeyCode) {
     }
 
     /**
+     * Reset all input state.
+     *
+     * This is useful when the window loses focus to avoid
+     * keys or touches being stuck in a pressed state.
+     */
+    fun resetAllState() {
+        for (i in touch.indices) {
+            touch[i] = null
+        }
+        for (i in justTouch.indices) {
+            justTouch[i] = null
+        }
+        for (i in type.indices) {
+            type[i] = null
+        }
+        for (i in keyPressed.indices) {
+            keyPressed[i] = false
+        }
+        for (i in justKeyPressed.indices) {
+            justKeyPressed[i] = false
+        }
+        justPressedKeyCode.clear()
+        isAnyKeyJustPressed = false
+        numberOfKeyPressed = 0
+        eventsPool.free(queueEvents)
+        queueEvents.clear()
+    }
+
+    /**
      * Process received touch events
      *
      * Previous received events will be discarded.
