@@ -19,7 +19,7 @@ import kotlin.math.max
 * @param maxSize The maximum number of elements this list can hold. Must be non-negative.
 */
 class MutableFixedSizeList<T>(val maxSize: Int) : MutableList<T> {
-    private val delegate: MutableList<T> = ArrayList<T>(maxSize)
+    private val delegate: MutableList<T> = ArrayDeque<T>(maxSize)
 
     override val size: Int
         get() {

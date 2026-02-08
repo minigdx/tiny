@@ -43,7 +43,6 @@ import org.lwjgl.opengl.GL
 import org.lwjgl.system.MemoryUtil
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.imageio.ImageIO
@@ -71,8 +70,8 @@ class GlfwPlatform(
 
     private var lastFrame: Long = getTime()
 
-    // Keep 30 seconds at 60 frames per seconds
-    private val gifFrameCache: MutableFixedSizeList<IntArray> = MutableFixedSizeList(gameOptions.record.toInt() * FPS)
+    // Keep N seconds at 60 frames per seconds (ByteArray of palette indices per frame)
+    private val gifFrameCache: MutableFixedSizeList<ByteArray> = MutableFixedSizeList(gameOptions.record.toInt() * FPS)
 
     private var lastDraw: PixelArray = PixelArray(gameOptions.width, gameOptions.height)
 
@@ -220,13 +219,14 @@ class GlfwPlatform(
 
     override fun newFrameRendered(virtualFrameBuffer: VirtualFrameBuffer) {
         virtualFrameBuffer.readFrameBuffer().copyInto(lastDraw)
+        gifFrameCache.add(lastDraw.pixels.copyOf())
     }
 
     override fun record() {
         val origin = newFile("video", "gif")
 
-        logger.info("GLWF") { "Starting to generate GIF in '${origin.absolutePath}' (Wait for it...)" }
-        val buffer = mutableListOf<IntArray>().apply {
+        logger.info("GLFW") { "Starting to generate GIF in '${origin.absolutePath}' (Wait for it...)" }
+        val buffer = mutableListOf<ByteArray>().apply {
             addAll(gifFrameCache)
         }
 
@@ -235,7 +235,7 @@ class GlfwPlatform(
             val options = ImageOptions().apply {
                 this.setDelay(20, TimeUnit.MILLISECONDS)
             }
-            ByteArrayOutputStream().use { out ->
+            origin.outputStream().buffered().use { out ->
                 val encoder = FastGifEncoder(
                     out,
                     gameOptions.width,
@@ -244,11 +244,10 @@ class GlfwPlatform(
                     gameOptions.colors(),
                 )
 
-                buffer.forEach { img ->
-                    encoder.addImage(img, gameOptions.width, options)
+                buffer.forEach { frame ->
+                    encoder.addIndexedImage(frame, gameOptions.width, options)
                 }
                 encoder.finishEncoding()
-                vfs.save(FileStream(origin), out.toByteArray())
             }
             logger.info("GLFW") { "Screen recorded in '${origin.absolutePath}' in ${System.currentTimeMillis() - now} ms" }
         }

@@ -48,6 +48,50 @@ class FastGifEncoder(
     }
 
     /**
+     * Add a frame from pre-indexed palette data, skipping color quantization.
+     *
+     * @param indexedData a ByteArray where each byte is a palette index
+     * @param width the number of pixels per row
+     * @param options options to be applied to this image
+     * @return this instance for chaining
+     */
+    @Synchronized
+    @Throws(IOException::class)
+    fun addIndexedImage(
+        indexedData: ByteArray,
+        width: Int,
+        options: ImageOptions,
+    ): FastGifEncoder {
+        val height = indexedData.size / width
+        require(
+            !(options.left + width > screenWidth || options.top + height > screenHeight),
+        ) { "Image does not fit in screen." }
+
+        val paddedColorCount = colorTable.paddedSize()
+        GraphicsControlExtensionBlock.write(
+            outputStream,
+            options.disposalMethod,
+            false,
+            false,
+            options.delayCentiseconds,
+            0,
+        )
+        ImageDescriptorBlock.write(
+            outputStream, options.left, options.top, width,
+            height, true, false, false, getColorTableSizeField(paddedColorCount),
+        )
+        colorTable.write(outputStream)
+
+        // Convert ByteArray palette indices to IntArray for LZW encoder
+        val colorIndices = IntArray(indexedData.size) { indexedData[it].toInt() and 0xFF }
+
+        val lzwEncoder = FastLzwEncoder(paddedColorCount)
+        val lzwData = lzwEncoder.encode(colorIndices)
+        ImageDataBlock.write(outputStream, lzwEncoder.minimumCodeSize, lzwData)
+        return this
+    }
+
+    /**
      * Writes the trailer. This should be called exactly once per GIF file.
      *
      *
@@ -117,59 +161,85 @@ class FastGifEncoder(
 }
 
 /**
+ * LZW encoder using an integer-array trie instead of HashMap for zero-allocation encoding.
+ *
  * For background, see Appendix F of the
  * [GIF spec](http://www.w3.org/Graphics/GIF/spec-gif89a.txt).
  */
-internal class FastLzwEncoder(colorTableSize: Int) {
+internal class FastLzwEncoder(private val colorTableSize: Int) {
     val minimumCodeSize: Int
+
     private val outputBits = BitSet()
     private var position = 0
-    private var codeTable: MutableMap<String, Int> = defaultCodeTable()
     private var codeSize = 0
-    private var indexBuffer: String = ""
 
-    /**
-     * @param colorTableSize Size of the (padded) color table; must be a power of 2
-     */
+    // Trie: each node has colorTableSize child slots. -1 means no child.
+    // Node 0..colorTableSize-1 are single-color root nodes.
+    // clearCode and endOfInfoCode are special codes with no trie node.
+    private var trieChildren: Array<IntArray> = emptyArray()
+    private var nodeCodes: IntArray = IntArray(0)
+    private var nextNodeIndex = 0
+    private var nextCode = 0
+
+    private val clearCode: Int
+    private val endOfInfoCode: Int
+
+    // Current trie node (-1 means empty buffer)
+    private var currentNode = -1
+
     init {
         require(GifMath.isPowerOfTwo(colorTableSize)) { "Color table size must be a power of 2" }
         minimumCodeSize = computeMinimumCodeSize(colorTableSize)
+        clearCode = 1 shl minimumCodeSize
+        endOfInfoCode = clearCode + 1
         resetCodeTableAndCodeSize()
     }
 
     fun encode(indices: IntArray): ByteArray {
-        writeCode(codeTable[CLEAR_CODE]!!)
+        writeCode(clearCode)
         for (index in indices) {
             processIndex(index)
-            // writeCode(codeTable[indexBuffer]!!)
-            // writeCode(codeTable[index.toChar().toString()]!!)
         }
-        writeCode(codeTable[indexBuffer]!!)
-        writeCode(codeTable[END_OF_INFO]!!)
+        // Flush remaining buffer
+        if (currentNode >= 0) {
+            writeCode(nodeCodes[currentNode])
+        }
+        writeCode(endOfInfoCode)
         return toBytes()
     }
 
     private fun processIndex(index: Int) {
-        val indexAsStr = index.toChar().toString()
-        val extendedIndexBuffer = indexBuffer + indexAsStr
-        indexBuffer =
-            if (codeTable.containsKey(extendedIndexBuffer)) {
-                extendedIndexBuffer
+        if (currentNode < 0) {
+            // Empty buffer: start with the single-color root node
+            currentNode = index
+            return
+        }
+        val childNode = trieChildren[currentNode][index]
+        if (childNode >= 0) {
+            // Extend: the sequence is already in the trie
+            currentNode = childNode
+        } else {
+            // Output code for current sequence
+            writeCode(nodeCodes[currentNode])
+            if (nextCode == MAX_CODE_TABLE_SIZE) {
+                // Table full: emit clear code, reset
+                writeCode(clearCode)
+                resetCodeTableAndCodeSize()
             } else {
-                writeCode(codeTable[indexBuffer]!!)
-                if (codeTable.size == MAX_CODE_TABLE_SIZE) {
-                    writeCode(codeTable[CLEAR_CODE]!!)
-                    resetCodeTableAndCodeSize()
-                } else {
-                    addCodeToTable(extendedIndexBuffer)
+                // Add new trie node for currentNode + index
+                val newNode = nextNodeIndex++
+                trieChildren[currentNode][index] = newNode
+                nodeCodes[newNode] = nextCode
+                if (nextCode == 1 shl codeSize) {
+                    ++codeSize
                 }
-                indexAsStr
+                nextCode++
             }
+            // Reset buffer to single-color root node
+            currentNode = index
+        }
     }
 
-    /**
-     * Write the given code to the output stream.
-     */
     private fun writeCode(code: Int) {
         for (shift in 0 until codeSize) {
             val bit = code ushr shift and 1 != 0
@@ -177,9 +247,6 @@ internal class FastLzwEncoder(colorTableSize: Int) {
         }
     }
 
-    /**
-     * Convert our stream of bits into a byte array, as described in the spec.
-     */
     private fun toBytes(): ByteArray {
         val bitCount = position
         val result = ByteArray((bitCount + 7) / 8)
@@ -191,63 +258,35 @@ internal class FastLzwEncoder(colorTableSize: Int) {
         return result
     }
 
-    private fun addCodeToTable(indices: String) {
-        val newCode = codeTable.size
-        codeTable[indices] = newCode
-        if (newCode == 1 shl codeSize) {
-            // The next code won't fit in {@code codeSize} bits, so we need to increment.
-            ++codeSize
-        }
-    }
-
     private fun resetCodeTableAndCodeSize() {
-        codeTable = defaultCodeTable()
+        // Max 4096 entries per GIF spec
+        trieChildren = Array(MAX_CODE_TABLE_SIZE) { IntArray(colorTableSize) { -1 } }
+        nodeCodes = IntArray(MAX_CODE_TABLE_SIZE)
 
-        // We add an extra bit because of the special "clear" and "end of info" codes.
-        codeSize = minimumCodeSize + 1
-    }
-
-    private fun defaultCodeTable(): MutableMap<String, Int> {
-        val codeTable: MutableMap<String, Int> = HashMap(126 * 4 * 30 * 60)
-
-        // The spec indicates that CLEAR_CODE must have a value of 2**minimumCodeSize. Thus we reserve
-        // the first 2**minimumCodeSize codes for colors, even if our color table is smaller.
         val colorsInCodeTable = 1 shl minimumCodeSize
+        // Initialize root nodes (single-color entries)
         for (i in 0 until colorsInCodeTable) {
-            codeTable[i.toChar().toString()] = i
+            nodeCodes[i] = i
         }
-        codeTable[CLEAR_CODE] = codeTable.size
-        codeTable[(END_OF_INFO)] = codeTable.size
-        return codeTable
+        nextNodeIndex = colorsInCodeTable
+        // clearCode = colorsInCodeTable, endOfInfoCode = colorsInCodeTable + 1
+        nextCode = endOfInfoCode + 1
+
+        // Code size starts one bit larger to accommodate clear and end-of-info codes
+        codeSize = minimumCodeSize + 1
+
+        currentNode = -1
     }
 
     companion object {
-        // Dummy values to represent special, GIF-specific instructions.
-        private val CLEAR_CODE = (-1).toChar().toString()
-        private val END_OF_INFO = (-2).toChar().toString()
-
-        /**
-         * The specification stipulates that code size may not exceed 12 bits.
-         */
         private const val MAX_CODE_TABLE_SIZE = 1 shl 12
 
-        /**
-         * This computes what the spec refers to as "code size". The actual starting code size will be one
-         * bit larger than this, because of the special "clear" and "end of info" codes.
-         */
         private fun computeMinimumCodeSize(colorTableSize: Int): Int {
-            var size = 2 // LZW has a minimum code size of 2.
+            var size = 2
             while (colorTableSize > 1 shl size) {
                 ++size
             }
             return size
-        }
-
-        private fun <T> append(
-            list: List<T>,
-            value: T,
-        ): List<T> {
-            return list + value
         }
     }
 }
