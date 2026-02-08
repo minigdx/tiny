@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tiny Editor</title>
+  <link rel="stylesheet" href="/src/styles/main.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="toolbar">
+      <div class="toolbar-left">
+        <span class="toolbar-title">Tiny Editor</span>
+      </div>
+      <div class="toolbar-center">
+        <button id="btn-play" class="toolbar-btn" title="Play (F5)">&#9654; Play</button>
+        <button id="btn-stop" class="toolbar-btn" title="Stop" disabled>&#9632; Stop</button>
+      </div>
+      <div class="toolbar-right">
+        <button id="btn-save" class="toolbar-btn" title="Save (Ctrl+S)">&#128190; Save</button>
+        <button id="btn-export" class="toolbar-btn" title="Export ZIP (Ctrl+Shift+E)">&#128230; Export ZIP</button>
+        <button id="btn-import" class="toolbar-btn" title="Import ZIP">&#128194; Import ZIP</button>
+        <span id="save-status" class="save-status"></span>
+      </div>
+    </header>
+
+    <div class="main-content">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <span class="sidebar-title">Files</span>
+          <button id="btn-new-file" class="sidebar-btn" title="New file">+</button>
+        </div>
+        <div id="file-tree" class="file-tree"></div>
+      </aside>
+
+      <div class="editor-area">
+        <div id="tab-bar" class="tab-bar"></div>
+        <div id="editor-container" class="editor-container">
+          <div class="editor-placeholder">Open a file from the sidebar to start editing</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="console-panel" id="console-panel">
+      <div class="console-header">
+        <span class="console-title">Console</span>
+        <button id="btn-clear-console" class="console-btn" title="Clear">Clear</button>
+      </div>
+      <div id="console-output" class="console-output"></div>
+    </div>
+  </div>
+
+  <div id="welcome-screen" class="welcome-screen hidden">
+    <div class="welcome-content">
+      <h1 class="welcome-title">Tiny Editor</h1>
+      <p class="welcome-subtitle">A pixel-art game editor for the Tiny engine</p>
+      <div class="welcome-actions">
+        <button id="btn-new-project" class="welcome-btn">New Project</button>
+        <button id="btn-import-project" class="welcome-btn">Import ZIP</button>
+      </div>
+      <div id="recent-projects" class="recent-projects"></div>
+    </div>
+  </div>
+
+  <canvas id="game-canvas" class="game-canvas hidden"></canvas>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
