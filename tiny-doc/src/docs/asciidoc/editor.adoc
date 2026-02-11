@@ -3,6 +3,7 @@
 :book:
 :source-highlighter: rouge
 :favicon: ./sample/favicon.png
+:stylesheet: adoc-riak.css
 
 = Tiny Editor
 

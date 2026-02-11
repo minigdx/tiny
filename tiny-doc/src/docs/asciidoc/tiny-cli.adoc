@@ -1,0 +1,18 @@
+:docinfo: shared
+:icons: font
+:book:
+:source-highlighter: rouge
+:favicon: ./sample/favicon.png
+:stylesheet: adoc-riak.css
+
+= Tiny CLI
+
+++++
+<style>#header { display: none; }</style>
+++++
+
+The Tiny command-line interface provides everything you need to create, develop, test, and export your games.
+
+include::dependencies/tiny-cli-commands.adoc[]
+
+include::tiny-sfx-editor.adoc[]

@@ -1,0 +1,22 @@
+:docinfo: shared
+:icons: font
+:book:
+:source-highlighter: rouge
+:favicon: ./sample/favicon.png
+:stylesheet: adoc-riak.css
+:toc: left
+:toclevels: 3
+
+= Lua API Reference
+
+++++
+<style>
+#header > h1,
+#header > .details { display: none; }
+#header { margin-bottom: 0; padding-bottom: 0; }
+</style>
+++++
+
+Complete reference for all Lua functions available in the Tiny game engine.
+
+include::dependencies/tiny-api.adoc[]
