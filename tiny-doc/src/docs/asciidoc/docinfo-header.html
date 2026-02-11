@@ -388,13 +388,79 @@
         border: none;
         overflow: hidden;
     }
+
+    /* Editor page: wider layout, push below fixed nav */
+    body.tiny-editor-page #content {
+        max-width: 90%;
+        padding-top: 64px;
+    }
+
+    body.tiny-editor-page #header {
+        display: none;
+    }
+
+    /* Editor toolbar (editor page mode) */
+    .tiny-editor-toolbar {
+        width: calc(100%);
+        min-height: 48px;
+        padding: 4px 12px;
+        border-radius: 10px 10px 0 0;
+        background: #eef0f2;
+        border: 1px solid #e0e0e0;
+        border-bottom: none;
+        margin-bottom: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-family: 'Titillium Web', sans-serif;
+    }
+
+    .tiny-example-name {
+        flex: 1;
+        color: #555;
+        font-size: 0.9em;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .tiny-examples-select {
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-family: 'Source Code Pro', monospace;
+        font-size: 0.85em;
+        background: white;
+        cursor: pointer;
+    }
+
+    .tiny-examples-select:hover {
+        border-color: #2a8a6e;
+    }
+
+    /* Share link below editor */
+    .tiny-share-link {
+        display: inline-block;
+        margin-top: 8px;
+        padding: 6px 12px;
+        color: #555;
+        font-size: 0.85em;
+        font-family: 'Source Code Pro', monospace;
+        text-decoration: none;
+        transition: color 0.15s ease;
+    }
+
+    .tiny-share-link:hover {
+        color: #2a8a6e;
+    }
 </style>
 
 <nav class="tiny-nav">
     <a href="index.html" class="nav-logo">TINY</a>
     <a href="index.html#_tiny_showcase">Demos</a>
     <a href="index.html#_tiny_engine">Documentation</a>
-    <a href="playground.html">Sandbox</a>
+    <a href="editor.html">Editor</a>
     <a href="index.html#_tiny_api">API</a>
     <a href="https://github.com/minigdx/tiny">GitHub</a>
     <a href="index.html#_tiny_install" class="nav-cta">Get Started</a>

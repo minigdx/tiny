@@ -21,7 +21,7 @@
         A tiny virtual console for building pixel art games with Lua. Hot-reload your scripts, draw sprites, synthesize sounds, and export to desktop or web &mdash; all from a single codebase.
     </p>
     <div class="landing-cta-group">
-        <a href="playground.html" class="landing-cta landing-cta-primary">Try the Sandbox</a>
+        <a href="editor.html" class="landing-cta landing-cta-primary">Try the Editor</a>
         <a href="#_tiny_install" class="landing-cta landing-cta-secondary">Get Started</a>
     </div>
 </section>
@@ -104,9 +104,9 @@ New to Tiny? Start here:
  - https://github.com/minigdx/tiny[GitHub Repository]
  - https://github.com/minigdx/tiny/releases[Download Latest Release]
 
-== Tiny Playground
+== Tiny Editor
 
-You can try creating a game right away with `Tiny` using link:playground.html?game=[the Playground], or you can experiment by updating the examples available on this page.
+You can try creating a game right away with `Tiny` using link:editor.html?game=[the Editor], or you can experiment by updating the examples available on this page.
 
 == Tiny is open source
 

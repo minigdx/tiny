@@ -23,10 +23,25 @@ import org.w3c.dom.Element
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.HTMLDivElement
+import org.w3c.dom.HTMLSelectElement
 import org.w3c.dom.Node
+import org.w3c.dom.events.Event
 import org.w3c.dom.url.URLSearchParams
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
+
+data class ExampleEntry(val name: String, val code: String)
+
+fun parseExamples(json: String): List<ExampleEntry> {
+    val parsed: dynamic = kotlin.js.JSON.parse(json)
+    val length = parsed.length as Int
+    val result = mutableListOf<ExampleEntry>()
+    for (i in 0 until length) {
+        val item = parsed[i]
+        result.add(ExampleEntry(item.name as String, item.code as String))
+    }
+    return result
+}
 
 @OptIn(ExperimentalEncodingApi::class)
 fun main() {
@@ -37,64 +52,166 @@ fun main() {
     val url = URLSearchParams(window.location.search)
     val savedCode = url.get("game")
     val decodedCode = if (savedCode?.isNotBlank() == true) {
-        Base64.decode(savedCode.encodeToByteArray()).decodeToString()
+        // URLSearchParams decodes '+' as space; restore it for valid base64
+        Base64.decode(savedCode.replace(' ', '+').encodeToByteArray()).decodeToString()
     } else {
         null
     }
 
     elts.forEachIndexed { index, game ->
-        val code = game.textContent ?: ""
-        val spritePath = game.getAttribute("sprite")
-        val levelPath = game.getAttribute("level")
-
-        val toolbar = document.createElement("div") {
-            setAttribute("class", "tiny-toolbar")
-        }
-        game.before(toolbar)
-
-        val link = document.createElement("a") {
-            setAttribute("id", "link-editor-$index")
-            setAttribute("class", "tiny-play tiny-button")
-            setAttribute("href", "#link-editor-$index")
-        } as HTMLAnchorElement
-        toolbar.appendChild(link)
-
-        val playLink = document.createElement("div").apply {
-            setAttribute("class", "tiny-container")
-        }
-        toolbar.after(playLink)
-
-        val codeToUse = decodedCode ?: "-- Update the code to update the game!\n$code"
-
-        var clicked = false
-        link.textContent = "\uD83D\uDC7E ▶ Run and tweak an example"
-        link.onclick = { _ ->
-            if (!clicked) {
-                createGame(playLink, index, codeToUse, spritePath, levelPath, rootPath)
-                clicked = true
-            }
-            true
-        }
-
-        val playground = (
-            document.createElement("a") {
-                setAttribute("class", "tiny-button tiny-button-right")
-                id = "share-$index"
-                textContent = "↗\uFE0F Playground"
-            } as HTMLAnchorElement
-        ).apply {
-            val b64 = Base64.encode(code.encodeToByteArray())
-            href = "playground.html?game=$b64"
-            target = "_blank"
-        }
-
-        toolbar.appendChild(playground)
-
-        // There is a user code. Let's unfold the game.
-        if (savedCode != null) {
-            createGame(playLink, index, codeToUse, spritePath, levelPath, rootPath)
+        val mode = game.getAttribute("mode")
+        if (mode == "editor") {
+            setupEditorMode(index, game, decodedCode, rootPath)
+        } else {
+            setupDocMode(index, game, decodedCode, savedCode, rootPath)
         }
     }
+}
+
+@OptIn(ExperimentalEncodingApi::class)
+private fun setupDocMode(
+    index: Int,
+    game: Element,
+    decodedCode: String?,
+    savedCode: String?,
+    rootPath: String,
+) {
+    val code = game.textContent ?: ""
+    val spritePath = game.getAttribute("sprite")
+    val levelPath = game.getAttribute("level")
+
+    val toolbar = document.createElement("div") {
+        setAttribute("class", "tiny-toolbar")
+    }
+    game.before(toolbar)
+
+    val link = document.createElement("a") {
+        setAttribute("id", "link-editor-$index")
+        setAttribute("class", "tiny-play tiny-button")
+        setAttribute("href", "#link-editor-$index")
+    } as HTMLAnchorElement
+    toolbar.appendChild(link)
+
+    val playLink = document.createElement("div").apply {
+        setAttribute("class", "tiny-container")
+    }
+    toolbar.after(playLink)
+
+    val codeToUse = decodedCode ?: "-- Update the code to update the game!\n$code"
+
+    var clicked = false
+    link.textContent = "\uD83D\uDC7E ▶ Run and tweak an example"
+    link.onclick = { _ ->
+        if (!clicked) {
+            createGame(playLink, index, codeToUse, spritePath, levelPath, rootPath)
+            clicked = true
+        }
+        true
+    }
+
+    val editorLink = (
+        document.createElement("a") {
+            setAttribute("class", "tiny-button tiny-button-right")
+            id = "share-$index"
+            textContent = "↗\uFE0F Editor"
+        } as HTMLAnchorElement
+    ).apply {
+        val b64 = Base64.encode(code.encodeToByteArray())
+        href = "editor.html?game=$b64"
+        target = "_blank"
+    }
+
+    toolbar.appendChild(editorLink)
+
+    // There is a user code. Let's unfold the game.
+    if (savedCode != null) {
+        createGame(playLink, index, codeToUse, spritePath, levelPath, rootPath)
+    }
+}
+
+@OptIn(ExperimentalEncodingApi::class)
+private fun setupEditorMode(
+    index: Int,
+    game: Element,
+    decodedCode: String?,
+    rootPath: String,
+) {
+    val code = game.textContent ?: ""
+    val spritePath = game.getAttribute("sprite")
+    val levelPath = game.getAttribute("level")
+    val examplesJson = game.getAttribute("examples") ?: "[]"
+    val examples = parseExamples(examplesJson)
+
+    val codeToUse = decodedCode ?: "-- Update the code to update the game!\n$code"
+
+    // Widen the editor page layout
+    document.body?.classList?.add("tiny-editor-page")
+
+    // Create editor toolbar (example name + dropdown only)
+    val toolbar = document.createElement("div") {
+        setAttribute("class", "tiny-editor-toolbar")
+    }
+    game.before(toolbar)
+
+    // Example name label
+    val exampleName = document.createElement("span") {
+        setAttribute("class", "tiny-example-name")
+        textContent = if (decodedCode != null) "Shared Code" else examples.firstOrNull()?.name ?: "Empty Project"
+    }
+    toolbar.appendChild(exampleName)
+
+    // Examples dropdown
+    val select = document.createElement("select") {
+        setAttribute("class", "tiny-examples-select")
+    } as HTMLSelectElement
+    examples.forEachIndexed { i, example ->
+        select.appendChild(
+            document.createElement("option") {
+                setAttribute("value", i.toString())
+                textContent = example.name
+            },
+        )
+    }
+    toolbar.appendChild(select)
+
+    // Container for game + editor
+    val playLink = document.createElement("div").apply {
+        setAttribute("class", "tiny-container")
+    }
+    toolbar.after(playLink)
+
+    // Share link below the editor
+    val share = (
+        document.createElement("a") {
+            setAttribute("class", "tiny-share-link")
+            id = "share-$index"
+            textContent = "\uD83D\uDD17 Share this code"
+        } as HTMLAnchorElement
+    ).apply {
+        val b64 = Base64.encode(codeToUse.encodeToByteArray())
+        href = "editor.html?game=$b64"
+        target = "_blank"
+    }
+    playLink.after(share)
+
+    // Auto-start the game
+    createGame(playLink, index, codeToUse, spritePath, levelPath, rootPath)
+
+    // Examples dropdown change handler
+    select.addEventListener("change", {
+        val selectedIndex = select.selectedIndex
+        if (selectedIndex >= 0 && selectedIndex < examples.size) {
+            val example = examples[selectedIndex]
+            val decoded = Base64.decode(example.code.encodeToByteArray()).decodeToString()
+            val editor = document.getElementById("editor-$index") as? HTMLDivElement
+            if (editor != null) {
+                editor.innerHTML = highlight(decoded)
+                editor.dispatchEvent(Event("input"))
+            }
+            exampleName.textContent = example.name
+            share.href = "editor.html?game=${example.code}"
+        }
+    }, null)
 }
 
 /**
