@@ -66,6 +66,9 @@ fun main() {
             setupDocMode(index, game, decodedCode, savedCode, rootPath)
         }
     }
+
+    // Render Lucide icons in dynamically created elements
+    js("if (typeof lucide !== 'undefined') { lucide.createIcons(); }")
 }
 
 @OptIn(ExperimentalEncodingApi::class)
@@ -100,7 +103,7 @@ private fun setupDocMode(
     val codeToUse = decodedCode ?: "-- Update the code to update the game!\n$code"
 
     var clicked = false
-    link.textContent = "\uD83D\uDC7E ▶ Run and tweak an example"
+    link.innerHTML = """<i data-lucide="play"></i> Run and edit this example"""
     link.onclick = { _ ->
         if (!clicked) {
             createGame(playLink, index, codeToUse, spritePath, levelPath, rootPath)
@@ -113,7 +116,7 @@ private fun setupDocMode(
         document.createElement("a") {
             setAttribute("class", "tiny-button tiny-button-right")
             id = "share-$index"
-            textContent = "↗\uFE0F Editor"
+            innerHTML = """<i data-lucide="external-link"></i> Editor"""
         } as HTMLAnchorElement
     ).apply {
         val b64 = Base64.encode(code.encodeToByteArray())
@@ -185,7 +188,7 @@ private fun setupEditorMode(
         document.createElement("a") {
             setAttribute("class", "tiny-share-link")
             id = "share-$index"
-            textContent = "\uD83D\uDD17 Share this code"
+            innerHTML = """<i data-lucide="share-2"></i> Share this code"""
         } as HTMLAnchorElement
     ).apply {
         val b64 = Base64.encode(codeToUse.encodeToByteArray())

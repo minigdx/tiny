@@ -1,5 +1,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
 
 <style>
     /* Shared nav bar */
@@ -283,6 +284,7 @@
     .tiny-button {
         display: inline-flex;
         align-items: center;
+        gap: 6px;
         padding: 8px 16px;
 
         background-color: #007bff;
@@ -313,6 +315,12 @@
         background-color: #0056b3;
         color: white;
         outline: none;
+    }
+
+    .tiny-button svg {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
     }
 
     .tiny-toolbar {
@@ -441,7 +449,9 @@
 
     /* Share link below editor */
     .tiny-share-link {
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
         margin-top: 8px;
         padding: 6px 12px;
         color: #555;
@@ -449,6 +459,12 @@
         font-family: 'Source Code Pro', monospace;
         text-decoration: none;
         transition: color 0.15s ease;
+    }
+
+    .tiny-share-link svg {
+        width: 14px;
+        height: 14px;
+        flex-shrink: 0;
     }
 
     .tiny-share-link:hover {
