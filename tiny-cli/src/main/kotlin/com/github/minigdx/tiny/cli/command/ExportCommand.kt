@@ -497,6 +497,17 @@ class GameExporter {
 
         when (gameParameters) {
             is GameParametersV1 -> {
+                // Bundle the custom boot script if configured
+                listOfNotNull(gameParameters.bootScript)
+                    .filterNot { exportedFile.contains(it) }
+                    .forEach { name ->
+                        exportedGame.putNextEntry(ZipEntry(name))
+                        exportedGame.write(gameDirectory.resolve(name).readBytes())
+                        exportedGame.closeEntry()
+
+                        exportedFile += name
+                    }
+
                 (gameParameters.scripts)
                     .filterNot { exportedFile.contains(it) }
                     .forEach { name ->
@@ -559,6 +570,7 @@ class GameExporter {
                 template = template.replace("{GAME_SPRW}", gameParameters.sprites.width.toString())
                 template = template.replace("{GAME_SPRH}", gameParameters.sprites.height.toString())
                 template = template.replace("{GAME_HIDE_MOUSE}", gameParameters.hideMouseCursor.toString())
+                template = template.replace("{GAME_BOOT_SCRIPT}", gameParameters.bootScript ?: "")
 
                 template = replaceList(
                     template,

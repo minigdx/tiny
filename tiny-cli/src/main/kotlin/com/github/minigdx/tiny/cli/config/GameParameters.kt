@@ -101,6 +101,12 @@ data class GameParametersV1(
      * The game have to display it by itself if the mouse is required.
      */
     val hideMouseCursor: Boolean = false,
+    /**
+     * Custom boot script to use instead of the default boot.lua.
+     * This script should exist in the game directory.
+     * When set, this script will be used as the first script to run.
+     */
+    val bootScript: String? = null,
 ) : GameParameters() {
     override fun toGameOptions(): GameOptions {
         return GameOptions(
@@ -114,6 +120,7 @@ data class GameParametersV1(
             zoom = zoom,
             sound = sound,
             hideMouseCursor = hideMouseCursor,
+            bootScript = bootScript,
         )
     }
 

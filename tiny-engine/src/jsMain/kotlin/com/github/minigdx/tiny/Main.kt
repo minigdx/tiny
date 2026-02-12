@@ -74,6 +74,7 @@ fun setupGames(
 
         val sprWidth = game.getAttribute("spritew")?.toInt() ?: 16
         val sprHeight = game.getAttribute("spriteh")?.toInt() ?: 16
+        val bootScript = game.getAttribute("bootscript")?.ifBlank { null }
 
         val scripts = game.getElementsByTagName("tiny-script").map { script ->
             script.getAttribute("name")
@@ -115,6 +116,7 @@ fun setupGames(
                 gutter = 0 to 0,
                 spriteSize = sprWidth to sprHeight,
                 hideMouseCursor = hideMouse,
+                bootScript = bootScript,
             )
 
         val logger = StdOutLogger("game-$index")

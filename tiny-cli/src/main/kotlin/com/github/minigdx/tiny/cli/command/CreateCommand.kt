@@ -90,6 +90,12 @@ ${
         .prompt("\uD83D\uDDB1\uFE0F  Hide system cursor mouse? (yes or no)", default = "No")
         .validate { it.lowercase() == "yes" || it.lowercase() == "no" }
 
+    private val bootScript by option(help = "🚀 Custom boot script to use instead of the default boot.lua")
+        .prompt("\uD83D\uDE80  Custom boot script (leave empty for default boot.lua)", default = "")
+        .validate {
+            require(it.isEmpty() || it.endsWith(".lua")) { "Invalid boot script extension: $it. Must be a .lua file." }
+        }
+
     override fun help(context: Context) = "Create a new game with the help of a wizard 🧙."
 
     override fun run() {
@@ -98,6 +104,9 @@ ${
         echo("➡\uFE0F  Game Resolution: $spriteSize")
         echo("➡\uFE0F  Sprite Sheet Filenames: ${spritesheets.ifBlank { "No spritesheet added!" }}")
         echo("➡\uFE0F  Color palette: ${GamePalette.ALL[palette - 1].name}")
+        if (bootScript.isNotBlank()) {
+            echo("➡\uFE0F  Boot script: $bootScript")
+        }
 
         val configuration = GameParametersV1(
             name = gameName,
@@ -109,6 +118,7 @@ ${
             scripts = listOf(gameScript),
             sound = "default-sound.sfx",
             hideMouseCursor = hideMouseCursor == "yes".lowercase(),
+            bootScript = bootScript.ifBlank { null },
         ) as GameParameters
 
         if (!gameDirectory.exists()) gameDirectory.mkdirs()
@@ -120,6 +130,10 @@ ${
         soundFile.writeText(SoundData.DEFAULT_SFX.music.serialize())
 
         gameDirectory.resolve(gameScript).writeText(DEFAULT_GAME_SCRIPT)
+
+        if (bootScript.isNotBlank()) {
+            gameDirectory.resolve(bootScript).writeText(DEFAULT_GAME_SCRIPT)
+        }
 
         CreateCommand::class.java.getResourceAsStream("/_tiny.stub.lua")?.let { content ->
             gameDirectory.resolve("_tiny.stub.lua").writeBytes(content.readAllBytes())
