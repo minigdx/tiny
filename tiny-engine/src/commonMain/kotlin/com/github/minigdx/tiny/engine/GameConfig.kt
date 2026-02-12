@@ -40,17 +40,17 @@ data class GameConfigV1(
     val sound: String? = null,
     val hideMouseCursor: Boolean = false,
 ) : GameConfig() {
-
-    override fun toGameOptions(): GameOptions = GameOptions(
-        width = resolution.width,
-        height = resolution.height,
-        palette = colors,
-        spriteSize = sprites.width to sprites.height,
-        gameScripts = scripts,
-        spriteSheets = spritesheets,
-        gameLevels = levels,
-        zoom = zoom,
-        sound = sound,
-        hideMouseCursor = hideMouseCursor,
-    )
+    override fun toGameOptions(): GameOptions =
+        GameOptions(
+            width = resolution.width,
+            height = resolution.height,
+            palette = colors,
+            spriteSize = sprites.width to sprites.height,
+            gameScripts = scripts,
+            spriteSheets = spritesheets,
+            gameLevels = levels,
+            zoom = zoom,
+            sound = sound,
+            hideMouseCursor = hideMouseCursor,
+        )
 }

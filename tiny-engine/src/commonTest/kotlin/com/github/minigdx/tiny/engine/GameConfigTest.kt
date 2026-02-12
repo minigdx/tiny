@@ -7,7 +7,6 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class GameConfigTest {
-
     @Test
     fun parse_v1_config_with_all_fields() {
         val json = """

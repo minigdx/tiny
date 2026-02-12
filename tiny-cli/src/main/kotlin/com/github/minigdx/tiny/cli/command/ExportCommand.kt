@@ -548,34 +548,8 @@ class GameExporter {
                             }
                     }
 
-                // Add index.html
-
-                var template = indexContent
-                template = template.replace("{GAME_ID}", gameParameters.id)
-                template = template.replace("{GAME_NAME}", gameParameters.name)
-                template = template.replace("{GAME_WIDTH}", gameParameters.resolution.width.toString())
-                template = template.replace("{GAME_HEIGHT}", gameParameters.resolution.height.toString())
-                template = template.replace("{GAME_ZOOM}", gameParameters.zoom.toString())
-                template = template.replace("{GAME_SPRW}", gameParameters.sprites.width.toString())
-                template = template.replace("{GAME_SPRH}", gameParameters.sprites.height.toString())
-                template = template.replace("{GAME_HIDE_MOUSE}", gameParameters.hideMouseCursor.toString())
-
-                template = replaceList(
-                    template,
-                    gameParameters.scripts,
-                    "{GAME_SCRIPT}",
-                    "GAME_SCRIPT",
-                )
-                template = replaceList(
-                    template,
-                    gameParameters.spritesheets,
-                    "{GAME_SPRITESHEET}",
-                    "GAME_SPRITESHEET",
-                )
-                template = replaceList(template, gameParameters.levels, "{GAME_LEVEL}", "GAME_LEVEL")
-                template = replaceList(template, listOfNotNull(gameParameters.sound), "{GAME_SOUND}", "GAME_SOUND")
-
-                template = template.replace("{GAME_COLORS}", gameParameters.colors.joinToString(","))
+                // Add index.html with only the game name replaced
+                val template = indexContent.replace("{GAME_NAME}", gameParameters.name)
 
                 exportedGame.putNextEntry(ZipEntry("index.html"))
                 exportedGame.write(template.toByteArray())
@@ -584,22 +558,6 @@ class GameExporter {
         }
 
         exportedGame.close()
-    }
-
-    private fun replaceList(
-        template: String,
-        values: List<String>,
-        tag: String,
-        delimiter: String,
-    ): String {
-        val pattern = ("<!-- $delimiter -->(.*?)<!-- ${delimiter}_END -->").toRegex(RegexOption.DOT_MATCHES_ALL)
-        val delimiterTag = pattern.find(template)!!.groupValues[1]
-
-        var result = ""
-        values.forEach { script ->
-            result += delimiterTag.replace(tag, script)
-        }
-        return template.replace(delimiterTag, result)
     }
 
     companion object {

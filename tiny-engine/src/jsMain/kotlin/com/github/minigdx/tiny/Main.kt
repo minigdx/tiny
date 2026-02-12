@@ -1,12 +1,16 @@
 package com.github.minigdx.tiny
 
+import com.github.minigdx.tiny.engine.GameConfig
 import com.github.minigdx.tiny.engine.GameEngine
-import com.github.minigdx.tiny.engine.GameOptions
+import com.github.minigdx.tiny.file.AjaxStream
 import com.github.minigdx.tiny.file.CommonVirtualFileSystem
 import com.github.minigdx.tiny.log.StdOutLogger
 import com.github.minigdx.tiny.platform.webgl.WebGlPlatform
 import kotlinx.browser.document
 import kotlinx.browser.window
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.dom.appendText
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLCanvasElement
@@ -20,9 +24,9 @@ fun getRootPath(): String {
     var rootPath = window.location.protocol + "//" + window.location.host + window.location.pathname
     rootPath = rootPath.substring(0, rootPath.lastIndexOf('/'))
 
-    // Remove the last "/" to a avoid double slash when the engine getting resources.
+    // Remove the last "/" to avoid double slash when the engine getting resources.
     if (rootPath.endsWith("/")) {
-        rootPath.dropLast(1)
+        rootPath = rootPath.dropLast(1)
     }
     return rootPath
 }
@@ -30,10 +34,13 @@ fun getRootPath(): String {
 fun main() {
     val rootPath = getRootPath()
     val tinyGameTag = document.getElementsByTagName("tiny-game")
-    setupGames(rootPath, tinyGameTag)
+
+    CoroutineScope(Dispatchers.Main).launch {
+        setupGames(rootPath, tinyGameTag)
+    }
 }
 
-fun setupGames(
+suspend fun setupGames(
     rootPath: String,
     tinyGameTag: HTMLCollection,
 ) {
@@ -64,65 +71,33 @@ fun setupGames(
         )
     }
 
-    tinyGameTag.forEachIndexed { index, game ->
+    for (index in 0 until tinyGameTag.length) {
+        val game = tinyGameTag[index] ?: continue
+        val gamePath = game.getAttribute("game") ?: "."
+        val gameRootPath = "$rootPath/$gamePath".trimEnd('/')
 
-        val gameId = game.getAttribute("id")!!
-        val gameWidth = game.getAttribute("width")?.toInt() ?: 128
-        val gameHeight = game.getAttribute("height")?.toInt() ?: 128
-        val gameZoom = game.getAttribute("zoom")?.toInt() ?: 1
-        val hideMouse = game.getAttribute("mouse")?.toBoolean() ?: false
+        val logger = StdOutLogger("game-$index")
+        logger.debug("TINY-JS") { "Boot the game using the URL '$gameRootPath'." }
 
-        val sprWidth = game.getAttribute("spritew")?.toInt() ?: 16
-        val sprHeight = game.getAttribute("spriteh")?.toInt() ?: 16
+        // Fetch and parse _tiny.json
+        val configUrl = "$gameRootPath/_tiny.json"
+        val configBytes = AjaxStream(configUrl).read()
+        val configJson = configBytes.decodeToString()
+        val config = GameConfig.parse(configJson)
+        val gameOptions = config.toGameOptions().copy(gutter = 0 to 0)
 
-        val scripts = game.getElementsByTagName("tiny-script").map { script ->
-            script.getAttribute("name")
-        }.filterNotNull()
-
-        val levels = game.getElementsByTagName("tiny-level").map { level ->
-            level.getAttribute("name")
-        }.filterNotNull()
-
-        val sounds = game.getElementsByTagName("tiny-sound").map { level ->
-            level.getAttribute("name")
-        }.filterNotNull()
-
-        val spritesheets = game.getElementsByTagName("tiny-spritesheet").map { spritesheet ->
-            spritesheet.getAttribute("name")
-        }.filterNotNull()
-
-        val colors =
-            game.getElementsByTagName("tiny-colors")[0]?.getAttribute("name")?.split(",")?.toList() ?: emptyList()
         val canvas = document.createElement("canvas")
-        canvas.setAttribute("width", (gameWidth * gameZoom).toString())
-        canvas.setAttribute("height", (gameHeight * gameZoom).toString())
+        canvas.setAttribute("width", (gameOptions.width * gameOptions.zoom).toString())
+        canvas.setAttribute("height", (gameOptions.height * gameOptions.zoom).toString())
         canvas.setAttribute("tabindex", "1")
-        if (hideMouse) {
+        if (gameOptions.hideMouseCursor) {
             canvas.setAttribute("style", "cursor: none;")
         }
         game.appendChild(canvas)
 
-        val gameOptions =
-            GameOptions(
-                width = gameWidth,
-                height = gameHeight,
-                palette = colors.ifEmpty { listOf("#FFFFFF", "#000000") },
-                gameScripts = scripts,
-                spriteSheets = spritesheets,
-                gameLevels = levels,
-                sound = sounds.firstOrNull(),
-                zoom = gameZoom,
-                gutter = 0 to 0,
-                spriteSize = sprWidth to sprHeight,
-                hideMouseCursor = hideMouse,
-            )
-
-        val logger = StdOutLogger("game-$index")
-        logger.debug("TINY-JS") { "Boot the game using the URL '$rootPath'." }
-
         GameEngine(
             gameOptions = gameOptions,
-            platform = WebGlPlatform(canvas as HTMLCanvasElement, gameOptions, gameId, rootPath),
+            platform = WebGlPlatform(canvas as HTMLCanvasElement, gameOptions, config.id, gameRootPath),
             vfs = CommonVirtualFileSystem(),
             logger = logger,
         ).main()
