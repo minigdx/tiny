@@ -88,14 +88,21 @@ class GameResourceProcessor(
             Sound(0, 0, "default-sound", SoundData.DEFAULT_EMPTY)
         }
 
+        val bootScriptFlow = if (gameOptions.bootScript != null) {
+            resourceFactory.customBootScript(gameOptions.bootScript)
+        } else {
+            resourceFactory.bootscript("_boot.lua")
+        }
+        val bootScriptName = gameOptions.bootScript ?: "_boot.lua"
+
         resources = listOf(
-            resourceFactory.bootscript("_boot.lua"),
+            bootScriptFlow,
             resourceFactory.enginescript("_engine.lua"),
             resourceFactory.bootSpritesheet("_boot.png"),
         ) + gameScripts + spriteSheets + gameLevels + listOfNotNull(sounds)
 
         toBeLoaded.addAll(
-            setOf("_boot.lua", "_engine.lua", "_boot.png"),
+            setOf(bootScriptName, "_engine.lua", "_boot.png"),
         )
         toBeLoaded.addAll(gameOptions.gameLevels)
         toBeLoaded.addAll(gameOptions.gameScripts)
