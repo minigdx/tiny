@@ -65,8 +65,10 @@ function _draw()
     local src = {x = 1, y = 2, z = 3}
     local dst = {a = 4, b = 5}
     local result = merge(src, dst)
-    for k,v in ipars(result) do
-        print(v, (k + 1) * 8, 8) 
+    local index = 1
+    for k,v in pairs(result) do
+        print(k..":"..v , index * 4 * 8, 8)
+        index = index + 1
     end
 end
 """
@@ -78,7 +80,7 @@ function _draw()
     local src = {1, 2, 3}
     local dst = {4, 5}
     local result = append(src, dst)
-    for k,v in ipars(result) do
+    for k,v in ipairs(result) do
         print(v, (k + 1) * 8, 8) 
     end
 end

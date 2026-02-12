@@ -70,4 +70,28 @@ class StdLibTest {
         val activeValue = instance.get("child").get("active")
         assertTrue(activeValue.toboolean(), "Nested instance should preserve metatable and access 'active' field")
     }
+
+    @Test
+    fun `merge should copy all keys from source into dest`() {
+        val mergeFunc = lib.merge()
+
+        val src = LuaTable()
+        src.set("x", valueOf(1))
+        src.set("y", valueOf(2))
+        src.set("z", valueOf(3))
+
+        val dst = LuaTable()
+        dst.set("a", valueOf(4))
+        dst.set("b", valueOf(5))
+
+        val result = mergeFunc.call(src, dst)
+
+        // Source keys copied into dest
+        assertEquals(1, result.get("x").toint())
+        assertEquals(2, result.get("y").toint())
+        assertEquals(3, result.get("z").toint())
+        // Original dest keys preserved
+        assertEquals(4, result.get("a").toint())
+        assertEquals(5, result.get("b").toint())
+    }
 }

@@ -17,6 +17,4 @@
 </style>
 ++++
 
-Complete reference for all Lua functions available in the Tiny game engine.
-
 include::dependencies/tiny-api.adoc[]

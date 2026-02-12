@@ -104,7 +104,7 @@ class StdLib(
                     val value = arg1.get(k)
                     arg2[k] = value
                 }
-                return arg2
+                arg2
             } else {
                 NIL
             }
