@@ -6,7 +6,7 @@ import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.log.Logger
 import com.github.minigdx.tiny.lua.CtrlLib
-import com.github.minigdx.tiny.lua.DebugLib
+import com.github.minigdx.tiny.lua.ConsoleLib
 import com.github.minigdx.tiny.lua.FloppyLib
 import com.github.minigdx.tiny.lua.GfxLib
 import com.github.minigdx.tiny.lua.JuiceLib
@@ -98,7 +98,7 @@ class GameScript(
             load(SfxLib(resourceAccess, virtualSoundBoard, platform, playSound = !forValidation))
             load(SoundLib(resourceAccess, virtualSoundBoard, playSound = !forValidation))
             load(ShapeLib(gameOptions, virtualFrameBuffer))
-            load(DebugLib(logger))
+            load(ConsoleLib(logger))
             load(KeysLib())
             load(MathLib())
             load(Vec2Lib())

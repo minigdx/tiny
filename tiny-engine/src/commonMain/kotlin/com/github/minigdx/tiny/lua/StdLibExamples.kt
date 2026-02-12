@@ -65,7 +65,9 @@ function _draw()
     local src = {x = 1, y = 2, z = 3}
     local dst = {a = 4, b = 5}
     local result = merge(src, dst)
-    debug.table(result)
+    for k,v in ipars(result) do
+        print(v, (k + 1) * 8, 8) 
+    end
 end
 """
 
@@ -76,6 +78,8 @@ function _draw()
     local src = {1, 2, 3}
     local dst = {4, 5}
     local result = append(src, dst)
-    debug.table(result)
+    for k,v in ipars(result) do
+        print(v, (k + 1) * 8, 8) 
+    end
 end
 """

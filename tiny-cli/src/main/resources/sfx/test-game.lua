@@ -63,7 +63,7 @@ local button_type = {
 mode.score.configure = function(self, content)
     local content = self.file_selector:current()
 
-    debug.console(content)
+    console.log(content)
     for index, note in ipairs(content.tracks[1].patterns[1]) do
         if (note.type == "Silence") then
             self.sound.notes[index]:set_value(0)
@@ -190,7 +190,7 @@ function _init()
             })
         else
             for f in all(files) do
-                debug.console(f)
+                console.log(f)
                 table.insert(file_selector.files, {
                     file = f,
                     content = sfx.to_table(ws.load(f))
@@ -218,7 +218,7 @@ function _init()
         end)
 
         file_selector.new_file:on_update(function(self)
-            debug.console("creating file")
+            console.log("creating file")
             local new_file = ws.create("sfx", "sfx")
             table.insert(file_selector.files, {
                 file = new_file,
@@ -229,12 +229,12 @@ function _init()
         end)
 
         file_selector.save:on_update(function(self)
-            debug.console("saving file...")
+            console.log("saving file...")
             local score = sfx.to_score(file_selector:current())
-            debug.console(file_selector:current())
-            debug.console(score)
+            console.log(file_selector:current())
+            console.log(score)
             ws.save(file_selector:currentName(), score)
-            debug.console("file saved!") --
+            console.log("file saved!") --
         end)
         file_selector.screen:set_value(file_selector.files[file_selector.current_file].file)
     end
@@ -243,7 +243,7 @@ function _init()
     for name, m in pairs(mode) do
         m.file_selector = file_selector
 
-        debug.console("preload screen " .. name)
+        console.log("preload screen " .. name)
         map.level(m.id)
         for k in all(map.entities()["Knob"]) do
             local knob = widgets:create_knob(k)

@@ -12,18 +12,17 @@ import org.luaj.vm2.Varargs
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.VarArgFunction
 
-@TinyLib("debug", "Helpers to debug your game by drawing or printing information on screen.")
-class DebugLib(private val logger: Logger) : TwoArgFunction() {
+@TinyLib("console", "Helpers to log information in the console.")
+class ConsoleLib(private val logger: Logger) : TwoArgFunction() {
     override fun call(
         arg1: LuaValue,
         arg2: LuaValue,
     ): LuaValue {
         val tiny = LuaTable()
-        // TODO: move it into console.log instead of debug.console ?
-        tiny["console"] = console()
+        tiny["log"] = log()
 
-        arg2["debug"] = tiny
-        arg2["package"]["loaded"]["debug"] = tiny
+        arg2["console"] = tiny
+        arg2["package"]["loaded"]["console"] = tiny
 
         return tiny
     }
@@ -52,7 +51,7 @@ class DebugLib(private val logger: Logger) : TwoArgFunction() {
         }
 
     @TinyFunction("Log a message into the console.", example = DEBUG_EXAMPLE)
-    internal inner class console : VarArgFunction() {
+    internal inner class log : VarArgFunction() {
         @TinyCall("Log a message into the console.")
         override fun invoke(
             @TinyArg("str", type = LuaType.ANY) args: Varargs,
