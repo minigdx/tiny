@@ -56,7 +56,10 @@ class UpdateCommand : CliktCommand(name = "update") {
         }
     }
 
-    private fun applyUpdates(params: GameParametersV1, configFile: File) {
+    private fun applyUpdates(
+        params: GameParametersV1,
+        configFile: File,
+    ) {
         var updated = params
 
         newZoom?.let { zoom ->

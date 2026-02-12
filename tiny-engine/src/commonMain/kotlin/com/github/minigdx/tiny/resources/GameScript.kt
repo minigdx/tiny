@@ -5,8 +5,8 @@ import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.log.Logger
-import com.github.minigdx.tiny.lua.CtrlLib
 import com.github.minigdx.tiny.lua.ConsoleLib
+import com.github.minigdx.tiny.lua.CtrlLib
 import com.github.minigdx.tiny.lua.FloppyLib
 import com.github.minigdx.tiny.lua.GfxLib
 import com.github.minigdx.tiny.lua.JuiceLib

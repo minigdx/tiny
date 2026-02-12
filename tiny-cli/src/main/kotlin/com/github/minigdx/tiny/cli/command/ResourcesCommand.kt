@@ -47,7 +47,10 @@ class ResourcesCommand : CliktCommand(name = "resources") {
         }
     }
 
-    private fun deleteResources(params: GameParametersV1, configFile: File) {
+    private fun deleteResources(
+        params: GameParametersV1,
+        configFile: File,
+    ) {
         var updated = params
 
         for (resource in delete) {
@@ -91,7 +94,10 @@ class ResourcesCommand : CliktCommand(name = "resources") {
         displayCategory("🔊 Sounds", listOfNotNull(params.sound))
     }
 
-    private fun displayCategory(label: String, resources: List<String>) {
+    private fun displayCategory(
+        label: String,
+        resources: List<String>,
+    ) {
         if (resources.isEmpty()) return
         echo("$label:")
         resources.forEachIndexed { index, resource ->

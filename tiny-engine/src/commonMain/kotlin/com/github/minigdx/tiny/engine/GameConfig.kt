@@ -39,6 +39,12 @@ data class GameConfigV1(
     val levels: List<String> = emptyList(),
     val sound: String? = null,
     val hideMouseCursor: Boolean = false,
+    /**
+     * Custom boot script to use instead of the default boot.lua.
+     * This script should exist in the game directory.
+     * When set, this script will be used as the first script to run.
+     */
+    val bootScript: String? = null,
 ) : GameConfig() {
     override fun toGameOptions(): GameOptions =
         GameOptions(
@@ -52,5 +58,6 @@ data class GameConfigV1(
             zoom = zoom,
             sound = sound,
             hideMouseCursor = hideMouseCursor,
+            bootScript = bootScript,
         )
 }
