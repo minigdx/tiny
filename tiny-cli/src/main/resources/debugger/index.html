@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tiny Debugger</title>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* === Reset & Base === */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-base: #1e1e2e;
+            --bg-surface: #181825;
+            --bg-overlay: #11111b;
+            --border: #313244;
+            --text: #cdd6f4;
+            --text-dim: #6c7086;
+            --text-muted: #45475a;
+            --accent-blue: #89b4fa;
+            --accent-green: #a6e3a1;
+            --accent-red: #f38ba8;
+            --accent-peach: #fab387;
+            --accent-mauve: #cba6f7;
+            --accent-yellow: #f9e2af;
+            --highlight-line: rgba(243, 139, 168, 0.12);
+            --hover: #313244;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-base);
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* === App Layout === */
+        #app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* === Toolbar === */
+        #toolbar {
+            display: flex;
+            align-items: center;
+            padding: 6px 12px;
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border);
+            gap: 2px;
+            flex-shrink: 0;
+        }
+
+        .toolbar-group {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            padding: 0 8px;
+            border-right: 1px solid var(--border);
+        }
+        .toolbar-group:last-child { border-right: none; }
+
+        .toolbar-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            background: transparent;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 12px;
+            font-family: inherit;
+            white-space: nowrap;
+            transition: background 0.15s;
+        }
+        .toolbar-btn:hover { background: var(--hover); }
+        .toolbar-btn:active { background: var(--border); }
+        .toolbar-btn:disabled { opacity: 0.4; cursor: default; }
+        .toolbar-btn:disabled:hover { background: transparent; }
+        .toolbar-btn svg { flex-shrink: 0; }
+
+        .toolbar-btn.continue { color: var(--accent-green); }
+        .toolbar-btn.step-over { color: var(--accent-blue); }
+        .toolbar-btn.step-in { color: var(--accent-mauve); }
+        .toolbar-btn.disconnect { color: var(--accent-red); }
+
+        .toolbar-spacer { flex: 1; }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--text-dim);
+            padding: 0 8px;
+        }
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--accent-red);
+            transition: background 0.3s;
+        }
+        .status-dot.connected { background: var(--accent-green); }
+
+        .toolbar-title {
+            font-weight: 600;
+            font-size: 12px;
+            color: var(--text-muted);
+            padding-left: 8px;
+        }
+
+        /* === Main Content === */
+        #main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* === Editor Panel === */
+        #editor-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        /* === Tabs === */
+        #tabs {
+            display: flex;
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+            flex-shrink: 0;
+        }
+        #tabs::-webkit-scrollbar { height: 2px; }
+        #tabs::-webkit-scrollbar-thumb { background: var(--border); }
+
+        .tab {
+            padding: 7px 16px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: var(--text-dim);
+            font-size: 12px;
+            font-family: 'Source Code Pro', monospace;
+            border-bottom: 2px solid transparent;
+            white-space: nowrap;
+            transition: all 0.15s;
+        }
+        .tab:hover { color: var(--text); background: var(--bg-base); }
+        .tab.active {
+            color: var(--text);
+            border-bottom-color: var(--accent-blue);
+            background: var(--bg-base);
+        }
+
+        /* === Code Container === */
+        #code-container {
+            flex: 1;
+            overflow: auto;
+        }
+        #code-container::-webkit-scrollbar { width: 8px; height: 8px; }
+        #code-container::-webkit-scrollbar-track { background: var(--bg-base); }
+        #code-container::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        .code-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Source Code Pro', monospace;
+            font-size: 13px;
+            line-height: 20px;
+        }
+
+        .code-line {
+            height: 20px;
+        }
+        .code-line.highlighted {
+            background: var(--highlight-line);
+        }
+        .code-line.highlighted .gutter {
+            background: var(--highlight-line);
+        }
+
+        .gutter {
+            width: 64px;
+            min-width: 64px;
+            text-align: right;
+            padding-right: 16px;
+            color: var(--text-muted);
+            user-select: none;
+            cursor: pointer;
+            position: relative;
+            vertical-align: top;
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border);
+        }
+        .gutter:hover {
+            color: var(--accent-blue);
+        }
+
+        .breakpoint-marker {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--accent-red);
+        }
+        .breakpoint-marker.conditional {
+            background: var(--accent-yellow);
+        }
+
+        .code-content {
+            padding-left: 16px;
+            white-space: pre;
+            tab-size: 4;
+        }
+
+        /* === Syntax Highlighting === */
+        .syn-keyword { color: var(--accent-mauve); font-weight: 600; }
+        .syn-string { color: var(--accent-green); }
+        .syn-comment { color: var(--text-dim); font-style: italic; }
+        .syn-number { color: var(--accent-peach); }
+        .syn-builtin { color: var(--accent-blue); }
+        .syn-boolean { color: var(--accent-peach); }
+        .syn-operator { color: var(--accent-blue); }
+
+        /* === Variables Panel === */
+        #variables-panel {
+            width: 280px;
+            min-width: 200px;
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-surface);
+            flex-shrink: 0;
+        }
+
+        .panel-header {
+            padding: 8px 12px;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-dim);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        #variables-list {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        #variables-list::-webkit-scrollbar { width: 6px; }
+        #variables-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        .var-section {
+            border-bottom: 1px solid var(--border);
+        }
+        .var-section:last-child { border-bottom: none; }
+
+        .var-section-header {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            padding: 6px 12px 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .var-entry {
+            display: flex;
+            padding: 2px 12px;
+            font-size: 12px;
+            font-family: 'Source Code Pro', monospace;
+            line-height: 20px;
+        }
+        .var-entry:hover {
+            background: var(--bg-base);
+        }
+        .var-name {
+            color: var(--accent-blue);
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+        .var-separator {
+            color: var(--text-muted);
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+        .var-value {
+            color: var(--accent-green);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .var-value.dict-val {
+            color: var(--accent-peach);
+            cursor: pointer;
+        }
+        .var-value.dict-val:hover {
+            text-decoration: underline;
+        }
+
+        .no-variables {
+            padding: 16px 12px;
+            color: var(--text-muted);
+            font-size: 12px;
+            font-style: italic;
+        }
+
+        /* === Modal (Dictionary Viewer) === */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+        .modal {
+            background: var(--bg-base);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            width: 450px;
+            max-height: 70vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+        }
+        .modal-close:hover { color: var(--text); }
+        .modal-body {
+            padding: 12px 16px;
+            overflow-y: auto;
+            font-family: 'Source Code Pro', monospace;
+            font-size: 12px;
+            line-height: 20px;
+        }
+
+        .tree-node {
+            padding-left: 16px;
+        }
+        .tree-node.root { padding-left: 0; }
+        .tree-key { color: var(--accent-blue); }
+        .tree-value { color: var(--accent-green); }
+        .tree-colon { color: var(--text-muted); }
+        .tree-bracket { color: var(--text-dim); }
+        .tree-toggle {
+            cursor: pointer;
+            user-select: none;
+            color: var(--text-dim);
+        }
+        .tree-toggle:hover { color: var(--text); }
+
+        /* === Empty state === */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-muted);
+            gap: 12px;
+        }
+        .empty-state svg { opacity: 0.3; }
+        .empty-state p { font-size: 13px; }
+
+        /* === Resize handle === */
+        .resize-handle {
+            width: 4px;
+            cursor: col-resize;
+            background: transparent;
+            flex-shrink: 0;
+            transition: background 0.15s;
+        }
+        .resize-handle:hover { background: var(--accent-blue); }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Toolbar -->
+        <div id="toolbar">
+            <div class="toolbar-group">
+                <button class="toolbar-btn continue" id="btn-continue" onclick="doResume()" title="Continue (F5)" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                    Continue
+                </button>
+                <button class="toolbar-btn step-over" id="btn-step-over" onclick="doStepOver()" title="Step Over (F10)" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 8 4 4-4 4"/><path d="M2 12h20"/></svg>
+                    Step Over
+                </button>
+            </div>
+            <div class="toolbar-group">
+                <button class="toolbar-btn disconnect" id="btn-disconnect" onclick="doDisconnect()" title="Disconnect">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 5 3-3"/><path d="m2 22 3-3"/><path d="M6.3 20.3a2.4 2.4 0 0 0 3.4 0L12 18l-6-6-2.3 2.3a2.4 2.4 0 0 0 0 3.4Z"/><path d="M7.5 13.5 10 11"/><path d="M10.5 16.5 13 14"/><path d="m12 6 6 6 2.3-2.3a2.4 2.4 0 0 0 0-3.4l-2.6-2.6a2.4 2.4 0 0 0-3.4 0Z"/></svg>
+                    Disconnect
+                </button>
+            </div>
+
+            <div class="toolbar-spacer"></div>
+
+            <div class="status">
+                <div class="status-dot" id="status-dot"></div>
+                <span id="status-text">Disconnected</span>
+            </div>
+
+            <div class="toolbar-title" id="toolbar-title">Tiny Debugger</div>
+        </div>
+
+        <!-- Main Content -->
+        <div id="main">
+            <div id="editor-panel">
+                <div id="tabs"></div>
+                <div id="code-container">
+                    <div class="empty-state">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></svg>
+                        <p>Loading scripts...</p>
+                    </div>
+                </div>
+            </div>
+            <div id="variables-panel">
+                <div class="panel-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></svg>
+                    Variables
+                </div>
+                <div id="variables-list">
+                    <div class="no-variables">Paused state will show variables here.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // ============================================================
+    // Tiny Web Debugger
+    // ============================================================
+
+    // --- State ---
+    let debugPort = 8081;
+    let ws = null;
+    let scripts = {};               // scriptName -> content
+    let activeTab = null;
+    let breakpoints = new Map();    // "script:line" -> { enabled, condition }
+    let currentHighlight = null;    // { script, line }
+    let isPaused = false;
+    let currentVariables = { locals: {}, upValues: {} };
+
+    // kotlinx.serialization type discriminator values
+    const PKG = 'com.github.minigdx.tiny.cli.debug';
+    const TYPE = {
+        // Engine -> Debugger
+        BREAKPOINT_HIT:     PKG + '.BreakpointHit',
+        CURRENT_BREAKPOINTS: PKG + '.CurrentBreakpoints',
+        RELOAD:             PKG + '.Reload',
+        // Debugger -> Engine
+        TOGGLE_BREAKPOINT:  PKG + '.ToggleBreakpoint',
+        RESUME_EXECUTION:   PKG + '.ResumeExecution',
+        DISCONNECT:         PKG + '.Disconnect',
+        REQUEST_BREAKPOINTS: PKG + '.RequestBreakpoints',
+        // LuaValue
+        LUA_PRIMITIVE:      PKG + '.LuaValue.Primitive',
+        LUA_DICTIONARY:     PKG + '.LuaValue.Dictionary',
+    };
+
+    // --- Initialization ---
+    async function init() {
+        try {
+            const configRes = await fetch('/api/config');
+            const config = await configRes.json();
+            debugPort = parseInt(config.debugPort);
+            const name = config.gameName || 'Game';
+            document.getElementById('toolbar-title').textContent = 'Tiny Debugger \u2014 ' + name;
+            document.title = 'Tiny Debugger \u2014 ' + name;
+        } catch (e) {
+            console.error('Failed to load config:', e);
+        }
+
+        await loadScripts();
+        connectWebSocket();
+    }
+
+    async function loadScripts() {
+        try {
+            const res = await fetch('/api/scripts');
+            scripts = await res.json();
+            renderTabs();
+            const first = Object.keys(scripts)[0];
+            if (first) selectTab(first);
+        } catch (e) {
+            console.error('Failed to load scripts:', e);
+        }
+    }
+
+    // --- WebSocket ---
+    function connectWebSocket() {
+        const wsUrl = 'ws://' + location.hostname + ':' + debugPort + '/debug';
+        try {
+            ws = new WebSocket(wsUrl);
+        } catch (e) {
+            setConnectionStatus(false);
+            scheduleReconnect();
+            return;
+        }
+
+        ws.onopen = function() {
+            setConnectionStatus(true);
+            sendCommand({ type: TYPE.REQUEST_BREAKPOINTS });
+        };
+
+        ws.onclose = function() {
+            setConnectionStatus(false);
+            scheduleReconnect();
+        };
+
+        ws.onerror = function() {
+            // onclose will fire after this
+        };
+
+        ws.onmessage = function(event) {
+            try {
+                var msg = JSON.parse(event.data);
+                handleEngineMessage(msg);
+            } catch (e) {
+                console.error('Failed to parse message:', e);
+            }
+        };
+    }
+
+    function scheduleReconnect() {
+        setTimeout(connectWebSocket, 2000);
+    }
+
+    function sendCommand(cmd) {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify(cmd));
+        }
+    }
+
+    function setConnectionStatus(connected) {
+        var dot = document.getElementById('status-dot');
+        var text = document.getElementById('status-text');
+        if (connected) {
+            dot.classList.add('connected');
+            text.textContent = 'Connected';
+        } else {
+            dot.classList.remove('connected');
+            text.textContent = 'Disconnected';
+            setPaused(false);
+        }
+    }
+
+    function setPaused(paused) {
+        isPaused = paused;
+        document.getElementById('btn-continue').disabled = !paused;
+        document.getElementById('btn-step-over').disabled = !paused;
+    }
+
+    // --- Engine Message Handling ---
+    function handleEngineMessage(msg) {
+        switch (msg.type) {
+            case TYPE.BREAKPOINT_HIT:
+                handleBreakpointHit(msg);
+                break;
+            case TYPE.CURRENT_BREAKPOINTS:
+                handleCurrentBreakpoints(msg);
+                break;
+            case TYPE.RELOAD:
+                handleReload(msg);
+                break;
+        }
+    }
+
+    function handleBreakpointHit(msg) {
+        clearHighlight();
+        currentHighlight = { script: msg.script, line: msg.line };
+        setPaused(true);
+
+        // Switch to the right tab
+        selectTab(msg.script);
+        renderCode(msg.script);
+
+        // Show variables
+        currentVariables = { locals: msg.locals || {}, upValues: msg.upValues || {} };
+        renderVariables();
+    }
+
+    function handleCurrentBreakpoints(msg) {
+        breakpoints.clear();
+        if (msg.breakpoints) {
+            msg.breakpoints.forEach(function(bp) {
+                if (bp.enabled) {
+                    breakpoints.set(bp.script + ':' + bp.line, {
+                        enabled: true,
+                        condition: bp.condition || null
+                    });
+                }
+            });
+        }
+        if (activeTab) renderCode(activeTab);
+    }
+
+    async function handleReload(msg) {
+        try {
+            var res = await fetch('/api/scripts');
+            var newScripts = await res.json();
+            if (newScripts[msg.script] !== undefined) {
+                scripts[msg.script] = newScripts[msg.script];
+                // Add tab if it's a new script
+                if (!document.querySelector('.tab[data-script="' + CSS.escape(msg.script) + '"]')) {
+                    renderTabs();
+                }
+                if (activeTab === msg.script) {
+                    renderCode(msg.script);
+                }
+            }
+        } catch (e) {
+            console.error('Failed to reload script:', e);
+        }
+    }
+
+    // --- Debug Actions ---
+    function doResume() {
+        clearHighlight();
+        clearVariables();
+        setPaused(false);
+        sendCommand({ type: TYPE.RESUME_EXECUTION, advanceByStep: false });
+    }
+
+    function doStepOver() {
+        clearHighlight();
+        sendCommand({ type: TYPE.RESUME_EXECUTION, advanceByStep: true });
+    }
+
+    function doDisconnect() {
+        clearHighlight();
+        clearVariables();
+        setPaused(false);
+        sendCommand({ type: TYPE.DISCONNECT });
+    }
+
+    // --- Tabs ---
+    function renderTabs() {
+        var container = document.getElementById('tabs');
+        container.innerHTML = '';
+        Object.keys(scripts).forEach(function(name) {
+            var tab = document.createElement('button');
+            tab.className = 'tab' + (name === activeTab ? ' active' : '');
+            tab.textContent = shortName(name);
+            tab.title = name;
+            tab.setAttribute('data-script', name);
+            tab.onclick = function() { selectTab(name); };
+            container.appendChild(tab);
+        });
+    }
+
+    function shortName(path) {
+        var parts = path.replace(/\\/g, '/').split('/');
+        return parts[parts.length - 1];
+    }
+
+    function selectTab(name) {
+        if (!scripts[name]) return;
+        activeTab = name;
+        document.querySelectorAll('.tab').forEach(function(t) {
+            t.classList.toggle('active', t.getAttribute('data-script') === name);
+        });
+        renderCode(name);
+    }
+
+    // --- Code Rendering ---
+    function renderCode(scriptName) {
+        var container = document.getElementById('code-container');
+        var code = scripts[scriptName];
+        if (!code && code !== '') {
+            container.innerHTML = '<div class="empty-state"><p>Script not found.</p></div>';
+            return;
+        }
+
+        var lines = code.split('\n');
+        var html = '<table class="code-table">';
+
+        for (var i = 0; i < lines.length; i++) {
+            var lineNum = i + 1;
+            var bpKey = scriptName + ':' + lineNum;
+            var bp = breakpoints.get(bpKey);
+            var hasBreakpoint = !!bp;
+            var hasCondition = hasBreakpoint && bp.condition;
+            var isHighlighted = currentHighlight &&
+                currentHighlight.script === scriptName &&
+                currentHighlight.line === lineNum;
+
+            html += '<tr class="code-line' + (isHighlighted ? ' highlighted' : '') + '" data-line="' + lineNum + '">';
+            html += '<td class="gutter" data-script="' + escapeAttr(scriptName) + '" data-line="' + lineNum + '">';
+            if (hasBreakpoint) {
+                html += '<div class="breakpoint-marker' + (hasCondition ? ' conditional' : '') + '"></div>';
+            }
+            html += lineNum + '</td>';
+            html += '<td class="code-content">' + highlightSyntax(lines[i]) + '</td>';
+            html += '</tr>';
+        }
+
+        html += '</table>';
+        container.innerHTML = html;
+
+        // Scroll highlighted line into view
+        if (currentHighlight && currentHighlight.script === scriptName) {
+            var el = container.querySelector('.code-line.highlighted');
+            if (el) {
+                el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+            }
+        }
+    }
+
+    // --- Syntax Highlighting ---
+    function highlightSyntax(line) {
+        line = escapeHtml(line);
+
+        // Handle comments: find the first -- that isn't inside a string
+        var commentIdx = findCommentStart(line);
+        if (commentIdx >= 0) {
+            var before = line.substring(0, commentIdx);
+            var comment = line.substring(commentIdx);
+            return highlightCode(before) + '<span class="syn-comment">' + comment + '</span>';
+        }
+
+        return highlightCode(line);
+    }
+
+    function findCommentStart(escapedLine) {
+        // Operates on HTML-escaped text.
+        // &quot; is the escaped double-quote in the text.
+        var inString = false;
+        var i = 0;
+        while (i < escapedLine.length) {
+            // Check for &quot; (HTML-escaped double quote)
+            if (escapedLine.substring(i, i + 6) === '&quot;') {
+                if (inString === '"') {
+                    inString = false;
+                } else if (!inString) {
+                    inString = '"';
+                }
+                i += 6;
+                continue;
+            }
+            // Check for single quote (not HTML-escaped by our escapeHtml)
+            if (escapedLine[i] === "'") {
+                if (inString === "'") {
+                    inString = false;
+                } else if (!inString) {
+                    inString = "'";
+                }
+                i++;
+                continue;
+            }
+            // Check for --
+            if (!inString && escapedLine[i] === '-' && i + 1 < escapedLine.length && escapedLine[i + 1] === '-') {
+                return i;
+            }
+            i++;
+        }
+        return -1;
+    }
+
+    function highlightCode(code) {
+        // Strings: match &quot;...&quot; (HTML-escaped double quotes)
+        code = code.replace(/(&quot;.*?&quot;)/g, '<span class="syn-string">$1</span>');
+        // Strings: match '...' (single quotes are not escaped by our escapeHtml)
+        code = code.replace(/('.*?')/g, function(match) {
+            // Avoid matching inside already-wrapped span attributes
+            if (match.indexOf('class=') >= 0) return match;
+            return '<span class="syn-string">' + match + '</span>';
+        });
+
+        // Booleans and nil
+        code = code.replace(/\b(true|false|nil)\b/g, '<span class="syn-boolean">$1</span>');
+
+        // Keywords
+        code = code.replace(/\b(if|else|elseif|then|end|while|for|in|do|repeat|until|return|function|local|not|and|or|break|goto)\b/g, '<span class="syn-keyword">$1</span>');
+
+        // Numbers
+        code = code.replace(/\b(\d+\.?\d*)\b/g, '<span class="syn-number">$1</span>');
+
+        return code;
+    }
+
+    function highlightLine(scriptName, line) {
+        if (activeTab === scriptName) {
+            renderCode(scriptName);
+        }
+    }
+
+    function clearHighlight() {
+        currentHighlight = null;
+        if (activeTab) renderCode(activeTab);
+    }
+
+    // --- Breakpoints ---
+    function toggleBreakpoint(scriptName, line) {
+        var key = scriptName + ':' + line;
+        var exists = breakpoints.has(key);
+
+        if (exists) {
+            breakpoints.delete(key);
+            sendCommand({
+                type: TYPE.TOGGLE_BREAKPOINT,
+                script: scriptName,
+                line: line,
+                enabled: false
+            });
+        } else {
+            breakpoints.set(key, { enabled: true, condition: null });
+            sendCommand({
+                type: TYPE.TOGGLE_BREAKPOINT,
+                script: scriptName,
+                line: line,
+                enabled: true
+            });
+        }
+
+        renderCode(scriptName);
+    }
+
+    function onGutterContext(scriptName, line) {
+        var key = scriptName + ':' + line;
+        if (!breakpoints.has(key)) return;
+
+        var bp = breakpoints.get(key);
+        var currentCondition = bp.condition || '';
+        var condition = prompt(
+            'Lua condition for breakpoint at line ' + line + ':\n(Leave empty to remove condition)',
+            currentCondition
+        );
+
+        if (condition === null) return; // Cancelled
+
+        if (condition.trim() === '') {
+            bp.condition = null;
+        } else {
+            bp.condition = condition.trim();
+        }
+
+        sendCommand({
+            type: TYPE.TOGGLE_BREAKPOINT,
+            script: scriptName,
+            line: line,
+            enabled: true,
+            condition: bp.condition
+        });
+
+        renderCode(scriptName);
+    }
+
+    // --- Variables ---
+    function renderVariables() {
+        var container = document.getElementById('variables-list');
+        var hasLocals = Object.keys(currentVariables.locals).length > 0;
+        var hasUpValues = Object.keys(currentVariables.upValues).length > 0;
+
+        if (!hasLocals && !hasUpValues) {
+            container.innerHTML = '<div class="no-variables">No variables in scope.</div>';
+            return;
+        }
+
+        var html = '';
+
+        if (hasLocals) {
+            html += '<div class="var-section">';
+            html += '<div class="var-section-header">Locals</div>';
+            Object.keys(currentVariables.locals).forEach(function(name) {
+                html += renderVariable(name, currentVariables.locals[name], 'locals');
+            });
+            html += '</div>';
+        }
+
+        if (hasUpValues) {
+            html += '<div class="var-section">';
+            html += '<div class="var-section-header">Upvalues</div>';
+            Object.keys(currentVariables.upValues).forEach(function(name) {
+                html += renderVariable(name, currentVariables.upValues[name], 'upValues');
+            });
+            html += '</div>';
+        }
+
+        container.innerHTML = html;
+    }
+
+    function renderVariable(name, value, scope) {
+        if (!value) return '';
+        if (value.type === TYPE.LUA_PRIMITIVE) {
+            return '<div class="var-entry">' +
+                '<span class="var-name">' + escapeHtml(name) + '</span>' +
+                '<span class="var-separator">=</span>' +
+                '<span class="var-value">' + escapeHtml(value.value) + '</span>' +
+                '</div>';
+        } else if (value.type === TYPE.LUA_DICTIONARY) {
+            var count = Object.keys(value.entries).length;
+            return '<div class="var-entry">' +
+                '<span class="var-name">' + escapeHtml(name) + '</span>' +
+                '<span class="var-separator">=</span>' +
+                '<span class="var-value dict-val" data-var-name="' + escapeAttr(name) + '" data-var-scope="' + scope + '">' +
+                '{' + count + ' entries}' +
+                '</span>' +
+                '</div>';
+        }
+        return '';
+    }
+
+    function clearVariables() {
+        currentVariables = { locals: {}, upValues: {} };
+        document.getElementById('variables-list').innerHTML =
+            '<div class="no-variables">Paused state will show variables here.</div>';
+    }
+
+    // Event delegation for gutter clicks (breakpoint toggling)
+    document.getElementById('code-container').addEventListener('click', function(e) {
+        var gutter = e.target.closest('.gutter');
+        if (!gutter) return;
+        var scriptName = gutter.getAttribute('data-script');
+        var line = parseInt(gutter.getAttribute('data-line'));
+        if (scriptName && !isNaN(line)) {
+            toggleBreakpoint(scriptName, line);
+        }
+    });
+
+    // Event delegation for gutter right-click (conditional breakpoints)
+    document.getElementById('code-container').addEventListener('contextmenu', function(e) {
+        var gutter = e.target.closest('.gutter');
+        if (!gutter) return;
+        e.preventDefault();
+        var scriptName = gutter.getAttribute('data-script');
+        var line = parseInt(gutter.getAttribute('data-line'));
+        if (scriptName && !isNaN(line)) {
+            onGutterContext(scriptName, line);
+        }
+    });
+
+    // Event delegation for dictionary clicks
+    document.getElementById('variables-list').addEventListener('click', function(e) {
+        var target = e.target.closest('.dict-val');
+        if (!target) return;
+        var name = target.getAttribute('data-var-name');
+        var scope = target.getAttribute('data-var-scope');
+        var value = currentVariables[scope] && currentVariables[scope][name];
+        if (value && value.type === TYPE.LUA_DICTIONARY) {
+            showDictionaryModal(name, value);
+        }
+    });
+
+    // --- Dictionary Modal ---
+    function showDictionaryModal(name, dict) {
+        var overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        overlay.onclick = function(e) {
+            if (e.target === overlay) overlay.remove();
+        };
+
+        var modal = document.createElement('div');
+        modal.className = 'modal';
+
+        var header = document.createElement('div');
+        header.className = 'modal-header';
+        header.innerHTML = '<span>' + escapeHtml(name) + '</span>';
+
+        var closeBtn = document.createElement('button');
+        closeBtn.className = 'modal-close';
+        closeBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>';
+        closeBtn.onclick = function() { overlay.remove(); };
+        header.appendChild(closeBtn);
+
+        var body = document.createElement('div');
+        body.className = 'modal-body';
+        body.innerHTML = renderDictTree(dict, true);
+
+        modal.appendChild(header);
+        modal.appendChild(body);
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+    }
+
+    function renderDictTree(dict, isRoot) {
+        if (!dict || !dict.entries) return '';
+        var html = '<div class="tree-node' + (isRoot ? ' root' : '') + '">';
+        Object.keys(dict.entries).forEach(function(key) {
+            var entry = dict.entries[key];
+            if (entry.type === TYPE.LUA_PRIMITIVE) {
+                html += '<div><span class="tree-key">' + escapeHtml(key) + '</span>' +
+                    '<span class="tree-colon"> = </span>' +
+                    '<span class="tree-value">' + escapeHtml(entry.value) + '</span></div>';
+            } else if (entry.type === TYPE.LUA_DICTIONARY) {
+                var count = Object.keys(entry.entries).length;
+                html += '<div><span class="tree-toggle" onclick="this.parentElement.querySelector(\'.tree-node\').style.display = this.parentElement.querySelector(\'.tree-node\').style.display === \'none\' ? \'block\' : \'none\'; this.textContent = this.textContent === \'\u25B6\' ? \'\u25BC\' : \'\u25B6\';">\u25BC</span> ' +
+                    '<span class="tree-key">' + escapeHtml(key) + '</span>' +
+                    '<span class="tree-bracket"> {' + count + '}</span></div>';
+                html += renderDictTree(entry, false);
+            }
+        });
+        html += '</div>';
+        return html;
+    }
+
+    // --- Utility ---
+    function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function escapeAttr(str) {
+        return escapeHtml(str).replace(/'/g, '&#x27;');
+    }
+
+    // --- Keyboard Shortcuts ---
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'F5') {
+            e.preventDefault();
+            if (isPaused) doResume();
+        } else if (e.key === 'F10') {
+            e.preventDefault();
+            if (isPaused) doStepOver();
+        } else if (e.key === 'Escape') {
+            var modal = document.querySelector('.modal-overlay');
+            if (modal) modal.remove();
+        }
+    });
+
+    // --- Start ---
+    init();
+    </script>
+</body>
+</html>

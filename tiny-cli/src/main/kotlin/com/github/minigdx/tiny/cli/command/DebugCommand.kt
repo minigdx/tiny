@@ -8,27 +8,17 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.minigdx.tiny.cli.config.GameParameters
-import com.github.minigdx.tiny.cli.debug.DebugRemoteCommand
-import com.github.minigdx.tiny.cli.debug.Disconnect
-import com.github.minigdx.tiny.cli.debug.EngineRemoteCommand
-import com.github.minigdx.tiny.cli.ui.TinyDebuggerUI
-import io.ktor.client.HttpClient
-import io.ktor.client.plugins.websocket.WebSockets
-import io.ktor.client.plugins.websocket.webSocketSession
-import io.ktor.websocket.Frame
-import io.ktor.websocket.close
-import io.ktor.websocket.readText
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.coroutines.channels.SendChannel
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import io.ktor.http.ContentType
+import io.ktor.server.engine.embeddedServer
+import io.ktor.server.netty.Netty
+import io.ktor.server.response.respondText
+import io.ktor.server.routing.get
+import io.ktor.server.routing.routing
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import java.io.File
-import javax.swing.SwingUtilities
 
 class DebugCommand : CliktCommand(name = "debug") {
     val gameDirectory by option("-d", "--directory", help = "The directory containing all game information.")
@@ -38,6 +28,10 @@ class DebugCommand : CliktCommand(name = "debug") {
     val debug by option(help = "Debug port used by the game.")
         .int()
         .default(8081)
+
+    val webPort by option("--web-port", help = "Port for the web debugger UI.")
+        .int()
+        .default(8082)
 
     override fun help(context: Context) = "Debug the current game"
 
@@ -49,56 +43,48 @@ class DebugCommand : CliktCommand(name = "debug") {
         }
         val gameParameters = GameParameters.read(configFile)
 
-        val debugCommandSender = Channel<DebugRemoteCommand>()
-        val engineCommandReceiver = Channel<EngineRemoteCommand>()
+        val debuggerHtml = DebugCommand::class.java.getResource("/debugger/index.html")?.readText()
+            ?: throw IllegalStateException("Debugger HTML resource not found")
 
-        SwingUtilities.invokeLater {
-            TinyDebuggerUI(debugCommandSender, engineCommandReceiver, gameParameters).apply { isVisible = true }
-        }
+        val configJson = buildJsonObject {
+            put("debugPort", debug.toString())
+            put("gameName", gameParameters.name)
+        }.toString()
 
-        runBlocking {
-            val client =
-                HttpClient {
-                    install(WebSockets)
+        echo("\uD83D\uDD0D Starting web debugger at http://localhost:$webPort")
+        echo("\uD83D\uDD0D Make sure the game is running with 'tiny-cli run' on port $debug")
+
+        val server = embeddedServer(
+            factory = Netty,
+            port = webPort,
+        ) {
+            routing {
+                get("/") {
+                    call.respondText(debuggerHtml, ContentType.Text.Html)
                 }
-
-            var connected = false
-            while (!connected) {
-                try {
-                    connectToGame(client, debugCommandSender, engineCommandReceiver)
-                    connected = true
-                } catch (ex: Exception) {
-                    delay(500)
-                    connected = false
+                get("/api/config") {
+                    call.respondText(configJson, ContentType.Application.Json)
                 }
-            }
-        }
-    }
-
-    private suspend fun connectToGame(
-        client: HttpClient,
-        channel: ReceiveChannel<DebugRemoteCommand>,
-        received: SendChannel<EngineRemoteCommand>,
-    ) {
-        val session = client.webSocketSession("ws://localhost:$debug/debug")
-
-        coroutineScope {
-            launch {
-                for (message in channel) {
-                    session.outgoing.send(Frame.Text(Json.encodeToString(message)))
-                    if (message is Disconnect) {
-                        session.close()
-                    }
-                }
-            }
-
-            launch {
-                for (message in session.incoming) {
-                    if (message is Frame.Text) {
-                        received.send(Json.decodeFromString(message.readText()))
-                    }
+                get("/api/scripts") {
+                    val scripts = gameParameters.getAllScripts()
+                        .associateWith { scriptPath ->
+                            gameDirectory.resolve(scriptPath).readText()
+                        }
+                    call.respondText(
+                        Json.encodeToString<Map<String, String>>(scripts),
+                        ContentType.Application.Json,
+                    )
                 }
             }
         }
+
+        Runtime.getRuntime().addShutdownHook(
+            Thread {
+                server.stop()
+                echo("\uD83D\uDC4B See you soon!")
+            },
+        )
+
+        server.start(wait = true)
     }
 }
