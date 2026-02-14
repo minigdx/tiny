@@ -43,6 +43,7 @@ local Keyboard = require("widgets.Keyboard")
 local Help = require("widgets.Help")
 local Button = require("widgets.Button")
 local Dropdown = require("widgets.Dropdown")
+local Modal = require("widgets.Modal")
 
 factory.create_mode_switch_component = function(self, value)
     local result = new(ModeSwitch, value)
@@ -97,6 +98,12 @@ factory.create_dropdown = function(self, value)
     local result = new(Dropdown, value)
     result.help = result.fields.Help
     result:_init()
+    return result
+end
+
+factory.create_modal = function(self, data)
+    local result = new(Modal, data)
+    result:_init(self)
     return result
 end
 
