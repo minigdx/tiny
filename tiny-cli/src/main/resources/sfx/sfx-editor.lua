@@ -30,6 +30,8 @@ local State = {
 
 local state = new(State)
 
+local modal = nil
+
 local utils = require("widgets.utils")
 inside_widget = utils.inside_widget
 
@@ -487,6 +489,19 @@ function _init_mini_button(entities)
     end
 end
 
+function _init_modal()
+    local modal_data = {
+        x = 96,
+        y = 92,
+        width = 192,
+        height = 72,
+        level_name = "Modal",
+        fields = {},
+    }
+    modal = widgets:create_modal(modal_data)
+    table.insert(m.widgets, modal)
+end
+
 function _init()
     m.widgets = {}
 
@@ -504,6 +519,7 @@ function _init()
     _init_velocity_editor(entities)
     _init_sfx_editor(entities)
     _init_mini_button(entities)
+    _init_modal()
     _init_player(entities)
 
     -- force setting correct values
@@ -518,8 +534,20 @@ function _update()
     end, function()
     end)
 
-    for w in all(m.widgets) do
-        w:_update()
+    if ctrl.pressed(keys.m) then
+        if modal.visible then
+            modal:close()
+        else
+            modal:open()
+        end
+    end
+
+    if modal.visible then
+        modal:_update()
+    else
+        for w in all(m.widgets) do
+            w:_update()
+        end
     end
 
 end

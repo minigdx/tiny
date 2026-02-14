@@ -42,6 +42,7 @@
     "widgets.lua",
     "music-editor.lua",
     "widgets/Envelop.lua",
+    "widgets/Dropdown.lua",
     "widgets/MatrixSelector.lua",
     "widgets/ModeSwitch.lua",
     "widgets/Knob.lua",
@@ -50,7 +51,9 @@
     "widgets/MenuItem.lua",
     "widgets/Keyboard.lua",
     "widgets/Help.lua",
-    "widgets/Button.lua"
+    "widgets/Button.lua",
+    "widgets/Modal.lua",
+    "widgets/utils.lua"
   ],
   "spritesheets": [
     "sfx-spritesheet.png",

@@ -96,6 +96,7 @@ end
 
 factory.create_dropdown = function(self, value)
     local result = new(Dropdown, value)
+    result.options = result.fields.Options or {}
     result.help = result.fields.Help
     result:_init()
     return result

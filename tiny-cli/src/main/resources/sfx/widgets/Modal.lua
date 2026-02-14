@@ -54,6 +54,8 @@ Modal._load_widgets = function(self, widget_factory)
             for entity in all(entities[entity_type]) do
                 if widget_factory[factory_method] then
                     local widget = widget_factory[factory_method](widget_factory, entity)
+                    widget.x = widget.x + self.x
+                    widget.y = widget.y + self.y
                     table.insert(self.widgets, widget)
                 end
             end
@@ -99,6 +101,12 @@ Modal._update = function(self)
 
     -- Close button click
     if inside_widget(self.close_button, pos.x, pos.y) then
+        self:close()
+        return
+    end
+
+    -- Click outside modal → close
+    if not inside_widget(self, pos.x, pos.y) then
         self:close()
         return
     end

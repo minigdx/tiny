@@ -95,7 +95,8 @@ end
 
 Dropdown._draw = function(self)
     -- Background and border for the closed box
-    shape.rectf(self.x, self.y, self.width, self.height, 1)
+    local bg = self.background_color or 2
+    shape.rectf(self.x, self.y, self.width, self.height, bg)
     shape.rect(self.x, self.y, self.width, self.height)
 
     -- Selected option text
@@ -104,14 +105,14 @@ Dropdown._draw = function(self)
     -- Downward triangle indicator on the right side
     local tx = self.x + self.width - 7
     local ty = self.y + 3
-    shape.trianglef(tx, ty, tx + 4, ty, tx + 2, ty + 3)
+    shape.trianglef(tx, ty, tx + 4, ty, tx + 2, ty + 3, 18)
 
     -- Open state: draw options list below
     if self.open then
         local list_h = #self.options * self.item_height
 
         -- Options container background and border
-        shape.rectf(self.x, self.y + self.height, self.width, list_h, 1)
+        shape.rectf(self.x, self.y + self.height, self.width, list_h, bg)
         shape.rect(self.x, self.y + self.height, self.width, list_h)
 
         -- Hover detection
