@@ -65,57 +65,45 @@ TextInput._update = function(self)
 
     local changed = false
 
-    -- Handle letter keys a-z
-    local letters = "abcdefghijklmnopqrstuvwxyz"
-    for i = 1, #letters do
-        local ch = string.sub(letters, i, i)
-        if ctrl.pressed(keys[ch]) then
-            local before = string.sub(self.value, 1, self.cursor)
-            local after = string.sub(self.value, self.cursor + 1)
-            self.value = before .. ch .. after
-            self.cursor = self.cursor + 1
-            changed = true
+    local pressed_keys = ctrl.pressed()
+    if pressed_keys then
+        for k in all(pressed_keys) do
+            if k >= keys.a and k <= keys.z then
+                -- Letter key: convert key ordinal to character
+                local ch = string.char(string.byte("a") + (k - keys.a))
+                local before = string.sub(self.value, 1, self.cursor)
+                local after = string.sub(self.value, self.cursor + 1)
+                self.value = before .. ch .. after
+                self.cursor = self.cursor + 1
+                changed = true
+            elseif k >= keys["0"] and k <= keys["9"] then
+                -- Number key: convert key ordinal to digit character
+                local ch = string.char(string.byte("0") + (k - keys["0"]))
+                local before = string.sub(self.value, 1, self.cursor)
+                local after = string.sub(self.value, self.cursor + 1)
+                self.value = before .. ch .. after
+                self.cursor = self.cursor + 1
+                changed = true
+            elseif k == keys.space then
+                local before = string.sub(self.value, 1, self.cursor)
+                local after = string.sub(self.value, self.cursor + 1)
+                self.value = before .. " " .. after
+                self.cursor = self.cursor + 1
+                changed = true
+            elseif k == keys.delete then
+                if self.cursor > 0 then
+                    local before = string.sub(self.value, 1, self.cursor - 1)
+                    local after = string.sub(self.value, self.cursor + 1)
+                    self.value = before .. after
+                    self.cursor = self.cursor - 1
+                    changed = true
+                end
+            elseif k == keys.left then
+                self.cursor = math.max(0, self.cursor - 1)
+            elseif k == keys.right then
+                self.cursor = math.min(#self.value, self.cursor + 1)
+            end
         end
-    end
-
-    -- Handle number keys 0-9
-    for i = 0, 9 do
-        local ch = tostring(i)
-        if ctrl.pressed(keys[ch]) then
-            local before = string.sub(self.value, 1, self.cursor)
-            local after = string.sub(self.value, self.cursor + 1)
-            self.value = before .. ch .. after
-            self.cursor = self.cursor + 1
-            changed = true
-        end
-    end
-
-    -- Handle space
-    if ctrl.pressed(keys.space) then
-        local before = string.sub(self.value, 1, self.cursor)
-        local after = string.sub(self.value, self.cursor + 1)
-        self.value = before .. " " .. after
-        self.cursor = self.cursor + 1
-        changed = true
-    end
-
-    -- Handle delete/backspace
-    if ctrl.pressed(keys.delete) then
-        if self.cursor > 0 then
-            local before = string.sub(self.value, 1, self.cursor - 1)
-            local after = string.sub(self.value, self.cursor + 1)
-            self.value = before .. after
-            self.cursor = self.cursor - 1
-            changed = true
-        end
-    end
-
-    -- Handle cursor movement with arrow keys
-    if ctrl.pressed(keys.left) then
-        self.cursor = math.max(0, self.cursor - 1)
-    end
-    if ctrl.pressed(keys.right) then
-        self.cursor = math.min(#self.value, self.cursor + 1)
     end
 
     if changed then
