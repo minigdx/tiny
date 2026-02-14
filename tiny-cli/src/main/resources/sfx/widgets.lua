@@ -72,6 +72,7 @@ local menuItems = MenuItemModule.menuItems
 local Keyboard = require("widgets.Keyboard")
 local Help = require("widgets.Help")
 local Button = require("widgets.Button")
+local TextInput = require("widgets.TextInput")
 
 factory.create_mode_switch_component = function(self, value)
     local result = new(ModeSwitch, value)
@@ -130,6 +131,14 @@ end
 factory.create_keyboard = function(self, data)
     local keyboard = new(Keyboard, data)
     return keyboard
+end
+
+factory.create_text_input = function(self, data)
+    local result = new(TextInput, data)
+    result.help = result.fields.Help
+    result.label = result.fields.Label
+    result:_init()
+    return result
 end
 
 factory.create_menu_item = function(self, data)
