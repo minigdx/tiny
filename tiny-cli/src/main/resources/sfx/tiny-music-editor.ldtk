@@ -266,9 +266,9 @@
 			"doc": null,
 			"width": 16,
 			"height": 16,
-			"resizableX": false,
+			"resizableX": true,
 			"resizableY": false,
-			"minWidth": null,
+			"minWidth": 16,
 			"maxWidth": null,
 			"minHeight": null,
 			"maxHeight": null,
@@ -2252,7 +2252,7 @@
 					"entityInstances": [
 						{
 							"__identifier": "Button",
-							"__grid": [4,5],
+							"__grid": [10,11],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": { "tilesetUid": 5, "x": 80, "y": 0, "w": 16, "h": 16 },
@@ -2261,7 +2261,7 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 1,
-							"px": [32,40],
+							"px": [80,88],
 							"fieldInstances": [
 								{ "__identifier": "Modal", "__type": "String", "__value": null, "__tile": null, "defUid": 13, "realEditorValues": [] },
 								{ "__identifier": "IconName", "__type": "LocalEnum.Icon", "__value": "Sine", "__tile": null, "defUid": 15, "realEditorValues": [{
@@ -2269,51 +2269,23 @@
 									"params": ["Sine"]
 								}] }
 							],
-							"__worldX": 128,
-							"__worldY": -160
-						},
-						{
-							"__identifier": "Button",
-							"__grid": [10,5],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": { "tilesetUid": 5, "x": 80, "y": 0, "w": 16, "h": 16 },
-							"__smartColor": "#BE4A2F",
-							"iid": "fb610c30-fa90-11f0-ad09-9d43918232fd",
-							"width": 16,
-							"height": 16,
-							"defUid": 1,
-							"px": [80,40],
-							"fieldInstances": [
-								{ "__identifier": "Modal", "__type": "String", "__value": null, "__tile": null, "defUid": 13, "realEditorValues": [] },
-								{ "__identifier": "IconName", "__type": "LocalEnum.Icon", "__value": "Modulations", "__tile": null, "defUid": 15, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["Modulations"]
-								}] }
-							],
 							"__worldX": 176,
-							"__worldY": -160
+							"__worldY": -112
 						},
 						{
-							"__identifier": "Button",
-							"__grid": [16,5],
+							"__identifier": "TextInput",
+							"__grid": [6,5],
 							"__pivot": [0,0],
 							"__tags": [],
-							"__tile": { "tilesetUid": 5, "x": 80, "y": 0, "w": 16, "h": 16 },
-							"__smartColor": "#BE4A2F",
-							"iid": "fbd61520-fa90-11f0-ad09-8d4c1350c3fa",
-							"width": 16,
+							"__tile": null,
+							"__smartColor": "#EAD4AA",
+							"iid": "aae4f750-fa90-11f0-8d20-b953b85604df",
+							"width": 96,
 							"height": 16,
-							"defUid": 1,
-							"px": [128,40],
-							"fieldInstances": [
-								{ "__identifier": "Modal", "__type": "String", "__value": null, "__tile": null, "defUid": 13, "realEditorValues": [] },
-								{ "__identifier": "IconName", "__type": "LocalEnum.Icon", "__value": "Envelope", "__tile": null, "defUid": 15, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["Envelope"]
-								}] }
-							],
-							"__worldX": 224,
+							"defUid": 3,
+							"px": [48,40],
+							"fieldInstances": [],
+							"__worldX": 144,
 							"__worldY": -160
 						}
 					]
