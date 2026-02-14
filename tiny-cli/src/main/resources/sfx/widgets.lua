@@ -1,41 +1,11 @@
-local on_update = function(self, listener)
-    table.insert(self.listeners, listener)
-end
-
-local fire_on_update = function(self, value)
-    for l in all(self.listeners) do
-        l(self, value)
-    end
-end
-
-local set_value = function(self, value)
-    self.value = value
-    if (self.on_change) then
-        self:on_change()
-    end
-    self:fire_on_update(value)
-end
-
-
-
-
-
+local utils = require("widgets.utils")
 
 
 
 local factory = { }
 
-function inside_widget(w, x, y, offset)
-    local off = 0
-    if (offset) then
-        off = offset
-    end
-
-    return w.x - off <= x and
-            x <= w.x + w.width + off and
-            w.y - off <= y and
-            y <= w.y + w.height + off
-end
+-- Expose inside_widget as global for widgets that depend on it (e.g., ModeSwitch)
+inside_widget = utils.inside_widget
 
 
 
@@ -72,6 +42,7 @@ local menuItems = MenuItemModule.menuItems
 local Keyboard = require("widgets.Keyboard")
 local Help = require("widgets.Help")
 local Button = require("widgets.Button")
+local Dropdown = require("widgets.Dropdown")
 
 factory.create_mode_switch_component = function(self, value)
     local result = new(ModeSwitch, value)
@@ -119,6 +90,13 @@ end
 factory.create_button = function(self, value)
     local result = new(Button, value)
     result.help = result.fields.Help
+    return result
+end
+
+factory.create_dropdown = function(self, value)
+    local result = new(Dropdown, value)
+    result.help = result.fields.Help
+    result:_init()
     return result
 end
 

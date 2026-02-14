@@ -1,32 +1,5 @@
-local on_update = function(self, listener)
-    table.insert(self.listeners, listener)
-end
-
-local fire_on_update = function(self, value)
-    for l in all(self.listeners) do
-        l(self, value)
-    end
-end
-
-local set_value = function(self, value)
-    self.value = value
-    if (self.on_change) then
-        self:on_change()
-    end
-    self:fire_on_update(value)
-end
-
-local function inside_widget(w, x, y, offset)
-    local off = 0
-    if (offset) then
-        off = offset
-    end
-
-    return w.x - off <= x and
-            x <= w.x + w.width + off and
-            w.y - off <= y and
-            y <= w.y + w.height + off
-end
+local utils = require("widgets.utils")
+local inside_widget = utils.inside_widget
 
 local MenuItem = {
     _type = "MenuItem",
@@ -40,9 +13,9 @@ local MenuItem = {
     on_hover = function()
     end,
     listeners = {},
-    on_update = on_update,
-    fire_on_update = fire_on_update,
-    set_value = set_value,
+    on_update = utils.on_update,
+    fire_on_update = utils.fire_on_update,
+    set_value = utils.set_value,
 }
 
 local menuItems = {}

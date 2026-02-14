@@ -30,17 +30,8 @@ local State = {
 
 local state = new(State)
 
-function inside_widget(w, x, y, offset)
-    local off = 0
-    if (offset) then
-        off = offset
-    end
-
-    return w.x - off <= x and
-            x <= w.x + w.width + off and
-            w.y - off <= y and
-            y <= w.y + w.height + off
-end
+local utils = require("widgets.utils")
+inside_widget = utils.inside_widget
 
 function filter(widgetType)
     for w in all(m.widgets) do
