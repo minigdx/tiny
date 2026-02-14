@@ -46,14 +46,15 @@ Fader._update = function(self)
 end
 
 Fader._draw = function(self)
-    local color = self.disabled_color
+    -- Vertical line (track)
+    local line_x = self.x + math.floor(self.width / 2)
+    shape.line(line_x, self.y, line_x, self.y + self.height, self.disabled_color)
 
-    if self.value ~= nil and self.value > 0 then
-        color = self.tip_color
-    end
+    -- Sliding handle rectangle
+    local handle_h = 4
     local y = self.height - self.value * self.height
-    local tipy = self.y + y
-    shape.rectf(self.x + 1, tipy, self.width - 2, 2, self.tip_color)
+    local tipy = self.y + y - math.floor(handle_h / 2)
+    shape.rectf(self.x, tipy, self.width, handle_h, self.tip_color)
 end
 
 return Fader
