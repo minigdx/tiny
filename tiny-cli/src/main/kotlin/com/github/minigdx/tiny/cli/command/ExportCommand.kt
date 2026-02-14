@@ -9,6 +9,7 @@ import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.choice
 import com.github.ajalt.clikt.parameters.types.file
+import com.github.minigdx.tiny.cli.command.utils.IconConverter
 import com.github.minigdx.tiny.cli.config.GameParameters
 import com.github.minigdx.tiny.cli.config.GameParameters.Companion.JSON
 import com.github.minigdx.tiny.cli.config.GameParametersV1
@@ -113,6 +114,7 @@ class ExportCommand : CliktCommand(name = "export") {
                 appVersion = appVersion,
                 platform = targetPlatform,
                 debug = debug,
+                gameParameters = gameParameters,
             )
         } else {
             createPortableJarLauncher(
@@ -143,6 +145,52 @@ class ExportCommand : CliktCommand(name = "export") {
         }
     }
 
+    /**
+     * Resolve the icon file for the target platform, converting to the platform-specific
+     * format if needed (ICO for Windows, ICNS for macOS, PNG for Linux).
+     */
+    private fun resolveIconForPlatform(
+        gameDir: File,
+        gameParameters: GameParameters,
+        platform: String,
+        tempDir: File,
+    ): File? {
+        val iconName = when (gameParameters) {
+            is GameParametersV1 -> gameParameters.icon
+        }
+
+        // Find the icon file: use configured icon, or fall back to icon.png
+        val iconFile = if (iconName != null) {
+            gameDir.resolve(iconName)
+        } else {
+            gameDir.resolve("icon.png")
+        }
+
+        if (!iconFile.exists()) {
+            return null
+        }
+
+        return when (platform) {
+            "windows" -> {
+                val icoFile = File(tempDir, "icon.ico")
+                val result = IconConverter.convertToIco(iconFile, icoFile)
+                if (result == null) {
+                    echo("\u26A0\uFE0F Failed to convert icon to ICO format.")
+                }
+                result
+            }
+            "mac" -> {
+                val icnsFile = File(tempDir, "icon.icns")
+                val result = IconConverter.convertToIcns(iconFile, icnsFile)
+                if (result == null) {
+                    echo("\u26A0\uFE0F Failed to convert icon to ICNS format (sips not available?).")
+                }
+                result
+            }
+            else -> iconFile // Linux accepts PNG directly
+        }
+    }
+
     private fun createStandaloneAppWithJdk(
         gameDir: File,
         outputDir: File,
@@ -150,6 +198,7 @@ class ExportCommand : CliktCommand(name = "export") {
         appVersion: String,
         platform: String,
         debug: Boolean = false,
+        gameParameters: GameParameters,
     ) {
         echo("\uD83D\uDCE6 Creating standalone application with bundled JDK...")
 
@@ -168,6 +217,12 @@ class ExportCommand : CliktCommand(name = "export") {
             "--main-jar", appJarFile.name,
             "--main-class", "com.github.minigdx.tiny.cli.MainKt",
         )
+
+        // Add application icon
+        val iconFile = resolveIconForPlatform(gameDir, gameParameters, platform, tempDir)
+        if (iconFile != null) {
+            jpackageCommand.addAll(listOf("--icon", iconFile.absolutePath))
+        }
 
         // Add platform-specific arguments for game location
         when (platform) {
@@ -548,6 +603,31 @@ class GameExporter {
                             }
                     }
 
+                // Add game icon to the export
+                val iconFileName = gameParameters.icon
+                val iconList = if (iconFileName != null) {
+                    val iconFile = gameDirectory.resolve(iconFileName)
+                    if (iconFile.exists() && !exportedFile.contains(iconFileName)) {
+                        exportedGame.putNextEntry(ZipEntry(iconFileName))
+                        exportedGame.write(iconFile.readBytes())
+                        exportedGame.closeEntry()
+                        exportedFile += iconFileName
+                    }
+                    listOf(iconFileName)
+                } else {
+                    // Fallback: check if icon.png exists in game directory
+                    val defaultIcon = gameDirectory.resolve("icon.png")
+                    if (defaultIcon.exists() && !exportedFile.contains("icon.png")) {
+                        exportedGame.putNextEntry(ZipEntry("icon.png"))
+                        exportedGame.write(defaultIcon.readBytes())
+                        exportedGame.closeEntry()
+                        exportedFile += "icon.png"
+                        listOf("icon.png")
+                    } else {
+                        emptyList()
+                    }
+                }
+
                 // Add index.html
 
                 var template = indexContent
@@ -574,6 +654,7 @@ class GameExporter {
                 )
                 template = replaceList(template, gameParameters.levels, "{GAME_LEVEL}", "GAME_LEVEL")
                 template = replaceList(template, listOfNotNull(gameParameters.sound), "{GAME_SOUND}", "GAME_SOUND")
+                template = replaceList(template, iconList, "{GAME_ICON}", "GAME_ICON")
 
                 template = template.replace("{GAME_COLORS}", gameParameters.colors.joinToString(","))
 

@@ -13,6 +13,7 @@ import com.github.ajalt.mordant.rendering.TextStyles
 import com.github.minigdx.tiny.cli.GamePalette
 import com.github.minigdx.tiny.cli.command.utils.ColorUtils
 import com.github.minigdx.tiny.cli.command.utils.ColorUtils.brightness
+import com.github.minigdx.tiny.cli.command.utils.IconImageGenerator
 import com.github.minigdx.tiny.cli.command.utils.PaletteImageGenerator
 import com.github.minigdx.tiny.cli.config.GameParameters
 import com.github.minigdx.tiny.cli.config.GameParametersV1
@@ -99,19 +100,25 @@ ${
         echo("➡\uFE0F  Sprite Sheet Filenames: ${spritesheets.ifBlank { "No spritesheet added!" }}")
         echo("➡\uFE0F  Color palette: ${GamePalette.ALL[palette - 1].name}")
 
+        val sortedColors = GamePalette.ALL[palette - 1].colors.sortedBy { brightness(it) }
+
+        if (!gameDirectory.exists()) gameDirectory.mkdirs()
+
+        // Generate game icon
+        val iconFile = IconImageGenerator.generateIcon(gameDirectory, sortedColors, gameName)
+
         val configuration = GameParametersV1(
             name = gameName,
             id = UUID.randomUUID().toString(),
             resolution = gameResolution.toSize(),
             sprites = spriteSize.toSize(),
             zoom = zoom,
-            colors = GamePalette.ALL[palette - 1].colors.sortedBy { brightness(it) },
+            colors = sortedColors,
             scripts = listOf(gameScript),
             sound = "default-sound.sfx",
             hideMouseCursor = hideMouseCursor == "yes".lowercase(),
+            icon = iconFile.name,
         ) as GameParameters
-
-        if (!gameDirectory.exists()) gameDirectory.mkdirs()
 
         val configurationFile = gameDirectory.resolve("_tiny.json")
         configuration.write(configurationFile)
@@ -130,6 +137,7 @@ ${
 
         echo("\uD83C\uDFD7\uFE0F  Game created into: ${gameDirectory.absolutePath}")
         echo("\uD83C\uDFA8  Palette image created: ${paletteFile.name}")
+        echo("\uD83C\uDFAE  Game icon created: ${iconFile.name}")
         echo("\uD83C\uDFC3\u200D♂\uFE0F To run the game: tiny-cli run ${computePath(gameDirectory)}")
     }
 

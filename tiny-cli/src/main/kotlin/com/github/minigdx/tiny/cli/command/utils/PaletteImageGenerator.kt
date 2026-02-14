@@ -40,7 +40,7 @@ object PaletteImageGenerator {
             val color = if (index == 0) {
                 Color(0, 0, 0, 0) // Transparent
             } else {
-                parseColor(colorString)
+                ColorUtils.parseColor(colorString)
             }
 
             // Fill cell background
@@ -115,26 +115,6 @@ object PaletteImageGenerator {
                 graphics.drawString(digit.toString(), currentX, y + 12)
                 currentX += 8
             }
-        }
-    }
-
-    private fun parseColor(colorString: String): Color {
-        val hex = colorString.removePrefix("#")
-        return when (hex.length) {
-            6 -> {
-                val r = hex.substring(0, 2).toInt(16)
-                val g = hex.substring(2, 4).toInt(16)
-                val b = hex.substring(4, 6).toInt(16)
-                Color(r, g, b)
-            }
-            8 -> {
-                val r = hex.substring(0, 2).toInt(16)
-                val g = hex.substring(2, 4).toInt(16)
-                val b = hex.substring(4, 6).toInt(16)
-                val a = hex.substring(6, 8).toInt(16)
-                Color(r, g, b, a)
-            }
-            else -> Color.BLACK
         }
     }
 

@@ -39,6 +39,8 @@ sealed class GameParameters {
 
     abstract fun setPalette(colors: List<String>): GameParameters
 
+    abstract fun setIcon(icon: String): GameParameters
+
     /**
      * Return the list of the user Lua script to load.
      */
@@ -101,6 +103,12 @@ data class GameParametersV1(
      * The game have to display it by itself if the mouse is required.
      */
     val hideMouseCursor: Boolean = false,
+    /**
+     * Path to the game icon image (PNG).
+     * Used as favicon for web export and application icon for desktop export.
+     * If null, the default generated icon.png is used if it exists.
+     */
+    val icon: String? = null,
 ) : GameParameters() {
     override fun toGameOptions(): GameOptions {
         return GameOptions(
@@ -148,5 +156,9 @@ data class GameParametersV1(
 
     override fun setPalette(colors: List<String>): GameParameters {
         return copy(colors = colors)
+    }
+
+    override fun setIcon(icon: String): GameParameters {
+        return copy(icon = icon)
     }
 }
