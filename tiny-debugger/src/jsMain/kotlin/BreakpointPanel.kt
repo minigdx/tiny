@@ -107,7 +107,7 @@ class BreakpointPanel(
         if (condition != null) {
             val badge = document.createElement("span") as HTMLSpanElement
             badge.className = "bp-condition-badge"
-            badge.innerHTML = LucideIcons.circleDot
+            badge.innerHTML = LucideIcons.circleEllipsis
             badge.title = "Condition: $condition"
             row.appendChild(badge)
         }

@@ -101,7 +101,12 @@ class CodeEditor(
             if (breakpoints.contains(lineNum)) {
                 val marker = document.createElement("span") as HTMLElement
                 marker.className = "breakpoint-marker"
-                marker.innerHTML = LucideIcons.circleDot
+                marker.innerHTML =
+                    if (conditions.containsKey(lineNum)) {
+                        LucideIcons.circleEllipsis
+                    } else {
+                        LucideIcons.circleDot
+                    }
                 marker.title =
                     if (conditions.containsKey(lineNum)) {
                         "Conditional: ${conditions[lineNum]}"
@@ -112,7 +117,7 @@ class CodeEditor(
             } else if (disabledBreakpoints.contains(lineNum)) {
                 val marker = document.createElement("span") as HTMLElement
                 marker.className = "breakpoint-marker breakpoint-disabled"
-                marker.innerHTML = LucideIcons.circleSlash
+                marker.innerHTML = LucideIcons.circleSlash2
                 marker.title = "Breakpoint (disabled)"
                 gutterLine.appendChild(marker)
             }
