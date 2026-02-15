@@ -40,7 +40,6 @@ class EngineDebugSocket(
         ws?.onopen = {
             console.log("Debug socket connected")
             onConnected()
-            send(RequestBreakpoints)
         }
 
         ws?.onmessage = { event ->
@@ -101,6 +100,10 @@ class EngineDebugSocket(
 
     fun step() {
         send(ResumeExecution(advanceByStep = true))
+    }
+
+    fun requestBreakpoints() {
+        send(RequestBreakpoints)
     }
 
     fun disconnect() {

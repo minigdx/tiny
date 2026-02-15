@@ -125,7 +125,13 @@ class DebuggerApp {
             onFileChanged = { msg -> handleFileChanged(msg.file) },
             onGameMetadata = { meta -> handleGameMetadata(meta) },
             onConnected = { toolbar.setConnected(true) },
-            onDisconnected = { toolbar.setConnected(false) },
+            onDisconnected = {
+                toolbar.setConnected(false)
+                isPaused = false
+                toolbar.setPaused(false)
+                codeEditor.highlightLine(null)
+                variableInspector.clear()
+            },
         )
 
         toggleAllCheckbox.onchange = {
@@ -139,6 +145,7 @@ class DebuggerApp {
     private fun handleGameMetadata(meta: GameMetadata) {
         gameId = meta.gameId
         restoreBreakpointsFromStorage()
+        engineSocket.requestBreakpoints()
     }
 
     private fun handleFiles(files: List<FileInfo>) {
