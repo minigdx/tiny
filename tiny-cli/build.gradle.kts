@@ -88,4 +88,11 @@ project.tasks.withType(JavaExec::class.java).configureEach {
     val runtimeClasspath by configurations.existing
 
     classpath(jar, runtimeClasspath, externalDependencies)
+
+    if (project.hasProperty("tiny.workDir")) {
+        workingDir = rootProject.projectDir.resolve(project.property("tiny.workDir") as String)
+    }
+    if (System.getProperty("os.name").contains("Mac", ignoreCase = true)) {
+        jvmArgs("-XstartOnFirstThread")
+    }
 }

@@ -25,3 +25,9 @@ docs: install
 	tiny-cli export tiny-cli/src/main/resources/sfx
 	unzip -o -d tiny-doc/src/docs/asciidoc/sample/sfx-editor tiny-cli/src/main/resources/sfx/tiny-export.zip
 	./gradlew asciidoctor -Pversion=$(uuidgen)
+
+sfx:
+	./gradlew :tiny-cli:run --args="run ." -Ptiny.workDir=tiny-cli/src/main/resources/sfx
+
+sample:
+	./gradlew :tiny-cli:run --args="run ." -Ptiny.workDir=tiny-sample
