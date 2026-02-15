@@ -75,16 +75,6 @@ class RunCommand : CliktCommand(name = "run") {
 
     override fun help(context: Context) = "Run your game."
 
-    private fun isOracleOrOpenJDK(): Boolean {
-        val vendor = System.getProperty("java.vendor")?.lowercase()
-        return vendor?.contains("oracle") == true || vendor?.contains("eclipse") == true || vendor?.contains("openjdk") == true
-    }
-
-    private fun isMacOS(): Boolean {
-        val os = System.getProperty("os.name").lowercase()
-        return os.contains("mac") || os.contains("darwin")
-    }
-
     private fun getClassLocationDirectory(): File {
         val classLocation = RunCommand::class.java.protectionDomain.codeSource.location.toURI().path
         val classLocationFile = File(classLocation)
@@ -98,11 +88,6 @@ class RunCommand : CliktCommand(name = "run") {
 
     @OptIn(ExperimentalTime::class)
     override fun run() {
-        if (isMacOS() && isOracleOrOpenJDK()) {
-            echo("\uD83D\uDEA7 === The Tiny CLI on Mac with require a special option.")
-            echo("\uD83D\uDEA7 === If the application crash ➡ use the command 'tiny-cli-mac' instead.")
-        }
-
         val effectiveGameDirectory = if (macFromJpackage) {
             val classLocationDir = getClassLocationDirectory()
             echo("\uD83D\uDC1F === Using class location directory instead of game directory due to mac-from-jpackage flag ===")

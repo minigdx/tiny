@@ -82,7 +82,7 @@ class DebuggerApp {
             },
             onNavigateBreakpoint = { script, line ->
                 selectScript(script)
-                codeEditor.highlightLine(line)
+                codeEditor.scrollToLine(line)
             },
             onRemoveAll = {
                 breakpoints.forEach { (script, lines) ->
@@ -109,6 +109,7 @@ class DebuggerApp {
             onResume = {
                 isPaused = false
                 toolbar.setPaused(false)
+                codeEditor.highlightLine(null)
                 engineSocket.resume()
             },
             onStep = { engineSocket.step() },

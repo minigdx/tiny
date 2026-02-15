@@ -158,7 +158,7 @@ class CodeEditor(
         }
     }
 
-    private fun scrollToLine(line: Int) {
+    fun scrollToLine(line: Int) {
         val lineElements = codeContainer.children
         val index = line - 1
         if (index >= 0 && index < lineElements.length) {

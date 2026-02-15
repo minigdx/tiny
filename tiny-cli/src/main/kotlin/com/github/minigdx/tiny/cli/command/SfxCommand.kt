@@ -24,24 +24,9 @@ class SfxCommand : CliktCommand(name = "sfx") {
         canBeFile = true,
     )
 
-    fun isOracleOrOpenJDK(): Boolean {
-        val vendor = System.getProperty("java.vendor")?.lowercase()
-        return vendor?.contains("oracle") == true || vendor?.contains("eclipse") == true || vendor?.contains("openjdk") == true
-    }
-
-    fun isMacOS(): Boolean {
-        val os = System.getProperty("os.name").lowercase()
-        return os.contains("mac") || os.contains("darwin")
-    }
-
     override fun help(context: Context) = "Start the SFX Editor"
 
     override fun run() {
-        if (isMacOS() && isOracleOrOpenJDK()) {
-            echo("\uD83D\uDEA7 === The Tiny CLI on Mac with require a special option.")
-            echo("\uD83D\uDEA7 === If the application crash ➡ use the command 'tiny-cli-mac' instead.")
-        }
-
         try {
             val configFile = SfxCommand::class.java.getResourceAsStream("/sfx/_tiny.json")
             if (configFile == null) {
