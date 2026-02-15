@@ -41,6 +41,7 @@ include("tiny-annotation-processors:tiny-lua-stub-generator")
 include("tiny-engine")
 include("tiny-sample")
 include("tiny-web-editor")
+include("tiny-debugger")
 
 develocity {
     buildScan {

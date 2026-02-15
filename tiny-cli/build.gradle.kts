@@ -27,6 +27,8 @@ dependencies {
     implementation(project(":tiny-doc-annotations"))
     implementation(project(":tiny-engine", "jvmRuntimeElements"))!!
         .because("Depends on the JVM Jar containing commons resources in the JAR.")
+    implementation(project(":tiny-debugger", "jvmRuntimeElements"))!!
+        .because("Depends on the debugger protocol classes and web UI.")
 
     implementation(libs.kgl.lwjgl)
 
@@ -44,6 +46,19 @@ dependencies {
     )?.because(
         "Embed the JS engine in the CLI " +
             "so it can be included when the game is exported.",
+    )
+
+    add(
+        externalDependencies.name,
+        project(
+            mapOf(
+                "path" to ":tiny-debugger",
+                "configuration" to "tinyDebugger",
+            ),
+        ),
+    )?.because(
+        "Embed the web debugger in the CLI " +
+            "so it can be served by the debug2 command.",
     )
 }
 
