@@ -12,6 +12,7 @@ import com.github.minigdx.tiny.cli.debug.GameMetadata
 import com.github.minigdx.tiny.cli.debug.Reload
 import com.github.minigdx.tiny.cli.debug.RequestBreakpoints
 import com.github.minigdx.tiny.cli.debug.ResumeExecution
+import com.github.minigdx.tiny.cli.debug.ResumeMode
 import com.github.minigdx.tiny.cli.debug.ToggleBreakpoint
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -95,11 +96,15 @@ class EngineDebugSocket(
     }
 
     fun resume() {
-        send(ResumeExecution(advanceByStep = false))
+        send(ResumeExecution(mode = ResumeMode.RESUME))
     }
 
     fun step() {
-        send(ResumeExecution(advanceByStep = true))
+        send(ResumeExecution(mode = ResumeMode.STEP_INTO))
+    }
+
+    fun stepOver() {
+        send(ResumeExecution(mode = ResumeMode.STEP_OVER))
     }
 
     fun requestBreakpoints() {

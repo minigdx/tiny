@@ -52,11 +52,18 @@ data class ToggleBreakpoint(val script: String, val line: Int, val enabled: Bool
 @Serializable
 data class DeleteBreakpoint(val script: String, val line: Int) : DebugRemoteCommand
 
+@Serializable
+enum class ResumeMode {
+    RESUME,
+    STEP_INTO,
+    STEP_OVER,
+}
+
 /**
  * Resume game execution.
  */
 @Serializable
-data class ResumeExecution(val advanceByStep: Boolean = false) : DebugRemoteCommand
+data class ResumeExecution(val mode: ResumeMode = ResumeMode.RESUME) : DebugRemoteCommand
 
 /**
  * Resume game execution.

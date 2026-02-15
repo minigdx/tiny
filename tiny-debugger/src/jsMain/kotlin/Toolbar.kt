@@ -8,6 +8,7 @@ class Toolbar(
     private val container: HTMLDivElement,
     private val onResume: () -> Unit,
     private val onStep: () -> Unit,
+    private val onStepOver: () -> Unit,
     private val onDisconnect: () -> Unit,
     private val onConnect: () -> Unit,
 ) {
@@ -25,10 +26,17 @@ class Toolbar(
 
         val stepBtn = document.createElement("button") as HTMLButtonElement
         stepBtn.className = "toolbar-btn"
-        stepBtn.innerHTML = "${LucideIcons.stepForward} Step"
-        stepBtn.title = "Step to next line"
+        stepBtn.innerHTML = "${LucideIcons.stepInto} Step In"
+        stepBtn.title = "Step to next instruction"
         stepBtn.onclick = { onStep() }
         container.appendChild(stepBtn)
+
+        val stepOverBtn = document.createElement("button") as HTMLButtonElement
+        stepOverBtn.className = "toolbar-btn"
+        stepOverBtn.innerHTML = "${LucideIcons.stepOver} Step Over"
+        stepOverBtn.title = "Step to next line in current script"
+        stepOverBtn.onclick = { onStepOver() }
+        container.appendChild(stepOverBtn)
 
         disconnectBtn = document.createElement("button") as HTMLButtonElement
         disconnectBtn.className = "toolbar-btn toolbar-btn-danger"

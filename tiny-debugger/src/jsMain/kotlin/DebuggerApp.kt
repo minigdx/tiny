@@ -113,6 +113,7 @@ class DebuggerApp {
                 engineSocket.resume()
             },
             onStep = { engineSocket.step() },
+            onStepOver = { engineSocket.stepOver() },
             onDisconnect = { engineSocket.disconnect() },
             onConnect = { engineSocket.connect() },
         )
@@ -205,6 +206,7 @@ class DebuggerApp {
     }
 
     private fun selectScript(name: String) {
+        if (currentScript == name) return
         currentScript = name
         val content = scripts[name] ?: return
         codeEditor.setContent(content)

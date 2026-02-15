@@ -47,11 +47,20 @@ class DebuggerExecutionListener(
 
     private val blocker = CoroutineBlocker()
 
-    private var advanceByStep: Boolean = false
+    private var resumeMode: ResumeMode = ResumeMode.RESUME
 
-    // Current line when the execution resume.
+    // Current line when the execution resumed.
     // So when the step advance of one step, it's to another line.
     private var advanceByStepCurrentLine: Int = -1
+
+    // Script name at the time the execution was resumed (used for STEP_OVER).
+    private var advanceByStepCurrentScript: String = ""
+
+    // Call depth at the time the execution was resumed (used for STEP_OVER).
+    private var advanceByStepCallDepth: Int = 0
+
+    // Current call depth counter (incremented on call, decremented on return).
+    private var callDepth: Int = 0
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
@@ -68,8 +77,10 @@ class DebuggerExecutionListener(
     }
 
     private fun resumeExecution(debugRemoteCommand: ResumeExecution) {
-        advanceByStep = debugRemoteCommand.advanceByStep
+        resumeMode = debugRemoteCommand.mode
         advanceByStepCurrentLine = currentExecutionPoint.line
+        advanceByStepCurrentScript = currentExecutionPoint.script
+        advanceByStepCallDepth = callDepth
         blocker.unblock()
     }
 
@@ -215,12 +226,14 @@ class DebuggerExecutionListener(
         varargs: Varargs,
         stack: Array<LuaValue>,
     ) {
+        callDepth++
         callstack(globals.running).onCall(c, varargs, stack)
 
         onCall(c)
     }
 
     override fun onCall(f: LuaFunction) {
+        callDepth++
         callstack(globals.running).onCall(f)
         (f as? LuaClosure)?.run { onCall(this) }
     }
@@ -260,8 +273,18 @@ class DebuggerExecutionListener(
         currentExecutionPoint.pc = pc
         currentExecutionPoint.line = line
 
-        if (advanceByStep && line != advanceByStepCurrentLine) {
-            pauseExecution(currentExecutionPoint.script, line)
+        when (resumeMode) {
+            ResumeMode.STEP_INTO -> if (line != advanceByStepCurrentLine) {
+                pauseExecution(currentExecutionPoint.script, line)
+            }
+            ResumeMode.STEP_OVER -> if (
+                callDepth <= advanceByStepCallDepth &&
+                currentExecutionPoint.script == advanceByStepCurrentScript &&
+                line != advanceByStepCurrentLine
+            ) {
+                pauseExecution(currentExecutionPoint.script, line)
+            }
+            ResumeMode.RESUME -> { /* no stepping pause */ }
         }
 
         breakpoints.values.forEach { breakpoint ->
@@ -407,6 +430,7 @@ class DebuggerExecutionListener(
     }
 
     override fun onReturn() {
+        callDepth--
         callstack(globals.running).onReturn()
 
         val frame = callstack(globals.running).getCurrentFrame()
