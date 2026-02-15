@@ -15,6 +15,7 @@
             <option value="$PROJECT_DIR$/tiny-annotation-processors/tiny-lua-dsl" />
             <option value="$PROJECT_DIR$/tiny-annotation-processors/tiny-lua-stub-generator" />
             <option value="$PROJECT_DIR$/tiny-cli" />
+            <option value="$PROJECT_DIR$/tiny-debugger" />
             <option value="$PROJECT_DIR$/tiny-doc" />
             <option value="$PROJECT_DIR$/tiny-doc-annotations" />
             <option value="$PROJECT_DIR$/tiny-engine" />

@@ -23,12 +23,10 @@ dependencies {
         ?.because("https://youtrack.jetbrains.com/issue/KT-57235")
 }
 
-val tinyDebugger = tasks.register("tinyDebugger", Zip::class) {
-    val jsBundleArchive = tasks.named<Jar>("jsBundleProduction").flatMap { it.archiveFile }
-
+val tinyDebugger = tasks.register("tinyDebugger", Jar::class) {
     group = "tiny"
-    from(jsBundleArchive.map { zipTree(it) })
-    exclude("index.html")
+    from(tasks.named("jsBundleProduction"))
+    this.rename { "tiny-debugger.zip" }
     this.destinationDirectory.set(project.layout.buildDirectory.dir("tiny-dist"))
     this.archiveVersion.set("")
 }
