@@ -72,8 +72,6 @@ function _resources()
 end
 """
 
-
-
 class CreateCommand : CliktCommand(name = "create") {
     val gameDirectory by argument(help = "The directory containing all game information")
         .file(mustExist = false, canBeDir = true, canBeFile = false)
