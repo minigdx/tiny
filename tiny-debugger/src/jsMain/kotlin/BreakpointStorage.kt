@@ -20,12 +20,19 @@ object BreakpointStorage {
         gameId: String,
         breakpoints: Map<String, Set<Int>>,
         conditions: Map<String, Map<Int, String>>,
+        disabledBreakpoints: Map<String, Set<Int>> = emptyMap(),
     ) {
         val stored = mutableListOf<StoredBreakpoint>()
         breakpoints.forEach { (script, lines) ->
             lines.forEach { line ->
                 val condition = conditions[script]?.get(line)
                 stored.add(StoredBreakpoint(script, line, true, condition))
+            }
+        }
+        disabledBreakpoints.forEach { (script, lines) ->
+            lines.forEach { line ->
+                val condition = conditions[script]?.get(line)
+                stored.add(StoredBreakpoint(script, line, false, condition))
             }
         }
         val data = json.encodeToString(stored)
