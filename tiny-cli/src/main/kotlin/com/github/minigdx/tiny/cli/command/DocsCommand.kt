@@ -45,7 +45,6 @@ class DocsCommand : CliktCommand(name = "docs") {
             val commands = listOf(
                 CreateCommand(),
                 RunCommand(),
-                DebugCommand(),
                 AddCommand(),
                 ExportCommand(),
                 ServeCommand(),

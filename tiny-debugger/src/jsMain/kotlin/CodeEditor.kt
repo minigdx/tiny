@@ -21,10 +21,18 @@ class CodeEditor(
     private var conditions = mutableMapOf<Int, String>()
     private var highlightedLine: Int? = null
 
+    init {
+        codeContainer.addEventListener("scroll", {
+            gutterContainer.scrollTop = codeContainer.scrollTop
+        })
+    }
+
     fun setContent(code: String) {
         content = code
         lines = code.split("\n")
         render()
+        codeContainer.scrollTop = 0.0
+        gutterContainer.scrollTop = 0.0
     }
 
     fun setBreakpoints(
@@ -87,23 +95,23 @@ class CodeEditor(
                 gutterLine.classList.add("gutter-hit")
             }
 
-            val lineNumber = document.createElement("span") as HTMLElement
-            lineNumber.className = "line-number"
-            lineNumber.textContent = "$lineNum"
-            gutterLine.appendChild(lineNumber)
-
             if (breakpoints.contains(lineNum)) {
                 val marker = document.createElement("span") as HTMLElement
                 marker.className = "breakpoint-marker"
                 if (conditions.containsKey(lineNum)) {
-                    marker.textContent = "\uD83D\uDC1B"
+                    marker.innerHTML = LucideIcons.bug
                     marker.title = "Conditional: ${conditions[lineNum]}"
                 } else {
-                    marker.textContent = "\u25CF"
+                    marker.innerHTML = LucideIcons.circleDot
                     marker.title = "Breakpoint"
                 }
                 gutterLine.appendChild(marker)
             }
+
+            val lineNumber = document.createElement("span") as HTMLElement
+            lineNumber.className = "line-number"
+            lineNumber.textContent = "$lineNum"
+            gutterLine.appendChild(lineNumber)
 
             gutterLine.onclick = { e ->
                 onToggleBreakpoint(lineNum)

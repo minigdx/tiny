@@ -1,10 +1,13 @@
 package com.github.minigdx.tiny.debugger
 
+import com.github.minigdx.tiny.cli.debug.AllFiles
 import com.github.minigdx.tiny.cli.debug.BreakpointHit
 import com.github.minigdx.tiny.cli.debug.CurrentBreakpoints
 import com.github.minigdx.tiny.cli.debug.DebugRemoteCommand
 import com.github.minigdx.tiny.cli.debug.Disconnect
 import com.github.minigdx.tiny.cli.debug.EngineRemoteCommand
+import com.github.minigdx.tiny.cli.debug.FileChanged
+import com.github.minigdx.tiny.cli.debug.GameMetadata
 import com.github.minigdx.tiny.cli.debug.Reload
 import com.github.minigdx.tiny.cli.debug.RequestBreakpoints
 import com.github.minigdx.tiny.cli.debug.ResumeExecution
@@ -14,10 +17,12 @@ import kotlinx.serialization.json.Json
 import org.w3c.dom.WebSocket
 
 class EngineDebugSocket(
-    private val debugPort: Int,
     private val onBreakpointHit: (BreakpointHit) -> Unit,
     private val onCurrentBreakpoints: (CurrentBreakpoints) -> Unit,
     private val onReload: (Reload) -> Unit,
+    private val onAllFiles: (AllFiles) -> Unit,
+    private val onFileChanged: (FileChanged) -> Unit,
+    private val onGameMetadata: (GameMetadata) -> Unit,
     private val onConnected: () -> Unit,
     private val onDisconnected: () -> Unit,
 ) {
@@ -25,11 +30,12 @@ class EngineDebugSocket(
     private val json = Json { ignoreUnknownKeys = true }
 
     fun connect() {
-        val host = kotlinx.browser.window.location.hostname
-        ws = WebSocket("ws://$host:$debugPort/debug")
+        val host = kotlinx.browser.window.location.host
+        val protocol = if (kotlinx.browser.window.location.protocol == "https:") "wss" else "ws"
+        ws = WebSocket("$protocol://$host/debug")
 
         ws?.onopen = {
-            console.log("Engine debug connected on port $debugPort")
+            console.log("Debug socket connected")
             onConnected()
             send(RequestBreakpoints)
         }
@@ -42,20 +48,23 @@ class EngineDebugSocket(
                     is BreakpointHit -> onBreakpointHit(command)
                     is CurrentBreakpoints -> onCurrentBreakpoints(command)
                     is Reload -> onReload(command)
+                    is AllFiles -> onAllFiles(command)
+                    is FileChanged -> onFileChanged(command)
+                    is GameMetadata -> onGameMetadata(command)
                 }
             } catch (e: Exception) {
-                console.error("Engine debug parse error", e)
+                console.error("Debug socket parse error", e)
             }
         }
 
         ws?.onclose = {
-            console.log("Engine debug disconnected, reconnecting...")
+            console.log("Debug socket disconnected, reconnecting...")
             onDisconnected()
             kotlinx.browser.window.setTimeout({ connect() }, 2000)
         }
 
         ws?.onerror = {
-            console.error("Engine debug error")
+            console.error("Debug socket error")
         }
     }
 

@@ -169,7 +169,7 @@
             min-width: 70px;
             background: var(--bg-surface);
             border-right: 1px solid var(--border);
-            overflow-y: auto;
+            overflow: hidden;
             user-select: none;
         }
 
@@ -216,12 +216,13 @@
             line-height: 20px;
             white-space: pre;
             min-height: 20px;
+            border-left: 2px solid transparent;
+            padding-left: 14px;
         }
 
         .code-line-hit {
             background: rgba(249, 226, 175, 0.12);
-            border-left: 2px solid var(--yellow);
-            padding-left: 14px;
+            border-left-color: var(--yellow);
         }
 
         .code-line-bp {
@@ -425,6 +426,127 @@
             opacity: 0.85;
         }
 
+        /* Sidebar section title */
+        .sidebar-section-title {
+            padding: 10px 16px 6px;
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            border-top: 1px solid var(--border);
+        }
+
+        /* Breakpoint panel */
+        .bp-master-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .bp-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 16px;
+            font-size: 12px;
+            cursor: default;
+        }
+
+        .bp-row:hover {
+            background: var(--bg-highlight);
+        }
+
+        .bp-row:hover .bp-remove {
+            opacity: 1;
+        }
+
+        .bp-toggle {
+            accent-color: var(--accent3);
+            cursor: pointer;
+        }
+
+        .bp-info {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            cursor: pointer;
+            color: var(--text);
+        }
+
+        .bp-info:hover {
+            color: var(--accent3);
+        }
+
+        .bp-remove {
+            opacity: 0;
+            cursor: pointer;
+            color: var(--red);
+            display: flex;
+            align-items: center;
+            transition: opacity 0.15s;
+        }
+
+        .bp-remove:hover {
+            color: var(--text-bright);
+        }
+
+        .bp-condition-badge {
+            color: var(--yellow);
+            display: flex;
+            align-items: center;
+        }
+
+        .bp-remove-all {
+            margin-left: auto;
+            cursor: pointer;
+            color: var(--red);
+            display: flex;
+            align-items: center;
+            opacity: 0.6;
+            transition: opacity 0.15s;
+        }
+
+        .bp-remove-all:hover {
+            opacity: 1;
+        }
+
+        .bp-empty {
+            padding: 8px 16px;
+            color: var(--text-dim);
+            font-size: 11px;
+        }
+
+        /* Drag handle */
+        .drag-handle {
+            height: 6px;
+            background: var(--bg-surface);
+            border-top: 1px solid var(--border);
+            cursor: ns-resize;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-dim);
+        }
+
+        .drag-handle:hover {
+            background: var(--bg-highlight);
+        }
+
+        /* SVG icon alignment */
+        .toolbar-btn svg,
+        .breakpoint-marker svg,
+        .bp-condition-badge svg,
+        .bp-remove svg,
+        .bp-remove-all svg {
+            vertical-align: middle;
+        }
+
         /* Scrollbar styling */
         ::-webkit-scrollbar {
             width: 8px;
@@ -450,6 +572,8 @@
         <div class="sidebar">
             <div class="sidebar-title">Scripts</div>
             <div id="script-list"></div>
+            <div class="sidebar-section-title">Breakpoints</div>
+            <div id="breakpoint-panel"></div>
         </div>
         <div class="main">
             <div id="toolbar" class="toolbar"></div>
@@ -457,7 +581,8 @@
                 <div id="gutter" class="gutter"></div>
                 <div id="code" class="code-area"></div>
             </div>
-            <div class="variables-panel">
+            <div id="drag-handle" class="drag-handle"></div>
+            <div id="variables-panel" class="variables-panel">
                 <div class="variables-title">Variables</div>
                 <div id="variables"></div>
             </div>

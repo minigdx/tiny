@@ -10,7 +10,6 @@ class MainCommand : CliktCommand() {
         subcommands(
             CreateCommand(),
             RunCommand(),
-            DebugCommand(),
             AddCommand(),
             ExportCommand(),
             ServeCommand(),

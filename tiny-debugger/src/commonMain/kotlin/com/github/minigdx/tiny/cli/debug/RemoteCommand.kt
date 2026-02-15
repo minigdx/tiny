@@ -23,6 +23,15 @@ sealed interface EngineRemoteCommand : RemoteCommand
 @Serializable
 data class Reload(val script: String) : EngineRemoteCommand
 
+@Serializable
+data class AllFiles(val files: List<FileInfo>) : EngineRemoteCommand
+
+@Serializable
+data class FileChanged(val file: FileInfo) : EngineRemoteCommand
+
+@Serializable
+data class GameMetadata(val gameId: String, val gameName: String) : EngineRemoteCommand
+
 /**
  * Toggle a breakpoint in the game engine.
  *

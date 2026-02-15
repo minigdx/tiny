@@ -19,11 +19,6 @@ dependencies {
     implementation(libs.kotlin.serialization.json)
     implementation(libs.clikt)
 
-    // Exception in thread "main" java.lang.NoClassDefFoundError: com/sun/jna/Platform
-    // https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform
-    implementation(libs.jna)
-    implementation(libs.rsyntax)
-
     implementation(project(":tiny-doc-annotations"))
     implementation(project(":tiny-engine", "jvmRuntimeElements"))!!
         .because("Depends on the JVM Jar containing commons resources in the JAR.")
@@ -33,7 +28,6 @@ dependencies {
     implementation(libs.kgl.lwjgl)
 
     implementation(libs.bundles.jvm.ktor.server)
-    implementation(libs.bundles.jvm.ktor.client)
 
     add(
         externalDependencies.name,
@@ -58,7 +52,7 @@ dependencies {
         ),
     )?.because(
         "Embed the web debugger in the CLI " +
-            "so it can be served by the debug2 command.",
+            "so it can be served by the run command debug server.",
     )
 }
 

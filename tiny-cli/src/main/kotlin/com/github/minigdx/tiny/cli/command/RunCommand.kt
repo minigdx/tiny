@@ -11,12 +11,13 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.minigdx.tiny.cli.config.GameParameters
+import com.github.minigdx.tiny.cli.debug.AllFiles
 import com.github.minigdx.tiny.cli.debug.DebugRemoteCommand
 import com.github.minigdx.tiny.cli.debug.DebuggerExecutionListener
 import com.github.minigdx.tiny.cli.debug.EngineRemoteCommand
-import com.github.minigdx.tiny.cli.debug.FileChangedMessage
+import com.github.minigdx.tiny.cli.debug.FileChanged
 import com.github.minigdx.tiny.cli.debug.FileInfo
-import com.github.minigdx.tiny.cli.debug.FilesMessage
+import com.github.minigdx.tiny.cli.debug.GameMetadata
 import com.github.minigdx.tiny.cli.debug.Reload
 import com.github.minigdx.tiny.engine.GameEngine
 import com.github.minigdx.tiny.engine.GameEngineListener
@@ -249,65 +250,68 @@ class RunCommand : CliktCommand(name = "run") {
             install(WebSockets)
 
             routing {
-                // Debug WebSocket for the game engine
+                // Unified WebSocket: engine debug commands + file watching + metadata
                 webSocket("/debug") {
+                    // Send game metadata on connect
+                    if (configFile.exists()) {
+                        val params = GameParameters.read(configFile)
+                        val metadata = GameMetadata(gameId = params.id, gameName = params.name)
+                        outgoing.send(Frame.Text(Json.encodeToString<EngineRemoteCommand>(metadata)))
+                    }
+
+                    // Send initial file list
+                    val allFiles = buildFilesList(effectiveGameDirectory)
+                    outgoing.send(Frame.Text(Json.encodeToString<EngineRemoteCommand>(AllFiles(allFiles))))
+
+                    // Forward engine commands to the client
                     launch {
                         for (command in engineCommandSender) {
                             outgoing.send(Frame.Text(Json.encodeToString(command)))
                         }
                     }
 
+                    // File-watching coroutine
+                    launch {
+                        while (isActive) {
+                            delay(500)
+
+                            val currentScripts = try {
+                                val params = GameParameters.read(configFile)
+                                params.getAllScripts()
+                            } catch (_: Exception) {
+                                scriptFiles
+                            }
+
+                            val configModified = configFile.lastModified()
+                            if (configModified != lastModified["_tiny.json"]) {
+                                lastModified["_tiny.json"] = configModified
+                                val content = configFile.readText()
+                                val msg = FileChanged(file = FileInfo("_tiny.json", content))
+                                outgoing.send(Frame.Text(Json.encodeToString<EngineRemoteCommand>(msg)))
+                            }
+
+                            currentScripts.forEach { script ->
+                                val file = effectiveGameDirectory.resolve(script)
+                                if (file.exists()) {
+                                    val modified = file.lastModified()
+                                    if (modified != lastModified[script]) {
+                                        lastModified[script] = modified
+                                        val content = file.readText()
+                                        val msg = FileChanged(file = FileInfo(script, content))
+                                        outgoing.send(Frame.Text(Json.encodeToString<EngineRemoteCommand>(msg)))
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Process incoming debug commands from the client
                     for (frame in incoming) {
                         if (frame is Frame.Text) {
                             val command = Json.decodeFromString<DebugRemoteCommand>(frame.readText())
                             debugCommandReceiver.send(command)
                         } else {
                             TODO("$frame content not expected")
-                        }
-                    }
-                }
-
-                // File-watching WebSocket for the debugger webapp
-                webSocket("/ws") {
-                    val allFiles = buildFilesList(effectiveGameDirectory)
-                    val filesMsg = FilesMessage(type = "files", files = allFiles)
-                    outgoing.send(Frame.Text(Json.encodeToString(filesMsg)))
-
-                    while (isActive) {
-                        delay(500)
-
-                        val currentScripts = try {
-                            val params = GameParameters.read(configFile)
-                            params.getAllScripts()
-                        } catch (_: Exception) {
-                            scriptFiles
-                        }
-
-                        val configModified = configFile.lastModified()
-                        if (configModified != lastModified["_tiny.json"]) {
-                            lastModified["_tiny.json"] = configModified
-                            val content = configFile.readText()
-                            val msg = FileChangedMessage(
-                                type = "fileChanged",
-                                file = FileInfo("_tiny.json", content),
-                            )
-                            outgoing.send(Frame.Text(Json.encodeToString(msg)))
-                        }
-
-                        currentScripts.forEach { script ->
-                            val file = effectiveGameDirectory.resolve(script)
-                            if (file.exists()) {
-                                val modified = file.lastModified()
-                                if (modified != lastModified[script]) {
-                                    lastModified[script] = modified
-                                    val content = file.readText()
-                                    val msg = FileChangedMessage(
-                                        type = "fileChanged",
-                                        file = FileInfo(script, content),
-                                    )
-                                    outgoing.send(Frame.Text(Json.encodeToString(msg)))
-                                }
-                            }
                         }
                     }
                 }
@@ -348,7 +352,7 @@ class RunCommand : CliktCommand(name = "run") {
 
         val debuggerAddress = "http://localhost:$debug"
         echo("\uD83D\uDC1B === Debug server started on port '$debug' ===")
-        echo("\uD83D\uDC1B === Debugger webapp: $debuggerAddress?debugPort=$debug ===")
+        echo("\uD83D\uDC1B === Debugger webapp: $debuggerAddress ===")
 
         return server
     }
