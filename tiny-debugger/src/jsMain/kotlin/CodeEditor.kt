@@ -18,6 +18,7 @@ class CodeEditor(
     private var content: String = ""
     private var lines: List<String> = emptyList()
     private var breakpoints = mutableSetOf<Int>()
+    private var disabledBreakpoints = mutableSetOf<Int>()
     private var conditions = mutableMapOf<Int, String>()
     private var highlightedLine: Int? = null
 
@@ -38,9 +39,11 @@ class CodeEditor(
     fun setBreakpoints(
         bps: Set<Int>,
         conds: Map<Int, String>,
+        disabled: Set<Int> = emptySet(),
     ) {
         breakpoints = bps.toMutableSet()
         conditions = conds.toMutableMap()
+        disabledBreakpoints = disabled.toMutableSet()
         renderGutter()
     }
 
@@ -98,13 +101,19 @@ class CodeEditor(
             if (breakpoints.contains(lineNum)) {
                 val marker = document.createElement("span") as HTMLElement
                 marker.className = "breakpoint-marker"
-                if (conditions.containsKey(lineNum)) {
-                    marker.innerHTML = LucideIcons.bug
-                    marker.title = "Conditional: ${conditions[lineNum]}"
-                } else {
-                    marker.innerHTML = LucideIcons.circleDot
-                    marker.title = "Breakpoint"
-                }
+                marker.innerHTML = LucideIcons.circleDot
+                marker.title =
+                    if (conditions.containsKey(lineNum)) {
+                        "Conditional: ${conditions[lineNum]}"
+                    } else {
+                        "Breakpoint"
+                    }
+                gutterLine.appendChild(marker)
+            } else if (disabledBreakpoints.contains(lineNum)) {
+                val marker = document.createElement("span") as HTMLElement
+                marker.className = "breakpoint-marker breakpoint-disabled"
+                marker.innerHTML = LucideIcons.circleSlash
+                marker.title = "Breakpoint (disabled)"
                 gutterLine.appendChild(marker)
             }
 
