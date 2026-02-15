@@ -3,8 +3,10 @@
 :book:
 :source-highlighter: rouge
 :favicon: ./sample/favicon.png
+:description: Try the Tiny game engine directly in your browser. Interactive playground with code examples for Lua game development.
+:keywords: lua game playground, try lua game engine online, browser game editor
 
-= Tiny Playground
+= Tiny Game Engine - Playground
 
 ++++
 <script>

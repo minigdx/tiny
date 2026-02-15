@@ -65,6 +65,15 @@ val copyResources =
         into(project.layout.buildDirectory.get().asFile.resolve("docs/asciidoc/resources"))
     }
 
+val copySeoFiles = tasks.register("copy-seoFiles", Copy::class) {
+        from(project.projectDir.resolve("src/docs/asciidoc")) {
+            include("robots.txt")
+            include("sitemap.xml")
+            include(".nojekyll")
+        }
+        into(project.layout.buildDirectory.get().asFile.resolve("docs/asciidoc"))
+    }
+
 tasks.withType(AsciidoctorTask::class.java).configureEach {
     this.baseDirFollowsSourceDir()
     this.notCompatibleWithConfigurationCache("AsciidoctorJ plugin is not compatible with configuration cache")
@@ -74,5 +83,6 @@ tasks.withType(AsciidoctorTask::class.java).configureEach {
         copyAsciidoctorDependencies,
         copySample,
         copyResources,
+        copySeoFiles,
     )
 }

@@ -4,8 +4,10 @@
 :source-highlighter: rouge
 :favicon: ./sample/favicon.png
 :stylesheet: adoc-riak.css
+:description: Tiny CLI command reference. Create, run, debug, serve, and export your Lua games with the Tiny command-line interface.
+:keywords: tiny cli, game engine cli, lua game commands, game development tools, hot reload, game export
 
-= Tiny CLI
+= Tiny Game Engine - CLI Commands
 
 ++++
 <style>#header { display: none; }</style>

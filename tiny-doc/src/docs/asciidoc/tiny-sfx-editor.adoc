@@ -7,5 +7,5 @@ This editor can design an instrument and the notes played by this instrument, th
 The editor can be tested below:
 
 ++++
-<iframe class="no-resize" title="SFX Editor " width="768" height="512" src="sample/sfx-editor/index.html"></iframe>
+<iframe class="no-resize" title="Tiny retro sound effects editor" loading="lazy" width="768" height="512" src="sample/sfx-editor/index.html"></iframe>
 ++++

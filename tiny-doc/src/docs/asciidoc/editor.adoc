@@ -4,8 +4,10 @@
 :source-highlighter: rouge
 :favicon: ./sample/favicon.png
 :stylesheet: adoc-riak.css
+:description: Try the Tiny game engine directly in your browser. Interactive code editor with Lua game examples - no installation required.
+:keywords: lua game editor, online game editor, browser game development, tiny game engine playground, interactive lua editor
 
-= Tiny Editor
+= Tiny Game Engine - Online Editor
 
 ++++
 <tiny-editor style="display: none;" sprite="resources/tiny-dungeon.png" mode="editor"

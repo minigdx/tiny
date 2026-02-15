@@ -4,8 +4,11 @@
 :source-highlighter: rouge
 :favicon: ./sample/favicon.png
 :stylesheet: adoc-riak.css
+:description: Tiny is a lightweight Lua game engine and virtual console for building retro-style games. Open source, cross-platform, with hot reload and web export.
+:keywords: game engine, lua, virtual console, fantasy console, retro games, pixel art, indie game development, kotlin multiplatform, game jam, hot reload
+:author: Tiny Game Engine Contributors
 
-= Tiny
+= Tiny - Lightweight Lua Game Engine
 
 ++++
 <style>#header { display: none; }</style>
@@ -78,14 +81,12 @@
 
 == Tiny Engine
 
-`Tiny` is designed to help you create and test your ideas quickly and effectively. You can run your games on your desktop computer and export them for the web, making it easy to share your creations with others.
+Tiny is a free, open-source **fantasy console** and **lightweight game engine** for creating retro-style games using **Lua scripting**. Build pixel art games with a 256-color palette, test instantly with hot reload, and export to **desktop and web** platforms. Ideal for **game jams**, rapid prototyping, and learning game development.
 
-With `Tiny`, you'll be able to get started right away and see your progress in real-time, thanks to its hot reloading feature. This documentation will guide you through the setup and usage of `Tiny` as well as provide you with helpful tips and tricks to make the most out of this powerful tool.
-
-> _Let's get started and unleash your creativity!_
+Create and test your ideas quickly and effectively. Run your games on your desktop computer and export them for the web, making it easy to share your creations with others. Get started right away and see your progress in real-time, thanks to Tiny's **hot reloading** feature.
 
 ++++
-<iframe class="no-resize" title="Breakout example" width="516" height="516" src="sample/game-example/index.html"></iframe>
+<iframe class="no-resize" title="Breakout example game built with Tiny game engine" loading="lazy" width="516" height="516" src="sample/game-example/index.html"></iframe>
 ++++
 
 NOTE: The code source of this sample is available in the https://github.com/minigdx/tiny/tree/main/tiny-sample[Tiny git repository].
@@ -116,8 +117,7 @@ Contributions from the community are welcome, and can help to improve the overal
 
 A presentation about the technologies used behind Tiny was also given during the conference https://2024.droidkaigi.jp/en/timetable/683368/[DroidKaigi 2024 @ Tokyo]. You can check https://speakerdeck.com/dwursteisen/crafting-cross-platform-adventures-building-a-game-engine-with-kotlin-multiplatform[the slides], or you also https://www.youtube.com/watch?v=4_i_Xp96IMM[watch the session].
 
-image:sample/droidkaigi-tiny-export.gif[https://speakerdeck.com/dwursteisen/crafting-cross-platform-adventures-building-a-game-engine-with-kotlin-multiplatform
-]
+image:sample/droidkaigi-tiny-export.gif[DroidKaigi 2024 presentation - Building a game engine with Kotlin Multiplatform,link=https://speakerdeck.com/dwursteisen/crafting-cross-platform-adventures-building-a-game-engine-with-kotlin-multiplatform]
 
 TIP: Want to help make this documentation even better? Feel free to contribute by updating https://github.com/minigdx/tiny/tree/main/tiny-doc/src/docs/asciidoc[the documentation source code]!
 
