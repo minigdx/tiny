@@ -75,7 +75,7 @@ class DebuggerApp {
                 breakpoints[script]?.remove(line)
                 disabledBreakpoints[script]?.remove(line)
                 conditions[script]?.remove(line)
-                engineSocket.toggleBreakpoint(script, line, false, null)
+                engineSocket.deleteBreakpoint(script, line)
                 refreshEditorBreakpoints()
                 refreshBreakpointPanel()
                 saveBreakpointsToStorage()
@@ -87,12 +87,12 @@ class DebuggerApp {
             onRemoveAll = {
                 breakpoints.forEach { (script, lines) ->
                     lines.forEach { line ->
-                        engineSocket.toggleBreakpoint(script, line, false, null)
+                        engineSocket.deleteBreakpoint(script, line)
                     }
                 }
                 disabledBreakpoints.forEach { (script, lines) ->
                     lines.forEach { line ->
-                        engineSocket.toggleBreakpoint(script, line, false, null)
+                        engineSocket.deleteBreakpoint(script, line)
                     }
                 }
                 breakpoints.clear()
@@ -223,22 +223,24 @@ class DebuggerApp {
         val script = currentScript ?: return
         val scriptBps = breakpoints.getOrPut(script) { mutableSetOf() }
         val scriptDisabled = disabledBreakpoints.getOrPut(script) { mutableSetOf() }
-        val enabled: Boolean
         if (scriptBps.contains(line)) {
+            // The line contains a breakpoint: let's remove it
             scriptBps.remove(line)
             conditions[script]?.remove(line)
-            enabled = false
+            engineSocket.deleteBreakpoint(script, line)
         } else if (scriptDisabled.contains(line)) {
+            // The line contains a disabled breakpoint. Let's toggle it.
             scriptDisabled.remove(line)
             scriptBps.add(line)
-            enabled = true
+            val condition = conditions[script]?.get(line)
+            engineSocket.toggleBreakpoint(script, line, true, condition)
         } else {
+            // The line contains nothing. Let's add a breakpoint.
             scriptBps.add(line)
-            enabled = true
+            val condition = conditions[script]?.get(line)
+            engineSocket.toggleBreakpoint(script, line, true, condition)
         }
         refreshEditorBreakpoints()
-        val condition = conditions[script]?.get(line)
-        engineSocket.toggleBreakpoint(script, line, enabled, condition)
         refreshBreakpointPanel()
         saveBreakpointsToStorage()
     }
@@ -345,25 +347,34 @@ class DebuggerApp {
         val variablesPanel = document.getElementById("variables-panel") ?: return
         var dragging = false
 
-        dragHandle.addEventListener("mousedown", { e: org.w3c.dom.events.Event ->
-            dragging = true
-            e.preventDefault()
-        })
+        dragHandle.addEventListener(
+            "mousedown",
+            { e: org.w3c.dom.events.Event ->
+                dragging = true
+                e.preventDefault()
+            },
+        )
 
-        document.addEventListener("mousemove", { e: org.w3c.dom.events.Event ->
-            if (dragging) {
-                val mouseEvent = e.asDynamic()
-                val parentRect = variablesPanel.parentElement?.getBoundingClientRect()
-                if (parentRect != null) {
-                    val newHeight = parentRect.bottom - (mouseEvent.clientY as Double)
-                    val clamped = newHeight.coerceIn(60.0, 500.0)
-                    variablesPanel.asDynamic().style.height = "${clamped}px"
+        document.addEventListener(
+            "mousemove",
+            { e: org.w3c.dom.events.Event ->
+                if (dragging) {
+                    val mouseEvent = e.asDynamic()
+                    val parentRect = variablesPanel.parentElement?.getBoundingClientRect()
+                    if (parentRect != null) {
+                        val newHeight = parentRect.bottom - (mouseEvent.clientY as Double)
+                        val clamped = newHeight.coerceIn(60.0, 500.0)
+                        variablesPanel.asDynamic().style.height = "${clamped}px"
+                    }
                 }
-            }
-        })
+            },
+        )
 
-        document.addEventListener("mouseup", { _: org.w3c.dom.events.Event ->
-            dragging = false
-        })
+        document.addEventListener(
+            "mouseup",
+            { _: org.w3c.dom.events.Event ->
+                dragging = false
+            },
+        )
     }
 }

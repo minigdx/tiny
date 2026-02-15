@@ -472,8 +472,8 @@ class GlfwPlatform(
         val buffer = MemoryUtil.memAlloc(width * height * 4)
         for (pixel in rgb) {
             buffer.put(((pixel shr 16) and 0xFF).toByte()) // R
-            buffer.put(((pixel shr 8) and 0xFF).toByte())  // G
-            buffer.put((pixel and 0xFF).toByte())           // B
+            buffer.put(((pixel shr 8) and 0xFF).toByte()) // G
+            buffer.put((pixel and 0xFF).toByte()) // B
             buffer.put(((pixel shr 24) and 0xFF).toByte()) // A
         }
         buffer.flip()

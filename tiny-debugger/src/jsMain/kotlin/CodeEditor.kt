@@ -154,9 +154,8 @@ class CodeEditor(
             val lineNum = index + 1
             if (highlightedLine == lineNum) {
                 lineDiv.classList.add("code-line-hit")
-            }
-            if (breakpoints.contains(lineNum)) {
-                lineDiv.classList.add("code-line-bp")
+            } else {
+                lineDiv.classList.remove("code-line-hit")
             }
 
             codeContainer.appendChild(lineDiv)

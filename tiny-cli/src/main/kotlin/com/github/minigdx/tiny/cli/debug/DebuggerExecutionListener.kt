@@ -58,6 +58,7 @@ class DebuggerExecutionListener(
             for (debugRemoteCommand in debugCommandReceiver) {
                 when (debugRemoteCommand) {
                     is ToggleBreakpoint -> toggleBreakpoint(debugRemoteCommand)
+                    is DeleteBreakpoint -> deleteBreakpoint(debugRemoteCommand)
                     is ResumeExecution -> resumeExecution(debugRemoteCommand)
                     Disconnect -> disconnect()
                     RequestBreakpoints -> sendCurrentBreakpoints()
@@ -112,6 +113,11 @@ class DebuggerExecutionListener(
                 upValues = context.upValues,
             ),
         )
+    }
+
+    private fun deleteBreakpoint(command: DeleteBreakpoint) {
+        val executionPoint = ExecutionPoint(command.script, command.line)
+        breakpoints = breakpoints - executionPoint
     }
 
     private fun toggleBreakpoint(debugRemoteCommand: ToggleBreakpoint) {

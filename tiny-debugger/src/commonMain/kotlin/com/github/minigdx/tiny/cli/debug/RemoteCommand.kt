@@ -44,6 +44,15 @@ data class GameMetadata(val gameId: String, val gameName: String) : EngineRemote
 data class ToggleBreakpoint(val script: String, val line: Int, val enabled: Boolean, val condition: String? = null) : DebugRemoteCommand
 
 /**
+ * Delete a breakpoint from the game engine.
+ *
+ * @param script the name of the script where the breakpoint is.
+ * @param line the line number of the breakpoint.
+ */
+@Serializable
+data class DeleteBreakpoint(val script: String, val line: Int) : DebugRemoteCommand
+
+/**
  * Resume game execution.
  */
 @Serializable

@@ -4,6 +4,7 @@ import com.github.minigdx.tiny.cli.debug.AllFiles
 import com.github.minigdx.tiny.cli.debug.BreakpointHit
 import com.github.minigdx.tiny.cli.debug.CurrentBreakpoints
 import com.github.minigdx.tiny.cli.debug.DebugRemoteCommand
+import com.github.minigdx.tiny.cli.debug.DeleteBreakpoint
 import com.github.minigdx.tiny.cli.debug.Disconnect
 import com.github.minigdx.tiny.cli.debug.EngineRemoteCommand
 import com.github.minigdx.tiny.cli.debug.FileChanged
@@ -85,6 +86,13 @@ class EngineDebugSocket(
         condition: String? = null,
     ) {
         send(ToggleBreakpoint(script, line, enabled, condition))
+    }
+
+    fun deleteBreakpoint(
+        script: String,
+        line: Int,
+    ) {
+        send(DeleteBreakpoint(script, line))
     }
 
     fun resume() {
