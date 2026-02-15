@@ -28,8 +28,10 @@ class EngineDebugSocket(
 ) {
     private var ws: WebSocket? = null
     private val json = Json { ignoreUnknownKeys = true }
+    private var manualDisconnect = false
 
     fun connect() {
+        manualDisconnect = false
         val host = kotlinx.browser.window.location.host
         val protocol = if (kotlinx.browser.window.location.protocol == "https:") "wss" else "ws"
         ws = WebSocket("$protocol://$host/debug")
@@ -58,9 +60,12 @@ class EngineDebugSocket(
         }
 
         ws?.onclose = {
-            console.log("Debug socket disconnected, reconnecting...")
+            console.log("Debug socket disconnected")
             onDisconnected()
-            kotlinx.browser.window.setTimeout({ connect() }, 2000)
+            if (!manualDisconnect) {
+                console.log("Reconnecting in 2s...")
+                kotlinx.browser.window.setTimeout({ connect() }, 2000)
+            }
         }
 
         ws?.onerror = {
@@ -91,6 +96,8 @@ class EngineDebugSocket(
     }
 
     fun disconnect() {
+        manualDisconnect = true
         send(Disconnect)
+        ws?.close()
     }
 }
