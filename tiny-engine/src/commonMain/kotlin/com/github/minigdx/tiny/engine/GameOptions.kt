@@ -20,6 +20,7 @@ data class GameOptions(
     val spriteSize: Pair<Pixel, Pixel> = 8 to 8,
     val hideMouseCursor: Boolean = false,
     val bootScript: String? = null,
+    val icon: String? = null,
 ) : MouseProject {
     init {
         require(width > 0) { "The width needs to be a positive number." }

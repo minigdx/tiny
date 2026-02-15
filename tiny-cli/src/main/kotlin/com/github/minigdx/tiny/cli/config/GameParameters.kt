@@ -129,6 +129,7 @@ data class GameParametersV1(
             sound = sound,
             hideMouseCursor = hideMouseCursor,
             bootScript = bootScript,
+            icon = icon,
         )
     }
 

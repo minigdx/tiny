@@ -39,6 +39,7 @@ import kotlinx.coroutines.runBlocking
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.glfw.GLFW.GLFW_CURSOR
 import org.lwjgl.glfw.GLFW.GLFW_CURSOR_HIDDEN
+import org.lwjgl.glfw.GLFWImage
 import org.lwjgl.opengl.GL
 import org.lwjgl.system.MemoryUtil
 import java.awt.image.BufferedImage
@@ -149,6 +150,8 @@ class GlfwPlatform(
         if (gameOptions.hideMouseCursor) {
             GLFW.glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN)
         }
+
+        setWindowIcon()
 
         // Make the OpenGL context current
         GLFW.glfwMakeContextCurrent(window)
@@ -438,6 +441,48 @@ class GlfwPlatform(
         } else {
             null
         }
+    }
+
+    private fun setWindowIcon() {
+        try {
+            val iconFileName = gameOptions.icon ?: "icon.png"
+            val iconFile = gameDirectory.resolve(iconFileName)
+            if (!iconFile.exists()) {
+                logger.info("GLFW") { "No icon file found at '${iconFile.absolutePath}', using default icon." }
+                return
+            }
+            val image = ImageIO.read(iconFile) ?: return
+            val isMac = System.getProperty("os.name").lowercase().contains("mac")
+            if (isMac) {
+                // AWT Taskbar conflicts with GLFW on macOS when using -XstartOnFirstThread.
+                // The dock icon can be set via -Xdock:icon JVM argument in the CLI launcher.
+                logger.info("GLFW") { "Dock icon is set via JVM arguments on macOS." }
+            } else {
+                setGlfwWindowIcon(image)
+            }
+        } catch (e: Exception) {
+            logger.info("GLFW") { "Could not set window icon: ${e.message}" }
+        }
+    }
+
+    private fun setGlfwWindowIcon(image: BufferedImage) {
+        val width = image.width
+        val height = image.height
+        val rgb = image.getRGB(0, 0, width, height, null, 0, width)
+        val buffer = MemoryUtil.memAlloc(width * height * 4)
+        for (pixel in rgb) {
+            buffer.put(((pixel shr 16) and 0xFF).toByte()) // R
+            buffer.put(((pixel shr 8) and 0xFF).toByte())  // G
+            buffer.put((pixel and 0xFF).toByte())           // B
+            buffer.put(((pixel shr 24) and 0xFF).toByte()) // A
+        }
+        buffer.flip()
+
+        val glfwImage = GLFWImage.malloc(1)
+        glfwImage.position(0).width(width).height(height).pixels(buffer)
+        GLFW.glfwSetWindowIcon(window, glfwImage)
+        glfwImage.free()
+        MemoryUtil.memFree(buffer)
     }
 
     companion object {
