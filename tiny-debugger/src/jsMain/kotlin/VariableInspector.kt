@@ -70,9 +70,11 @@ class VariableInspector(
         name: String,
         value: LuaValue,
         depth: Int,
-    ) {
+        insertAfterRow: HTMLElement? = null,
+    ): HTMLElement {
         val row = document.createElement("tr") as HTMLElement
-        row.className = "var-row"
+        row.className = if (depth > 0) "var-row var-child" else "var-row"
+        row.setAttribute("data-depth", depth.toString())
 
         val nameCell = document.createElement("td") as HTMLElement
         nameCell.className = "var-name"
@@ -99,7 +101,6 @@ class VariableInspector(
                 valueCell.textContent = "{${value.entries.size} entries}"
 
                 var expanded = false
-                val childRows = mutableListOf<HTMLElement>()
 
                 row.onclick = {
                     expanded = !expanded
@@ -107,27 +108,16 @@ class VariableInspector(
                     if (expanded) {
                         var insertAfter = row
                         value.entries.forEach { (childName, childValue) ->
-                            val childRow = document.createElement("tr") as HTMLElement
-                            childRow.className = "var-row var-child"
-                            val cName = document.createElement("td") as HTMLElement
-                            cName.className = "var-name"
-                            cName.style.paddingLeft = "${(depth + 1) * 16 + 8}px"
-                            cName.textContent = childName
-                            val cValue = document.createElement("td") as HTMLElement
-                            cValue.className = "var-value"
-                            when (childValue) {
-                                is LuaValue.Primitive -> cValue.textContent = childValue.value
-                                is LuaValue.Dictionary -> cValue.textContent = "{${childValue.entries.size} entries}"
-                            }
-                            childRow.appendChild(cName)
-                            childRow.appendChild(cValue)
-                            insertAfter.after(childRow)
-                            insertAfter = childRow
-                            childRows.add(childRow)
+                            insertAfter = addVariableRow(tbody, childName, childValue, depth + 1, insertAfter)
                         }
                     } else {
-                        childRows.forEach { it.remove() }
-                        childRows.clear()
+                        // Remove all following rows with depth greater than current
+                        while (true) {
+                            val next = row.nextElementSibling as? HTMLElement ?: break
+                            val nextDepth = next.getAttribute("data-depth")?.toIntOrNull() ?: 0
+                            if (nextDepth <= depth) break
+                            next.remove()
+                        }
                     }
                 }
             }
@@ -135,6 +125,13 @@ class VariableInspector(
 
         row.appendChild(nameCell)
         row.appendChild(valueCell)
-        tbody.appendChild(row)
+
+        if (insertAfterRow != null) {
+            insertAfterRow.after(row)
+        } else {
+            tbody.appendChild(row)
+        }
+
+        return row
     }
 }
