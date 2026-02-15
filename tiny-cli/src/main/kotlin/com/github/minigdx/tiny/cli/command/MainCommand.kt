@@ -11,7 +11,6 @@ class MainCommand : CliktCommand() {
             CreateCommand(),
             RunCommand(),
             DebugCommand(),
-            DebugCommand2(),
             AddCommand(),
             ExportCommand(),
             ServeCommand(),

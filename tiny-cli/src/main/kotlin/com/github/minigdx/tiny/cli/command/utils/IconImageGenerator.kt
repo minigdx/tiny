@@ -1,6 +1,5 @@
 package com.github.minigdx.tiny.cli.command.utils
 
-import java.awt.Color
 import java.awt.Font
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage

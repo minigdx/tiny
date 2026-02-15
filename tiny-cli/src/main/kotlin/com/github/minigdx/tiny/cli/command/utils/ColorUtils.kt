@@ -4,7 +4,6 @@ import com.github.ajalt.mordant.rendering.TextColors
 import java.awt.Color
 
 object ColorUtils {
-
     fun parseColor(colorString: String): Color {
         val hex = colorString.removePrefix("#")
         return when (hex.length) {
@@ -24,6 +23,7 @@ object ColorUtils {
             else -> Color.BLACK
         }
     }
+
     fun brightness(hexColor: String): Float {
         // Remove the '#' prefix
         val colorWithoutHash = hexColor.removePrefix("#")

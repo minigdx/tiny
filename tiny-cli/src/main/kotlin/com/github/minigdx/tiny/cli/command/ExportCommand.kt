@@ -235,6 +235,8 @@ class ExportCommand : CliktCommand(name = "export") {
                         "run",
                         "--arguments",
                         "--mac-from-jpackage",
+                        "--arguments",
+                        "--no-debug",
                     ),
                 )
 
@@ -253,6 +255,8 @@ class ExportCommand : CliktCommand(name = "export") {
                         "run",
                         "--arguments",
                         "game",
+                        "--arguments",
+                        "--no-debug",
                     ),
                 )
 
@@ -268,6 +272,8 @@ class ExportCommand : CliktCommand(name = "export") {
                         "run",
                         "--arguments",
                         "game",
+                        "--arguments",
+                        "--no-debug",
                     ),
                 )
 
@@ -283,6 +289,8 @@ class ExportCommand : CliktCommand(name = "export") {
                         "run",
                         "--arguments",
                         "game",
+                        "--arguments",
+                        "--no-debug",
                     ),
                 )
             }
