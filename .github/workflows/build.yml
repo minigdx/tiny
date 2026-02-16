@@ -102,6 +102,16 @@ jobs:
           tiny-cli-${{github.ref_name}}\bin\tiny-cli.bat export tiny-sample -p desktop --exclude-jdk
           if (-Not (Test-Path exported-game)) { exit 1 }
           if (-Not (Get-ChildItem exported-game\*.jar)) { exit 1 }
+      - name: Test desktop export with JDK (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          tiny-cli-${{github.ref_name}}/bin/tiny-cli export tiny-sample -p desktop --include-jdk -o exported-game-jdk
+          test -d exported-game-jdk
+      - name: Test desktop export with JDK (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          tiny-cli-${{github.ref_name}}\bin\tiny-cli.bat export tiny-sample -p desktop --include-jdk -o exported-game-jdk
+          if (-Not (Test-Path exported-game-jdk)) { exit 1 }
 
 env:
   GRADLE_OPTS: -Dorg.gradle.configureondemand=true -Dorg.gradle.parallel=true -Dkotlin.incremental=false -Dorg.gradle.jvmargs="-Xmx3g -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
