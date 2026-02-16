@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.cli.command
 
+import com.github.ajalt.clikt.core.Abort
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.arguments.argument
@@ -96,7 +97,7 @@ class ExportCommand : CliktCommand(name = "export") {
         if (includeJdk && !isJpackageAvailable()) {
             echo("\uD83D\uDE31 jpackage is not available. Please use Java 14 or later with jpackage support.")
             echo("\uD83D\uDCA1 Alternatively, use --exclude-jdk to create a portable JAR launcher.")
-            return
+            throw Abort()
         }
 
         val targetPlatform = when (desktopPlatform) {
@@ -305,6 +306,7 @@ class ExportCommand : CliktCommand(name = "export") {
 
         if (exitCode != 0) {
             echo("\uD83D\uDE31 jpackage failed with exit code $exitCode")
+            throw Abort()
         }
 
         if (!debug) {
@@ -342,7 +344,7 @@ class ExportCommand : CliktCommand(name = "export") {
             echo("\uD83D\uDE31 Could not find tiny-cli JAR.")
             echo("\uD83D\uDCA1 The CLI must be installed before using export-desktop.")
             echo("\uD83D\uDCA1 Run 'make install' to install the CLI.")
-            return
+            throw Abort()
         }
 
         Files.copy(cliJar.toPath(), outputJar.toPath(), StandardCopyOption.REPLACE_EXISTING)
@@ -499,7 +501,7 @@ class ExportCommand : CliktCommand(name = "export") {
         return when (platform) {
             "windows" -> "exe"
             "mac" -> "dmg"
-            "linux" -> "pkg"
+            "linux" -> "deb"
             else -> "app-image"
         }
     }

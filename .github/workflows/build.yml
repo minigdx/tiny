@@ -107,11 +107,17 @@ jobs:
         run: |
           tiny-cli-${{github.ref_name}}/bin/tiny-cli export tiny-sample -p desktop --include-jdk -o exported-game-jdk
           test -d exported-game-jdk
+          if [ "$(uname -s)" = "Linux" ]; then
+            ls exported-game-jdk/*.deb
+          elif [ "$(uname -s)" = "Darwin" ]; then
+            ls exported-game-jdk/*.dmg
+          fi
       - name: Test desktop export with JDK (Windows)
         if: runner.os == 'Windows'
         run: |
           tiny-cli-${{github.ref_name}}\bin\tiny-cli.bat export tiny-sample -p desktop --include-jdk -o exported-game-jdk
           if (-Not (Test-Path exported-game-jdk)) { exit 1 }
+          if (-Not (Get-ChildItem exported-game-jdk\*.exe)) { exit 1 }
 
 env:
   GRADLE_OPTS: -Dorg.gradle.configureondemand=true -Dorg.gradle.parallel=true -Dkotlin.incremental=false -Dorg.gradle.jvmargs="-Xmx3g -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"

@@ -31,3 +31,17 @@ sfx:
 
 sample:
 	./gradlew :tiny-cli:run --args="run ." -Ptiny.workDir=tiny-sample
+
+test-linux-export:
+	./gradlew assembleDist -Pversion=DEV-SNAPSHOT
+	docker run --rm \
+		-v "$(PWD)/tiny-cli/build/distributions:/dist" \
+		-v "$(PWD)/tiny-sample:/tiny-sample" \
+		eclipse-temurin:17-jdk-jammy \
+		bash -c '\
+			apt-get update && apt-get install -y --no-install-recommends fakeroot binutils unzip && \
+			cd /tmp && \
+			unzip /dist/tiny-cli-DEV-SNAPSHOT.zip && \
+			tiny-cli-DEV-SNAPSHOT/bin/tiny-cli export /tiny-sample -p desktop --include-jdk -o /tmp/exported-game-jdk && \
+			ls /tmp/exported-game-jdk/*.deb \
+		'
