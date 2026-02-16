@@ -278,6 +278,7 @@ class DebuggerExecutionListener(
             ResumeMode.STEP_INTO -> if (line != advanceByStepCurrentLine) {
                 pauseExecution(currentExecutionPoint.script, line)
             }
+
             ResumeMode.STEP_OVER -> if (
                 callDepth <= advanceByStepCallDepth &&
                 currentExecutionPoint.script == advanceByStepCurrentScript &&
@@ -285,7 +286,9 @@ class DebuggerExecutionListener(
             ) {
                 pauseExecution(currentExecutionPoint.script, line)
             }
-            ResumeMode.RESUME -> { /* no stepping pause */ }
+
+            ResumeMode.RESUME -> { // no stepping pause
+            }
         }
 
         breakpoints.values.forEach { breakpoint ->
@@ -432,6 +435,7 @@ class DebuggerExecutionListener(
                 }
                 "{${entries.joinToString(", ")}}"
             }
+
             else -> "nil" // For functions and other complex types
         }
     }
