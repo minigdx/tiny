@@ -94,6 +94,7 @@ function guessMode(target)
         return "change"
     end
 end
+
 --- Sync data from source to target
 -- Updates target whenever source changes (via on_change) or continuously (via _update)
 -- @param source Source object

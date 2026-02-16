@@ -33,6 +33,7 @@
     "#FFF7E4"
   ],
   "scripts": [
+    "tiny-instrument-editor.lua",
     "instrument-editor.lua",
     "sfx-editor.lua",
     "wire.lua",
@@ -60,6 +61,7 @@
     "sfx.png"
   ],
   "levels": [
+    "tiny-music-editor.ldtk",
     "sfx-editor.ldtk",
     "editor.ldtk"
   ],
