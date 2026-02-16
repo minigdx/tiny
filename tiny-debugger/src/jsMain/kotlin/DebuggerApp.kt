@@ -23,6 +23,7 @@ class DebuggerApp {
     private lateinit var variableInspector: VariableInspector
     private lateinit var toolbar: Toolbar
     private lateinit var conditionModal: ConditionModal
+    private lateinit var evaluateModal: EvaluateModal
     private lateinit var engineSocket: EngineDebugSocket
     private lateinit var breakpointPanel: BreakpointPanel
     private lateinit var toggleAllCheckbox: HTMLInputElement
@@ -38,6 +39,7 @@ class DebuggerApp {
         toggleAllCheckbox = document.getElementById("toggle-all-breakpoints") as HTMLInputElement
 
         conditionModal = ConditionModal(modalOverlay)
+        evaluateModal = EvaluateModal(modalOverlay)
 
         codeEditor = CodeEditor(
             gutterContainer,
@@ -110,10 +112,16 @@ class DebuggerApp {
                 isPaused = false
                 toolbar.setPaused(false)
                 codeEditor.highlightLine(null)
+                evaluateModal.hide()
                 engineSocket.resume()
             },
             onStep = { engineSocket.step() },
             onStepOver = { engineSocket.stepOver() },
+            onEvaluate = {
+                evaluateModal.show { expression ->
+                    engineSocket.evaluateExpression(expression)
+                }
+            },
             onDisconnect = { engineSocket.disconnect() },
             onConnect = { engineSocket.connect() },
         )
@@ -125,6 +133,7 @@ class DebuggerApp {
             onAllFiles = { msg -> handleFiles(msg.files) },
             onFileChanged = { msg -> handleFileChanged(msg.file) },
             onGameMetadata = { meta -> handleGameMetadata(meta) },
+            onEvaluationResult = { result -> evaluateModal.showResult(result.result, result.error) },
             onConnected = { toolbar.setConnected(true) },
             onDisconnected = {
                 toolbar.setConnected(false)
@@ -132,6 +141,7 @@ class DebuggerApp {
                 toolbar.setPaused(false)
                 codeEditor.highlightLine(null)
                 variableInspector.clear()
+                evaluateModal.hide()
             },
         )
 

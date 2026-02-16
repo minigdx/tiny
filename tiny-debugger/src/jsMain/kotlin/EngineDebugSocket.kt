@@ -7,6 +7,8 @@ import com.github.minigdx.tiny.cli.debug.DebugRemoteCommand
 import com.github.minigdx.tiny.cli.debug.DeleteBreakpoint
 import com.github.minigdx.tiny.cli.debug.Disconnect
 import com.github.minigdx.tiny.cli.debug.EngineRemoteCommand
+import com.github.minigdx.tiny.cli.debug.EvaluateExpression
+import com.github.minigdx.tiny.cli.debug.EvaluationResult
 import com.github.minigdx.tiny.cli.debug.FileChanged
 import com.github.minigdx.tiny.cli.debug.GameMetadata
 import com.github.minigdx.tiny.cli.debug.Reload
@@ -25,6 +27,7 @@ class EngineDebugSocket(
     private val onAllFiles: (AllFiles) -> Unit,
     private val onFileChanged: (FileChanged) -> Unit,
     private val onGameMetadata: (GameMetadata) -> Unit,
+    private val onEvaluationResult: (EvaluationResult) -> Unit,
     private val onConnected: () -> Unit,
     private val onDisconnected: () -> Unit,
 ) {
@@ -54,6 +57,7 @@ class EngineDebugSocket(
                     is AllFiles -> onAllFiles(command)
                     is FileChanged -> onFileChanged(command)
                     is GameMetadata -> onGameMetadata(command)
+                    is EvaluationResult -> onEvaluationResult(command)
                 }
             } catch (e: Exception) {
                 console.error("Debug socket parse error", e)
@@ -109,6 +113,10 @@ class EngineDebugSocket(
 
     fun requestBreakpoints() {
         send(RequestBreakpoints)
+    }
+
+    fun evaluateExpression(expression: String) {
+        send(EvaluateExpression(expression))
     }
 
     fun disconnect() {

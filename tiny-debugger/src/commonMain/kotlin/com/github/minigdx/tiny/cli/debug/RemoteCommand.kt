@@ -119,3 +119,20 @@ data class BreakpointInfo(
     val enabled: Boolean,
     val condition: String? = null,
 )
+
+/**
+ * Evaluate a Lua expression in the current execution context.
+ *
+ * @param expression the Lua expression to evaluate.
+ */
+@Serializable
+data class EvaluateExpression(val expression: String) : DebugRemoteCommand
+
+/**
+ * Result of evaluating a Lua expression.
+ *
+ * @param result the string representation of the result.
+ * @param error an error message if the evaluation failed.
+ */
+@Serializable
+data class EvaluationResult(val result: String, val error: String? = null) : EngineRemoteCommand

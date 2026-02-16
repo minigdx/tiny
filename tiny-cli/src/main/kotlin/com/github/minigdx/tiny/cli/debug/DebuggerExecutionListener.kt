@@ -71,6 +71,7 @@ class DebuggerExecutionListener(
                     is ResumeExecution -> resumeExecution(debugRemoteCommand)
                     Disconnect -> disconnect()
                     RequestBreakpoints -> sendCurrentBreakpoints()
+                    is EvaluateExpression -> evaluateExpression(debugRemoteCommand)
                 }
             }
         }
@@ -316,13 +317,9 @@ class DebuggerExecutionListener(
     }
 
     /**
-     * Evaluates a Lua condition in the current execution context.
+     * Evaluates a Lua expression in the current execution context and returns the raw LuaValue.
      */
-    private fun evaluateCondition(
-        condition: String,
-        scriptName: String,
-        line: Int,
-    ): Boolean {
+    private fun evaluateLuaExpression(expression: String): LuaValue {
         val frames = callstack(globals.running).getCallFrames()
 
         // Collect upvalues
@@ -359,14 +356,53 @@ class DebuggerExecutionListener(
                 }
             }
 
-            // Evaluate condition
-            appendLine("return ($condition)")
+            // Evaluate expression
+            appendLine("return ($expression)")
         }
 
         // Execute the script
-        val result = globals.load(script).call()
-        return result.toboolean()
+        return globals.load(script).call()
     }
+
+    /**
+     * Evaluates a Lua condition in the current execution context.
+     */
+    private fun evaluateCondition(
+        condition: String,
+        scriptName: String,
+        line: Int,
+    ): Boolean = evaluateLuaExpression(condition).toboolean()
+
+    /**
+     * Evaluates an arbitrary Lua expression and sends the result back to the debugger.
+     */
+    private suspend fun evaluateExpression(cmd: EvaluateExpression) {
+        try {
+            val result = evaluateLuaExpression(cmd.expression)
+            val formatted = formatValue(result)
+            val resultStr = luaValueToDisplayString(formatted)
+            engineCommandSender.send(EvaluationResult(result = resultStr))
+        } catch (e: Exception) {
+            engineCommandSender.send(EvaluationResult(result = "", error = e.message ?: "Unknown error"))
+        }
+    }
+
+    /**
+     * Converts a formatted [com.github.minigdx.tiny.cli.debug.LuaValue] to a readable display string.
+     */
+    private fun luaValueToDisplayString(
+        value: com.github.minigdx.tiny.cli.debug.LuaValue,
+        indent: String = "",
+    ): String =
+        when (value) {
+            is Primitive -> value.value
+            is Dictionary -> {
+                val entries = value.entries.entries.joinToString("\n") { (k, v) ->
+                    "$indent  $k = ${luaValueToDisplayString(v, "$indent  ")}"
+                }
+                "{\n$entries\n$indent}"
+            }
+        }
 
     /**
      * Converts a LuaValue to its string representation for script generation.
@@ -555,6 +591,8 @@ class DebuggerExecutionListener(
                         .map { it.varname }
 
                 return locvars.zip(stack!!) { name, value -> LuaValue.varargsOf(name, value) }
+                    // Remove internal local variables "(for generator)", "(for state)", "(for control)"
+                    .filter { !it.arg(1).tojstring().startsWith("(") }
             }
         }
     }

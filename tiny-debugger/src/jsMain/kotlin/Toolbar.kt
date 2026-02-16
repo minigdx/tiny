@@ -9,10 +9,12 @@ class Toolbar(
     private val onResume: () -> Unit,
     private val onStep: () -> Unit,
     private val onStepOver: () -> Unit,
+    private val onEvaluate: () -> Unit,
     private val onDisconnect: () -> Unit,
     private val onConnect: () -> Unit,
 ) {
     private val resumeBtn: HTMLButtonElement
+    private val evaluateBtn: HTMLButtonElement
     private val disconnectBtn: HTMLButtonElement
 
     init {
@@ -38,6 +40,12 @@ class Toolbar(
         stepOverBtn.onclick = { onStepOver() }
         container.appendChild(stepOverBtn)
 
+        evaluateBtn = document.createElement("button") as HTMLButtonElement
+        evaluateBtn.className = "toolbar-btn"
+        evaluateBtn.innerHTML = "${LucideIcons.calculator} Eval"
+        evaluateBtn.title = "Evaluate expression"
+        container.appendChild(evaluateBtn)
+
         disconnectBtn = document.createElement("button") as HTMLButtonElement
         disconnectBtn.className = "toolbar-btn toolbar-btn-danger"
         disconnectBtn.innerHTML = "${LucideIcons.unplug} Disconnect"
@@ -52,11 +60,17 @@ class Toolbar(
             resumeBtn.innerHTML = LucideIcons.play
             resumeBtn.title = "Resume execution"
             resumeBtn.onclick = { onResume() }
+
+            evaluateBtn.className = "toolbar-btn toolbar-btn-paused"
+            evaluateBtn.onclick = { onEvaluate() }
         } else {
             resumeBtn.className = "toolbar-btn"
             resumeBtn.innerHTML = LucideIcons.pause
             resumeBtn.title = "Running"
             resumeBtn.onclick = null
+
+            evaluateBtn.className = "toolbar-btn"
+            evaluateBtn.onclick = null
         }
     }
 
