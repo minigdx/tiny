@@ -422,7 +422,7 @@ class ExportCommand : CliktCommand(name = "export") {
 
     private fun getDependencies(): List<String> {
         val classPath = System.getProperty("java.class.path")
-        return classPath.split(":")
+        return classPath.split(File.pathSeparator)
             .filter { it.endsWith(".jar") }
             .filter { !it.contains("tiny-cli-") } // Exclude the CLI jar as it's already copied
             .distinct()
