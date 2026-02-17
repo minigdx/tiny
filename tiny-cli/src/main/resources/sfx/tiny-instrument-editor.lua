@@ -51,7 +51,7 @@ function _init_buttons(entities)
                 -- Update the dropdown label for the currently selected instrument
                 if dropdown_widget then
                     local idx = dropdown_widget.selected
-                    dropdown_widget.options[idx] = "[" .. idx .. "] " .. value
+                    dropdown_widget.options[idx] = "[" .. (idx - 1) .. "] " .. value
                     dropdown_widget:_init()
                 end
             end
@@ -64,14 +64,16 @@ function _init_dropdowns(entities)
         local dropdown = widgets:create_dropdown(d)
 
         if #dropdown.options == 0 then
-            for i = 1, 8 do
-                table.insert(dropdown.options, "[" .. i .. "] Instrument " .. i)
+            for i = 0, 7 do
+                local instr = sfx.instrument(i)
+                local name = instr.name or ("Instrument " .. i)
+                table.insert(dropdown.options, "[" .. i .. "] " .. name)
             end
             dropdown:_init()
         end
 
         dropdown.on_change = function(self)
-            state.instrument = sfx.instrument(self.selected)
+            state.instrument = sfx.instrument(self.selected - 1)
         end
 
         dropdown_widget = dropdown
@@ -115,7 +117,7 @@ function _init()
     dropdown_widget = nil
     map.level("InstrumentEditor")
     local entities = map.entities()
-    state.instrument = sfx.instrument(1)
+    state.instrument = sfx.instrument(0)
 
     _init_buttons(entities)
     _init_dropdowns(entities)
