@@ -24,6 +24,22 @@ Keyboard._update = function(self)
         [7] = "As4",
         [10] = "B4"
     }
+
+    local key_to_note = {
+        a = "C4",
+        w = "Cs4",
+        s = "D4",
+        e = "Ds4",
+        d = "E4",
+        f = "F4",
+        t = "Fs4",
+        g = "G4",
+        y = "Gs4",
+        h = "A4",
+        u = "As4",
+        j = "B4"
+    }
+
     local pos = ctrl.touch()
 
     local value
@@ -34,7 +50,20 @@ Keyboard._update = function(self)
         local color = spr.pget(relative_x + spr_x, relative_y + spr_y)
         value = color_to_note[color]
     else
-        value = nil
+        -- No mouse/touch input: check physical keyboard
+        for k, note in pairs(key_to_note) do
+            if ctrl.pressing(keys[k]) then
+                value = note
+                self._held_key = k
+                break
+            end
+        end
+        -- Detect key release
+        if value == nil and self._held_key then
+            if not ctrl.pressing(keys[self._held_key]) then
+                self._held_key = nil
+            end
+        end
     end
 
     -- There is a value change.
