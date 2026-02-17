@@ -11,6 +11,7 @@ local widget_factories = {
     Help = "create_help",
     MenuItem = "create_menu_item",
     Dropdown = "create_dropdown",
+    TextInput = "create_text_input",
 }
 
 local Modal = {
@@ -44,6 +45,8 @@ end
 
 Modal._load_widgets = function(self, widget_factory)
     self.widgets = {}
+    self.text_input = nil
+    local buttons = {}
 
     local previous_level = map.level()
     map.level(self.level_name)
@@ -57,16 +60,33 @@ Modal._load_widgets = function(self, widget_factory)
                     widget.x = widget.x + self.x
                     widget.y = widget.y + self.y
                     table.insert(self.widgets, widget)
+
+                    if entity_type == "TextInput" and not self.text_input then
+                        self.text_input = widget
+                    elseif entity_type == "Button" then
+                        table.insert(buttons, widget)
+                    end
                 end
             end
+        end
+    end
+
+    -- Wire buttons in the modal to validate
+    for _, button in ipairs(buttons) do
+        button.on_change = function()
+            self:validate()
         end
     end
 
     map.level(previous_level)
 end
 
-Modal.open = function(self)
+Modal.open = function(self, initial_value)
     self.visible = true
+    if initial_value and self.text_input then
+        self.text_input:set_value(initial_value)
+        self.text_input.focused = true
+    end
 end
 
 Modal.close = function(self)
@@ -78,10 +98,14 @@ end
 
 Modal.validate = function(self)
     self.visible = false
-    if self.on_validate then
-        self:on_validate()
+    local value = nil
+    if self.text_input then
+        value = self.text_input.value
     end
-    self:fire_on_update(self)
+    if self.on_validate then
+        self:on_validate(value)
+    end
+    self:fire_on_update(value)
 end
 
 Modal._update = function(self)

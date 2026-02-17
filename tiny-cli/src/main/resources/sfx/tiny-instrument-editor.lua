@@ -3,31 +3,9 @@ local mouse = require("mouse")
 local wire = require("wire")
 local ModeSwitch = require("widgets/ModeSwitch")
 
-local icons = {
-    -- Waveform icons (16x16, row y=16)
-    Sine      = { x = 16, y = 16 },
-    Pulse     = { x = 32, y = 16 },
-    Noise     = { x = 48, y = 16 },
-    Sawtooth  = { x = 64, y = 16 },
-    Triangle  = { x = 80, y = 16 },
-    Square    = { x = 96, y = 16 },
-    -- Editor mode icons (16x16, row y=80)
-    Instrument = { x = 16, y = 80 },
-    Sfx        = { x = 32, y = 80 },
-    Music      = { x = 48, y = 80 },
-    -- Action icons (8x8, row y=40)
-    Play   = { x = 48, y = 40 },
-    Save   = { x = 56, y = 40 },
-    Export = { x = 64, y = 40 },
-    Gear = { x = 0, y = 80 },
-    Random = { x = 64, y = 80 },
-    Envelope = { x = 80, y = 80 },
-    Harmonics = { x = 96, y = 80 },
-    Modulations = { x = 112, y = 80 },
-}
-
 local all_widgets = {}
 local modals_by_name = {}
+local dropdown_widget = nil
 
 local state = {
     instrument = nil,
@@ -36,7 +14,6 @@ local state = {
 function _init_buttons(entities)
     for b in all(entities["Button"]) do
         local button = widgets:create_button(b)
-        button.overlay = icons[button.fields.IconName]
 
         if button.fields.Modal then
             local modal_name = button.fields.Modal
@@ -57,12 +34,28 @@ function _init_buttons(entities)
             button.on_change = function()
                 local target = modals_by_name[modal_name]
                 if target then
-                    target:open()
+                    target:open(state.instrument.name)
                 end
             end
         end
 
         table.insert(all_widgets, button)
+    end
+
+    -- Wire NameModal's on_validate callback
+    local name_modal = modals_by_name["NameModal"]
+    if name_modal then
+        name_modal.on_validate = function(self, value)
+            if value and state.instrument then
+                state.instrument.name = value
+                -- Update the dropdown label for the currently selected instrument
+                if dropdown_widget then
+                    local idx = dropdown_widget.selected
+                    dropdown_widget.options[idx] = "[" .. idx .. "] " .. value
+                    dropdown_widget:_init()
+                end
+            end
+        end
     end
 end
 
@@ -81,6 +74,7 @@ function _init_dropdowns(entities)
             state.instrument = sfx.instrument(self.selected)
         end
 
+        dropdown_widget = dropdown
         table.insert(all_widgets, dropdown)
     end
 end
@@ -118,6 +112,7 @@ end
 function _init()
     all_widgets = {}
     modals_by_name = {}
+    dropdown_widget = nil
     map.level("InstrumentEditor")
     local entities = map.entities()
     state.instrument = sfx.instrument(1)

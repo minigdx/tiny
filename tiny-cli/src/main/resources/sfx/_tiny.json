@@ -40,6 +40,7 @@
     "test-game.lua",
     "game.lua",
     "mouse.lua",
+    "widgets/icons.lua",
     "widgets.lua",
     "music-editor.lua",
     "widgets/Envelop.lua",
@@ -54,6 +55,7 @@
     "widgets/Help.lua",
     "widgets/Button.lua",
     "widgets/Modal.lua",
+    "widgets/TextInput.lua",
     "widgets/utils.lua"
   ],
   "spritesheets": [

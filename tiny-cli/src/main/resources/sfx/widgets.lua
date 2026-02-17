@@ -1,4 +1,5 @@
 local utils = require("widgets.utils")
+local icons = require("widgets.icons")
 
 
 
@@ -92,6 +93,9 @@ end
 factory.create_button = function(self, value)
     local result = new(Button, value)
     result.help = result.fields.Help
+    if result.fields.IconName then
+        result.overlay = icons[result.fields.IconName]
+    end
     return result
 end
 

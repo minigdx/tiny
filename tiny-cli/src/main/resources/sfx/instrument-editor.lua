@@ -2,7 +2,8 @@ local widgets = require("widgets")
 local mouse = require("mouse")
 local wire = require("wire")
 local MatrixSelector = require("widgets/MatrixSelector")
-local ModeSwitch = require("widgets/ModeSwitch") 
+local ModeSwitch = require("widgets/ModeSwitch")
+local icons = require("widgets.icons")
 
 local m = {
     widgets = {}
@@ -196,19 +197,10 @@ function _init_wave_type(entities)
     end
 end
 
-local overlays = {
-    Sine = { x = 16, y = 16 },
-    Pulse = { x = 32, y = 16 },
-    Noise = { x = 48, y = 16 },
-    Sawtooth = { x = 64, y = 16 },
-    Triangle = { x = 80, y = 16 },
-    Square = { x = 96, y = 16 },
-}
-
 function _init_buttons(entities)
     for b in all(entities["Button"]) do
         local button = widgets:create_button(b)
-        button.overlay = overlays[button.fields.WaveType]
+        button.overlay = icons[button.fields.WaveType]
         table.insert(m.widgets, button)
     end
 end
