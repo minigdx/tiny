@@ -9,12 +9,16 @@ import com.github.minigdx.tiny.lua.Note
  * with the fundamental frequency of a note. This creates richer, more complex sounds
  * than simple sine waves.
  *
- * Each harmonic is a multiple of the fundamental frequency (2x, 3x, 4x, etc.) and
+ * Each harmonic is a multiple of the fundamental frequency (1x, 2x, 3x, etc.) and
  * has its own amplitude weight defined in the harmonics array.
  *
- * @param harmonics Array of relative amplitudes for each harmonic. Index 0 represents
- *                  the first harmonic (2x fundamental), index 1 represents the second
- *                  harmonic (3x fundamental), etc. Values typically range from 0.0 to 1.0.
+ * The output is normalized so that the sum of harmonics never exceeds [-1, 1],
+ * preventing clipping in downstream stages.
+ *
+ * @param harmonics0 Array of relative amplitudes for each harmonic. Index 0 represents
+ *                   the fundamental (1x frequency), index 1 represents the 2nd harmonic
+ *                   (2x frequency), index 2 represents the 3rd harmonic (3x frequency), etc.
+ *                   Values typically range from 0.0 to 1.0.
  */
 class Harmonizer(
     val harmonics0: () -> FloatArray,
@@ -24,11 +28,13 @@ class Harmonizer(
      * Each harmonic frequency is calculated as a multiple of the fundamental frequency,
      * and the generator function is called to produce the actual waveform value for each frequency.
      *
+     * The result is normalized by the total harmonic amplitude to prevent exceeding [-1, 1].
+     *
      * @param note The musical note that provides the fundamental frequency
      * @param sample The current sample number (used for time-based calculations)
-     * @param generator A function that generates waveform values given a frequency and harmonic number.
-     *                  Takes (frequency, harmonicNumber) and returns the waveform sample value.
-     * @return The combined sample value of the fundamental frequency and all its harmonics
+     * @param generator A function that generates waveform values given a frequency and sample index.
+     *                  Takes (frequency, sampleIndex) and returns the waveform sample value.
+     * @return The combined and normalized sample value
      */
     fun generate(
         note: Note,
@@ -39,16 +45,18 @@ class Harmonizer(
 
         val harmonics = harmonics0.invoke()
         var sampleValue = 0f
+        var totalAmplitude = 0f
         harmonics.forEachIndexed { index, relativeAmplitude ->
-            // Harmonic numbers start at 1 (fundamental is implied to be 1x)
-            // So index 0 = 2nd harmonic (2x), index 1 = 3rd harmonic (3x), etc.
             val harmonicNumber = index + 1
             val harmonicFreq = fundamentalFreq * harmonicNumber
             val value = generator.invoke(harmonicFreq, sample)
 
-            // Weight the harmonic contribution by its relative amplitude
             sampleValue += relativeAmplitude * value
+            totalAmplitude += relativeAmplitude
         }
-        return sampleValue
+
+        // Normalize to prevent exceeding [-1, 1]
+        val normFactor = if (totalAmplitude > 1.0f) 1.0f / totalAmplitude else 1.0f
+        return sampleValue * normFactor
     }
 }

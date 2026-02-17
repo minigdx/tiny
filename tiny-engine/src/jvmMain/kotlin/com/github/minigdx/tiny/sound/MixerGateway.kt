@@ -6,8 +6,7 @@ import javax.sound.sampled.AudioFormat
 import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.DataLine
 import javax.sound.sampled.SourceDataLine
-import kotlin.math.max
-import kotlin.math.min
+import com.github.minigdx.tiny.sound.SoundManager.Companion.softClip
 import kotlin.math.roundToInt
 
 /**
@@ -51,7 +50,7 @@ class MixerGateway(var alive: Boolean = true, val queue: BlockingQueue<ByteArray
                     var mixIndex = 0
                     // Mix current sound chunk into the mix buffer
                     (0 until chunk.size).forEach { i ->
-                        mixBuffer[mixIndex] = max(-1f, min(1f, (mixBuffer[mixIndex] + chunk[i])))
+                        mixBuffer[mixIndex] = softClip(mixBuffer[mixIndex] + chunk[i])
                         mixIndex++
                     }
                 }
@@ -88,12 +87,10 @@ class MixerGateway(var alive: Boolean = true, val queue: BlockingQueue<ByteArray
         var byteIndex = 0
 
         for (floatSample in floatAudioData) {
-            // Clip the value to ensure it's within [-1.0, 1.0]
-            val clippedSample = max(-1.0f, min(1.0f, floatSample))
+            // Soft-clip to ensure the value is within [-1.0, 1.0]
+            val clippedSample = softClip(floatSample)
 
             // Convert float (-1.0 to 1.0) to short (-32768 to 32767)
-            // Note: The multiplication float * Short.MAX_VALUE returns a float.
-            // Convert to Int first for better range handling before converting to Short.
             val pcmValue = (clippedSample * Short.MAX_VALUE).roundToInt().toShort()
 
             // Convert short to two bytes (Little Endian since IS_BIG_ENDIAN = false)

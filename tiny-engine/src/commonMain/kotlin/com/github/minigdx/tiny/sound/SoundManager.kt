@@ -7,6 +7,7 @@ import com.github.minigdx.tiny.lua.Note
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
+import kotlin.math.tanh
 
 class DefaultSoundBoard(private val soundManager: SoundManager) : VirtualSoundBoard {
     override fun prepare(bar: MusicalBar): SoundHandler {
@@ -46,6 +47,11 @@ abstract class SoundManager {
     abstract fun initSoundManager(inputHandler: InputHandler)
 
     open fun destroy() = Unit
+
+    /**
+     * Configurable master volume. Defaults to [DEFAULT_MASTER_VOLUME].
+     */
+    var masterVolume: Float = DEFAULT_MASTER_VOLUME
 
     /**
      * @param buffer byte array representing the sound. Each sample is represented with a float from -1.0f to 1.0f
@@ -126,8 +132,7 @@ abstract class SoundManager {
                 mixedSample = tracks.mapNotNull { it.getOrNull(index) }.sum() / tracks.size.toFloat()
             }
 
-            // Ensure the final sample is within the valid range
-            result[index] = max(-1f, min(1f, mixedSample))
+            result[index] = softClip(mixedSample)
         }
         return result
     }
@@ -164,7 +169,8 @@ abstract class SoundManager {
         for (b in beats) {
             val instrument = b.instrument ?: defaultInstrument
             // Duration of the note added to the duration of the release.
-            val noteDurationInSeconds = (b.duration * secondsPerBeat) + instrument.release
+            val effectiveRelease = max(instrument.release, MIN_RELEASE_SECONDS)
+            val noteDurationInSeconds = (b.duration * secondsPerBeat) + effectiveRelease
             val numberOfSamples = (noteDurationInSeconds * SAMPLE_RATE).roundToInt()
 
             val maxPossibleAmplitude = instrument.harmonics.sum()
@@ -189,10 +195,20 @@ abstract class SoundManager {
 
                     sampleValue *= envelopeFilter(i, numberOfSamples, instrument)
                     sampleValue *= normalizationFactor * b.volume * volume
-                    sampleValue *= MASTER_VOLUME
+                    sampleValue *= masterVolume
                 }
 
-                buffer[i] = max(-1.0f, min(1.0f, sampleValue))
+                buffer[i] = softClip(sampleValue)
+            }
+
+            // Apply safety fade-out to prevent clicks at buffer boundaries
+            val fadeOutSamples = min(FADE_OUT_SAMPLES, numberOfSamples)
+            for (i in 0 until fadeOutSamples) {
+                val fadeIndex = numberOfSamples - fadeOutSamples + i
+                if (fadeIndex >= 0 && fadeIndex < buffer.size) {
+                    val fadeFactor = 1.0f - (i.toFloat() / fadeOutSamples.toFloat())
+                    buffer[fadeIndex] *= fadeFactor
+                }
             }
 
             // Put the buffer at the time of the beat in the result (without the release).
@@ -208,7 +224,7 @@ abstract class SoundManager {
             // Additive synthesis of the buffer into the result.
             var index = 0
             for (i in startIndex until endIndex) {
-                result[i] = min(max(-1f, result[i] + buffer[index++]), 1f)
+                result[i] = softClip(result[i] + buffer[index++])
             }
         }
 
@@ -223,28 +239,32 @@ abstract class SoundManager {
         // Get the number of samples for each phase. Avoid empty phase
         val attackSamples = max(1f, instrument.attack * SAMPLE_RATE)
         val decaySamples = max(1f, instrument.decay * SAMPLE_RATE)
-        val releaseSamples = max(1f, instrument.release * SAMPLE_RATE)
+        val effectiveRelease = max(MIN_RELEASE_SECONDS, instrument.release)
+        val releaseSamples = max(1f, effectiveRelease * SAMPLE_RATE)
         val sustainLevel = min(1f, max(instrument.sustain, 0f))
 
-        val releaseStartSample = totalSamples - (instrument.release * SAMPLE_RATE)
+        val releaseStartSample = totalSamples - (effectiveRelease * SAMPLE_RATE)
         // Ensure that phases can't finish AFTER the release.
         val attackEndSample = min(attackSamples, releaseStartSample)
         val decayEndSample = min(attackEndSample + decaySamples, releaseStartSample)
 
         val multiplier = if (currentSample < attackEndSample) {
-            // Attack: going from 0 to 1.0
-            currentSample.toFloat() / attackSamples
+            // Attack: quadratic curve (slow start, fast finish)
+            val linear = currentSample.toFloat() / attackSamples
+            linear * linear
         } else if (currentSample < decayEndSample) {
-            // Decay: going from 1.0 to sustain level
-            val decayProgress = (currentSample - attackEndSample) / decaySamples
-            1.0f - decayProgress * (1.0f - sustainLevel)
+            // Decay: inverse-square curve (fast drop, slow tail toward sustain)
+            val linear = (currentSample - attackEndSample) / decaySamples
+            val remaining = 1.0f - linear
+            sustainLevel + (1.0f - sustainLevel) * remaining * remaining
         } else if (currentSample < releaseStartSample) {
             // Sustain level
             sustainLevel
         } else {
-            // Release: going from sustain to 0f
-            val releaseProgress = (currentSample - releaseStartSample) / releaseSamples
-            sustainLevel * (1.0f - min(1.0f, releaseProgress))
+            // Release: quadratic curve (fast drop, slow tail to 0)
+            val linear = (currentSample - releaseStartSample) / releaseSamples
+            val remaining = 1.0f - min(1.0f, linear)
+            sustainLevel * remaining * remaining
         }
 
         return max(0.0f, min(1.0f, multiplier))
@@ -275,8 +295,32 @@ abstract class SoundManager {
 
     companion object {
         const val SAMPLE_RATE = 44100
-        const val MASTER_VOLUME = 0.5f
+
+        const val DEFAULT_MASTER_VOLUME = 0.5f
+
+        @Deprecated("Use instance masterVolume instead", replaceWith = ReplaceWith("masterVolume"))
+        const val MASTER_VOLUME = DEFAULT_MASTER_VOLUME
+
         const val PI = (kotlin.math.PI).toFloat()
         const val TWO_PI = 2.0f * PI
+
+        // ~2ms at 44100 Hz - safety fade-out to prevent clicks at buffer boundaries
+        private const val FADE_OUT_SAMPLES = 88
+
+        // Minimum release time in seconds (~2ms) to prevent clicks
+        private const val MIN_RELEASE_SECONDS = 0.002f
+
+        // Pre-computed normalization constant for tanh-based soft clipping
+        private val TANH_NORM = 1.0f / tanh(1.5f)
+
+        /**
+         * Soft saturation using tanh.
+         * Produces warm compression when signals exceed the dynamic range,
+         * instead of harsh distortion from hard clipping.
+         * Quiet signals pass through nearly unaffected.
+         */
+        fun softClip(sample: Float): Float {
+            return tanh(sample * 1.5f) * TANH_NORM
+        }
     }
 }
