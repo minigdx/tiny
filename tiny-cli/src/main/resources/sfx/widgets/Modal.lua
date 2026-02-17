@@ -31,8 +31,8 @@ local Modal = {
 
 Modal._init = function(self, widget_factory)
     self.close_button = {
-        x = self.x + self.width - 9,
-        y = self.y + 2,
+        x = self.x + self.width - 11,
+        y = self.y + 4,
         width = 7,
         height = 7,
     }
@@ -117,10 +117,15 @@ Modal._draw = function(self)
         return
     end
 
-    -- Background fill
-    shape.rectf(self.x, self.y, self.width, self.height, self.background_color)
-    -- Border
-    shape.rect(self.x, self.y, self.width, self.height, self.border_color)
+    -- Draw the modal level as background
+    if self.level_name then
+        local previous_level = map.level()
+        map.level(self.level_name)
+        gfx.camera(-self.x, -self.y)
+        map.draw()
+        gfx.camera()
+        map.level(previous_level)
+    end
 
     -- Draw child widgets
     for w in all(self.widgets) do

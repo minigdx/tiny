@@ -18,6 +18,11 @@ local icons = {
     Play   = { x = 48, y = 40 },
     Save   = { x = 56, y = 40 },
     Export = { x = 64, y = 40 },
+    Gear = { x = 0, y = 80 },
+    Random = { x = 64, y = 80 },
+    Envelope = { x = 80, y = 80 },
+    Harmonics = { x = 96, y = 80 },
+    Modulations = { x = 112, y = 80 },
 }
 
 local all_widgets = {}
@@ -27,14 +32,6 @@ local state = {
     instrument = nil,
 }
 
-function _init_modals(entities)
-    for entity in all(entities["Modal"]) do
-        local modal = widgets:create_modal(entity)
-        modals_by_name[modal.level_name] = modal
-        table.insert(all_widgets, modal)
-    end
-end
-
 function _init_buttons(entities)
     for b in all(entities["Button"]) do
         local button = widgets:create_button(b)
@@ -42,6 +39,20 @@ function _init_buttons(entities)
 
         if button.fields.Modal then
             local modal_name = button.fields.Modal
+
+            -- Create the modal if it doesn't exist yet
+            if not modals_by_name[modal_name] then
+                local modal = widgets:create_modal({
+                    x = 96,
+                    y = 64,
+                    width = 192,
+                    height = 128,
+                    level_name = modal_name,
+                    fields = {},
+                })
+                modals_by_name[modal_name] = modal
+            end
+
             button.on_change = function()
                 local target = modals_by_name[modal_name]
                 if target then
@@ -87,8 +98,6 @@ function _init()
     local entities = map.entities()
     state.instrument = sfx.instrument(1)
 
-    -- Order matters: modals before buttons
-    _init_modals(entities)
     _init_buttons(entities)
     _init_dropdowns(entities)
     _init_mode_switch(entities)
@@ -118,6 +127,10 @@ function _draw()
     map.draw()
     for widget in all(all_widgets) do
         widget:_draw()
+    end
+    -- Draw modals last so they appear on top of everything
+    for _, modal in pairs(modals_by_name) do
+        modal:_draw()
     end
     mouse._draw()
 end
