@@ -1,5 +1,6 @@
 local widgets = require("widgets")
 local mouse = require("mouse")
+local wire = require("wire")
 local ModeSwitch = require("widgets/ModeSwitch")
 
 local icons = {
@@ -91,6 +92,29 @@ function _init_mode_switch(entities)
     end
 end
 
+function _init_keyboard(entities)
+    local currentNote
+    local playNote = function(_, value)
+        if value and currentNote == nil then
+            state.instrument.note_on(value)
+            currentNote = value
+        elseif value and currentNote ~= nil then
+            state.instrument.note_on(value)
+            state.instrument.note_off(currentNote)
+            currentNote = value
+        elseif not value then
+            state.instrument.note_off(currentNote)
+            currentNote = nil
+        end
+    end
+
+    for k in all(entities["Keyboard"]) do
+        local keyboard = widgets:create_keyboard(k)
+        wire.listen(keyboard, "value", playNote)
+        table.insert(all_widgets, keyboard)
+    end
+end
+
 function _init()
     all_widgets = {}
     modals_by_name = {}
@@ -101,6 +125,7 @@ function _init()
     _init_buttons(entities)
     _init_dropdowns(entities)
     _init_mode_switch(entities)
+    _init_keyboard(entities)
 end
 
 function _update()
