@@ -2,7 +2,6 @@ package com.github.minigdx.tiny.sound
 
 import com.github.minigdx.tiny.Percent
 import com.github.minigdx.tiny.Seconds
-import com.github.minigdx.tiny.lua.Note
 import com.github.minigdx.tiny.sound.Instrument.WaveType.NOISE
 import com.github.minigdx.tiny.sound.Instrument.WaveType.PULSE
 import com.github.minigdx.tiny.sound.Instrument.WaveType.SAW_TOOTH
@@ -13,7 +12,6 @@ import com.github.minigdx.tiny.sound.SoundManager.Companion.SAMPLE_RATE
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlin.math.PI
-import kotlin.math.abs
 import kotlin.math.exp
 import kotlin.math.max
 import kotlin.math.sin
@@ -61,9 +59,18 @@ class Instrument(
      * Will be applied in the order configured.
      */
     val modulations: List<Modulation> = listOf(
-        Sweep(Note.A5.frequency, 1f),
+        Sweep(440f, 1f),
         Vibrato(0f, 0f),
     ),
+    /**
+     * Duty cycle for the PULSE wave type.
+     * 0.5 = square wave, 0.25 = nasal, 0.125 = thin/reedy.
+     */
+    var dutyCycle: Percent = 0.5f,
+    /**
+     * Tremolo effect (amplitude modulation).
+     */
+    val tremolo: Tremolo = Tremolo(),
 ) {
     enum class WaveType {
         SAW_TOOTH,
@@ -74,7 +81,7 @@ class Instrument(
         SQUARE,
     }
 
-    // Last output generated. Used by the [NOISE] wave type
+    // State for NOISE wave type - low-pass filter
     @Transient
     private var lastOutput: Float = 0.0f
 
@@ -84,6 +91,16 @@ class Instrument(
     @Transient
     private var cachedAlpha: Float = 0.0f
 
+    @Transient
+    private val random: Random = Random(42)
+
+    // DC blocker state for NOISE
+    @Transient
+    private var dcBlockerPrev: Float = 0f
+
+    @Transient
+    private var dcBlockerOut: Float = 0f
+
     fun generate(
         freq: Float,
         time: Float,
@@ -92,36 +109,35 @@ class Instrument(
         val harmonicFreq = modulations.filter { it.active }
             .fold(freq) { acc, modulation -> modulation.apply(time, acc) }
 
-        return when (this.wave) {
+        val sample = when (this.wave) {
             TRIANGLE -> {
-                val angle: Float = sin(TWO_PI * harmonicFreq * time)
-                val phase = (angle + 1.0) % 1.0 // Normalize sinValue to the range [0, 1]
-                return (if (phase < 0.5) 4.0 * phase - 1.0 else 3.0 - 4.0 * phase).toFloat()
-            }
-
-            SINE -> sin(TWO_PI * harmonicFreq * time)
-            SQUARE -> {
-                val value = sin(TWO_PI * harmonicFreq * time)
-                return if (value > 0f) {
-                    1f
+                val phase = (harmonicFreq * time) % 1.0f
+                if (phase < 0.5f) {
+                    (4.0f * phase) - 1.0f
                 } else {
-                    -1f
+                    3.0f - (4.0f * phase)
                 }
             }
 
-            PULSE -> {
-                val angle = sin(TWO_PI * harmonicFreq * time)
+            SINE -> sin(TWO_PI * harmonicFreq * time)
 
-                val t = angle % 1
-                val k = abs(2.0 * ((angle / 128.0) % 1.0) - 1.0)
-                val u = (t + 0.5 * k) % 1.0
-                val ret = abs(4.0 * u - 2.0) - abs(8.0 * t - 4.0)
-                return (ret / 6.0).toFloat()
+            SQUARE -> {
+                val value = sin(TWO_PI * harmonicFreq * time)
+                if (value > 0f) 1f else -1f
+            }
+
+            PULSE -> {
+                val phase = (harmonicFreq * time) % 1.0f
+                val dc = dutyCycle
+                val raw = if (phase < dc) 1.0f else -1.0f
+                // Remove DC offset for non-50% duty cycles
+                val dcOffset = (2.0f * dc) - 1.0f
+                raw - dcOffset
             }
 
             SAW_TOOTH -> {
-                val angle: Float = sin(TWO_PI * harmonicFreq * time)
-                return (angle * 2f) - 1f
+                val phase = (harmonicFreq * time) % 1.0f
+                (2.0f * phase) - 1.0f
             }
 
             NOISE -> {
@@ -132,18 +148,23 @@ class Instrument(
                         val safeCutoff = max(1f, harmonicFreq)
                         val wc = TWO_PI * safeCutoff / SAMPLE_RATE
                         val x = exp(-wc)
-                        // Cache values
                         cachedAlpha = 1.0f - x
                         lastFrequencyUsed = harmonicFreq
-
                         cachedAlpha
                     }
-                val white = Random.nextFloat() * 2f - 1f
-                val result = alpha * white + (1.0f - alpha) * lastOutput
-                lastOutput = result
-                return result
+                val white = random.nextFloat() * 2f - 1f
+                val filtered = alpha * white + (1.0f - alpha) * lastOutput
+                lastOutput = filtered
+
+                // DC blocker (single-pole high-pass, ~20 Hz cutoff)
+                val dcAlpha = 0.997f
+                dcBlockerOut = dcAlpha * (dcBlockerOut + filtered - dcBlockerPrev)
+                dcBlockerPrev = filtered
+                dcBlockerOut
             }
         }
+
+        return tremolo.apply(time, sample)
     }
 
     companion object {

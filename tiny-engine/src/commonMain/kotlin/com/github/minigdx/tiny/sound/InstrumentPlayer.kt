@@ -39,7 +39,10 @@ class InstrumentPlayer(private val instrument: Instrument) {
 
     private val harmonizer = Harmonizer({ instrument.harmonics })
 
-    private val oscillator = Oscillator({ instrument.wave })
+    private val oscillator = Oscillator(
+        waveType0 = { instrument.wave },
+        dutyCycle0 = { instrument.dutyCycle },
+    )
 
     private val notesOn = mutableSetOf<NoteProgress>()
     private val notesOff = mutableSetOf<NoteProgress>()

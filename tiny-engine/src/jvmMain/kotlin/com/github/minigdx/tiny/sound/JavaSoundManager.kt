@@ -3,7 +3,8 @@ package com.github.minigdx.tiny.sound
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.internal.ObjectPool
 import com.github.minigdx.tiny.lua.Note
-import com.github.minigdx.tiny.sound.SoundManager.Companion.MASTER_VOLUME
+import com.github.minigdx.tiny.sound.SoundManager.Companion.DEFAULT_MASTER_VOLUME
+import com.github.minigdx.tiny.sound.SoundManager.Companion.softClip
 import com.github.minigdx.tiny.util.MutableFixedSizeList
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -94,7 +95,7 @@ class StreamingAudioThread(
             instrumentPlayers.forEach { instrumentPlayer ->
                 floatData[sample] += instrumentPlayer.generate()
             }
-            floatData[sample] = (floatData[sample] * MASTER_VOLUME).coerceIn(-1f, 1f)
+            floatData[sample] = softClip(floatData[sample] * DEFAULT_MASTER_VOLUME)
 
             val sampleValue = (floatData[sample] * 32767f).toInt().coerceIn(-32768, 32767)
 
