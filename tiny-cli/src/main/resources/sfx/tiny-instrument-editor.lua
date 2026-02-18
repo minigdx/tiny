@@ -278,6 +278,24 @@ function _init_envelope(envelope_entities)
     end
 end
 
+function _init_harmonics(harmonics_entities)
+    layer_widgets["Harmonics"] = {}
+
+    for k in all(harmonics_entities["Knob"]) do
+        local knob = widgets:create_knob(k)
+        table.insert(layer_widgets["Harmonics"], knob)
+    end
+
+    for mode in all(harmonics_entities["Harmonics"]) do
+        for index, harmonic in ipairs(mode.fields.Harmonics) do
+            local knob = wire.find_widget(layer_widgets["Harmonics"], harmonic)
+            knob.on_press = on_press
+            knob.on_release = on_release
+            wire.bind(state, "instrument.harmonics." .. index, knob, "value")
+        end
+    end
+end
+
 function _init()
     all_widgets = {}
     modals_by_name = {}
@@ -291,6 +309,7 @@ function _init()
     local widget_entities = map.entities("Widgets")
     local waveform_entities = map.entities("Waveform")
     local envelope_entities = map.entities("Envelope")
+    local harmonics_entities = map.entities("Harmonics")
 
     state.instrument = sfx.instrument(0)
 
@@ -301,15 +320,15 @@ function _init()
     _init_keyboard(widget_entities)
     _init_waveform(waveform_entities)
     _init_envelope(envelope_entities)
+    _init_harmonics(harmonics_entities)
 
-    layer_widgets["Harmonics"] = {}
     layer_widgets["Modulation"] = {}
 
     layer_manager = LayerManager.create()
     layer_manager:register("Widgets",    { tiles = "WidgetsTiles",   widgets = all_widgets,              always = true })
     layer_manager:register("Envelope",   { tiles = "EnvelopeTiles",  widgets = layer_widgets["Envelope"] })
     layer_manager:register("Waveform",   { tiles = "WaveformTiles",  widgets = layer_widgets["Waveform"] })
-    layer_manager:register("Harmonics",  { tiles = nil,              widgets = layer_widgets["Harmonics"] })
+    layer_manager:register("Harmonics",  { tiles = "HarmonicsTiles", widgets = layer_widgets["Harmonics"] })
     layer_manager:register("Modulation", { tiles = nil,              widgets = layer_widgets["Modulation"] })
 
     _switch_layer("Waveform")
