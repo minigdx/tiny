@@ -2,6 +2,7 @@ local widgets = require("widgets")
 local mouse = require("mouse")
 local wire = require("wire")
 local ModeSwitch = require("widgets/ModeSwitch")
+local LayerManager = require("layers")
 
 local all_widgets = {}
 local modals_by_name = {}
@@ -10,6 +11,7 @@ local dropdown_widget = nil
 local layer_widgets = {}
 local layer_buttons = {}
 local active_layer = nil
+local layer_manager = nil
 
 local state = {
     instrument = nil,
@@ -65,6 +67,9 @@ function _switch_layer(layer_name)
         end
     end
     active_layer = layer_name
+    if layer_manager then
+        layer_manager:switch(layer_name)
+    end
 end
 
 function _init_layer_buttons(entities)
@@ -147,6 +152,20 @@ function _init_dropdowns(entities)
         end
 
         dropdown_widget = dropdown
+
+        local original_update = dropdown._update
+        dropdown._update = function(self)
+            local was_open = self.open
+            original_update(self)
+            if layer_manager then
+                if self.open and not was_open then
+                    layer_manager:set_overlay(self)
+                elseif not self.open and was_open then
+                    layer_manager:set_overlay(nil)
+                end
+            end
+        end
+
         table.insert(all_widgets, dropdown)
     end
 end
@@ -266,6 +285,7 @@ function _init()
     layer_widgets = {}
     layer_buttons = {}
     active_layer = nil
+    layer_manager = nil
 
     map.level("InstrumentEditor")
     local widget_entities = map.entities("Widgets")
@@ -285,6 +305,13 @@ function _init()
     layer_widgets["Harmonics"] = {}
     layer_widgets["Modulation"] = {}
 
+    layer_manager = LayerManager.create()
+    layer_manager:register("Widgets",    { tiles = "WidgetsTiles",   widgets = all_widgets,              always = true })
+    layer_manager:register("Envelope",   { tiles = "EnvelopeTiles",  widgets = layer_widgets["Envelope"] })
+    layer_manager:register("Waveform",   { tiles = "WaveformTiles",  widgets = layer_widgets["Waveform"] })
+    layer_manager:register("Harmonics",  { tiles = nil,              widgets = layer_widgets["Harmonics"] })
+    layer_manager:register("Modulation", { tiles = nil,              widgets = layer_widgets["Modulation"] })
+
     _switch_layer("Waveform")
 end
 
@@ -302,32 +329,15 @@ function _update()
     if active_modal then
         active_modal:_update()
     else
-        for widget in all(all_widgets) do
-            widget:_update()
-        end
-
-        if layer_widgets[active_layer] then
-            local i = 0
-            for widget in all(layer_widgets[active_layer]) do
-                i = i + 1
-                widget:_update()
-            end
-        end
+        layer_manager:update_widgets()
     end
 
     on_repeat_update()
 end
 
 function _draw()
-    map.draw()
-    for widget in all(all_widgets) do
-        widget:_draw()
-    end
-    if layer_widgets[active_layer] then
-        for widget in all(layer_widgets[active_layer]) do
-            widget:_draw()
-        end
-    end
+    layer_manager:draw_base()
+    layer_manager:draw_active()
     -- Draw modals last so they appear on top of everything
     for _, modal in pairs(modals_by_name) do
         modal:_draw()
