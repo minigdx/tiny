@@ -171,7 +171,7 @@ function _init_dropdowns(entities)
 end
 
 function _init_mode_switch(entities)
-    for mode in all(entities["ModeButton"]) do
+    for mode in all(entities["ModeSwitch"]) do
         local button = new(ModeSwitch, mode)
         table.insert(all_widgets, button)
     end
@@ -353,10 +353,6 @@ function _init()
 
     map.level("InstrumentEditor")
     local widget_entities = map.entities("Widgets")
-    local waveform_entities = map.entities("Waveform")
-    local envelope_entities = map.entities("Envelope")
-    local harmonics_entities = map.entities("Harmonics")
-    local modulation_entities = map.entities("Modulation")
 
     state.instrument = sfx.instrument(0)
 
@@ -365,10 +361,15 @@ function _init()
     _init_dropdowns(widget_entities)
     _init_mode_switch(widget_entities)
     _init_keyboard(widget_entities)
-    _init_waveform(waveform_entities)
-    _init_envelope(envelope_entities)
-    _init_harmonics(harmonics_entities)
-    _init_modulation(modulation_entities)
+
+    local waveform_entities = map.entities("Waveform")
+    if waveform_entities then _init_waveform(waveform_entities) end
+    local envelope_entities = map.entities("Envelope")
+    if envelope_entities then _init_envelope(envelope_entities) end
+    local harmonics_entities = map.entities("Harmonics")
+    if harmonics_entities then _init_harmonics(harmonics_entities) end
+    local modulation_entities = map.entities("Modulation")
+    if modulation_entities then _init_modulation(modulation_entities) end
 
     layer_manager = LayerManager.create()
     layer_manager:register("Widgets",    { tiles = "WidgetsTiles",   widgets = all_widgets,              always = true })
