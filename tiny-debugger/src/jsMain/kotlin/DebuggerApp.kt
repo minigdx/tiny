@@ -150,6 +150,7 @@ class DebuggerApp {
         }
 
         initDragHandle()
+        requestNotificationPermission()
         engineSocket.connect()
     }
 
@@ -185,6 +186,7 @@ class DebuggerApp {
         selectScript(hit.script)
         codeEditor.highlightLine(hit.line)
         variableInspector.update(hit.locals, hit.upValues)
+        sendBreakpointNotification(hit.script, hit.line)
     }
 
     private fun handleCurrentBreakpoints(bp: CurrentBreakpoints) {
@@ -359,6 +361,25 @@ class DebuggerApp {
     private fun saveBreakpointsToStorage() {
         val id = gameId ?: return
         BreakpointStorage.save(id, breakpoints, conditions, disabledBreakpoints)
+    }
+
+    private fun requestNotificationPermission() {
+        if (js("typeof Notification !== 'undefined'") as Boolean) {
+            val permission = js("Notification.permission") as String
+            if (permission != "granted" && permission != "denied") {
+                js("Notification.requestPermission()")
+            }
+        }
+    }
+
+    private fun sendBreakpointNotification(script: String, line: Int) {
+        if (js("typeof Notification !== 'undefined'") as Boolean) {
+            if (js("Notification.permission") as String == "granted") {
+                val title = "Breakpoint Hit"
+                val body = "$script:$line"
+                js("new Notification(title, { body: body })")
+            }
+        }
     }
 
     private fun initDragHandle() {
