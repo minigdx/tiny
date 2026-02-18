@@ -307,7 +307,9 @@ function _update()
         end
 
         if layer_widgets[active_layer] then
+            local i = 0
             for widget in all(layer_widgets[active_layer]) do
+                i = i + 1
                 widget:_update()
             end
         end
