@@ -7,48 +7,118 @@ local all_widgets = {}
 local modals_by_name = {}
 local dropdown_widget = nil
 
+local layer_widgets = {}
+local layer_buttons = {}
+local active_layer = nil
+
 local state = {
     instrument = nil,
+    next_note_on = nil,
+    next_note_off = nil,
 }
+
+local on_press = function()
+    state.instrument.note_on("C4")
+end
+
+local on_release = function()
+    state.instrument.note_off("C4")
+end
+
+local on_press_repeat = function()
+    state.next_note_on = 0
+    state.next_note_off = nil
+end
+
+local on_release_repeat = function()
+    state.next_note_on = nil
+end
+
+local on_repeat_update = function()
+    if state.next_note_off then
+        state.next_note_off = state.next_note_off - tiny.dt
+        if state.next_note_off < 0 then
+            state.instrument.note_off("C4")
+            state.next_note_off = nil
+
+            if state.next_note_on then
+                state.next_note_on = state.instrument.release + tiny.dt
+            end
+        end
+    end
+
+    if state.next_note_on and state.next_note_on >= 0 then
+        state.next_note_on = state.next_note_on - tiny.dt
+        if state.next_note_on < 0 then
+            state.instrument.note_on("C4")
+            state.next_note_off = state.instrument.attack + state.instrument.decay
+        end
+    end
+end
+
+function _switch_layer(layer_name)
+    for name, button in pairs(layer_buttons) do
+        if name == layer_name then
+            button.status = 2
+        else
+            button.status = 0
+        end
+    end
+    active_layer = layer_name
+end
+
+function _init_layer_buttons(entities)
+    for b in all(entities["Button"]) do
+        if b.fields.Layer ~= nil then
+            local layer_name = b.fields.Layer
+            local button = widgets:create_button(b)
+            layer_buttons[layer_name] = button
+            table.insert(all_widgets, button)
+
+            button.on_change = function()
+                _switch_layer(layer_name)
+            end
+        end
+    end
+end
 
 function _init_buttons(entities)
     for b in all(entities["Button"]) do
-        local button = widgets:create_button(b)
+        if b.fields.Layer == nil then
+            local button = widgets:create_button(b)
 
-        if button.fields.Modal then
-            local modal_name = button.fields.Modal
+            if button.fields.Modal then
+                local modal_name = button.fields.Modal
 
-            -- Create the modal if it doesn't exist yet
-            if not modals_by_name[modal_name] then
-                local modal = widgets:create_modal({
-                    x = 96,
-                    y = 64,
-                    width = 192,
-                    height = 128,
-                    level_name = modal_name,
-                    fields = {},
-                })
-                modals_by_name[modal_name] = modal
-            end
+                if not modals_by_name[modal_name] then
+                    local modal = widgets:create_modal({
+                        x = 96,
+                        y = 64,
+                        width = 192,
+                        height = 128,
+                        level_name = modal_name,
+                        fields = {},
+                    })
+                    modals_by_name[modal_name] = modal
+                end
 
-            button.on_change = function()
-                local target = modals_by_name[modal_name]
-                if target then
-                    target:open(state.instrument.name)
+                button.on_change = function()
+                    local target = modals_by_name[modal_name]
+                    if target then
+                        target:open(state.instrument.name)
+                    end
                 end
             end
-        end
 
-        table.insert(all_widgets, button)
+            table.insert(all_widgets, button)
+        end
     end
 
-    -- Wire NameModal's on_validate callback
     local name_modal = modals_by_name["NameModal"]
     if name_modal then
         name_modal.on_validate = function(self, value)
             if value and state.instrument then
                 state.instrument.name = value
-                -- Update the dropdown label for the currently selected instrument
                 if dropdown_widget then
                     local idx = dropdown_widget.selected
                     dropdown_widget.options[idx] = "[" .. (idx - 1) .. "] " .. value
@@ -111,18 +181,111 @@ function _init_keyboard(entities)
     end
 end
 
+function _init_waveform(waveform_entities)
+    layer_widgets["Waveform"] = {}
+
+    local buttonToWave = function(type)
+        local result = {}
+        result.from_widget = function(source, target, value)
+            return type
+        end
+        result.to_widget = function(source, target, value)
+            if value == type then
+                return 2
+            else
+                return 0
+            end
+        end
+        return result
+    end
+
+    for b in all(waveform_entities["Button"]) do
+        local button = widgets:create_button(b)
+        table.insert(layer_widgets["Waveform"], button)
+    end
+
+    for b in all(waveform_entities["WaveTypeSelector"]) do
+        local sine = wire.find_widget(layer_widgets["Waveform"], b.fields.Sine)
+        wire.bind(state, "instrument.wave", sine, "status", buttonToWave("SINE"))
+        local triangle = wire.find_widget(layer_widgets["Waveform"], b.fields.Triangle)
+        wire.bind(state, "instrument.wave", triangle, "status", buttonToWave("TRIANGLE"))
+        local pulse = wire.find_widget(layer_widgets["Waveform"], b.fields.Pulse)
+        wire.bind(state, "instrument.wave", pulse, "status", buttonToWave("PULSE"))
+        local noise = wire.find_widget(layer_widgets["Waveform"], b.fields.Noise)
+        wire.bind(state, "instrument.wave", noise, "status", buttonToWave("NOISE"))
+        local square = wire.find_widget(layer_widgets["Waveform"], b.fields.Square)
+        wire.bind(state, "instrument.wave", square, "status", buttonToWave("SQUARE"))
+        local sawtooth = wire.find_widget(layer_widgets["Waveform"], b.fields.Sawtooth)
+        wire.bind(state, "instrument.wave", sawtooth, "status", buttonToWave("SAW_TOOTH"))
+    end
+end
+
+function _init_envelope(envelope_entities)
+    layer_widgets["Envelope"] = {}
+
+    for k in all(envelope_entities["Knob"]) do
+        local knob = widgets:create_knob(k)
+        table.insert(layer_widgets["Envelope"], knob)
+    end
+
+    for k in all(envelope_entities["Envelope"]) do
+        local envelop = widgets:create_envelop(k)
+
+        local widget = wire.find_widget(layer_widgets["Envelope"], k.fields.Attack)
+        widget.on_press = on_press_repeat
+        widget.on_release = on_release_repeat
+        wire.bind(state, "instrument.attack", widget, "value")
+        wire.bind(state, "instrument.attack", envelop, "attack")
+
+        widget = wire.find_widget(layer_widgets["Envelope"], k.fields.Decay)
+        widget.on_press = on_press_repeat
+        widget.on_release = on_release_repeat
+        wire.bind(state, "instrument.decay", widget, "value")
+        wire.bind(state, "instrument.decay", envelop, "decay")
+
+        widget = wire.find_widget(layer_widgets["Envelope"], k.fields.Sustain)
+        widget.on_press = on_press
+        widget.on_release = on_release
+        wire.bind(state, "instrument.sustain", widget, "value")
+        wire.bind(state, "instrument.sustain", envelop, "sustain")
+
+        widget = wire.find_widget(layer_widgets["Envelope"], k.fields.Release)
+        widget.on_press = on_press_repeat
+        widget.on_release = on_release_repeat
+        wire.bind(state, "instrument.release", widget, "value")
+        wire.bind(state, "instrument.release", envelop, "release")
+
+        table.insert(layer_widgets["Envelope"], envelop)
+    end
+end
+
 function _init()
     all_widgets = {}
     modals_by_name = {}
     dropdown_widget = nil
+    layer_widgets = {}
+    layer_buttons = {}
+    active_layer = nil
+
     map.level("InstrumentEditor")
-    local entities = map.entities()
+    local widget_entities = map.entities("Widgets")
+    local waveform_entities = map.entities("Waveform")
+    local envelope_entities = map.entities("Envelope")
+
     state.instrument = sfx.instrument(0)
 
-    _init_buttons(entities)
-    _init_dropdowns(entities)
-    _init_mode_switch(entities)
-    _init_keyboard(entities)
+    _init_layer_buttons(widget_entities)
+    _init_buttons(widget_entities)
+    _init_dropdowns(widget_entities)
+    _init_mode_switch(widget_entities)
+    _init_keyboard(widget_entities)
+    _init_waveform(waveform_entities)
+    _init_envelope(envelope_entities)
+
+    layer_widgets["Harmonics"] = {}
+    layer_widgets["Modulation"] = {}
+
+    _switch_layer("Waveform")
 end
 
 function _update()
@@ -142,13 +305,26 @@ function _update()
         for widget in all(all_widgets) do
             widget:_update()
         end
+
+        if layer_widgets[active_layer] then
+            for widget in all(layer_widgets[active_layer]) do
+                widget:_update()
+            end
+        end
     end
+
+    on_repeat_update()
 end
 
 function _draw()
     map.draw()
     for widget in all(all_widgets) do
         widget:_draw()
+    end
+    if layer_widgets[active_layer] then
+        for widget in all(layer_widgets[active_layer]) do
+            widget:_draw()
+        end
     end
     -- Draw modals last so they appear on top of everything
     for _, modal in pairs(modals_by_name) do
