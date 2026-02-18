@@ -11,7 +11,7 @@
 	"iid": "4cf47920-fa90-11f0-ad09-7b5a63ac610d",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 45,
+	"nextUid": 46,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -1198,6 +1198,43 @@
 					"allowedRefsEntityUid": 1,
 					"allowedRefTags": [],
 					"tilesetUid": null
+				},
+				{
+					"identifier": "Drum",
+					"doc": null,
+					"__type": "EntityRef",
+					"uid": 45,
+					"type": "F_EntityRef",
+					"isArray": false,
+					"canBeNull": true,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "RefLinkBetweenCenters",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "CurvedArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySpecificEntity",
+					"allowedRefsEntityUid": 1,
+					"allowedRefTags": [],
+					"tilesetUid": null
 				}
 			]
 		},
@@ -1294,7 +1331,7 @@
 			"savedSelections": [],
 			"cachedPixelData": {
 				"opaqueTiles": "0000000000000011000000000000011100000000000000110000000000000111000000000000000000000000000001110000000000000000000000000000000000000000001011111100000000000000000000000010010010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000010000000000000000000000000000000100000000000000000000000000000001000000000000000000000000000000010000000000000000000000000000000100000000000000000000000000000001000000000000000000000000000000010000000000000000000000000000000100000000000000000000000000000001000000000000000000000000000000010000000000000000000000000000000100000000000000000000000000000001000000000000000000000000000000010000000000000000000000000000000100000000000000000000000000000001000000000000000000000000000000010000000000001111111111110000000100000000000011111111111100000001000000000000000000000000000000010000000000000000000000000000000100000000000011111111111100000001000000000000111111111111000000010000000000000000000000000000000100000000000",
-				"averageColors": "bcbc0000bcdddccdbccddcbdbdbaddbabcebdcdabedcdedcbeeddeedfffdffec6cba6cba6cbabcba000000000000000000000000000000000000fa98f988fa9800000000dbcdfbcddcbdfbadddbafda9dcdafbd9dedcfedcdeedfeedfacdfae91edb6cba1edb3edb000000000000000000000000000000000000f988f657f988abaa00001f880f881fb81fb828a800000ff91ff91acd0acd1fad1fad000000001aad2aad3aad0000000000000000000000000000000000000000fa98f988fa98000000000f882f881fb82fb818a838a81ff92ff90acd1acd1fad4fad00000000000000001aad00000000000000000000000000000000000000006edb4edb6cbaaa992889aebb0000addb0000ddccdcaa0000edccfddcecccfeddfffdfeddfa9dfaadfa9d000000000000000000000000000000000000000000004edb00004988000000000000000000000000165727792657edccfeddecbcedccfeddedccea9cfa9dea9c000000000000000000000000000000000000000000006cba49886988579600007ccc9cdd7cdb9cdb7cbc9ccd7dba9eba0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000009cddbcdd9cebbceb9ccdbccd9ebabfba000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000657000016570000065716570000165700000657000000000000000000000000f2230000000000000000000000000000000000000000000000000000165700001657000000000000000000000000000000001657000016570000000000000000f65600000000000000000000000000000000000000000000588a688a9a753b853cbb8baaabaa3aa927777ccb389909a816571657165726570000000000000000f79700000000000000000000000000000000000000000000688a788a3b85ed94abba3cbb2bba9bbaaccb5bba89bb9b9936572657165726570000000000000000fd770000000000000000000000000000000000000000000000000000eccdfccdeccdfcbdedbafdbaecdbfcdaeedcfedceeedfeed000000000000000000000000fb87000000000000000000000000000000000000000000000000000000000000aa98000000000000000000000000000000000000000000000000000000000000f9c80000000000000000000000000000000000000000000000000000eeed5bbada98000000000000000000000000000000000000000000000000000000000000fda70000000000000000000000000000000000000000000000000000ead857a7dcb92fad00000000000000000000000000000000000000000000000000000000fcd8000000000000000000000000000000000000000000000000000000000000da98ddbd00000000000000000000000000000000000000000000000000000000fbaa000000000000000000000000000000000000000000000000000000000000dba9dfea00000000000000000000000000000000000000000000000000000000fdd8000000000000000000000000000000000000000000000000000000000000dba9dee900000000000000000000000000000000000000000000000000000000f99c000000000000000000000000000000000000000000000000000000000000da98dcd800000000000000000000000000000000000000000000000000000000fd9c000000000000000000000000000000000000000000000000000000000000dcb9dcb800000000000000000000000000000000000000000000000000000000f223000000000000000000000000000000000000000000000000000000000000da98dc9800000000000000000000000000000000000000000000000000000000f656000000000000000000000000000000000000000000000000000000000000da98d67700000000000000000000000000000000000000000000000000000000f797000000000000000000000000000000000000000000000000000000000000acb9a22300000000000000000000000000000000000000000000000000000000fd7700000000000000000000000000000000000000000000bdccd777d777d777d777dedcdddcd777d777d777d777d777d777bdcc000000000000000000000000fb8700000000000000000000000000000000000000000000dedcf887f887f887f887fffdfeedf887f887f887f887f887f887dedc000000000000000000000000f9c800000000000000000000000000000000000000000000dedcfffdfeedfffdfeedfffdfeedfffdfeedfeedfffdfffdfeeddedc000000000000000000000000fda700000000000000000000000000000000000000000000bdccdedcdddcdedcdddcdedcdddcdedcdddcdddcdedcdedcdddcbdcc000000000000000000000000fcd800000000000000000000000000000000000000000000b223d656d777dd88de88dda8dae9dec8dfc8ddcbddcbdcbddcadbfad000000000000000000000000fbaa00000000000000000000000000000000000000000000d223f656f777fd88fe88fda8fae9fec8ffc8fdcbfdcbfcbdfcaddfad000000000000000000000000fdd800000000000000000000000000000000000000000000d223f223f798f8a8fda8fda8fae9fae9fee9fee9fff9fff9ffaddfad000000000000000000000000f99c00000000000000000000000000000000000000000000b223d223d798d8a8dda8dda8dae9dae9dee9dee9dff9dff9dfadbfad000000000000000000000000fd9c00000000000000000000000000000000000000000000"
+				"averageColors": "bcbc0000bcdddccdbccddcbdbdbaddbabcebdcdabedcdedcbeeddeedfffdffec6cba6cba6cbabcba000000000000000000000000000000000000fa98f988fa9800000000dbcdfbcddcbdfbadddbafda9dcdafbd9dedcfedcdeedfeedfacdfae91edb6cba1edb3edb000000000000000000000000000000000000f988f657f988abaa00001f880f881fb81fb828a800000da81da81acd0acd1fad1fad1ae93ae91aad2aad3aad0000000000000000000000000000000000000000fa98f988fa98000000000f882f881fb82fb818a838a81da82da80acd1acd1fad4fad2ae94ae9000000001aad00000000000000000000000000000000000000006edb4edb6cbaaa992889aebb0000addb0000ddccdcaa0000edccfddcecccfeddfffdfeddfa9dfaadfa9d000000000000000000000000000000000000000000004edb00004988000000000000000000000000165727792657edccfeddecbcedccfeddedccea9cfa9dea9c000000000000000000000000000000000000000000006cba49886988579600007ccc9cdd7cdb9cdb7cbc9ccd7dba9eba0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000009cddbcdd9cebbceb9ccdbccd9ebabfba000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000657000016570000065716570000165700000657000000000000000000000000f2230000000000000000000000000000000000000000000000000000165700001657000000000000000000000000000000001657000016570000000000000000f65600000000000000000000000000000000000000000000588a688a9a753b853cbb8baaabaa3aa927777ccb389909a816571657165726570000000000000000f79700000000000000000000000000000000000000000000688a788a3b85ed94abba3cbb2bba9bbaaccb5bba89bb9b9936572657165726570000000000000000fd770000000000000000000000000000000000000000000000000000eccdfccdeccdfcbdedbafdbaecdbfcdaeedcfedceeedfeed000000000000000000000000fb87000000000000000000000000000000000000000000000000000000000000aa98000000000000000000000000000000000000000000000000000000000000f9c80000000000000000000000000000000000000000000000000000eeed5bbada98000000000000000000000000000000000000000000000000000000000000fda70000000000000000000000000000000000000000000000000000ead857a7dcb92fad00000000000000000000000000000000000000000000000000000000fcd8000000000000000000000000000000000000000000000000000000000000da98ddbd00000000000000000000000000000000000000000000000000000000fbaa000000000000000000000000000000000000000000000000000000000000dba9dfea00000000000000000000000000000000000000000000000000000000fdd8000000000000000000000000000000000000000000000000000000000000dba9dee900000000000000000000000000000000000000000000000000000000f99c000000000000000000000000000000000000000000000000000000000000da98dcd800000000000000000000000000000000000000000000000000000000fd9c000000000000000000000000000000000000000000000000000000000000dcb9dcb800000000000000000000000000000000000000000000000000000000f223000000000000000000000000000000000000000000000000000000000000da98dc9800000000000000000000000000000000000000000000000000000000f656000000000000000000000000000000000000000000000000000000000000da98d67700000000000000000000000000000000000000000000000000000000f797000000000000000000000000000000000000000000000000000000000000acb9a22300000000000000000000000000000000000000000000000000000000fd7700000000000000000000000000000000000000000000bdccd777d777d777d777dedcdddcd777d777d777d777d777d777bdcc000000000000000000000000fb8700000000000000000000000000000000000000000000dedcf887f887f887f887fffdfeedf887f887f887f887f887f887dedc000000000000000000000000f9c800000000000000000000000000000000000000000000dedcfffdfeedfffdfeedfffdfeedfffdfeedfeedfffdfffdfeeddedc000000000000000000000000fda700000000000000000000000000000000000000000000bdccdedcdddcdedcdddcdedcdddcdedcdddcdddcdedcdedcdddcbdcc000000000000000000000000fcd800000000000000000000000000000000000000000000b223d656d777dd88de88dda8dae9dec8dfc8ddcbddcbdcbddcadbfad000000000000000000000000fbaa00000000000000000000000000000000000000000000d223f656f777fd88fe88fda8fae9fec8ffc8fdcbfdcbfcbdfcaddfad000000000000000000000000fdd800000000000000000000000000000000000000000000d223f223f798f8a8fda8fda8fae9fae9fee9fee9fff9fff9ffaddfad000000000000000000000000f99c00000000000000000000000000000000000000000000b223d223d798d8a8dda8dda8dae9dae9dee9dee9dff9dff9dfadbfad000000000000000000000000fd9c00000000000000000000000000000000000000000000"
 			}
 		}
 	], "enums": [
@@ -1309,7 +1346,8 @@
 			{ "id": "Pulse", "tileRect": { "tilesetUid": 5, "x": 32, "y": 16, "w": 16, "h": 16 }, "color": 16705377 },
 			{ "id": "Noise", "tileRect": { "tilesetUid": 5, "x": 48, "y": 16, "w": 16, "h": 16 }, "color": 6539085 },
 			{ "id": "Square", "tileRect": { "tilesetUid": 5, "x": 96, "y": 16, "w": 16, "h": 16 }, "color": 4098376 },
-			{ "id": "Sawtooth", "tileRect": { "tilesetUid": 5, "x": 64, "y": 16, "w": 16, "h": 16 }, "color": 1199753 }
+			{ "id": "Sawtooth", "tileRect": { "tilesetUid": 5, "x": 64, "y": 16, "w": 16, "h": 16 }, "color": 1199753 },
+			{ "id": "Drum", "tileRect": { "tilesetUid": 5, "x": 112, "y": 16, "w": 16, "h": 16 }, "color": 39387 }
 		], "iconTilesetUid": 5, "externalRelPath": null, "externalFileChecksum": null, "tags": [] },
 		{ "identifier": "Action", "uid": 17, "values": [ { "id": "Validate", "tileRect": null, "color": 12470831 }, { "id": "Cancel", "tileRect": null, "color": 14120515 } ], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] },
 		{ "identifier": "Color", "uid": 39, "values": [
@@ -1625,7 +1663,7 @@
 					"layerDefUid": 42,
 					"pxOffsetX": 0,
 					"pxOffsetY": 0,
-					"visible": true,
+					"visible": false,
 					"optionalRules": [],
 					"intGridCsv": [],
 					"autoLayerTiles": [],
@@ -1748,7 +1786,7 @@
 					"layerDefUid": 19,
 					"pxOffsetX": 0,
 					"pxOffsetY": 0,
-					"visible": false,
+					"visible": true,
 					"optionalRules": [],
 					"intGridCsv": [],
 					"autoLayerTiles": [],
@@ -1758,7 +1796,7 @@
 					"entityInstances": [
 						{
 							"__identifier": "Button",
-							"__grid": [4,8],
+							"__grid": [6,7],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": { "tilesetUid": 5, "x": 80, "y": 0, "w": 16, "h": 16 },
@@ -1767,7 +1805,7 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 1,
-							"px": [64,128],
+							"px": [96,112],
 							"fieldInstances": [
 								{ "__identifier": "Modal", "__type": "String", "__value": null, "__tile": null, "defUid": 13, "realEditorValues": [] },
 								{ "__identifier": "IconName", "__type": "LocalEnum.Icon", "__value": "Sine", "__tile": null, "defUid": 15, "realEditorValues": [{
@@ -1777,12 +1815,12 @@
 								{ "__identifier": "Action", "__type": "LocalEnum.Action", "__value": null, "__tile": null, "defUid": 18, "realEditorValues": [] },
 								{ "__identifier": "Layer", "__type": "String", "__value": null, "__tile": null, "defUid": 28, "realEditorValues": [] }
 							],
-							"__worldX": 64,
-							"__worldY": 128
+							"__worldX": 96,
+							"__worldY": 112
 						},
 						{
 							"__identifier": "Button",
-							"__grid": [10,8],
+							"__grid": [10,7],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": { "tilesetUid": 5, "x": 80, "y": 0, "w": 16, "h": 16 },
@@ -1791,7 +1829,7 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 1,
-							"px": [160,128],
+							"px": [160,112],
 							"fieldInstances": [
 								{ "__identifier": "Modal", "__type": "String", "__value": null, "__tile": null, "defUid": 13, "realEditorValues": [] },
 								{ "__identifier": "IconName", "__type": "LocalEnum.Icon", "__value": "Triangle", "__tile": null, "defUid": 15, "realEditorValues": [{
@@ -1802,11 +1840,11 @@
 								{ "__identifier": "Layer", "__type": "String", "__value": null, "__tile": null, "defUid": 28, "realEditorValues": [] }
 							],
 							"__worldX": 160,
-							"__worldY": 128
+							"__worldY": 112
 						},
 						{
 							"__identifier": "Button",
-							"__grid": [19,8],
+							"__grid": [14,7],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": { "tilesetUid": 5, "x": 80, "y": 0, "w": 16, "h": 16 },
@@ -1815,7 +1853,7 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 1,
-							"px": [304,128],
+							"px": [224,112],
 							"fieldInstances": [
 								{ "__identifier": "Modal", "__type": "String", "__value": null, "__tile": null, "defUid": 13, "realEditorValues": [] },
 								{ "__identifier": "IconName", "__type": "LocalEnum.Icon", "__value": "Pulse", "__tile": null, "defUid": 15, "realEditorValues": [{
@@ -1825,12 +1863,12 @@
 								{ "__identifier": "Action", "__type": "LocalEnum.Action", "__value": null, "__tile": null, "defUid": 18, "realEditorValues": [] },
 								{ "__identifier": "Layer", "__type": "String", "__value": null, "__tile": null, "defUid": 28, "realEditorValues": [] }
 							],
-							"__worldX": 304,
-							"__worldY": 128
+							"__worldX": 224,
+							"__worldY": 112
 						},
 						{
 							"__identifier": "Button",
-							"__grid": [7,8],
+							"__grid": [5,9],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": { "tilesetUid": 5, "x": 80, "y": 0, "w": 16, "h": 16 },
@@ -1839,7 +1877,7 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 1,
-							"px": [112,128],
+							"px": [80,144],
 							"fieldInstances": [
 								{ "__identifier": "Modal", "__type": "String", "__value": null, "__tile": null, "defUid": 13, "realEditorValues": [] },
 								{ "__identifier": "IconName", "__type": "LocalEnum.Icon", "__value": "Noise", "__tile": null, "defUid": 15, "realEditorValues": [{
@@ -1849,12 +1887,12 @@
 								{ "__identifier": "Action", "__type": "LocalEnum.Action", "__value": null, "__tile": null, "defUid": 18, "realEditorValues": [] },
 								{ "__identifier": "Layer", "__type": "String", "__value": null, "__tile": null, "defUid": 28, "realEditorValues": [] }
 							],
-							"__worldX": 112,
-							"__worldY": 128
+							"__worldX": 80,
+							"__worldY": 144
 						},
 						{
 							"__identifier": "Button",
-							"__grid": [13,8],
+							"__grid": [8,9],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": { "tilesetUid": 5, "x": 80, "y": 0, "w": 16, "h": 16 },
@@ -1863,7 +1901,7 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 1,
-							"px": [208,128],
+							"px": [128,144],
 							"fieldInstances": [
 								{ "__identifier": "Modal", "__type": "String", "__value": null, "__tile": null, "defUid": 13, "realEditorValues": [] },
 								{ "__identifier": "IconName", "__type": "LocalEnum.Icon", "__value": "Square", "__tile": null, "defUid": 15, "realEditorValues": [{
@@ -1873,12 +1911,12 @@
 								{ "__identifier": "Action", "__type": "LocalEnum.Action", "__value": null, "__tile": null, "defUid": 18, "realEditorValues": [] },
 								{ "__identifier": "Layer", "__type": "String", "__value": null, "__tile": null, "defUid": 28, "realEditorValues": [] }
 							],
-							"__worldX": 208,
-							"__worldY": 128
+							"__worldX": 128,
+							"__worldY": 144
 						},
 						{
 							"__identifier": "Button",
-							"__grid": [16,8],
+							"__grid": [12,9],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": { "tilesetUid": 5, "x": 80, "y": 0, "w": 16, "h": 16 },
@@ -1887,7 +1925,7 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 1,
-							"px": [256,128],
+							"px": [192,144],
 							"fieldInstances": [
 								{ "__identifier": "Modal", "__type": "String", "__value": null, "__tile": null, "defUid": 13, "realEditorValues": [] },
 								{ "__identifier": "IconName", "__type": "LocalEnum.Icon", "__value": "Sawtooth", "__tile": null, "defUid": 15, "realEditorValues": [{
@@ -1897,8 +1935,8 @@
 								{ "__identifier": "Action", "__type": "LocalEnum.Action", "__value": null, "__tile": null, "defUid": 18, "realEditorValues": [] },
 								{ "__identifier": "Layer", "__type": "String", "__value": null, "__tile": null, "defUid": 28, "realEditorValues": [] }
 							],
-							"__worldX": 256,
-							"__worldY": 128
+							"__worldX": 192,
+							"__worldY": 144
 						},
 						{
 							"__identifier": "WaveTypeSelector",
@@ -1966,10 +2004,43 @@
 								}, "__tile": null, "defUid": 36, "realEditorValues": [{
 									"id": "V_String",
 									"params": ["62863ab0-fa90-11f0-846e-050283a18756"]
+								}] },
+								{ "__identifier": "Drum", "__type": "EntityRef", "__value": {
+									"entityIid": "1c2caad0-fa90-11f0-a3f9-951b15574712",
+									"layerIid": "da71a6a0-fa90-11f0-846e-a90ff5f670b6",
+									"levelIid": "4cf47922-fa90-11f0-ad09-17fea0f83d6f",
+									"worldIid": "4cf47921-fa90-11f0-ad09-8d23e32977ff"
+								}, "__tile": null, "defUid": 45, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["1c2caad0-fa90-11f0-a3f9-951b15574712"]
 								}] }
 							],
 							"__worldX": 176,
 							"__worldY": 48
+						},
+						{
+							"__identifier": "Button",
+							"__grid": [16,9],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 5, "x": 80, "y": 0, "w": 16, "h": 16 },
+							"__smartColor": "#BE4A2F",
+							"iid": "1c2caad0-fa90-11f0-a3f9-951b15574712",
+							"width": 16,
+							"height": 16,
+							"defUid": 1,
+							"px": [256,144],
+							"fieldInstances": [
+								{ "__identifier": "Modal", "__type": "String", "__value": null, "__tile": null, "defUid": 13, "realEditorValues": [] },
+								{ "__identifier": "IconName", "__type": "LocalEnum.Icon", "__value": "Drum", "__tile": null, "defUid": 15, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Drum"]
+								}] },
+								{ "__identifier": "Action", "__type": "LocalEnum.Action", "__value": null, "__tile": null, "defUid": 18, "realEditorValues": [] },
+								{ "__identifier": "Layer", "__type": "String", "__value": null, "__tile": null, "defUid": 28, "realEditorValues": [] }
+							],
+							"__worldX": 256,
+							"__worldY": 144
 						}
 					]
 				},
@@ -1989,7 +2060,7 @@
 					"layerDefUid": 38,
 					"pxOffsetX": 0,
 					"pxOffsetY": 0,
-					"visible": false,
+					"visible": true,
 					"optionalRules": [],
 					"intGridCsv": [],
 					"autoLayerTiles": [],

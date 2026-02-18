@@ -6,6 +6,7 @@ local icons = {
     Sawtooth  = { x = 64, y = 16 },
     Triangle  = { x = 80, y = 16 },
     Square    = { x = 96, y = 16 },
+    Drum      = { x = 112, y = 16 },
     -- Editor mode icons (16x16, row y=80)
     Instrument = { x = 16, y = 80 },
     Sfx        = { x = 32, y = 80 },

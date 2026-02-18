@@ -236,6 +236,8 @@ function _init_waveform(waveform_entities)
         wire.bind(state, "instrument.wave", square, "status", buttonToWave("SQUARE"))
         local sawtooth = wire.find_widget(layer_widgets["Waveform"], b.fields.Sawtooth)
         wire.bind(state, "instrument.wave", sawtooth, "status", buttonToWave("SAW_TOOTH"))
+        local drum = wire.find_widget(layer_widgets["Waveform"], b.fields.Drum)
+        wire.bind(state, "instrument.wave", drum, "status", buttonToWave("DRUM"))
     end
 end
 
