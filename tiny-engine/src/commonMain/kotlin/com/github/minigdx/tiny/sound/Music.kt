@@ -93,10 +93,10 @@ val drum =
     Instrument(
         index = 3,
         name = "drum",
-        wave = Instrument.WaveType.NOISE,
-        attack = 0.1f,
-        decay = 0.1f,
-        sustain = 0.9f,
+        wave = Instrument.WaveType.DRUM,
+        attack = 0.001f,
+        decay = 0.01f,
+        sustain = 1.0f,
         release = 0.05f,
         harmonics = floatArrayOf(1f),
     )

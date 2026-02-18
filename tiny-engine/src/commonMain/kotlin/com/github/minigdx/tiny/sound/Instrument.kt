@@ -2,6 +2,7 @@ package com.github.minigdx.tiny.sound
 
 import com.github.minigdx.tiny.Percent
 import com.github.minigdx.tiny.Seconds
+import com.github.minigdx.tiny.sound.Instrument.WaveType.DRUM
 import com.github.minigdx.tiny.sound.Instrument.WaveType.NOISE
 import com.github.minigdx.tiny.sound.Instrument.WaveType.PULSE
 import com.github.minigdx.tiny.sound.Instrument.WaveType.SAW_TOOTH
@@ -79,6 +80,7 @@ class Instrument(
         SINE,
         NOISE,
         SQUARE,
+        DRUM,
     }
 
     // State for NOISE wave type - low-pass filter
@@ -162,6 +164,8 @@ class Instrument(
                 dcBlockerPrev = filtered
                 dcBlockerOut
             }
+
+            DRUM -> DrumSynthesizer.generate(harmonicFreq, time, random)
         }
 
         return tremolo.apply(time, sample)

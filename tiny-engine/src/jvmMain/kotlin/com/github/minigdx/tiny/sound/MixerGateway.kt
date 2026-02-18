@@ -1,12 +1,12 @@
 package com.github.minigdx.tiny.sound
 
+import com.github.minigdx.tiny.sound.SoundManager.Companion.softClip
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.ConcurrentLinkedQueue
 import javax.sound.sampled.AudioFormat
 import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.DataLine
 import javax.sound.sampled.SourceDataLine
-import com.github.minigdx.tiny.sound.SoundManager.Companion.softClip
 import kotlin.math.roundToInt
 
 /**

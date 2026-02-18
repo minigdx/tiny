@@ -104,6 +104,8 @@ class Oscillator(
                 dcBlockerPrev = filtered
                 dcBlockerOut
             }
+
+            Instrument.WaveType.DRUM -> DrumSynthesizer.generate(frequency, time, random)
         }
     }
 
