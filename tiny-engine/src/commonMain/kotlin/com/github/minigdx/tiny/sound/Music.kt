@@ -14,10 +14,10 @@ class Music(
             violon,
             obos,
             drum,
-            custom1,
-            custom2,
-            custom3,
-            custom4,
+            bass,
+            lead,
+            pluck,
+            snare,
             null,
             null,
             null,
@@ -101,50 +101,51 @@ val drum =
         harmonics = floatArrayOf(1f),
     )
 
-val custom1 =
+val bass =
     Instrument(
         index = 4,
-        name = "custom1",
+        name = "bass",
         wave = Instrument.WaveType.PULSE,
-        attack = 0.1f,
-        decay = 0.1f,
-        sustain = 0.9f,
-        release = 0.05f,
-        harmonics = floatArrayOf(1f, 0.05f, 0.01f),
+        dutyCycle = 0.25f,
+        attack = 0.005f,
+        decay = 0.15f,
+        sustain = 0.6f,
+        release = 0.1f,
+        harmonics = floatArrayOf(1.0f, 0.5f, 0.25f, 0.12f, 0.06f, 0.0f, 0.0f),
     )
 
-val custom2 =
+val lead =
     Instrument(
         index = 5,
-        name = "custom2",
-        wave = Instrument.WaveType.SAW_TOOTH,
-        attack = 0.1f,
-        decay = 0.1f,
-        sustain = 0.9f,
-        release = 0.05f,
-        harmonics = floatArrayOf(1f, 0.05f, 0.01f),
+        name = "lead",
+        wave = Instrument.WaveType.SQUARE,
+        attack = 0.01f,
+        decay = 0.08f,
+        sustain = 0.85f,
+        release = 0.15f,
+        harmonics = floatArrayOf(1.0f, 0.0f, 0.45f, 0.0f, 0.25f, 0.0f, 0.15f),
     )
 
-val custom3 =
+val pluck =
     Instrument(
         index = 6,
-        name = "custom3",
+        name = "pluck",
         wave = Instrument.WaveType.TRIANGLE,
-        attack = 0.1f,
-        decay = 0.1f,
-        sustain = 0.9f,
-        release = 0.05f,
-        harmonics = floatArrayOf(1f, 0.05f, 0.01f),
+        attack = 0.002f,
+        decay = 0.2f,
+        sustain = 0.05f,
+        release = 0.08f,
+        harmonics = floatArrayOf(1.0f, 0.4f, 0.3f, 0.15f, 0.08f, 0.04f, 0.02f),
     )
 
-val custom4 =
+val snare =
     Instrument(
         index = 7,
-        name = "custom4",
-        wave = Instrument.WaveType.SQUARE,
-        attack = 0.1f,
-        decay = 0.1f,
-        sustain = 0.9f,
+        name = "snare",
+        wave = Instrument.WaveType.NOISE,
+        attack = 0.001f,
+        decay = 0.08f,
+        sustain = 0.1f,
         release = 0.05f,
-        harmonics = floatArrayOf(1f, 0.05f, 0.01f),
+        harmonics = floatArrayOf(1.0f, 0.8f, 0.5f, 0.3f),
     )
