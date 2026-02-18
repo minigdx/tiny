@@ -298,6 +298,50 @@ function _init_harmonics(harmonics_entities)
     end
 end
 
+function _init_modulation(modulation_entities)
+    layer_widgets["Modulation"] = {}
+
+    for k in all(modulation_entities["Knob"]) do
+        local knob = widgets:create_knob(k)
+        table.insert(layer_widgets["Modulation"], knob)
+    end
+
+    for c in all(modulation_entities["Checkbox"]) do
+        local checkbox = widgets:create_checkbox(c)
+        table.insert(layer_widgets["Modulation"], checkbox)
+    end
+
+    for effect in all(modulation_entities["Sweep"]) do
+        local active = wire.find_widget(layer_widgets["Modulation"], effect.fields.Enabled)
+        local acceleration = wire.find_widget(layer_widgets["Modulation"], effect.fields.Acceleration)
+        local sweep = wire.find_widget(layer_widgets["Modulation"], effect.fields.Sweep)
+
+        acceleration.on_press = on_press
+        acceleration.on_release = on_release
+        sweep.on_press = on_press
+        sweep.on_release = on_release
+
+        wire.bind(state, "instrument.sweep.active", active, "value")
+        wire.bind(state, "instrument.sweep.acceleration", acceleration, "value")
+        wire.bind(state, "instrument.sweep.sweep", sweep, "value")
+    end
+
+    for effect in all(modulation_entities["Vibrato"]) do
+        local active = wire.find_widget(layer_widgets["Modulation"], effect.fields.Enabled)
+        local frequency = wire.find_widget(layer_widgets["Modulation"], effect.fields.Frequency)
+        local depth = wire.find_widget(layer_widgets["Modulation"], effect.fields.Depth)
+
+        frequency.on_press = on_press
+        frequency.on_release = on_release
+        depth.on_press = on_press
+        depth.on_release = on_release
+
+        wire.bind(state, "instrument.vibrato.active", active, "value")
+        wire.bind(state, "instrument.vibrato.frequency", frequency, "value")
+        wire.bind(state, "instrument.vibrato.depth", depth, "value")
+    end
+end
+
 function _init()
     all_widgets = {}
     modals_by_name = {}
@@ -312,6 +356,7 @@ function _init()
     local waveform_entities = map.entities("Waveform")
     local envelope_entities = map.entities("Envelope")
     local harmonics_entities = map.entities("Harmonics")
+    local modulation_entities = map.entities("Modulation")
 
     state.instrument = sfx.instrument(0)
 
@@ -323,8 +368,7 @@ function _init()
     _init_waveform(waveform_entities)
     _init_envelope(envelope_entities)
     _init_harmonics(harmonics_entities)
-
-    layer_widgets["Modulation"] = {}
+    _init_modulation(modulation_entities)
 
     layer_manager = LayerManager.create()
     layer_manager:register("Widgets",    { tiles = "WidgetsTiles",   widgets = all_widgets,              always = true })
