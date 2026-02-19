@@ -22,6 +22,7 @@ import com.github.minigdx.tiny.lua.StdLib
 import com.github.minigdx.tiny.lua.TinyBaseLib
 import com.github.minigdx.tiny.lua.TinyLib
 import com.github.minigdx.tiny.lua.Vec2Lib
+import com.github.minigdx.tiny.lua.WorkLib
 import com.github.minigdx.tiny.lua.toTinyException
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.render.VirtualFrameBuffer
@@ -74,6 +75,7 @@ class GameScript(
     var globals: Globals? = null
 
     private val tinyLib: TinyLib = TinyLib(gameOptions.gameScripts, gameOptions)
+    private val workLib: WorkLib = WorkLib()
 
     class State(val args: LuaValue)
 
@@ -103,6 +105,7 @@ class GameScript(
             load(MathLib())
             load(Vec2Lib())
             load(tinyLib)
+            load(workLib)
             load(sprLib)
             load(JuiceLib())
             load(NotesLib())
@@ -181,6 +184,7 @@ class GameScript(
 
     suspend fun advance() {
         tinyLib.advance()
+        workLib.advance(tinyLib.currentTime)
         try {
             updateFunction?.callSuspend()
             drawFunction?.callSuspend()

@@ -13,6 +13,7 @@ import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.Varargs
 import org.luaj.vm2.lib.LibFunction
+import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.VarArgFunction
 
@@ -30,6 +31,9 @@ class StdLib(
         arg2["all"] = all()
         arg2["rpairs"] = rpairs()
         arg2["print"] = print()
+        arg2["printf"] = printf()
+        arg2["textw"] = textw()
+        arg2["texth"] = texth()
         arg2["merge"] = merge()
         arg2["append"] = append()
         arg2["new"] = new()
@@ -243,67 +247,138 @@ class StdLib(
             val y = c.checkint()
             val color = d.checkColorIndex()
 
-            val space = 4
-            var currentX = x
-            var currentY = y
-            str.forEach { char ->
+            drawText(spritesheet, str, x, y, color)
 
-                val coord = if (char.isLetter()) {
-                    // The character has an accent. Let's try to get rid of it
-                    val l = if (char.hasAccent) {
-                        ACCENT_MAP[char.lowercaseChar()] ?: char.lowercaseChar()
-                    } else {
-                        char.lowercaseChar()
-                    }
-                    val index = l - 'a'
-                    index to 0
-                } else if (char.isDigit()) {
-                    val index = char.lowercaseChar() - '0'
-                    index to 1
-                } else if (char in '!'..'/') {
-                    val index = char.lowercaseChar() - '!'
-                    index to 2
-                } else if (char in '['..'`') {
-                    val index = char.lowercaseChar() - '['
-                    index to 3
-                } else if (char in '{'..'~') {
-                    val index = char.lowercaseChar() - '{'
-                    index to 4
-                } else if (char in ':'..'@') {
-                    val index = char.lowercaseChar() - ':'
-                    index to 5
-                } else if (char == '\n') {
-                    currentY += 6
-                    currentX = x - space // compensate the next space
-                    null
-                } else {
-                    // Maybe it's an emoji: try EMOJI MAP conversion
-                    EMOJI_MAP[char]
+            return NONE
+        }
+    }
+
+    @TinyFunction(
+        "Print on the screen a string with word wrapping and optional alignment. " +
+            "Alignment: 0 = left (default), 1 = center, 2 = right.",
+        example = STD_PRINTF_EXAMPLE,
+    )
+    internal inner class printf : VarArgFunction() {
+        @TinyCall(
+            description = "Print a word-wrapped string with optional alignment.",
+        )
+        override fun invoke(
+            @TinyArgs(
+                names = ["str", "x", "y", "color", "width", "align"],
+                types = [LuaType.STRING, LuaType.NUMBER, LuaType.NUMBER, LuaType.ANY, LuaType.NUMBER, LuaType.NUMBER],
+            )
+            args: Varargs,
+        ): Varargs {
+            val spritesheet = resourceAccess.bootSpritesheet ?: return NONE
+
+            val str = args.checkjstring(1) ?: return NONE
+            val x = args.checkint(2)
+            val y = args.checkint(3)
+            val color = args.arg(4).checkColorIndex()
+            val maxWidth = args.checkint(5)
+            val align = args.optint(6, 0) // 0=left, 1=center, 2=right
+
+            val lines = wrapText(str, maxWidth)
+
+            lines.forEachIndexed { lineIndex, line ->
+                val lineWidth = line.length * CHAR_SPACING
+                val offsetX = when (align) {
+                    1 -> (maxWidth - lineWidth) / 2 // center
+                    2 -> maxWidth - lineWidth // right
+                    else -> 0 // left
                 }
+
+                val currentY = y + lineIndex * LINE_HEIGHT
+                drawText(spritesheet, line, x + offsetX, currentY, color)
+            }
+
+            return NONE
+        }
+    }
+
+    @TinyFunction(
+        "Measure the width of a text string in pixels. " +
+            "Each character is 4 pixels wide. " +
+            "If the string contains newlines, it returns the width of the widest line.",
+        example = STD_TEXTW_EXAMPLE,
+    )
+    internal inner class textw : OneArgFunction() {
+        @TinyCall(
+            description = "Return the width of the string in pixels.",
+        )
+        override fun call(
+            @TinyArg("str", type = LuaType.STRING) arg: LuaValue,
+        ): LuaValue {
+            val str = arg.tojstring()
+            return valueOf(measureWidth(str))
+        }
+    }
+
+    @TinyFunction(
+        "Measure the height of a text string in pixels. " +
+            "Without a width parameter, it counts lines separated by newlines. " +
+            "With a width parameter, the text is word-wrapped before measuring.",
+        example = STD_TEXTH_EXAMPLE,
+    )
+    internal inner class texth : LibFunction() {
+        @TinyCall(
+            description = "Return the height of the string in pixels.",
+        )
+        override fun call(
+            @TinyArg("str", type = LuaType.STRING) arg: LuaValue,
+        ): LuaValue {
+            val str = arg.tojstring()
+            val lines = str.split('\n')
+            return valueOf(lines.size * LINE_HEIGHT)
+        }
+
+        @TinyCall(
+            description = "Return the height of the string in pixels with word wrapping.",
+        )
+        override fun call(
+            @TinyArg("str", type = LuaType.STRING) arg1: LuaValue,
+            @TinyArg("width", type = LuaType.NUMBER) arg2: LuaValue,
+        ): LuaValue {
+            val str = arg1.tojstring()
+            val maxWidth = arg2.checkint()
+            val lines = wrapText(str, maxWidth)
+            return valueOf(lines.size * LINE_HEIGHT)
+        }
+    }
+
+    private fun drawText(
+        spritesheet: com.github.minigdx.tiny.resources.SpriteSheet,
+        str: String,
+        x: Int,
+        y: Int,
+        color: Int,
+    ) {
+        var currentX = x
+        var currentY = y
+        str.forEach { char ->
+            if (char == '\n') {
+                currentY += LINE_HEIGHT
+                currentX = x - CHAR_SPACING // compensate the next advance
+            } else {
+                val coord = charToCoord(char)
                 if (coord != null) {
                     val (indexX, indexY) = coord
-
                     virtualFrameBuffer.drawMonocolor(
                         spritesheet,
                         color,
-                        indexX * 4,
-                        indexY * 4,
-                        4,
-                        4,
+                        indexX * CHAR_SPACING,
+                        indexY * CHAR_SPACING,
+                        CHAR_SPACING,
+                        CHAR_SPACING,
                         currentX,
                         currentY,
                         flipX = false,
                         flipY = false,
                     )
                 }
-                currentX += space
             }
-
-            return NONE
+            currentX += CHAR_SPACING
         }
-
-        val Char.hasAccent: Boolean
-            get() = this.isLetter() && this.lowercaseChar() !in 'a'..'z'
     }
 
     private fun LuaValue.checkColorIndex(): Int {
@@ -316,6 +391,85 @@ class StdLib(
     }
 
     companion object {
+        const val CHAR_SPACING = 4
+        const val LINE_HEIGHT = 6
+
+        fun charToCoord(char: Char): Pair<Int, Int>? {
+            return if (char.isLetter()) {
+                val l = if (char.hasAccent) {
+                    ACCENT_MAP[char.lowercaseChar()] ?: char.lowercaseChar()
+                } else {
+                    char.lowercaseChar()
+                }
+                val index = l - 'a'
+                index to 0
+            } else if (char.isDigit()) {
+                val index = char.lowercaseChar() - '0'
+                index to 1
+            } else if (char in '!'..'/') {
+                val index = char.lowercaseChar() - '!'
+                index to 2
+            } else if (char in '['..'`') {
+                val index = char.lowercaseChar() - '['
+                index to 3
+            } else if (char in '{'..'~') {
+                val index = char.lowercaseChar() - '{'
+                index to 4
+            } else if (char in ':'..'@') {
+                val index = char.lowercaseChar() - ':'
+                index to 5
+            } else {
+                EMOJI_MAP[char]
+            }
+        }
+
+        fun measureWidth(str: String): Int {
+            if (str.isEmpty()) return 0
+            return str.split('\n').maxOf { line -> line.length * CHAR_SPACING }
+        }
+
+        fun wrapText(str: String, maxWidth: Int): List<String> {
+            val result = mutableListOf<String>()
+            val maxCharsPerLine = maxWidth / CHAR_SPACING
+
+            if (maxCharsPerLine <= 0) return listOf(str)
+
+            str.split('\n').forEach { paragraph ->
+                if (paragraph.isEmpty()) {
+                    result.add("")
+                    return@forEach
+                }
+
+                val words = paragraph.split(' ')
+                val currentLine = StringBuilder()
+
+                words.forEach { word ->
+                    if (currentLine.isEmpty()) {
+                        currentLine.append(word)
+                    } else if (currentLine.length + 1 + word.length <= maxCharsPerLine) {
+                        currentLine.append(' ').append(word)
+                    } else {
+                        result.add(currentLine.toString())
+                        currentLine.clear()
+                        currentLine.append(word)
+                    }
+                }
+
+                if (currentLine.isNotEmpty()) {
+                    result.add(currentLine.toString())
+                }
+            }
+
+            if (result.isEmpty()) {
+                result.add("")
+            }
+
+            return result
+        }
+
+        val Char.hasAccent: Boolean
+            get() = this.isLetter() && this.lowercaseChar() !in 'a'..'z'
+
         val ACCENT_MAP =
             mapOf(
                 'à' to 'a', 'á' to 'a', 'â' to 'a', 'ã' to 'a', 'ä' to 'a', 'å' to 'a',

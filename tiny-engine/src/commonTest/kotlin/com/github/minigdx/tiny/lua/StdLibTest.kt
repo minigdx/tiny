@@ -72,6 +72,111 @@ class StdLibTest {
     }
 
     @Test
+    fun `textw returns width of single line`() {
+        val textwFunc = lib.textw()
+        // "hello" = 5 chars * 4px = 20
+        assertEquals(20, textwFunc.call(valueOf("hello")).toint())
+    }
+
+    @Test
+    fun `textw returns width of widest line with newlines`() {
+        val textwFunc = lib.textw()
+        // "bonjour" = 7 chars * 4px = 28 (widest line)
+        assertEquals(28, textwFunc.call(valueOf("hello\nbonjour")).toint())
+    }
+
+    @Test
+    fun `textw returns 0 for empty string`() {
+        val textwFunc = lib.textw()
+        assertEquals(0, textwFunc.call(valueOf("")).toint())
+    }
+
+    @Test
+    fun `texth returns height for single line`() {
+        val texthFunc = lib.texth()
+        // 1 line * 6px = 6
+        assertEquals(6, texthFunc.call(valueOf("hello")).toint())
+    }
+
+    @Test
+    fun `texth returns height with newlines`() {
+        val texthFunc = lib.texth()
+        // 2 lines * 6px = 12
+        assertEquals(12, texthFunc.call(valueOf("hello\nworld")).toint())
+    }
+
+    @Test
+    fun `texth with width wraps text and returns correct height`() {
+        val texthFunc = lib.texth()
+        // "hello world" with width 24px = 6 chars max per line
+        // "hello" (5 chars) fits, "world" (5 chars) next line -> 2 lines * 6px = 12
+        assertEquals(12, texthFunc.call(valueOf("hello world"), valueOf(24)).toint())
+    }
+
+    @Test
+    fun `texth with large width returns single line height`() {
+        val texthFunc = lib.texth()
+        // "hello world" fits in 200px -> 1 line * 6px = 6
+        assertEquals(6, texthFunc.call(valueOf("hello world"), valueOf(200)).toint())
+    }
+
+    @Test
+    fun `wrapText splits at word boundaries`() {
+        // 20px wide = 5 chars max per line
+        val lines = StdLib.wrapText("ab cd ef gh", 20)
+        // "ab cd" (5 chars) fits, "ef gh" (5 chars) fits -> 2 lines
+        assertEquals(2, lines.size)
+        assertEquals("ab cd", lines[0])
+        assertEquals("ef gh", lines[1])
+    }
+
+    @Test
+    fun `wrapText handles empty string`() {
+        val lines = StdLib.wrapText("", 40)
+        assertEquals(1, lines.size)
+        assertEquals("", lines[0])
+    }
+
+    @Test
+    fun `wrapText preserves explicit newlines`() {
+        val lines = StdLib.wrapText("hello\nworld", 200)
+        assertEquals(2, lines.size)
+        assertEquals("hello", lines[0])
+        assertEquals("world", lines[1])
+    }
+
+    @Test
+    fun `wrapText keeps long words intact`() {
+        // Word "abcdefghij" is 10 chars, but max is 5 chars per line
+        // The word should still be kept intact (not split mid-word)
+        val lines = StdLib.wrapText("abcdefghij", 20)
+        assertEquals(1, lines.size)
+        assertEquals("abcdefghij", lines[0])
+    }
+
+    @Test
+    fun `charToCoord maps letters correctly`() {
+        // 'a' is at index 0, row 0
+        assertEquals(0 to 0, StdLib.charToCoord('a'))
+        // 'z' is at index 25, row 0
+        assertEquals(25 to 0, StdLib.charToCoord('z'))
+        // uppercase maps to lowercase
+        assertEquals(0 to 0, StdLib.charToCoord('A'))
+    }
+
+    @Test
+    fun `charToCoord maps digits correctly`() {
+        assertEquals(0 to 1, StdLib.charToCoord('0'))
+        assertEquals(9 to 1, StdLib.charToCoord('9'))
+    }
+
+    @Test
+    fun `charToCoord returns null for space`() {
+        // space is not mapped to any glyph
+        assertEquals(null, StdLib.charToCoord(' '))
+    }
+
+    @Test
     fun `merge should copy all keys from source into dest`() {
         val mergeFunc = lib.merge()
 

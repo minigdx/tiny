@@ -31,6 +31,8 @@ class TinyLib(
     private var frame: Int = 0
     private val tiny = LuaTable()
 
+    val currentTime: Double get() = time
+
     fun advance() {
         frame++
         time += 1 / 60.0

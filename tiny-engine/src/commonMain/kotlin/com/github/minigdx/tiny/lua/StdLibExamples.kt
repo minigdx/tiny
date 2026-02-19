@@ -81,7 +81,52 @@ function _draw()
     local dst = {4, 5}
     local result = append(src, dst)
     for k,v in ipairs(result) do
-        print(v, (k + 1) * 8, 8) 
+        print(v, (k + 1) * 8, 8)
     end
+end
+"""
+
+//language=Lua
+const val STD_TEXTW_EXAMPLE = """
+function _draw()
+    gfx.cls()
+    local text = "hello world"
+    local w = textw(text)
+    print(text, 10, 10, 4)
+    -- draw a line under the text showing its width
+    shape.line(10, 17, 10 + w, 17, 7)
+    print("width=" .. w, 10, 20)
+end
+"""
+
+//language=Lua
+const val STD_TEXTH_EXAMPLE = """
+function _draw()
+    gfx.cls()
+    local text = "hello world this is a long text"
+    -- measure height with word wrapping at 60px
+    local h = texth(text, 60)
+    print("height=" .. h, 0, 0)
+    -- draw the wrapped text and a bounding box
+    printf(text, 10, 10, 4, 60)
+    shape.rect(10, 10, 60, h, 7)
+end
+"""
+
+//language=Lua
+const val STD_PRINTF_EXAMPLE = """
+function _draw()
+    gfx.cls()
+    local text = "the quick brown fox jumps over the lazy dog"
+    -- left aligned (default)
+    printf(text, 10, 10, 4, 80, 0)
+    -- centered
+    printf(text, 10, 50, 5, 80, 1)
+    -- right aligned
+    printf(text, 10, 90, 6, 80, 2)
+    -- draw bounding boxes
+    shape.rect(10, 10, 80, 24, 7)
+    shape.rect(10, 50, 80, 24, 7)
+    shape.rect(10, 90, 80, 24, 7)
 end
 """
