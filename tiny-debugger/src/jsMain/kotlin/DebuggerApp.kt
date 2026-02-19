@@ -151,6 +151,10 @@ class DebuggerApp {
 
         initDragHandle()
         engineSocket.connect()
+
+        if (BrowserNotification.permission == "default") {
+            BrowserNotification.requestPermission()
+        }
     }
 
     private fun handleGameMetadata(meta: GameMetadata) {
@@ -185,6 +189,12 @@ class DebuggerApp {
         selectScript(hit.script)
         codeEditor.highlightLine(hit.line)
         variableInspector.update(hit.locals, hit.upValues)
+
+        if (BrowserNotification.permission == "granted") {
+            val options: dynamic = js("{}")
+            options.body = "${hit.script}:${hit.line}"
+            BrowserNotification("Breakpoint hit", options)
+        }
     }
 
     private fun handleCurrentBreakpoints(bp: CurrentBreakpoints) {
