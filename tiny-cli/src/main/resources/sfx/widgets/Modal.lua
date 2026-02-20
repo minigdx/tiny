@@ -46,6 +46,7 @@ end
 Modal._load_widgets = function(self, widget_factory)
     self.widgets = {}
     self.text_input = nil
+    self.dropdown = nil
     local buttons = {}
 
     local previous_level = map.level()
@@ -63,6 +64,8 @@ Modal._load_widgets = function(self, widget_factory)
 
                     if entity_type == "TextInput" and not self.text_input then
                         self.text_input = widget
+                    elseif entity_type == "Dropdown" and not self.dropdown then
+                        self.dropdown = widget
                     elseif entity_type == "Button" then
                         table.insert(buttons, widget)
                     end
@@ -102,8 +105,12 @@ Modal.validate = function(self)
     if self.text_input then
         value = self.text_input.value
     end
+    local dropdown_value = nil
+    if self.dropdown then
+        dropdown_value = self.dropdown.selected
+    end
     if self.on_validate then
-        self:on_validate(value)
+        self:on_validate(value, dropdown_value)
     end
     self:fire_on_update(value)
 end
@@ -129,10 +136,14 @@ Modal._update = function(self)
         return
     end
 
-    -- Click outside modal → close
+    -- Click outside modal → close (unless dropdown is open)
     if not inside_widget(self, pos.x, pos.y) then
-        self:close()
-        return
+        if self.dropdown and self.dropdown.open then
+            -- Let dropdown handle the click
+        else
+            self:close()
+            return
+        end
     end
 end
 

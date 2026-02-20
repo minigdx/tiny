@@ -35,6 +35,7 @@
   "scripts": [
     "tiny-instrument-editor.lua",
     "tiny-sfx-editor.lua",
+    "sfx-templates.lua",
     "instrument-editor.lua",
     "sfx-editor.lua",
     "wire.lua",

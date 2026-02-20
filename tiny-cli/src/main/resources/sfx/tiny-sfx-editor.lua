@@ -3,6 +3,7 @@ local mouse = require("mouse")
 local wire = require("wire")
 local ModeSwitch = require("widgets/ModeSwitch")
 local LayerManager = require("layers")
+local sfx_templates = require("sfx-templates")
 
 local all_widgets = {}
 local modals_by_name = {}
@@ -348,11 +349,16 @@ function _init_buttons(entities)
             local modal_name = button.fields.Modal
 
             if not modals_by_name[modal_name] then
+                local modal_sizes = {
+                    NameModal = { x = 96, y = 64, width = 192, height = 128 },
+                    RandomSfxModal = { x = 72, y = 68, width = 240, height = 120 },
+                }
+                local size = modal_sizes[modal_name] or { x = 96, y = 64, width = 192, height = 128 }
                 local modal = widgets:create_modal({
-                    x = 96,
-                    y = 64,
-                    width = 192,
-                    height = 128,
+                    x = size.x,
+                    y = size.y,
+                    width = size.width,
+                    height = size.height,
                     level_name = modal_name,
                     fields = {},
                 })
@@ -379,6 +385,23 @@ function _init_buttons(entities)
                     local idx = dropdown_widget.selected
                     dropdown_widget.options[idx] = "[" .. (idx - 1) .. "] " .. value
                     dropdown_widget:_init()
+                end
+            end
+        end
+    end
+
+    local random_modal = modals_by_name["RandomSfxModal"]
+    if random_modal then
+        if random_modal.dropdown then
+            random_modal.dropdown.options = sfx_templates.list
+            random_modal.dropdown:_init()
+        end
+
+        random_modal.on_validate = function(self, value, dropdown_index)
+            if dropdown_index and state.sfx then
+                local template_name = sfx_templates.list[dropdown_index]
+                if template_name then
+                    sfx_templates.generate(state.sfx, template_name)
                 end
             end
         end
