@@ -254,12 +254,12 @@ SfxEditor._draw = function(self)
         local note = self.values[index]
         local next_note = self.values[index + 1]
 
-        local y = self.y + self.height - (note.notei - self.octave * 12) * 8 + 4
+        local y = self.y + self.y + self.height - (note.notei + 2 - self.octave * 12) * 8 + 4
         local end_x = self.x + note.beat * 16 + (note.duration) * 16
 
         local center = end_x - 4
 
-        local y_next = self.y + self.height - (next_note.notei - self.octave * 12) * 8 + 4
+        local y_next = self.y + self.y + self.height - (next_note.notei + 2 - self.octave * 12) * 8 + 4
         local start_x_next = self.x + next_note.beat * 16
 
         local center_next = start_x_next + 4
@@ -430,10 +430,9 @@ function _init_sfx_editor(entities)
         -- Instrument dropdown
         local instrument_dropdown = wire.find_widget(all_widgets, widget.fields.Instrument)
         if #instrument_dropdown.options == 0 then
-            local count = sfx.instrument_count()
-            for i = 0, count - 1 do
+            for i = 0, 15 do
                 local inst = sfx.instrument(i)
-                local name = inst.name or ("Instrument " .. i)
+                local name = (inst and inst.name) or ("Instrument " .. i)
                 table.insert(instrument_dropdown.options, "[" .. i .. "] " .. name)
             end
             instrument_dropdown:_init()
