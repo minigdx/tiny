@@ -67,7 +67,10 @@ class FastGifEncoder(
             !(options.left + width > screenWidth || options.top + height > screenHeight),
         ) { "Image does not fit in screen." }
 
-        val paddedColorCount = colorTable.paddedSize()
+        var paddedColorCount = 2
+        while (paddedColorCount < rgbPalette.size) {
+            paddedColorCount *= 2
+        }
         GraphicsControlExtensionBlock.write(
             outputStream,
             options.disposalMethod,
@@ -80,7 +83,18 @@ class FastGifEncoder(
             outputStream, options.left, options.top, width,
             height, true, false, false, getColorTableSizeField(paddedColorCount),
         )
-        colorTable.write(outputStream)
+        // Write color table directly from rgbPalette to preserve duplicate RGB entries
+        for (i in 0 until rgbPalette.size) {
+            val rgb = rgbPalette.getRGAasInt(i)
+            outputStream.write(rgb shr 16 and 0xFF)
+            outputStream.write(rgb shr 8 and 0xFF)
+            outputStream.write(rgb and 0xFF)
+        }
+        for (i in rgbPalette.size until paddedColorCount) {
+            outputStream.write(0)
+            outputStream.write(0)
+            outputStream.write(0)
+        }
 
         // Convert ByteArray palette indices to IntArray for LZW encoder
         val colorIndices = IntArray(indexedData.size) { indexedData[it].toInt() and 0xFF }
