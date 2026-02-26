@@ -19,6 +19,7 @@ import com.github.minigdx.tiny.lua.ShapeLib
 import com.github.minigdx.tiny.lua.SoundLib
 import com.github.minigdx.tiny.lua.SprLib
 import com.github.minigdx.tiny.lua.StdLib
+import com.github.minigdx.tiny.lua.TextLib
 import com.github.minigdx.tiny.lua.TinyBaseLib
 import com.github.minigdx.tiny.lua.TinyLib
 import com.github.minigdx.tiny.lua.Vec2Lib
@@ -106,6 +107,7 @@ class GameScript(
             load(sprLib)
             load(JuiceLib())
             load(NotesLib())
+            load(TextLib(gameOptions, resourceAccess, virtualFrameBuffer))
             load(FloppyLib(platform = platform, logger = logger))
 
             LoadState.install(this)

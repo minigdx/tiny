@@ -25,6 +25,24 @@ sealed class GameConfig {
 @Serializable
 data class GameConfigSize(val width: Int, val height: Int)
 
+@Serializable
+data class GameConfigFontBank(
+    val name: String,
+    val width: Int,
+    val height: Int,
+    val characters: List<String>,
+    val x: Int = 0,
+    val y: Int = 0,
+)
+
+@Serializable
+data class GameConfigFont(
+    val name: String,
+    val spritesheet: String,
+    val spaceWidth: Int? = null,
+    val banks: List<GameConfigFontBank>,
+)
+
 @SerialName("V1")
 @Serializable
 data class GameConfigV1(
@@ -45,6 +63,7 @@ data class GameConfigV1(
      * When set, this script will be used as the first script to run.
      */
     val bootScript: String? = null,
+    val fonts: List<GameConfigFont> = emptyList(),
 ) : GameConfig() {
     override fun toGameOptions(): GameOptions =
         GameOptions(
@@ -59,5 +78,8 @@ data class GameConfigV1(
             sound = sound,
             hideMouseCursor = hideMouseCursor,
             bootScript = bootScript,
+            fonts = fonts.map { font ->
+                FontDescriptor.fromConfig(font)
+            },
         )
 }

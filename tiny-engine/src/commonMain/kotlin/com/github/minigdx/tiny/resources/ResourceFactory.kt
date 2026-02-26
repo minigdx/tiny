@@ -179,6 +179,13 @@ class ResourceFactory(
         return spritesheet(0, name, BOOT_SPRITESHEET)
     }
 
+    fun fontSpritesheet(
+        index: Int,
+        name: String,
+    ): Flow<SpriteSheet> {
+        return spritesheet(index, name, ResourceType.FONT_SPRITESHEET)
+    }
+
     private fun spritesheet(
         index: Int,
         name: String,

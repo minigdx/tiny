@@ -21,6 +21,7 @@ data class GameOptions(
     val hideMouseCursor: Boolean = false,
     val bootScript: String? = null,
     val icon: String? = null,
+    val fonts: List<FontDescriptor> = emptyList(),
 ) : MouseProject {
     init {
         require(width > 0) { "The width needs to be a positive number." }
