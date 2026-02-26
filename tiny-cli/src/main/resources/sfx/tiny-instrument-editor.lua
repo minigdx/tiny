@@ -13,6 +13,8 @@ local layer_buttons = {}
 local active_layer = nil
 local layer_manager = nil
 
+local test_panels = {}
+
 local state = {
     instrument = nil,
     next_note_on = nil,
@@ -379,6 +381,13 @@ function _init()
     layer_manager:register("Modulation", { tiles = nil,              widgets = layer_widgets["Modulation"] })
 
     _switch_layer("Waveform")
+
+    -- Test panels: 4 variants at different positions and sizes
+    test_panels = {}
+    table.insert(test_panels, widgets:create_panel({ x = 10,  y = 10,  width = 60,  height = 40,  variant = 0 }))
+    table.insert(test_panels, widgets:create_panel({ x = 80,  y = 10,  width = 80,  height = 50,  variant = 1 }))
+    table.insert(test_panels, widgets:create_panel({ x = 170, y = 10,  width = 50,  height = 60,  variant = 2 }))
+    table.insert(test_panels, widgets:create_panel({ x = 230, y = 10,  width = 100, height = 35,  variant = 3 }))
 end
 
 function _update()
@@ -402,11 +411,16 @@ function _update()
 end
 
 function _draw()
-    layer_manager:draw_base()
-    layer_manager:draw_active()
+    gfx.cls()
+   -- layer_manager:draw_base()
+   -- layer_manager:draw_active()
+    -- Draw test panels
+    for _, panel in ipairs(test_panels) do
+        panel:_draw()
+    end
     -- Draw modals last so they appear on top of everything
     for _, modal in pairs(modals_by_name) do
-        modal:_draw()
+  --      modal:_draw()
     end
-    mouse._draw()
+   -- mouse._draw()
 end

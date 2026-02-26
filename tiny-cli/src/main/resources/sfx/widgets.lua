@@ -46,6 +46,7 @@ local Button = require("widgets.Button")
 local Dropdown = require("widgets.Dropdown")
 local Modal = require("widgets.Modal")
 local TextInput = require("widgets.TextInput")
+local Panel = require("widgets.Panel")
 
 factory.create_mode_switch_component = function(self, value)
     local result = new(ModeSwitch, value)
@@ -128,6 +129,11 @@ factory.create_text_input = function(self, data)
     result.help = result.fields.Help
     result.label = result.fields.Label
     result:_init()
+    return result
+end
+
+factory.create_panel = function(self, value)
+    local result = new(Panel, value)
     return result
 end
 

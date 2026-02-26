@@ -1,7 +1,7 @@
 {
   "version": "V1",
-  "id": "b9bfec40-57eb-45bb-9e9a-435edb19c17e",
   "name": "Tiny SFX Sequencer",
+  "id": "b9bfec40-57eb-45bb-9e9a-435edb19c17e",
   "resolution": {
     "width": 384,
     "height": 256
@@ -58,20 +58,19 @@
     "widgets/Help.lua",
     "widgets/Button.lua",
     "widgets/Modal.lua",
+    "widgets/Panel.lua",
     "widgets/TextInput.lua",
     "widgets/utils.lua"
   ],
   "spritesheets": [
     "sfx-spritesheet.png",
-    "sfx.png"
+    "sfx.png",
+    "sprite-sheet.png"
   ],
   "levels": [
     "tiny-music-editor.ldtk",
     "sfx-editor.ldtk",
     "editor.ldtk"
-  ],
-  "sounds": [
-    "test.sfx"
   ],
   "hideMouseCursor": true
 }
