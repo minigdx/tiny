@@ -320,7 +320,8 @@ abstract class SoundManager {
          * Quiet signals pass through nearly unaffected.
          */
         fun softClip(sample: Float): Float {
-            return tanh(sample * 1.5f) * TANH_NORM
+            val clipped = tanh(sample * 1.5f) * TANH_NORM
+            return max(-1.0f, min(1.0f, clipped))
         }
     }
 }
