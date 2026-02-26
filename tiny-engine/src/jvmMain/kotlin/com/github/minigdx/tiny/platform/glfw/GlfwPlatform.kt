@@ -160,7 +160,9 @@ class GlfwPlatform(
         GLFW.glfwSwapInterval(1)
 
         // Make the window visible
-        GLFW.glfwShowWindow(window)
+        if (!gameOptions.headless) {
+            GLFW.glfwShowWindow(window)
+        }
 
         // Get the size of the device window
         val tmpWidth = MemoryUtil.memAllocInt(1)
@@ -218,7 +220,13 @@ class GlfwPlatform(
         GLFW.glfwTerminate()
     }
 
-    override fun endGameLoop() = Unit
+    override fun endGameLoop() {
+        GLFW.glfwSetWindowShouldClose(window, true)
+    }
+
+    override fun clearRecordingCache() {
+        gifFrameCache.clear()
+    }
 
     override fun newFrameRendered(virtualFrameBuffer: VirtualFrameBuffer) {
         virtualFrameBuffer.readFrameBuffer().copyInto(lastDraw)
@@ -281,6 +289,56 @@ class GlfwPlatform(
         recordScope.launch {
             writeImage(buffer)
         }
+    }
+
+    fun recordSync(outputFile: File) {
+        logger.info("GLFW") { "Starting to generate GIF in '${outputFile.absolutePath}' (Wait for it...)" }
+        val buffer = mutableListOf<ByteArray>().apply {
+            addAll(gifFrameCache)
+        }
+
+        val now = System.currentTimeMillis()
+        val options = ImageOptions().apply {
+            this.setDelay(20, TimeUnit.MILLISECONDS)
+        }
+        outputFile.outputStream().buffered().use { out ->
+            val encoder = FastGifEncoder(
+                out,
+                gameOptions.width,
+                gameOptions.height,
+                0,
+                gameOptions.colors(),
+            )
+
+            buffer.forEach { frame ->
+                encoder.addIndexedImage(frame, gameOptions.width, options)
+            }
+            encoder.finishEncoding()
+        }
+        logger.info("GLFW") { "Screen recorded in '${outputFile.absolutePath}' in ${System.currentTimeMillis() - now} ms" }
+    }
+
+    fun screenshotSync(outputFile: File) {
+        val buffer = lastDraw.pixels.copyOf()
+        val width = gameOptions.width
+        val height = gameOptions.height
+        val image = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
+
+        for (y in 0 until height) {
+            for (x in 0 until width) {
+                val colorData = gameOptions.colors().getRGBA(buffer[x + y * width].toInt())
+
+                val r = colorData[0].toInt() and 0xff
+                val g = colorData[1].toInt() and 0xff
+                val b = colorData[2].toInt() and 0xff
+                val a = colorData[3].toInt() and 0xff
+                val color = (a shl 24) or (r shl 16) or (g shl 8) or b
+                image.setRGB(x, y, color)
+            }
+        }
+
+        ImageIO.write(image, "png", outputFile)
+        logger.info("GLFW") { "Screenshot saved in '${outputFile.absolutePath}'" }
     }
 
     override fun writeImage(buffer: ByteArray) {

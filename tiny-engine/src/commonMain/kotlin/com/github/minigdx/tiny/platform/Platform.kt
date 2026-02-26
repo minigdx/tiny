@@ -48,6 +48,11 @@ interface Platform {
     fun screenshot() = Unit
 
     /**
+     * Clear the recording frame cache.
+     */
+    fun clearRecordingCache() = Unit
+
+    /**
      * Write an image from a frame using index as colors
      */
     fun writeImage(buffer: ByteArray)

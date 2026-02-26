@@ -22,6 +22,9 @@ data class GameOptions(
     val bootScript: String? = null,
     val icon: String? = null,
     val fonts: List<FontDescriptor> = emptyList(),
+    val headless: Boolean = false,
+    // 0 = unlimited
+    val maxFrames: Long = 0L,
 ) : MouseProject {
     init {
         require(width > 0) { "The width needs to be a positive number." }

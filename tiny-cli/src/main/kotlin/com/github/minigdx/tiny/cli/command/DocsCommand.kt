@@ -52,6 +52,7 @@ class DocsCommand : CliktCommand(name = "docs") {
                 SfxCommand(),
                 UpdateCommand(),
                 ResourcesCommand(),
+                RecordCommand(),
             )
 
             // Generate documentation for each command

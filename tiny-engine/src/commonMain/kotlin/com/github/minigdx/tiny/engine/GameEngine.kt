@@ -115,6 +115,10 @@ class GameEngine(
             accumulator -= REFRESH_LIMIT
             currentFrame++
 
+            if (gameOptions.maxFrames > 0 && currentFrame >= gameOptions.maxFrames) {
+                platform.endGameLoop()
+            }
+
             interceptUserShortcup()
             currentMetrics?.run { storeFrameMetrics(this) }
 
