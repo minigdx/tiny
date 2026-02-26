@@ -190,7 +190,11 @@ class GfxLib(
         }
 
         private fun getIndexAndName(arg: LuaValue): Pair<Int, String> {
-            return if (arg.isstring()) {
+            return if (arg.isint()) {
+                val index = arg.toint()
+                val spriteSheet = resourceAccess.findSpritesheet(index)
+                index to (spriteSheet?.name ?: "frame_buffer_$index")
+            } else if (arg.isstring()) {
                 val name = arg.tojstring()
                 val existing = resourceAccess.findSpritesheet(name)
                 val index = existing?.index ?: resourceAccess.newSpritesheetIndex()

@@ -120,6 +120,8 @@ class SprLib(
             val previousSpriteSheet = currentSpritesheet
             currentSpritesheet = if (arg.isnil()) {
                 0
+            } else if (arg.isint()) {
+                arg.checkint()
             } else if (arg.isstring()) {
                 val spritesheet = resourceAccess.findSpritesheet(arg.tojstring())
                 spritesheet?.index ?: 0
