@@ -5,7 +5,6 @@ import com.github.mingdx.tiny.doc.TinyArg
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
-import com.github.minigdx.tiny.engine.BOOT_EMOJI_MAP
 import com.github.minigdx.tiny.engine.FontDescriptor
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
@@ -30,7 +29,7 @@ class TextLib(
     private val resourceAccess: GameResourceAccess,
     private val virtualFrameBuffer: VirtualFrameBuffer,
 ) : TwoArgFunction() {
-    private val bootFontDescriptor by lazy { FontDescriptor.createBootDescriptor(BOOT_EMOJI_MAP) }
+    private val bootFontDescriptor by lazy { FontDescriptor.createBootDescriptor() }
     private var currentFontIndex: Int? = null
 
     override fun call(

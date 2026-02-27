@@ -4,13 +4,13 @@ package com.github.minigdx.tiny.lua
 const val STD_PRINT_EXAMPLE = """
 function _draw()
     gfx.cls()
-    -- every character is a sprite 6x12 pixels.
+    -- every character is a sprite 4x4 pixels.
     print("hello")
-    print("world", 10, 14)
-    print("how", 10, 28, 4)
-    print("are", 28, 28, 5)
-    print("you", 46, 28, 6)
-    print("...", 64, 28, math.rnd(10))
+    print("world", 10, 8)
+    print("how", 10, 16, 4)
+    print("are", 28, 16, 5)
+    print("you", 46, 16, 6)
+    print("...", 64, 16, math.rnd(10))
 end
 """
 
