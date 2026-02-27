@@ -5,10 +5,12 @@ import com.github.mingdx.tiny.doc.TinyArg
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
+import com.github.minigdx.tiny.engine.BOOT_EMOJI_MAP
 import com.github.minigdx.tiny.engine.FontDescriptor
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.engine.forEachCodepoint
+import com.github.minigdx.tiny.engine.renderText
 import com.github.minigdx.tiny.render.VirtualFrameBuffer
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
@@ -28,6 +30,7 @@ class TextLib(
     private val resourceAccess: GameResourceAccess,
     private val virtualFrameBuffer: VirtualFrameBuffer,
 ) : TwoArgFunction() {
+    private val bootFontDescriptor by lazy { FontDescriptor.createBootDescriptor(BOOT_EMOJI_MAP) }
     private var currentFontIndex: Int? = null
 
     override fun call(
@@ -116,7 +119,8 @@ class TextLib(
             if (font != null) {
                 renderCustomFont(str, x, y, color, font)
             } else {
-                renderBootFont(str, x, y, color)
+                val spritesheet = resourceAccess.bootSpritesheet ?: return NIL
+                renderText(bootFontDescriptor, spritesheet, str, x, y, color, virtualFrameBuffer)
             }
 
             return NIL
@@ -155,9 +159,9 @@ class TextLib(
                         maxWidth = max(maxWidth, currentWidth)
                         currentWidth = 0
                     } else if (codepoint == ' '.code) {
-                        currentWidth += BOOT_SPACE_WIDTH
+                        currentWidth += bootFontDescriptor.spaceWidth
                     } else {
-                        currentWidth += BOOT_CHAR_WIDTH
+                        currentWidth += bootFontDescriptor.resolve(codepoint)?.charWidth ?: 0
                     }
                 }
             }
@@ -209,107 +213,12 @@ class TextLib(
         }
     }
 
-    private fun renderBootFont(
-        str: String,
-        x: Int,
-        y: Int,
-        color: Int,
-    ) {
-        val spritesheet = resourceAccess.bootSpritesheet ?: return
-        var currentX = x
-        var currentY = y
-
-        str.forEach { char ->
-            val coord = resolveBootChar(char)
-            if (coord != null) {
-                virtualFrameBuffer.drawMonocolor(
-                    spritesheet,
-                    color,
-                    coord.first * BOOT_CHAR_WIDTH,
-                    coord.second * BOOT_CHAR_HEIGHT,
-                    BOOT_CHAR_WIDTH,
-                    BOOT_CHAR_HEIGHT,
-                    currentX,
-                    currentY,
-                    flipX = false,
-                    flipY = false,
-                )
-            } else if (char == '\n') {
-                currentY += BOOT_LINE_HEIGHT
-                currentX = x - BOOT_SPACE_WIDTH
-            }
-            currentX += BOOT_SPACE_WIDTH
-        }
-    }
-
-    private fun resolveBootChar(char: Char): Pair<Int, Int>? {
-        return if (char.isLetter()) {
-            val l = if (char.hasAccent) {
-                StdLib.ACCENT_MAP[char.lowercaseChar()] ?: char.lowercaseChar()
-            } else {
-                char.lowercaseChar()
-            }
-            val index = l - 'a'
-            index to 0
-        } else if (char.isDigit()) {
-            val index = char - '0'
-            index to 1
-        } else if (char in '!'..'/') {
-            val index = char - '!'
-            index to 2
-        } else if (char in '['..'`') {
-            val index = char - '['
-            index to 3
-        } else if (char in '{'..'~') {
-            val index = char - '{'
-            index to 4
-        } else if (char in ':'..'@') {
-            val index = char - ':'
-            index to 5
-        } else {
-            StdLib.EMOJI_MAP[char]
-        }
-    }
-
-    private val Char.hasAccent: Boolean
-        get() = this.isLetter() && this.lowercaseChar() !in 'a'..'z'
-
     private fun checkColorIndex(value: LuaValue): Int {
         val colors = gameOptions.colors()
         return if (value.isnumber()) {
             colors.check(value.checkint())
         } else {
             colors.getColorIndex(value.checkjstring()!!)
-        }
-    }
-
-    companion object {
-        private const val BOOT_CHAR_WIDTH = 4
-        private const val BOOT_CHAR_HEIGHT = 4
-        private const val BOOT_SPACE_WIDTH = 4
-        private const val BOOT_LINE_HEIGHT = 6
-
-        private val bootCharMap: Map<Int, Pair<Int, Int>> by lazy {
-            val map = mutableMapOf<Int, Pair<Int, Int>>()
-            for (c in 'a'..'z') {
-                map[c.code] = (c - 'a') to 0
-            }
-            for (c in '0'..'9') {
-                map[c.code] = (c - '0') to 1
-            }
-            for (c in '!'..'/') {
-                map[c.code] = (c - '!') to 2
-            }
-            for (c in '['..'`') {
-                map[c.code] = (c - '[') to 3
-            }
-            for (c in '{'..'~') {
-                map[c.code] = (c - '{') to 4
-            }
-            for (c in ':'..'@') {
-                map[c.code] = (c - ':') to 5
-            }
-            map
         }
     }
 }

@@ -6,8 +6,11 @@ import com.github.mingdx.tiny.doc.TinyArgs
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
+import com.github.minigdx.tiny.engine.BOOT_EMOJI_MAP
+import com.github.minigdx.tiny.engine.FontDescriptor
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
+import com.github.minigdx.tiny.engine.renderText
 import com.github.minigdx.tiny.render.VirtualFrameBuffer
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
@@ -22,6 +25,8 @@ class StdLib(
     val resourceAccess: GameResourceAccess,
     val virtualFrameBuffer: VirtualFrameBuffer,
 ) : TwoArgFunction() {
+    private val bootFontDescriptor by lazy { FontDescriptor.createBootDescriptor(BOOT_EMOJI_MAP) }
+
     override fun call(
         arg1: LuaValue,
         arg2: LuaValue,
@@ -243,67 +248,10 @@ class StdLib(
             val y = c.checkint()
             val color = d.checkColorIndex()
 
-            val space = 4
-            var currentX = x
-            var currentY = y
-            str.forEach { char ->
-
-                val coord = if (char.isLetter()) {
-                    // The character has an accent. Let's try to get rid of it
-                    val l = if (char.hasAccent) {
-                        ACCENT_MAP[char.lowercaseChar()] ?: char.lowercaseChar()
-                    } else {
-                        char.lowercaseChar()
-                    }
-                    val index = l - 'a'
-                    index to 0
-                } else if (char.isDigit()) {
-                    val index = char.lowercaseChar() - '0'
-                    index to 1
-                } else if (char in '!'..'/') {
-                    val index = char.lowercaseChar() - '!'
-                    index to 2
-                } else if (char in '['..'`') {
-                    val index = char.lowercaseChar() - '['
-                    index to 3
-                } else if (char in '{'..'~') {
-                    val index = char.lowercaseChar() - '{'
-                    index to 4
-                } else if (char in ':'..'@') {
-                    val index = char.lowercaseChar() - ':'
-                    index to 5
-                } else if (char == '\n') {
-                    currentY += 6
-                    currentX = x - space // compensate the next space
-                    null
-                } else {
-                    // Maybe it's an emoji: try EMOJI MAP conversion
-                    EMOJI_MAP[char]
-                }
-                if (coord != null) {
-                    val (indexX, indexY) = coord
-
-                    virtualFrameBuffer.drawMonocolor(
-                        spritesheet,
-                        color,
-                        indexX * 4,
-                        indexY * 4,
-                        4,
-                        4,
-                        currentX,
-                        currentY,
-                        flipX = false,
-                        flipY = false,
-                    )
-                }
-                currentX += space
-            }
+            renderText(bootFontDescriptor, spritesheet, str, x, y, color, virtualFrameBuffer)
 
             return NONE
         }
-
-        val Char.hasAccent: Boolean
-            get() = this.isLetter() && this.lowercaseChar() !in 'a'..'z'
     }
 
     private fun LuaValue.checkColorIndex(): Int {
@@ -313,24 +261,5 @@ class StdLib(
         } else {
             colors.getColorIndex(this.checkjstring()!!)
         }
-    }
-
-    companion object {
-        val ACCENT_MAP =
-            mapOf(
-                'à' to 'a', 'á' to 'a', 'â' to 'a', 'ã' to 'a', 'ä' to 'a', 'å' to 'a',
-                'ç' to 'c',
-                'è' to 'e', 'é' to 'e', 'ê' to 'e', 'ë' to 'e',
-                'ì' to 'i', 'í' to 'i', 'î' to 'i', 'ï' to 'i',
-                'ñ' to 'n',
-                'ò' to 'o', 'ó' to 'o', 'ô' to 'o', 'õ' to 'o', 'ö' to 'o',
-                'ù' to 'u', 'ú' to 'u', 'û' to 'u', 'ü' to 'u',
-                'ý' to 'y', 'ÿ' to 'y',
-            )
-
-        val EMOJI_MAP =
-            mapOf(
-                '⚠' to (0 to 0),
-            )
     }
 }

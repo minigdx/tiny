@@ -2,8 +2,8 @@ function _init()
     ready = false
     dt = 0
 
-    prefix = {"b", "u", "i", "l", "d"," ", "w", "i", "t", "h", " "}
-    txt = { "t", "i", "n", "y" }
+    prefix_str = "Built with"
+    txt_str = "TINY"
     waiting = 3
 end
 
@@ -19,41 +19,36 @@ function _update()
     end
 end
 
-function letter(x, l, index, move)
+function letter(lx, l, index, move)
     local offset = 3
     if move then
-        offset = math.abs(math.cos(dt * math.pi * 2 + index) * 4)
+        offset = math.abs(math.cos(dt * math.pi * 2 + index) * 6)
     end
+    local w = text.width(l)
     if ((not ready) and (l ~= " ")) then
-        shape.rectf(
-                x + index * 4 + 1,
-                1 + 8 + offset,
-                4, 4,
-                "#5f574f"
-        )
-        shape.rectf(
-                x + index * 4,
-                8 + offset,
-                4, 4,
-                "#FFFFFF"
-        )
+        shape.rectf(lx + 1, 1 + 8 + offset, w, 12, "#5f574f")
+        shape.rectf(lx, 8 + offset, w, 12, "#FFFFFF")
     else
-        print(l, x + index * 4 + 1, 1 + 8 + offset, "#5f574f")
-        print(l, x + index * 4, 8 + offset, "#FFFFFF")
+        print(l, lx + 1, 1 + 8 + offset, "#5f574f")
+        print(l, lx, 8 + offset, "#FFFFFF")
     end
 end
+
 function _draw()
     gfx.cls("#000000")
 
-    for index = 1, #prefix do
-        letter(2, prefix[index], index, false)
+    local px = 2
+    for i = 1, #prefix_str do
+        local l = prefix_str:sub(i, i)
+        letter(px, l, i, false)
+        px = px + text.width(l)
     end
 
-    for index = 1, #txt do
-        letter(46, txt[index], index, true)
+    for i = 1, #txt_str do
+        local l = txt_str:sub(i, i)
+        letter(px, l, i, true)
+        px = px + text.width(l)
     end
-
-
 end
 
 function _resources()
