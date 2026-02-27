@@ -1,5 +1,7 @@
 package com.github.minigdx.tiny.cli.config
 
+import com.github.minigdx.tiny.engine.FontDescriptor
+import com.github.minigdx.tiny.engine.GameConfigFont
 import com.github.minigdx.tiny.engine.GameOptions
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
@@ -115,6 +117,11 @@ data class GameParametersV1(
      * If null, the default generated icon.png is used if it exists.
      */
     val icon: String? = null,
+    /**
+     * Custom fonts to be loaded.
+     * Each font has a name, a spritesheet image, and character bank definitions.
+     */
+    val fonts: List<GameConfigFont> = emptyList(),
 ) : GameParameters() {
     override fun toGameOptions(): GameOptions {
         return GameOptions(
@@ -130,6 +137,9 @@ data class GameParametersV1(
             hideMouseCursor = hideMouseCursor,
             bootScript = bootScript,
             icon = icon,
+            fonts = fonts.map { font ->
+                FontDescriptor.fromConfig(font)
+            },
         )
     }
 
