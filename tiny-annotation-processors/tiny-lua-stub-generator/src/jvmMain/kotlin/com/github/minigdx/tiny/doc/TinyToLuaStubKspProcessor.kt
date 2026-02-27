@@ -42,8 +42,13 @@ class TinyToLuaStubKspProcessor(
                 -- DO NOT EDIT // DO NOT EDIT // DO NOT EDIT // DO NOT EDIT // DO NOT EDIT
                 -- Tiny stub lua file generated automatically
                 -- The file is used only to help Lua editors with autocomplete
-                -- 
+                --
                 -- An error, an issue? Please consult https://github.com/minigdx/tiny
+                --
+                -- Colors:
+                --   Color indices start at 1. The index 0 is reserved for transparency.
+                --   Colors are defined in the _tiny.json configuration file.
+                --   The first color in the palette is index 1, the second is index 2, etc.
                 """.trimIndent(),
             ) {
                 libs.forEach {
