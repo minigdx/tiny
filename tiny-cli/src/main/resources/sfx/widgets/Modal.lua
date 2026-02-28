@@ -12,6 +12,7 @@ local widget_factories = {
     MenuItem = "create_menu_item",
     Dropdown = "create_dropdown",
     TextInput = "create_text_input",
+    TextButton = "create_text_button",
 }
 
 local Modal = {
@@ -67,6 +68,8 @@ Modal._load_widgets = function(self, widget_factory)
                     elseif entity_type == "Dropdown" and not self.dropdown then
                         self.dropdown = widget
                     elseif entity_type == "Button" then
+                        table.insert(buttons, widget)
+                    elseif entity_type == "TextButton" then
                         table.insert(buttons, widget)
                     end
                 end
