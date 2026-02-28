@@ -83,12 +83,6 @@ factory.create_fader = function(self, value)
     local result = new(Fader, value)
     result.help = result.fields.Help
     result.label = result.fields.Label
-    result.hitbox = {
-        x = result.x,
-        y = result.y,
-        width = result.width,
-        height = result.height + 4
-    }
     return result
 end
 

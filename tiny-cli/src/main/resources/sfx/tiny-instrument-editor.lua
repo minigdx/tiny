@@ -81,9 +81,57 @@ end
 function _init_knobs(entities)
     for k in all(entities["Knob"]) do
         local knob = widgets:create_knob(k)
-        knob.on_press = on_press
-        knob.on_release = on_release
         table.insert(all_widgets, knob)
+    end
+end
+
+function _init_faders(entities)
+    for f in all(entities["Fader"]) do
+        local fader = widgets:create_fader(f)
+        table.insert(all_widgets, fader)
+    end
+end
+
+function _init_envelop(entities)
+    for k in all(entities["Envelope"]) do
+        local envelop = widgets:create_envelop(k)
+
+        local widget = wire.find_widget(all_widgets, envelop.fields.Attack)
+        widget.on_press = on_press_repeat
+        widget.on_release = on_release_repeat
+        wire.bind(state, "instrument.attack", widget, "value")
+        wire.bind(state, "instrument.attack", envelop, "attack")
+
+        widget = wire.find_widget(all_widgets, envelop.fields.Decay)
+        widget.on_press = on_press_repeat
+        widget.on_release = on_release_repeat
+        wire.bind(state, "instrument.decay", widget, "value")
+        wire.bind(state, "instrument.decay", envelop, "decay")
+
+        widget = wire.find_widget(all_widgets, envelop.fields.Sustain)
+        widget.on_press = on_press
+        widget.on_release = on_release
+        wire.bind(state, "instrument.sustain", widget, "value")
+        wire.bind(state, "instrument.sustain", envelop, "sustain")
+
+        widget = wire.find_widget(all_widgets, envelop.fields.Release)
+        widget.on_press = on_press_repeat
+        widget.on_release = on_release_repeat
+        wire.bind(state, "instrument.release", widget, "value")
+        wire.bind(state, "instrument.release", envelop, "release")
+
+        table.insert(all_widgets, envelop)
+    end
+end
+
+function _init_harmonics(entities)
+    for mode in all(entities["Harmonics"]) do
+        for index, harmonic in ipairs(mode.fields.Harmonics) do
+            local fader = wire.find_widget(all_widgets, harmonic)
+            fader.on_press = on_press
+            fader.on_release = on_release
+            wire.bind(state, "instrument.harmonics." .. index, fader, "value")
+        end
     end
 end
 
@@ -187,9 +235,6 @@ function _init_keyboard(entities)
     end
 end
 
--- TODO: _init_waveform, _init_envelope, _init_harmonics, _init_modulation
--- These will be re-added once the corresponding widgets are placed in the new LDtk layout.
-
 function _init()
     all_widgets = {}
     modals_by_name = {}
@@ -207,10 +252,13 @@ function _init()
     local widget_entities = map.entities("Widgets")
     _init_speakers(widget_entities)
     _init_knobs(widget_entities)
+    _init_faders(widget_entities)
     _init_buttons(widget_entities)
     _init_dropdowns(widget_entities)
     _init_mode_switch(widget_entities)
     _init_keyboard(widget_entities)
+    _init_envelop(widget_entities)
+    _init_harmonics(widget_entities)
 end
 
 function _update()

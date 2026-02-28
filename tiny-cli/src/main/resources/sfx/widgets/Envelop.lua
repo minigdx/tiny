@@ -47,11 +47,15 @@ Envelop._update = function(self)
 end
 
 local blue = 9
-local green = 13
-local purple = 7
-local red = 5
+local green = 6
+local purple = 8
+local red = 3
 
 Envelop._draw = function(self)
+
+    -- background
+    shape.rectf(self.x, self.y, self.width, self.height, 2)
+    shape.rect(self.x, self.y, self.width, self.height, 1)
 
     -- attack
     shape.line(

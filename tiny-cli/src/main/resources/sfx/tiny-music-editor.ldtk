@@ -11,7 +11,7 @@
 	"iid": "4cf47920-fa90-11f0-ad09-7b5a63ac610d",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 77,
+	"nextUid": 81,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -150,7 +150,7 @@
 		{
 			"identifier": "Button",
 			"uid": 1,
-			"tags": [],
+			"tags": ["Widget"],
 			"exportToToc": false,
 			"allowOutOfBounds": false,
 			"doc": null,
@@ -334,7 +334,7 @@
 		{
 			"identifier": "Dropdown",
 			"uid": 2,
-			"tags": [],
+			"tags": ["Widget"],
 			"exportToToc": false,
 			"allowOutOfBounds": false,
 			"doc": null,
@@ -352,11 +352,11 @@
 			"lineOpacity": 0,
 			"hollow": false,
 			"color": "#D77643",
-			"renderMode": "Rectangle",
+			"renderMode": "Tile",
 			"showName": true,
-			"tilesetId": null,
+			"tilesetId": 72,
 			"tileRenderMode": "NineSlice",
-			"tileRect": { "tilesetUid": 5, "x": 72, "y": 32, "w": 24, "h": 16 },
+			"tileRect": { "tilesetUid": 72, "x": 24, "y": 0, "w": 24, "h": 24 },
 			"uiTileRect": null,
 			"nineSliceBorders": [2,10,2,3],
 			"maxCount": 0,
@@ -369,7 +369,7 @@
 		{
 			"identifier": "TextInput",
 			"uid": 3,
-			"tags": [],
+			"tags": ["Widget"],
 			"exportToToc": false,
 			"allowOutOfBounds": false,
 			"doc": null,
@@ -404,7 +404,7 @@
 		{
 			"identifier": "Knob",
 			"uid": 4,
-			"tags": [],
+			"tags": [ "Widget", "PercentOutput" ],
 			"exportToToc": false,
 			"allowOutOfBounds": false,
 			"doc": null,
@@ -517,7 +517,7 @@
 		{
 			"identifier": "Keyboard",
 			"uid": 16,
-			"tags": [],
+			"tags": ["Widget"],
 			"exportToToc": false,
 			"allowOutOfBounds": false,
 			"doc": null,
@@ -552,7 +552,7 @@
 		{
 			"identifier": "Envelope",
 			"uid": 23,
-			"tags": [],
+			"tags": ["Widget"],
 			"exportToToc": false,
 			"allowOutOfBounds": false,
 			"doc": null,
@@ -736,7 +736,7 @@
 		{
 			"identifier": "WaveTypeSelector",
 			"uid": 30,
-			"tags": [],
+			"tags": ["Orchestrator"],
 			"exportToToc": false,
 			"allowOutOfBounds": false,
 			"doc": null,
@@ -1031,7 +1031,7 @@
 		{
 			"identifier": "Harmonics",
 			"uid": 43,
-			"tags": [],
+			"tags": ["Orchestrator"],
 			"exportToToc": false,
 			"allowOutOfBounds": false,
 			"doc": null,
@@ -1094,9 +1094,9 @@
 					"symmetricalRef": false,
 					"autoChainRef": true,
 					"allowOutOfLevelRef": true,
-					"allowedRefs": "OnlySpecificEntity",
+					"allowedRefs": "OnlyTags",
 					"allowedRefsEntityUid": 4,
-					"allowedRefTags": [],
+					"allowedRefTags": ["PercentOutput"],
 					"tilesetUid": null
 				}
 			]
@@ -1104,7 +1104,7 @@
 		{
 			"identifier": "Checkbox",
 			"uid": 46,
-			"tags": [],
+			"tags": ["Widget"],
 			"exportToToc": false,
 			"allowOutOfBounds": false,
 			"doc": null,
@@ -1177,7 +1177,7 @@
 		{
 			"identifier": "Sweep",
 			"uid": 47,
-			"tags": [],
+			"tags": ["Orchestrator"],
 			"exportToToc": false,
 			"allowOutOfBounds": false,
 			"doc": null,
@@ -1324,7 +1324,7 @@
 		{
 			"identifier": "Vibrato",
 			"uid": 51,
-			"tags": [],
+			"tags": ["Orchestrator"],
 			"exportToToc": false,
 			"allowOutOfBounds": false,
 			"doc": null,
@@ -1544,7 +1544,7 @@
 		{
 			"identifier": "SfxEditor",
 			"uid": 59,
-			"tags": [],
+			"tags": ["Orchestrator"],
 			"exportToToc": false,
 			"allowOutOfBounds": false,
 			"doc": null,
@@ -1689,7 +1689,7 @@
 		{
 			"identifier": "Player",
 			"uid": 63,
-			"tags": [],
+			"tags": ["Orchestrator"],
 			"exportToToc": false,
 			"allowOutOfBounds": false,
 			"doc": null,
@@ -2054,6 +2054,151 @@
 			"pivotX": 0,
 			"pivotY": 0,
 			"fieldDefs": []
+		},
+		{
+			"identifier": "Fader",
+			"uid": 77,
+			"tags": [ "Widget", "PercentOutput" ],
+			"exportToToc": false,
+			"allowOutOfBounds": false,
+			"doc": null,
+			"width": 8,
+			"height": 24,
+			"resizableX": false,
+			"resizableY": true,
+			"minWidth": null,
+			"maxWidth": null,
+			"minHeight": 24,
+			"maxHeight": null,
+			"keepAspectRatio": false,
+			"tileOpacity": 1,
+			"fillOpacity": 0.08,
+			"lineOpacity": 0,
+			"hollow": false,
+			"color": "#8B9BB4",
+			"renderMode": "Tile",
+			"showName": true,
+			"tilesetId": 72,
+			"tileRenderMode": "Repeat",
+			"tileRect": { "tilesetUid": 72, "x": 0, "y": 24, "w": 8, "h": 24 },
+			"uiTileRect": null,
+			"nineSliceBorders": [],
+			"maxCount": 0,
+			"limitScope": "PerLevel",
+			"limitBehavior": "MoveLastOne",
+			"pivotX": 0,
+			"pivotY": 0,
+			"fieldDefs": []
+		},
+		{
+			"identifier": "TextButton",
+			"uid": 78,
+			"tags": ["Widget"],
+			"exportToToc": false,
+			"allowOutOfBounds": false,
+			"doc": null,
+			"width": 16,
+			"height": 16,
+			"resizableX": true,
+			"resizableY": false,
+			"minWidth": 16,
+			"maxWidth": null,
+			"minHeight": null,
+			"maxHeight": null,
+			"keepAspectRatio": false,
+			"tileOpacity": 1,
+			"fillOpacity": 0.08,
+			"lineOpacity": 0,
+			"hollow": false,
+			"color": "#5A6988",
+			"renderMode": "Tile",
+			"showName": true,
+			"tilesetId": 72,
+			"tileRenderMode": "NineSlice",
+			"tileRect": { "tilesetUid": 72, "x": 24, "y": 0, "w": 24, "h": 24 },
+			"uiTileRect": null,
+			"nineSliceBorders": [3,3,3,3],
+			"maxCount": 0,
+			"limitScope": "PerLevel",
+			"limitBehavior": "MoveLastOne",
+			"pivotX": 0,
+			"pivotY": 0,
+			"fieldDefs": [
+				{
+					"identifier": "Label",
+					"doc": null,
+					"__type": "String",
+					"uid": 79,
+					"type": "F_String",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "ValueOnly",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": true,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				},
+				{
+					"identifier": "IsActive",
+					"doc": null,
+					"__type": "Bool",
+					"uid": 80,
+					"type": "F_Bool",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				}
+			]
 		}
 	], "tilesets": [
 		{
@@ -2074,8 +2219,8 @@
 			"customData": [],
 			"savedSelections": [],
 			"cachedPixelData": {
-				"opaqueTiles": "0000000000000000000000000000000001001001001000000000000000001111000000000000000000000000000011111000000000000000000000000001111110000000000000000000000000011111100000000000000000000000000111110000000000000000000000000001111100000000000000000000000000011111000000000000000000000000000111110000000000000000000000000000111100000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000111000000000000000000000000000001110000000000000000000000000000011100000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-				"averageColors": "bccddcdebbbdbddddeeebcddbdc7ded8bcc8b9abd9acb89b000000000000000000000000000000000000000000000000000000000000245644577456c678f89adcdefdefdbcddeeeffffddddded8ffe8ddc8d9acf8acd89b000000000000000000000000000000000000000000000000000000000000d568f668fbbcfabcf99abbbcdbcdbabcbccdddddbbccbcb8ddc8bbb8b89bd89bb78a000000000000000000000000000000000000000000000000000000000000d567fccdf88af789f789f6793fd80000b868b868b689b689b888b888b888b888b679b67900000000000000000000000000000000000000000000000000003456faacf99af889f889f9abf679778a0000b868b868b689b689b888b888b888b888b679b67900000000000000000000000000000000000000000000000000008456fbbdf99af99afccdfffff679bbbc0000e8ba1456eb8914563ccc8bbb000000000000000000000000000000000000000000000000000000000000000000009456fbcdf9abfaabf889fddd000000000000145600001456000079aa1dee000000000000000000000000000000000000000000000000000000000000000000008456fbcdfabcfabcf899f446000000000000000000001def00001def00001def1def00001def00001def000000000000000000000000000000000000000000004456fabcfbcdfbbdfbcdf9aa0000000000001def00001def000000000000000000000000000000001def00001def0000000000000000000000000000000000000000f668fccefccdfccdfccd0000000000001f660f661fb81fb828ea00001fe81fe818ac08ac2fad2fad2a9c3a9c0000000000000000000000000000000000000000f568f778fccdfcdefcce0000000000000f661f661fb81fb818ea28ea2fe81fe8000018ac00003fad2a9c3a9c0000000000000000000000000000000000000000455764578457e889f9ab0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000245600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e87af98be87a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f98bfa9cf98b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f87af98bf87a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f89bf8acf89b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e78af78ae78a000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+				"opaqueTiles": "0000000000000000000000000000000001001001001001001001001000001111000000000000000000000000000011111000000000000000000000000001111110000000000000000000000000011111100000000000000000000000000111110000000000000000000000000001111100000000000000000000000000011111000000000000000000000000000111110000000000000000000000000000111100000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000111000000000000000000000000000001110000000000000000000000000000011100000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+				"averageColors": "bccddcdebbbdbddddeeebcddbdc7ded8bcc8b9abd9acb89bbc88dd78bc78b9cad9dab8babca9deb9bca9b99cda9cb98b000000000000245644577456c678f89adcdefdefdbcddeeeffffddddded8ffe8ddc8d9acf8acd89bdd78ff66dd67d9daf8ead8cadeb9ffb8dda8da9cfa9cd98b000000000000d568f668fbbcfabcf99abbbcdbcdbabcbccdddddbbccbcb8ddc8bbb8b89bd89bb78abc78dd67bb67b8bad8cab7b9bca8dda8bb98b98bd98bb87b000000000000d567fccdf88af789f789f6793fd80000b868b868b689b689b888b888b888b888b679b67900000000000000000000000000000000000000000000000000003456faacf99af889f889f9abf679778a0000b868b868b689b689b888b888b888b888b679b67900000000000000000000000000000000000000000000000000008456fbbdf99af99afccdfffff679bbbc0000e8ba1456eb8914563ccc8bbb000000000000000000000000000000000000000000000000000000000000000000009456fbcdf9abfaabf889fddd000000000000145600001456000079aa1dee000000000000000000000000000000000000000000000000000000000000000000008456fbcdfabcfabcf899f446000000000000000000001def00001def00001def1def00001def00001def000000000000000000000000000000000000000000004456fabcfbcdfbbdfbcdf9aa0000000000001def00001def000000000000000000000000000000001def00001def0000000000000000000000000000000000000000f668fccefccdfccdfccd0000000000001f660f661fb81fb828ea00001fe81fe818ac08ac2fad2fad2a9c3a9c0000000000000000000000000000000000000000f568f778fccdfcdefcce0000000000000f661f661fb81fb818ea28ea2fe81fe8000018ac00003fad2a9c3a9c0000000000000000000000000000000000000000455764578457e889f9ab0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000245600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e87af98be87a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f98bfa9cf98b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f87af98bf87a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f89bf8acf89b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e78af78ae78a000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
 			}
 		}
 	], "enums": [
@@ -2156,7 +2301,7 @@
 							"__identifier": "Keyboard",
 							"__grid": [17,26],
 							"__pivot": [0,0],
-							"__tags": [],
+							"__tags": ["Widget"],
 							"__tile": null,
 							"__smartColor": "#733E39",
 							"iid": "89021c00-fa90-11f0-8d20-3f0909672c1b",
@@ -2204,8 +2349,8 @@
 							"__identifier": "Knob",
 							"__grid": [16,22],
 							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": { "tilesetUid": 72, "x": 88, "y": 24, "w": 16, "h": 16 },
+							"__tags": [ "Widget", "PercentOutput" ],
+							"__tile": { "tilesetUid": 72, "x": 56, "y": 24, "w": 16, "h": 16 },
 							"__smartColor": "#E4A672",
 							"iid": "94174ae0-fa90-11f0-ade1-9d1424886248",
 							"width": 16,
@@ -2213,9 +2358,9 @@
 							"defUid": 4,
 							"px": [128,176],
 							"fieldInstances": [
-								{ "__identifier": "Color", "__type": "LocalEnum.Color", "__value": "Blue", "__tile": { "tilesetUid": 72, "x": 88, "y": 24, "w": 16, "h": 16 }, "defUid": 40, "realEditorValues": [{
+								{ "__identifier": "Color", "__type": "LocalEnum.Color", "__value": "Yellow", "__tile": { "tilesetUid": 72, "x": 56, "y": 24, "w": 16, "h": 16 }, "defUid": 40, "realEditorValues": [{
 									"id": "V_String",
-									"params": ["Blue"]
+									"params": ["Yellow"]
 								}] },
 								{ "__identifier": "Label", "__type": "String", "__value": null, "__tile": null, "defUid": 41, "realEditorValues": [] }
 							],
@@ -2226,7 +2371,7 @@
 							"__identifier": "Knob",
 							"__grid": [21,22],
 							"__pivot": [0,0],
-							"__tags": [],
+							"__tags": [ "Widget", "PercentOutput" ],
 							"__tile": { "tilesetUid": 72, "x": 40, "y": 24, "w": 16, "h": 16 },
 							"__smartColor": "#E4A672",
 							"iid": "94bf4ab0-fa90-11f0-ade1-ab1a9c595258",
@@ -2248,8 +2393,8 @@
 							"__identifier": "Knob",
 							"__grid": [26,22],
 							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": { "tilesetUid": 72, "x": 56, "y": 24, "w": 16, "h": 16 },
+							"__tags": [ "Widget", "PercentOutput" ],
+							"__tile": { "tilesetUid": 72, "x": 72, "y": 24, "w": 16, "h": 16 },
 							"__smartColor": "#E4A672",
 							"iid": "9542d290-fa90-11f0-ade1-ab899ebe0964",
 							"width": 16,
@@ -2257,9 +2402,9 @@
 							"defUid": 4,
 							"px": [208,176],
 							"fieldInstances": [
-								{ "__identifier": "Color", "__type": "LocalEnum.Color", "__value": "Yellow", "__tile": { "tilesetUid": 72, "x": 56, "y": 24, "w": 16, "h": 16 }, "defUid": 40, "realEditorValues": [{
+								{ "__identifier": "Color", "__type": "LocalEnum.Color", "__value": "Orange", "__tile": { "tilesetUid": 72, "x": 72, "y": 24, "w": 16, "h": 16 }, "defUid": 40, "realEditorValues": [{
 									"id": "V_String",
-									"params": ["Yellow"]
+									"params": ["Orange"]
 								}] },
 								{ "__identifier": "Label", "__type": "String", "__value": null, "__tile": null, "defUid": 41, "realEditorValues": [] }
 							],
@@ -2270,7 +2415,7 @@
 							"__identifier": "Knob",
 							"__grid": [31,22],
 							"__pivot": [0,0],
-							"__tags": [],
+							"__tags": [ "Widget", "PercentOutput" ],
 							"__tile": { "tilesetUid": 72, "x": 24, "y": 24, "w": 16, "h": 16 },
 							"__smartColor": "#E4A672",
 							"iid": "96280270-fa90-11f0-ade1-637b463d516b",
@@ -2284,6 +2429,351 @@
 							],
 							"__worldX": 248,
 							"__worldY": 176
+						},
+						{
+							"__identifier": "Envelope",
+							"__grid": [14,10],
+							"__pivot": [0,0],
+							"__tags": ["Widget"],
+							"__tile": null,
+							"__smartColor": "#FF0044",
+							"iid": "8c51f250-fa90-11f0-ade1-d313c7943aff",
+							"width": 168,
+							"height": 80,
+							"defUid": 23,
+							"px": [112,80],
+							"fieldInstances": [
+								{ "__identifier": "Attack", "__type": "EntityRef", "__value": {
+									"entityIid": "94174ae0-fa90-11f0-ade1-9d1424886248",
+									"layerIid": "32e251f0-fa90-11f0-ad09-7fbd56ca9a79",
+									"levelIid": "4cf47922-fa90-11f0-ad09-17fea0f83d6f",
+									"worldIid": "4cf47921-fa90-11f0-ad09-8d23e32977ff"
+								}, "__tile": null, "defUid": 24, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["94174ae0-fa90-11f0-ade1-9d1424886248"]
+								}] },
+								{ "__identifier": "Decay", "__type": "EntityRef", "__value": {
+									"entityIid": "94bf4ab0-fa90-11f0-ade1-ab1a9c595258",
+									"layerIid": "32e251f0-fa90-11f0-ad09-7fbd56ca9a79",
+									"levelIid": "4cf47922-fa90-11f0-ad09-17fea0f83d6f",
+									"worldIid": "4cf47921-fa90-11f0-ad09-8d23e32977ff"
+								}, "__tile": null, "defUid": 25, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["94bf4ab0-fa90-11f0-ade1-ab1a9c595258"]
+								}] },
+								{ "__identifier": "Sustain", "__type": "EntityRef", "__value": {
+									"entityIid": "9542d290-fa90-11f0-ade1-ab899ebe0964",
+									"layerIid": "32e251f0-fa90-11f0-ad09-7fbd56ca9a79",
+									"levelIid": "4cf47922-fa90-11f0-ad09-17fea0f83d6f",
+									"worldIid": "4cf47921-fa90-11f0-ad09-8d23e32977ff"
+								}, "__tile": null, "defUid": 26, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["9542d290-fa90-11f0-ade1-ab899ebe0964"]
+								}] },
+								{ "__identifier": "Release", "__type": "EntityRef", "__value": {
+									"entityIid": "96280270-fa90-11f0-ade1-637b463d516b",
+									"layerIid": "32e251f0-fa90-11f0-ad09-7fbd56ca9a79",
+									"levelIid": "4cf47922-fa90-11f0-ad09-17fea0f83d6f",
+									"worldIid": "4cf47921-fa90-11f0-ad09-8d23e32977ff"
+								}, "__tile": null, "defUid": 27, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["96280270-fa90-11f0-ade1-637b463d516b"]
+								}] }
+							],
+							"__worldX": 112,
+							"__worldY": 80
+						},
+						{
+							"__identifier": "Fader",
+							"__grid": [1,14],
+							"__pivot": [0,0],
+							"__tags": [ "Widget", "PercentOutput" ],
+							"__tile": { "tilesetUid": 72, "x": 0, "y": 24, "w": 8, "h": 24 },
+							"__smartColor": "#8B9BB4",
+							"iid": "2fdb7c70-fa90-11f0-ade1-3b9f367fc7e9",
+							"width": 8,
+							"height": 48,
+							"defUid": 77,
+							"px": [14,112],
+							"fieldInstances": [],
+							"__worldX": 14,
+							"__worldY": 112
+						},
+						{
+							"__identifier": "Fader",
+							"__grid": [3,14],
+							"__pivot": [0,0],
+							"__tags": [ "Widget", "PercentOutput" ],
+							"__tile": { "tilesetUid": 72, "x": 0, "y": 24, "w": 8, "h": 24 },
+							"__smartColor": "#8B9BB4",
+							"iid": "346411d0-fa90-11f0-ade1-1bf6bba48c53",
+							"width": 8,
+							"height": 48,
+							"defUid": 77,
+							"px": [26,112],
+							"fieldInstances": [],
+							"__worldX": 26,
+							"__worldY": 112
+						},
+						{
+							"__identifier": "Fader",
+							"__grid": [4,14],
+							"__pivot": [0,0],
+							"__tags": [ "Widget", "PercentOutput" ],
+							"__tile": { "tilesetUid": 72, "x": 0, "y": 24, "w": 8, "h": 24 },
+							"__smartColor": "#8B9BB4",
+							"iid": "3626a960-fa90-11f0-ade1-0587a7ef8128",
+							"width": 8,
+							"height": 48,
+							"defUid": 77,
+							"px": [38,112],
+							"fieldInstances": [],
+							"__worldX": 38,
+							"__worldY": 112
+						},
+						{
+							"__identifier": "Fader",
+							"__grid": [6,14],
+							"__pivot": [0,0],
+							"__tags": [ "Widget", "PercentOutput" ],
+							"__tile": { "tilesetUid": 72, "x": 0, "y": 24, "w": 8, "h": 24 },
+							"__smartColor": "#8B9BB4",
+							"iid": "37cf2940-fa90-11f0-ade1-5b018a3ac01f",
+							"width": 8,
+							"height": 48,
+							"defUid": 77,
+							"px": [50,112],
+							"fieldInstances": [],
+							"__worldX": 50,
+							"__worldY": 112
+						},
+						{
+							"__identifier": "Fader",
+							"__grid": [7,14],
+							"__pivot": [0,0],
+							"__tags": [ "Widget", "PercentOutput" ],
+							"__tile": { "tilesetUid": 72, "x": 0, "y": 24, "w": 8, "h": 24 },
+							"__smartColor": "#8B9BB4",
+							"iid": "3a279830-fa90-11f0-ade1-492df4507858",
+							"width": 8,
+							"height": 48,
+							"defUid": 77,
+							"px": [62,112],
+							"fieldInstances": [],
+							"__worldX": 62,
+							"__worldY": 112
+						},
+						{
+							"__identifier": "Fader",
+							"__grid": [9,14],
+							"__pivot": [0,0],
+							"__tags": [ "Widget", "PercentOutput" ],
+							"__tile": { "tilesetUid": 72, "x": 0, "y": 24, "w": 8, "h": 24 },
+							"__smartColor": "#8B9BB4",
+							"iid": "935b22a0-fa90-11f0-ade1-5b2f270bcca8",
+							"width": 8,
+							"height": 48,
+							"defUid": 77,
+							"px": [74,112],
+							"fieldInstances": [],
+							"__worldX": 74,
+							"__worldY": 112
+						},
+						{
+							"__identifier": "Fader",
+							"__grid": [10,14],
+							"__pivot": [0,0],
+							"__tags": [ "Widget", "PercentOutput" ],
+							"__tile": { "tilesetUid": 72, "x": 0, "y": 24, "w": 8, "h": 24 },
+							"__smartColor": "#8B9BB4",
+							"iid": "93e190b0-fa90-11f0-ade1-8534814b62ee",
+							"width": 8,
+							"height": 48,
+							"defUid": 77,
+							"px": [86,112],
+							"fieldInstances": [],
+							"__worldX": 86,
+							"__worldY": 112
+						},
+						{
+							"__identifier": "Harmonics",
+							"__grid": [5,6],
+							"__pivot": [0,0],
+							"__tags": ["Orchestrator"],
+							"__tile": null,
+							"__smartColor": "#2CE8F5",
+							"iid": "d1d9f9c0-fa90-11f0-ade1-d5f796a2158f",
+							"width": 16,
+							"height": 16,
+							"defUid": 43,
+							"px": [45,49],
+							"fieldInstances": [{ "__identifier": "Harmonics", "__type": "Array<EntityRef>", "__value": [
+								{
+									"entityIid": "2fdb7c70-fa90-11f0-ade1-3b9f367fc7e9",
+									"layerIid": "32e251f0-fa90-11f0-ad09-7fbd56ca9a79",
+									"levelIid": "4cf47922-fa90-11f0-ad09-17fea0f83d6f",
+									"worldIid": "4cf47921-fa90-11f0-ad09-8d23e32977ff"
+								},
+								{
+									"entityIid": "346411d0-fa90-11f0-ade1-1bf6bba48c53",
+									"layerIid": "32e251f0-fa90-11f0-ad09-7fbd56ca9a79",
+									"levelIid": "4cf47922-fa90-11f0-ad09-17fea0f83d6f",
+									"worldIid": "4cf47921-fa90-11f0-ad09-8d23e32977ff"
+								},
+								{
+									"entityIid": "3626a960-fa90-11f0-ade1-0587a7ef8128",
+									"layerIid": "32e251f0-fa90-11f0-ad09-7fbd56ca9a79",
+									"levelIid": "4cf47922-fa90-11f0-ad09-17fea0f83d6f",
+									"worldIid": "4cf47921-fa90-11f0-ad09-8d23e32977ff"
+								},
+								{
+									"entityIid": "37cf2940-fa90-11f0-ade1-5b018a3ac01f",
+									"layerIid": "32e251f0-fa90-11f0-ad09-7fbd56ca9a79",
+									"levelIid": "4cf47922-fa90-11f0-ad09-17fea0f83d6f",
+									"worldIid": "4cf47921-fa90-11f0-ad09-8d23e32977ff"
+								},
+								{
+									"entityIid": "3a279830-fa90-11f0-ade1-492df4507858",
+									"layerIid": "32e251f0-fa90-11f0-ad09-7fbd56ca9a79",
+									"levelIid": "4cf47922-fa90-11f0-ad09-17fea0f83d6f",
+									"worldIid": "4cf47921-fa90-11f0-ad09-8d23e32977ff"
+								},
+								{
+									"entityIid": "935b22a0-fa90-11f0-ade1-5b2f270bcca8",
+									"layerIid": "32e251f0-fa90-11f0-ad09-7fbd56ca9a79",
+									"levelIid": "4cf47922-fa90-11f0-ad09-17fea0f83d6f",
+									"worldIid": "4cf47921-fa90-11f0-ad09-8d23e32977ff"
+								},
+								{
+									"entityIid": "93e190b0-fa90-11f0-ade1-8534814b62ee",
+									"layerIid": "32e251f0-fa90-11f0-ad09-7fbd56ca9a79",
+									"levelIid": "4cf47922-fa90-11f0-ad09-17fea0f83d6f",
+									"worldIid": "4cf47921-fa90-11f0-ad09-8d23e32977ff"
+								}
+							], "__tile": null, "defUid": 44, "realEditorValues": [
+								{
+									"id": "V_String",
+									"params": ["2fdb7c70-fa90-11f0-ade1-3b9f367fc7e9"]
+								},
+								{
+									"id": "V_String",
+									"params": ["346411d0-fa90-11f0-ade1-1bf6bba48c53"]
+								},
+								{
+									"id": "V_String",
+									"params": ["3626a960-fa90-11f0-ade1-0587a7ef8128"]
+								},
+								{
+									"id": "V_String",
+									"params": ["37cf2940-fa90-11f0-ade1-5b018a3ac01f"]
+								},
+								{
+									"id": "V_String",
+									"params": ["3a279830-fa90-11f0-ade1-492df4507858"]
+								},
+								{
+									"id": "V_String",
+									"params": ["935b22a0-fa90-11f0-ade1-5b2f270bcca8"]
+								},
+								{
+									"id": "V_String",
+									"params": ["93e190b0-fa90-11f0-ade1-8534814b62ee"]
+								}
+							] }],
+							"__worldX": 45,
+							"__worldY": 49
+						},
+						{
+							"__identifier": "Dropdown",
+							"__grid": [13,5],
+							"__pivot": [0,0],
+							"__tags": ["Widget"],
+							"__tile": { "tilesetUid": 72, "x": 24, "y": 0, "w": 24, "h": 24 },
+							"__smartColor": "#D77643",
+							"iid": "49a4b0f0-fa90-11f0-8348-0f19ae757f51",
+							"width": 163,
+							"height": 16,
+							"defUid": 2,
+							"px": [107,43],
+							"fieldInstances": [],
+							"__worldX": 107,
+							"__worldY": 43
+						},
+						{
+							"__identifier": "Button",
+							"__grid": [33,5],
+							"__pivot": [0,0],
+							"__tags": ["Widget"],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"iid": "838547d0-fa90-11f0-8348-419ba72c9dd0",
+							"width": 16,
+							"height": 16,
+							"defUid": 1,
+							"px": [269,43],
+							"fieldInstances": [
+								{ "__identifier": "Modal", "__type": "String", "__value": "NameModal", "__tile": null, "defUid": 13, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["NameModal"]
+								}] },
+								{ "__identifier": "IconName", "__type": "LocalEnum.Icon", "__value": "Gear", "__tile": null, "defUid": 15, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Gear"]
+								}] },
+								{ "__identifier": "Action", "__type": "LocalEnum.Action", "__value": null, "__tile": null, "defUid": 18, "realEditorValues": [] },
+								{ "__identifier": "Layer", "__type": "String", "__value": null, "__tile": null, "defUid": 28, "realEditorValues": [] }
+							],
+							"__worldX": 269,
+							"__worldY": 43
+						},
+						{
+							"__identifier": "Button",
+							"__grid": [45,0],
+							"__pivot": [0,0],
+							"__tags": ["Widget"],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"iid": "a08b6530-fa90-11f0-8348-21a20508524c",
+							"width": 16,
+							"height": 16,
+							"defUid": 1,
+							"px": [362,4],
+							"fieldInstances": [
+								{ "__identifier": "Modal", "__type": "String", "__value": null, "__tile": null, "defUid": 13, "realEditorValues": [] },
+								{ "__identifier": "IconName", "__type": "LocalEnum.Icon", "__value": "Save", "__tile": null, "defUid": 15, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Save"]
+								}] },
+								{ "__identifier": "Action", "__type": "LocalEnum.Action", "__value": null, "__tile": null, "defUid": 18, "realEditorValues": [] },
+								{ "__identifier": "Layer", "__type": "String", "__value": null, "__tile": null, "defUid": 28, "realEditorValues": [] }
+							],
+							"__worldX": 362,
+							"__worldY": 4
+						},
+						{
+							"__identifier": "TextButton",
+							"__grid": [0,0],
+							"__pivot": [0,0],
+							"__tags": ["Widget"],
+							"__tile": { "tilesetUid": 72, "x": 24, "y": 0, "w": 24, "h": 24 },
+							"__smartColor": "#5A6988",
+							"iid": "0ed92860-fa90-11f0-8348-8157c09dd647",
+							"width": 56,
+							"height": 16,
+							"defUid": 78,
+							"px": [4,4],
+							"fieldInstances": [
+								{ "__identifier": "Label", "__type": "String", "__value": "📣 Instrument", "__tile": null, "defUid": 79, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["📣 Instrument"]
+								}] },
+								{ "__identifier": "IsActive", "__type": "Bool", "__value": true, "__tile": null, "defUid": 80, "realEditorValues": [{
+									"id": "V_Bool",
+									"params": [ true ]
+								}] }
+							],
+							"__worldX": 4,
+							"__worldY": 4
 						}
 					]
 				},
@@ -4039,8 +4529,8 @@
 							"__identifier": "Dropdown",
 							"__grid": [9,2],
 							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
+							"__tags": ["Widget"],
+							"__tile": { "tilesetUid": 72, "x": 24, "y": 0, "w": 24, "h": 24 },
 							"__smartColor": "#D77643",
 							"iid": "5e14b916-fa90-11f0-a3f9-71de04f3e0fe",
 							"width": 240,
@@ -4055,7 +4545,7 @@
 							"__identifier": "Button",
 							"__grid": [6,2],
 							"__pivot": [0,0],
-							"__tags": [],
+							"__tags": ["Widget"],
 							"__tile": null,
 							"__smartColor": "#BE4A2F",
 							"iid": "5e14b917-fa90-11f0-a3f9-6785f3b40f16",
@@ -4082,7 +4572,7 @@
 							"__identifier": "Button",
 							"__grid": [40,2],
 							"__pivot": [0,0],
-							"__tags": [],
+							"__tags": ["Widget"],
 							"__tile": null,
 							"__smartColor": "#BE4A2F",
 							"iid": "5e14b918-fa90-11f0-a3f9-9ba06dec2d6d",
@@ -4128,7 +4618,7 @@
 							"__identifier": "Button",
 							"__grid": [10,6],
 							"__pivot": [0,0],
-							"__tags": [],
+							"__tags": ["Widget"],
 							"__tile": null,
 							"__smartColor": "#BE4A2F",
 							"iid": "9e84bf10-fa90-11f0-ba84-b945bf57e9bc",
@@ -4152,7 +4642,7 @@
 							"__identifier": "Button",
 							"__grid": [32,6],
 							"__pivot": [0,0],
-							"__tags": [],
+							"__tags": ["Widget"],
 							"__tile": null,
 							"__smartColor": "#BE4A2F",
 							"iid": "9ee29680-fa90-11f0-ba84-dd50e4d46aed",
@@ -4176,7 +4666,7 @@
 							"__identifier": "Button",
 							"__grid": [35,6],
 							"__pivot": [0,0],
-							"__tags": [],
+							"__tags": ["Widget"],
 							"__tile": null,
 							"__smartColor": "#BE4A2F",
 							"iid": "9f248180-fa90-11f0-ba84-c9e54d1b76de",
@@ -4216,7 +4706,7 @@
 							"__identifier": "Player",
 							"__grid": [20,5],
 							"__pivot": [0,0],
-							"__tags": [],
+							"__tags": ["Orchestrator"],
 							"__tile": null,
 							"__smartColor": "#0099DB",
 							"iid": "a3b3cda0-fa90-11f0-ba84-e36a05ae2a0b",
@@ -4287,7 +4777,7 @@
 							"__identifier": "SfxEditor",
 							"__grid": [10,8],
 							"__pivot": [0,0],
-							"__tags": [],
+							"__tags": ["Orchestrator"],
 							"__tile": null,
 							"__smartColor": "#124E89",
 							"iid": "a7054290-fa90-11f0-ba84-3b073e91b88b",
@@ -4322,8 +4812,8 @@
 							"__identifier": "Dropdown",
 							"__grid": [1,8],
 							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
+							"__tags": ["Widget"],
+							"__tile": { "tilesetUid": 72, "x": 24, "y": 0, "w": 24, "h": 24 },
 							"__smartColor": "#D77643",
 							"iid": "a97928c0-fa90-11f0-ba84-6b6725ae5b0d",
 							"width": 56,
@@ -4338,7 +4828,7 @@
 							"__identifier": "Knob",
 							"__grid": [4,13],
 							"__pivot": [0,0],
-							"__tags": [],
+							"__tags": [ "Widget", "PercentOutput" ],
 							"__tile": { "tilesetUid": 72, "x": 24, "y": 24, "w": 16, "h": 16 },
 							"__smartColor": "#E4A672",
 							"iid": "aaa091c0-fa90-11f0-ba84-8ba78a440c06",
@@ -6003,7 +6493,7 @@
 							"__identifier": "Button",
 							"__grid": [10,11],
 							"__pivot": [0,0],
-							"__tags": [],
+							"__tags": ["Widget"],
 							"__tile": null,
 							"__smartColor": "#BE4A2F",
 							"iid": "faedd800-fa90-11f0-ad09-798f4fd0b560",
@@ -6030,7 +6520,7 @@
 							"__identifier": "TextInput",
 							"__grid": [6,5],
 							"__pivot": [0,0],
-							"__tags": [],
+							"__tags": ["Widget"],
 							"__tile": null,
 							"__smartColor": "#EAD4AA",
 							"iid": "aae4f750-fa90-11f0-8d20-b953b85604df",
@@ -6531,8 +7021,8 @@
 							"__identifier": "Dropdown",
 							"__grid": [4,5],
 							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
+							"__tags": ["Widget"],
+							"__tile": { "tilesetUid": 72, "x": 24, "y": 0, "w": 24, "h": 24 },
 							"__smartColor": "#D77643",
 							"iid": "b1c2d3e4-fa90-11f0-ba84-a1b2c3d4e5f6",
 							"width": 176,
@@ -6547,7 +7037,7 @@
 							"__identifier": "Button",
 							"__grid": [14,11],
 							"__pivot": [0,0],
-							"__tags": [],
+							"__tags": ["Widget"],
 							"__tile": null,
 							"__smartColor": "#BE4A2F",
 							"iid": "c2d3e4f5-fa90-11f0-ba84-b2c3d4e5f6a7",
