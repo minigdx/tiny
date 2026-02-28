@@ -1,12 +1,12 @@
 local icons = {
-    -- Waveform icons (16x16, row y=16)
-    Sine      = { x = 16, y = 16 },
-    Pulse     = { x = 32, y = 16 },
-    Noise     = { x = 48, y = 16 },
-    Sawtooth  = { x = 64, y = 16 },
-    Triangle  = { x = 80, y = 16 },
-    Square    = { x = 96, y = 16 },
-    Drum      = { x = 112, y = 16 },
+    -- Waveform icons (spritesheet 2, 16px apart, row y=72)
+    Sine      = { x = 24, y = 72 },
+    Pulse     = { x = 40, y = 72 },
+    Noise     = { x = 56, y = 72 },
+    Sawtooth  = { x = 72, y = 72 },
+    Triangle  = { x = 88, y = 72 },
+    Square    = { x = 104, y = 72 },
+    Drum      = { x = 120, y = 72 },
     -- Editor mode icons (16x16, row y=80)
     Instrument = { x = 16, y = 80 },
     Sfx        = { x = 32, y = 80 },
@@ -15,7 +15,7 @@ local icons = {
     Play   = { x = 112, y = 48 },
     Save   = { x = 128, y = 48 },
     Export = { x = 144, y = 48 },
-    Gear = { x = 0, y = 80 },
+    Gear = { x = 136, y = 72 },
     Random = { x = 64, y = 80 },
     Envelope = { x = 80, y = 80 },
     Harmonics = { x = 96, y = 80 },

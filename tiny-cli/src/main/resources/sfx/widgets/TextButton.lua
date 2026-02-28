@@ -14,9 +14,24 @@ local TextButton = {
     listeners = {},
     on_update = utils.on_update,
     fire_on_update = utils.fire_on_update,
+    shake_timer = 0,
+    shake_offset = 0,
 }
 
+TextButton.shake = function(self)
+    self.shake_timer = 0.4
+end
+
 TextButton._update = function(self)
+    if self.shake_timer > 0 then
+        self.shake_timer = self.shake_timer - tiny.dt
+        self.shake_offset = math.sin(self.shake_timer * 30) * 2
+        if self.shake_timer <= 0 then
+            self.shake_timer = 0
+            self.shake_offset = 0
+        end
+    end
+
     if self.status == 2 or self.is_active then
         return
     end
@@ -37,6 +52,9 @@ TextButton._update = function(self)
 end
 
 TextButton._draw = function(self)
+    local real_x = self.x
+    self.x = self.x + (self.shake_offset or 0)
+
     local prev = spr.sheet(2)
 
     local draw_variant
@@ -115,6 +133,8 @@ TextButton._draw = function(self)
         text.print(self.label, tx, ty, 1)
         text.font()
     end
+
+    self.x = real_x
 end
 
 return TextButton

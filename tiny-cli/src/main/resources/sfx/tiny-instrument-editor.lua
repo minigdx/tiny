@@ -10,6 +10,10 @@ local dropdown_widget = nil
 local speaker_widgets = {}
 local layer_manager = nil
 
+local save_dirty = false
+local next_shake_time = 0
+local save_button_ref = nil
+
 local state = {
     instrument = nil,
     next_note_on = nil,
@@ -75,6 +79,15 @@ end
 function _init_text_buttons(entities)
     for tb in all(entities["TextButton"]) do
         local text_button = widgets:create_text_button(tb)
+
+        if text_button.fields.Action == "Save" then
+            save_button_ref = text_button
+            text_button.on_change = function()
+                sfx.save()
+                save_dirty = false
+            end
+        end
+
         table.insert(all_widgets, text_button)
     end
 end
@@ -189,6 +202,40 @@ function _init_buttons(entities)
     end
 end
 
+function _init_wave_type(entities)
+    local buttonToWave = function(wave_type)
+        return {
+            from_widget = function(source, target, value)
+                return wave_type
+            end,
+            to_widget = function(source, target, value)
+                if value == wave_type then
+                    return 2
+                else
+                    return 0
+                end
+            end,
+        }
+    end
+
+    for b in all(entities["WaveTypeSelector"]) do
+        local sine = wire.find_widget(all_widgets, b.fields.Sine)
+        wire.bind(state, "instrument.wave", sine, "status", buttonToWave("SINE"))
+        local square = wire.find_widget(all_widgets, b.fields.Square)
+        wire.bind(state, "instrument.wave", square, "status", buttonToWave("SQUARE"))
+        local pulse = wire.find_widget(all_widgets, b.fields.Pulse)
+        wire.bind(state, "instrument.wave", pulse, "status", buttonToWave("PULSE"))
+        local triangle = wire.find_widget(all_widgets, b.fields.Triangle)
+        wire.bind(state, "instrument.wave", triangle, "status", buttonToWave("TRIANGLE"))
+        local noise = wire.find_widget(all_widgets, b.fields.Noise)
+        wire.bind(state, "instrument.wave", noise, "status", buttonToWave("NOISE"))
+        local sawtooth = wire.find_widget(all_widgets, b.fields.Sawtooth)
+        wire.bind(state, "instrument.wave", sawtooth, "status", buttonToWave("SAW_TOOTH"))
+        local drum = wire.find_widget(all_widgets, b.fields.Drum)
+        wire.bind(state, "instrument.wave", drum, "status", buttonToWave("DRUM"))
+    end
+end
+
 function _init_dropdowns(entities)
     for d in all(entities["Dropdown"]) do
         local dropdown = widgets:create_dropdown(d)
@@ -257,12 +304,46 @@ function _init_keyboard(entities)
     end
 end
 
+function _mark_dirty()
+    save_dirty = true
+    next_shake_time = tiny.t + 15
+end
+
+function _init_save_reminder()
+    if not save_button_ref then return end
+
+    for _, w in ipairs(all_widgets) do
+        if w ~= save_button_ref then
+            local orig = w.on_change
+            if orig then
+                w.on_change = function(self, ...)
+                    _mark_dirty()
+                    return orig(self, ...)
+                end
+            end
+        end
+    end
+
+    for _, modal in pairs(modals_by_name) do
+        local orig_validate = modal.on_validate
+        if orig_validate then
+            modal.on_validate = function(self, ...)
+                _mark_dirty()
+                return orig_validate(self, ...)
+            end
+        end
+    end
+end
+
 function _init()
     all_widgets = {}
     modals_by_name = {}
     dropdown_widget = nil
     speaker_widgets = {}
     layer_manager = nil
+    save_dirty = false
+    next_shake_time = 0
+    save_button_ref = nil
 
     map.level("InstrumentEditor")
     state.instrument = sfx.instrument(0)
@@ -278,6 +359,7 @@ function _init()
     _init_knobs(widget_entities)
     _init_faders(widget_entities)
     _init_buttons(widget_entities)
+    _init_wave_type(widget_entities)
     _init_dropdowns(widget_entities)
     _init_mode_switch(widget_entities)
     _init_keyboard(widget_entities)
@@ -286,10 +368,17 @@ function _init()
 
     layer_manager = LayerManager.create()
     layer_manager:register("Widgets", { tiles = nil, widgets = all_widgets, always = true })
+
+    _init_save_reminder()
 end
 
 function _update()
     mouse._update(function() end, function() end, function() end)
+
+    if save_dirty and save_button_ref and tiny.t >= next_shake_time then
+        save_button_ref:shake()
+        next_shake_time = tiny.t + 15
+    end
 
     local active_modal
     for _, modal in pairs(modals_by_name) do
