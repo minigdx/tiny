@@ -12,25 +12,18 @@
   },
   "zoom": 2,
   "colors": [
-    "#28282E",
-    "#1D2B53",
-    "#6C5671",
-    "#87A889",
-    "#F98284",
-    "#FFA300",
-    "#B0A9E4",
-    "#DEA38B",
-    "#ACCCE4",
+    "#414D66",
+    "#7284AA",
+    "#F76666",
+    "#A891D4",
+    "#8FABD0",
+    "#8CE8AB",
     "#FEAAE4",
-    "#D9C8BF",
     "#FFC384",
-    "#B0EB93",
-    "#FFCCAA",
-    "#E9F59D",
-    "#FFE6C6",
-    "#FFF7A0",
+    "#FFEA86",
+    "#DEE7FC",
     "#FFF1E8",
-    "#FFF7E4"
+    "#FFFFFF"
   ],
   "scripts": [
     "tiny-instrument-editor.lua",
@@ -60,6 +53,7 @@
     "widgets/Modal.lua",
     "widgets/Panel.lua",
     "widgets/TextInput.lua",
+    "widgets/Speaker.lua",
     "widgets/utils.lua"
   ],
   "spritesheets": [
@@ -72,5 +66,45 @@
     "sfx-editor.ldtk",
     "editor.ldtk"
   ],
-  "hideMouseCursor": true
+  "hideMouseCursor": true,
+  "fonts": [
+    {
+      "name": "monogram",
+      "spritesheet": "monogram-bitmap.png",
+      "banks": [
+        {
+          "name": "ascii",
+          "width": 6,
+          "height": 16,
+          "characters": [
+            " !\"#$%&'()*+,-./",
+            "0123456789:;<=>?",
+            "@ABCDEFGHIJKLMNO",
+            "PQRSTUVWXYZ[\\]^_",
+            "`abcdefghijklmno",
+            "pqrstuvwxyz{|}~"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "monogram-italic",
+      "spritesheet": "monogram-italic-bitmap.png",
+      "banks": [
+        {
+          "name": "ascii",
+          "width": 6,
+          "height": 16,
+          "characters": [
+            " !\"#$%&'()*+,-./",
+            "0123456789:;<=>?",
+            "@ABCDEFGHIJKLMNO",
+            "PQRSTUVWXYZ[\\]^_",
+            "`abcdefghijklmno",
+            "pqrstuvwxyz{|}~"
+          ]
+        }
+      ]
+    }
+  ]
 }

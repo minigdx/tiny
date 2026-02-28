@@ -14,22 +14,25 @@ local Knob = {
 
 Knob._init = function(self)
     local color_mapping = {
-        Blue = 0,
+        Red = 0,
         Green = 1,
-        Purple = 2,
-        Red = 3
+        Yellow = 2,
+        Orange = 3,
+        Blue = 4
     }
     self.color = color_mapping[self.fields.Color] or 0
     self.label = self.fields.Label
 end
 
 Knob._draw = function(self)
+    local prev = spr.sheet(2)
     local i = math.floor(self.value * 6)
 
-    spr.sdraw(self.x, self.y, 16 + self.color * 16, 48, 16, 16)
-    spr.sdraw(self.x, self.y, 16 + i * 16, 64, 16, 16)
+    spr.sdraw(self.x, self.y, 24 + self.color * 16, 24, 16, 16)
+    spr.sdraw(self.x, self.y, 24 + i * 16, 56, 16, 16)
 
     print(self.label, self.x, self.y + self.height + 2)
+    spr.sheet(prev)
 end
 
 Knob._update = function(self)

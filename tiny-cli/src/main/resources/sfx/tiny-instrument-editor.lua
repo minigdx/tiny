@@ -2,18 +2,11 @@ local widgets = require("widgets")
 local mouse = require("mouse")
 local wire = require("wire")
 local ModeSwitch = require("widgets/ModeSwitch")
-local LayerManager = require("layers")
 
 local all_widgets = {}
 local modals_by_name = {}
 local dropdown_widget = nil
-
-local layer_widgets = {}
-local layer_buttons = {}
-local active_layer = nil
-local layer_manager = nil
-
-local test_panels = {}
+local speaker_widgets = {}
 
 local state = {
     instrument = nil,
@@ -21,21 +14,31 @@ local state = {
     next_note_off = nil,
 }
 
+local set_speakers_playing = function(playing)
+    for _, s in ipairs(speaker_widgets) do
+        s.playing = playing
+    end
+end
+
 local on_press = function()
     state.instrument.note_on("C4")
+    set_speakers_playing(true)
 end
 
 local on_release = function()
     state.instrument.note_off("C4")
+    set_speakers_playing(false)
 end
 
 local on_press_repeat = function()
     state.next_note_on = 0
     state.next_note_off = nil
+    set_speakers_playing(true)
 end
 
 local on_release_repeat = function()
     state.next_note_on = nil
+    set_speakers_playing(false)
 end
 
 local on_repeat_update = function()
@@ -60,65 +63,58 @@ local on_repeat_update = function()
     end
 end
 
-function _switch_layer(layer_name)
-    for name, button in pairs(layer_buttons) do
-        if name == layer_name then
-            button.status = 2
-        else
-            button.status = 0
-        end
-    end
-    active_layer = layer_name
-    if layer_manager then
-        layer_manager:switch(layer_name)
+function _init_panels(entities)
+    for p in all(entities["Panel"]) do
+        local panel = widgets:create_panel(p)
+        table.insert(all_widgets, panel)
     end
 end
 
-function _init_layer_buttons(entities)
-    for b in all(entities["Button"]) do
-        if b.fields.Layer ~= nil then
-            local layer_name = b.fields.Layer
-            local button = widgets:create_button(b)
-            layer_buttons[layer_name] = button
-            table.insert(all_widgets, button)
+function _init_speakers(entities)
+    for s in all(entities["Speaker"]) do
+        local speaker = widgets:create_speaker(s)
+        table.insert(all_widgets, speaker)
+        table.insert(speaker_widgets, speaker)
+    end
+end
 
-            button.on_change = function()
-                _switch_layer(layer_name)
-            end
-        end
+function _init_knobs(entities)
+    for k in all(entities["Knob"]) do
+        local knob = widgets:create_knob(k)
+        knob.on_press = on_press
+        knob.on_release = on_release
+        table.insert(all_widgets, knob)
     end
 end
 
 function _init_buttons(entities)
     for b in all(entities["Button"]) do
-        if b.fields.Layer == nil then
-            local button = widgets:create_button(b)
+        local button = widgets:create_button(b)
 
-            if button.fields.Modal then
-                local modal_name = button.fields.Modal
+        if button.fields.Modal then
+            local modal_name = button.fields.Modal
 
-                if not modals_by_name[modal_name] then
-                    local modal = widgets:create_modal({
-                        x = 96,
-                        y = 64,
-                        width = 192,
-                        height = 128,
-                        level_name = modal_name,
-                        fields = {},
-                    })
-                    modals_by_name[modal_name] = modal
-                end
-
-                button.on_change = function()
-                    local target = modals_by_name[modal_name]
-                    if target then
-                        target:open(state.instrument.name)
-                    end
-                end
+            if not modals_by_name[modal_name] then
+                local modal = widgets:create_modal({
+                    x = 96,
+                    y = 64,
+                    width = 192,
+                    height = 128,
+                    level_name = modal_name,
+                    fields = {},
+                })
+                modals_by_name[modal_name] = modal
             end
 
-            table.insert(all_widgets, button)
+            button.on_change = function()
+                local target = modals_by_name[modal_name]
+                if target then
+                    target:open(state.instrument.name)
+                end
+            end
         end
+
+        table.insert(all_widgets, button)
     end
 
     local name_modal = modals_by_name["NameModal"]
@@ -155,19 +151,6 @@ function _init_dropdowns(entities)
 
         dropdown_widget = dropdown
 
-        local original_update = dropdown._update
-        dropdown._update = function(self)
-            local was_open = self.open
-            original_update(self)
-            if layer_manager then
-                if self.open and not was_open then
-                    layer_manager:set_overlay(self)
-                elseif not self.open and was_open then
-                    layer_manager:set_overlay(nil)
-                end
-            end
-        end
-
         table.insert(all_widgets, dropdown)
     end
 end
@@ -185,6 +168,7 @@ function _init_keyboard(entities)
         if value and currentNote == nil then
             state.instrument.note_on(value)
             currentNote = value
+            set_speakers_playing(true)
         elseif value and currentNote ~= nil then
             state.instrument.note_on(value)
             state.instrument.note_off(currentNote)
@@ -192,6 +176,7 @@ function _init_keyboard(entities)
         elseif not value then
             state.instrument.note_off(currentNote)
             currentNote = nil
+            set_speakers_playing(false)
         end
     end
 
@@ -202,192 +187,30 @@ function _init_keyboard(entities)
     end
 end
 
-function _init_waveform(waveform_entities)
-    layer_widgets["Waveform"] = {}
-
-    local buttonToWave = function(type)
-        local result = {}
-        result.from_widget = function(source, target, value)
-            return type
-        end
-        result.to_widget = function(source, target, value)
-            if value == type then
-                return 2
-            else
-                return 0
-            end
-        end
-        return result
-    end
-
-    for b in all(waveform_entities["Button"]) do
-        local button = widgets:create_button(b)
-        table.insert(layer_widgets["Waveform"], button)
-    end
-
-    for b in all(waveform_entities["WaveTypeSelector"]) do
-        local sine = wire.find_widget(layer_widgets["Waveform"], b.fields.Sine)
-        wire.bind(state, "instrument.wave", sine, "status", buttonToWave("SINE"))
-        local triangle = wire.find_widget(layer_widgets["Waveform"], b.fields.Triangle)
-        wire.bind(state, "instrument.wave", triangle, "status", buttonToWave("TRIANGLE"))
-        local pulse = wire.find_widget(layer_widgets["Waveform"], b.fields.Pulse)
-        wire.bind(state, "instrument.wave", pulse, "status", buttonToWave("PULSE"))
-        local noise = wire.find_widget(layer_widgets["Waveform"], b.fields.Noise)
-        wire.bind(state, "instrument.wave", noise, "status", buttonToWave("NOISE"))
-        local square = wire.find_widget(layer_widgets["Waveform"], b.fields.Square)
-        wire.bind(state, "instrument.wave", square, "status", buttonToWave("SQUARE"))
-        local sawtooth = wire.find_widget(layer_widgets["Waveform"], b.fields.Sawtooth)
-        wire.bind(state, "instrument.wave", sawtooth, "status", buttonToWave("SAW_TOOTH"))
-        local drum = wire.find_widget(layer_widgets["Waveform"], b.fields.Drum)
-        wire.bind(state, "instrument.wave", drum, "status", buttonToWave("DRUM"))
-    end
-end
-
-function _init_envelope(envelope_entities)
-    layer_widgets["Envelope"] = {}
-
-    for k in all(envelope_entities["Knob"]) do
-        local knob = widgets:create_knob(k)
-        table.insert(layer_widgets["Envelope"], knob)
-    end
-
-    for k in all(envelope_entities["Envelope"]) do
-        local envelop = widgets:create_envelop(k)
-
-        local widget = wire.find_widget(layer_widgets["Envelope"], k.fields.Attack)
-        widget.on_press = on_press_repeat
-        widget.on_release = on_release_repeat
-        wire.bind(state, "instrument.attack", widget, "value")
-        wire.bind(state, "instrument.attack", envelop, "attack")
-
-        widget = wire.find_widget(layer_widgets["Envelope"], k.fields.Decay)
-        widget.on_press = on_press_repeat
-        widget.on_release = on_release_repeat
-        wire.bind(state, "instrument.decay", widget, "value")
-        wire.bind(state, "instrument.decay", envelop, "decay")
-
-        widget = wire.find_widget(layer_widgets["Envelope"], k.fields.Sustain)
-        widget.on_press = on_press
-        widget.on_release = on_release
-        wire.bind(state, "instrument.sustain", widget, "value")
-        wire.bind(state, "instrument.sustain", envelop, "sustain")
-
-        widget = wire.find_widget(layer_widgets["Envelope"], k.fields.Release)
-        widget.on_press = on_press_repeat
-        widget.on_release = on_release_repeat
-        wire.bind(state, "instrument.release", widget, "value")
-        wire.bind(state, "instrument.release", envelop, "release")
-
-        table.insert(layer_widgets["Envelope"], envelop)
-    end
-end
-
-function _init_harmonics(harmonics_entities)
-    layer_widgets["Harmonics"] = {}
-
-    for k in all(harmonics_entities["Knob"]) do
-        local knob = widgets:create_knob(k)
-        table.insert(layer_widgets["Harmonics"], knob)
-    end
-
-    for mode in all(harmonics_entities["Harmonics"]) do
-        for index, harmonic in ipairs(mode.fields.Harmonics) do
-            local knob = wire.find_widget(layer_widgets["Harmonics"], harmonic)
-            knob.on_press = on_press
-            knob.on_release = on_release
-            wire.bind(state, "instrument.harmonics." .. index, knob, "value")
-        end
-    end
-end
-
-function _init_modulation(modulation_entities)
-    layer_widgets["Modulation"] = {}
-
-    for k in all(modulation_entities["Knob"]) do
-        local knob = widgets:create_knob(k)
-        table.insert(layer_widgets["Modulation"], knob)
-    end
-
-    for c in all(modulation_entities["Checkbox"]) do
-        local checkbox = widgets:create_checkbox(c)
-        table.insert(layer_widgets["Modulation"], checkbox)
-    end
-
-    for effect in all(modulation_entities["Sweep"]) do
-        local active = wire.find_widget(layer_widgets["Modulation"], effect.fields.Enabled)
-        local acceleration = wire.find_widget(layer_widgets["Modulation"], effect.fields.Acceleration)
-        local sweep = wire.find_widget(layer_widgets["Modulation"], effect.fields.Sweep)
-
-        acceleration.on_press = on_press
-        acceleration.on_release = on_release
-        sweep.on_press = on_press
-        sweep.on_release = on_release
-
-        wire.bind(state, "instrument.sweep.active", active, "value")
-        wire.bind(state, "instrument.sweep.acceleration", acceleration, "value")
-        wire.bind(state, "instrument.sweep.sweep", sweep, "value")
-    end
-
-    for effect in all(modulation_entities["Vibrato"]) do
-        local active = wire.find_widget(layer_widgets["Modulation"], effect.fields.Enabled)
-        local frequency = wire.find_widget(layer_widgets["Modulation"], effect.fields.Frequency)
-        local depth = wire.find_widget(layer_widgets["Modulation"], effect.fields.Depth)
-
-        frequency.on_press = on_press
-        frequency.on_release = on_release
-        depth.on_press = on_press
-        depth.on_release = on_release
-
-        wire.bind(state, "instrument.vibrato.active", active, "value")
-        wire.bind(state, "instrument.vibrato.frequency", frequency, "value")
-        wire.bind(state, "instrument.vibrato.depth", depth, "value")
-    end
-end
+-- TODO: _init_waveform, _init_envelope, _init_harmonics, _init_modulation
+-- These will be re-added once the corresponding widgets are placed in the new LDtk layout.
 
 function _init()
     all_widgets = {}
     modals_by_name = {}
     dropdown_widget = nil
-    layer_widgets = {}
-    layer_buttons = {}
-    active_layer = nil
-    layer_manager = nil
+    speaker_widgets = {}
 
     map.level("InstrumentEditor")
-    local widget_entities = map.entities("Widgets")
-
     state.instrument = sfx.instrument(0)
 
-    _init_layer_buttons(widget_entities)
+    -- Panels first (drawn behind everything)
+    local panel_entities = map.entities("Panels")
+    _init_panels(panel_entities)
+
+    -- Then all interactive widgets
+    local widget_entities = map.entities("Widgets")
+    _init_speakers(widget_entities)
+    _init_knobs(widget_entities)
     _init_buttons(widget_entities)
     _init_dropdowns(widget_entities)
     _init_mode_switch(widget_entities)
     _init_keyboard(widget_entities)
-
-    local waveform_entities = map.entities("Waveform")
-    if waveform_entities then _init_waveform(waveform_entities) end
-    local envelope_entities = map.entities("Envelope")
-    if envelope_entities then _init_envelope(envelope_entities) end
-    local harmonics_entities = map.entities("Harmonics")
-    if harmonics_entities then _init_harmonics(harmonics_entities) end
-    local modulation_entities = map.entities("Modulation")
-    if modulation_entities then _init_modulation(modulation_entities) end
-
-    layer_manager = LayerManager.create()
-    layer_manager:register("Widgets",    { tiles = "WidgetsTiles",   widgets = all_widgets,              always = true })
-    layer_manager:register("Envelope",   { tiles = "EnvelopeTiles",  widgets = layer_widgets["Envelope"] })
-    layer_manager:register("Waveform",   { tiles = "WaveformTiles",  widgets = layer_widgets["Waveform"] })
-    layer_manager:register("Harmonics",  { tiles = "HarmonicsTiles", widgets = layer_widgets["Harmonics"] })
-    layer_manager:register("Modulation", { tiles = nil,              widgets = layer_widgets["Modulation"] })
-
-    _switch_layer("Waveform")
-
-    -- Test panels: 4 variants at different positions and sizes
-    test_panels = {}
-    table.insert(test_panels, widgets:create_panel({ x = 10,  y = 10,  width = 60,  height = 40,  variant = 0 }))
-    table.insert(test_panels, widgets:create_panel({ x = 80,  y = 10,  width = 80,  height = 50,  variant = 1 }))
-    table.insert(test_panels, widgets:create_panel({ x = 170, y = 10,  width = 50,  height = 60,  variant = 2 }))
-    table.insert(test_panels, widgets:create_panel({ x = 230, y = 10,  width = 100, height = 35,  variant = 3 }))
 end
 
 function _update()
@@ -404,7 +227,9 @@ function _update()
     if active_modal then
         active_modal:_update()
     else
-        layer_manager:update_widgets()
+        for w in all(all_widgets) do
+            w:_update()
+        end
     end
 
     on_repeat_update()
@@ -412,15 +237,12 @@ end
 
 function _draw()
     gfx.cls()
-   -- layer_manager:draw_base()
-   -- layer_manager:draw_active()
-    -- Draw test panels
-    for _, panel in ipairs(test_panels) do
-        panel:_draw()
+    map.draw("Background")
+    for w in all(all_widgets) do
+        w:_draw()
     end
-    -- Draw modals last so they appear on top of everything
     for _, modal in pairs(modals_by_name) do
-  --      modal:_draw()
+        modal:_draw()
     end
-   -- mouse._draw()
+    mouse._draw()
 end
