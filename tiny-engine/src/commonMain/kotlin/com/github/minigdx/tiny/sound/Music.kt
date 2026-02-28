@@ -86,7 +86,7 @@ val obos =
         decay = 0.1f,
         sustain = 0.9f,
         release = 0.05f,
-        harmonics = floatArrayOf(1f, 0.05f, 0.01f),
+        harmonics = floatArrayOf(1f, 0.05f, 0.01f, 0f, 0f, 0f, 0f),
     )
 
 val drum =
@@ -98,7 +98,7 @@ val drum =
         decay = 0.01f,
         sustain = 1.0f,
         release = 0.05f,
-        harmonics = floatArrayOf(1f),
+        harmonics = floatArrayOf(1f, 0f, 0f, 0f, 0f, 0f, 0f),
     )
 
 val bass =
@@ -147,5 +147,5 @@ val snare =
         decay = 0.08f,
         sustain = 0.1f,
         release = 0.05f,
-        harmonics = floatArrayOf(1.0f, 0.8f, 0.5f, 0.3f),
+        harmonics = floatArrayOf(1.0f, 0.8f, 0.5f, 0.3f, 0f, 0f, 0f),
     )

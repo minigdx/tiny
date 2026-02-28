@@ -134,12 +134,20 @@ class InstrumentLuaWrapper(
 
         wrap("harmonics") {
             WrapperLuaTable().apply {
-                (0 until instrument.harmonics.size).forEach { index ->
-                    wrap(
-                        "${index + 1}",
-                        { valueOf(instrument.harmonics[index].toDouble()) },
-                        { instrument.harmonics[index] = it.tofloat() },
-                    )
+                (0 until 7).forEach { index ->
+                    if (index < instrument.harmonics.size) {
+                        wrap(
+                            "${index + 1}",
+                            { valueOf(instrument.harmonics[index].toDouble()) },
+                            { instrument.harmonics[index] = it.tofloat() },
+                        )
+                    } else {
+                        wrap(
+                            "${index + 1}",
+                            { valueOf(0.0) },
+                            { },
+                        )
+                    }
                 }
             }
         }
