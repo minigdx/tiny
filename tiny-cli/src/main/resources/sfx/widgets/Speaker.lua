@@ -47,9 +47,14 @@ end
 Speaker._draw = function(self)
     local prev = spr.sheet(2)
 
-    -- draw speaker
-    spr.sdraw(self.x, self.y, 208, 0, 48, 96)
-    spr.sdraw(self.x + 48, self.y, 208, 0, 48, 96, true, false)
+    -- draw speaker (shake when playing)
+    local sx, sy = self.x, self.y
+    if self.playing then
+        sx = sx + math.random(-1, 1)
+        sy = sy + math.random(-1, 1)
+    end
+    spr.sdraw(sx, sy, 208, 0, 48, 96)
+    spr.sdraw(sx + 48, sy, 208, 0, 48, 96, true, false)
 
     -- draw note particles
     if self.particles then
