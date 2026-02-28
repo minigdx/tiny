@@ -11,19 +11,18 @@ Keyboard._update = function(self)
     local spr_y = 224
 
     local color_to_note = {
-        [0] = "C4",
-        [1] = "Cs4",
-        [4] = "D4",
-        [9] = "Ds4",
-        [11] = "E4",
-        [3] = "F4",
-        [5] = "Fs4",
-        [8] = "G4",
-        [2] = "Gs4",
-        [6] = "A4",
-        [7] = "As4",
-        -- B4: sprite uses wrong color (110,184,135), maps to palette 1 (same as Cs4)
-        -- Fix sprite-sheet.png to use palette 10 (#FFF1E8) for B4, then add: [10] = "B4"
+        [1] = "C4",
+        [2] = "Cs4",
+        [5] = "D4",
+        [10] = "Ds4",
+        [12] = "E4",
+        [4] = "F4",
+        [6] = "Fs4",
+        [9] = "G4",
+        [3] = "Gs4",
+        [7] = "A4",
+        [8] = "As4",
+        [13] = "B4",
     }
 
     local key_to_note = {

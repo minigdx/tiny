@@ -2928,7 +2928,10 @@
 									"id": "V_String",
 									"params": ["Yellow"]
 								}] },
-								{ "__identifier": "TinyExit", "__type": "String", "__value": null, "__tile": null, "defUid": 83, "realEditorValues": [] }
+								{ "__identifier": "TinyExit", "__type": "String", "__value": "tiny-sg", "__tile": null, "defUid": 83, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["tiny-sg"]
+								}] }
 							],
 							"__worldX": 96,
 							"__worldY": 4
