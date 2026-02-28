@@ -31,7 +31,6 @@ Fader._update = function(self)
                     self:on_press()
                 end
             end
-            -- Compute value from current Y
             local track_top = self.y + 8
             local track_bottom = self.y + self.height - 8
             local track_height = track_bottom - track_top
@@ -39,6 +38,14 @@ Fader._update = function(self)
             local percent = 1.0 - ((clamped_y - track_top) / track_height)
             local value = percent * percent
             self:set_value(value)
+        else
+            -- Mouse held but moved outside: unfocus so a new fader can take focus
+            if self.focused then
+                self.focused = false
+                if self.on_release then
+                    self:on_release()
+                end
+            end
         end
     else
         if self.focused then

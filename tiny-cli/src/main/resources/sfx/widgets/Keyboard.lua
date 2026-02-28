@@ -11,18 +11,19 @@ Keyboard._update = function(self)
     local spr_y = 224
 
     local color_to_note = {
-        [1] = "C4",
-        [3] = "Cs4",
+        [0] = "C4",
+        [1] = "Cs4",
         [4] = "D4",
-        [5] = "Ds4",
-        [8] = "E4",
-        [13] = "F4",
-        [12] = "Fs4",
-        [15] = "G4",
-        [11] = "Gs4",
-        [17] = "A4",
+        [9] = "Ds4",
+        [11] = "E4",
+        [3] = "F4",
+        [5] = "Fs4",
+        [8] = "G4",
+        [2] = "Gs4",
+        [6] = "A4",
         [7] = "As4",
-        [10] = "B4"
+        -- B4: sprite uses wrong color (110,184,135), maps to palette 1 (same as Cs4)
+        -- Fix sprite-sheet.png to use palette 10 (#FFF1E8) for B4, then add: [10] = "B4"
     }
 
     local key_to_note = {
@@ -47,7 +48,9 @@ Keyboard._update = function(self)
         local relative_x = pos.x - self.x
         local relative_y = pos.y - self.y
 
+        local prev = spr.sheet(2)
         local color = spr.pget(relative_x + spr_x, relative_y + spr_y)
+        spr.sheet(prev)
         value = color_to_note[color]
     else
         -- No mouse/touch input: check physical keyboard
@@ -76,7 +79,9 @@ Keyboard._update = function(self)
 end
 
 Keyboard._draw = function(self)
+    local prev = spr.sheet(2)
     spr.sdraw(self.x, self.y, 0, 192, self.width, self.height)
+    spr.sheet(prev)
 end
 
 return Keyboard

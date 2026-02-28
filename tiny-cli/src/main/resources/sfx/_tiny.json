@@ -23,7 +23,8 @@
     "#FFEA86",
     "#DEE7FC",
     "#FFF1E8",
-    "#FFFFFF"
+    "#FFFFFF",
+    "#6EB887"
   ],
   "scripts": [
     "tiny-instrument-editor.lua",

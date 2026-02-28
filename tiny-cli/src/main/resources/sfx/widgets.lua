@@ -140,6 +140,11 @@ factory.create_text_button = function(self, value)
     result.label = result.fields.Label or ""
     result.is_active = result.fields.IsActive or false
     result.variant = utils.variant_mapping[result.fields.Variant] or 0
+    if result.fields.TinyExit then
+        result.on_change = function(self)
+            tiny.exit(self.fields.TinyExit)
+        end
+    end
     return result
 end
 
