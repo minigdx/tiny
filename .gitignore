@@ -46,3 +46,5 @@ bin/
 /tiny-doc/src/docs/asciidoc/sample/sfx-editor
 
 .kotlin
+
+.idea
