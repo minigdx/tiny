@@ -1,40 +1,24 @@
-local on_update = function(self, listener)
-    table.insert(self.listeners, listener)
-end
+local utils = require("widgets.utils")
+local inside_widget = utils.inside_widget
 
-local fire_on_update = function(self, value)
-    for l in all(self.listeners) do
-        l(self, value)
-    end
-end
-
-local function inside_widget(w, x, y, offset)
-    local off = 0
-    if (offset) then
-        off = offset
-    end
-
-    return w.x - off <= x and
-            x <= w.x + w.width + off and
-            w.y - off <= y and
-            y <= w.y + w.height + off
-end
-
-local CHAR_WIDTH = 4
-local PADDING = 2
+local PADDING = 5
+local CURSOR_SX = 72
+local CURSOR_SY = 40
+local CURSOR_W = 4
+local CURSOR_H = 12
 
 local TextInput = {
     x = 0,
     y = 0,
     width = 32,
-    height = 8,
+    height = 32,
     value = "",
     focused = false,
     cursor = 0,
     enabled = true,
     listeners = {},
-    on_update = on_update,
-    fire_on_update = fire_on_update,
+    on_update = utils.on_update,
+    fire_on_update = utils.fire_on_update,
     cursor_blink = 0,
 }
 
@@ -115,30 +99,83 @@ TextInput._update = function(self)
 end
 
 TextInput._draw = function(self)
-    -- Draw background rect
-    local bg_color = 0
-    if self.focused then
-        bg_color = 1
-    end
-    shape.rectf(self.x, self.y, self.width, self.height, bg_color)
+    local prev = spr.sheet(2)
 
-    -- Draw border
-    local border_color = 6
-    if self.focused then
-        border_color = 7
-    end
-    shape.rect(self.x, self.y, self.width, self.height, border_color)
+    -- 9-patch background (White variant, flipped on both axes)
+    local sx = 24  -- White variant = 1 * 24
+    local sy = 0
+    local corner = 5
+    local edge = 14
 
-    -- Draw text
+    local inner_w = self.width - corner * 2
+    local inner_h = self.height - corner * 2
+
+    -- Corners (flipped: source positions swap)
+    spr.sdraw(self.x, self.y, sx + 19, sy + 19, corner, corner, true, true)
+    spr.sdraw(self.x + self.width - corner, self.y, sx, sy + 19, corner, corner, true, true)
+    spr.sdraw(self.x, self.y + self.height - corner, sx + 19, sy, corner, corner, true, true)
+    spr.sdraw(self.x + self.width - corner, self.y + self.height - corner, sx, sy, corner, corner, true, true)
+
+    -- Top edge (from bottom edge source, flipped)
+    local cx = 0
+    while cx < inner_w do
+        local tw = math.min(edge, inner_w - cx)
+        spr.sdraw(self.x + corner + cx, self.y, sx + 5, sy + 19, tw, corner, true, true)
+        cx = cx + tw
+    end
+
+    -- Bottom edge (from top edge source, flipped)
+    cx = 0
+    while cx < inner_w do
+        local tw = math.min(edge, inner_w - cx)
+        spr.sdraw(self.x + corner + cx, self.y + self.height - corner, sx + 5, sy, tw, corner, true, true)
+        cx = cx + tw
+    end
+
+    -- Left edge (from right edge source, flipped)
+    local cy = 0
+    while cy < inner_h do
+        local th = math.min(edge, inner_h - cy)
+        spr.sdraw(self.x, self.y + corner + cy, sx + 19, sy + 5, corner, th, true, true)
+        cy = cy + th
+    end
+
+    -- Right edge (from left edge source, flipped)
+    cy = 0
+    while cy < inner_h do
+        local th = math.min(edge, inner_h - cy)
+        spr.sdraw(self.x + self.width - corner, self.y + corner + cy, sx, sy + 5, corner, th, true, true)
+        cy = cy + th
+    end
+
+    -- Center fill (flipped)
+    cy = 0
+    while cy < inner_h do
+        local th = math.min(edge, inner_h - cy)
+        cx = 0
+        while cx < inner_w do
+            local tw = math.min(edge, inner_w - cx)
+            spr.sdraw(self.x + corner + cx, self.y + corner + cy, sx + 5, sy + 5, tw, th, true, true)
+            cx = cx + tw
+        end
+        cy = cy + th
+    end
+
+    -- Draw text with monogram font
     local text_x = self.x + PADDING
     local text_y = self.y + PADDING
-    print(self.value, text_x, text_y)
+    text.font("monogram")
+    text.print(self.value, text_x, text_y, 1)
 
-    -- Draw cursor (blinking line)
+    -- Draw sprite cursor (blinking)
     if self.focused and self.cursor_blink < 40 then
-        local cursor_x = text_x + self.cursor * CHAR_WIDTH
-        shape.line(cursor_x, self.y + 1, cursor_x, self.y + self.height - 2, 7)
+        local before_cursor = string.sub(self.value, 1, self.cursor)
+        local cursor_x = text_x + text.width(before_cursor)
+        spr.sdraw(cursor_x - 2, self.y + PADDING, CURSOR_SX, CURSOR_SY, CURSOR_W, CURSOR_H)
     end
+
+    text.font()
+    spr.sheet(prev)
 end
 
 TextInput.set_value = function(self, value)
