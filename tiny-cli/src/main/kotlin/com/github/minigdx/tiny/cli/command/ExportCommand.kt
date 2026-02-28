@@ -591,6 +591,16 @@ class GameExporter {
 
                         exportedFile += name
                     }
+                gameParameters.fonts
+                    .map { it.spritesheet }
+                    .filterNot { exportedFile.contains(it) }
+                    .forEach { name ->
+                        exportedGame.putNextEntry(ZipEntry(name))
+                        exportedGame.write(gameDirectory.resolve(name).readBytes())
+                        exportedGame.closeEntry()
+
+                        exportedFile += name
+                    }
                 listOfNotNull(gameParameters.sound)
                     .filterNot { exportedFile.contains(it) }
                     .forEach { name ->
