@@ -47,6 +47,7 @@ local Dropdown = require("widgets.Dropdown")
 local Modal = require("widgets.Modal")
 local TextInput = require("widgets.TextInput")
 local Panel = require("widgets.Panel")
+local TextButton = require("widgets.TextButton")
 local Speaker = require("widgets.Speaker")
 
 factory.create_mode_switch_component = function(self, value)
@@ -129,6 +130,14 @@ end
 
 factory.create_panel = function(self, value)
     local result = new(Panel, value)
+    result.label = result.fields.Label
+    return result
+end
+
+factory.create_text_button = function(self, value)
+    local result = new(TextButton, value)
+    result.label = result.fields.Label or ""
+    result.is_active = result.fields.IsActive or false
     return result
 end
 

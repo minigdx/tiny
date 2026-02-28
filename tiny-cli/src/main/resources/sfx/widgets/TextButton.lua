@@ -1,19 +1,50 @@
-local Panel = {
+local utils = require("widgets.utils")
+local inside_widget = utils.inside_widget
+
+local TextButton = {
     x = 0,
     y = 0,
     width = 48,
-    height = 48,
-    variant = 0,
+    height = 24,
+    label = "",
+    is_active = false,
+    enabled = true,
+    status = 0, -- 0 : idle ; 1 : over ; 2 : active
+    listeners = {},
+    on_update = utils.on_update,
+    fire_on_update = utils.fire_on_update,
 }
 
-Panel._update = function(self)
-    -- purely visual, no interaction
+TextButton._update = function(self)
+    if self.status == 2 then
+        return
+    end
+
+    local pos = ctrl.touch()
+
+    if inside_widget(self, pos.x, pos.y) then
+        self.status = 1
+        local touched = ctrl.touched(0)
+        if touched then
+            if (self.on_change) then
+                self:on_change()
+            end
+        end
+    else
+        self.status = 0
+    end
 end
 
-Panel._draw = function(self)
+TextButton._draw = function(self)
     local prev = spr.sheet(2)
 
-    local sx = self.variant * 24
+    -- Use variant 1 (sx=24) for idle, variant 0 (sx=0) for hover/active/is_active
+    local variant = 1
+    if self.status > 0 or self.is_active then
+        variant = 0
+    end
+
+    local sx = variant * 24
     local sy = 0
     local corner = 5
     local edge = 14
@@ -74,12 +105,14 @@ Panel._draw = function(self)
 
     spr.sheet(prev)
 
-    -- Render optional label
+    -- Render label centered
     if self.label and #self.label > 0 then
         text.font("monogram")
-        text.print(self.label, self.x + 4, self.y + 4, 1)
+        local tx = self.x + 4
+        local ty = self.y + 2
+        text.print(self.label, tx, ty, 1)
         text.font()
     end
 end
 
-return Panel
+return TextButton

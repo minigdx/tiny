@@ -70,6 +70,13 @@ function _init_panels(entities)
     end
 end
 
+function _init_text_buttons(entities)
+    for tb in all(entities["TextButton"]) do
+        local text_button = widgets:create_text_button(tb)
+        table.insert(all_widgets, text_button)
+    end
+end
+
 function _init_speakers(entities)
     for s in all(entities["Speaker"]) do
         local speaker = widgets:create_speaker(s)
@@ -250,6 +257,7 @@ function _init()
 
     -- Then all interactive widgets
     local widget_entities = map.entities("Widgets")
+    _init_text_buttons(widget_entities)
     _init_speakers(widget_entities)
     _init_knobs(widget_entities)
     _init_faders(widget_entities)

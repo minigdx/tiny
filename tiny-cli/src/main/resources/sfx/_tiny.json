@@ -52,6 +52,7 @@
     "widgets/Button.lua",
     "widgets/Modal.lua",
     "widgets/Panel.lua",
+    "widgets/TextButton.lua",
     "widgets/TextInput.lua",
     "widgets/Speaker.lua",
     "widgets/utils.lua"
@@ -75,14 +76,16 @@
         {
           "name": "ascii",
           "width": 6,
-          "height": 16,
+          "height": 12,
           "characters": [
             " !\"#$%&'()*+,-./",
             "0123456789:;<=>?",
             "@ABCDEFGHIJKLMNO",
             "PQRSTUVWXYZ[\\]^_",
             "`abcdefghijklmno",
-            "pqrstuvwxyz{|}~"
+            "pqrstuvwxyz{|}~",
+            "                ↑↓",
+            "                ←→"
           ]
         }
       ]
@@ -94,7 +97,7 @@
         {
           "name": "ascii",
           "width": 6,
-          "height": 16,
+          "height": 12,
           "characters": [
             " !\"#$%&'()*+,-./",
             "0123456789:;<=>?",
