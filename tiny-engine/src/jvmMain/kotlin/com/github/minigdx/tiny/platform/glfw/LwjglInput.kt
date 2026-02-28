@@ -3,6 +3,7 @@ package com.github.minigdx.tiny.platform.glfw
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
 import com.github.minigdx.tiny.input.Key
+import com.github.minigdx.tiny.input.KeyCode
 import com.github.minigdx.tiny.input.MouseProject
 import com.github.minigdx.tiny.input.TouchManager
 import com.github.minigdx.tiny.input.TouchSignal
@@ -28,9 +29,26 @@ import org.lwjgl.glfw.GLFWKeyCallback
 import org.lwjgl.glfw.GLFWMouseButtonCallback
 import org.lwjgl.glfw.GLFWWindowFocusCallback
 import java.nio.DoubleBuffer
+import java.util.concurrent.ConcurrentLinkedQueue
 
 class LwjglInput(private val projector: MouseProject) : InputHandler, InputManager {
     private val touchManager = TouchManager(UNKNOWN_KEY)
+
+    private sealed class RemoteKeyEvent {
+        data class Press(val keyCode: KeyCode) : RemoteKeyEvent()
+
+        data class Release(val keyCode: KeyCode) : RemoteKeyEvent()
+    }
+
+    private val remoteKeyEvents = ConcurrentLinkedQueue<RemoteKeyEvent>()
+
+    fun injectKeyPress(keyCode: KeyCode) {
+        remoteKeyEvents.add(RemoteKeyEvent.Press(keyCode))
+    }
+
+    fun injectKeyRelease(keyCode: KeyCode) {
+        remoteKeyEvents.add(RemoteKeyEvent.Release(keyCode))
+    }
 
     private var window: Long = 0
 
@@ -165,7 +183,18 @@ class LwjglInput(private val projector: MouseProject) : InputHandler, InputManag
         }
     }
 
-    override fun reset() = touchManager.processReceivedEvent()
+    override fun reset() {
+        // Drain remote key events into TouchManager (thread-safe: polled on game loop thread)
+        var event = remoteKeyEvents.poll()
+        while (event != null) {
+            when (event) {
+                is RemoteKeyEvent.Press -> touchManager.onKeyPressed(event.keyCode)
+                is RemoteKeyEvent.Release -> touchManager.onKeyReleased(event.keyCode)
+            }
+            event = remoteKeyEvents.poll()
+        }
+        touchManager.processReceivedEvent()
+    }
 
     override fun isKeyJustPressed(key: Key): Boolean =
         if (key == Key.ANY_KEY) {

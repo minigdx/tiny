@@ -78,6 +78,12 @@ class GlfwPlatform(
 
     private val lwjglInputHandler = LwjglInput(gameOptions)
 
+    /**
+     * Returns the input handler for remote control injection.
+     * Used by the debug server to inject key events from external programs.
+     */
+    fun remoteInput(): LwjglInput = lwjglInputHandler
+
     private val recordScope = CoroutineScope(Dispatchers.IO)
 
     /**

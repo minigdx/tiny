@@ -23,10 +23,13 @@ import com.github.minigdx.tiny.engine.GameEngine
 import com.github.minigdx.tiny.engine.GameEngineListener
 import com.github.minigdx.tiny.engine.TinyException
 import com.github.minigdx.tiny.file.CommonVirtualFileSystem
+import com.github.minigdx.tiny.input.Key
 import com.github.minigdx.tiny.log.LogLevel
 import com.github.minigdx.tiny.log.StdOutLogger
 import com.github.minigdx.tiny.lua.errorLine
 import com.github.minigdx.tiny.platform.glfw.GlfwPlatform
+import com.github.minigdx.tiny.platform.glfw.LwjglInput
+import com.github.minigdx.tiny.platform.glfw.keyCode
 import com.github.minigdx.tiny.resources.GameScript
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
@@ -35,7 +38,10 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondBytes
+import io.ktor.server.response.respondText
+import io.ktor.server.routing.RoutingContext
 import io.ktor.server.routing.get
+import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
 import io.ktor.server.websocket.WebSockets
 import io.ktor.server.websocket.webSocket
@@ -51,6 +57,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.luaj.vm2.LuaError
 import java.io.File
+import java.util.concurrent.atomic.AtomicReference
 import java.util.jar.JarInputStream
 import kotlin.system.exitProcess
 import kotlin.time.ExperimentalTime
@@ -99,9 +106,10 @@ class RunCommand : CliktCommand(name = "run") {
 
         val debugCommandReceiver = Channel<DebugRemoteCommand>()
         val engineCommandSender = Channel<EngineRemoteCommand>()
+        val remoteInput = AtomicReference<LwjglInput?>(null)
 
         val server = if (!noDebug) {
-            startDebugServer(effectiveGameDirectory, debugCommandReceiver, engineCommandSender)
+            startDebugServer(effectiveGameDirectory, debugCommandReceiver, engineCommandSender, remoteInput)
         } else {
             null
         }
@@ -158,6 +166,9 @@ class RunCommand : CliktCommand(name = "run") {
                         }
                     },
             )
+            // Set remote input reference for the debug server control endpoints
+            remoteInput.set((gameEngine.platform as GlfwPlatform).remoteInput())
+
             Runtime.getRuntime().addShutdownHook(
                 Thread {
                     gameEngine.end()
@@ -206,6 +217,7 @@ class RunCommand : CliktCommand(name = "run") {
         effectiveGameDirectory: File,
         debugCommandReceiver: Channel<DebugRemoteCommand>,
         engineCommandSender: Channel<EngineRemoteCommand>,
+        remoteInput: AtomicReference<LwjglInput?>,
     ): io.ktor.server.engine.EmbeddedServer<*, *> {
         val configFile = effectiveGameDirectory.resolve("_tiny.json")
         val staticResources = loadDebuggerResources()
@@ -332,14 +344,97 @@ class RunCommand : CliktCommand(name = "run") {
                         call.respond(HttpStatusCode.NotFound)
                     }
                 }
+
+                // --- Remote control endpoints ---
+
+                get("/control/keys") {
+                    val keyNames = Key.entries
+                        .filter { it != Key.ANY_KEY }
+                        .joinToString(",", "[", "]") { "\"${it.name}\"" }
+                    call.respondText(keyNames, ContentType.Application.Json)
+                }
+
+                post("/control/press") {
+                    withKeyInput(remoteInput) { input, key ->
+                        input.injectKeyPress(key.keyCode)
+                        call.respondText(
+                            """{"ok":true,"action":"press","key":"${key.name}"}""",
+                            ContentType.Application.Json,
+                        )
+                    }
+                }
+
+                post("/control/release") {
+                    withKeyInput(remoteInput) { input, key ->
+                        input.injectKeyRelease(key.keyCode)
+                        call.respondText(
+                            """{"ok":true,"action":"release","key":"${key.name}"}""",
+                            ContentType.Application.Json,
+                        )
+                    }
+                }
+
+                post("/control/tap") {
+                    withKeyInput(remoteInput) { input, key ->
+                        val kc = key.keyCode
+                        input.injectKeyPress(kc)
+                        launch {
+                            delay(50)
+                            input.injectKeyRelease(kc)
+                        }
+                        call.respondText(
+                            """{"ok":true,"action":"tap","key":"${key.name}"}""",
+                            ContentType.Application.Json,
+                        )
+                    }
+                }
             }
         }.start()
 
         val debuggerAddress = "http://localhost:$debug"
         echo("\uD83D\uDC1B === Debug server started on port '$debug' ===")
         echo("\uD83D\uDC1B === Debugger webapp: $debuggerAddress ===")
+        echo("\uD83C\uDFAE === Remote control: $debuggerAddress/control/keys ===")
 
         return server
+    }
+
+    private suspend fun RoutingContext.withKeyInput(
+        remoteInput: AtomicReference<LwjglInput?>,
+        action: suspend RoutingContext.(LwjglInput, Key) -> Unit,
+    ) {
+        val input = remoteInput.get()
+        if (input == null) {
+            call.respondText(
+                """{"error":"Engine not ready"}""",
+                ContentType.Application.Json,
+                HttpStatusCode.ServiceUnavailable,
+            )
+            return
+        }
+        val keyName = call.request.queryParameters["key"]
+        if (keyName == null) {
+            call.respondText(
+                """{"error":"Missing 'key' query parameter"}""",
+                ContentType.Application.Json,
+                HttpStatusCode.BadRequest,
+            )
+            return
+        }
+        val key = try {
+            Key.valueOf(keyName)
+        } catch (_: IllegalArgumentException) {
+            null
+        }
+        if (key == null || key == Key.ANY_KEY) {
+            call.respondText(
+                """{"error":"Unknown key: $keyName"}""",
+                ContentType.Application.Json,
+                HttpStatusCode.BadRequest,
+            )
+            return
+        }
+        action(input, key)
     }
 
     private fun loadDebuggerResources(): Map<String, ByteArray> {
