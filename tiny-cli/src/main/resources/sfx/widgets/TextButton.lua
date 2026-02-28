@@ -9,6 +9,7 @@ local TextButton = {
     label = "",
     is_active = false,
     enabled = true,
+    variant = 0,
     status = 0, -- 0 : idle ; 1 : over ; 2 : active
     listeners = {},
     on_update = utils.on_update,
@@ -16,7 +17,7 @@ local TextButton = {
 }
 
 TextButton._update = function(self)
-    if self.status == 2 then
+    if self.status == 2 or self.is_active then
         return
     end
 
@@ -38,13 +39,14 @@ end
 TextButton._draw = function(self)
     local prev = spr.sheet(2)
 
-    -- Use variant 1 (sx=24) for idle, variant 0 (sx=0) for hover/active/is_active
-    local variant = 1
-    if self.status > 0 or self.is_active then
-        variant = 0
+    local draw_variant
+    if self.is_active or self.status > 0 then
+        draw_variant = self.variant
+    else
+        draw_variant = 3  -- HardBlue as idle color
     end
 
-    local sx = variant * 24
+    local sx = draw_variant * 24
     local sy = 0
     local corner = 5
     local edge = 14

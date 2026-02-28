@@ -131,6 +131,7 @@ end
 factory.create_panel = function(self, value)
     local result = new(Panel, value)
     result.label = result.fields.Label
+    result.variant = utils.variant_mapping[result.fields.Variant] or 0
     return result
 end
 
@@ -138,6 +139,7 @@ factory.create_text_button = function(self, value)
     local result = new(TextButton, value)
     result.label = result.fields.Label or ""
     result.is_active = result.fields.IsActive or false
+    result.variant = utils.variant_mapping[result.fields.Variant] or 0
     return result
 end
 

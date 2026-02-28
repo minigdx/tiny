@@ -35,4 +35,15 @@ utils.set_value = function(self, value)
     self:fire_on_update(value)
 end
 
+utils.variant_mapping = {
+    LigthBlue = 0,
+    White = 1,
+    Yellow = 2,
+    HardBlue = 3,
+    Red = 4,
+    Green = 5,
+    Orange = 6,
+    Purple = 7,
+}
+
 return utils

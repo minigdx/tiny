@@ -2007,7 +2007,7 @@
 					"acceptFileTypes": null,
 					"defaultOverride": {
 						"id": "V_String",
-						"params": ["Unnamed"]
+						"params": ["LigthBlue"]
 					},
 					"textLanguageMode": null,
 					"symmetricalRef": false,
@@ -2264,7 +2264,7 @@
 					"acceptFileTypes": null,
 					"defaultOverride": {
 						"id": "V_String",
-						"params": ["Unnamed"]
+						"params": ["HardBlue"]
 					},
 					"textLanguageMode": null,
 					"symmetricalRef": false,
@@ -2296,8 +2296,8 @@
 			"customData": [],
 			"savedSelections": [],
 			"cachedPixelData": {
-				"opaqueTiles": "0000000000000000000000000000000001001001001001001001001000001111000000000000000000000000000011111000000000000000000000000001111110000000000000000000000000011111100000000000000000000000000111110000000000000000000000000001111100000000000000000000000000011111000000000000000000000000000111110000000000000000000000000000111100000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000111000000000000000000000000000001110000000000000000000000000000011100000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-				"averageColors": "bccddcdebbbdbddddeeebcddbdc7ded8bcc8b9abd9acb89bbc88dd78bc78b9cad9dab8babca9deb9bca9b99cda9cb98b000000000000245644577456c678f89adcdefdefdbcddeeeffffddddded8ffe8ddc8d9acf8acd89bdd78ff66dd67d9daf8ead8cadeb9ffb8dda8da9cfa9cd98b000000000000d568f668fbbcfabcf99abbbcdbcdbabcbccdddddbbccbcb8ddc8bbb8b89bd89bb78abc78dd67bb67b8bad8cab7b9bca8dda8bb98b98bd98bb87b000000000000d567fccdf88af789f789f6793fd80000b868b868b689b689b888b888b888b888b679b67900000000000000000000000000000000000000000000000000003456faacf99af889f889f9abf679778a0000b868b868b689b689b888b888b888b888b679b67900000000000000000000000000000000000000000000000000008456fbbdf99af99afccdfffff679bbbc0000e8ba1456eb8914563ccc8bbb000000000000000000000000000000000000000000000000000000000000000000009456fbcdf9abfaabf889fddd000000000000145600001456000079aa1dee000000000000000000000000000000000000000000000000000000000000000000008456fbcdfabcfabcf899f446000000000000000000001def00001def00001def1def00001def00001def000000000000000000000000000000000000000000004456fabcfbcdfbbdfbcdf9aa0000000000001def00001def000000000000000000000000000000001def00001def0000000000000000000000000000000000000000f668fccefccdfccdfccd0000000000001f660f661fb81fb828ea00001fe81fe818ac08ac2fad2fad2a9c3a9c0000000000000000000000000000000000000000f568f778fccdfcdefcce0000000000000f661f661fb81fb818ea28ea2fe81fe8000018ac00003fad2a9c3a9c0000000000000000000000000000000000000000455764578457e889f9ab0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000245600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e87af98be87a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f98bfa9cf98b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f87af98bf87a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f89bf8acf89b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e78af78ae78a000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+				"opaqueTiles": "0000000000000000000000000000000001001001001001001001001000001111000000000000000000000000000011111000000000000000000000000001111110000000000000000000000000011111100000000000000000000000000111110000000000000000000000000001111100000000000000000000000000011111000000000000000000000000000111110000000000000000000000000000111100000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000111000000000000000000000000000001110000000000000000000000000000011100000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001111111111110000000000000000000011111111111100000000000000000000000000000000000000000000000000000000000000000000000000000000000011111111111100000000000000000000111111111111000000000000000000000000000000000000000000000000000",
+				"averageColors": "bccddcdebbbdbddddeeebcddbdc7ded8bcc8b9abd9acb89bbc88dd78bc78b9cad9dab8babca9deb9bca9b99cda9cb98b000000000000245644577456c678f89adcdefdefdbcddeeeffffddddded8ffe8ddc8d9acf8acd89bdd78ff66dd67d9daf8ead8cadeb9ffb8dda8da9cfa9cd98b000000000000d568f668fbbcfabcf99abbbcdbcdbabcbccdddddbbccbcb8ddc8bbb8b89bd89bb78abc78dd67bb67b8bad8cab7b9bca8dda8bb98b98bd98bb87b000000000000d567fccdf88af789f789f6793fd80000b868b868b689b689b888b888b888b888b679b67900000000000000000000000000000000000000000000000000003456faacf99af889f889f9abf679778a0000b868b868b689b689b888b888b888b888b679b67900000000000000000000000000000000000000000000000000008456fbbdf99af99afccdfffff679bbbc0000e8ba1456eb8914563ccc8bbb000000000000000000000000000000000000000000000000000000000000000000009456fbcdf9abfaabf889fddd000000000000145600001456000079aa1dee000000000000000000000000000000000000000000000000000000000000000000008456fbcdfabcfabcf899f446000000000000000000001def00001def00001def1def00001def00001def000000000000000000000000000000000000000000004456fabcfbcdfbbdfbcdf9aa0000000000001def00001def000000000000000000000000000000001def00001def0000000000000000000000000000000000000000f668fccefccdfccdfccd0000000000001f660f661fb81fb828ea00001fe81fe818ac08ac2fad2fad2a9c3a9c0000000000000000000000000000000000000000f568f778fccdfcdefcce0000000000000f661f661fb81fb818ea28ea2fe81fe8000018ac00003fad2a9c3a9c0000000000000000000000000000000000000000455764578457e889f9ab0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000245600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e87af98be87a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f98bfa9cf98b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f87af98bf87a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f89bf8acf89b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e78af78ae78a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000bddcd888d888d888d888deeddddcd888d888d888d888d888d888bddc000000000000000000000000000000000000000000000000000000000000000000000000deedf888f888f888f888fffdfeedf888f888f888f888f888f888deed000000000000000000000000000000000000000000000000000000000000000000000000deedfffdfeedfffdfeedfffdfeedfffdfeedfeedfffdfffdfeeddeed000000000000000000000000000000000000000000000000000000000000000000000000bddcdeeddddcdeeddddcdeeddddcdeeddddcdddcdeeddeeddddcbddc000000000000000000000000000000000000000000000000000000000000000000000000b456d679d78bdcdedeefdfffda9cd9dbdaeadf96df78dfb9ddb8b6b8000000000000000000000000000000000000000000000000000000000000000000000000d456f679f78bfcdefeeffffffa9cf9dbfaeaff96ff78ffb9fdb8d6b8000000000000000000000000000000000000000000000000000000000000000000000000d456f446f8acf8acfeeffffffa9cfa9cffe8ffe8ffadffadf6b8d6b8000000000000000000000000000000000000000000000000000000000000000000000000b456d456d8acd8acdeefdfffda9cda9cdfe8dfe8dfaddfadd6b8b6b8000000000000000000000000000000000000000000000000000000000000000000000000"
 			}
 		}
 	], "enums": [
@@ -2857,7 +2857,10 @@
 									"id": "V_Bool",
 									"params": [ true ]
 								}] },
-								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": null, "__tile": null, "defUid": 82, "realEditorValues": [] }
+								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "Green", "__tile": null, "defUid": 82, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Green"]
+								}] }
 							],
 							"__worldX": 4,
 							"__worldY": 4
@@ -2883,10 +2886,157 @@
 									"id": "V_Bool",
 									"params": [ false ]
 								}] },
-								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": null, "__tile": null, "defUid": 82, "realEditorValues": [] }
+								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "Yellow", "__tile": null, "defUid": 82, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Yellow"]
+								}] }
 							],
 							"__worldX": 96,
 							"__worldY": 4
+						},
+						{
+							"__identifier": "Button",
+							"__grid": [0,10],
+							"__pivot": [0,0],
+							"__tags": ["Widget"],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"iid": "cbbbe5c0-fa90-11f0-8348-2d04cba85dc2",
+							"width": 16,
+							"height": 16,
+							"defUid": 1,
+							"px": [4,80],
+							"fieldInstances": [
+								{ "__identifier": "Modal", "__type": "String", "__value": null, "__tile": null, "defUid": 13, "realEditorValues": [] },
+								{ "__identifier": "IconName", "__type": "LocalEnum.Icon", "__value": "Sine", "__tile": null, "defUid": 15, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Sine"]
+								}] },
+								{ "__identifier": "Action", "__type": "LocalEnum.Action", "__value": null, "__tile": null, "defUid": 18, "realEditorValues": [] },
+								{ "__identifier": "Layer", "__type": "String", "__value": null, "__tile": null, "defUid": 28, "realEditorValues": [] }
+							],
+							"__worldX": 4,
+							"__worldY": 80
+						},
+						{
+							"__identifier": "Button",
+							"__grid": [2,10],
+							"__pivot": [0,0],
+							"__tags": ["Widget"],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"iid": "cc665690-fa90-11f0-8348-1d6ab18c35d2",
+							"width": 16,
+							"height": 16,
+							"defUid": 1,
+							"px": [20,80],
+							"fieldInstances": [
+								{ "__identifier": "Modal", "__type": "String", "__value": null, "__tile": null, "defUid": 13, "realEditorValues": [] },
+								{ "__identifier": "IconName", "__type": "LocalEnum.Icon", "__value": "Triangle", "__tile": null, "defUid": 15, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Triangle"]
+								}] },
+								{ "__identifier": "Action", "__type": "LocalEnum.Action", "__value": null, "__tile": null, "defUid": 18, "realEditorValues": [] },
+								{ "__identifier": "Layer", "__type": "String", "__value": null, "__tile": null, "defUid": 28, "realEditorValues": [] }
+							],
+							"__worldX": 20,
+							"__worldY": 80
+						},
+						{
+							"__identifier": "Button",
+							"__grid": [4,10],
+							"__pivot": [0,0],
+							"__tags": ["Widget"],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"iid": "cd0cf6d0-fa90-11f0-8348-a7946f5e4c7f",
+							"width": 16,
+							"height": 16,
+							"defUid": 1,
+							"px": [36,80],
+							"fieldInstances": [
+								{ "__identifier": "Modal", "__type": "String", "__value": null, "__tile": null, "defUid": 13, "realEditorValues": [] },
+								{ "__identifier": "IconName", "__type": "LocalEnum.Icon", "__value": "Pulse", "__tile": null, "defUid": 15, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Pulse"]
+								}] },
+								{ "__identifier": "Action", "__type": "LocalEnum.Action", "__value": null, "__tile": null, "defUid": 18, "realEditorValues": [] },
+								{ "__identifier": "Layer", "__type": "String", "__value": null, "__tile": null, "defUid": 28, "realEditorValues": [] }
+							],
+							"__worldX": 36,
+							"__worldY": 80
+						},
+						{
+							"__identifier": "Button",
+							"__grid": [6,10],
+							"__pivot": [0,0],
+							"__tags": ["Widget"],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"iid": "cdcceb70-fa90-11f0-8348-df9dafe386da",
+							"width": 16,
+							"height": 16,
+							"defUid": 1,
+							"px": [52,80],
+							"fieldInstances": [
+								{ "__identifier": "Modal", "__type": "String", "__value": null, "__tile": null, "defUid": 13, "realEditorValues": [] },
+								{ "__identifier": "IconName", "__type": "LocalEnum.Icon", "__value": "Noise", "__tile": null, "defUid": 15, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Noise"]
+								}] },
+								{ "__identifier": "Action", "__type": "LocalEnum.Action", "__value": null, "__tile": null, "defUid": 18, "realEditorValues": [] },
+								{ "__identifier": "Layer", "__type": "String", "__value": null, "__tile": null, "defUid": 28, "realEditorValues": [] }
+							],
+							"__worldX": 52,
+							"__worldY": 80
+						},
+						{
+							"__identifier": "Button",
+							"__grid": [8,10],
+							"__pivot": [0,0],
+							"__tags": ["Widget"],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"iid": "ce79f450-fa90-11f0-8348-fdf3dd47b3a8",
+							"width": 16,
+							"height": 16,
+							"defUid": 1,
+							"px": [70,80],
+							"fieldInstances": [
+								{ "__identifier": "Modal", "__type": "String", "__value": null, "__tile": null, "defUid": 13, "realEditorValues": [] },
+								{ "__identifier": "IconName", "__type": "LocalEnum.Icon", "__value": "Square", "__tile": null, "defUid": 15, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Square"]
+								}] },
+								{ "__identifier": "Action", "__type": "LocalEnum.Action", "__value": null, "__tile": null, "defUid": 18, "realEditorValues": [] },
+								{ "__identifier": "Layer", "__type": "String", "__value": null, "__tile": null, "defUid": 28, "realEditorValues": [] }
+							],
+							"__worldX": 70,
+							"__worldY": 80
+						},
+						{
+							"__identifier": "Button",
+							"__grid": [10,10],
+							"__pivot": [0,0],
+							"__tags": ["Widget"],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"iid": "cf1a2bf0-fa90-11f0-8348-c74e561b7b5c",
+							"width": 16,
+							"height": 16,
+							"defUid": 1,
+							"px": [84,80],
+							"fieldInstances": [
+								{ "__identifier": "Modal", "__type": "String", "__value": null, "__tile": null, "defUid": 13, "realEditorValues": [] },
+								{ "__identifier": "IconName", "__type": "LocalEnum.Icon", "__value": "Sawtooth", "__tile": null, "defUid": 15, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Sawtooth"]
+								}] },
+								{ "__identifier": "Action", "__type": "LocalEnum.Action", "__value": null, "__tile": null, "defUid": 18, "realEditorValues": [] },
+								{ "__identifier": "Layer", "__type": "String", "__value": null, "__tile": null, "defUid": 28, "realEditorValues": [] }
+							],
+							"__worldX": 84,
+							"__worldY": 80
 						}
 					]
 				},
@@ -2927,7 +3077,7 @@
 							"defUid": 71,
 							"px": [104,32],
 							"fieldInstances": [
-								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": null, "__tile": null, "defUid": 74, "realEditorValues": [] },
+								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "LigthBlue", "__tile": { "tilesetUid": 72, "x": 0, "y": 0, "w": 24, "h": 24 }, "defUid": 74, "realEditorValues": [] },
 								{ "__identifier": "Label", "__type": "String", "__value": null, "__tile": null, "defUid": 81, "realEditorValues": [] }
 							],
 							"__worldX": 104,
@@ -2946,7 +3096,7 @@
 							"defUid": 71,
 							"px": [104,72],
 							"fieldInstances": [
-								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": null, "__tile": null, "defUid": 74, "realEditorValues": [] },
+								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "LigthBlue", "__tile": { "tilesetUid": 72, "x": 0, "y": 0, "w": 24, "h": 24 }, "defUid": 74, "realEditorValues": [] },
 								{ "__identifier": "Label", "__type": "String", "__value": null, "__tile": null, "defUid": 81, "realEditorValues": [] }
 							],
 							"__worldX": 104,
@@ -2965,7 +3115,7 @@
 							"defUid": 71,
 							"px": [8,72],
 							"fieldInstances": [
-								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": null, "__tile": null, "defUid": 74, "realEditorValues": [] },
+								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "LigthBlue", "__tile": { "tilesetUid": 72, "x": 0, "y": 0, "w": 24, "h": 24 }, "defUid": 74, "realEditorValues": [] },
 								{ "__identifier": "Label", "__type": "String", "__value": null, "__tile": null, "defUid": 81, "realEditorValues": [] }
 							],
 							"__worldX": 8,
@@ -2984,7 +3134,7 @@
 							"defUid": 71,
 							"px": [288,72],
 							"fieldInstances": [
-								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": null, "__tile": null, "defUid": 74, "realEditorValues": [] },
+								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "LigthBlue", "__tile": { "tilesetUid": 72, "x": 0, "y": 0, "w": 24, "h": 24 }, "defUid": 74, "realEditorValues": [] },
 								{ "__identifier": "Label", "__type": "String", "__value": null, "__tile": null, "defUid": 81, "realEditorValues": [] }
 							],
 							"__worldX": 288,
@@ -3003,7 +3153,7 @@
 							"defUid": 71,
 							"px": [8,96],
 							"fieldInstances": [
-								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": null, "__tile": null, "defUid": 74, "realEditorValues": [] },
+								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "LigthBlue", "__tile": { "tilesetUid": 72, "x": 0, "y": 0, "w": 24, "h": 24 }, "defUid": 74, "realEditorValues": [] },
 								{ "__identifier": "Label", "__type": "String", "__value": "Harmonics", "__tile": null, "defUid": 81, "realEditorValues": [{
 									"id": "V_String",
 									"params": ["Harmonics"]
@@ -3025,7 +3175,7 @@
 							"defUid": 71,
 							"px": [104,168],
 							"fieldInstances": [
-								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": null, "__tile": null, "defUid": 74, "realEditorValues": [] },
+								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "LigthBlue", "__tile": { "tilesetUid": 72, "x": 0, "y": 0, "w": 24, "h": 24 }, "defUid": 74, "realEditorValues": [] },
 								{ "__identifier": "Label", "__type": "String", "__value": null, "__tile": null, "defUid": 81, "realEditorValues": [] }
 							],
 							"__worldX": 104,
@@ -3044,7 +3194,7 @@
 							"defUid": 71,
 							"px": [128,200],
 							"fieldInstances": [
-								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": null, "__tile": null, "defUid": 74, "realEditorValues": [] },
+								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "LigthBlue", "__tile": { "tilesetUid": 72, "x": 0, "y": 0, "w": 24, "h": 24 }, "defUid": 74, "realEditorValues": [] },
 								{ "__identifier": "Label", "__type": "String", "__value": null, "__tile": null, "defUid": 81, "realEditorValues": [] }
 							],
 							"__worldX": 128,

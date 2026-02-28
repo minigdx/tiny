@@ -2,11 +2,13 @@ local widgets = require("widgets")
 local mouse = require("mouse")
 local wire = require("wire")
 local ModeSwitch = require("widgets/ModeSwitch")
+local LayerManager = require("layers")
 
 local all_widgets = {}
 local modals_by_name = {}
 local dropdown_widget = nil
 local speaker_widgets = {}
+local layer_manager = nil
 
 local state = {
     instrument = nil,
@@ -206,6 +208,19 @@ function _init_dropdowns(entities)
 
         dropdown_widget = dropdown
 
+        local original_update = dropdown._update
+        dropdown._update = function(self)
+            local was_open = self.open
+            original_update(self)
+            if layer_manager then
+                if self.open and not was_open then
+                    layer_manager:set_overlay(self)
+                elseif not self.open and was_open then
+                    layer_manager:set_overlay(nil)
+                end
+            end
+        end
+
         table.insert(all_widgets, dropdown)
     end
 end
@@ -247,6 +262,7 @@ function _init()
     modals_by_name = {}
     dropdown_widget = nil
     speaker_widgets = {}
+    layer_manager = nil
 
     map.level("InstrumentEditor")
     state.instrument = sfx.instrument(0)
@@ -267,6 +283,9 @@ function _init()
     _init_keyboard(widget_entities)
     _init_envelop(widget_entities)
     _init_harmonics(widget_entities)
+
+    layer_manager = LayerManager.create()
+    layer_manager:register("Widgets", { tiles = nil, widgets = all_widgets, always = true })
 end
 
 function _update()
@@ -283,9 +302,7 @@ function _update()
     if active_modal then
         active_modal:_update()
     else
-        for w in all(all_widgets) do
-            w:_update()
-        end
+        layer_manager:update_widgets()
     end
 
     on_repeat_update()
@@ -294,9 +311,8 @@ end
 function _draw()
     gfx.cls()
     map.draw("Background")
-    for w in all(all_widgets) do
-        w:_draw()
-    end
+    layer_manager:draw_base()
+    layer_manager:draw_active()
     for _, modal in pairs(modals_by_name) do
         modal:_draw()
     end
