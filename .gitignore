@@ -8,8 +8,7 @@ build/
 .test/
 
 ### IntelliJ IDEA ###
-.idea/**
-.idea/
+.idea
 *.iws
 *.iml
 *.ipr
@@ -46,5 +45,3 @@ bin/
 /tiny-doc/src/docs/asciidoc/sample/sfx-editor
 
 .kotlin
-
-.idea
