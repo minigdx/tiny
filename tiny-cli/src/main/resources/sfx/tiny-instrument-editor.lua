@@ -1,7 +1,6 @@
 local widgets = require("widgets")
-local mouse = require("mouse")
 local wire = require("wire")
-local ModeSwitch = require("widgets/ModeSwitch")
+local EditorBase = require("editor-base")
 local LayerManager = require("layers")
 
 local all_widgets = {}
@@ -10,8 +9,7 @@ local dropdown_widget = nil
 local speaker_widgets = {}
 local layer_manager = nil
 
-local save_dirty = false
-local next_shake_time = 0
+local save_state = nil
 local save_button_ref = nil
 
 local state = {
@@ -66,37 +64,6 @@ local on_repeat_update = function()
             state.instrument.note_on("C4")
             state.next_note_off = state.instrument.attack + state.instrument.decay
         end
-    end
-end
-
-function _init_panels(entities)
-    for p in all(entities["Panel"]) do
-        local panel = widgets:create_panel(p)
-        table.insert(all_widgets, panel)
-    end
-end
-
-function _init_text_buttons(entities)
-    for tb in all(entities["TextButton"]) do
-        local text_button = widgets:create_text_button(tb)
-
-        if text_button.fields.Action == "Save" then
-            save_button_ref = text_button
-            text_button.on_change = function()
-                sfx.save()
-                save_dirty = false
-            end
-        end
-
-        table.insert(all_widgets, text_button)
-    end
-end
-
-function _init_speakers(entities)
-    for s in all(entities["Speaker"]) do
-        local speaker = widgets:create_speaker(s)
-        table.insert(all_widgets, speaker)
-        table.insert(speaker_widgets, speaker)
     end
 end
 
@@ -157,51 +124,6 @@ function _init_harmonics(entities)
     end
 end
 
-function _init_buttons(entities)
-    for b in all(entities["Button"]) do
-        local button = widgets:create_button(b)
-
-        if button.fields.Modal then
-            local modal_name = button.fields.Modal
-
-            if not modals_by_name[modal_name] then
-                local modal = widgets:create_modal({
-                    x = 96,
-                    y = 64,
-                    width = 192,
-                    height = 128,
-                    level_name = modal_name,
-                    fields = {},
-                })
-                modals_by_name[modal_name] = modal
-            end
-
-            button.on_change = function()
-                local target = modals_by_name[modal_name]
-                if target then
-                    target:open(state.instrument.name)
-                end
-            end
-        end
-
-        table.insert(all_widgets, button)
-    end
-
-    local name_modal = modals_by_name["NameModal"]
-    if name_modal then
-        name_modal.on_validate = function(self, value)
-            if value and state.instrument then
-                state.instrument.name = value
-                if dropdown_widget then
-                    local idx = dropdown_widget.selected
-                    dropdown_widget.options[idx] = "[" .. (idx - 1) .. "] " .. value
-                    dropdown_widget:_init()
-                end
-            end
-        end
-    end
-end
-
 function _init_wave_type(entities)
     local buttonToWave = function(wave_type)
         return {
@@ -236,49 +158,6 @@ function _init_wave_type(entities)
     end
 end
 
-function _init_dropdowns(entities)
-    for d in all(entities["Dropdown"]) do
-        local dropdown = widgets:create_dropdown(d)
-
-        if #dropdown.options == 0 then
-            for i = 0, 7 do
-                local instr = sfx.instrument(i)
-                local name = instr.name or ("Instrument " .. i)
-                table.insert(dropdown.options, "[" .. i .. "] " .. name)
-            end
-            dropdown:_init()
-        end
-
-        dropdown.on_change = function(self)
-            state.instrument = sfx.instrument(self.selected - 1)
-        end
-
-        dropdown_widget = dropdown
-
-        local original_update = dropdown._update
-        dropdown._update = function(self)
-            local was_open = self.open
-            original_update(self)
-            if layer_manager then
-                if self.open and not was_open then
-                    layer_manager:set_overlay(self)
-                elseif not self.open and was_open then
-                    layer_manager:set_overlay(nil)
-                end
-            end
-        end
-
-        table.insert(all_widgets, dropdown)
-    end
-end
-
-function _init_mode_switch(entities)
-    for mode in all(entities["ModeSwitch"]) do
-        local button = new(ModeSwitch, mode)
-        table.insert(all_widgets, button)
-    end
-end
-
 function _init_keyboard(entities)
     local currentNote
     local playNote = function(_, value)
@@ -304,45 +183,13 @@ function _init_keyboard(entities)
     end
 end
 
-function _mark_dirty()
-    save_dirty = true
-    next_shake_time = tiny.t + 15
-end
-
-function _init_save_reminder()
-    if not save_button_ref then return end
-
-    for _, w in ipairs(all_widgets) do
-        if w ~= save_button_ref then
-            local orig = w.on_change
-            if orig then
-                w.on_change = function(self, ...)
-                    _mark_dirty()
-                    return orig(self, ...)
-                end
-            end
-        end
-    end
-
-    for _, modal in pairs(modals_by_name) do
-        local orig_validate = modal.on_validate
-        if orig_validate then
-            modal.on_validate = function(self, ...)
-                _mark_dirty()
-                return orig_validate(self, ...)
-            end
-        end
-    end
-end
-
 function _init()
     all_widgets = {}
     modals_by_name = {}
     dropdown_widget = nil
     speaker_widgets = {}
     layer_manager = nil
-    save_dirty = false
-    next_shake_time = 0
+    save_state = nil
     save_button_ref = nil
 
     map.level("InstrumentEditor")
@@ -350,18 +197,39 @@ function _init()
 
     -- Panels first (drawn behind everything)
     local panel_entities = map.entities("Panels")
-    _init_panels(panel_entities)
+    EditorBase.init_panels(panel_entities, all_widgets)
 
     -- Then all interactive widgets
     local widget_entities = map.entities("Widgets")
-    _init_text_buttons(widget_entities)
-    _init_speakers(widget_entities)
+
+    local buttons_by_action = EditorBase.init_text_buttons(widget_entities, all_widgets)
+    save_button_ref = buttons_by_action["Save"]
+
+    EditorBase.init_speakers(widget_entities, all_widgets, speaker_widgets)
     _init_knobs(widget_entities)
     _init_faders(widget_entities)
-    _init_buttons(widget_entities)
+
+    modals_by_name = EditorBase.init_buttons(widget_entities, all_widgets, {
+        on_open = function() return state.instrument.name end,
+        on_name_validate = function(value)
+            if value and state.instrument then
+                state.instrument.name = value
+                EditorBase.update_dropdown_name(dropdown_widget, value)
+            end
+        end,
+    })
+
     _init_wave_type(widget_entities)
-    _init_dropdowns(widget_entities)
-    _init_mode_switch(widget_entities)
+
+    dropdown_widget = EditorBase.init_entity_dropdown(widget_entities, all_widgets, {
+        count = 8,
+        fetch = function(i) return sfx.instrument(i) end,
+        label = "Instrument",
+        on_select = function(index) state.instrument = sfx.instrument(index) end,
+        layer_manager = nil, -- set after layer_manager is created
+    })
+
+    EditorBase.init_mode_switch(widget_entities, all_widgets)
     _init_keyboard(widget_entities)
     _init_envelop(widget_entities)
     _init_harmonics(widget_entities)
@@ -369,41 +237,36 @@ function _init()
     layer_manager = LayerManager.create()
     layer_manager:register("Widgets", { tiles = nil, widgets = all_widgets, always = true })
 
-    _init_save_reminder()
-end
-
-function _update()
-    mouse._update(function() end, function() end, function() end)
-
-    if save_dirty and save_button_ref and tiny.t >= next_shake_time then
-        save_button_ref:shake()
-        next_shake_time = tiny.t + 15
-    end
-
-    local active_modal
-    for _, modal in pairs(modals_by_name) do
-        if modal.visible then
-            active_modal = modal
-            break
+    -- Wire dropdown overlay after layer_manager is created
+    if dropdown_widget then
+        local original_update = dropdown_widget._update
+        dropdown_widget._update = function(self)
+            local was_open = self.open
+            original_update(self)
+            if self.open and not was_open then
+                layer_manager:set_overlay(self)
+            elseif not self.open and was_open then
+                layer_manager:set_overlay(nil)
+            end
         end
     end
 
-    if active_modal then
-        active_modal:_update()
-    else
+    save_state = EditorBase.init_save_reminder(all_widgets, save_button_ref, modals_by_name)
+end
+
+function _update()
+    EditorBase.update(modals_by_name, function()
         layer_manager:update_widgets()
-    end
+    end)
+
+    EditorBase.update_save_reminder(save_button_ref, save_state)
 
     on_repeat_update()
 end
 
 function _draw()
-    gfx.cls()
-    map.draw("Background")
-    layer_manager:draw_base()
-    layer_manager:draw_active()
-    for _, modal in pairs(modals_by_name) do
-        modal:_draw()
-    end
-    mouse._draw()
+    EditorBase.draw(function()
+        layer_manager:draw_base()
+        layer_manager:draw_active()
+    end, modals_by_name)
 end

@@ -1,8 +1,7 @@
 local widgets = require("widgets")
-local mouse = require("mouse")
 local wire = require("wire")
-local ModeSwitch = require("widgets/ModeSwitch")
 local sfx_templates = require("sfx-templates")
+local EditorBase = require("editor-base")
 
 local all_widgets = {}
 local modals_by_name = {}
@@ -294,128 +293,6 @@ SfxEditor._draw = function(self)
     end
 end
 
-function _init_panels(entities)
-    for p in all(entities["Panel"]) do
-        local panel = widgets:create_panel(p)
-        table.insert(all_widgets, panel)
-    end
-end
-
-function _init_text_buttons(entities)
-    for tb in all(entities["TextButton"]) do
-        local text_button = widgets:create_text_button(tb)
-        table.insert(all_widgets, text_button)
-    end
-end
-
-function _init_speakers(entities)
-    for s in all(entities["Speaker"]) do
-        local speaker = widgets:create_speaker(s)
-        table.insert(all_widgets, speaker)
-        table.insert(speaker_widgets, speaker)
-    end
-end
-
-function _init_mode_switch(entities)
-    for mode in all(entities["ModeSwitch"]) do
-        local button = new(ModeSwitch, mode)
-        table.insert(all_widgets, button)
-    end
-end
-
-function _init_dropdowns(entities)
-    for d in all(entities["Dropdown"]) do
-        local dropdown = widgets:create_dropdown(d)
-
-        -- The wide dropdown (240px) is the SFX selector; narrower ones are instrument selectors
-        if dropdown_widget == nil and dropdown.width >= 200 then
-            if #dropdown.options == 0 then
-                for i = 0, 31 do
-                    local s = sfx.sfx(i)
-                    local name = s.name or ("SFX " .. i)
-                    table.insert(dropdown.options, "[" .. i .. "] " .. name)
-                end
-                dropdown:_init()
-            end
-
-            dropdown.on_change = function(self)
-                state.sfx = sfx.sfx(self.selected - 1)
-            end
-
-            dropdown_widget = dropdown
-        end
-
-        table.insert(all_widgets, dropdown)
-    end
-end
-
-function _init_buttons(entities)
-    for b in all(entities["Button"]) do
-        local button = widgets:create_button(b)
-
-        if button.fields.Modal then
-            local modal_name = button.fields.Modal
-
-            if not modals_by_name[modal_name] then
-                local modal_sizes = {
-                    NameModal = { x = 96, y = 64, width = 192, height = 128 },
-                    RandomSfxModal = { x = 72, y = 68, width = 240, height = 120 },
-                }
-                local size = modal_sizes[modal_name] or { x = 96, y = 64, width = 192, height = 128 }
-                local modal = widgets:create_modal({
-                    x = size.x,
-                    y = size.y,
-                    width = size.width,
-                    height = size.height,
-                    level_name = modal_name,
-                    fields = {},
-                })
-                modals_by_name[modal_name] = modal
-            end
-
-            button.on_change = function()
-                local target = modals_by_name[modal_name]
-                if target then
-                    target:open(state.sfx.name)
-                end
-            end
-        end
-
-        table.insert(all_widgets, button)
-    end
-
-    local name_modal = modals_by_name["NameModal"]
-    if name_modal then
-        name_modal.on_validate = function(self, value)
-            if value and state.sfx then
-                state.sfx.name = value
-                if dropdown_widget then
-                    local idx = dropdown_widget.selected
-                    dropdown_widget.options[idx] = "[" .. (idx - 1) .. "] " .. value
-                    dropdown_widget:_init()
-                end
-            end
-        end
-    end
-
-    local random_modal = modals_by_name["RandomSfxModal"]
-    if random_modal then
-        if random_modal.dropdown then
-            random_modal.dropdown.options = sfx_templates.list
-            random_modal.dropdown:_init()
-        end
-
-        random_modal.on_validate = function(self, value, dropdown_index)
-            if dropdown_index and state.sfx then
-                local template_name = sfx_templates.list[dropdown_index]
-                if template_name then
-                    sfx_templates.generate(state.sfx, template_name)
-                end
-            end
-        end
-    end
-end
-
 function _init_knob(entities)
     for k in all(entities["Knob"]) do
         local knob = widgets:create_knob(k)
@@ -517,49 +394,72 @@ function _init()
 
     -- Panels first (drawn behind everything)
     local panel_entities = map.entities("Panels")
-    _init_panels(panel_entities)
+    EditorBase.init_panels(panel_entities, all_widgets)
 
     -- Then all interactive widgets
     local widget_entities = map.entities("Widgets")
-    _init_text_buttons(widget_entities)
-    _init_speakers(widget_entities)
-    _init_mode_switch(widget_entities)
-    _init_dropdowns(widget_entities)
-    _init_buttons(widget_entities)
+    EditorBase.init_text_buttons(widget_entities, all_widgets)
+    EditorBase.init_speakers(widget_entities, all_widgets, speaker_widgets)
+    EditorBase.init_mode_switch(widget_entities, all_widgets)
+
+    dropdown_widget = EditorBase.init_entity_dropdown(widget_entities, all_widgets, {
+        count = 32,
+        fetch = function(i) return sfx.sfx(i) end,
+        label = "SFX",
+        min_width = 200,
+        on_select = function(index) state.sfx = sfx.sfx(index) end,
+    })
+
+    modals_by_name = EditorBase.init_buttons(widget_entities, all_widgets, {
+        modal_sizes = {
+            NameModal = { x = 96, y = 64, width = 192, height = 128 },
+            RandomSfxModal = { x = 72, y = 68, width = 240, height = 120 },
+        },
+        on_open = function() return state.sfx.name end,
+        on_name_validate = function(value)
+            if value and state.sfx then
+                state.sfx.name = value
+                EditorBase.update_dropdown_name(dropdown_widget, value)
+            end
+        end,
+    })
+
+    -- Wire RandomSfxModal
+    local random_modal = modals_by_name["RandomSfxModal"]
+    if random_modal then
+        if random_modal.dropdown then
+            random_modal.dropdown.options = sfx_templates.list
+            random_modal.dropdown:_init()
+        end
+
+        random_modal.on_validate = function(self, value, dropdown_index)
+            if dropdown_index and state.sfx then
+                local template_name = sfx_templates.list[dropdown_index]
+                if template_name then
+                    sfx_templates.generate(state.sfx, template_name)
+                end
+            end
+        end
+    end
+
     _init_knob(widget_entities)
     _init_velocity_editor(widget_entities)
-    _init_sfx_editor(widget_entities)    -- refs Knob + Instrument Dropdown
-    _init_player(widget_entities)        -- refs SfxEditor + VelocityEditor + Knob + Buttons
+    _init_sfx_editor(widget_entities)
+    _init_player(widget_entities)
 end
 
 function _update()
-    mouse._update(function() end, function() end, function() end)
-
-    local active_modal
-    for _, modal in pairs(modals_by_name) do
-        if modal.visible then
-            active_modal = modal
-            break
-        end
-    end
-
-    if active_modal then
-        active_modal:_update()
-    else
+    EditorBase.update(modals_by_name, function()
         for w in all(all_widgets) do
             w:_update()
         end
-    end
+    end)
 end
 
 function _draw()
-    gfx.cls()
-    map.draw("Background")
-    for w in all(all_widgets) do
-        w:_draw()
-    end
-    for _, modal in pairs(modals_by_name) do
-        modal:_draw()
-    end
-    mouse._draw()
+    EditorBase.draw(function()
+        for w in all(all_widgets) do
+            w:_draw()
+        end
+    end, modals_by_name)
 end
