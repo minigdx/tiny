@@ -22,7 +22,9 @@ class AddCommand : CliktCommand(name = "add") {
     val fontName by option("--font", help = "Mark .png resources as fonts instead of spritesheets. Optionally specify the font name.")
         .optionalValue("")
 
-    val size by option("--size", help = "Character size in pixels (e.g., '8x12' or '8' for square). Requires --font.")
+    val size by option("--size", help = "Character size in pixels (e.g., '8x12' or '8' for square). Auto-detected if omitted.")
+
+    val offset by option("--offset", help = "Pixel offset where the character grid begins (e.g., '8,12'). Auto-detected if omitted.")
 
     val chars by option("--chars", help = "Characters in the font, in reading order (left-to-right, top-to-bottom). Requires --font.")
 
@@ -37,13 +39,13 @@ class AddCommand : CliktCommand(name = "add") {
             throw MissingTinyConfigurationException(tiny)
         }
 
-        if (fontName != null && (size == null || chars == null)) {
-            echo("❌ --font requires both --size and --chars options.")
+        if (fontName != null && chars == null) {
+            echo("❌ --font requires --chars option.")
             throw Abort()
         }
 
-        if (fontName == null && (size != null || chars != null)) {
-            echo("⚠️  --size and --chars are only used with --font. They will be ignored.")
+        if (fontName == null && (size != null || chars != null || offset != null)) {
+            echo("⚠️  --size, --chars, and --offset are only used with --font. They will be ignored.")
         }
 
         // Open the _tiny.json
@@ -92,22 +94,43 @@ class AddCommand : CliktCommand(name = "add") {
         resource: String,
         params: GameParameters,
     ): GameParameters {
-        val (charWidth, charHeight) = FontAnalyzer.parseSize(size!!)
-        val (imageWidth, _) = FontAnalyzer.readImageDimensions(gameDirectory, resource)
+        val image = FontAnalyzer.readImage(gameDirectory, resource)
+        val parsedSize = size?.let { FontAnalyzer.parseSize(it) }
+        val parsedOffset = offset?.let { FontAnalyzer.parseOffset(it) }
+
+        val result = FontAnalyzer.autoDetect(image, parsedSize, parsedOffset, chars!!.length)
+        if (result == null) {
+            echo("❌ Could not auto-detect character size. Please provide --size explicitly.")
+            throw Abort()
+        }
+
+        if (result.sizeDetected) {
+            echo("   🔍 Auto-detected character size: ${result.cellWidth}x${result.cellHeight}")
+        }
+        if (result.offsetDetected) {
+            echo("   🔍 Auto-detected grid offset: ${result.offsetX},${result.offsetY}")
+        }
+
         val fontName = this.fontName!!.ifEmpty { FontAnalyzer.deriveFontName(resource) }
-        val rows = FontAnalyzer.splitCharsIntoRows(imageWidth, charWidth, chars!!)
-        val charsPerRow = imageWidth / charWidth
+        val effectiveWidth = image.width - result.offsetX
+        val rows = FontAnalyzer.splitCharsIntoRows(effectiveWidth, result.cellWidth, chars!!)
+        val charsPerRow = effectiveWidth / result.cellWidth
 
         val font = FontAnalyzer.buildFontConfig(
             fontName = fontName,
             spritesheet = resource,
-            charWidth = charWidth,
-            charHeight = charHeight,
+            charWidth = result.cellWidth,
+            charHeight = result.cellHeight,
             characters = rows,
+            offsetX = result.offsetX,
+            offsetY = result.offsetY,
         )
 
-        echo("   📐 Character size: ${charWidth}x$charHeight")
+        echo("   📐 Character size: ${result.cellWidth}x${result.cellHeight}")
         echo("   📏 Grid: $charsPerRow chars/row, ${rows.size} rows, ${chars!!.length} total chars")
+        if (result.offsetX != 0 || result.offsetY != 0) {
+            echo("   📍 Offset: ${result.offsetX},${result.offsetY}")
+        }
 
         return params.addFont(font)
     }

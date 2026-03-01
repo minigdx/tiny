@@ -16,6 +16,7 @@ Each bank defines:
 - A **name** to identify the bank (e.g., `default`, `uppercase`, `symbols`).
 - The **width** and **height** of each character cell, in pixels.
 - A **characters** list describing which characters are in each row of the grid.
+- An optional **x** and **y** offset where the character grid begins in the spritesheet.
 
 A single font can have multiple banks.
 This is useful when you want to group different character sets — for example, one bank for Latin letters and another for punctuation — while keeping them under the same font name.
@@ -30,15 +31,35 @@ If you provide 144 characters, they fill 8 rows of 18 characters.
 
 === Adding a font with the CLI
 
-Use the `tiny-cli add` command with the `--font`, `--size`, and `--chars` options to register a PNG as a font.
+Use the `tiny-cli add` command with the `--font` and `--chars` options to register a PNG as a font.
 
 ```bash
-tiny-cli add --font=myfont --size 8x12 --chars "abcdefghijklmnopqrstuvwxyz0123456789" myfont.png
+tiny-cli add --font=myfont --chars "abcdefghijklmnopqrstuvwxyz0123456789" myfont.png
 ```
 
 - `--font` marks the PNG as a font instead of a spritesheet. You can optionally give the font a name (e.g., `--font=myfont`). If you omit the name (`--font`), it is derived from the filename.
-- `--size` specifies the character cell size in pixels. Use `WxH` for rectangular cells (e.g., `6x12`) or a single number for square cells (e.g., `8`).
 - `--chars` lists all the characters in the spritesheet, in reading order (left-to-right, top-to-bottom).
+- `--size` specifies the character cell size in pixels. Use `WxH` for rectangular cells (e.g., `6x12`) or a single number for square cells (e.g., `8`). **Optional**: if omitted, the size is auto-detected from the image.
+- `--offset` specifies the pixel offset where the character grid begins in the image (e.g., `8,12` or `8x12`). **Optional**: if omitted, the offset is auto-detected from the image.
+
+==== Auto-detection
+
+When `--size` or `--offset` are omitted, Tiny analyzes the PNG image to detect the values automatically:
+
+1. **Bounding box detection**: Scans all pixels to find the region containing non-transparent pixels.
+2. **Gap analysis**: Looks for fully-transparent columns and rows within the bounding box to identify individual character cells.
+3. **Divisor fallback**: If gap analysis fails, tries to find cell dimensions that evenly divide the bounding box and can fit all characters.
+
+The auto-detected values are displayed during the add operation. If auto-detection fails, an error message asks you to provide `--size` explicitly.
+
+==== Explicit size and offset
+
+You can always provide explicit values to override auto-detection:
+
+```bash
+tiny-cli add --font=myfont --size 8x12 --chars "abcdefghijklmnopqrstuvwxyz0123456789" myfont.png
+tiny-cli add --font=myfont --size 8x12 --offset 4,2 --chars "abcdefghijklmnopqrstuvwxyz0123456789" myfont.png
+```
 
 ==== Adding multiple banks
 
@@ -74,6 +95,8 @@ When you add a font, it is stored in the `fonts` section of `_tiny.json`:
           "name": "default",
           "width": 8,
           "height": 12,
+          "x": 0,
+          "y": 0,
           "characters": [
             "abcdefgh",
             "ijklmnop",
@@ -90,6 +113,8 @@ When you add a font, it is stored in the `fonts` section of `_tiny.json`:
 
 The `characters` array contains one string per row.
 Each string has as many characters as fit in one row of the spritesheet (image width / character width).
+
+The `x` and `y` fields specify the pixel offset where the character grid starts in the spritesheet. They default to `0` when not specified.
 
 === Managing fonts
 
