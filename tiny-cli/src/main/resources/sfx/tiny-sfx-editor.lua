@@ -8,6 +8,15 @@ local modals_by_name = {}
 local dropdown_widget = nil
 local speaker_widgets = {}
 
+-- colors
+local yellow = 9
+local orange = 8
+local light_green = 6
+local dark_green = 13
+local pink = 7
+local purple = 4
+
+
 local state = {
     sfx = nil,
 }
@@ -22,6 +31,7 @@ end
 local VelocityEditor = {
     values = {},
     current_beat = nil,
+    playing = false,
 }
 
 VelocityEditor._update = function(self)
@@ -47,39 +57,41 @@ VelocityEditor.set_value = function(self, beat, volume)
 end
 
 VelocityEditor._draw = function(self)
-    local low = self.y + self.height - 8
+    -- background
+    shape.rectf(self.x, self.y, self.width, self.height, 2)
+    shape.rect(self.x, self.y, self.width, self.height, 1)
 
-    local previous_x = nil
-    local previous_y = nil
+    local low = self.y + self.height
 
+    -- Pass 1: Group outlines at tip level
     for note in all(self.values) do
-        local volume = note.volume * (self.height - 8)
-        local y = low - volume
-        local startVelocity = self.x + note.beat * 16
-        local endVelocity = startVelocity + note.duration * 16
-        local x = startVelocity + (endVelocity - startVelocity) * 0.5
-
-        if previous_x then
-            shape.line(x, y, previous_x, previous_y, 5)
+        if note.duration > 0.5 then
+            local volume_height = note.volume * (self.height - 8)
+            local tip_y = (volume_height > 0) and (low - volume_height - 2) or (low - 2)
+            local bg_x = self.x + note.beat * 16
+            local bg_width = note.duration * 16
+            shape.rect(bg_x, tip_y, bg_width, 2, 3)
         end
-
-        previous_x = x
-        previous_y = y
     end
 
+    -- Pass 2: Fader bars per half-beat
     for note in all(self.values) do
-        local volume = note.volume * (self.height - 8)
-        local y = low - volume
-        local startVelocity = self.x + note.beat * 16
-        local endVelocity = startVelocity + note.duration * 16
-        local x = startVelocity + (endVelocity - startVelocity) * 0.5
+        local num_half_beats = math.floor(note.duration / 0.5)
+        local is_active = self.playing and self.current_beat and note.beat <= self.current_beat and self.current_beat < note.beat + note.duration
 
-        local is_active = self.current_beat and note.beat <= self.current_beat and self.current_beat < note.beat + note.duration
+        for i = 0, num_half_beats - 1 do
+            local cell_x = self.x + (note.beat + i * 0.5) * 16
+            local volume_height = note.volume * (self.height - 8)
 
-        if is_active then
-            shape.circlef(x, y, 2, 13)
-        else
-            shape.circle(x, y, 2, 18)
+            local fill_color = is_active and light_green or pink
+            local tip_color = is_active and light_green or purple
+
+            if volume_height > 0 then
+                shape.rectf(cell_x + 1, low - volume_height, 6, volume_height, fill_color)
+            end
+
+            local tip_y = (volume_height > 0) and (low - volume_height - 2) or (low - 2)
+            shape.rectf(cell_x + 1, tip_y, 6, 2, tip_color)
         end
     end
 end
@@ -94,12 +106,6 @@ local Player = {
 }
 
 Player._update = function(self)
-    if ctrl.pressed(keys.left) then
-        self.beat = self.beat - 0.5
-    elseif ctrl.pressed(keys.right) then
-        self.beat = self.beat + 0.5
-    end
-
     if ctrl.pressed(keys.space) then
         self:playSfx()
     end
@@ -119,11 +125,7 @@ Player._update = function(self)
     self:set_value(self.beat)
 end
 
-Player._draw = function(self)
-    local x = self.editor.x + self.beat * self.step_x
-    local y = self.editor.y - 4
-    spr.sdraw(x, y, 0, 48, 8, 8)
-end
+Player._draw = function(self) end
 
 Player.playSfx = function(self)
     self.beat = 0
@@ -150,10 +152,15 @@ local SfxEditor = {
     octave = 2,
     note = "C2",
     current_beat = nil,
-    values = {}
+    playing = false,
+    values = {},
+    y_factor = 1,
+    note_y_factor = 1,
 }
 
 SfxEditor._init = function(self)
+    self.y_factor = 192 / self.height
+    self.note_y_factor = self.height / 24
 end
 
 SfxEditor._update = function(self)
@@ -218,25 +225,29 @@ SfxEditor._update = function(self)
     end
 
     local local_y = math.clamp(0, p.y - self.y, self.height)
-    local color = spr.pget(164, 64 + local_y)
+
+    local prev = spr.sheet(2)
+    local color = spr.pget(164, (64 + local_y * self.y_factor))
+    spr.sheet(prev)
+    self.yy = color
 
     local color_to_note = {
-        [10] = "C",
-        [7] = "Cs",
-        [17] = "D",
-        [11] = "Ds",
-        [15] = "E",
-        [12] = "F",
-        [13] = "Fs",
-        [8] = "G",
-        [5] = "Gs",
-        [4] = "A",
-        [3] = "As",
-        [1] = "B"
+        [1] = "C",
+        [2] = "Cs",
+        [5] = "D",
+        [10] = "Ds",
+        [12] = "E",
+        [4] = "F",
+        [6] = "Fs",
+        [9] = "G",
+        [3] = "Gs",
+        [7] = "A",
+        [8] = "As",
+        [13] = "B"
     }
 
     local note = color_to_note[color]
-    local octave = (local_y <= 95 and 1) or 0
+    local octave = (local_y <= self.height * 0.5 and 1) or 0
     if note then
         self.note = note .. (self.octave + octave)
     end
@@ -249,54 +260,71 @@ SfxEditor.set_value = function(self, value)
 end
 
 SfxEditor._draw = function(self)
-    for index = 1, #self.values - 1 do
-        local note = self.values[index]
-        local next_note = self.values[index + 1]
+    -- background
+    shape.rectf(self.x, self.y, self.width, self.height, 2)
+    shape.rect(self.x, self.y, self.width, self.height, 1)
 
-        local y = self.y + self.y + self.height - (note.notei + 2 - self.octave * 12) * 8 + 4
-        local end_x = self.x + note.beat * 16 + (note.duration) * 16
+    local bottom = self.y + self.height
 
-        local center = end_x - 4
-
-        local y_next = self.y + self.y + self.height - (next_note.notei + 2 - self.octave * 12) * 8 + 4
-        local start_x_next = self.x + next_note.beat * 16
-
-        local center_next = start_x_next + 4
-
-        shape.line(center, y, center_next, y_next, 13)
+    -- Pass 1: Group outlines at tip level
+    for note in all(self.values) do
+        if note.duration > 0.5 then
+            local note_y = self.y + (23 - (note.notei - self.octave * 12)) * 8
+            local tip_y = math.max(self.y, note_y - 2)
+            local bg_x = self.x + note.beat * 16
+            local bg_width = note.duration * 16
+            shape.rect(bg_x, tip_y, bg_width, 2, 3)
+        end
     end
 
+    -- Pass 2: Fader bars from bottom up to pitch level
     for note in all(self.values) do
-        local y = self.y + self.height - (note.notei + 2 - self.octave * 12) * 8
-        local start_x = self.x + note.beat * 16
-        local end_x = self.x + note.beat * 16 + (note.duration) * 16 - 3
-
-        local is_active = 0
-        if self.current_beat and note.beat <= self.current_beat and self.current_beat < note.beat + note.duration then
-            is_active = 8
+        -- octave_offset should be equal to 0 or 1
+        local octave_offset = (note.octave - self.octave)
+        if(octave_offset > 1) then
+            console.log("octave_offset > 1 = ", octave_offset)
         end
-        -- head
-        spr.sdraw(
-                start_x, self.y + y,
-                16, 112 + is_active, 3, 8)
-
-        -- body
-        for xx = start_x + 3, end_x do
-            spr.sdraw(
-                    xx, self.y + y,
-                    22, 112 + is_active, 1, 8)
+        -- notei is the index of the note in an octave (0 < notei < 12
+        local notei = note.notei - note.octave * 12
+        if notei > 12 then
+            console.log("notei is an invalid note index as > 12", notei)
         end
-        -- tail
-        spr.sdraw(
-                end_x, self.y + y,
-                24, 112 + is_active, 4, 8)
+
+        local note_height = (notei + octave_offset * 12) * self.note_y_factor
+
+        local note_y = self.y + self.height - note_height
+        local fader_height = bottom - note_y
+        local num_half_beats = math.floor(note.duration / 0.5)
+        local is_active = self.playing and self.current_beat and note.beat <= self.current_beat and self.current_beat < note.beat + note.duration
+
+        for i = 0, num_half_beats - 1 do
+            local cell_x = self.x + (note.beat + i * 0.5) * 16
+
+            local fill_color = is_active and light_green or yellow
+            local tip_color = is_active and light_green or orange
+
+            if fader_height > 0 then
+                shape.rectf(cell_x + 1, note_y, 6, fader_height, fill_color)
+            end
+
+            local tip_y = math.max(self.y, note_y - 2)
+            shape.rectf(cell_x + 1, tip_y, 6, 2, tip_color)
+        end
     end
 end
+
 
 function _init_knob(entities)
     for k in all(entities["Knob"]) do
         local knob = widgets:create_knob(k)
         table.insert(all_widgets, knob)
+    end
+end
+
+function _init_fader(entities)
+    for f in all(entities["Fader"]) do
+        local fader = widgets:create_fader(f)
+        table.insert(all_widgets, fader)
     end
 end
 
@@ -314,6 +342,7 @@ end
 function _init_sfx_editor(entities)
     for editor in all(entities["SfxEditor"]) do
         local widget = new(SfxEditor, editor)
+        widget:_init()
         local bpm = wire.find_widget(all_widgets, widget.fields.BPM)
 
         local transform = {
@@ -367,7 +396,18 @@ function _init_player(entities)
 
         wire.sync(widget, "beat", sfxEditor, "current_beat")
         wire.sync(widget, "beat", velocityEditor, "current_beat")
+        wire.sync(widget, "play", sfxEditor, "playing")
+        wire.sync(widget, "play", velocityEditor, "playing")
         wire.sync(widget, "bpm", bpm, "value")
+
+        for _, s in ipairs(speaker_widgets) do
+            wire.sync(widget, "play", s, "playing")
+        end
+
+        if widget.fields.SfxSelector then
+            local sfxSelector = wire.find_widget(all_widgets, widget.fields.SfxSelector)
+            widget.sfxSelector = sfxSelector
+        end
 
         local playButton = wire.find_widget(all_widgets, widget.fields.PlayButton)
         playButton.on_change = function() widget:playSfx() end
@@ -443,6 +483,7 @@ function _init()
     end
 
     _init_knob(widget_entities)
+    _init_fader(widget_entities)
     _init_velocity_editor(widget_entities)
     _init_sfx_editor(widget_entities)
     _init_player(widget_entities)

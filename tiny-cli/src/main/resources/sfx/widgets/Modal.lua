@@ -165,9 +165,17 @@ Modal._draw = function(self)
         map.level(previous_level)
     end
 
-    -- Draw child widgets
+    -- Draw child widgets (open dropdown drawn last so it renders on top)
+    local open_dropdown = nil
     for w in all(self.widgets) do
-        w:_draw()
+        if w == self.dropdown and self.dropdown.open then
+            open_dropdown = w
+        else
+            w:_draw()
+        end
+    end
+    if open_dropdown then
+        open_dropdown:_draw()
     end
 
     -- Close button (X) in top-right corner
