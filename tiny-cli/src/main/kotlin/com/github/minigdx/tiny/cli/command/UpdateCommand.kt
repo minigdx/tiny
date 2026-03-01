@@ -27,6 +27,8 @@ class UpdateCommand : CliktCommand(name = "update") {
     private val showMouseCursor by option("--show-cursor", help = "Show the system mouse cursor.")
         .flag()
 
+    private val entryPoint by option("--entry-point", help = "Set the entry point script (moved to first in scripts list).")
+
     override fun help(context: Context) = "View and update game parameters."
 
     override fun run() {
@@ -48,7 +50,7 @@ class UpdateCommand : CliktCommand(name = "update") {
             throw Abort()
         }
 
-        val hasUpdates = newZoom != null || hideMouseCursor || showMouseCursor
+        val hasUpdates = newZoom != null || hideMouseCursor || showMouseCursor || entryPoint != null
         if (hasUpdates) {
             applyUpdates(gameParameters, configFile)
         } else {
@@ -79,6 +81,15 @@ class UpdateCommand : CliktCommand(name = "update") {
             echo("✅ Mouse cursor visible")
         }
 
+        entryPoint?.let { script ->
+            if (script !in updated.scripts) {
+                echo("❌ Script '$script' not found. Available scripts: ${updated.scripts.joinToString(", ")}")
+                throw Abort()
+            }
+            updated = updated.setEntryPoint(script)
+            echo("✅ Entry point set to $script")
+        }
+
         try {
             updated.write(configFile)
         } catch (e: Exception) {
@@ -97,6 +108,9 @@ class UpdateCommand : CliktCommand(name = "update") {
         echo("📐 Sprites: ${params.sprites.width}x${params.sprites.height}")
         echo("🔍 Zoom: ${params.zoom}")
         echo("🎨 Palette: ${ColorUtils.formatCurrentPaletteDisplay(params.colors, maxColors = 16)}")
+        if (params.scripts.isNotEmpty()) {
+            echo("🚀 Entry point: ${params.scripts.first()}")
+        }
         echo("📝 Scripts: ${params.scripts.joinToString(", ").ifEmpty { "none" }}")
         echo("🖼️  Spritesheets: ${params.spritesheets.joinToString(", ").ifEmpty { "none" }}")
         echo("🗺️  Levels: ${params.levels.joinToString(", ").ifEmpty { "none" }}")

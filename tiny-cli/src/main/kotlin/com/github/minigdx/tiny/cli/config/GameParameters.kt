@@ -179,4 +179,9 @@ data class GameParametersV1(
     override fun setIcon(icon: String): GameParameters {
         return copy(icon = icon)
     }
+
+    fun setEntryPoint(scriptName: String): GameParametersV1 {
+        val reordered = listOf(scriptName) + scripts.filter { it != scriptName }
+        return copy(scripts = reordered)
+    }
 }
