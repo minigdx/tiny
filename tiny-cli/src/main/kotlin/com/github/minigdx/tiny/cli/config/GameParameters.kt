@@ -39,6 +39,8 @@ sealed class GameParameters {
 
     abstract fun addSound(sound: String): GameParameters
 
+    abstract fun addFont(font: GameConfigFont): GameParameters
+
     abstract fun setPalette(colors: List<String>): GameParameters
 
     abstract fun setIcon(icon: String): GameParameters
@@ -178,6 +180,16 @@ data class GameParametersV1(
 
     override fun setIcon(icon: String): GameParameters {
         return copy(icon = icon)
+    }
+
+    override fun addFont(font: GameConfigFont): GameParameters {
+        val existing = fonts.find { it.name == font.name }
+        return if (existing != null) {
+            val merged = existing.copy(banks = existing.banks + font.banks)
+            copy(fonts = fonts.map { if (it.name == font.name) merged else it })
+        } else {
+            copy(fonts = fonts + font)
+        }
     }
 
     fun setEntryPoint(scriptName: String): GameParametersV1 {

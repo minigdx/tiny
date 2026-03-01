@@ -115,6 +115,17 @@ class UpdateCommand : CliktCommand(name = "update") {
         echo("🖼️  Spritesheets: ${params.spritesheets.joinToString(", ").ifEmpty { "none" }}")
         echo("🗺️  Levels: ${params.levels.joinToString(", ").ifEmpty { "none" }}")
         echo("🔊 Sounds: ${listOfNotNull(params.sound).joinToString(", ").ifEmpty { "none" }}")
+        val fontsDisplay = if (params.fonts.isEmpty()) {
+            "none"
+        } else {
+            params.fonts.joinToString(", ") { font ->
+                val banks = font.banks.joinToString("+") { bank ->
+                    "${bank.name}(${bank.width}x${bank.height})"
+                }
+                "${font.name} [$banks]"
+            }
+        }
+        echo("🔤 Fonts: $fontsDisplay")
         echo("🖱️  Hide mouse cursor: ${if (params.hideMouseCursor) "yes" else "no"}")
     }
 }

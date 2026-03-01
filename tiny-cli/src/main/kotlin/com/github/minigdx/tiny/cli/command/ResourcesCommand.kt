@@ -57,7 +57,8 @@ class ResourcesCommand : CliktCommand(name = "resources") {
             val found = resource in updated.scripts ||
                 resource in updated.spritesheets ||
                 resource in updated.levels ||
-                resource == updated.sound
+                resource == updated.sound ||
+                updated.fonts.any { it.spritesheet == resource || it.name == resource }
 
             if (!found) {
                 echo("❌ Resource not found: $resource")
@@ -69,6 +70,7 @@ class ResourcesCommand : CliktCommand(name = "resources") {
                 spritesheets = updated.spritesheets.filter { it != resource },
                 levels = updated.levels.filter { it != resource },
                 sound = if (updated.sound == resource) null else updated.sound,
+                fonts = updated.fonts.filter { it.spritesheet != resource && it.name != resource },
             )
             echo("✅ Removed: $resource")
         }
@@ -92,6 +94,7 @@ class ResourcesCommand : CliktCommand(name = "resources") {
         displayCategory("🖼️  Spritesheets", params.spritesheets)
         displayCategory("🗺️  Levels", params.levels)
         displayCategory("🔊 Sounds", listOfNotNull(params.sound))
+        displayFonts(params)
     }
 
     private fun displayCategory(
@@ -102,6 +105,18 @@ class ResourcesCommand : CliktCommand(name = "resources") {
         echo("$label:")
         resources.forEachIndexed { index, resource ->
             echo("   ${index + 1}. $resource")
+        }
+        echo()
+    }
+
+    private fun displayFonts(params: GameParametersV1) {
+        if (params.fonts.isEmpty()) return
+        echo("🔤 Fonts:")
+        params.fonts.forEachIndexed { index, font ->
+            val banks = font.banks.joinToString(", ") { bank ->
+                "${bank.name}(${bank.width}x${bank.height})"
+            }
+            echo("   ${index + 1}. ${font.name} [${font.spritesheet}] — $banks")
         }
         echo()
     }
