@@ -2,13 +2,12 @@ local widgets = require("widgets")
 local mouse = require("mouse")
 local wire = require("wire")
 local ModeSwitch = require("widgets/ModeSwitch")
-local LayerManager = require("layers")
 local sfx_templates = require("sfx-templates")
 
 local all_widgets = {}
 local modals_by_name = {}
 local dropdown_widget = nil
-local layer_manager = nil
+local speaker_widgets = {}
 
 local state = {
     sfx = nil,
@@ -295,6 +294,28 @@ SfxEditor._draw = function(self)
     end
 end
 
+function _init_panels(entities)
+    for p in all(entities["Panel"]) do
+        local panel = widgets:create_panel(p)
+        table.insert(all_widgets, panel)
+    end
+end
+
+function _init_text_buttons(entities)
+    for tb in all(entities["TextButton"]) do
+        local text_button = widgets:create_text_button(tb)
+        table.insert(all_widgets, text_button)
+    end
+end
+
+function _init_speakers(entities)
+    for s in all(entities["Speaker"]) do
+        local speaker = widgets:create_speaker(s)
+        table.insert(all_widgets, speaker)
+        table.insert(speaker_widgets, speaker)
+    end
+end
+
 function _init_mode_switch(entities)
     for mode in all(entities["ModeSwitch"]) do
         local button = new(ModeSwitch, mode)
@@ -322,19 +343,6 @@ function _init_dropdowns(entities)
             end
 
             dropdown_widget = dropdown
-
-            local original_update = dropdown._update
-            dropdown._update = function(self)
-                local was_open = self.open
-                original_update(self)
-                if layer_manager then
-                    if self.open and not was_open then
-                        layer_manager:set_overlay(self)
-                    elseif not self.open and was_open then
-                        layer_manager:set_overlay(nil)
-                    end
-                end
-            end
         end
 
         table.insert(all_widgets, dropdown)
@@ -468,20 +476,6 @@ function _init_sfx_editor(entities)
             state.sfx.set_instrument(self.selected - 1)
         end
 
-        -- Overlay handling for instrument dropdown
-        local original_update = instrument_dropdown._update
-        instrument_dropdown._update = function(self)
-            local was_open = self.open
-            original_update(self)
-            if layer_manager then
-                if self.open and not was_open then
-                    layer_manager:set_overlay(self)
-                elseif not self.open and was_open then
-                    layer_manager:set_overlay(nil)
-                end
-            end
-        end
-
         table.insert(all_widgets, widget)
     end
 end
@@ -515,24 +509,27 @@ function _init()
     all_widgets = {}
     modals_by_name = {}
     dropdown_widget = nil
-    layer_manager = nil
+    speaker_widgets = {}
 
     map.level("SfxEditor")
-    local entities = map.entities()
 
     state.sfx = sfx.sfx(0)
 
-    -- Init order matters for EntityRef resolution
-    _init_mode_switch(entities)
-    _init_dropdowns(entities)
-    _init_buttons(entities)
-    _init_knob(entities)
-    _init_velocity_editor(entities)
-    _init_sfx_editor(entities)    -- refs Knob + Instrument Dropdown
-    _init_player(entities)        -- refs SfxEditor + VelocityEditor + Knob + Buttons
+    -- Panels first (drawn behind everything)
+    local panel_entities = map.entities("Panels")
+    _init_panels(panel_entities)
 
-    layer_manager = LayerManager.create()
-    layer_manager:register("Widgets", { tiles = "WidgetsTiles", widgets = all_widgets, always = true })
+    -- Then all interactive widgets
+    local widget_entities = map.entities("Widgets")
+    _init_text_buttons(widget_entities)
+    _init_speakers(widget_entities)
+    _init_mode_switch(widget_entities)
+    _init_dropdowns(widget_entities)
+    _init_buttons(widget_entities)
+    _init_knob(widget_entities)
+    _init_velocity_editor(widget_entities)
+    _init_sfx_editor(widget_entities)    -- refs Knob + Instrument Dropdown
+    _init_player(widget_entities)        -- refs SfxEditor + VelocityEditor + Knob + Buttons
 end
 
 function _update()
@@ -549,13 +546,18 @@ function _update()
     if active_modal then
         active_modal:_update()
     else
-        layer_manager:update_widgets()
+        for w in all(all_widgets) do
+            w:_update()
+        end
     end
 end
 
 function _draw()
-    layer_manager:draw_base()
-    layer_manager:draw_active()
+    gfx.cls()
+    map.draw("Background")
+    for w in all(all_widgets) do
+        w:_draw()
+    end
     for _, modal in pairs(modals_by_name) do
         modal:_draw()
     end
