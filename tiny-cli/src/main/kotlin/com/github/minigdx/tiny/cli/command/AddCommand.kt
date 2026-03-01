@@ -6,8 +6,8 @@ import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.options.default
-import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.optionalValue
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.minigdx.tiny.cli.command.utils.FontAnalyzer
 import com.github.minigdx.tiny.cli.config.GameParameters
@@ -19,8 +19,8 @@ class AddCommand : CliktCommand(name = "add") {
         .file(mustExist = true, canBeDir = true, canBeFile = false)
         .default(File("."))
 
-    val isFont by option("--font", help = "Mark .png resources as fonts instead of spritesheets.")
-        .flag()
+    val fontName by option("--font", help = "Mark .png resources as fonts instead of spritesheets. Optionally specify the font name.")
+        .optionalValue("")
 
     val size by option("--size", help = "Character size in pixels (e.g., '8x12' or '8' for square). Requires --font.")
 
@@ -37,12 +37,12 @@ class AddCommand : CliktCommand(name = "add") {
             throw MissingTinyConfigurationException(tiny)
         }
 
-        if (isFont && (size == null || chars == null)) {
+        if (fontName != null && (size == null || chars == null)) {
             echo("❌ --font requires both --size and --chars options.")
             throw Abort()
         }
 
-        if (!isFont && (size != null || chars != null)) {
+        if (fontName == null && (size != null || chars != null)) {
             echo("⚠️  --size and --chars are only used with --font. They will be ignored.")
         }
 
@@ -52,7 +52,7 @@ class AddCommand : CliktCommand(name = "add") {
         // regarding the input, add it into the right resource
         resources.forEach { r ->
             val type =
-                if (r.endsWith("png") && isFont) {
+                if (r.endsWith("png") && fontName != null) {
                     addFont(r, gameParameters).let { gameParameters = it }
                     "font"
                 } else if (r.endsWith("png")) {
@@ -94,7 +94,7 @@ class AddCommand : CliktCommand(name = "add") {
     ): GameParameters {
         val (charWidth, charHeight) = FontAnalyzer.parseSize(size!!)
         val (imageWidth, _) = FontAnalyzer.readImageDimensions(gameDirectory, resource)
-        val fontName = FontAnalyzer.deriveFontName(resource)
+        val fontName = this.fontName!!.ifEmpty { FontAnalyzer.deriveFontName(resource) }
         val rows = FontAnalyzer.splitCharsIntoRows(imageWidth, charWidth, chars!!)
         val charsPerRow = imageWidth / charWidth
 
