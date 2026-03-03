@@ -314,6 +314,34 @@ SfxEditor._draw = function(self)
 end
 
 
+local function shift_notes(old_octave, new_octave)
+    local delta = new_octave - old_octave
+    local notes = state.sfx.notes
+    local saved = {}
+    for note in all(notes) do
+        table.insert(saved, {
+            beat = note.beat,
+            note = note.note,
+            octave = note.octave,
+            duration = note.duration,
+            volume = note.volume,
+        })
+    end
+    for _, note in ipairs(saved) do
+        state.sfx.remove_note({ beat = note.beat, note = note.note })
+    end
+    for _, note in ipairs(saved) do
+        local pitch_class = string.sub(note.note, 1, #note.note - 1)
+        local new_note_name = pitch_class .. (note.octave + delta)
+        state.sfx.set_note({
+            beat = note.beat,
+            note = new_note_name,
+            duration = note.duration,
+        })
+        state.sfx.set_volume({ beat = note.beat, volume = note.volume })
+    end
+end
+
 function _init_knob(entities)
     for k in all(entities["Knob"]) do
         local knob = widgets:create_knob(k)
@@ -383,7 +411,30 @@ function _init_sfx_editor(entities)
         end
 
         table.insert(all_widgets, widget)
+        return widget
     end
+end
+
+function _init_counter(sfx_editor_widget)
+    local Counter = require("widgets.Counter")
+    local counter = new(Counter, {
+        x = sfx_editor_widget.x - 44,
+        y = sfx_editor_widget.y + math.floor(sfx_editor_widget.height / 2) - 8,
+        width = 40,
+        height = 16,
+        value = sfx_editor_widget.octave,
+        min = 0,
+        max = 7,
+    })
+    counter.on_change = function(self)
+        local old_octave = sfx_editor_widget.octave
+        local new_octave = self.value
+        if old_octave ~= new_octave then
+            shift_notes(old_octave, new_octave)
+            sfx_editor_widget.octave = new_octave
+        end
+    end
+    table.insert(all_widgets, counter)
 end
 
 function _init_player(entities)
@@ -485,7 +536,10 @@ function _init()
     _init_knob(widget_entities)
     _init_fader(widget_entities)
     _init_velocity_editor(widget_entities)
-    _init_sfx_editor(widget_entities)
+    local sfx_editor_widget = _init_sfx_editor(widget_entities)
+    if sfx_editor_widget then
+        _init_counter(sfx_editor_widget)
+    end
     _init_player(widget_entities)
 end
 
