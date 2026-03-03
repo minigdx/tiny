@@ -66,7 +66,7 @@ class SfxCommand : CliktCommand(name = "sfx") {
 
             if (!sfxFileName.exists()) {
                 val json = Json.encodeToString(Music())
-                platform.saveIntoHome(sfxFileName.name, json)
+                platform.saveIntoGameDirectory(sfxFileName.name, json)
             }
 
             val gameEngine = GameEngine(
