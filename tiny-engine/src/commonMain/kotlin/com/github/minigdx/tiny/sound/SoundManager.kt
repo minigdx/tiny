@@ -66,6 +66,7 @@ abstract class SoundManager {
             defaultInstrument = bar.instrument,
             beats = bar.beats,
             tempo = bar.tempo,
+            volume = bar.volume,
         )
     }
 

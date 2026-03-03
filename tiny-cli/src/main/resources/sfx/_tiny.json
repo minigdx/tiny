@@ -57,6 +57,7 @@
     "widgets/TextButton.lua",
     "widgets/TextInput.lua",
     "widgets/Speaker.lua",
+    "widgets/Counter.lua",
     "widgets/utils.lua"
   ],
   "spritesheets": [

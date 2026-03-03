@@ -32,7 +32,7 @@ end
 -- Helper: find an instrument whose wave matches one of the compatible types
 local function find_instrument(compatible_waves)
     local candidates = {}
-    for i = 0, 15 do
+    for i = 0, 7 do
         local inst = sfx.instrument(i)
         if inst then
             for _, w in ipairs(compatible_waves) do
@@ -374,6 +374,45 @@ M.generate = function(sfx_bar, template_name)
 
     -- Generate notes
     def.generate(sfx_bar, inst_index)
+
+    -- Clamp notes to span at most 2 octaves
+    local notes = sfx_bar.notes
+    if #notes > 0 then
+        local min_octave = 7
+        local max_octave = 0
+        for note in all(notes) do
+            if note.octave < min_octave then min_octave = note.octave end
+            if note.octave > max_octave then max_octave = note.octave end
+        end
+
+        if max_octave - min_octave > 1 then
+            local saved = {}
+            for note in all(notes) do
+                table.insert(saved, {
+                    beat = note.beat,
+                    note = note.note,
+                    octave = note.octave,
+                    duration = note.duration,
+                    volume = note.volume,
+                })
+            end
+            clear_notes(sfx_bar)
+            for _, note in ipairs(saved) do
+                local clamped_octave = math.clamp(min_octave, note.octave, min_octave + 1)
+                local pitch_class = string.sub(note.note, 1, #note.note - 1)
+                local new_note_name = pitch_class .. clamped_octave
+                sfx_bar.set_note({
+                    beat = note.beat,
+                    note = new_note_name,
+                    duration = note.duration,
+                    unique = true,
+                })
+                sfx_bar.set_volume({ beat = note.beat, volume = note.volume })
+            end
+        end
+
+        return min_octave
+    end
 end
 
 return M

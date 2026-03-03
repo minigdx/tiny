@@ -2,11 +2,14 @@ local widgets = require("widgets")
 local wire = require("wire")
 local sfx_templates = require("sfx-templates")
 local EditorBase = require("editor-base")
+local icons = require("widgets.icons")
 
 local all_widgets = {}
 local modals_by_name = {}
 local dropdown_widget = nil
 local speaker_widgets = {}
+local sfx_editor_ref = nil
+local octave_counter_ref = nil
 
 -- colors
 local yellow = 9
@@ -117,6 +120,9 @@ Player._update = function(self)
         if self.beat >= 32 then
             self.play = false
             self.beat = 0
+            if self.playButton then
+                self.playButton.overlay = icons.Play
+            end
         end
     end
 
@@ -356,6 +362,13 @@ function _init_fader(entities)
     end
 end
 
+function _init_counter_entities(entities)
+    for c in all(entities["Counter"]) do
+        local counter = widgets:create_counter(c)
+        table.insert(all_widgets, counter)
+    end
+end
+
 function _init_velocity_editor(entities)
     for volume in all(entities["VelocityEditor"]) do
         local widget = new(VelocityEditor, volume)
@@ -384,6 +397,27 @@ function _init_sfx_editor(entities)
         }
         wire.bind(state, "sfx.bpm", bpm, "value", transform)
 
+        local volume_knob = wire.find_widget(all_widgets, widget.fields.Volume)
+        if volume_knob then
+            wire.bind(state, "sfx.volume", volume_knob, "value")
+        end
+
+        local octave_counter = wire.find_widget(all_widgets, widget.fields.Octave)
+        if octave_counter then
+            octave_counter.min = 0
+            octave_counter.max = 7
+            octave_counter.value = widget.octave
+            octave_counter.on_change = function(self)
+                local old_octave = widget.octave
+                local new_octave = self.value
+                if old_octave ~= new_octave then
+                    shift_notes(old_octave, new_octave)
+                    widget.octave = new_octave
+                end
+            end
+            octave_counter_ref = octave_counter
+        end
+
         wire.sync(state, "sfx.notes", widget, "values")
         widget.on_change = function(self, value)
             state.sfx.set_note(value)
@@ -395,7 +429,7 @@ function _init_sfx_editor(entities)
         -- Instrument dropdown
         local instrument_dropdown = wire.find_widget(all_widgets, widget.fields.Instrument)
         if #instrument_dropdown.options == 0 then
-            for i = 0, 15 do
+            for i = 0, 7 do
                 local inst = sfx.instrument(i)
                 local name = (inst and inst.name) or ("Instrument " .. i)
                 table.insert(instrument_dropdown.options, "[" .. i .. "] " .. name)
@@ -411,30 +445,9 @@ function _init_sfx_editor(entities)
         end
 
         table.insert(all_widgets, widget)
+        sfx_editor_ref = widget
         return widget
     end
-end
-
-function _init_counter(sfx_editor_widget)
-    local Counter = require("widgets.Counter")
-    local counter = new(Counter, {
-        x = sfx_editor_widget.x - 44,
-        y = sfx_editor_widget.y + math.floor(sfx_editor_widget.height / 2) - 8,
-        width = 40,
-        height = 16,
-        value = sfx_editor_widget.octave,
-        min = 0,
-        max = 7,
-    })
-    counter.on_change = function(self)
-        local old_octave = sfx_editor_widget.octave
-        local new_octave = self.value
-        if old_octave ~= new_octave then
-            shift_notes(old_octave, new_octave)
-            sfx_editor_widget.octave = new_octave
-        end
-    end
-    table.insert(all_widgets, counter)
 end
 
 function _init_player(entities)
@@ -461,7 +474,15 @@ function _init_player(entities)
         end
 
         local playButton = wire.find_widget(all_widgets, widget.fields.PlayButton)
-        playButton.on_change = function() widget:playSfx() end
+        widget.playButton = playButton
+        playButton.on_change = function()
+            widget:playSfx()
+            if widget.play then
+                playButton.overlay = icons.Stop
+            else
+                playButton.overlay = icons.Play
+            end
+        end
 
         local saveButton = wire.find_widget(all_widgets, widget.fields.SaveButton)
         saveButton.on_change = function() sfx.save() end
@@ -478,6 +499,8 @@ function _init()
     modals_by_name = {}
     dropdown_widget = nil
     speaker_widgets = {}
+    sfx_editor_ref = nil
+    octave_counter_ref = nil
 
     map.level("SfxEditor")
 
@@ -527,7 +550,11 @@ function _init()
             if dropdown_index and state.sfx then
                 local template_name = sfx_templates.list[dropdown_index]
                 if template_name then
-                    sfx_templates.generate(state.sfx, template_name)
+                    local lowest_octave = sfx_templates.generate(state.sfx, template_name)
+                    if lowest_octave and sfx_editor_ref and octave_counter_ref then
+                        sfx_editor_ref.octave = lowest_octave
+                        octave_counter_ref.value = math.clamp(octave_counter_ref.min, lowest_octave, octave_counter_ref.max)
+                    end
                 end
             end
         end
@@ -535,11 +562,9 @@ function _init()
 
     _init_knob(widget_entities)
     _init_fader(widget_entities)
+    _init_counter_entities(widget_entities)
     _init_velocity_editor(widget_entities)
-    local sfx_editor_widget = _init_sfx_editor(widget_entities)
-    if sfx_editor_widget then
-        _init_counter(sfx_editor_widget)
-    end
+    _init_sfx_editor(widget_entities)
     _init_player(widget_entities)
 end
 

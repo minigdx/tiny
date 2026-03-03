@@ -31,6 +31,7 @@ class MusicalBar(
      * Name of the SFX
      */
     var name: String? = "SFX $index",
+    var volume: Percent = 1.0f,
 ) {
     val beats: MutableList<MusicalNote> = mutableListOf()
 
