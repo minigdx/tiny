@@ -49,6 +49,7 @@ local TextInput = require("widgets.TextInput")
 local Panel = require("widgets.Panel")
 local TextButton = require("widgets.TextButton")
 local Speaker = require("widgets.Speaker")
+local Counter = require("widgets.Counter")
 
 factory.create_mode_switch_component = function(self, value)
     local result = new(ModeSwitch, value)
@@ -150,6 +151,11 @@ end
 
 factory.create_speaker = function(self, value)
     local result = new(Speaker, value)
+    return result
+end
+
+factory.create_counter = function(self, data)
+    local result = new(Counter, data)
     return result
 end
 
