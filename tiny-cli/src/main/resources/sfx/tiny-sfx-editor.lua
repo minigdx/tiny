@@ -620,8 +620,12 @@ end
 
 function _update()
     EditorBase.update(modals_by_name, function()
-        for w in all(all_widgets) do
-            w:_update()
+        if overlay_widget then
+            overlay_widget:_update()
+        else
+            for w in all(all_widgets) do
+                w:_update()
+            end
         end
     end)
 end
