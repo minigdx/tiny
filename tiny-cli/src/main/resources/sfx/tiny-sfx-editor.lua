@@ -10,6 +10,7 @@ local dropdown_widget = nil
 local speaker_widgets = {}
 local sfx_editor_ref = nil
 local octave_counter_ref = nil
+local overlay_widget = nil
 
 -- colors
 local yellow = 9
@@ -117,9 +118,17 @@ Player._update = function(self)
         self.time = self.time + tiny.dt
         self.beat = self.time * (state.sfx.bpm / 60)
 
-        if self.beat >= 32 then
+        local finished = false
+        if self.handler and not self.handler.playing then
+            finished = true
+        elseif self.beat >= 32 then
+            finished = true
+        end
+
+        if finished then
             self.play = false
             self.beat = 0
+            self.time = 0
             if self.playButton then
                 self.playButton.overlay = icons.Play
             end
@@ -348,6 +357,21 @@ local function shift_notes(old_octave, new_octave)
     end
 end
 
+local function wrap_dropdown_overlay(dropdown)
+    local original_update = dropdown._update
+    dropdown._update = function(self)
+        local was_open = self.open
+        original_update(self)
+        if self.open and not was_open then
+            overlay_widget = self
+        elseif not self.open and was_open then
+            if overlay_widget == self then
+                overlay_widget = nil
+            end
+        end
+    end
+end
+
 function _init_knob(entities)
     for k in all(entities["Knob"]) do
         local knob = widgets:create_knob(k)
@@ -437,6 +461,8 @@ function _init_sfx_editor(entities)
             instrument_dropdown:_init()
         end
 
+        wrap_dropdown_overlay(instrument_dropdown)
+
         wire.sync(state, "sfx.instrument", instrument_dropdown, "selected", function(_, _, value)
             return value + 1
         end)
@@ -501,6 +527,7 @@ function _init()
     speaker_widgets = {}
     sfx_editor_ref = nil
     octave_counter_ref = nil
+    overlay_widget = nil
 
     map.level("SfxEditor")
 
@@ -520,9 +547,13 @@ function _init()
         count = 32,
         fetch = function(i) return sfx.sfx(i) end,
         label = "SFX",
-        min_width = 200,
+        min_width = 150,
         on_select = function(index) state.sfx = sfx.sfx(index) end,
     })
+
+    if dropdown_widget then
+        wrap_dropdown_overlay(dropdown_widget)
+    end
 
     modals_by_name = EditorBase.init_buttons(widget_entities, all_widgets, {
         modal_sizes = {
@@ -579,7 +610,12 @@ end
 function _draw()
     EditorBase.draw(function()
         for w in all(all_widgets) do
-            w:_draw()
+            if w ~= overlay_widget then
+                w:_draw()
+            end
+        end
+        if overlay_widget then
+            overlay_widget:_draw()
         end
     end, modals_by_name)
 end

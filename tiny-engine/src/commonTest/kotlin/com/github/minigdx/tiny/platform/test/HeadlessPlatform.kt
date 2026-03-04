@@ -121,6 +121,8 @@ class HeadlessPlatform(
                         TODO("Not yet implemented")
                     }
 
+                    override fun isPlaying(): Boolean = false
+
                     override fun nextChunk(samples: Int): FloatData {
                         TODO("Not yet implemented")
                     }

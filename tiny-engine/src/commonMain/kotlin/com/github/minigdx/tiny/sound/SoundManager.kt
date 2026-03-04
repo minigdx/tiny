@@ -26,6 +26,10 @@ class DefaultSoundBoard(private val soundManager: SoundManager) : VirtualSoundBo
         return soundManager.createSoundHandler(buffer)
     }
 
+    override fun createHandler(buffer: FloatArray): SoundHandler {
+        return soundManager.createSoundHandler(buffer)
+    }
+
     override fun convert(bar: MusicalBar): FloatArray {
         val buffer = soundManager.convert(bar)
         return buffer

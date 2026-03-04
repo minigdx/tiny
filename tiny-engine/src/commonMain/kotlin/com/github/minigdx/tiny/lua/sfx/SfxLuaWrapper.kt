@@ -113,6 +113,7 @@ class SfxLuaWrapper(
                 handler.stop()
                 NONE
             }
+            result.wrap("playing") { valueOf(handler.isPlaying()) }
             result
         }
 

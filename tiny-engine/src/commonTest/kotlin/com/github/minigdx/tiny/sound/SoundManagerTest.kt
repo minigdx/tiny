@@ -24,6 +24,8 @@ class SoundManagerTest {
 
                 override fun stop() {}
 
+                override fun isPlaying(): Boolean = false
+
                 override fun nextChunk(samples: Int): FloatData {
                     TODO("Not yet implemented")
                 }
