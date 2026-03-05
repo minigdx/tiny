@@ -12,7 +12,6 @@ class SequenceLuaWrapper(
     private val soundBoard: VirtualSoundBoard,
     private val platform: Platform,
 ) : WrapperLuaTable() {
-
     private var cachedBuffer: FloatArray? = null
 
     init {

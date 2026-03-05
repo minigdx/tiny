@@ -7,7 +7,6 @@ import com.github.minigdx.tiny.lua.Note
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
-import kotlin.math.tanh
 
 class DefaultSoundBoard(private val soundManager: SoundManager) : VirtualSoundBoard {
     override fun prepare(bar: MusicalBar): SoundHandler {
@@ -113,35 +112,44 @@ abstract class SoundManager {
         if (tracks.isEmpty()) return floatArrayOf()
 
         val resultSize = tracks.maxOf { it.size }
-        val result = FloatArray(resultSize) { 0f }
+        val result = FloatArray(resultSize)
 
         // Calculate RMS values for each track to properly scale them during mixing
-        val trackRmsValues = tracks.map { calculateRms(it) }
+        val trackRmsValues = FloatArray(tracks.size) { calculateRms(tracks[it]) }
         val totalRms = trackRmsValues.sum()
 
-        // Mix tracks with RMS-based scaling to prevent saturation
-        result.indices.forEach { index ->
-            var mixedSample = 0f
-
-            // If total RMS is significant, use it for scaling
-            if (totalRms > 0.001f) {
-                tracks.forEachIndexed { trackIndex, track ->
-                    val sample = track.getOrNull(index) ?: 0f
-                    // Scale each sample based on its track's contribution to the total RMS
-                    val scaleFactor = if (trackRmsValues[trackIndex] > 0.001f) {
-                        // Normalize by the track's RMS value relative to the total RMS
-                        1f / (trackRmsValues.size * (trackRmsValues[trackIndex] / totalRms))
-                    } else {
-                        1f
-                    }
-                    mixedSample += sample * scaleFactor
+        // Step 6: Pre-compute scale factors and use indexed loops
+        if (totalRms > 0.001f) {
+            val scaleFactors = FloatArray(tracks.size) { t ->
+                if (trackRmsValues[t] > 0.001f) {
+                    1f / (tracks.size * (trackRmsValues[t] / totalRms))
+                } else {
+                    1f
                 }
-            } else {
-                // Fallback to simple averaging if RMS values are too small
-                mixedSample = tracks.mapNotNull { it.getOrNull(index) }.sum() / tracks.size.toFloat()
             }
 
-            result[index] = softClip(mixedSample)
+            for (index in result.indices) {
+                var mixedSample = 0f
+                for (t in tracks.indices) {
+                    val track = tracks[t]
+                    if (index < track.size) {
+                        mixedSample += track[index] * scaleFactors[t]
+                    }
+                }
+                result[index] = softClip(mixedSample)
+            }
+        } else {
+            val invSize = 1f / tracks.size.toFloat()
+            for (index in result.indices) {
+                var mixedSample = 0f
+                for (t in tracks.indices) {
+                    val track = tracks[t]
+                    if (index < track.size) {
+                        mixedSample += track[index]
+                    }
+                }
+                result[index] = softClip(mixedSample * invSize)
+            }
         }
         return result
     }
@@ -173,9 +181,22 @@ abstract class SoundManager {
 
         val secondsPerBeat = 60f / tempo
 
-        var result = floatArrayOf()
+        // Step 1: Pre-allocate result array to avoid O(n^2) copyOf calls
+        var resultSize = 0
+        for (b in beats) {
+            val instrument = b.instrument ?: defaultInstrument
+            val effectiveRelease = max(instrument.release, MIN_RELEASE_SECONDS)
+            val noteDurationInSeconds = (b.duration * secondsPerBeat) + effectiveRelease
+            val numberOfSamples = (noteDurationInSeconds * SAMPLE_RATE).roundToInt()
+            val minimumSize = (b.beat * secondsPerBeat * SAMPLE_RATE).roundToInt() + numberOfSamples
+            if (minimumSize > resultSize) resultSize = minimumSize
+        }
+        val result = FloatArray(resultSize)
 
         for (b in beats) {
+            // Step 7: Skip silent notes early
+            if (b.note == null && b.volume == 0f) continue
+
             val instrument = b.instrument ?: defaultInstrument
             // Duration of the note added to the duration of the release.
             val effectiveRelease = max(instrument.release, MIN_RELEASE_SECONDS)
@@ -189,25 +210,34 @@ abstract class SoundManager {
 
             val fundamentalFreq = b.note?.frequency ?: 0f
 
+            // Step 2: Pre-filter active modulations once per note
+            val activeModulations = instrument.activeModulations()
+            // Step 3: Precompute envelope parameters once per note
+            val envelope = PrecomputedEnvelope(numberOfSamples, instrument)
+            // Step 5: Get harmonics array for indexed loop
+            val harmonics = instrument.harmonics
+
             for (i in 0..<numberOfSamples) {
                 val time = (i.toFloat() / SAMPLE_RATE.toFloat())
                 var sampleValue = 0.0f
 
                 // Only generate sound if there is a note
                 if (b.note != null) {
-                    instrument.harmonics.forEachIndexed { index, relativeAmplitude ->
-                        val harmonicNumber = index + 1
-                        val harmonicFreq = fundamentalFreq * harmonicNumber
-
-                        sampleValue += relativeAmplitude * instrument.generate(harmonicFreq, time)
+                    // Step 5: Indexed loop + skip zero harmonics
+                    for (h in harmonics.indices) {
+                        val amp = harmonics[h]
+                        if (amp == 0f) continue
+                        sampleValue += amp * instrument.generate(fundamentalFreq * (h + 1), time, activeModulations)
                     }
 
-                    sampleValue *= envelopeFilter(i, numberOfSamples, instrument)
+                    // Step 3: Use precomputed envelope
+                    sampleValue *= envelope.evaluate(i)
                     sampleValue *= normalizationFactor * b.volume * volume
                     sampleValue *= masterVolume
                 }
 
-                buffer[i] = softClip(sampleValue)
+                // Step 4: No softClip per sample — only at final mix
+                buffer[i] = sampleValue
             }
 
             // Apply safety fade-out to prevent clicks at buffer boundaries
@@ -223,60 +253,56 @@ abstract class SoundManager {
             // Put the buffer at the time of the beat in the result (without the release).
             val startIndex = (b.beat * secondsPerBeat * SAMPLE_RATE).roundToInt()
             val endIndex = startIndex + numberOfSamples - 1
-            val minimumSize = startIndex + numberOfSamples
 
-            // Adjust the size of result if the buffer finish after the actual result.
-            if (minimumSize > result.size) {
-                result = result.copyOf(minimumSize)
-            }
-
-            // Additive synthesis of the buffer into the result.
+            // Step 4: No softClip on additive mix — just accumulate
             var index = 0
             for (i in startIndex until endIndex) {
-                result[i] = softClip(result[i] + buffer[index++])
+                result[i] += buffer[index++]
             }
         }
 
         return result
     }
 
-    private fun envelopeFilter(
-        currentSample: Int,
-        totalSamples: Int,
-        instrument: Instrument,
-    ): Float {
-        // Get the number of samples for each phase. Avoid empty phase
-        val attackSamples = max(1f, instrument.attack * SAMPLE_RATE)
-        val decaySamples = max(1f, instrument.decay * SAMPLE_RATE)
-        val effectiveRelease = max(MIN_RELEASE_SECONDS, instrument.release)
-        val releaseSamples = max(1f, effectiveRelease * SAMPLE_RATE)
-        val sustainLevel = min(1f, max(instrument.sustain, 0f))
+    /**
+     * Pre-computed envelope parameters to avoid redundant calculations per sample.
+     * All phase boundaries are computed once per note.
+     */
+    private class PrecomputedEnvelope(totalSamples: Int, instrument: Instrument) {
+        private val attackSamples: Float = max(1f, instrument.attack * SAMPLE_RATE)
+        private val decaySamples: Float = max(1f, instrument.decay * SAMPLE_RATE)
+        private val sustainLevel: Float = min(1f, max(instrument.sustain, 0f))
+        private val releaseSamples: Float
+        private val releaseStartSample: Float
+        private val attackEndSample: Float
+        private val decayEndSample: Float
 
-        val releaseStartSample = totalSamples - (effectiveRelease * SAMPLE_RATE)
-        // Ensure that phases can't finish AFTER the release.
-        val attackEndSample = min(attackSamples, releaseStartSample)
-        val decayEndSample = min(attackEndSample + decaySamples, releaseStartSample)
-
-        val multiplier = if (currentSample < attackEndSample) {
-            // Attack: quadratic curve (slow start, fast finish)
-            val linear = currentSample.toFloat() / attackSamples
-            linear * linear
-        } else if (currentSample < decayEndSample) {
-            // Decay: inverse-square curve (fast drop, slow tail toward sustain)
-            val linear = (currentSample - attackEndSample) / decaySamples
-            val remaining = 1.0f - linear
-            sustainLevel + (1.0f - sustainLevel) * remaining * remaining
-        } else if (currentSample < releaseStartSample) {
-            // Sustain level
-            sustainLevel
-        } else {
-            // Release: quadratic curve (fast drop, slow tail to 0)
-            val linear = (currentSample - releaseStartSample) / releaseSamples
-            val remaining = 1.0f - min(1.0f, linear)
-            sustainLevel * remaining * remaining
+        init {
+            val effectiveRelease = max(MIN_RELEASE_SECONDS, instrument.release)
+            releaseSamples = max(1f, effectiveRelease * SAMPLE_RATE)
+            releaseStartSample = totalSamples - (effectiveRelease * SAMPLE_RATE)
+            attackEndSample = min(attackSamples, releaseStartSample)
+            decayEndSample = min(attackEndSample + decaySamples, releaseStartSample)
         }
 
-        return max(0.0f, min(1.0f, multiplier))
+        fun evaluate(currentSample: Int): Float {
+            val multiplier = if (currentSample < attackEndSample) {
+                val linear = currentSample.toFloat() / attackSamples
+                linear * linear
+            } else if (currentSample < decayEndSample) {
+                val linear = (currentSample - attackEndSample) / decaySamples
+                val remaining = 1.0f - linear
+                sustainLevel + (1.0f - sustainLevel) * remaining * remaining
+            } else if (currentSample < releaseStartSample) {
+                sustainLevel
+            } else {
+                val linear = (currentSample - releaseStartSample) / releaseSamples
+                val remaining = 1.0f - min(1.0f, linear)
+                sustainLevel * remaining * remaining
+            }
+
+            return max(0.0f, min(1.0f, multiplier))
+        }
     }
 
     abstract fun noteOn(
@@ -319,18 +345,22 @@ abstract class SoundManager {
         // Minimum release time in seconds (~2ms) to prevent clicks
         private const val MIN_RELEASE_SECONDS = 0.002f
 
-        // Pre-computed normalization constant for tanh-based soft clipping
-        private val TANH_NORM = 1.0f / tanh(1.5f)
-
         /**
-         * Soft saturation using tanh.
+         * Fast soft saturation using a Padé approximation of tanh.
          * Produces warm compression when signals exceed the dynamic range,
          * instead of harsh distortion from hard clipping.
          * Quiet signals pass through nearly unaffected.
          */
         fun softClip(sample: Float): Float {
-            val clipped = tanh(sample * 1.5f) * TANH_NORM
-            return max(-1.0f, min(1.0f, clipped))
+            val x = sample * 1.5f
+            return when {
+                x >= 3f -> 1f
+                x <= -3f -> -1f
+                else -> {
+                    val x2 = x * x
+                    x * (27f + x2) / (27f + 9f * x2)
+                }
+            }
         }
     }
 }

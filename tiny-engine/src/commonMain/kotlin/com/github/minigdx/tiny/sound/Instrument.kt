@@ -171,6 +171,80 @@ class Instrument(
         return tremolo.apply(time, sample)
     }
 
+    /**
+     * Return only the active modulations, to avoid filtering per sample.
+     */
+    fun activeModulations(): List<Modulation> = modulations.filter { it.active }
+
+    /**
+     * Generate a sample with pre-filtered active modulations to avoid
+     * per-sample list allocation.
+     */
+    fun generate(
+        freq: Float,
+        time: Float,
+        activeModulations: List<Modulation>,
+    ): Float {
+        val harmonicFreq = activeModulations.fold(freq) { acc, modulation -> modulation.apply(time, acc) }
+
+        val sample = when (this.wave) {
+            TRIANGLE -> {
+                val phase = (harmonicFreq * time) % 1.0f
+                if (phase < 0.5f) {
+                    (4.0f * phase) - 1.0f
+                } else {
+                    3.0f - (4.0f * phase)
+                }
+            }
+
+            SINE -> sin(TWO_PI * harmonicFreq * time)
+
+            SQUARE -> {
+                val value = sin(TWO_PI * harmonicFreq * time)
+                if (value > 0f) 1f else -1f
+            }
+
+            PULSE -> {
+                val phase = (harmonicFreq * time) % 1.0f
+                val dc = dutyCycle
+                val raw = if (phase < dc) 1.0f else -1.0f
+                val dcOffset = (2.0f * dc) - 1.0f
+                raw - dcOffset
+            }
+
+            SAW_TOOTH -> {
+                val phase = (harmonicFreq * time) % 1.0f
+                (2.0f * phase) - 1.0f
+            }
+
+            NOISE -> {
+                val alpha =
+                    if (lastFrequencyUsed == harmonicFreq) {
+                        cachedAlpha
+                    } else {
+                        val safeCutoff = max(1f, harmonicFreq)
+                        val wc = TWO_PI * safeCutoff / SAMPLE_RATE
+                        val x = exp(-wc)
+                        cachedAlpha = 1.0f - x
+                        lastFrequencyUsed = harmonicFreq
+                        cachedAlpha
+                    }
+                val white = random.nextFloat() * 2f - 1f
+                val filtered = alpha * white + (1.0f - alpha) * lastOutput
+                lastOutput = filtered
+
+                val dcAlpha = 0.997f
+                dcBlockerOut = dcAlpha * (dcBlockerOut + filtered - dcBlockerPrev)
+                dcBlockerPrev = filtered
+                dcBlockerOut
+            }
+
+            DRUM -> DrumSynthesizer.generate(harmonicFreq, time, random)
+        }
+
+        return tremolo.apply(time, sample)
+    }
+
     companion object {
         private const val NUMBER_OF_HARMONICS = 7
         private const val TWO_PI = PI.toFloat() * 2f
