@@ -11,7 +11,7 @@
 	"iid": "4cf47920-fa90-11f0-ad09-7b5a63ac610d",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 105,
+	"nextUid": 106,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -3046,6 +3046,43 @@
 					"allowOutOfLevelRef": true,
 					"allowedRefs": "OnlySpecificEntity",
 					"allowedRefsEntityUid": 2,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				},
+				{
+					"identifier": "Export",
+					"doc": null,
+					"__type": "EntityRef",
+					"uid": 105,
+					"type": "F_EntityRef",
+					"isArray": false,
+					"canBeNull": true,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "RefLinkBetweenCenters",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "CurvedArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySpecificEntity",
+					"allowedRefsEntityUid": 78,
 					"allowedRefTags": [],
 					"tilesetUid": null
 				}
@@ -9180,7 +9217,10 @@
 							"defUid": 78,
 							"px": [314,4],
 							"fieldInstances": [
-								{ "__identifier": "Label", "__type": "String", "__value": "", "__tile": null, "defUid": 79, "realEditorValues": [] },
+								{ "__identifier": "Label", "__type": "String", "__value": "Export", "__tile": null, "defUid": 79, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Export"]
+								}] },
 								{ "__identifier": "IsActive", "__type": "Bool", "__value": false, "__tile": null, "defUid": 80, "realEditorValues": [] },
 								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "LigthBlue", "__tile": null, "defUid": 82, "realEditorValues": [{
 									"id": "V_String",
@@ -9343,19 +9383,19 @@
 						},
 						{
 							"__identifier": "Dropdown",
-							"__grid": [3,14],
+							"__grid": [3,13],
 							"__pivot": [0,0],
 							"__tags": ["Widget"],
 							"__tile": { "tilesetUid": 72, "x": 24, "y": 0, "w": 24, "h": 24 },
 							"__smartColor": "#D77643",
 							"iid": "32cf0410-fa90-11f0-9ead-e9c92c8921e0",
-							"width": 96,
+							"width": 136,
 							"height": 16,
 							"defUid": 2,
-							"px": [24,112],
+							"px": [24,104],
 							"fieldInstances": [],
 							"__worldX": 840,
-							"__worldY": 112
+							"__worldY": 104
 						},
 						{
 							"__identifier": "Dropdown",
@@ -9607,6 +9647,15 @@
 								}, "__tile": null, "defUid": 104, "realEditorValues": [{
 									"id": "V_String",
 									"params": ["28531860-fa90-11f0-9ead-3f8e285343d4"]
+								}] },
+								{ "__identifier": "Export", "__type": "EntityRef", "__value": {
+									"entityIid": "0883b030-fa90-11f0-9ead-999e302540dc",
+									"layerIid": "c5000ed1-fa90-11f0-9ead-a1240c4664a1",
+									"levelIid": "c5000ed0-fa90-11f0-9ead-c7908e5e7535",
+									"worldIid": "4cf47921-fa90-11f0-ad09-8d23e32977ff"
+								}, "__tile": null, "defUid": 105, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["0883b030-fa90-11f0-9ead-999e302540dc"]
 								}] }
 							],
 							"__worldX": 1000,
@@ -9695,7 +9744,7 @@
 							"__tile": { "tilesetUid": 72, "x": 24, "y": 0, "w": 24, "h": 24 },
 							"__smartColor": "#D77643",
 							"iid": "384e4820-fa90-11f0-9ead-cbd74a75cb33",
-							"width": 32,
+							"width": 88,
 							"height": 16,
 							"defUid": 2,
 							"px": [64,32],
@@ -9705,19 +9754,19 @@
 						},
 						{
 							"__identifier": "Dropdown",
-							"__grid": [4,17],
+							"__grid": [3,15],
 							"__pivot": [0,0],
 							"__tags": ["Widget"],
 							"__tile": { "tilesetUid": 72, "x": 24, "y": 0, "w": 24, "h": 24 },
 							"__smartColor": "#D77643",
 							"iid": "48a63de0-fa90-11f0-9ead-3711375dd545",
-							"width": 80,
+							"width": 136,
 							"height": 16,
 							"defUid": 2,
-							"px": [32,136],
+							"px": [24,120],
 							"fieldInstances": [],
-							"__worldX": 848,
-							"__worldY": 136
+							"__worldX": 840,
+							"__worldY": 120
 						}
 					]
 				},

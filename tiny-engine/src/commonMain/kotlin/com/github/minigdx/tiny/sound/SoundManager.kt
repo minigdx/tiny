@@ -35,6 +35,10 @@ class DefaultSoundBoard(private val soundManager: SoundManager) : VirtualSoundBo
         return buffer
     }
 
+    override fun convert(sequence: MusicalSequence): FloatArray {
+        return soundManager.convert(sequence)
+    }
+
     override fun noteOn(
         note: Note,
         instrument: Instrument,

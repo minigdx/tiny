@@ -136,7 +136,7 @@ class SfxLib(
             val index = arg.checkint()
             return music.sequences
                 .getOrNull(index)
-                ?.let { SequenceLuaWrapper(music, it, soundBoard) } ?: NIL
+                ?.let { SequenceLuaWrapper(music, it, soundBoard, platform) } ?: NIL
         }
     }
 

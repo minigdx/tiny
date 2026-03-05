@@ -2,6 +2,7 @@ local widgets = require("widgets")
 local wire = require("wire")
 local EditorBase = require("editor-base")
 local music_templates = require("music-templates")
+local icons = require("widgets.icons")
 
 local all_widgets = {}
 local modals_by_name = {}
@@ -10,6 +11,8 @@ local overlay_widget = nil
 
 local save_state = nil
 local save_button_ref = nil
+local selector_dd_ref = nil
+local play_button_ref = nil
 
 local state = {
     seq = nil,
@@ -18,6 +21,7 @@ local state = {
 
 local playing = false
 local play_handler = nil
+local config_dirty = true
 
 local config = {
     root = "C",
@@ -29,10 +33,10 @@ local config = {
     bass_instrument = 1,
     lead_instrument = 2,
     drum_instrument = 3,
-    chord_volume = 0.6,
-    bass_volume = 0.8,
-    lead_volume = 0.5,
-    drum_volume = 0.7,
+    chord_volume = 0.3,
+    bass_volume = 0.4,
+    lead_volume = 0.25,
+    drum_volume = 0.35,
     bpm = 120,
 }
 
@@ -85,6 +89,19 @@ local function populate_dropdown(dd, options, default_index)
     dd:_init()
 end
 
+local function build_seq_label(index)
+    local seq = sfx.sequence(index)
+    local name = seq and seq.name
+    if name and name ~= "" then
+        return "[" .. index .. "] " .. name
+    end
+    return "Seq " .. index
+end
+
+local function mark_config_dirty()
+    config_dirty = true
+end
+
 local function _init_music_generator(widget_entities)
     local generators = widget_entities["MusicGenerator"]
     if not generators then return end
@@ -111,6 +128,10 @@ local function _init_music_generator(widget_entities)
     local play_button = wire.find_widget(all_widgets, gen.fields.Play)
     local master_volume_fader = wire.find_widget(all_widgets, gen.fields.Volume)
     local selector_dd = wire.find_widget(all_widgets, gen.fields.Selector)
+    local export_button = wire.find_widget(all_widgets, gen.fields.Export)
+
+    selector_dd_ref = selector_dd
+    play_button_ref = play_button
 
     -- Find unreferenced dropdown for Lead Style by position (21, 72)
     local lead_style_dd = nil
@@ -119,7 +140,7 @@ local function _init_music_generator(widget_entities)
         "DrumPattern", "DrumVolume", "MusicTheme", "MusicScale",
         "LeadInstrument", "LeadVolume", "BassInstrument", "BassVolume",
         "RythmVolume", "RythmChordProgression", "RythmInstrument",
-        "Play", "Volume", "Selector",
+        "Play", "Volume", "Selector", "Export",
     }) do
         local ref = gen.fields[field_name]
         if ref then
@@ -145,7 +166,7 @@ local function _init_music_generator(widget_entities)
 
     local seq_options = {}
     for i = 0, 7 do
-        table.insert(seq_options, "Seq " .. i)
+        table.insert(seq_options, build_seq_label(i))
     end
 
     -- Populate dropdowns with options
@@ -170,42 +191,49 @@ local function _init_music_generator(widget_entities)
     if scale_dd then
         scale_dd.on_change = function(self)
             config.scale_name = music_templates.scale_names[self.selected]
+            mark_config_dirty()
         end
     end
 
     if progression_dd then
         progression_dd.on_change = function(self)
             config.progression_name = music_templates.progression_names[self.selected]
+            mark_config_dirty()
         end
     end
 
     if drum_pattern_dd then
         drum_pattern_dd.on_change = function(self)
             config.drum_pattern = music_templates.drum_pattern_names[self.selected]
+            mark_config_dirty()
         end
     end
 
     if lead_style_dd then
         lead_style_dd.on_change = function(self)
             config.lead_style = music_templates.lead_styles[self.selected]
+            mark_config_dirty()
         end
     end
 
     if chord_inst_dd then
         chord_inst_dd.on_change = function(self)
             config.chord_instrument = self.selected - 1
+            mark_config_dirty()
         end
     end
 
     if bass_inst_dd then
         bass_inst_dd.on_change = function(self)
             config.bass_instrument = self.selected - 1
+            mark_config_dirty()
         end
     end
 
     if lead_inst_dd then
         lead_inst_dd.on_change = function(self)
             config.lead_instrument = self.selected - 1
+            mark_config_dirty()
         end
     end
 
@@ -213,24 +241,28 @@ local function _init_music_generator(widget_entities)
     if chord_volume_fader then
         chord_volume_fader.on_change = function(self)
             config.chord_volume = self.value
+            mark_config_dirty()
         end
     end
 
     if bass_volume_fader then
         bass_volume_fader.on_change = function(self)
             config.bass_volume = self.value
+            mark_config_dirty()
         end
     end
 
     if lead_volume_fader then
         lead_volume_fader.on_change = function(self)
             config.lead_volume = self.value
+            mark_config_dirty()
         end
     end
 
     if drum_volume_fader then
         drum_volume_fader.on_change = function(self)
             config.drum_volume = self.value
+            mark_config_dirty()
         end
     end
 
@@ -245,6 +277,8 @@ local function _init_music_generator(widget_entities)
                     track.volume = base_volumes[i + 1] * vol
                 end
             end
+            -- Master volume changes need audio re-render but not note regeneration
+            state.seq.invalidate()
         end
     end
 
@@ -272,6 +306,8 @@ local function _init_music_generator(widget_entities)
             if lead_style_dd then
                 lead_style_dd:set_selected(find_index(music_templates.lead_styles, theme.lead_style))
             end
+
+            mark_config_dirty()
         end
     end
 
@@ -284,17 +320,35 @@ local function _init_music_generator(widget_entities)
                 end
                 playing = false
                 play_handler = nil
+                play_button.overlay = icons.Play
                 for s in all(speaker_widgets) do
                     s.playing = false
                 end
             else
-                music_templates.generate(state.seq, config)
+                if config_dirty then
+                    music_templates.generate(state.seq, config)
+                    state.seq.invalidate()
+                    config_dirty = false
+                end
                 play_handler = state.seq.play()
                 playing = true
+                play_button.overlay = icons.Stop
                 for s in all(speaker_widgets) do
                     s.playing = true
                 end
             end
+        end
+    end
+
+    -- Export button: export current sequence as wav
+    if export_button then
+        export_button.on_change = function()
+            if config_dirty then
+                music_templates.generate(state.seq, config)
+                state.seq.invalidate()
+                config_dirty = false
+            end
+            state.seq.export()
         end
     end
 
@@ -305,12 +359,16 @@ local function _init_music_generator(widget_entities)
                 play_handler.stop()
                 playing = false
                 play_handler = nil
+                if play_button then
+                    play_button.overlay = icons.Play
+                end
                 for s in all(speaker_widgets) do
                     s.playing = false
                 end
             end
             state.seq_index = self.selected - 1
             state.seq = sfx.sequence(state.seq_index)
+            config_dirty = true
         end
     end
 end
@@ -336,8 +394,11 @@ function _init()
     overlay_widget = nil
     save_state = nil
     save_button_ref = nil
+    selector_dd_ref = nil
+    play_button_ref = nil
     playing = false
     play_handler = nil
+    config_dirty = true
 
     map.level("MusicEditor")
 
@@ -358,7 +419,18 @@ function _init()
     EditorBase.init_mode_switch(widget_entities, all_widgets)
 
     modals_by_name = EditorBase.init_buttons(widget_entities, all_widgets, {
-        on_open = function() return "" end,
+        on_open = function()
+            return state.seq.name or ""
+        end,
+        on_name_validate = function(value)
+            if value and state.seq then
+                state.seq.name = value
+                if selector_dd_ref then
+                    selector_dd_ref.options[state.seq_index + 1] = build_seq_label(state.seq_index)
+                    selector_dd_ref:_init()
+                end
+            end
+        end,
     })
 
     -- Create all dropdowns and wrap with overlay
@@ -383,6 +455,9 @@ function _update()
         if not play_handler.playing then
             playing = false
             play_handler = nil
+            if play_button_ref then
+                play_button_ref.overlay = icons.Play
+            end
             for s in all(speaker_widgets) do
                 s.playing = false
             end

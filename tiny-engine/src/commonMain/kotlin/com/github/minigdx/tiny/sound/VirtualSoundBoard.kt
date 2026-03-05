@@ -25,6 +25,8 @@ interface VirtualSoundBoard {
 
     fun convert(bar: MusicalBar): FloatArray
 
+    fun convert(sequence: MusicalSequence): FloatArray
+
     fun noteOn(
         note: Note,
         instrument: Instrument,

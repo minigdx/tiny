@@ -125,7 +125,7 @@ local function generate_chords(track, config)
             local beat = bar * 8 + i
             if beat < 33 then
                 local note_idx = (i % #chord) + 1
-                track.set_note({ beat = beat, note = make_note(chord[note_idx]), volume = 0.7 })
+                track.set_note({ beat = beat, note = make_note(chord[note_idx]), volume = 0.5 })
             end
         end
     end
@@ -145,11 +145,11 @@ local function generate_bass(track, config)
             local beat = bar * 8 + i
             if beat < 33 then
                 if i == 0 or i == 4 then
-                    track.set_note({ beat = beat, note = make_note(root), volume = 0.9 })
+                    track.set_note({ beat = beat, note = make_note(root), volume = 0.7 })
                 elseif i == 2 or i == 6 then
                     local fifth_idx = ((degree - 1 + 4) % #scale) + 1
                     local fifth = note_name_to_index(config.root) + 2 * 12 + scale[fifth_idx]
-                    track.set_note({ beat = beat, note = make_note(fifth), volume = 0.7 })
+                    track.set_note({ beat = beat, note = make_note(fifth), volume = 0.5 })
                 end
             end
         end
@@ -192,7 +192,7 @@ local function generate_lead(track, config)
             local semi = scale_notes[pos]
             if semi > 95 then semi = semi - 12 end
             if semi < 0 then semi = semi + 12 end
-            track.set_note({ beat = beat, note = make_note(semi), volume = 0.6 + math.random() * 0.3 })
+            track.set_note({ beat = beat, note = make_note(semi), volume = 0.4 + math.random() * 0.2 })
         end
     end
 end
@@ -213,11 +213,11 @@ local function generate_drums(track, config)
             local pi = (i % #pattern.kick) + 1
             if beat < 33 then
                 if pattern.kick[pi] == 1 then
-                    track.set_note({ beat = beat, note = kick_note, volume = 0.9 })
+                    track.set_note({ beat = beat, note = kick_note, volume = 0.7 })
                 elseif pattern.snare[pi] == 1 then
-                    track.set_note({ beat = beat, note = snare_note, volume = 0.8 })
+                    track.set_note({ beat = beat, note = snare_note, volume = 0.6 })
                 elseif pattern.hihat[pi] == 1 then
-                    track.set_note({ beat = beat, note = hihat_note, volume = 0.5 })
+                    track.set_note({ beat = beat, note = hihat_note, volume = 0.35 })
                 end
             end
         end
