@@ -5,6 +5,7 @@ import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.lua.sfx.InstrumentLuaWrapper
+import com.github.minigdx.tiny.lua.sfx.SequenceLuaWrapper
 import com.github.minigdx.tiny.lua.sfx.SfxLuaWrapper
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.sound.Instrument
@@ -36,6 +37,7 @@ class SfxLib(
 
         ctrl.set("instrument", instrument())
         ctrl.set("sfx", sfx())
+        ctrl.set("sequence", sequence())
 
         ctrl.set("save", save())
 
@@ -121,6 +123,20 @@ class SfxLib(
             return sound.data.music.musicalBars
                 .getOrNull(index)
                 ?.let { SfxLuaWrapper(sound, it, soundBoard, platform) } ?: NIL
+        }
+    }
+
+    @TinyFunction("Access musical sequence using its index.")
+    inner class sequence : OneArgFunction() {
+        @TinyCall("Access musical sequence using its index.")
+        override fun call(arg: LuaValue): LuaValue {
+            val sound = resourceAccess.findSound(0) ?: return NIL
+            val music = sound.data.music
+
+            val index = arg.checkint()
+            return music.sequences
+                .getOrNull(index)
+                ?.let { SequenceLuaWrapper(music, it, soundBoard) } ?: NIL
         }
     }
 

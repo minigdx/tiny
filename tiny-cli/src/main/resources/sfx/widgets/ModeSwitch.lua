@@ -5,7 +5,7 @@ local ModeSwitch = {
     scripts = {
         Instrument = "tiny-instrument-editor.lua",
         Sfx = "tiny-sfx-editor.lua",
-        Music = nil,
+        Music = "music-editor.lua",
         MusicFactory = nil,
     },
     hover_index = nil,
