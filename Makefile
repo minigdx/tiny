@@ -32,6 +32,15 @@ sfx:
 sample:
 	./gradlew :tiny-cli:run --args="run ." -Ptiny.workDir=tiny-sample
 
+register:
+	@if [ -z "$(GAME)" ]; then echo "Usage: make register GAME=path/to/game"; exit 1; fi
+	@echo "Registering game from $(GAME)..."
+	cp $(GAME)/_tiny.json $(GAME)/_tiny.json.bak
+	jq '.resolution = {"width": 256, "height": 256} | .zoom = 1' $(GAME)/_tiny.json.bak > $(GAME)/_tiny.json
+	tiny-cli record --headless --output tiny-doc/src/docs/asciidoc/sample/$$(basename $(GAME)).gif $(GAME)
+	mv $(GAME)/_tiny.json.bak $(GAME)/_tiny.json
+	@echo "Screenshot saved to tiny-doc/src/docs/asciidoc/sample/$$(basename $(GAME)).gif"
+
 test-linux-export:
 	./gradlew assembleDist -Pversion=DEV-SNAPSHOT
 	docker run --rm \
