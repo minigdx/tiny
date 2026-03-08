@@ -245,6 +245,26 @@ class Instrument(
         return tremolo.apply(time, sample)
     }
 
+    /**
+     * Create a copy of this instrument with fresh (reset) transient state.
+     * Used to isolate mutable state (NOISE filter, DC blocker) when synthesizing in parallel.
+     */
+    fun copyWithFreshState(): Instrument {
+        return Instrument(
+            index = index,
+            name = name,
+            wave = wave,
+            attack = attack,
+            decay = decay,
+            sustain = sustain,
+            release = release,
+            harmonics = harmonics.copyOf(),
+            modulations = modulations,
+            dutyCycle = dutyCycle,
+            tremolo = tremolo,
+        )
+    }
+
     companion object {
         private const val NUMBER_OF_HARMONICS = 7
         private const val TWO_PI = PI.toFloat() * 2f
