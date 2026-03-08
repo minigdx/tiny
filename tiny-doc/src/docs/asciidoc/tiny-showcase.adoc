@@ -13,6 +13,7 @@ image:sample/meiro_de_maigo2.gif[Meiro de Maigo - a maze exploration game made w
 image:sample/freezming.gif[Freezming - a freezing-themed game made with Tiny game engine,link=https://dwursteisen.itch.io/freezming]
 image:sample/gravity-balls.gif[Gravity Balls - a physics gravity game made with Tiny game engine,link=https://dwursteisen.itch.io/gravity-balls]
 image:sample/reflections.gif[Reflections - a reflection-themed game made with Tiny game engine,link=https://dwursteisen.itch.io/macro-jams-06-reflections]
+image:sample/2026-1bit-jam-2.gif[2026 1bit Jam 2 - a game made with Tiny game engine,link=https://dwursteisen.itch.io/pair-of-pipes]
 
 
 TIP: Want your game to appear here? Create a post about it in https://github.com/minigdx/tiny/discussions/categories/show-and-tell[the Show and tell board] and share all information about it.
