@@ -326,8 +326,8 @@ local function _init_music_generator(widget_entities)
                 end
             else
                 if config_dirty then
-                    music_templates.generate(state.seq, config)
-                    state.seq.invalidate()
+                    config.seed = math.random(1, 2147483647)
+                    state.seq.generate(config)
                     config_dirty = false
                 end
                 play_handler = state.seq.play()
@@ -344,8 +344,8 @@ local function _init_music_generator(widget_entities)
     if export_button then
         export_button.on_change = function()
             if config_dirty then
-                music_templates.generate(state.seq, config)
-                state.seq.invalidate()
+                config.seed = math.random(1, 2147483647)
+                state.seq.generate(config)
                 config_dirty = false
             end
             state.seq.export()
@@ -368,8 +368,120 @@ local function _init_music_generator(widget_entities)
             end
             state.seq_index = self.selected - 1
             state.seq = sfx.sequence(state.seq_index)
+
+            -- Load config from sequence if available
+            local saved_config = state.seq.config
+            if saved_config then
+                config.root = saved_config.root or config.root
+                config.scale_name = saved_config.scale_name or config.scale_name
+                config.progression_name = saved_config.progression_name or config.progression_name
+                config.lead_style = saved_config.lead_style or config.lead_style
+                config.drum_pattern = saved_config.drum_pattern or config.drum_pattern
+                config.chord_instrument = saved_config.chord_instrument or config.chord_instrument
+                config.bass_instrument = saved_config.bass_instrument or config.bass_instrument
+                config.lead_instrument = saved_config.lead_instrument or config.lead_instrument
+                config.drum_instrument = saved_config.drum_instrument or config.drum_instrument
+                config.chord_volume = saved_config.chord_volume or config.chord_volume
+                config.bass_volume = saved_config.bass_volume or config.bass_volume
+                config.lead_volume = saved_config.lead_volume or config.lead_volume
+                config.drum_volume = saved_config.drum_volume or config.drum_volume
+                config.bpm = saved_config.bpm or config.bpm
+                config.seed = saved_config.seed or config.seed
+
+                -- Update UI controls to match loaded config
+                if scale_dd then
+                    scale_dd:set_selected(find_index(music_templates.scale_names, config.scale_name))
+                end
+                if progression_dd then
+                    progression_dd:set_selected(find_index(music_templates.progression_names, config.progression_name))
+                end
+                if drum_pattern_dd then
+                    drum_pattern_dd:set_selected(find_index(music_templates.drum_pattern_names, config.drum_pattern))
+                end
+                if lead_style_dd then
+                    lead_style_dd:set_selected(find_index(music_templates.lead_styles, config.lead_style))
+                end
+                if chord_inst_dd then
+                    chord_inst_dd:set_selected(config.chord_instrument + 1)
+                end
+                if bass_inst_dd then
+                    bass_inst_dd:set_selected(config.bass_instrument + 1)
+                end
+                if lead_inst_dd then
+                    lead_inst_dd:set_selected(config.lead_instrument + 1)
+                end
+                if chord_volume_fader then
+                    chord_volume_fader.value = config.chord_volume
+                end
+                if bass_volume_fader then
+                    bass_volume_fader.value = config.bass_volume
+                end
+                if lead_volume_fader then
+                    lead_volume_fader.value = config.lead_volume
+                end
+                if drum_volume_fader then
+                    drum_volume_fader.value = config.drum_volume
+                end
+            end
+
             config_dirty = true
         end
+    end
+
+    -- Load config for initial sequence if available
+    local saved_config = state.seq.config
+    if saved_config then
+        config.root = saved_config.root or config.root
+        config.scale_name = saved_config.scale_name or config.scale_name
+        config.progression_name = saved_config.progression_name or config.progression_name
+        config.lead_style = saved_config.lead_style or config.lead_style
+        config.drum_pattern = saved_config.drum_pattern or config.drum_pattern
+        config.chord_instrument = saved_config.chord_instrument or config.chord_instrument
+        config.bass_instrument = saved_config.bass_instrument or config.bass_instrument
+        config.lead_instrument = saved_config.lead_instrument or config.lead_instrument
+        config.drum_instrument = saved_config.drum_instrument or config.drum_instrument
+        config.chord_volume = saved_config.chord_volume or config.chord_volume
+        config.bass_volume = saved_config.bass_volume or config.bass_volume
+        config.lead_volume = saved_config.lead_volume or config.lead_volume
+        config.drum_volume = saved_config.drum_volume or config.drum_volume
+        config.bpm = saved_config.bpm or config.bpm
+        config.seed = saved_config.seed or config.seed
+
+        if scale_dd then
+            scale_dd:set_selected(find_index(music_templates.scale_names, config.scale_name))
+        end
+        if progression_dd then
+            progression_dd:set_selected(find_index(music_templates.progression_names, config.progression_name))
+        end
+        if drum_pattern_dd then
+            drum_pattern_dd:set_selected(find_index(music_templates.drum_pattern_names, config.drum_pattern))
+        end
+        if lead_style_dd then
+            lead_style_dd:set_selected(find_index(music_templates.lead_styles, config.lead_style))
+        end
+        if chord_inst_dd then
+            chord_inst_dd:set_selected(config.chord_instrument + 1)
+        end
+        if bass_inst_dd then
+            bass_inst_dd:set_selected(config.bass_instrument + 1)
+        end
+        if lead_inst_dd then
+            lead_inst_dd:set_selected(config.lead_instrument + 1)
+        end
+        if chord_volume_fader then
+            chord_volume_fader.value = config.chord_volume
+        end
+        if bass_volume_fader then
+            bass_volume_fader.value = config.bass_volume
+        end
+        if lead_volume_fader then
+            lead_volume_fader.value = config.lead_volume
+        end
+        if drum_volume_fader then
+            drum_volume_fader.value = config.drum_volume
+        end
+
+        config_dirty = false
     end
 end
 

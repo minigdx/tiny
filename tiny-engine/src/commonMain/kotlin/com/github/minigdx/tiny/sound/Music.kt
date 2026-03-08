@@ -35,7 +35,30 @@ class Music(
     },
 ) {
     fun serialize(): String {
-        return serialize(this)
+        val lightSequences = sequences.map { seq ->
+            val hasConfig = seq.configuration != null
+            val allSilence = seq.tracks.all { track -> track.beats.all { it.note == null } }
+            if (hasConfig || allSilence) {
+                MusicalSequence(
+                    index = seq.index,
+                    tracks = Array(4) { i ->
+                        MusicalSequence.Track(
+                            index = seq.tracks[i].index,
+                            instrumentIndex = seq.tracks[i].instrumentIndex,
+                            mute = seq.tracks[i].mute,
+                            volume = seq.tracks[i].volume,
+                        ).also { it.beats.clear() }
+                    },
+                    tempo = seq.tempo,
+                    name = seq.name,
+                    configuration = seq.configuration,
+                )
+            } else {
+                seq
+            }
+        }.toTypedArray()
+        val lightCopy = Music(instruments, musicalBars, lightSequences)
+        return serialize(lightCopy)
     }
 
     companion object {

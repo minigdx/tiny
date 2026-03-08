@@ -2,6 +2,7 @@ package com.github.minigdx.tiny.file
 
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.sound.Music
+import com.github.minigdx.tiny.sound.MusicGenerator
 import com.github.minigdx.tiny.sound.MusicalBar
 import com.github.minigdx.tiny.sound.MusicalSequence
 import com.github.minigdx.tiny.sound.SoundManager
@@ -34,6 +35,9 @@ class SoundDataSourceStream(
         music.sequences.forEach { sequence ->
             sequence.tracks.forEach { track ->
                 track.instrument = music.instruments[track.instrumentIndex]
+            }
+            sequence.configuration?.let { config ->
+                MusicGenerator.generate(sequence, config)
             }
         }
 
