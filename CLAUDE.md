@@ -12,7 +12,7 @@ Tiny is a Kotlin Multiplatform game engine with Lua scripting support that compi
 - **tiny-doc-annotations**: Annotations for documentation generation
 - **tiny-doc-generator**: KSP-based documentation processor
 - **tiny-web-editor**: Web-based editor interface
-- **tiny-sample**: Sample games and examples
+- **tiny-samples**: Sample games and examples
 
 ## Key Technologies
 

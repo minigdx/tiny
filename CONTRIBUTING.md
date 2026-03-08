@@ -57,7 +57,7 @@ make install    # Builds and installs tiny-cli to ~/.bin/tiny-cli
 | `tiny-doc-annotations`  | Annotations for doc generation           |
 | `tiny-doc-generator`    | KSP-based documentation processor        |
 | `tiny-web-editor`       | Web-based editor interface               |
-| `tiny-sample`           | Sample games and examples                |
+| `tiny-samples`          | Sample games and examples                |
 
 ## Making Changes
 

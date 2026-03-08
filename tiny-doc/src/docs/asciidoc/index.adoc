@@ -89,7 +89,7 @@ Create and test your ideas quickly and effectively. Run your games on your deskt
 <iframe class="no-resize" title="Breakout example game built with Tiny game engine" loading="lazy" width="516" height="516" src="sample/game-example/index.html"></iframe>
 ++++
 
-NOTE: The code source of this sample is available in the https://github.com/minigdx/tiny/tree/main/tiny-sample[Tiny git repository].
+NOTE: The code source of this sample is available in the https://github.com/minigdx/tiny/tree/main/tiny-samples/breakout[Tiny git repository].
 
 
 == Quick Navigation

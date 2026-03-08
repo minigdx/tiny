@@ -44,8 +44,8 @@ jobs:
         run: |
           unzip tiny-cli/build/distributions/tiny-cli-${{github.ref_name}}.zip
           tiny-cli-${{github.ref_name}}/bin/tiny-cli docs --output tiny-doc/src/docs/asciidoc/dependencies/tiny-cli-commands.adoc
-          tiny-cli-${{github.ref_name}}/bin/tiny-cli export tiny-sample
-          unzip -o -d tiny-doc/src/docs/asciidoc/sample/game-example tiny-sample/tiny-export.zip
+          tiny-cli-${{github.ref_name}}/bin/tiny-cli export tiny-samples/breakout
+          unzip -o -d tiny-doc/src/docs/asciidoc/sample/game-example tiny-samples/breakout/tiny-export.zip
           tiny-cli-${{github.ref_name}}/bin/tiny-cli export tiny-cli/src/main/resources/sfx
           unzip -o -d tiny-doc/src/docs/asciidoc/sample/sfx-editor tiny-cli/src/main/resources/sfx/tiny-export.zip
       - name: Build examples and generate Asciidoctor HTML pages
@@ -91,29 +91,29 @@ jobs:
       - name: Test web export (Unix)
         if: runner.os != 'Windows'
         run: |
-          tiny-cli-${{github.ref_name}}/bin/tiny-cli export tiny-sample
-          test -f tiny-sample/tiny-export.zip
+          tiny-cli-${{github.ref_name}}/bin/tiny-cli export tiny-samples/breakout
+          test -f tiny-samples/breakout/tiny-export.zip
       - name: Test web export (Windows)
         if: runner.os == 'Windows'
         run: |
-          tiny-cli-${{github.ref_name}}\bin\tiny-cli.bat export tiny-sample
-          if (-Not (Test-Path tiny-sample\tiny-export.zip)) { exit 1 }
+          tiny-cli-${{github.ref_name}}\bin\tiny-cli.bat export tiny-samples\breakout
+          if (-Not (Test-Path tiny-samples\breakout\tiny-export.zip)) { exit 1 }
       - name: Test desktop export (Unix)
         if: runner.os != 'Windows'
         run: |
-          tiny-cli-${{github.ref_name}}/bin/tiny-cli export tiny-sample -p desktop --exclude-jdk
+          tiny-cli-${{github.ref_name}}/bin/tiny-cli export tiny-samples/breakout -p desktop --exclude-jdk
           test -d exported-game
           ls exported-game/*.jar
       - name: Test desktop export (Windows)
         if: runner.os == 'Windows'
         run: |
-          tiny-cli-${{github.ref_name}}\bin\tiny-cli.bat export tiny-sample -p desktop --exclude-jdk
+          tiny-cli-${{github.ref_name}}\bin\tiny-cli.bat export tiny-samples\breakout -p desktop --exclude-jdk
           if (-Not (Test-Path exported-game)) { exit 1 }
           if (-Not (Get-ChildItem exported-game\*.jar)) { exit 1 }
       - name: Test desktop export with JDK (Unix)
         if: runner.os != 'Windows'
         run: |
-          tiny-cli-${{github.ref_name}}/bin/tiny-cli export tiny-sample -p desktop --include-jdk -o exported-game-jdk
+          tiny-cli-${{github.ref_name}}/bin/tiny-cli export tiny-samples/breakout -p desktop --include-jdk -o exported-game-jdk
           test -d exported-game-jdk
           if [ "$(uname -s)" = "Linux" ]; then
             ls exported-game-jdk/*.deb
@@ -123,7 +123,7 @@ jobs:
       - name: Test desktop export with JDK (Windows)
         if: runner.os == 'Windows'
         run: |
-          tiny-cli-${{github.ref_name}}\bin\tiny-cli.bat export tiny-sample -p desktop --include-jdk -o exported-game-jdk
+          tiny-cli-${{github.ref_name}}\bin\tiny-cli.bat export tiny-samples\breakout -p desktop --include-jdk -o exported-game-jdk
           if (-Not (Test-Path exported-game-jdk)) { exit 1 }
           if (-Not (Get-ChildItem exported-game-jdk\*.exe)) { exit 1 }
 
