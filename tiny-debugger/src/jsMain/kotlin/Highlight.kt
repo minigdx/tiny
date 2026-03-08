@@ -16,14 +16,22 @@ private val KEYWORD_PATTERN =
         "true", "false", "nil",
     ).joinToString("|")
 
+private fun escapeHtml(s: String): String = s
+    .replace("&", "&amp;")
+    .replace("<", "&lt;")
+    .replace(">", "&gt;")
+    .replace("\"", "&quot;")
+
 fun highlight(content: String): String {
     return content
+        // Escape HTML entities first to prevent XSS via script content
+        .let { escapeHtml(it) }
         // Create lines
         .split("\n").map { "<div>$it</div>" }.joinToString("\n")
         // Replace \n with <br /> to be selected correctly in the range
         .replace("<div></div>", "<div><br /></div>")
-        // String
-        .replace(Regex("(\".*?\")"), "<strong class=\"code_string\">\$1</strong>")
+        // String (match escaped quotes)
+        .replace(Regex("(&quot;.*?&quot;)"), "<strong class=\"code_string\">\$1</strong>")
         // Comment
         .replace(Regex("--(.*)"), """<em class="code_comment">--$1</em>""")
         // Keyword

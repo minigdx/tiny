@@ -63,6 +63,19 @@ class GlfwPlatform(
     private val homeDirectory: File,
     private val jarResourcePrefix: String = "",
 ) : Platform {
+
+    /**
+     * Resolve [name] relative to [baseDirectory], ensuring the result stays
+     * within [baseDirectory] to prevent path traversal.
+     */
+    private fun safeResolve(baseDirectory: File, name: String): File {
+        val resolved = baseDirectory.resolve(name).canonicalFile
+        val root = baseDirectory.canonicalFile
+        require(resolved.path.startsWith(root.path + File.separator) || resolved.path == root.path) {
+            "Path traversal detected: '$name' resolves outside '${root.path}'"
+        }
+        return baseDirectory.resolve(name)
+    }
     override val performanceMonitor: PerformanceMonitor = LwjglPerformanceMonitor()
 
     private var window: Long = 0
@@ -408,7 +421,7 @@ class GlfwPlatform(
         return if (fromJar != null) {
             InputStreamStream(fromJar)
         } else {
-            FileStream(gameDirectory.resolve(name))
+            FileStream(safeResolve(gameDirectory, name))
         }
     }
 
@@ -440,7 +453,7 @@ class GlfwPlatform(
         name: String,
         data: String,
     ) {
-        gameDirectory.resolve(name).outputStream().use {
+        safeResolve(gameDirectory, name).outputStream().use {
             it.write(data.toByteArray())
         }
     }
@@ -494,12 +507,12 @@ class GlfwPlatform(
         if (!homeDirectory.exists()) {
             homeDirectory.mkdirs()
         }
-        val file = homeDirectory.resolve(name)
+        val file = safeResolve(homeDirectory, name)
         file.writeText(content)
     }
 
     override fun getFromHome(name: String): String? {
-        val file = homeDirectory.resolve(name)
+        val file = safeResolve(homeDirectory, name)
         return if (file.exists()) {
             file.readText()
         } else {
@@ -510,7 +523,7 @@ class GlfwPlatform(
     private fun setWindowIcon() {
         try {
             val iconFileName = gameOptions.icon ?: "icon.png"
-            val iconFile = gameDirectory.resolve(iconFileName)
+            val iconFile = safeResolve(gameDirectory, iconFileName)
             if (!iconFile.exists()) {
                 logger.info("GLFW") { "No icon file found at '${iconFile.absolutePath}', using default icon." }
                 return

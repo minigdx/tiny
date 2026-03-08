@@ -509,6 +509,20 @@ class ExportCommand : CliktCommand(name = "export") {
 
 @OptIn(ExperimentalSerializationApi::class)
 class GameExporter {
+
+    /**
+     * Resolve a file name relative to the game directory, ensuring the resolved path
+     * stays within the game directory to prevent path traversal attacks.
+     */
+    private fun safeResolve(gameDirectory: File, name: String): File {
+        val resolved = gameDirectory.resolve(name).canonicalFile
+        val gameRoot = gameDirectory.canonicalFile
+        require(resolved.path.startsWith(gameRoot.path + File.separator) || resolved.path == gameRoot.path) {
+            "Path traversal detected: '$name' resolves outside the game directory"
+        }
+        return gameDirectory.resolve(name)
+    }
+
     fun export(
         gameDirectory: File,
         archive: String,
@@ -567,7 +581,7 @@ class GameExporter {
                     .filterNot { exportedFile.contains(it) }
                     .forEach { name ->
                         exportedGame.putNextEntry(ZipEntry(name))
-                        exportedGame.write(gameDirectory.resolve(name).readBytes())
+                        exportedGame.write(safeResolve(gameDirectory, name).readBytes())
                         exportedGame.closeEntry()
 
                         exportedFile += name
@@ -577,7 +591,7 @@ class GameExporter {
                     .filterNot { exportedFile.contains(it) }
                     .forEach { name ->
                         exportedGame.putNextEntry(ZipEntry(name))
-                        exportedGame.write(gameDirectory.resolve(name).readBytes())
+                        exportedGame.write(safeResolve(gameDirectory, name).readBytes())
                         exportedGame.closeEntry()
 
                         exportedFile += name
@@ -586,7 +600,7 @@ class GameExporter {
                     .filterNot { exportedFile.contains(it) }
                     .forEach { name ->
                         exportedGame.putNextEntry(ZipEntry(name))
-                        exportedGame.write(gameDirectory.resolve(name).readBytes())
+                        exportedGame.write(safeResolve(gameDirectory, name).readBytes())
                         exportedGame.closeEntry()
 
                         exportedFile += name
@@ -596,7 +610,7 @@ class GameExporter {
                     .filterNot { exportedFile.contains(it) }
                     .forEach { name ->
                         exportedGame.putNextEntry(ZipEntry(name))
-                        exportedGame.write(gameDirectory.resolve(name).readBytes())
+                        exportedGame.write(safeResolve(gameDirectory, name).readBytes())
                         exportedGame.closeEntry()
 
                         exportedFile += name
@@ -605,7 +619,7 @@ class GameExporter {
                     .filterNot { exportedFile.contains(it) }
                     .forEach { name ->
                         exportedGame.putNextEntry(ZipEntry(name))
-                        exportedGame.write(gameDirectory.resolve(name).readBytes())
+                        exportedGame.write(safeResolve(gameDirectory, name).readBytes())
                         exportedGame.closeEntry()
 
                         exportedFile += name
@@ -614,15 +628,15 @@ class GameExporter {
                     .filterNot { exportedFile.contains(it) }
                     .forEach { name ->
                         exportedGame.putNextEntry(ZipEntry(name))
-                        exportedGame.write(gameDirectory.resolve(name).readBytes())
+                        exportedGame.write(safeResolve(gameDirectory, name).readBytes())
                         exportedGame.closeEntry()
 
                         exportedFile += name
 
-                        val ldtk = Ldtk.read(gameDirectory.resolve(name).readText())
+                        val ldtk = Ldtk.read(safeResolve(gameDirectory, name).readText())
                         ldtk.levels.flatMap { level -> level.layerInstances }
                             .mapNotNull { it.__tilesetRelPath }
-                            .map { gameDirectory.resolve(it) }
+                            .map { safeResolve(gameDirectory, it) }
                             .filterNot { file -> exportedFile.contains(file.relativeTo(gameDirectory).name) }
                             .toSet()
                             .forEach { file ->
@@ -637,7 +651,7 @@ class GameExporter {
                 // Add game icon to the export
                 val iconFileName = gameParameters.icon
                 val iconList = if (iconFileName != null) {
-                    val iconFile = gameDirectory.resolve(iconFileName)
+                    val iconFile = safeResolve(gameDirectory, iconFileName)
                     if (iconFile.exists() && !exportedFile.contains(iconFileName)) {
                         exportedGame.putNextEntry(ZipEntry(iconFileName))
                         exportedGame.write(iconFile.readBytes())
