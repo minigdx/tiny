@@ -70,6 +70,7 @@ val copySeoFiles = tasks.register("copy-seoFiles", Copy::class) {
         include("robots.txt")
         include("sitemap.xml")
         include(".nojekyll")
+        include("index.html")
     }
     into(project.layout.buildDirectory.get().asFile.resolve("docs/asciidoc"))
 }

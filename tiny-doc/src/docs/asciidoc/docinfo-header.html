@@ -1,7 +1,7 @@
 <!-- SEO Meta Tags -->
 <meta name="author" content="Tiny Game Engine Contributors">
 <meta name="robots" content="index, follow">
-<meta name="theme-color" content="#2563eb">
+<meta name="theme-color" content="#ff0080">
 
 <!-- Open Graph -->
 <meta property="og:type" content="website">
@@ -49,7 +49,8 @@
 <!-- Preconnect for fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest"></script>
 
@@ -62,273 +63,69 @@
         right: 0;
         z-index: 10000;
         height: 56px;
-        background: #ffffff;
-        border-bottom: 1px solid #e0e0e0;
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 4px solid rgba(0, 229, 255, 0.2);
         display: flex;
         align-items: center;
         padding: 0 24px;
-        font-family: 'Titillium Web', sans-serif;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+        font-family: 'Quicksand', sans-serif;
     }
 
     .tiny-nav a {
-        color: #555;
+        color: #444;
         text-decoration: none;
         margin: 0 12px;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
         transition: color 0.15s ease;
     }
 
     .tiny-nav a:hover {
-        color: #222;
+        color: #ff0080;
     }
 
     .tiny-nav .nav-logo {
-        color: #2563eb;
-        font-weight: 700;
-        font-size: 1.1em;
+        color: #1e293b;
+        font-family: 'Lilita One', cursive;
+        font-weight: 400;
+        font-size: 1.3em;
         margin-right: auto;
         white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        text-transform: none;
+        letter-spacing: 2px;
     }
 
     .tiny-nav .nav-logo:hover {
-        color: #1d4ed8;
+        color: #ff0080;
     }
 
     .tiny-nav .nav-cta {
-        background: #2563eb;
+        background: #00e5ff;
         color: #fff;
-        padding: 6px 16px;
-        border-radius: 4px;
-        font-weight: 700;
+        padding: 8px 20px;
+        border-radius: 16px;
+        border: 2px solid #1e293b;
+        font-family: 'Lilita One', cursive;
+        font-weight: 400;
+        box-shadow: 0 6px 0 #00b8cc;
+        transition: transform 0.15s ease;
     }
 
     .tiny-nav .nav-cta:hover {
-        background: #1d4ed8;
+        background: #00d4ec;
         color: #fff;
+        transform: translateY(-2px);
     }
 
-    /* Landing hero section */
-    .landing-hero {
-        text-align: center;
-        padding: 64px 24px 48px;
-        max-width: 800px;
-        margin: 0 auto;
-    }
-
-    .landing-hero h1 {
-        font-family: 'Titillium Web', sans-serif;
-        font-size: 3.2rem;
-        font-weight: 700;
-        color: #222;
-        margin-bottom: 16px;
-        line-height: 1.1;
-    }
-
-    .landing-tags {
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-bottom: 20px;
-    }
-
-    .landing-tag {
-        background: #eff6ff;
-        color: #2563eb;
-        padding: 4px 14px;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        border: 1px solid #bfdbfe;
-    }
-
-    .landing-desc {
-        color: #555;
-        font-size: 1.1rem;
-        max-width: 600px;
-        margin: 0 auto 28px;
-        line-height: 1.7;
-    }
-
-    .landing-cta-group {
-        display: flex;
-        justify-content: center;
-        gap: 14px;
-        flex-wrap: wrap;
-    }
-
-    .landing-cta {
-        display: inline-block;
-        padding: 11px 26px;
-        border-radius: 6px;
-        font-family: 'Titillium Web', sans-serif;
-        font-weight: 700;
-        font-size: 1rem;
-        text-decoration: none;
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
-
-    .landing-cta:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-
-    .landing-cta-primary {
-        background: #2563eb;
-        color: #fff;
-    }
-
-    .landing-cta-primary:hover {
-        background: #1d4ed8;
-        color: #fff;
-    }
-
-    .landing-cta-secondary {
-        background: #fff;
-        color: #333;
-        border: 1px solid #ccc;
-    }
-
-    .landing-cta-secondary:hover {
-        border-color: #2563eb;
-        color: #2563eb;
-    }
-
-    /* Code preview (landing) */
-    .landing-code {
-        max-width: 640px;
-        margin: 0 auto 60px;
-        padding: 0 24px;
-    }
-
-    .landing-code-block {
-        background: #f8f9fa;
-        border: 1px solid #e0e0e0;
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-    }
-
-    .landing-code-header {
-        display: flex;
-        align-items: center;
-        padding: 10px 16px;
-        background: #eef0f2;
-        border-bottom: 1px solid #e0e0e0;
-    }
-
-    .landing-code-dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        margin-right: 6px;
-    }
-
-    .landing-code-dot.red { background: #ff5f57; }
-    .landing-code-dot.yellow { background: #febc2e; }
-    .landing-code-dot.green { background: #28c840; }
-
-    .landing-code-title {
-        margin-left: 12px;
-        color: #888;
-        font-size: 0.8rem;
-        font-family: 'Source Code Pro', monospace;
-    }
-
-    .landing-code-body {
-        padding: 20px 24px;
-        font-family: 'Source Code Pro', monospace;
-        font-size: 0.88rem;
-        line-height: 1.7;
-        color: #333;
-        overflow-x: auto;
-    }
-
-    .landing-code-body pre {
-        margin: 0;
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        padding: 0 !important;
-        color: inherit;
-    }
-
-    /* Shared syntax highlighting (landing + interactive editor) */
-    .code-kw, .code_keyword { color: #7c3aed; }
-    .code-fn { color: #2563eb; }
-    .code-cm, .code_comment { color: #9ca3af; font-style: italic; }
-    .code-st, .code_string { color: #16a34a; }
-    .code-nb, .code_number { color: #ea580c; }
-
-    /* Feature cards */
-    .landing-features {
-        max-width: 900px;
-        margin: 0 auto 60px;
-        padding: 0 24px;
-    }
-
-    .landing-features h2 {
-        text-align: center;
-        font-family: 'Titillium Web', sans-serif;
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: #222;
-        margin-bottom: 36px;
-    }
-
-    .landing-features-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 16px;
-    }
-
-    .landing-feature-card {
-        background: #f8f9fa;
-        border: 1px solid #e8e8e8;
-        border-radius: 10px;
-        padding: 24px 18px;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .landing-feature-card:hover {
-        border-color: #2563eb;
-        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
-    }
-
-    .landing-feature-icon {
-        font-size: 1.6rem;
-        margin-bottom: 12px;
-        display: block;
-    }
-
-    .landing-feature-card h3 {
-        font-family: 'Titillium Web', sans-serif;
-        font-size: 1rem;
-        font-weight: 700;
-        color: #222;
-        margin-bottom: 6px;
-    }
-
-    .landing-feature-card p {
-        color: #666;
-        font-size: 0.88rem;
-        line-height: 1.5;
-        margin: 0;
-    }
-
-    @media (max-width: 960px) {
-        .landing-features-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-
-    @media (max-width: 600px) {
-        .landing-hero h1 { font-size: 2rem; }
-        .landing-hero { padding: 40px 16px 32px; }
-        .landing-features-grid { grid-template-columns: 1fr; }
-        .landing-cta-group { flex-direction: column; align-items: center; }
-        .landing-code-body { font-size: 0.78rem; padding: 14px 16px; }
-    }
+    /* Syntax highlighting (interactive editor) */
+    .code_keyword { color: #7c3aed; }
+    .code_comment { color: #9ca3af; font-style: italic; }
+    .code_string { color: #16a34a; }
+    .code_number { color: #ea580c; }
 
     /** link to start the game **/
     .tiny-button-right {
@@ -341,7 +138,7 @@
         gap: 6px;
         padding: 8px 16px;
 
-        background-color: #007bff;
+        background-color: #ff0080;
         color: white;
         text-align: center;
         text-decoration: none;
@@ -366,7 +163,7 @@
 
     .tiny-button:hover,
     .tiny-button:focus {
-        background-color: #0056b3;
+        background-color: #d4006b;
         color: white;
         outline: none;
     }
@@ -474,7 +271,7 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        font-family: 'Titillium Web', sans-serif;
+        font-family: 'Quicksand', sans-serif;
     }
 
     .tiny-example-name {
@@ -498,7 +295,7 @@
     }
 
     .tiny-examples-select:hover {
-        border-color: #2563eb;
+        border-color: #ff0080;
     }
 
     /* Share link below editor */
@@ -522,16 +319,15 @@
     }
 
     .tiny-share-link:hover {
-        color: #2563eb;
+        color: #ff0080;
     }
 </style>
 
 <nav class="tiny-nav">
-    <a href="index.html" class="nav-logo">🧸 Tiny - Multiplatform Game Engine</a>
-    <a href="index.html#_tiny_install" class="nav-cta">Getting Started</a>
-    <a href="tiny-cli.html">Tiny CLI</a>
-    <a href="tiny-api.html">API</a>
-    <a href="editor.html">Editor</a>
-    <a href="index.html#_tiny_showcase">Demos</a>
-    <a href="https://github.com/minigdx/tiny">GitHub</a>
+    <a href="index.html" class="nav-logo">Tiny</a>
+    <a href="index.html#features">Features</a>
+    <a href="documentation.html#_tiny_showcase">Showcase</a>
+    <a href="tiny-api.html">Docs</a>
+    <a href="https://github.com/minigdx/tiny">Community</a>
+    <a href="documentation.html#_tiny_install" class="nav-cta">Get Started</a>
 </nav>

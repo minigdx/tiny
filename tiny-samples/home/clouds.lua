@@ -1,93 +1,116 @@
-local clouds = {}
-local width = 480
-local height = 128
-local repulsion_radius = 60
+-- 3 layered waves with bottom-to-top transition and mouse interaction
 
-function _init()
-    -- Generate clouds in a grid pattern with random jitter
-    local cols = 10
-    local rows = 4
-    local cell_w = width / cols
-    local cell_h = height / rows
+local waves = {}
+local width, height
+local transition_start = 0
+local transition_duration = 1.5 -- seconds for all waves to fully appear
 
-    for row = 0, rows - 1 do
-        for col = 0, cols - 1 do
-            local cx = col * cell_w + cell_w / 2 + math.rnd(-cell_w * 0.3, cell_w * 0.3)
-            local cy = row * cell_h + cell_h / 2 + math.rnd(-cell_h * 0.3, cell_h * 0.3)
+function _init(w, h)
+    width = w
+    height = h
+    transition_start = tiny.t
 
-            -- Each cloud has 3-7 overlapping circle "puffs"
-            local puff_count = math.floor(math.rnd(3, 8))
-            local puffs = {}
-            for i = 1, puff_count do
-                puffs[i] = {
-                    ox = math.rnd(-12, 12),
-                    oy = math.rnd(-6, 6),
-                    r = math.rnd(6, 14),
-                }
-            end
-
-            clouds[#clouds + 1] = {
-                x = cx,
-                y = cy,
-                home_x = cx,
-                home_y = cy,
-                vx = 0,
-                vy = 0,
-                puffs = puffs,
-            }
-        end
-    end
+    -- Define 3 waves (back to front)
+    -- Colors: 0=darkest blue ... 7=white
+    waves = {
+        {
+            base_y = h * 0.45,
+            amplitude = 40,
+            speed = 0.05,
+            color = 5,
+            layer = 1,
+            delay = 0.0,
+        },
+        {
+            base_y = h * 0.58,
+            amplitude = 50,
+            speed = 0.07,
+            color = 3,
+            layer = 2,
+            delay = 0.3,
+        },
+        {
+            base_y = h * 0.72,
+            amplitude = 30,
+            speed = 0.1,
+            color = 1,
+            layer = 3,
+            delay = 0.6,
+        },
+    }
 end
 
+-- Ease out cubic
+local function ease_out(t)
+    local inv = 1 - t
+    return 1 - inv * inv * inv
+end
+
+local mouse_radius = 120
+local mouse_strength = 20
+local step = 8 * 4
+local circle_r = 48
+
 function _update()
-    local touch = ctrl.touch()
-    local mx = touch.x
-    local my = touch.y
+end
 
-    for i = 1, #clouds do
-        local c = clouds[i]
+-- Compute wave Y at a given x position
+local function wave_y_at(w, x, mx, my, offset_y, now)
+    local wy = w.base_y
+        + math.perlin(x / width, 0.5 * w.layer / 3, now * w.speed) * w.amplitude
 
-        -- Calculate distance to mouse
-        local dx = c.x - mx
-        local dy = c.y - my
-        local dist = math.sqrt(dx * dx + dy * dy)
-
-        -- Apply repulsion force if within radius
-        if dist < repulsion_radius and dist > 0.1 then
-            local factor = ((repulsion_radius - dist) / repulsion_radius)
-            local force = factor * factor * 3.0
-            c.vx = c.vx + (dx / dist) * force
-            c.vy = c.vy + (dy / dist) * force
-        end
-
-        -- Spring force back toward home position
-        c.vx = c.vx + 0.01 * (c.home_x - c.x)
-        c.vy = c.vy + 0.01 * (c.home_y - c.y)
-
-        -- Damping
-        c.vx = c.vx * 0.92
-        c.vy = c.vy * 0.92
-
-        -- Update position
-        c.x = c.x + c.vx
-        c.y = c.y + c.vy
-
-        -- Clamp within boundaries (with small margin)
-        c.x = math.clamp(-20, c.x, width + 20)
-        c.y = math.clamp(-20, c.y, height + 20)
+    -- Mouse interaction: push wave up near cursor
+    local dx = x - mx
+    local dy = (wy + offset_y) - my
+    local dist = math.sqrt(dx * dx + dy * dy)
+    if dist < mouse_radius and dist > 0.1 then
+        local factor = (mouse_radius - dist) / mouse_radius
+        wy = wy - factor * factor * mouse_strength
     end
+
+    return wy + offset_y
 end
 
 function _draw()
-    -- Clear with sky blue (palette index 0)
     gfx.cls(7)
 
-    -- Draw each cloud's puffs as white filled circles
-    for i = 1, #clouds do
-        local c = clouds[i]
-        for j = 1, #c.puffs do
-            local p = c.puffs[j]
-            shape.circlef(c.x + p.ox, c.y + p.oy, p.r, 2)
+    local touch = ctrl.touch()
+    local mx = touch.x
+    local my = touch.y
+    local now = tiny.t
+
+    for i = 1, #waves do
+        local w = waves[i]
+
+        -- Per-wave transition progress (staggered)
+        local elapsed = now - transition_start - w.delay
+        local progress = math.max(0, math.min(elapsed / transition_duration, 1))
+        local ease = ease_out(progress)
+
+        -- Offset: wave starts below screen, slides up
+        local offset_y = (1 - ease) * height
+
+        -- First pass: sample wave crest points, find peak (min y on screen)
+        local points = {}
+        local min_y = height
+        local x = -circle_r
+        while x <= width + circle_r do
+            local fy = wave_y_at(w, x, mx, my, offset_y, now)
+            points[#points + 1] = { x = x, y = fy }
+            if fy < min_y then min_y = fy end
+            x = x + step
+        end
+
+        -- Body: one big rectangle from just below the peak circles to bottom
+        local body_top = min_y + circle_r
+        if body_top < height then
+            shape.rectf(0, body_top, width + 1, height - body_top + 1, w.color)
+        end
+
+        -- Tip: consecutive circles along the wave crest
+        for j = 1, #points do
+            local p = points[j]
+            shape.circlef(p.x, p.y, circle_r, w.color)
         end
     end
 end
