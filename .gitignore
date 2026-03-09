@@ -43,5 +43,9 @@ bin/
 /tiny-doc/src/docs/asciidoc/dependencies/
 /tiny-doc/src/docs/asciidoc/sample/game-example
 /tiny-doc/src/docs/asciidoc/sample/sfx-editor
+/tiny-doc/src/docs/asciidoc/sample/home
+
+**/tiny-export.zip
+
 
 .kotlin

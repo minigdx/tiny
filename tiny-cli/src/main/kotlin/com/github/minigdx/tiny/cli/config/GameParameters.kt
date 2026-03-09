@@ -41,6 +41,8 @@ sealed class GameParameters {
 
     abstract fun addFont(font: GameConfigFont): GameParameters
 
+    abstract fun setBootScript(script: String): GameParameters
+
     abstract fun setPalette(colors: List<String>): GameParameters
 
     abstract fun setIcon(icon: String): GameParameters
@@ -190,6 +192,10 @@ data class GameParametersV1(
         } else {
             copy(fonts = fonts + font)
         }
+    }
+
+    override fun setBootScript(script: String): GameParameters {
+        return copy(bootScript = script)
     }
 
     fun setEntryPoint(scriptName: String): GameParametersV1 {

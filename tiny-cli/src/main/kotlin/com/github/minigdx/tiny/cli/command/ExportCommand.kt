@@ -509,12 +509,14 @@ class ExportCommand : CliktCommand(name = "export") {
 
 @OptIn(ExperimentalSerializationApi::class)
 class GameExporter {
-
     /**
      * Resolve a file name relative to the game directory, ensuring the resolved path
      * stays within the game directory to prevent path traversal attacks.
      */
-    private fun safeResolve(gameDirectory: File, name: String): File {
+    private fun safeResolve(
+        gameDirectory: File,
+        name: String,
+    ): File {
         val resolved = gameDirectory.resolve(name).canonicalFile
         val gameRoot = gameDirectory.canonicalFile
         require(resolved.path.startsWith(gameRoot.path + File.separator) || resolved.path == gameRoot.path) {

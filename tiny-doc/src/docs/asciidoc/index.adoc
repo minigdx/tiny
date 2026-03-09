@@ -12,7 +12,9 @@
 
 ++++
 <style>#header { display: none; }</style>
+
 <section class="landing-hero">
+<iframe class="no-resize" title="Breakout example game built with Tiny game engine" loading="lazy" width="920" height="256" src="sample/home/index.html"></iframe>
     <h1>Pixel-Perfect Game Engine</h1>
     <div class="landing-tags">
         <span class="landing-tag">256 colors</span>

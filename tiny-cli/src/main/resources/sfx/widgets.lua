@@ -32,16 +32,11 @@ end
 
 
 
-local ModeSwitch = require("widgets.ModeSwitch")
 local Envelop = require("widgets.Envelop")
 local Knob = require("widgets.Knob")
 local Checkbox = require("widgets.Checkbox")
 local Fader = require("widgets.Fader")
-local MenuItemModule = require("widgets.MenuItem")
-local MenuItem = MenuItemModule.MenuItem
-local menuItems = MenuItemModule.menuItems
 local Keyboard = require("widgets.Keyboard")
-local Help = require("widgets.Help")
 local Button = require("widgets.Button")
 local Dropdown = require("widgets.Dropdown")
 local Modal = require("widgets.Modal")
@@ -50,11 +45,6 @@ local Panel = require("widgets.Panel")
 local TextButton = require("widgets.TextButton")
 local Speaker = require("widgets.Speaker")
 local Counter = require("widgets.Counter")
-
-factory.create_mode_switch_component = function(self, value)
-    local result = new(ModeSwitch, value)
-    return result
-end
 
 factory.create_envelop = function(self, data)
     local result = new(Envelop, data)
@@ -111,11 +101,6 @@ factory.create_modal = function(self, data)
     return result
 end
 
-factory.create_help = function(self, data)
-    local help = new(Help, data)
-    return help
-end
-
 factory.create_keyboard = function(self, data)
     local keyboard = new(Keyboard, data)
     return keyboard
@@ -159,34 +144,6 @@ factory.create_counter = function(self, data)
     return result
 end
 
-factory.create_menu_item = function(self, data)
-    local menu = new(MenuItem, data)
-
-    local item = data.fields.Item
-    if item == "Wave" then
-        menu.spr = 14
-        menu.hold = true
-    elseif item == "Fx" then
-        menu.spr = 15
-        menu.hold = true
-    elseif item == "Music" then
-        menu.spr = 16
-        menu.hold = true
-    elseif item == "Save" then
-        menu.spr = 17
-    elseif item == "Prev" then
-        menu.spr = 21
-    elseif item == "Next" then
-        menu.spr = 22
-    elseif item == "NewFile" then
-        menu.spr = 13
-    end
-    menu.item = item
-    menu.help = data.fields.Help
-
-    table.insert(menuItems, menu)
-    return menu
-end
 
 factory._draw = function(self)
     for w in all(self.widgets) do

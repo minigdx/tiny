@@ -16,11 +16,12 @@ private val KEYWORD_PATTERN =
         "true", "false", "nil",
     ).joinToString("|")
 
-private fun escapeHtml(s: String): String = s
-    .replace("&", "&amp;")
-    .replace("<", "&lt;")
-    .replace(">", "&gt;")
-    .replace("\"", "&quot;")
+private fun escapeHtml(s: String): String =
+    s
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace("\"", "&quot;")
 
 fun highlight(content: String): String {
     return content

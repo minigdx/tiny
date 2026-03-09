@@ -1,6 +1,5 @@
 local widgets = require("widgets")
 local mouse = require("mouse")
-local ModeSwitch = require("widgets/ModeSwitch")
 
 local EditorBase = {}
 
@@ -35,13 +34,6 @@ EditorBase.init_speakers = function(entities, all_widgets, speaker_widgets)
     end
 end
 
--- Widget loading: mode switch
-EditorBase.init_mode_switch = function(entities, all_widgets)
-    for mode in all(entities["ModeSwitch"]) do
-        local button = new(ModeSwitch, mode)
-        table.insert(all_widgets, button)
-    end
-end
 
 -- Modal creation from Button entities.
 -- config.modal_sizes: optional table of { ModalName = {x, y, width, height} }

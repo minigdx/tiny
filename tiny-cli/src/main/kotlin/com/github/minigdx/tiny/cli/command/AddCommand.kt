@@ -6,6 +6,7 @@ import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.optionalValue
 import com.github.ajalt.clikt.parameters.types.file
@@ -25,6 +26,9 @@ class AddCommand : CliktCommand(name = "add") {
     val size by option("--size", help = "Character size in pixels (e.g., '8x12' or '8' for square). Auto-detected if omitted.")
 
     val offset by option("--offset", help = "Pixel offset where the character grid begins (e.g., '8,12'). Auto-detected if omitted.")
+
+    val boot by option("--boot", help = "Set a .lua script as the boot script instead of adding it to the scripts list.")
+        .flag(default = false)
 
     val chars by option("--chars", help = "Characters in the font, in reading order (left-to-right, top-to-bottom). Requires --font.")
 
@@ -48,6 +52,16 @@ class AddCommand : CliktCommand(name = "add") {
             echo("⚠️  --size, --chars, and --offset are only used with --font. They will be ignored.")
         }
 
+        if (boot && resources.any { !it.endsWith("lua") }) {
+            echo("❌ --boot can only be used with .lua scripts.")
+            throw Abort()
+        }
+
+        if (boot && resources.size > 1) {
+            echo("❌ --boot can only be used with a single script.")
+            throw Abort()
+        }
+
         // Open the _tiny.json
         var gameParameters = GameParameters.read(tiny)
 
@@ -61,6 +75,10 @@ class AddCommand : CliktCommand(name = "add") {
                     // Add spritesheet
                     gameParameters = gameParameters.addSpritesheet(r)
                     "spritesheet"
+                } else if (r.endsWith("lua") && boot) {
+                    // Set as boot script
+                    gameParameters = gameParameters.setBootScript(r)
+                    "boot script"
                 } else if (r.endsWith("lua")) {
                     // Add script
                     gameParameters = gameParameters.addScript(r)

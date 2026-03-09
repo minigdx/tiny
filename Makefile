@@ -22,6 +22,8 @@ docs: install
 	tiny-cli docs --output tiny-doc/src/docs/asciidoc/dependencies/tiny-cli-commands.adoc
 	tiny-cli export tiny-samples/breakout
 	unzip -o -d tiny-doc/src/docs/asciidoc/sample/game-example tiny-samples/breakout/tiny-export.zip
+	tiny-cli export tiny-samples/home
+	unzip -o -d tiny-doc/src/docs/asciidoc/sample/home tiny-samples/home/tiny-export.zip
 	tiny-cli export tiny-cli/src/main/resources/sfx
 	unzip -o -d tiny-doc/src/docs/asciidoc/sample/sfx-editor tiny-cli/src/main/resources/sfx/tiny-export.zip
 	./gradlew asciidoctor -Pversion=$(uuidgen)

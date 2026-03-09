@@ -40,7 +40,7 @@ function _init()
 end
 
 function _update()
-    local touch = ctrl.touch(0)
+    local touch = ctrl.touch()
     local mx = touch.x
     local my = touch.y
 
@@ -80,14 +80,14 @@ end
 
 function _draw()
     -- Clear with sky blue (palette index 0)
-    gfx.cls(0)
+    gfx.cls(7)
 
     -- Draw each cloud's puffs as white filled circles
     for i = 1, #clouds do
         local c = clouds[i]
         for j = 1, #c.puffs do
             local p = c.puffs[j]
-            shape.circlef(c.x + p.ox, c.y + p.oy, p.r, 7)
+            shape.circlef(c.x + p.ox, c.y + p.oy, p.r, 2)
         end
     end
 end

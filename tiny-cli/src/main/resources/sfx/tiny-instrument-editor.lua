@@ -229,7 +229,6 @@ function _init()
         layer_manager = nil, -- set after layer_manager is created
     })
 
-    EditorBase.init_mode_switch(widget_entities, all_widgets)
     _init_keyboard(widget_entities)
     _init_envelop(widget_entities)
     _init_harmonics(widget_entities)

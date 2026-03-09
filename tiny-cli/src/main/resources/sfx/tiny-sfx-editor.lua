@@ -541,8 +541,6 @@ function _init()
     local widget_entities = map.entities("Widgets")
     EditorBase.init_text_buttons(widget_entities, all_widgets)
     EditorBase.init_speakers(widget_entities, all_widgets, speaker_widgets)
-    EditorBase.init_mode_switch(widget_entities, all_widgets)
-
     dropdown_widget = EditorBase.init_entity_dropdown(widget_entities, all_widgets, {
         count = 32,
         fetch = function(i) return sfx.sfx(i) end,

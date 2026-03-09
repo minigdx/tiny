@@ -528,7 +528,7 @@ function _init()
     save_button_ref = buttons_by_action["Save"]
 
     EditorBase.init_speakers(widget_entities, all_widgets, speaker_widgets)
-    EditorBase.init_mode_switch(widget_entities, all_widgets)
+
 
     modals_by_name = EditorBase.init_buttons(widget_entities, all_widgets, {
         on_open = function()

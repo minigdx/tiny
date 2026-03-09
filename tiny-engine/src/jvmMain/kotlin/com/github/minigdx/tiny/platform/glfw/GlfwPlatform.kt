@@ -63,12 +63,14 @@ class GlfwPlatform(
     private val homeDirectory: File,
     private val jarResourcePrefix: String = "",
 ) : Platform {
-
     /**
      * Resolve [name] relative to [baseDirectory], ensuring the result stays
      * within [baseDirectory] to prevent path traversal.
      */
-    private fun safeResolve(baseDirectory: File, name: String): File {
+    private fun safeResolve(
+        baseDirectory: File,
+        name: String,
+    ): File {
         val resolved = baseDirectory.resolve(name).canonicalFile
         val root = baseDirectory.canonicalFile
         require(resolved.path.startsWith(root.path + File.separator) || resolved.path == root.path) {
@@ -76,6 +78,7 @@ class GlfwPlatform(
         }
         return baseDirectory.resolve(name)
     }
+
     override val performanceMonitor: PerformanceMonitor = LwjglPerformanceMonitor()
 
     private var window: Long = 0
