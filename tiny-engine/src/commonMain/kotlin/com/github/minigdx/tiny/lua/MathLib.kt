@@ -20,6 +20,7 @@ import kotlin.random.Random
 @TinyLib(
     "math",
     "Math functions. Please note that standard Lua math methods are also available.",
+    icon = "calculator",
 )
 class MathLib : org.luaj.vm2.lib.MathLib() {
     @TinyVariable("pi", "value of pi (~3.14)")

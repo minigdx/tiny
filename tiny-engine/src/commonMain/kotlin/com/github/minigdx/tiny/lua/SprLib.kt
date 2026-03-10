@@ -18,7 +18,7 @@ import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.ThreeArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 
-@TinyLib("spr", "Sprite API to draw or update sprites.")
+@TinyLib("spr", "Sprite API to draw or update sprites.", icon = "image")
 class SprLib(
     val virtualFrameBuffer: VirtualFrameBuffer,
     val resourceAccess: GameResourceAccess,

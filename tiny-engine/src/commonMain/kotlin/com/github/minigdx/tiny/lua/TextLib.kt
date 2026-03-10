@@ -23,6 +23,7 @@ import kotlin.math.max
     "Text rendering library for custom fonts. " +
         "Allows selecting fonts configured in `_tiny.json` and rendering text with them. " +
         "When no font is selected, uses the default boot font (same as `print()`).",
+    icon = "type",
 )
 class TextLib(
     private val gameOptions: GameOptions,

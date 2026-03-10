@@ -321,6 +321,65 @@
     .tiny-share-link:hover {
         color: #ff0080;
     }
+
+    /* === Lucide icons for library sections === */
+    /* Original passthrough divs hidden; JS moves icons inline into headings */
+    .lib-icon {
+        display: none;
+    }
+
+    /* Icons inside library headings (h2) */
+    .sect1 > h2 > svg {
+        width: 20px;
+        height: 20px;
+        margin-right: 8px;
+        vertical-align: -3px;
+        color: #1e293b;
+    }
+
+    /* Icons inside TOC links */
+    #toc a > svg {
+        width: 14px;
+        height: 14px;
+        margin-right: 4px;
+        vertical-align: -2px;
+    }
+
+    /* Library headings (h2) */
+    .sect1 > h2 {
+        font-family: 'Lilita One', cursive;
+        font-weight: 400;
+        letter-spacing: 1px;
+        color: #1e293b;
+    }
+
+    /* Function headings (h3) with blue left border */
+    .sect2 > h3 {
+        border-left: 4px solid #00e5ff;
+        padding-left: 12px;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    /* Spacing between function sections */
+    .sect1 > .sectionbody > .sect2 {
+        margin-top: 2em;
+    }
+
+    /* Override Riak theme fonts for consistency with index.html */
+    body {
+        font-family: 'Quicksand', sans-serif;
+    }
+
+    h1, h2, #toctitle, .sidebarblock > .content > .title {
+        font-family: 'Lilita One', cursive;
+        font-weight: 400;
+    }
+
+    h3, h4, h5, h6 {
+        font-family: 'Quicksand', sans-serif;
+        font-weight: 700;
+    }
 </style>
 
 <nav class="tiny-nav">

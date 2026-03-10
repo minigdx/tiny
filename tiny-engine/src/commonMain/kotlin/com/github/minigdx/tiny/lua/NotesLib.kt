@@ -218,6 +218,7 @@ enum class Note(val frequency: Frequency, val index: Int) {
     "notes",
     "List all notes from C0 to B8. " +
         "Please note that bemols are the note with b (ie: Gb2) while sharps are the note with s (ie: As3).",
+    icon = "music",
 )
 class NotesLib : TwoArgFunction() {
     override fun call(

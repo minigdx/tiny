@@ -29,6 +29,7 @@ import org.luaj.vm2.lib.TwoArgFunction
         "- exp10, expIn10, expOut10,\n" +
         "- exp5, expIn5, expOut5,\n" +
         "- linear ",
+    icon = "sparkles",
 )
 class JuiceLib : TwoArgFunction() {
     @TinyFunction(name = "pow2", example = JUICE_EXAMPLE)

@@ -21,6 +21,7 @@ import org.luaj.vm2.lib.ZeroArgFunction
 @TinyLib(
     "sfx",
     """TODO""",
+    icon = "audio-waveform",
 )
 class SfxLib(
     private val resourceAccess: GameResourceAccess,

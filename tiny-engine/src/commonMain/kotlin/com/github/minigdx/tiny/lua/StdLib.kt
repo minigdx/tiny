@@ -18,7 +18,7 @@ import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.VarArgFunction
 
-@TinyLib(description = "Standard library.")
+@TinyLib(description = "Standard library.", icon = "book-open")
 class StdLib(
     val gameOptions: GameOptions,
     val resourceAccess: GameResourceAccess,

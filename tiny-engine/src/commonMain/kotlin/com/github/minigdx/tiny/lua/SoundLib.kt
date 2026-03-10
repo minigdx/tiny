@@ -24,6 +24,7 @@ Avoid to start a music or a sound at the beginning of the game.
 Before it, force the player to hit a key or click by adding an interactive menu
 or by starting the sound as soon as the player is moving.
 """,
+    icon = "volume-2",
 )
 class SoundLib(
     private val resourceAccess: GameResourceAccess,

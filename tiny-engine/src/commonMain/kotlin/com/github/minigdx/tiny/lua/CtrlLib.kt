@@ -16,6 +16,7 @@ import org.luaj.vm2.lib.TwoArgFunction
 @TinyLib(
     "ctrl",
     "Access to controllers like touch/mouse events or accessing which key is pressed by the user.",
+    icon = "keyboard",
 )
 class CtrlLib(
     private val inputHandler: InputHandler,

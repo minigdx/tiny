@@ -14,6 +14,7 @@ import org.luaj.vm2.lib.TwoArgFunction
         "- `keys.up`, `keys.down`, `keys.left`, `keys.right` for directions.\n" +
         "- `keys.a` to `keys.z` and `keys.0` to `keys.9` for letters and numbers.\n" +
         "- `keys.space` and `keys.enter` for other keys.\n",
+    icon = "command",
 )
 class KeysLib : TwoArgFunction() {
     @TinyVariable("a", "the key a", hideInDocumentation = true)

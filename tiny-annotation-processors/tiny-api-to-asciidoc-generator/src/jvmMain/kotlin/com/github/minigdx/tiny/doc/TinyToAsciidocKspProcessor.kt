@@ -46,7 +46,7 @@ class TinyToAsciidocKspProcessor(
                 title = "Tiny API"
                 libs.sortedBy { it.name }
                     .forEach { lib ->
-                        section(lib.name.ifBlank { "std" }, lib.description) {
+                        section(lib.name.ifBlank { "std" }, lib.description, lib.icon.ifBlank { null }) {
                             lib.variables
                                 .sortedBy { it.name }
                                 .filterNot { it.hidden }

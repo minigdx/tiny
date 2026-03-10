@@ -24,6 +24,7 @@ import kotlin.math.min
 @TinyLib(
     "gfx",
     "Access to graphical API like updating the color palette or applying a dithering pattern.",
+    icon = "palette",
 )
 class GfxLib(
     private val resourceAccess: GameResourceAccess,

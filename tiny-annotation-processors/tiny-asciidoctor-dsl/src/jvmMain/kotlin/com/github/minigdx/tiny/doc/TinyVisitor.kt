@@ -159,6 +159,7 @@ class TinyLibVisitor : KSDefaultVisitor<TinyLibDescriptor, TinyLibDescriptor>() 
 
         data.name = lib.name
         data.description = lib.description
+        data.icon = lib.icon
 
         return super.visitAnnotated(annotated, data)
     }

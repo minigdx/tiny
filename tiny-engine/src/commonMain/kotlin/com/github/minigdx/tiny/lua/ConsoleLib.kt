@@ -12,7 +12,7 @@ import org.luaj.vm2.Varargs
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.VarArgFunction
 
-@TinyLib("console", "Helpers to log information in the console.")
+@TinyLib("console", "Helpers to log information in the console.", icon = "terminal")
 class ConsoleLib(private val logger: Logger) : TwoArgFunction() {
     override fun call(
         arg1: LuaValue,

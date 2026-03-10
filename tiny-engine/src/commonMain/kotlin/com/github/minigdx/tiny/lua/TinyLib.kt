@@ -22,6 +22,7 @@ internal expect fun platformValue(): Int
         "game dimensions (`tiny.width`, `tiny.height`), " +
         "platform information (`tiny.platform`) and " +
         "to switch to another script using `exit`.",
+    icon = "gamepad-2",
 )
 class TinyLib(
     private val gameScript: List<String>,

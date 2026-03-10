@@ -26,7 +26,7 @@ import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 
-@TinyLib("floppy", "Floppy allow you to get or save user Lua structure.")
+@TinyLib("floppy", "Floppy allow you to get or save user Lua structure.", icon = "save")
 class FloppyLib(
     private val platform: Platform,
     private val logger: Logger,

@@ -24,6 +24,7 @@ data class TinyFunctionDescriptor(
 class TinyLibDescriptor(
     var name: String = "",
     var description: String = "",
+    var icon: String = "",
     var functions: List<TinyFunctionDescriptor> = emptyList(),
     var variables: List<TinyVariableDescriptor> = emptyList(),
 )

@@ -73,6 +73,7 @@ private class Shape(private val gameOptions: GameOptions) {
     "Shape API to draw...shapes. " +
         "Those shapes can be circle, rectangle, line or oval." +
         "All shapes can be draw filed or not filed.",
+    icon = "pentagon",
 )
 class ShapeLib(
     private val gameOptions: GameOptions,
