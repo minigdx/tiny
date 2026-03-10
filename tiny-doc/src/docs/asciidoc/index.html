@@ -79,6 +79,7 @@
             font-family: 'Quicksand', sans-serif;
             color: #334155;
             background: var(--bg);
+            padding-top: 60px;
             background-image:
                 radial-gradient(circle at 10% 20%, rgba(255,0,128,.05) 0%, transparent 20%),
                 radial-gradient(circle at 90% 80%, rgba(0,229,255,.05) 0%, transparent 20%);
@@ -106,37 +107,6 @@
         .shadow-bubble-pink { box-shadow: 0 6px 0 #d4006b; }
         .shadow-bubble-blue { box-shadow: 0 6px 0 #00b8cc; }
 
-        /* ── Nav ───────────────────────────────────────── */
-        .nav {
-            position: sticky; top: 0; z-index: 100;
-            display: flex; align-items: center;
-            padding: 16px 24px;
-            background: rgba(255,255,255,.8);
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border-bottom: 4px solid rgba(0,229,255,.2);
-        }
-        .nav__logo {
-            display: flex; align-items: center; gap: 12px;
-            text-decoration: none; margin-right: auto;
-        }
-        .nav__logo-icon {
-            width: 40px; height: 40px;
-            display: flex; align-items: center; justify-content: center;
-            background: var(--yellow); border: 2px solid var(--dark);
-            border-radius: 12px; transform: rotate(3deg);
-            box-shadow: 4px 4px 0 #000;
-        }
-        .nav__logo-text { font-size: 1.5rem; letter-spacing: 2px; color: var(--dark); }
-        .nav__links { display: flex; align-items: center; gap: 32px; }
-        .nav__link {
-            font-size: .85rem; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 2px; text-decoration: none; color: #444;
-            transition: color .15s;
-        }
-        .nav__link:hover { color: var(--pink); }
-        .nav__link--cyan:hover { color: var(--cyan); }
-        .nav__link--green:hover { color: var(--green); }
-
         /* ── Buttons ───────────────────────────────────── */
         .button {
             display: inline-flex; align-items: center; justify-content: center;
@@ -153,7 +123,7 @@
         .button--pink  { background: var(--pink); color: #fff; box-shadow: 0 6px 0 #d4006b; }
         .button--white { background: #fff; color: var(--cyan); box-shadow: 0 8px 0 rgba(0,0,0,.1); }
         .button--cyan  { background: var(--cyan); color: #fff; border-color: var(--dark); box-shadow: 0 6px 0 #00b8cc; }
-        .button--small { padding: 10px 24px; font-size: .85rem; border-radius: 1rem; border-width: 2px; }
+
 
         /* ── Hero ──────────────────────────────────────── */
         .hero__wrapper { padding: 48px 24px 0; max-width: 1094px; margin: 0 auto; }
@@ -369,7 +339,7 @@
             .hero__title { font-size: 6rem; }
             .section-title, .features__title { font-size: 2.5rem; }
             .cta-card__title { font-size: 3rem; }
-            .nav__links { display: none; }
+
         }
         @media (max-width: 600px) {
             .hero__card { height: 400px; border-radius: 1.5rem; }
@@ -387,21 +357,8 @@
     </style>
 </head>
 <body>
+<script src="tiny-nav.js"></script>
 <div class="page">
-
-    <!-- ── NAV ──────────────────────────────────────── -->
-    <header class="nav">
-        <a href="index.html" class="nav__logo">
-            <span class="nav__logo-text font-display">🧸 Tiny</span>
-        </a>
-        <div class="nav__links">
-            <a class="nav__link" href="#features">Features</a>
-            <a class="nav__link nav__link--cyan" href="documentation.html#_tiny_showcase">Showcase</a>
-            <a class="nav__link nav__link--green" href="tiny-api.html">Docs</a>
-            <a class="nav__link" href="https://github.com/minigdx/tiny">Community</a>
-            <a class="button button--cyan button--small" href="documentation.html#_tiny_install">Get Started</a>
-        </div>
-    </header>
 
     <main style="flex:1">
 

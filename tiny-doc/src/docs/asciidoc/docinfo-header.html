@@ -55,72 +55,6 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 
 <style>
-    /* Shared nav bar */
-    .tiny-nav {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 10000;
-        height: 56px;
-        background: rgba(255, 255, 255, 0.8);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border-bottom: 4px solid rgba(0, 229, 255, 0.2);
-        display: flex;
-        align-items: center;
-        padding: 0 24px;
-        font-family: 'Quicksand', sans-serif;
-    }
-
-    .tiny-nav a {
-        color: #444;
-        text-decoration: none;
-        margin: 0 12px;
-        font-size: 0.85rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        transition: color 0.15s ease;
-    }
-
-    .tiny-nav a:hover {
-        color: #ff0080;
-    }
-
-    .tiny-nav .nav-logo {
-        color: #1e293b;
-        font-family: 'Lilita One', cursive;
-        font-weight: 400;
-        font-size: 1.3em;
-        margin-right: auto;
-        white-space: nowrap;
-        text-transform: none;
-        letter-spacing: 2px;
-    }
-
-    .tiny-nav .nav-logo:hover {
-        color: #ff0080;
-    }
-
-    .tiny-nav .nav-cta {
-        background: #00e5ff;
-        color: #fff;
-        padding: 8px 20px;
-        border-radius: 16px;
-        border: 2px solid #1e293b;
-        font-family: 'Lilita One', cursive;
-        font-weight: 400;
-        box-shadow: 0 6px 0 #00b8cc;
-        transition: transform 0.15s ease;
-    }
-
-    .tiny-nav .nav-cta:hover {
-        background: #00d4ec;
-        color: #fff;
-        transform: translateY(-2px);
-    }
-
     /* Syntax highlighting (interactive editor) */
     .code_keyword { color: #7c3aed; }
     .code_comment { color: #9ca3af; font-style: italic; }
@@ -382,11 +316,4 @@
     }
 </style>
 
-<nav class="tiny-nav">
-    <a href="index.html" class="nav-logo">Tiny</a>
-    <a href="index.html#features">Features</a>
-    <a href="documentation.html#_tiny_showcase">Showcase</a>
-    <a href="tiny-api.html">Docs</a>
-    <a href="https://github.com/minigdx/tiny">Community</a>
-    <a href="documentation.html#_tiny_install" class="nav-cta">Get Started</a>
-</nav>
+<script src="tiny-nav.js"></script>
