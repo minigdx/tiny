@@ -1,0 +1,130 @@
+:docinfo: shared
+:icons: font
+:book:
+:source-highlighter: rouge
+:favicon: ./sample/favicon.png
+:stylesheet: adoc-riak.css
+:description: Add sound effects and music to your Tiny game. Use the SFX editor, play sounds from Lua, loop music, and manage audio playback.
+:keywords: tiny sound, game audio, sfx editor, sound effects, chip tune, tiny game engine, game music, sound.sfx
+
+= Adding Sound to Your Game
+
+Sound effects bring your game to life.
+Tiny uses a chip-tune style sound system -- you design sounds using a built-in SFX editor, then play them from your Lua code.
+
+== How sound works in Tiny
+
+Tiny's audio system is based on synthesized sound effects (SFX). Instead of loading audio files, you design sounds using waveform parameters (frequency, volume, waveform type, etc.) in the SFX editor. These sounds are stored in a `.sfx` file.
+
+IMPORTANT: In web browsers, sound can only start after the first user interaction (click or key press). This is a browser security requirement, not a Tiny limitation. Your game should be designed so that sounds are triggered by player actions.
+
+== The SFX Editor
+
+Tiny includes a built-in sound effect editor. Launch it with:
+
+```bash
+tiny-cli sfx
+```
+
+The SFX editor lets you:
+
+- Design sounds using waveform types (square, sine, triangle, sawtooth, noise).
+- Adjust frequency, volume, attack, decay, and other parameters.
+- Preview sounds in real time.
+- Save sounds to a `.sfx` file.
+
+Each sound occupies a numbered slot (0, 1, 2, ...) in the SFX file.
+
+++++
+<iframe title="Tiny SFX Editor" loading="lazy" width="516" height="516" src="sample/sfx-editor/index.html" style="border: 4px solid #00e5ff; border-radius: 1rem; display: block; margin: 1em auto;"></iframe>
+++++
+
+== Configuration
+
+Register your sound file in `_tiny.json`:
+
+```json
+{
+  "sounds": ["my-sounds.sfx"]
+}
+```
+
+You can also add it via the CLI:
+
+```bash
+tiny-cli add my-sounds.sfx
+```
+
+== Playing sound effects
+
+Use `sfx.play()` to trigger a sound by its slot index:
+
+```lua
+function _update()
+    -- Play sound 0 when space is pressed
+    if ctrl.pressed(keys.space) then
+        sfx.play(0)
+    end
+end
+```
+
+=== Looping sounds
+
+To loop a sound (useful for background music or continuous effects):
+
+```lua
+function _init()
+    -- Start looping sound 1 (e.g., background music)
+    music_handle = sfx.play(1, true)
+end
+```
+
+The second argument `true` enables looping. The function returns a handle you can use to control playback.
+
+=== Controlling playback
+
+The handle returned by `sfx.play()` lets you stop the sound or check its status:
+
+```lua
+function _init()
+    music = sfx.play(1, true)
+end
+
+function _update()
+    -- Stop the music when M is pressed
+    if ctrl.pressed(keys.m) then
+        if music.playing then
+            music.stop()
+        else
+            music = sfx.play(1, true)
+        end
+    end
+end
+```
+
+== Playing notes
+
+You can play individual musical notes with `sfx.note()`:
+
+```lua
+-- Play note at index 0
+sfx.note(0)
+```
+
+This is useful for musical games or dynamic sound generation.
+
+== Best practices
+
+- **Trigger sounds on user input**: Always tie sounds to player actions (key presses, collisions) rather than playing them automatically on game start. This ensures sounds work in web browsers.
+- **Manage your handles**: Keep references to looping sounds so you can stop them later. Orphaned looping sounds continue playing indefinitely.
+- **Use distinct slots**: Organize your SFX file so each slot has a clear purpose (e.g., slot 0 = jump, slot 1 = coin, slot 2 = explosion).
+- **Test in the browser**: Audio behavior can differ between desktop and web. Always test your sounds in both environments.
+
+== What's next?
+
+You've completed the Tiny tutorial series! Here are some resources to continue your journey:
+
+- link:tiny-api.html[API Reference] -- Complete documentation for every Lua function.
+- link:tiny-cli.html[CLI Reference] -- All available command-line tools.
+- link:guide.html#_tiny_showcase[Showcase] -- See what others have built with Tiny.
+- https://github.com/minigdx/tiny[GitHub Repository] -- Source code, issues, and contributions.

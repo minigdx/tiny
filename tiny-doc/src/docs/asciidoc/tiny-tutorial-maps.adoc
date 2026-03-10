@@ -1,0 +1,164 @@
+:docinfo: shared
+:icons: font
+:book:
+:source-highlighter: rouge
+:favicon: ./sample/favicon.png
+:stylesheet: adoc-riak.css
+:description: Build game levels with LDtk and the Tiny game engine. Learn to draw maps, manage layers, handle entities, and implement tile-based collision.
+:keywords: tiny maps, ldtk, level editor, tilemap, game levels, tiny game engine, map collision, tile-based game
+
+= Managing Maps with the LDtk Editor
+
+Maps let you build rich game worlds using a visual editor.
+Tiny integrates with https://ldtk.io/[LDtk] (Level Designer Toolkit), a free and open-source 2D level editor.
+
+== What is LDtk?
+
+LDtk is a modern level editor designed for 2D games. It provides:
+
+- A visual tile-based map editor
+- Support for multiple layers (tiles, entities, collision)
+- Entity placement with custom fields
+- Auto-tiling rules
+- JSON-based output that Tiny reads directly
+
+Download LDtk from https://ldtk.io/[ldtk.io] to get started.
+
+== Setting up a map
+
+=== Create an LDtk project
+
+1. Open LDtk and create a new project.
+2. Set the grid size to match your spritesheet tile size (e.g., 16x16).
+3. Import your spritesheet as a tileset.
+4. Paint your level using the tile editor.
+5. Save the `.ldtk` file in your game directory.
+
+=== Add to your game configuration
+
+Register the LDtk file in your `_tiny.json`:
+
+```json
+{
+  "levels": ["my-level.ldtk"]
+}
+```
+
+You can also add it via the CLI:
+
+```bash
+tiny-cli add my-level.ldtk
+```
+
+== Drawing maps
+
+To draw the entire map with all its layers:
+
+```lua
+function _draw()
+    gfx.cls()
+    map.draw()
+end
+```
+
+=== Drawing specific layers
+
+If your map has multiple layers, you can draw them individually:
+
+```lua
+function _draw()
+    gfx.cls()
+    -- Draw only the "Background" layer
+    map.draw("Background")
+    -- Draw player on top
+    spr.draw(player_sprite, player_x, player_y)
+    -- Draw the "Foreground" layer on top of the player
+    map.draw("Foreground")
+end
+```
+
+This gives you control over the rendering order, so you can draw the player between background and foreground layers.
+
+== Working with multiple levels
+
+LDtk projects can contain multiple levels. Switch between them using `map.level()`:
+
+```lua
+function _init()
+    current_level = 0
+    map.level(current_level)
+end
+
+function change_level(n)
+    current_level = n
+    map.level(current_level)
+end
+```
+
+Levels are indexed starting from `0`, in the order they appear in the LDtk project.
+
+== Working with entities
+
+LDtk lets you place entities (spawn points, enemies, items, triggers) directly in the level editor.
+Access them in your game with `map.entities()`:
+
+```lua
+function _init()
+    -- Get all entities from the current level
+    local entities = map.entities()
+
+    for _, entity in ipairs(entities) do
+        if entity.name == "PlayerSpawn" then
+            player_x = entity.x
+            player_y = entity.y
+        elseif entity.name == "Enemy" then
+            -- Access custom fields defined in LDtk
+            local speed = entity.fields.speed or 1
+            spawn_enemy(entity.x, entity.y, speed)
+        end
+    end
+end
+```
+
+Each entity has:
+
+- `name` -- The entity identifier defined in LDtk.
+- `x`, `y` -- The position in pixels.
+- `fields` -- A table of custom fields you defined in LDtk.
+
+== Tile-based collision
+
+Use `map.cflag()` to check collision flags on tiles:
+
+```lua
+function _update()
+    -- Convert pixel position to tile coordinates
+    local cx, cy = map.from(player_x, player_y)
+
+    -- Check if the tile to the right is solid
+    if ctrl.pressing(keys.right) then
+        local next_cx = cx + 1
+        if map.cflag(next_cx, cy) == 0 then
+            player_x = player_x + 2
+        end
+    end
+end
+```
+
+=== Coordinate conversion
+
+Tiny provides functions to convert between pixel coordinates and tile coordinates:
+
+```lua
+-- Convert pixel coordinates to tile coordinates
+local tile_x, tile_y = map.from(pixel_x, pixel_y)
+
+-- Convert tile coordinates to pixel coordinates
+local pixel_x, pixel_y = map.to(tile_x, tile_y)
+```
+
+This is useful for snapping objects to the grid or checking which tile a character is standing on.
+
+== What's next?
+
+Learn how to give your game a unique visual identity with the link:tiny-fonts.html[Managing Custom Fonts] tutorial.

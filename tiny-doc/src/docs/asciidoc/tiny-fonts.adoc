@@ -1,14 +1,23 @@
-== Custom Fonts
+:docinfo: shared
+:icons: font
+:book:
+:source-highlighter: rouge
+:favicon: ./sample/favicon.png
+:stylesheet: adoc-riak.css
+:description: Add custom bitmap fonts to your Tiny game. Learn how to create font spritesheets, configure font banks, and use the CLI to register fonts.
+:keywords: tiny fonts, custom fonts, bitmap fonts, pixel font, game font, tiny game engine, font spritesheet
 
-`🧸 Tiny` comes with a built-in default font, but you can also use your own custom fonts to give your game a unique look.
+= Managing Custom Fonts
+
+`Tiny` comes with a built-in default font, but you can also use your own custom fonts to give your game a unique look.
 Custom fonts are bitmap fonts: each character is drawn as a small sprite on a PNG spritesheet, arranged in a grid.
 
-=== What is a font?
+== What is a font?
 
 A font in Tiny is a PNG image (the spritesheet) combined with metadata that describes how to read characters from it.
 Each font has a **name**, a reference to its **spritesheet** image, and one or more **banks** of characters.
 
-=== What is a font bank?
+== What is a font bank?
 
 A font bank is a set of characters within a font that share the same cell size.
 Each bank defines:
@@ -19,9 +28,9 @@ Each bank defines:
 - An optional **x** and **y** offset where the character grid begins in the spritesheet.
 
 A single font can have multiple banks.
-This is useful when you want to group different character sets — for example, one bank for Latin letters and another for punctuation — while keeping them under the same font name.
+This is useful when you want to group different character sets -- for example, one bank for Latin letters and another for punctuation -- while keeping them under the same font name.
 
-=== How the character grid works
+== How the character grid works
 
 The characters in a bank are arranged left-to-right, top-to-bottom in the spritesheet.
 Tiny uses the image width and the character cell width to determine how many characters fit per row.
@@ -29,7 +38,7 @@ Tiny uses the image width and the character cell width to determine how many cha
 For example, with an image that is 108 pixels wide and a character cell width of 6 pixels, each row contains 18 characters.
 If you provide 144 characters, they fill 8 rows of 18 characters.
 
-=== Adding a font with the CLI
+== Adding a font with the CLI
 
 Use the `tiny-cli add` command with the `--font` and `--chars` options to register a PNG as a font.
 
@@ -42,7 +51,7 @@ tiny-cli add --font=myfont --chars "abcdefghijklmnopqrstuvwxyz0123456789" myfont
 - `--size` specifies the character cell size in pixels. Use `WxH` for rectangular cells (e.g., `6x12`) or a single number for square cells (e.g., `8`). **Optional**: if omitted, the size is auto-detected from the image.
 - `--offset` specifies the pixel offset where the character grid begins in the image (e.g., `8,12` or `8x12`). **Optional**: if omitted, the offset is auto-detected from the image.
 
-==== Auto-detection
+=== Auto-detection
 
 When `--size` or `--offset` are omitted, Tiny analyzes the PNG image to detect the values automatically:
 
@@ -52,7 +61,7 @@ When `--size` or `--offset` are omitted, Tiny analyzes the PNG image to detect t
 
 The auto-detected values are displayed during the add operation. If auto-detection fails, an error message asks you to provide `--size` explicitly.
 
-==== Explicit size and offset
+=== Explicit size and offset
 
 You can always provide explicit values to override auto-detection:
 
@@ -61,7 +70,7 @@ tiny-cli add --font=myfont --size 8x12 --chars "abcdefghijklmnopqrstuvwxyz012345
 tiny-cli add --font=myfont --size 8x12 --offset 4,2 --chars "abcdefghijklmnopqrstuvwxyz0123456789" myfont.png
 ```
 
-==== Adding multiple banks
+=== Adding multiple banks
 
 To add a second bank to an existing font, run the command again with the same font name but different characters:
 
@@ -71,7 +80,7 @@ tiny-cli add --font=myfont --size 8x12 --chars "ABCDEFGHIJKLMNOPQRSTUVWXYZ" myfo
 
 Both banks are stored under the same font name `myfont`.
 
-==== Creating separate fonts
+=== Creating separate fonts
 
 To create distinct fonts, use different names:
 
@@ -80,7 +89,7 @@ tiny-cli add --font=big --size 16x16 --chars "abcdefghijklmnopqrstuvwxyz" big-fo
 tiny-cli add --font=small --size 6x8 --chars "abcdefghijklmnopqrstuvwxyz" small-font.png
 ```
 
-=== Configuration in _tiny.json
+== Configuration in _tiny.json
 
 When you add a font, it is stored in the `fonts` section of `_tiny.json`:
 
@@ -116,7 +125,7 @@ Each string has as many characters as fit in one row of the spritesheet (image w
 
 The `x` and `y` fields specify the pixel offset where the character grid starts in the spritesheet. They default to `0` when not specified.
 
-=== Managing fonts
+== Managing fonts
 
 You can view all resources, including fonts, with:
 
@@ -129,3 +138,12 @@ To remove a font, use `--delete` with the font name or spritesheet filename:
 ```bash
 tiny-cli resources --delete myfont.png
 ```
+
+== What's next?
+
+Want to add audio to your game? Continue with the link:tiny-tutorial-sound.html[Adding Sound to Your Game] tutorial.
+
+You can also explore:
+
+- link:tiny-api.html[API Reference] -- Complete documentation for every Lua function.
+- link:tiny-cli.html[CLI Reference] -- All available command-line tools.

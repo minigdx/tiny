@@ -1,10 +1,156 @@
-== Tiny Install
+:docinfo: shared
+:icons: font
+:book:
+:source-highlighter: rouge
+:favicon: ./sample/favicon.png
+:stylesheet: adoc-riak.css
+:description: Install the Tiny game engine CLI and create your first Lua game project. Step-by-step setup for macOS, Linux, and Windows.
+:keywords: tiny install, game engine setup, lua game engine, tiny cli install, getting started, game development
 
-`🧸 Tiny` is a game engine that runs through its command-line client.
-Once installed, you can start creating and developing games in no time!
+= Getting Started with Tiny
 
-- Download Tiny CLI from https://github.com/minigdx/tiny/releases[the release Github page]
-- Unzip it and put the `bin` directory in your path (i.e.: `export PATH=$PATH:<tiny-cli-path>/bin`)
-- Create your first game using `tiny-cli create my-first-game`
+`Tiny` is a free, open-source game engine that runs through its command-line client.
+Once installed, you can start creating and developing retro-style games in no time!
 
-What's next? You can check the <<_tiny_tutorial,Tiny Tutorial>>, link:tiny-api.html[Tiny API] or get more information about the link:tiny-cli.html[Tiny CLI].
+== Prerequisites
+
+Before installing Tiny, make sure you have:
+
+- **Java 21** or later installed on your system. You can download it from https://adoptium.net/[Adoptium] or use your system's package manager.
+
+To verify your Java installation, run:
+
+```bash
+java -version
+```
+
+You should see output indicating Java 21 or higher.
+
+== Download Tiny CLI
+
+Download the latest release of the Tiny CLI from the https://github.com/minigdx/tiny/releases[GitHub releases page].
+
+Choose the archive for your platform and extract it to a location of your choice.
+
+== Add to your PATH
+
+To use the `tiny-cli` command from anywhere, add the `bin` directory to your system PATH.
+
+**macOS / Linux:**
+
+```bash
+export PATH=$PATH:/path/to/tiny-cli/bin
+```
+
+To make this permanent, add the line to your shell profile (`~/.bashrc`, `~/.zshrc`, or `~/.profile`).
+
+**Windows:**
+
+Add the `bin` directory to your PATH through *System Properties > Environment Variables*, or run in PowerShell:
+
+```powershell
+$env:PATH += ";C:\path\to\tiny-cli\bin"
+```
+
+== Verify the installation
+
+Run the following command to confirm Tiny CLI is installed correctly:
+
+```bash
+tiny-cli --help
+```
+
+You should see the list of available commands.
+
+== Create your first project
+
+Generate a new game project with:
+
+```bash
+tiny-cli create my-first-game
+```
+
+This creates a `my-first-game` directory with the following structure:
+
+```
+my-first-game/
+  _tiny.json    <-- Game configuration (screen size, colors, resources)
+  game.lua      <-- Your game code
+```
+
+- **`_tiny.json`**: Defines your game's settings such as screen resolution, color palette, spritesheets, levels, sounds, and fonts.
+- **`game.lua`**: The main script where you write your game logic using Lua.
+
+== Run your game
+
+Navigate into the project directory and start the game:
+
+```bash
+cd my-first-game
+tiny-cli run
+```
+
+A window opens displaying your game. You can edit `game.lua` while the game is running -- Tiny's **hot reload** feature picks up your changes instantly.
+
+== Game structure basics
+
+Every Tiny game uses three callback functions in Lua:
+
+```lua
+function _init()
+    -- Called once when the game starts.
+    -- Initialize your variables here.
+end
+
+function _update()
+    -- Called every frame before drawing.
+    -- Update game logic here.
+end
+
+function _draw()
+    -- Called every frame after update.
+    -- Draw your game here.
+    gfx.cls()
+    print("hello tiny!", 80, 120, 7)
+end
+```
+
+++++
+<tiny-editor style="display: none;">
+function _init()
+    -- Called once when the game starts.
+    x = 128
+    y = 128
+    color = 8
+end
+
+function _update()
+    -- Move the circle with arrow keys
+    if ctrl.pressing(keys.left) then x = x - 2 end
+    if ctrl.pressing(keys.right) then x = x + 2 end
+    if ctrl.pressing(keys.up) then y = y - 2 end
+    if ctrl.pressing(keys.down) then y = y + 2 end
+
+    -- Change color on space
+    if ctrl.pressed(keys.space) then
+        color = color + 1
+        if color > 15 then color = 1 end
+    end
+end
+
+function _draw()
+    gfx.cls()
+    shape.circlef(x, y, 16, color)
+    print("arrows: move / space: color", 30, 8, 7)
+end
+</tiny-editor>
+++++
+
+== What's next?
+
+Now that you have Tiny installed, follow the link:tiny-tutorial.html[Build Your First Game: Pong] tutorial to learn the engine fundamentals by creating a complete game.
+
+You can also explore:
+
+- link:tiny-api.html[API Reference] -- Complete documentation for every Lua function.
+- link:tiny-cli.html[CLI Reference] -- All available command-line tools.

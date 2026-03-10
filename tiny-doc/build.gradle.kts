@@ -71,6 +71,7 @@ val copySeoFiles = tasks.register("copy-seoFiles", Copy::class) {
         include("sitemap.xml")
         include(".nojekyll")
         include("index.html")
+        include("documentation.html")
         include("tiny-nav.js")
     }
     into(project.layout.buildDirectory.get().asFile.resolve("docs/asciidoc"))
