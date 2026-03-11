@@ -336,6 +336,20 @@ private fun createGame(
     levelPath: String?,
     rootPath: String,
 ) {
+    val statusBar = (document.createElement("div") as HTMLDivElement).apply {
+        setAttribute("class", "tiny-status-bar")
+    }
+    val statusBarProgress = (document.createElement("div") as HTMLDivElement).apply {
+        setAttribute("class", "tiny-status-bar-progress tiny-status-loaded")
+    }
+    statusBar.appendChild(statusBarProgress)
+    container.before(statusBar)
+
+    statusBarProgress.addEventListener("transitionend", {
+        statusBarProgress.classList.remove("tiny-status-editing")
+        statusBarProgress.classList.add("tiny-status-loaded")
+    }, null)
+
     val textarea = (document.createElement("div") as HTMLDivElement).apply {
         setAttribute("id", "editor-$index")
         setAttribute("spellcheck", "false")
@@ -348,6 +362,15 @@ private fun createGame(
             val pos = getCaretPosition(this)
             this.innerHTML = highlight(extractText(this))
             setCaret(pos, this)
+
+            // Reset status bar: orange, animate from 0% to 100% over 1.5s
+            statusBarProgress.classList.remove("tiny-status-loaded")
+            statusBarProgress.classList.add("tiny-status-editing")
+            statusBarProgress.style.transition = "none"
+            statusBarProgress.style.width = "0%"
+            statusBarProgress.getBoundingClientRect() // Force reflow
+            statusBarProgress.style.transition = "width 1s linear"
+            statusBarProgress.style.width = "100%"
         }
     }
     textarea.innerHTML = highlight(textarea.innerText)

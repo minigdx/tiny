@@ -143,6 +143,10 @@
     }
 
     /** code editor **/
+    .tiny-textarea:focus {
+        outline: none;
+    }
+
     .tiny-textarea {
         flex: 2 1 auto;
         display: block;
@@ -254,6 +258,25 @@
 
     .tiny-share-link:hover {
         color: #ff0080;
+    }
+
+    /* Status bar: reload progress indicator */
+    .tiny-status-bar {
+        width: calc(100%);
+        height: 1px;
+    }
+
+    .tiny-status-bar-progress {
+        height: 100%;
+        width: 100%;
+    }
+
+    .tiny-status-editing {
+        background-color: #e89830;
+    }
+
+    .tiny-status-loaded {
+        background-color: #4caf50;
     }
 
     /* === Lucide icons for library sections === */

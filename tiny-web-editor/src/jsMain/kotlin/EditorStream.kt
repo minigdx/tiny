@@ -23,7 +23,7 @@ class EditorStream(field: String) : SourceStream<ByteArray> {
             this.textarea = textarea
             textarea.addEventListener("input", {
                 updated = true
-                timeout = Date.now() + 1500 // add 1.5 second
+                timeout = Date.now() + 1000 // add 1 second
             }, null)
         }
         share = document.getElementById(field.replace("#editor", "share")) as? HTMLAnchorElement

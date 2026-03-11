@@ -25,7 +25,7 @@ fun LuaError.fromErrorLine(): Int? {
 fun LuaError.fromMessage(): Int? {
     val msg = message ?: return null
 
-    val pattern = """\[[\s\S]*]:(\d+):.*""".toRegex()
+    val pattern = """\[[\s\S]*\]:(\d+):.*""".toRegex()
     val match = pattern.matchEntire(msg)
     return match?.groupValues?.get(1)?.toIntOrNull()
 }

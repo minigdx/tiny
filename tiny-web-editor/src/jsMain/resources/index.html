@@ -32,6 +32,10 @@
             right: calc(100% + 16px); /* add some space between this and the code line next to it */
         }
 
+        .tiny-textarea:focus {
+            outline: none;
+        }
+
         .tiny-textarea {
             padding-left: 48px;
             counter-reset: line; /* reset the "line" counter */
@@ -51,6 +55,24 @@
 
         .code_string {
             color: #128427
+        }
+
+        .tiny-status-bar {
+            width: 100%;
+            height: 1px;
+        }
+
+        .tiny-status-bar-progress {
+            height: 100%;
+            width: 100%;
+        }
+
+        .tiny-status-editing {
+            background-color: #e89830;
+        }
+
+        .tiny-status-loaded {
+            background-color: #4caf50;
         }
     </style>
 </head>
