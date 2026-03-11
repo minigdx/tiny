@@ -139,6 +139,7 @@
             position: absolute; inset: 0;
             width: 100%; height: 100%; border: none;
             opacity: .8;
+            overflow: hidden;
         }
         .hero__content {
             position: absolute; inset: 0; z-index: 1;
@@ -365,13 +366,13 @@
         <!-- ── HERO ─────────────────────────────────── -->
         <section class="hero__wrapper">
             <div class="hero__card">
-                <iframe src="sample/home/index.html" class="hero__game" tabindex="-1" loading="lazy" title="Hero background animation"></iframe>
+                <iframe src="sample/home/index.html" class="hero__game" tabindex="-1" loading="lazy" title="Hero background animation" scrolling="no"></iframe>
                 <div class="hero__content">
                     <h1 class="hero__title font-display">🧸 tiny</h1>
                     <p class="hero__subtitle">Build, Tweak, and Play.</p>
                     <div class="hero__actions">
                         <a href="editor.html" class="button button--pink">Start Creating</a>
-                        <a href="guide.html#_tiny_showcase" class="button button--white">View Samples</a>
+                        <a href="showcase.html" class="button button--white">View Samples</a>
                     </div>
                 </div>
             </div>
@@ -436,7 +437,7 @@
                                 <div class="tab-content tab-content--active" id="tab-draw">
 <pre><span class="syn-kw">function</span> <span class="syn-fn">_draw</span>()
     <span class="syn-cm">-- clear the screen</span>
-    gfx.<span class="syn-fn">cls</span>(<span class="syn-nb">0</span>)
+    gfx.<span class="syn-fn">cls</span>(<span class="syn-nb">1</span>)
 
     <span class="syn-cm">-- draw shapes</span>
     shape.<span class="syn-fn">rectf</span>(<span class="syn-nb">10</span>, <span class="syn-nb">10</span>, <span class="syn-nb">50</span>, <span class="syn-nb">30</span>, <span class="syn-nb">8</span>)
@@ -551,7 +552,6 @@
                     <a href="editor.html" class="button button--pink">Launch Editor</a>
                     <a href="documentation.html" class="button button--white" style="color:var(--dark)">Browse Docs</a>
                 </div>
-                <p class="cta-card__footer">Open source. Free forever. No friction.</p>
             </div>
         </section>
 

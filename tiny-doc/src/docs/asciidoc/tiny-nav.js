@@ -79,7 +79,7 @@
         '<a href="index.html" class="tiny-nav__logo">\uD83E\uDDF8 Tiny</a>',
         '<div class="tiny-nav__links">',
         '    <a href="index.html#features" class="tiny-nav__link">Features</a>',
-        '    <a href="guide.html#_tiny_showcase" class="tiny-nav__link">Showcase</a>',
+        '    <a href="showcase.html" class="tiny-nav__link">Showcase</a>',
         '    <a href="documentation.html" class="tiny-nav__link">Docs</a>',
         '    <a href="https://github.com/minigdx/tiny" class="tiny-nav__link">Community</a>',
         '    <a href="tiny-install.html" class="tiny-nav__cta">Get Started</a>',

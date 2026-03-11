@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Showcase - Tiny Game Engine</title>
+
+    <!-- SEO -->
+    <meta name="description" content="Explore games built with the Tiny game engine. Get inspired by community creations spanning arcade, puzzle, physics, and more.">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#ff0080">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="sample/favicon.png">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Quicksand:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
+    <style>
+        /* ── Reset & base ─────────────────────────────── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --pink:   #ff0080;
+            --cyan:   #00e5ff;
+            --green:  #a2ff00;
+            --yellow: #fff000;
+            --dark:   #1e293b;
+            --bg:     #fff5f9;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            color: #334155;
+            background: var(--bg);
+            padding-top: 60px;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(255,0,128,.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(0,229,255,.05) 0%, transparent 20%);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        a { color: inherit; }
+
+        .font-display { font-family: 'Lilita One', cursive; font-weight: 400; }
+
+        /* ── Layout helpers ────────────────────────────── */
+        .page        { display: flex; flex-direction: column; min-height: 100vh; }
+        .container   { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+        .section     { padding: 80px 24px; }
+
+        /* ── Bubble shadows ────────────────────────────── */
+        .shadow-bubble      { box-shadow: 0 8px 0 rgba(0,0,0,.1); }
+        .shadow-bubble-pink { box-shadow: 0 6px 0 #d4006b; }
+
+        /* ── Buttons ───────────────────────────────────── */
+        .button {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 16px 40px; border-radius: 2rem;
+            font-family: 'Lilita One', cursive; font-weight: 400;
+            font-size: 1.5rem; text-transform: uppercase; letter-spacing: 2px;
+            text-decoration: none; border: 4px solid var(--dark);
+            transition: transform .15s, box-shadow .15s;
+            cursor: pointer;
+        }
+        .button:hover { transform: translateY(-2px); }
+        .button:active { transform: translateY(0); }
+
+        .button--pink  { background: var(--pink); color: #fff; box-shadow: 0 6px 0 #d4006b; }
+        .button--cyan  { background: var(--cyan); color: #fff; border-color: var(--dark); box-shadow: 0 6px 0 #00b8cc; }
+        .button--small {
+            padding: 10px 24px; font-size: 1rem; letter-spacing: 1px;
+        }
+
+        /* ── Header section ───────────────────────────── */
+        .showcase-header {
+            text-align: center;
+            padding: 64px 24px 32px;
+        }
+        .showcase-header__title {
+            font-size: 4.5rem; text-transform: uppercase; color: var(--dark);
+            filter: drop-shadow(4px 4px 0 var(--green));
+        }
+        .showcase-header__subtitle {
+            font-size: 1.25rem; color: #64748b; font-weight: 500;
+            max-width: 560px; margin: 16px auto 0;
+        }
+        .showcase-header__actions {
+            margin-top: 32px;
+        }
+
+        /* ── Filter bar ───────────────────────────────── */
+        .filter-bar {
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 12px;
+            padding: 0 24px 48px;
+            max-width: 900px; margin: 0 auto;
+        }
+        .filter-pill {
+            padding: 8px 24px; border-radius: 999px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: .85rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .1em;
+            border: 3px solid var(--dark);
+            background: #fff; color: var(--dark);
+            cursor: pointer;
+            transition: background .15s, color .15s, transform .15s;
+        }
+        .filter-pill:hover { transform: translateY(-2px); }
+        .filter-pill--active {
+            background: var(--pink); color: #fff; border-color: var(--pink);
+        }
+
+        /* ── Game grid ────────────────────────────────── */
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ── Game card ────────────────────────────────── */
+        .game-card {
+            display: flex; flex-direction: column;
+            border-radius: 2.5rem;
+            background: #fff; border: 4px solid var(--cyan);
+            overflow: hidden;
+            transition: transform .2s;
+        }
+        .game-card:hover { transform: translateY(-4px); }
+        .game-card--hidden { display: none; }
+
+        .game-card__image {
+            width: 100%; aspect-ratio: 4 / 3;
+            object-fit: cover;
+            border-bottom: 4px solid var(--cyan);
+        }
+
+        .game-card__body {
+            display: flex; flex-direction: column; gap: 12px;
+            padding: 24px;
+            flex: 1;
+        }
+
+        .game-card__genres {
+            display: flex; flex-wrap: wrap; gap: 8px;
+        }
+
+        .genre-tag {
+            display: inline-block;
+            padding: 4px 14px; border-radius: 999px;
+            font-size: .75rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .08em;
+            background: rgba(0,229,255,.15); color: #0891b2;
+        }
+
+        .game-card__title {
+            font-size: 1.4rem; color: var(--dark);
+        }
+
+        .game-card__actions {
+            margin-top: auto; padding-top: 8px;
+        }
+        .game-card__play {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 24px; border-radius: 2rem;
+            font-family: 'Lilita One', cursive; font-weight: 400;
+            font-size: 1rem; text-transform: uppercase; letter-spacing: 1px;
+            text-decoration: none;
+            background: var(--pink); color: #fff;
+            border: 3px solid var(--dark);
+            box-shadow: 0 4px 0 #d4006b;
+            transition: transform .15s, box-shadow .15s;
+        }
+        .game-card__play:hover { transform: translateY(-2px); }
+        .game-card__play:active { transform: translateY(0); }
+
+        /* ── Footer ────────────────────────────────────── */
+        .footer {
+            display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 32px;
+            padding: 64px 24px;
+            border-top: 4px solid rgba(0,0,0,.05);
+            max-width: 1200px; margin: 0 auto;
+            color: #94a3b8; font-weight: 500;
+        }
+        .footer__brand { display: flex; align-items: center; gap: 12px; }
+        .footer__brand-text { font-size: 1.5rem; letter-spacing: 2px; color: var(--dark); }
+        .footer__links { display: flex; gap: 48px; }
+        .footer__link {
+            font-size: .85rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 2px; text-decoration: none; color: #94a3b8;
+            transition: color .15s;
+        }
+        .footer__link:hover { color: var(--pink); }
+        .footer__copy { font-size: .85rem; font-weight: 700; opacity: .6; }
+
+        /* ── Responsive ────────────────────────────────── */
+        @media (max-width: 960px) {
+            .game-grid { grid-template-columns: repeat(2, 1fr); }
+            .showcase-header__title { font-size: 3rem; }
+        }
+        @media (max-width: 600px) {
+            .game-grid { grid-template-columns: 1fr; }
+            .showcase-header__title { font-size: 2.5rem; }
+            .button { font-size: 1.2rem; padding: 14px 28px; }
+            .footer { flex-direction: column; text-align: center; }
+            .footer__links { flex-direction: column; gap: 16px; }
+        }
+    </style>
+</head>
+<body>
+<script src="tiny-nav.js"></script>
+<div class="page">
+
+    <main style="flex:1">
+
+        <!-- ── HEADER ─────────────────────────────────── -->
+        <section class="showcase-header">
+            <h1 class="showcase-header__title font-display">Showcase</h1>
+            <p class="showcase-header__subtitle">
+                Get inspired by what's possible with Tiny! Explore games created by the community.
+            </p>
+            <div class="showcase-header__actions">
+                <a href="https://github.com/minigdx/tiny/discussions/categories/show-and-tell"
+                   target="_blank" rel="noopener"
+                   class="button button--pink">Submit Your Game</a>
+            </div>
+        </section>
+
+        <!-- ── FILTER BAR ─────────────────────────────── -->
+        <div class="filter-bar" id="filter-bar">
+            <!-- Populated by JS -->
+        </div>
+
+        <!-- ── GAME GRID ──────────────────────────────── -->
+        <div class="game-grid" id="game-grid">
+            <!-- Populated by JS -->
+        </div>
+
+        <div style="height: 80px;"></div>
+
+    </main>
+
+    <!-- ── FOOTER ────────────────────────────────── -->
+    <footer class="footer">
+        <div class="footer__brand">
+            <span class="footer__brand-text font-display">🧸 Tiny</span>
+        </div>
+        <div class="footer__links">
+            <a class="footer__link" href="https://github.com/minigdx/tiny">GitHub</a>
+            <a class="footer__link" href="documentation.html">Documentation</a>
+            <a class="footer__link" href="editor.html">Editor</a>
+        </div>
+        <p class="footer__copy">&copy; 2026 Tiny Game Engine. Made for creators.</p>
+    </footer>
+
+</div>
+
+<script>
+(function () {
+    var grid = document.getElementById('game-grid');
+    var filterBar = document.getElementById('filter-bar');
+    var activeGenre = 'all';
+
+    fetch('showcase.json')
+        .then(function (res) { return res.json(); })
+        .then(function (games) {
+            // Build genre set
+            var genreSet = {};
+            games.forEach(function (g) {
+                g.genres.forEach(function (genre) { genreSet[genre] = true; });
+            });
+            var genres = Object.keys(genreSet).sort();
+
+            // Render filter pills
+            var allPill = createPill('All', 'all', true);
+            filterBar.appendChild(allPill);
+            genres.forEach(function (genre) {
+                filterBar.appendChild(createPill(capitalize(genre), genre, false));
+            });
+
+            // Render game cards
+            games.forEach(function (game) {
+                grid.appendChild(createCard(game));
+            });
+        });
+
+    function createPill(label, genre, isActive) {
+        var btn = document.createElement('button');
+        btn.className = 'filter-pill' + (isActive ? ' filter-pill--active' : '');
+        btn.textContent = label;
+        btn.setAttribute('data-genre', genre);
+        btn.addEventListener('click', function () {
+            activeGenre = genre;
+            // Update active pill
+            filterBar.querySelectorAll('.filter-pill').forEach(function (p) {
+                p.classList.remove('filter-pill--active');
+            });
+            btn.classList.add('filter-pill--active');
+            // Filter cards
+            grid.querySelectorAll('.game-card').forEach(function (card) {
+                if (genre === 'all' || card.getAttribute('data-genres').indexOf(genre) !== -1) {
+                    card.classList.remove('game-card--hidden');
+                } else {
+                    card.classList.add('game-card--hidden');
+                }
+            });
+        });
+        return btn;
+    }
+
+    function createCard(game) {
+        var card = document.createElement('div');
+        card.className = 'game-card shadow-bubble';
+        card.setAttribute('data-genres', game.genres.join(','));
+
+        var img = document.createElement('img');
+        img.className = 'game-card__image';
+        img.src = game.image;
+        img.alt = game.title + ' - a game made with Tiny game engine';
+        img.loading = 'lazy';
+
+        var body = document.createElement('div');
+        body.className = 'game-card__body';
+
+        var genres = document.createElement('div');
+        genres.className = 'game-card__genres';
+        game.genres.forEach(function (g) {
+            var tag = document.createElement('span');
+            tag.className = 'genre-tag';
+            tag.textContent = capitalize(g);
+            genres.appendChild(tag);
+        });
+
+        var title = document.createElement('h3');
+        title.className = 'game-card__title font-display';
+        title.textContent = game.title;
+
+        var actions = document.createElement('div');
+        actions.className = 'game-card__actions';
+
+        var playLink = document.createElement('a');
+        playLink.className = 'game-card__play';
+        playLink.href = game.url;
+        playLink.target = '_blank';
+        playLink.rel = 'noopener';
+        playLink.innerHTML = '<span class="material-symbols-outlined" style="font-size:1.2rem">play_arrow</span> Play';
+
+        actions.appendChild(playLink);
+        body.appendChild(genres);
+        body.appendChild(title);
+        body.appendChild(actions);
+        card.appendChild(img);
+        card.appendChild(body);
+
+        return card;
+    }
+
+    function capitalize(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+})();
+</script>
+</body>
+</html>
