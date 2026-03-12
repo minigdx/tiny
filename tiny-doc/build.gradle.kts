@@ -23,6 +23,11 @@ val asciidoctorDependencies by configurations.creating {
     isCanBeResolved = true
 }
 
+val jsonApiDependencies by configurations.creating {
+    isCanBeConsumed = false
+    isCanBeResolved = true
+}
+
 dependencies {
     add(
         asciidoctorResources.name,
@@ -40,6 +45,16 @@ dependencies {
             mapOf(
                 "path" to ":tiny-engine",
                 "configuration" to "tinyApiAsciidoctor",
+            ),
+        ),
+    )
+
+    add(
+        jsonApiDependencies.name,
+        project(
+            mapOf(
+                "path" to ":tiny-engine",
+                "configuration" to "tinyApiJson",
             ),
         ),
     )
@@ -72,6 +87,12 @@ val copyResources =
         into(project.layout.buildDirectory.get().asFile.resolve("docs/asciidoc/resources"))
     }
 
+val copyJsonApi =
+    tasks.maybeCreate("copy-jsonApiDependencies", Copy::class).also { cp ->
+        cp.into(project.layout.buildDirectory.get().asFile.resolve("docs/asciidoc"))
+        cp.from(jsonApiDependencies)
+    }
+
 val copySeoFiles = tasks.register("copy-seoFiles", Copy::class) {
     from(project.projectDir.resolve("src/docs/asciidoc")) {
         include("robots.txt")
@@ -82,6 +103,7 @@ val copySeoFiles = tasks.register("copy-seoFiles", Copy::class) {
         include("showcase.json")
         include("tutorials.json")
         include("document.json")
+        include("api.html")
     }
     into(project.layout.buildDirectory.get().asFile.resolve("docs/asciidoc"))
 }
@@ -199,6 +221,7 @@ tasks.withType(AsciidoctorTask::class.java).configureEach {
     this.dependsOn(
         unzipAsciidoctorResources.dependsOn(":tiny-web-editor:tinyWebEditor"),
         copyAsciidoctorDependencies,
+        copyJsonApi,
         copySample,
         copyResources,
         copySeoFiles,
