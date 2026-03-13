@@ -29,68 +29,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 
+    <!-- Shared styles -->
+    <link rel="stylesheet" href="tiny-common.css">
+
     <style>
-        /* ── Reset & base ─────────────────────────────── */
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        :root {
-            --pink:   #ff0080;
-            --cyan:   #00e5ff;
-            --green:  #a2ff00;
-            --yellow: #fff000;
-            --dark:   #1e293b;
-            --bg:     #fff5f9;
-        }
-
-        body {
-            font-family: 'Quicksand', sans-serif;
-            color: #334155;
-            background: var(--bg);
-            padding-top: 60px;
-            background-image:
-                radial-gradient(circle at 10% 20%, rgba(255,0,128,.05) 0%, transparent 20%),
-                radial-gradient(circle at 90% 80%, rgba(0,229,255,.05) 0%, transparent 20%);
-            -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
-        }
-
-        a { color: inherit; }
-
-        .font-display { font-family: 'Lilita One', cursive; font-weight: 400; }
-        .font-mono    { font-family: 'Source Code Pro', monospace; }
-
-        /* ── Layout helpers ────────────────────────────── */
-        .page        { display: flex; flex-direction: column; min-height: 100vh; }
-        .container   { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-        .section     { padding: 80px 24px; }
-        .section--white { background: #fff; }
-        .section--green { background: rgba(162,255,0,.1); }
-        .section--cyan  { background: rgba(0,229,255,.1); }
-        .center-text { text-align: center; }
-
-        /* ── Bubble shadows ────────────────────────────── */
-        .shadow-bubble      { box-shadow: 0 8px 0 rgba(0,0,0,.1); }
-        .shadow-bubble-pink { box-shadow: 0 6px 0 #d4006b; }
-        .shadow-bubble-blue { box-shadow: 0 6px 0 #00b8cc; }
-
-        /* ── Buttons ───────────────────────────────────── */
-        .button {
-            display: inline-flex; align-items: center; justify-content: center;
-            padding: 16px 40px; border-radius: 2rem;
-            font-family: 'Lilita One', cursive; font-weight: 400;
-            font-size: 1.5rem; text-transform: uppercase; letter-spacing: 2px;
-            text-decoration: none; border: 4px solid var(--dark);
-            transition: transform .15s, box-shadow .15s;
-            cursor: pointer;
-        }
-        .button:hover { transform: translateY(-2px); }
-        .button:active { transform: translateY(0); }
-
-        .button--pink  { background: var(--pink); color: #fff; box-shadow: 0 6px 0 #d4006b; }
-        .button--cyan  { background: var(--cyan); color: #fff; border-color: var(--dark); box-shadow: 0 6px 0 #00b8cc; }
-        .button--green { background: var(--green); color: var(--dark); border-color: var(--dark); box-shadow: 0 6px 0 #7acc00; }
-        .button--small { font-size: 1.1rem; padding: 12px 28px; }
-
         /* ── Hero header ──────────────────────────────── */
         .doc-hero {
             padding: 64px 24px 48px;
@@ -108,34 +50,6 @@
 
         /* ── Quick links grid ─────────────────────────── */
         .quick-links { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
-
-        .feature-card {
-            display: flex; flex-direction: column; gap: 24px;
-            padding: 40px; border-radius: 2.5rem;
-            background: #fff; border: 4px solid var(--pink);
-            transition: transform .2s;
-            text-decoration: none;
-        }
-        .feature-card:hover { transform: rotate(2deg); }
-        .feature-card--cyan  { border-color: var(--cyan); }
-        .feature-card--cyan:hover { transform: rotate(-2deg); }
-        .feature-card--green { border-color: var(--green); }
-        .feature-card--green:hover { transform: rotate(1deg); }
-
-        .feature-card__icon {
-            width: 64px; height: 64px;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 1rem; color: #fff;
-            box-shadow: 4px 4px 0 #000;
-            transition: transform .2s;
-        }
-        .feature-card:hover .feature-card__icon { transform: scale(1.1); }
-        .feature-card__icon--pink  { background: var(--pink); }
-        .feature-card__icon--cyan  { background: var(--cyan); }
-        .feature-card__icon--green { background: var(--green); }
-
-        .feature-card__title { font-size: 1.5rem; color: var(--dark); }
-        .feature-card__desc  { color: #64748b; font-weight: 500; line-height: 1.6; }
 
         /* ── Tutorial list ────────────────────────────── */
         .tutorial-card {
@@ -163,6 +77,32 @@
         }
         .tutorial-card:hover .tutorial-card__arrow { transform: translateX(4px); }
 
+        /* ── Function of the day ──────────────────────── */
+        .fn-day {
+            max-width: 700px; margin: 32px auto 0;
+            padding: 32px 40px; border-radius: 2rem;
+            background: #fff; border: 4px solid var(--green);
+            text-align: left;
+        }
+        .fn-day__header {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 12px;
+        }
+        .fn-day__badge {
+            display: inline-block; padding: 4px 14px;
+            border-radius: 999px; font-size: .75rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .1em;
+            background: rgba(162,255,0,.2); color: #5a8c00;
+        }
+        .fn-day__sig {
+            font-family: 'Source Code Pro', monospace;
+            font-size: 1.2rem; font-weight: 700; color: var(--dark);
+        }
+        .fn-day__desc {
+            color: #64748b; font-weight: 500; line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
         /* ── Resource links ───────────────────────────── */
         .resource-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
 
@@ -177,44 +117,10 @@
         .resource-link__icon { color: var(--cyan); font-size: 1.5rem; flex-shrink: 0; }
         .resource-link__text { font-size: 1.05rem; font-weight: 700; color: var(--dark); }
 
-        /* ── Footer ────────────────────────────────────── */
-        .footer {
-            display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 32px;
-            padding: 64px 24px;
-            border-top: 4px solid rgba(0,0,0,.05);
-            max-width: 1200px; margin: 0 auto;
-            color: #94a3b8; font-weight: 500;
-        }
-        .footer__brand { display: flex; align-items: center; gap: 12px; }
-        .footer__brand-text { font-size: 1.5rem; letter-spacing: 2px; color: var(--dark); }
-        .footer__links { display: flex; gap: 48px; }
-        .footer__link {
-            font-size: .85rem; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 2px; text-decoration: none; color: #94a3b8;
-            transition: color .15s;
-        }
-        .footer__link:hover { color: var(--pink); }
-        .footer__copy { font-size: .85rem; font-weight: 700; opacity: .6; }
-
-        /* ── Section headings ─────────────────────────── */
-        .section-header { margin-bottom: 48px; }
-        .section-badge {
-            display: inline-block; padding: 8px 24px;
-            border: 2px solid var(--pink); border-radius: 999px;
-            font-size: .9rem; text-transform: uppercase; letter-spacing: .2em;
-            color: var(--pink); background: #fff;
-            transform: rotate(-2deg);
-        }
-        .section-badge--cyan { border-color: var(--cyan); color: var(--cyan); }
-        .section-badge--green { border-color: var(--green); color: var(--green); }
-        .section-title { font-size: 3rem; line-height: 1.1; color: var(--dark); margin-top: 16px; }
-        .section-desc { font-size: 1.15rem; color: #64748b; max-width: 640px; margin: 12px auto 0; font-weight: 500; }
-
         /* ── Responsive ────────────────────────────────── */
         @media (max-width: 960px) {
             .quick-links { grid-template-columns: 1fr 1fr; }
             .doc-hero__title { font-size: 3.5rem; }
-            .section-title { font-size: 2.5rem; }
         }
         @media (max-width: 600px) {
             .quick-links { grid-template-columns: 1fr; }
@@ -222,9 +128,7 @@
             .doc-hero__title { font-size: 2.5rem; }
             .tutorial-card { flex-direction: column; text-align: center; }
             .tutorial-card__arrow { display: none; }
-            .button { font-size: 1.2rem; padding: 14px 28px; }
-            .footer { flex-direction: column; text-align: center; }
-            .footer__links { flex-direction: column; gap: 16px; }
+            .fn-day { padding: 24px; }
         }
     </style>
 </head>
@@ -253,7 +157,7 @@
                         <h2 class="feature-card__title font-display">Tutorials</h2>
                         <p class="feature-card__desc">7 step-by-step guides from installation to sound. Learn by building complete games from the ground up.</p>
                     </a>
-                    <a href="tiny-api.html" class="feature-card feature-card--cyan shadow-bubble" style="text-decoration:none">
+                    <a href="api.html" class="feature-card feature-card--cyan shadow-bubble" style="text-decoration:none">
                         <div class="feature-card__icon feature-card__icon--cyan">
                             <span class="material-symbols-outlined" style="font-size:2.5rem">menu_book</span>
                         </div>
@@ -279,77 +183,8 @@
                     <h2 class="section-title font-display">Tutorials</h2>
                     <p class="section-desc">Follow along and build complete games step by step.</p>
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 24px;">
-                    <a href="tiny-install.html" class="tutorial-card shadow-bubble" style="text-decoration:none">
-                        <div class="tutorial-card__icon">
-                            <span class="material-symbols-outlined" style="font-size:2.5rem">download</span>
-                        </div>
-                        <div class="tutorial-card__content">
-                            <h3 class="tutorial-card__title font-display">1. Getting Started</h3>
-                            <p class="tutorial-card__desc">Install Tiny CLI, create your first project, and learn the basics of the game loop.</p>
-                        </div>
-                        <span class="tutorial-card__arrow material-symbols-outlined">arrow_forward</span>
-                    </a>
-                    <a href="tiny-tutorial.html" class="tutorial-card shadow-bubble" style="text-decoration:none">
-                        <div class="tutorial-card__icon">
-                            <span class="material-symbols-outlined" style="font-size:2.5rem">sports_tennis</span>
-                        </div>
-                        <div class="tutorial-card__content">
-                            <h3 class="tutorial-card__title font-display">2. Build a Pong Game</h3>
-                            <p class="tutorial-card__desc">Learn the fundamentals of Tiny by building a classic Pong game. Covers input handling, collision detection, and game state.</p>
-                        </div>
-                        <span class="tutorial-card__arrow material-symbols-outlined">arrow_forward</span>
-                    </a>
-                    <a href="tiny-tutorial-export.html" class="tutorial-card shadow-bubble" style="text-decoration:none">
-                        <div class="tutorial-card__icon">
-                            <span class="material-symbols-outlined" style="font-size:2.5rem">public</span>
-                        </div>
-                        <div class="tutorial-card__content">
-                            <h3 class="tutorial-card__title font-display">3. Exporting Your Game</h3>
-                            <p class="tutorial-card__desc">Export your game for the web or desktop, and deploy it to itch.io or any static host.</p>
-                        </div>
-                        <span class="tutorial-card__arrow material-symbols-outlined">arrow_forward</span>
-                    </a>
-                    <a href="tiny-tutorial-sprites.html" class="tutorial-card shadow-bubble" style="text-decoration:none">
-                        <div class="tutorial-card__icon">
-                            <span class="material-symbols-outlined" style="font-size:2.5rem">image</span>
-                        </div>
-                        <div class="tutorial-card__content">
-                            <h3 class="tutorial-card__title font-display">4. Sprites &amp; Animation</h3>
-                            <p class="tutorial-card__desc">Draw spritesheets, animate characters, flip sprites, and manage multiple sheets.</p>
-                        </div>
-                        <span class="tutorial-card__arrow material-symbols-outlined">arrow_forward</span>
-                    </a>
-                    <a href="tiny-tutorial-maps.html" class="tutorial-card shadow-bubble" style="text-decoration:none">
-                        <div class="tutorial-card__icon">
-                            <span class="material-symbols-outlined" style="font-size:2.5rem">map</span>
-                        </div>
-                        <div class="tutorial-card__content">
-                            <h3 class="tutorial-card__title font-display">5. Maps with LDtk</h3>
-                            <p class="tutorial-card__desc">Build game levels with the LDtk editor. Draw maps, handle entities, and implement tile-based collision.</p>
-                        </div>
-                        <span class="tutorial-card__arrow material-symbols-outlined">arrow_forward</span>
-                    </a>
-                    <a href="tiny-fonts.html" class="tutorial-card shadow-bubble" style="text-decoration:none">
-                        <div class="tutorial-card__icon">
-                            <span class="material-symbols-outlined" style="font-size:2.5rem">font_download</span>
-                        </div>
-                        <div class="tutorial-card__content">
-                            <h3 class="tutorial-card__title font-display">6. Custom Fonts</h3>
-                            <p class="tutorial-card__desc">Create bitmap font spritesheets, configure font banks, and give your game a unique look.</p>
-                        </div>
-                        <span class="tutorial-card__arrow material-symbols-outlined">arrow_forward</span>
-                    </a>
-                    <a href="tiny-tutorial-sound.html" class="tutorial-card shadow-bubble" style="text-decoration:none">
-                        <div class="tutorial-card__icon">
-                            <span class="material-symbols-outlined" style="font-size:2.5rem">music_note</span>
-                        </div>
-                        <div class="tutorial-card__content">
-                            <h3 class="tutorial-card__title font-display">7. Adding Sound</h3>
-                            <p class="tutorial-card__desc">Design chip-tune sound effects with the SFX editor and play them from your Lua code.</p>
-                        </div>
-                        <span class="tutorial-card__arrow material-symbols-outlined">arrow_forward</span>
-                    </a>
+                <div id="tutorial-list" style="display: flex; flex-direction: column; gap: 24px;">
+                    <!-- Populated by JS from tutorials.json -->
                 </div>
             </div>
         </section>
@@ -362,8 +197,22 @@
                     <h2 class="section-title font-display">API Reference</h2>
                     <p class="section-desc">Complete documentation for every Lua function: graphics, sprites, sound, input, maps, and more.</p>
                 </div>
-                <div style="text-align: center;">
-                    <a href="tiny-api.html" class="button button--green">Explore the API</a>
+
+                <!-- Function of the day -->
+                <div id="fn-of-the-day" style="display: none;">
+                    <div class="center-text" style="margin-bottom: 16px;">
+                        <span class="section-badge section-badge--green font-display" style="font-size: .75rem;">
+                            <span class="material-symbols-outlined" style="font-size: 1rem; vertical-align: middle;">auto_awesome</span>
+                            Function of the Day
+                        </span>
+                    </div>
+                    <div class="fn-day shadow-bubble" id="fn-day-card">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 32px;">
+                    <a href="api.html" class="button button--green">Explore the API</a>
                 </div>
             </div>
         </section>
@@ -394,7 +243,7 @@
                         <span class="resource-link__icon material-symbols-outlined">download</span>
                         <span class="resource-link__text">Getting Started &amp; Installation</span>
                     </a>
-                    <a href="guide.html#_tiny_showcase" class="resource-link">
+                    <a href="showcase.html" class="resource-link">
                         <span class="resource-link__icon material-symbols-outlined">grid_view</span>
                         <span class="resource-link__text">Game Showcase</span>
                     </a>
@@ -426,5 +275,74 @@
     </footer>
 
 </div>
+
+<script>
+(function () {
+    // ── Load tutorials from JSON ──
+    var tutorialList = document.getElementById('tutorial-list');
+
+    fetch('tutorials.json')
+        .then(function (res) { return res.json(); })
+        .then(function (tutorials) {
+            tutorials.forEach(function (t) {
+                var card = document.createElement('a');
+                card.href = t.href;
+                card.className = 'tutorial-card shadow-bubble';
+                card.style.textDecoration = 'none';
+                card.innerHTML = [
+                    '<div class="tutorial-card__icon">',
+                    '    <span class="material-symbols-outlined" style="font-size:2.5rem">' + t.icon + '</span>',
+                    '</div>',
+                    '<div class="tutorial-card__content">',
+                    '    <h3 class="tutorial-card__title font-display">' + escapeHtml(t.title) + '</h3>',
+                    '    <p class="tutorial-card__desc">' + escapeHtml(t.description) + '</p>',
+                    '</div>',
+                    '<span class="tutorial-card__arrow material-symbols-outlined">arrow_forward</span>'
+                ].join('\n');
+                tutorialList.appendChild(card);
+            });
+        });
+
+    // ── Load function of the day from document.json ──
+    var fnContainer = document.getElementById('fn-of-the-day');
+    var fnCard = document.getElementById('fn-day-card');
+
+    fetch('document.json')
+        .then(function (res) { return res.json(); })
+        .then(function (funcs) {
+            if (!funcs.length) return;
+
+            // Use the day of the year as a seed for consistent daily pick
+            var now = new Date();
+            var start = new Date(now.getFullYear(), 0, 0);
+            var dayOfYear = Math.floor((now - start) / 86400000);
+            var idx = dayOfYear % funcs.length;
+            var fn = funcs[idx];
+
+            fnCard.innerHTML = [
+                '<div class="fn-day__header">',
+                '    <span class="fn-day__badge">' + fn.library + '</span>',
+                '    <span class="fn-day__sig">' + escapeHtml(fn.signature) + '</span>',
+                '</div>',
+                '<p class="fn-day__desc">' + escapeHtml(fn.description) + '</p>',
+                '<div class="terminal">',
+                '    <div class="terminal__header">',
+                '        <span class="terminal__dot terminal__dot--red"></span>',
+                '        <span class="terminal__dot terminal__dot--yellow"></span>',
+                '        <span class="terminal__dot terminal__dot--green"></span>',
+                '        <span class="terminal__filename">example.lua</span>',
+                '    </div>',
+                '    <div class="terminal__body"><pre>' + escapeHtml(fn.example) + '</pre></div>',
+                '</div>'
+            ].join('\n');
+
+            fnContainer.style.display = 'block';
+        });
+
+    function escapeHtml(str) {
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+})();
+</script>
 </body>
 </html>

@@ -72,7 +72,13 @@ val copySeoFiles = tasks.register("copy-seoFiles", Copy::class) {
         include(".nojekyll")
         include("index.html")
         include("documentation.html")
+        include("showcase.html")
+        include("api.html")
         include("tiny-nav.js")
+        include("tiny-common.css")
+        include("showcase.json")
+        include("tutorials.json")
+        include("document.json")
     }
     into(project.layout.buildDirectory.get().asFile.resolve("docs/asciidoc"))
 }

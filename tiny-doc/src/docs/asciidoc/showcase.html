@@ -19,63 +19,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Quicksand:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 
+    <!-- Shared styles -->
+    <link rel="stylesheet" href="tiny-common.css">
+
     <style>
-        /* ── Reset & base ─────────────────────────────── */
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        :root {
-            --pink:   #ff0080;
-            --cyan:   #00e5ff;
-            --green:  #a2ff00;
-            --yellow: #fff000;
-            --dark:   #1e293b;
-            --bg:     #fff5f9;
-        }
-
-        body {
-            font-family: 'Quicksand', sans-serif;
-            color: #334155;
-            background: var(--bg);
-            padding-top: 60px;
-            background-image:
-                radial-gradient(circle at 10% 20%, rgba(255,0,128,.05) 0%, transparent 20%),
-                radial-gradient(circle at 90% 80%, rgba(0,229,255,.05) 0%, transparent 20%);
-            -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
-        }
-
-        a { color: inherit; }
-
-        .font-display { font-family: 'Lilita One', cursive; font-weight: 400; }
-
-        /* ── Layout helpers ────────────────────────────── */
-        .page        { display: flex; flex-direction: column; min-height: 100vh; }
-        .container   { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-        .section     { padding: 80px 24px; }
-
-        /* ── Bubble shadows ────────────────────────────── */
-        .shadow-bubble      { box-shadow: 0 8px 0 rgba(0,0,0,.1); }
-        .shadow-bubble-pink { box-shadow: 0 6px 0 #d4006b; }
-
-        /* ── Buttons ───────────────────────────────────── */
-        .button {
-            display: inline-flex; align-items: center; justify-content: center;
-            padding: 16px 40px; border-radius: 2rem;
-            font-family: 'Lilita One', cursive; font-weight: 400;
-            font-size: 1.5rem; text-transform: uppercase; letter-spacing: 2px;
-            text-decoration: none; border: 4px solid var(--dark);
-            transition: transform .15s, box-shadow .15s;
-            cursor: pointer;
-        }
-        .button:hover { transform: translateY(-2px); }
-        .button:active { transform: translateY(0); }
-
-        .button--pink  { background: var(--pink); color: #fff; box-shadow: 0 6px 0 #d4006b; }
-        .button--cyan  { background: var(--cyan); color: #fff; border-color: var(--dark); box-shadow: 0 6px 0 #00b8cc; }
-        .button--small {
-            padding: 10px 24px; font-size: 1rem; letter-spacing: 1px;
-        }
-
         /* ── Header section ───────────────────────────── */
         .showcase-header {
             text-align: center;
@@ -91,27 +38,6 @@
         }
         .showcase-header__actions {
             margin-top: 32px;
-        }
-
-        /* ── Filter bar ───────────────────────────────── */
-        .filter-bar {
-            display: flex; flex-wrap: wrap; justify-content: center; gap: 12px;
-            padding: 0 24px 48px;
-            max-width: 900px; margin: 0 auto;
-        }
-        .filter-pill {
-            padding: 8px 24px; border-radius: 999px;
-            font-family: 'Quicksand', sans-serif;
-            font-size: .85rem; font-weight: 700;
-            text-transform: uppercase; letter-spacing: .1em;
-            border: 3px solid var(--dark);
-            background: #fff; color: var(--dark);
-            cursor: pointer;
-            transition: background .15s, color .15s, transform .15s;
-        }
-        .filter-pill:hover { transform: translateY(-2px); }
-        .filter-pill--active {
-            background: var(--pink); color: #fff; border-color: var(--pink);
         }
 
         /* ── Game grid ────────────────────────────────── */
@@ -180,25 +106,6 @@
         .game-card__play:hover { transform: translateY(-2px); }
         .game-card__play:active { transform: translateY(0); }
 
-        /* ── Footer ────────────────────────────────────── */
-        .footer {
-            display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 32px;
-            padding: 64px 24px;
-            border-top: 4px solid rgba(0,0,0,.05);
-            max-width: 1200px; margin: 0 auto;
-            color: #94a3b8; font-weight: 500;
-        }
-        .footer__brand { display: flex; align-items: center; gap: 12px; }
-        .footer__brand-text { font-size: 1.5rem; letter-spacing: 2px; color: var(--dark); }
-        .footer__links { display: flex; gap: 48px; }
-        .footer__link {
-            font-size: .85rem; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 2px; text-decoration: none; color: #94a3b8;
-            transition: color .15s;
-        }
-        .footer__link:hover { color: var(--pink); }
-        .footer__copy { font-size: .85rem; font-weight: 700; opacity: .6; }
-
         /* ── Responsive ────────────────────────────────── */
         @media (max-width: 960px) {
             .game-grid { grid-template-columns: repeat(2, 1fr); }
@@ -207,9 +114,6 @@
         @media (max-width: 600px) {
             .game-grid { grid-template-columns: 1fr; }
             .showcase-header__title { font-size: 2.5rem; }
-            .button { font-size: 1.2rem; padding: 14px 28px; }
-            .footer { flex-direction: column; text-align: center; }
-            .footer__links { flex-direction: column; gap: 16px; }
         }
     </style>
 </head>
@@ -249,7 +153,7 @@
     <!-- ── FOOTER ────────────────────────────────── -->
     <footer class="footer">
         <div class="footer__brand">
-            <span class="footer__brand-text font-display">🧸 Tiny</span>
+            <span class="footer__brand-text font-display">&#129528; Tiny</span>
         </div>
         <div class="footer__links">
             <a class="footer__link" href="https://github.com/minigdx/tiny">GitHub</a>

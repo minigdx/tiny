@@ -1,0 +1,50 @@
+[
+  {
+    "library": "gfx",
+    "name": "cls",
+    "signature": "gfx.cls(color)",
+    "description": "Clear the entire screen with a single color from the palette. Call this at the beginning of _draw() to reset the screen before drawing your frame.",
+    "parameters": [
+      { "name": "color", "type": "number", "description": "Color index from the palette (0\u2013255)" }
+    ],
+    "example": "function _draw()\n    gfx.cls(0) -- clear with black\n    print(\"hello!\", 10, 10, 7)\nend"
+  },
+  {
+    "library": "shape",
+    "name": "rectf",
+    "signature": "shape.rectf(x, y, width, height, color)",
+    "description": "Draw a filled rectangle on screen. Useful for UI elements, health bars, backgrounds, and simple geometric visuals.",
+    "parameters": [
+      { "name": "x", "type": "number", "description": "X position of the top-left corner" },
+      { "name": "y", "type": "number", "description": "Y position of the top-left corner" },
+      { "name": "width", "type": "number", "description": "Width in pixels" },
+      { "name": "height", "type": "number", "description": "Height in pixels" },
+      { "name": "color", "type": "number", "description": "Color index from the palette" }
+    ],
+    "example": "function _draw()\n    gfx.cls(1)\n    -- draw a red health bar\n    shape.rectf(10, 10, 100, 8, 8)\nend"
+  },
+  {
+    "library": "spr",
+    "name": "draw",
+    "signature": "spr.draw(spriteIndex, x, y, [flipX], [flipY])",
+    "description": "Draw a sprite from the current spritesheet at the given position. Optionally flip it horizontally or vertically for animations and directional characters.",
+    "parameters": [
+      { "name": "spriteIndex", "type": "number", "description": "Index of the sprite in the spritesheet" },
+      { "name": "x", "type": "number", "description": "X position to draw at" },
+      { "name": "y", "type": "number", "description": "Y position to draw at" },
+      { "name": "flipX", "type": "boolean", "description": "Flip horizontally (optional, default false)" },
+      { "name": "flipY", "type": "boolean", "description": "Flip vertically (optional, default false)" }
+    ],
+    "example": "function _draw()\n    gfx.cls(0)\n    spr.draw(0, player.x, player.y)\n    -- draw facing left\n    spr.draw(0, enemy.x, enemy.y, true)\nend"
+  },
+  {
+    "library": "ctrl",
+    "name": "pressing",
+    "signature": "ctrl.pressing(key)",
+    "description": "Check if a key is currently being held down. Returns true every frame the key is pressed, unlike ctrl.pressed() which fires only once. Ideal for continuous movement.",
+    "parameters": [
+      { "name": "key", "type": "number", "description": "Key constant from the keys table (e.g. keys.left, keys.right, keys.space)" }
+    ],
+    "example": "function _update()\n    if ctrl.pressing(keys.left) then\n        player.x = player.x - 2\n    end\n    if ctrl.pressing(keys.right) then\n        player.x = player.x + 2\n    end\nend"
+  }
+]
