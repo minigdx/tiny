@@ -48,6 +48,7 @@ class StreamingAudioThread(
     private val noteEventPool: NoteEventPool,
 ) : Thread("tiny-streaming-audio-thread") {
     init {
+        isDaemon = true
         priority = MAX_PRIORITY
     }
 
@@ -55,6 +56,13 @@ class StreamingAudioThread(
 
     @Volatile
     private var running = true
+
+    fun shutdown() {
+        running = false
+        if (::line.isInitialized) {
+            line.close()
+        }
+    }
 
     private val instrumentPlayers = MutableFixedSizeList<InstrumentPlayer>(MAX_INSTRUMENTS)
 
@@ -191,8 +199,13 @@ class JavaSoundManager : SoundManager() {
     }
 
     override fun destroy() {
-        soundPort.alive = false
-        mixer.add(JavaSoundHandler(FloatArray(0), mixer, this)) // unlock the sound port
-        mixer.alive = false
+        streamingAudioThread.shutdown()
+        streamingAudioThread.join(1000)
+
+        mixer.shutdown()
+        mixer.join(1000)
+
+        soundPort.shutdown()
+        soundPort.join(1000)
     }
 }

@@ -17,6 +17,10 @@ import kotlin.math.roundToInt
  * @param queue Output queue for processed audio chunks
  */
 class MixerGateway(var alive: Boolean = true, val queue: BlockingQueue<ByteArray>) : Thread("mixer-gateway") {
+    init {
+        isDaemon = true
+    }
+
     /** Buffer for mixing audio samples from all active sounds */
     val mixBuffer = FloatArray(CHUNK_SIZE)
 
@@ -28,6 +32,12 @@ class MixerGateway(var alive: Boolean = true, val queue: BlockingQueue<ByteArray
         start()
     }
 
+    fun shutdown() {
+        alive = false
+        interrupt()
+        line.close()
+    }
+
     /**
      * Main mixing loop that runs in a separate thread.
      * Continuously processes all active sounds and outputs mixed audio chunks.
@@ -35,33 +45,39 @@ class MixerGateway(var alive: Boolean = true, val queue: BlockingQueue<ByteArray
     override fun run() {
         priority = Thread.MAX_PRIORITY
 
-        while (alive) {
-            // Clear the mix buffer for the next chunk
-            mixBuffer.fill(0f)
+        try {
+            while (alive) {
+                // Clear the mix buffer for the next chunk
+                mixBuffer.fill(0f)
 
-            // Skip processing if no sounds are playing
-            if (sounds.isEmpty()) continue
+                // Skip processing if no sounds are playing
+                if (sounds.isEmpty()) continue
 
-            // Process each active sound
-            sounds
-                .filter { !it.stop }
-                .forEach { sound ->
-                    val chunk = sound.nextChunk(CHUNK_SIZE)
-                    var mixIndex = 0
-                    // Mix current sound chunk into the mix buffer
-                    (0 until chunk.size).forEach { i ->
-                        mixBuffer[mixIndex] = softClip(mixBuffer[mixIndex] + chunk[i])
-                        mixIndex++
+                // Process each active sound
+                sounds
+                    .filter { !it.stop }
+                    .forEach { sound ->
+                        val chunk = sound.nextChunk(CHUNK_SIZE)
+                        var mixIndex = 0
+                        // Mix current sound chunk into the mix buffer
+                        (0 until chunk.size).forEach { i ->
+                            mixBuffer[mixIndex] = softClip(mixBuffer[mixIndex] + chunk[i])
+                            mixIndex++
+                        }
                     }
-                }
 
-            // Remove finished or stopped sounds
-            sounds.removeIf { it.stop }
+                // Remove finished or stopped sounds
+                sounds.removeIf { it.stop }
 
-            // Convert mixed audio to bytes and queue for output
-            queue.put(playSoundFromFloats(mixBuffer))
-            // Sleep for half the chunk duration to maintain smooth playback
-            sleep(((CHUNK_DURATION.toFloat() * 0.5f) * 1000f).toLong())
+                // Convert mixed audio to bytes and queue for output
+                queue.put(playSoundFromFloats(mixBuffer))
+                // Sleep for half the chunk duration to maintain smooth playback
+                sleep(((CHUNK_DURATION.toFloat() * 0.5f) * 1000f).toLong())
+            }
+        } catch (_: InterruptedException) {
+            // Shutdown requested
+        } finally {
+            line.close()
         }
     }
 
