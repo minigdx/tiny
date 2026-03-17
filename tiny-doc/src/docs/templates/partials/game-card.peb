@@ -1,0 +1,19 @@
+<div class="game-card shadow-bubble{% if loop.index >= initialCount %} game-card--hidden{% endif %}" data-genres="{{ game.genres | join(',') }}">
+    <img class="game-card__image"
+         data-src="{{ game.image }}"
+         alt="{{ game.title }} - a game made with Tiny game engine"
+         src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23eef0f2' width='400' height='300'/%3E%3C/svg%3E">
+    <div class="game-card__body">
+        <div class="game-card__genres">
+{% for genre in game.genres %}
+            <span class="genre-tag">{{ genre | capitalize }}</span>
+{% endfor %}
+        </div>
+        <h3 class="game-card__title font-display">{{ game.title }}</h3>
+        <div class="game-card__actions">
+            <a class="game-card__play" href="{{ game.url }}" target="_blank" rel="noopener">
+                <span class="material-symbols-outlined" style="font-size:1.2rem">play_arrow</span> Play
+            </a>
+        </div>
+    </div>
+</div>

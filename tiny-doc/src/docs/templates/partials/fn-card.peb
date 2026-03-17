@@ -1,0 +1,28 @@
+<div class="fn-card shadow-bubble{% if fn.type is not null and fn.type == 'variable' %} fn-card--variable{% endif %}" data-lib="{{ fn.library }}" data-name="{{ fn.name | lower }}" data-sig="{{ fn.signature | lower }}">
+    <div class="fn-card__header">
+        <span class="fn-card__lib fn-card__lib--{{ fn.library }}">{{ fn.library }}</span>
+        <span class="fn-card__signature">{{ fn.signature }}</span>
+    </div>
+    <p class="fn-card__desc">{{ fn.description }}</p>
+{% if fn.parameters is not empty %}
+    <div class="fn-card__params">
+        <div class="fn-card__params-title">Parameters</div>
+{% for param in fn.parameters %}
+        <div class="fn-card__param">
+            <span class="fn-card__param-name">{{ param.name }}</span>
+            <span class="fn-card__param-type">{{ param.type }}</span>
+            <span class="fn-card__param-desc">{{ param.description }}</span>
+        </div>
+{% endfor %}
+    </div>
+{% endif %}
+    <div class="terminal">
+        <div class="terminal__header">
+            <span class="terminal__dot terminal__dot--red"></span>
+            <span class="terminal__dot terminal__dot--yellow"></span>
+            <span class="terminal__dot terminal__dot--green"></span>
+            <span class="terminal__filename">example.lua</span>
+        </div>
+        <div class="terminal__body"><pre>{{ fn.example }}</pre></div>
+    </div>
+</div>

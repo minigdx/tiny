@@ -1,0 +1,16 @@
+<div class="fn-day shadow-bubble" id="fn-day-card">
+    <div class="fn-day__header">
+        <span class="fn-day__badge" id="fn-day-badge"></span>
+        <span class="fn-day__sig" id="fn-day-sig"></span>
+    </div>
+    <p class="fn-day__desc" id="fn-day-desc"></p>
+    <div class="terminal">
+        <div class="terminal__header">
+            <span class="terminal__dot terminal__dot--red"></span>
+            <span class="terminal__dot terminal__dot--yellow"></span>
+            <span class="terminal__dot terminal__dot--green"></span>
+            <span class="terminal__filename">example.lua</span>
+        </div>
+        <div class="terminal__body"><pre id="fn-day-example"></pre></div>
+    </div>
+</div>

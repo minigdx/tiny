@@ -161,6 +161,81 @@ a { color: inherit; }
     background: var(--pink); color: #fff; border-color: var(--pink);
 }
 
+/* ── Navbar (static, matches tiny-nav.js output) ─ */
+.tiny-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 10000;
+    height: 56px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 4px solid rgba(0, 229, 255, 0.2);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    font-family: 'Quicksand', sans-serif;
+}
+.tiny-nav__logo {
+    color: #1e293b;
+    font-family: 'Lilita One', cursive;
+    font-weight: 400;
+    font-size: 1.3em;
+    margin-right: auto;
+    white-space: nowrap;
+    letter-spacing: 2px;
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+.tiny-nav__logo:hover { color: #ff0080; }
+.tiny-nav__links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.tiny-nav__link {
+    color: #444;
+    text-decoration: none;
+    margin: 0 12px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: color 0.15s ease;
+}
+.tiny-nav__link:hover { color: #ff0080; }
+.tiny-nav__cta {
+    background: #00e5ff;
+    color: #fff;
+    padding: 8px 20px;
+    border-radius: 16px;
+    border: 2px solid #1e293b;
+    font-family: 'Lilita One', cursive;
+    font-weight: 400;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+    box-shadow: 0 6px 0 #00b8cc;
+    transition: transform 0.15s ease;
+}
+.tiny-nav__cta:hover {
+    background: #00d4ec;
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+/* ── Lazy-load shimmer skeleton ───────────────── */
+.game-card__image[data-src] {
+    background: linear-gradient(90deg, #eef0f2 25%, #f5f6f8 50%, #eef0f2 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+}
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
 /* ── Footer ────────────────────────────────────── */
 .footer {
     display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 32px;
@@ -182,6 +257,7 @@ a { color: inherit; }
 
 /* ── Responsive ────────────────────────────────── */
 @media (max-width: 960px) {
+    .tiny-nav__links { display: none; }
     .section-title { font-size: 2.5rem; }
 }
 @media (max-width: 600px) {
