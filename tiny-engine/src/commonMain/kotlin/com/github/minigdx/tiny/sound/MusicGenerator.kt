@@ -118,6 +118,16 @@ object MusicGenerator {
         return listOf(root, third, fifth)
     }
 
+    /**
+     * Returns the step direction (-1 or +1) to move [pos] toward index 0 (root)
+     * using the shortest path in a circular scale of [scaleSize] notes.
+     * Returns 0 if already at root.
+     */
+    private fun stepTowardRoot(pos: Int, scaleSize: Int): Int {
+        if (pos == 0) return 0
+        return if (pos <= scaleSize / 2) -1 else 1
+    }
+
     private fun clearTrack(track: MusicalSequence.Track) {
         track.beats.indices.forEach { i ->
             track.beats[i] = MusicalNote(null, i.toFloat(), 1f, 1f)
@@ -158,11 +168,13 @@ object MusicGenerator {
                 val beat = bar * 8 + i
                 if (beat < 33) {
                     val noteIdx = i % chord.size
+                    // Gentle volume fade in last bar for smooth looping
+                    val fadeOut = if (bar == 3 && i >= 5) (8f - i) / 3f else 1f
                     track.beats[beat] = MusicalNote(
                         semitoneToNote(chord[noteIdx]),
                         beat.toFloat(),
                         1f,
-                        0.5f,
+                        0.5f * fadeOut,
                     )
                 }
             }
@@ -187,21 +199,25 @@ object MusicGenerator {
                 if (beat < 33) {
                     when (i) {
                         0, 4 -> {
+                            // Fade the second root hit in last bar for smooth looping
+                            val fadeOut = if (bar == 3 && i == 4) 0.7f else 1f
                             track.beats[beat] = MusicalNote(
                                 semitoneToNote(root),
                                 beat.toFloat(),
                                 1f,
-                                0.7f,
+                                0.7f * fadeOut,
                             )
                         }
                         2, 6 -> {
                             val fifthIdx = ((degree - 1 + 4) % scale.size)
                             val fifth = noteNameToIndex(config.root) + 2 * 12 + scale[fifthIdx]
+                            // Fade the last fifth in last bar for smooth looping
+                            val fadeOut = if (bar == 3 && i == 6) 0.4f else 1f
                             track.beats[beat] = MusicalNote(
                                 semitoneToNote(fifth),
                                 beat.toFloat(),
                                 1f,
-                                0.5f,
+                                0.5f * fadeOut,
                             )
                         }
                     }
@@ -224,43 +240,81 @@ object MusicGenerator {
         val scaleNotes = buildScaleNotes(config.root, scale, 4)
         var pos = random.nextInt(scaleNotes.size)
 
-        for (beat in 0..32) {
+        // Leave beat 32 silent for clean looping (avoids doubled note with beat 0)
+        val lastBeat = 31
+        // Start guiding melody back toward root for musical resolution
+        val resolveStart = 28
+
+        for (beat in 0..lastBeat) {
             var play = false
+            val resolving = beat >= resolveStart
+
             when (style) {
                 "Stepwise" -> {
                     play = true
-                    pos += listOf(-1, 0, 1).random(random)
+                    pos += if (resolving) {
+                        stepTowardRoot(pos, scaleNotes.size)
+                    } else {
+                        listOf(-1, 0, 1).random(random)
+                    }
                 }
                 "Arpeggiated" -> {
                     play = true
-                    pos += listOf(1, 2).random(random)
+                    pos += if (resolving) {
+                        stepTowardRoot(pos, scaleNotes.size)
+                    } else {
+                        listOf(1, 2).random(random)
+                    }
                 }
                 "Bouncy" -> {
                     play = true
-                    pos += listOf(-2, -1, 1, 2, 3).random(random)
+                    pos += if (resolving) {
+                        stepTowardRoot(pos, scaleNotes.size)
+                    } else {
+                        listOf(-2, -1, 1, 2, 3).random(random)
+                    }
                 }
                 "Sparse" -> {
-                    play = (beat % 2 == 0) && (random.nextFloat() > 0.3f)
-                    if (play) pos += listOf(-1, 0, 1).random(random)
+                    play = if (resolving) {
+                        beat % 2 == 0
+                    } else {
+                        (beat % 2 == 0) && (random.nextFloat() > 0.3f)
+                    }
+                    if (play) {
+                        pos += if (resolving) {
+                            stepTowardRoot(pos, scaleNotes.size)
+                        } else {
+                            listOf(-1, 0, 1).random(random)
+                        }
+                    }
                 }
                 "Random" -> {
-                    play = random.nextFloat() > 0.25f
-                    if (play) pos = random.nextInt(scaleNotes.size)
+                    play = if (resolving) true else random.nextFloat() > 0.25f
+                    if (play) {
+                        if (resolving) {
+                            pos += stepTowardRoot(pos, scaleNotes.size)
+                        } else {
+                            pos = random.nextInt(scaleNotes.size)
+                        }
+                    }
                 }
             }
 
             if (pos < 0) pos += scaleNotes.size
             if (pos >= scaleNotes.size) pos %= scaleNotes.size
 
-            if (play && beat < 33) {
+            if (play) {
                 var semi = scaleNotes[pos]
                 if (semi > 95) semi -= 12
                 if (semi < 0) semi += 12
+                val baseVolume = 0.4f + random.nextFloat() * 0.2f
+                // Fade volume in last 2 beats for smooth loop transition
+                val loopFade = if (beat >= 30) (lastBeat + 1f - beat) / 2f else 1f
                 track.beats[beat] = MusicalNote(
                     semitoneToNote(semi),
                     beat.toFloat(),
                     1f,
-                    0.4f + random.nextFloat() * 0.2f,
+                    baseVolume * loopFade,
                 )
             }
         }

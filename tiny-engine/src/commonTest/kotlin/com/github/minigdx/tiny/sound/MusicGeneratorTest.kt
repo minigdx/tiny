@@ -313,6 +313,43 @@ class MusicGeneratorTest {
     }
 
     @Test
+    fun lead_beat_32_is_silent_for_clean_looping() {
+        for (style in MusicGenerator.LEAD_STYLES) {
+            val config = MusicConfiguration(leadStyle = style, seed = 42L)
+            val seq = createSequence()
+            MusicGenerator.generate(seq, config)
+
+            assertNull(
+                seq.tracks[2].beats[32].note,
+                "Lead beat 32 should be silent for '$style' to allow clean looping",
+            )
+        }
+    }
+
+    @Test
+    fun tracks_fade_volume_at_end_for_smooth_looping() {
+        val config = MusicConfiguration()
+        val seq = createSequence()
+        MusicGenerator.generate(seq, config)
+
+        // Chord track: last beat (31) should have lower volume than early beats in last bar (24)
+        val chordBeat24 = seq.tracks[0].beats[24]
+        val chordBeat31 = seq.tracks[0].beats[31]
+        assertTrue(
+            chordBeat31.volume < chordBeat24.volume,
+            "Chord should fade at end: beat 31 (${chordBeat31.volume}) < beat 24 (${chordBeat24.volume})",
+        )
+
+        // Bass track: last fifth (beat 30) should have lower volume than earlier fifth (beat 26)
+        val bassBeat26 = seq.tracks[1].beats[26]
+        val bassBeat30 = seq.tracks[1].beats[30]
+        assertTrue(
+            bassBeat30.volume < bassBeat26.volume,
+            "Bass should fade at end: beat 30 (${bassBeat30.volume}) < beat 26 (${bassBeat26.volume})",
+        )
+    }
+
+    @Test
     fun unused_sequences_have_no_beats_in_json() {
         val music = Music()
         // Only generate for sequence 0
