@@ -130,6 +130,21 @@
             color: #64748b; font-weight: 500; font-size: .95rem;
         }
 
+        /* -- Try it button */
+        .fn-card__try-btn {
+            margin-left: auto;
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 12px;
+            border-radius: 999px;
+            background: #ff0080; color: #fff;
+            font-family: 'Source Code Pro', monospace;
+            font-size: .75rem; font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background .15s;
+        }
+        .fn-card__try-btn:hover { background: #d4006b; }
+
         /* -- Empty state */
         .fn-empty {
             text-align: center; padding: 64px 24px;
@@ -191,19 +206,6 @@
             </div>
         </section>
 
-        <!-- -- FULL DOCS CTA -->
-        <section class="section section--green">
-            <div class="container">
-                <div class="section-header center-text">
-                    <span class="section-badge section-badge--green font-display">Deep Dive</span>
-                    <h2 class="section-title font-display">Full Documentation</h2>
-                    <p class="section-desc">For detailed guides, examples, and advanced usage, check the complete generated API docs.</p>
-                </div>
-                <div style="text-align: center;">
-                    <a href="tiny-api.html" class="button button--green">Generated API Docs</a>
-                </div>
-            </div>
-        </section>
 {% endblock %}
 
 {% block pageScripts %}
@@ -231,6 +233,15 @@
     // -- Search
     searchInput.addEventListener('input', function () {
         filterCards();
+    });
+
+    // -- Try it: open example in the online editor
+    grid.addEventListener('click', function (e) {
+        var btn = e.target.closest('.fn-card__try-btn');
+        if (!btn) return;
+        var code = btn.getAttribute('data-example');
+        if (!code) return;
+        window.open('editor.html?game=' + btoa(code), '_blank');
     });
 
     function filterCards() {

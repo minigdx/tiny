@@ -145,5 +145,5 @@ Want to add audio to your game? Continue with the link:tiny-tutorial-sound.html[
 
 You can also explore:
 
-- link:tiny-api.html[API Reference] -- Complete documentation for every Lua function.
+- link:api.html[API Reference] -- Complete documentation for every Lua function.
 - link:tiny-cli.html[CLI Reference] -- All available command-line tools.

@@ -124,7 +124,7 @@ This is useful for musical games or dynamic sound generation.
 
 You've completed the Tiny tutorial series! Here are some resources to continue your journey:
 
-- link:tiny-api.html[API Reference] -- Complete documentation for every Lua function.
+- link:api.html[API Reference] -- Complete documentation for every Lua function.
 - link:tiny-cli.html[CLI Reference] -- All available command-line tools.
 - link:guide.html#_tiny_showcase[Showcase] -- See what others have built with Tiny.
 - https://github.com/minigdx/tiny[GitHub Repository] -- Source code, issues, and contributions.

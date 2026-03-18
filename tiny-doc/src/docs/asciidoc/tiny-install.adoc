@@ -152,5 +152,5 @@ Now that you have Tiny installed, follow the link:tiny-tutorial.html[Build Your 
 
 You can also explore:
 
-- link:tiny-api.html[API Reference] -- Complete documentation for every Lua function.
+- link:api.html[API Reference] -- Complete documentation for every Lua function.
 - link:tiny-cli.html[CLI Reference] -- All available command-line tools.

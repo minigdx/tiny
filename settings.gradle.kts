@@ -34,7 +34,6 @@ plugins {
 include("tiny-cli")
 include("tiny-doc")
 include("tiny-doc-annotations")
-include("tiny-annotation-processors:tiny-api-to-asciidoc-generator")
 include("tiny-annotation-processors:tiny-asciidoctor-dsl")
 include("tiny-annotation-processors:tiny-lua-dsl")
 include("tiny-annotation-processors:tiny-api-to-json-generator")

@@ -34,7 +34,7 @@ New to Tiny? Start here:
  5. **link:tiny-tutorial-maps.html[Maps]** - Build levels with LDtk
  6. **link:tiny-fonts.html[Fonts]** - Use custom bitmap fonts
  7. **link:tiny-tutorial-sound.html[Sound]** - Add sound effects to your game
- 8. **link:tiny-api.html[API Reference]** - Complete function documentation
+ 8. **link:api.html[API Reference]** - Complete function documentation
  9. **link:tiny-cli.html[CLI Commands]** - Command-line tools
 
 === Resources

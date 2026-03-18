@@ -13,6 +13,7 @@ luak = "1.2.0"
 lwjgl = "3.3.6"
 minigdx-developer = "1.5.0"
 mokkery = "2.10.1"
+pebble = "3.2.3"
 rsyntax = "3.6.0"
 slf4j = "2.0.7"
 
@@ -27,6 +28,8 @@ kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-te
 kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization-json" }
 
 luak = { module = "com.github.minigdx:luak", version.ref = "luak" }
+
+pebble = { module = "io.pebbletemplates:pebble", version.ref = "pebble" }
 
 lwjgl-core = { module = "org.lwjgl:lwjgl", version.ref = "lwjgl" }
 lwjgl-glfw = { module = "org.lwjgl:lwjgl-glfw", version.ref = "lwjgl" }

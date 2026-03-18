@@ -16,13 +16,19 @@
 {% endfor %}
     </div>
 {% endif %}
+{% if fn.example is not empty %}
     <div class="terminal">
         <div class="terminal__header">
             <span class="terminal__dot terminal__dot--red"></span>
             <span class="terminal__dot terminal__dot--yellow"></span>
             <span class="terminal__dot terminal__dot--green"></span>
             <span class="terminal__filename">example.lua</span>
+            <a class="fn-card__try-btn" data-example="{{ fn.example }}">
+                <span class="material-symbols-outlined" style="font-size: 1rem; vertical-align: middle;">play_arrow</span>
+                Try it
+            </a>
         </div>
         <div class="terminal__body"><pre>{{ fn.example }}</pre></div>
     </div>
+{% endif %}
 </div>
