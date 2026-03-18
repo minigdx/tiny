@@ -42,92 +42,52 @@ class TinyToJsonKspProcessor(
     }
 
     private fun generateJson(libs: Sequence<TinyLibDescriptor>): String {
-        val sb = StringBuilder()
-        sb.append("{\n")
-        sb.append("  \"libraries\": [\n")
-
         val sortedLibs = libs.sortedBy { it.name }.toList()
-        sortedLibs.forEachIndexed { libIndex, lib ->
-            sb.append("    {\n")
-            sb.append("      \"name\": ${jsonString(lib.name.ifBlank { "std" })},\n")
-            sb.append("      \"description\": ${jsonString(lib.description)},\n")
-            sb.append("      \"icon\": ${jsonString(lib.icon)},\n")
-
-            // Variables
-            sb.append("      \"variables\": [\n")
-            val visibleVars = lib.variables.filterNot { it.hidden }.sortedBy { it.name }
-            visibleVars.forEachIndexed { varIndex, variable ->
-                sb.append("        {\n")
-                sb.append("          \"name\": ${jsonString(variable.name)},\n")
-                sb.append("          \"description\": ${jsonString(variable.description)}\n")
-                sb.append("        }")
-                if (varIndex < visibleVars.size - 1) sb.append(",")
-                sb.append("\n")
-            }
-            sb.append("      ],\n")
-
-            // Functions
-            sb.append("      \"functions\": [\n")
-            val sortedFunctions = lib.functions.sortedBy { it.name }
-            sortedFunctions.forEachIndexed { funcIndex, func ->
-                sb.append("        {\n")
-                sb.append("          \"name\": ${jsonString(func.name)},\n")
-                sb.append("          \"description\": ${jsonString(func.description)},\n")
-
-                // Example
-                if (func.example != null) {
-                    sb.append("          \"example\": ${jsonString(func.example!!)},\n")
-                } else {
-                    sb.append("          \"example\": null,\n")
-                }
-
-                // Calls (overloads)
-                sb.append("          \"calls\": [\n")
-                func.calls.forEachIndexed { callIndex, call ->
-                    sb.append("            {\n")
-                    sb.append("              \"description\": ${jsonString(call.description)},\n")
-                    sb.append("              \"returnType\": ${jsonString(call.returnType)},\n")
-                    sb.append("              \"args\": [\n")
-                    call.args.forEachIndexed { argIndex, arg ->
-                        sb.append("                {\n")
-                        sb.append("                  \"name\": ${jsonString(arg.name)},\n")
-                        sb.append("                  \"type\": ${jsonString(arg.type)},\n")
-                        sb.append("                  \"description\": ${jsonString(arg.description)}\n")
-                        sb.append("                }")
-                        if (argIndex < call.args.size - 1) sb.append(",")
-                        sb.append("\n")
+        return json {
+            array("libraries") {
+                sortedLibs.forEach { lib ->
+                    obj {
+                        value("name", lib.name.ifBlank { "std" })
+                        value("description", lib.description)
+                        value("icon", lib.icon)
+                        array("variables") {
+                            lib.variables.filterNot { it.hidden }.sortedBy { it.name }.forEach { variable ->
+                                obj {
+                                    value("name", variable.name)
+                                    value("description", variable.description)
+                                }
+                            }
+                        }
+                        array("functions") {
+                            lib.functions.sortedBy { it.name }.forEach { func ->
+                                obj {
+                                    value("name", func.name)
+                                    value("description", func.description)
+                                    value("example", func.example)
+                                    array("calls") {
+                                        func.calls.forEach { call ->
+                                            obj {
+                                                value("description", call.description)
+                                                value("returnType", call.returnType)
+                                                array("args") {
+                                                    call.args.forEach { arg ->
+                                                        obj {
+                                                            value("name", arg.name)
+                                                            value("type", arg.type)
+                                                            value("description", arg.description)
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
-                    sb.append("              ]\n")
-                    sb.append("            }")
-                    if (callIndex < func.calls.size - 1) sb.append(",")
-                    sb.append("\n")
                 }
-                sb.append("          ]\n")
-
-                sb.append("        }")
-                if (funcIndex < sortedFunctions.size - 1) sb.append(",")
-                sb.append("\n")
             }
-            sb.append("      ]\n")
-
-            sb.append("    }")
-            if (libIndex < sortedLibs.size - 1) sb.append(",")
-            sb.append("\n")
-        }
-
-        sb.append("  ]\n")
-        sb.append("}\n")
-        return sb.toString()
-    }
-
-    private fun jsonString(value: String): String {
-        val escaped = value
-            .replace("\\", "\\\\")
-            .replace("\"", "\\\"")
-            .replace("\n", "\\n")
-            .replace("\r", "\\r")
-            .replace("\t", "\\t")
-        return "\"$escaped\""
+        }.generate() + "\n"
     }
 }
 
