@@ -59,8 +59,22 @@
             border-color: var(--pink);
         }
 
-        /* Hide the web component's own toolbar — examples are managed by the page */
+        /* Hide the web component's own toolbar and share link — managed by the page */
         .tiny-editor-toolbar { display: none !important; }
+        .tiny-share-link { display: none !important; }
+
+        /* -- Page share link */
+        .editor-share {
+            display: inline-flex; align-items: center; gap: 6px;
+            margin-top: 12px;
+            font-family: 'Source Code Pro', monospace;
+            font-size: .85rem; font-weight: 600;
+            color: var(--pink);
+            text-decoration: none;
+            transition: opacity .15s;
+        }
+        .editor-share:hover { opacity: .7; }
+        .editor-share svg { width: 16px; height: 16px; }
 
         /* -- tiny-web-editor styles */
         .tiny-button {
@@ -167,10 +181,15 @@ function _draw()
 end
             </tiny-editor>
         </div>
+        <a id="editor-share" class="editor-share" href="editor.html">
+            <i data-lucide="share-2"></i>
+            Share this code
+        </a>
         </div>
 {% endblock %}
 
 {% block pageScripts %}
+<script src="https://unpkg.com/lucide@latest"></script>
 <script type="module" crossorigin src="./tiny-web-editor.js"></script>
 <script>
 (function () {
@@ -208,6 +227,29 @@ end
             observer.observe(document.body, {childList: true, subtree: true});
         }
     });
+
+    // Keep the page share link in sync with editor content
+    var shareLink = document.getElementById('editor-share');
+    function updateShareLink() {
+        var editor = document.getElementById('editor-0');
+        if (!editor || !shareLink) return;
+        var code = editor.innerText || '';
+        shareLink.href = 'editor.html?game=' + btoa(code);
+    }
+
+    // Watch for the editor element and attach the input listener
+    var shareObserver = new MutationObserver(function (mutations, obs) {
+        var editor = document.getElementById('editor-0');
+        if (editor) {
+            editor.addEventListener('input', updateShareLink);
+            updateShareLink();
+            obs.disconnect();
+        }
+    });
+    shareObserver.observe(document.body, {childList: true, subtree: true});
+
+    // Initialize Lucide icons
+    if (window.lucide) lucide.createIcons();
 })();
 </script>
 {% endblock %}
