@@ -19,7 +19,7 @@ install:
 
 docs: install
 	./gradlew tiny-web-editor:tinyWebEditor
-	tiny-cli docs --output tiny-doc/src/docs/asciidoc/dependencies/tiny-cli-commands.adoc
+	tiny-cli docs --output tiny-doc/src/docs/asciidoc/tiny-cli-commands.json
 	tiny-cli export tiny-samples/breakout
 	unzip -o -d tiny-doc/src/docs/asciidoc/sample/game-example tiny-samples/breakout/tiny-export.zip
 	tiny-cli export tiny-samples/home

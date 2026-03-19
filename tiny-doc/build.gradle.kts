@@ -86,6 +86,7 @@ val renderPebbleTemplates = tasks.register("renderPebbleTemplates", JavaExec::cl
     val dataDir = project.projectDir.resolve("src/docs/asciidoc")
     val outputDir = project.layout.buildDirectory.get().asFile.resolve("docs/asciidoc")
     val apiJsonFile = project.layout.buildDirectory.get().asFile.resolve("docs/asciidoc/tiny-api.json")
+    val cliJsonFile = dataDir.resolve("tiny-cli-commands.json")
 
     dependsOn(
         tasks.named("classes"),
@@ -103,6 +104,7 @@ val renderPebbleTemplates = tasks.register("renderPebbleTemplates", JavaExec::cl
         dataDir.absolutePath,
         outputDir.absolutePath,
         apiJsonFile.absolutePath,
+        cliJsonFile.absolutePath,
     )
 
     inputs.dir(templateDir)
@@ -110,6 +112,7 @@ val renderPebbleTemplates = tasks.register("renderPebbleTemplates", JavaExec::cl
         dataDir.resolve("showcase.json"),
         dataDir.resolve("tutorials.json"),
         dataDir.resolve("document.json"),
+        cliJsonFile,
     )
     inputs.files(apiJsonFile)
     outputs.files(
@@ -117,6 +120,8 @@ val renderPebbleTemplates = tasks.register("renderPebbleTemplates", JavaExec::cl
         outputDir.resolve("showcase.html"),
         outputDir.resolve("documentation.html"),
         outputDir.resolve("api.html"),
+        outputDir.resolve("editor.html"),
+        outputDir.resolve("tiny-cli.html"),
     )
 }
 
