@@ -130,20 +130,78 @@
             color: #64748b; font-weight: 500; font-size: .95rem;
         }
 
-        /* -- Try it button */
-        .fn-card__try-btn {
-            margin-left: auto;
-            display: inline-flex; align-items: center; gap: 4px;
-            padding: 4px 12px;
-            border-radius: 999px;
-            background: #ff0080; color: #fff;
-            font-family: 'Source Code Pro', monospace;
-            font-size: .75rem; font-weight: 700;
-            text-decoration: none;
-            cursor: pointer;
-            transition: background .15s;
+        /* -- Syntax highlighting (interactive editor) */
+        .code_keyword { color: #7c3aed; }
+        .code_comment { color: #9ca3af; font-style: italic; }
+        .code_string { color: #16a34a; }
+        .code_number { color: #ea580c; }
+
+        /* -- tiny-web-editor styles */
+        .tiny-button {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 16px;
+            background-color: #ff0080; color: white;
+            text-align: center; text-decoration: none;
+            font-weight: bold; font-size: 0.9em;
+            border: none; border-radius: 4px; cursor: pointer;
+            font-family: "Source Code Pro", monospace;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease;
         }
-        .fn-card__try-btn:hover { background: #d4006b; }
+        .tiny-button, .tiny-button:link, .tiny-button:visited { color: white; text-decoration: none; }
+        .tiny-button:hover, .tiny-button:focus { background-color: #d4006b; color: white; outline: none; }
+        .tiny-button svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+        .tiny-toolbar {
+            width: 100%; min-height: 48px; padding: 4px 12px;
+            border-radius: 10px 10px 0 0;
+            background: #eef0f2; border: 1px solid #e0e0e0; border-bottom: none;
+            display: flex; align-items: center;
+        }
+        .tiny-container {
+            display: flex; width: 100%;
+            border: 1px solid #e0e0e0; border-radius: 0 0 10px 10px;
+            overflow: hidden; background: #f8f9fa;
+        }
+        .tiny-canvas {
+            border: none; border-right: 1px solid #e0e0e0; cursor: none;
+            flex: 1 1 auto; max-height: 512px; max-width: 512px;
+        }
+        .tiny-textarea:focus { outline: none; }
+        .tiny-textarea {
+            flex: 2 1 auto; display: block; min-height: 512px;
+            padding-left: 48px; padding-top: 12px; padding-bottom: 12px;
+            counter-reset: line; width: 100%;
+            font-family: "Source Code Pro", monospace;
+            font-size: 0.88rem; line-height: 1.7;
+            color: #333; background: #f8f9fa; resize: none;
+        }
+        .tiny-textarea div {
+            display: block; position: relative; white-space: pre-wrap; min-height: 1em;
+        }
+        .tiny-textarea div::before {
+            color: #c0c0c0; content: counter(line); counter-increment: line;
+            position: absolute; right: calc(100% + 16px); font-size: 0.8em;
+        }
+        .tiny-status-bar { width: 100%; height: 1px; }
+        .tiny-status-bar-progress { height: 100%; width: 100%; }
+        .tiny-status-editing { background-color: #e89830; }
+        .tiny-status-loaded { background-color: #4caf50; }
+
+        /* -- Static code block (matches editor look) */
+        .fn-card__try-btn { margin-left: auto; }
+        .fn-card__filename {
+            color: #888; font-size: .8rem;
+            font-family: 'Source Code Pro', monospace;
+        }
+        .fn-card__code {
+            padding: 20px 24px;
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0; border-top: none;
+            border-radius: 0 0 10px 10px;
+            font-family: 'Source Code Pro', monospace;
+            font-size: .88rem; line-height: 1.7; color: #333;
+        }
+        .fn-card__code pre { margin: 0; white-space: pre-wrap; }
 
         /* -- Empty state */
         .fn-empty {
@@ -235,16 +293,16 @@
         filterCards();
     });
 
-    // -- Try it: replace terminal with inline tiny-editor
+    // -- Try it: replace code block with inline tiny-editor
     grid.addEventListener('click', function (e) {
         var btn = e.target.closest('.fn-card__try-btn');
         if (!btn) return;
         var wrapper = btn.closest('.fn-card__example');
         if (!wrapper) return;
-        var terminal = wrapper.querySelector('.terminal');
+        var codeBlock = wrapper.querySelector('.fn-card__code-block');
         var editor = wrapper.querySelector('tiny-editor');
-        if (terminal && editor) {
-            terminal.style.display = 'none';
+        if (codeBlock && editor) {
+            codeBlock.style.display = 'none';
             editor.dispatchEvent(new Event('play'));
         }
     });
