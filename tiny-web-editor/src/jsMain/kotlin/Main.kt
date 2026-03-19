@@ -83,52 +83,28 @@ private fun setupDocMode(
     val spritePath = game.getAttribute("sprite")
     val levelPath = game.getAttribute("level")
 
-    val toolbar = document.createElement("div") {
-        setAttribute("class", "tiny-toolbar")
-    }
-    game.before(toolbar)
-
-    val link = document.createElement("a") {
-        setAttribute("id", "link-editor-$index")
-        setAttribute("class", "tiny-play tiny-button")
-        setAttribute("href", "#link-editor-$index")
-    } as HTMLAnchorElement
-    toolbar.appendChild(link)
-
-    val playLink = document.createElement("div").apply {
+    val container = document.createElement("div").apply {
         setAttribute("class", "tiny-container")
+        asDynamic().style.display = "none"
     }
-    toolbar.after(playLink)
+    game.after(container)
 
     val codeToUse = decodedCode ?: "-- Update the code to update the game!\n$code"
 
-    var clicked = false
-    link.innerHTML = """<i data-lucide="play"></i> Run and edit this example"""
-    link.onclick = { _ ->
-        if (!clicked) {
-            createGame(playLink, index, codeToUse, spritePath, levelPath, rootPath)
-            clicked = true
+    var started = false
+    game.addEventListener("play", {
+        if (!started) {
+            container.asDynamic().style.display = ""
+            createGame(container, index, codeToUse, spritePath, levelPath, rootPath)
+            started = true
         }
-        true
-    }
-
-    val editorLink = (
-        document.createElement("a") {
-            setAttribute("class", "tiny-button tiny-button-right")
-            id = "share-$index"
-            innerHTML = """<i data-lucide="external-link"></i> Editor"""
-        } as HTMLAnchorElement
-    ).apply {
-        val b64 = Base64.encode(code.encodeToByteArray())
-        href = "editor.html?game=$b64"
-        target = "_blank"
-    }
-
-    toolbar.appendChild(editorLink)
+    })
 
     // There is a user code. Let's unfold the game.
     if (savedCode != null) {
-        createGame(playLink, index, codeToUse, spritePath, levelPath, rootPath)
+        container.asDynamic().style.display = ""
+        createGame(container, index, codeToUse, spritePath, levelPath, rootPath)
+        started = true
     }
 }
 
