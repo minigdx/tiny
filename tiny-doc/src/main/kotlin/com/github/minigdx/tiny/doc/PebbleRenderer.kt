@@ -14,14 +14,15 @@ import kotlinx.serialization.json.longOrNull
 import java.io.File
 
 fun main(args: Array<String>) {
-    require(args.size == 4) {
-        "Usage: PebbleRenderer <templateDir> <dataDir> <outputDir> <apiJsonFile>"
+    require(args.size == 4 || args.size == 5) {
+        "Usage: PebbleRenderer <templateDir> <dataDir> <outputDir> <apiJsonFile> [cliJsonFile]"
     }
     PebbleRenderer(
         templateDir = File(args[0]),
         dataDir = File(args[1]),
         outputDir = File(args[2]),
         apiJsonFile = File(args[3]),
+        cliJsonFile = if (args.size == 5) File(args[4]) else null,
     ).render()
 }
 
@@ -30,12 +31,14 @@ class PebbleRenderer(
     private val dataDir: File,
     private val outputDir: File,
     private val apiJsonFile: File,
+    private val cliJsonFile: File? = null,
 ) {
     fun render() {
         val games = parseJsonArray(dataDir.resolve("showcase.json"))
         val tutorials = parseJsonArray(dataDir.resolve("tutorials.json"))
         val functions = flattenApiJson(apiJsonFile)
         val functionsJson = Json.encodeToString(JsonElement.serializer(), toJsonElement(functions))
+        val commands = parseCliJson()
 
         val genres = games
             .flatMap { game ->
@@ -87,7 +90,23 @@ class PebbleRenderer(
             ),
         )
 
-        println("Rendered 4 Pebble templates to ${outputDir.absolutePath}")
+        renderTemplate(
+            engine,
+            "pages/editor.peb",
+            "editor.html",
+            emptyMap(),
+        )
+
+        renderTemplate(
+            engine,
+            "pages/cli.peb",
+            "tiny-cli.html",
+            mapOf(
+                "commands" to commands,
+            ),
+        )
+
+        println("Rendered 6 Pebble templates to ${outputDir.absolutePath}")
     }
 
     private fun createEngine(): PebbleEngine {
@@ -110,6 +129,21 @@ class PebbleRenderer(
         File(outputDir, outputName).writer().use { writer ->
             template.evaluate(writer, context)
         }
+    }
+
+    /**
+     * Parse the CLI JSON file into a list of command maps.
+     *
+     * Input structure: { commands: [{ name, description, usage, options: [{ names, help }], arguments: [{ name, help }] }] }
+     * Output structure: list of maps with the same structure, ready for Pebble templates.
+     */
+    @Suppress("UNCHECKED_CAST")
+    private fun parseCliJson(): List<Map<String, Any?>> {
+        val file = cliJsonFile ?: return emptyList()
+        if (!file.exists()) return emptyList()
+
+        val root = toNative(Json.parseToJsonElement(file.readText())) as Map<*, *>
+        return root["commands"] as? List<Map<String, Any?>> ?: emptyList()
     }
 
     /**
