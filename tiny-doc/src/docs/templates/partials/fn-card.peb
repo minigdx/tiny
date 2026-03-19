@@ -18,18 +18,15 @@
 {% endif %}
 {% if fn.example is not empty %}
     <div class="fn-card__example">
-        <div class="terminal">
-            <div class="terminal__header">
-                <span class="terminal__dot terminal__dot--red"></span>
-                <span class="terminal__dot terminal__dot--yellow"></span>
-                <span class="terminal__dot terminal__dot--green"></span>
-                <span class="terminal__filename">example.lua</span>
-                <a class="fn-card__try-btn">
+        <div class="fn-card__code-block">
+            <div class="tiny-toolbar">
+                <span class="fn-card__filename">example.lua</span>
+                <a class="fn-card__try-btn tiny-button">
                     <span class="material-symbols-outlined" style="font-size: 1rem; vertical-align: middle;">play_arrow</span>
                     Try it
                 </a>
             </div>
-            <div class="terminal__body"><pre>{{ fn.example }}</pre></div>
+            <div class="fn-card__code"><pre>{{ fn.example }}</pre></div>
         </div>
         <tiny-editor style="display: none;">{{ fn.example | raw }}</tiny-editor>
     </div>
