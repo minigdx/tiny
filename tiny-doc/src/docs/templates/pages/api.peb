@@ -245,7 +245,7 @@
         var editor = wrapper.querySelector('tiny-editor');
         if (terminal && editor) {
             terminal.style.display = 'none';
-            editor.style.display = '';
+            editor.dispatchEvent(new Event('play'));
         }
     });
 
