@@ -293,16 +293,30 @@
         filterCards();
     });
 
-    // -- Try it: replace code block with inline tiny-editor
+    // -- Lua syntax highlighting (same logic as tiny-web-editor highlight())
+    function highlightLua(text) {
+        return text
+            .replace(/(".*?")/g, '<strong class="code_string">$1</strong>')
+            .replace(/--(.*)/g, '<em class="code_comment">--$1</em>')
+            .replace(/\b(if|else|elif|end|while|for|in|of|continue|break|return|function|local|do)\b/g, '<strong class="code_keyword">$1</strong>')
+            .replace(/\b(\d+)/g, '<em class="code_number">$1</em>');
+    }
+
+    // -- Highlight all static code blocks on load
+    grid.querySelectorAll('.fn-card__code pre').forEach(function (pre) {
+        pre.innerHTML = highlightLua(pre.textContent);
+    });
+
+    // -- Try it: hide code body, keep toolbar, start editor
     grid.addEventListener('click', function (e) {
         var btn = e.target.closest('.fn-card__try-btn');
         if (!btn) return;
         var wrapper = btn.closest('.fn-card__example');
         if (!wrapper) return;
-        var codeBlock = wrapper.querySelector('.fn-card__code-block');
+        var codeBody = wrapper.querySelector('.fn-card__code');
         var editor = wrapper.querySelector('tiny-editor');
-        if (codeBlock && editor) {
-            codeBlock.style.display = 'none';
+        if (codeBody && editor) {
+            codeBody.style.display = 'none';
             editor.dispatchEvent(new Event('play'));
         }
     });
