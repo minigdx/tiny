@@ -22,30 +22,54 @@ Create and test your ideas quickly and effectively. Run your games on your deskt
 
 NOTE: The code source of this sample is available in the https://github.com/minigdx/tiny/tree/main/tiny-samples/breakout[Tiny git repository].
 
+== Tutorials
 
-== Quick Navigation
+New to Tiny? Follow these step-by-step guides:
 
-New to Tiny? Start here:
+[cols="1,3",options="header"]
+|===
+| Guide | Description
 
- 1. **link:tiny-install.html[Installation]** - Get Tiny up and running
- 2. **link:tiny-tutorial.html[Tutorial: Pong]** - Build a complete Pong game
- 3. **link:tiny-tutorial-export.html[Exporting]** - Share your game on the web
- 4. **link:tiny-tutorial-sprites.html[Sprites]** - Manage sprites and animation
- 5. **link:tiny-tutorial-maps.html[Maps]** - Build levels with LDtk
- 6. **link:tiny-fonts.html[Fonts]** - Use custom bitmap fonts
- 7. **link:tiny-tutorial-sound.html[Sound]** - Add sound effects to your game
- 8. **link:api.html[API Reference]** - Complete function documentation
- 9. **link:tiny-cli.html[CLI Commands]** - Command-line tools
+| link:tiny-install.html[1. Getting Started]
+| Install the Tiny CLI, create your first project, and learn the game loop basics.
 
-=== Resources
- - https://github.com/minigdx/tiny[GitHub Repository]
- - https://github.com/minigdx/tiny/releases[Download Latest Release]
+| link:tiny-tutorial.html[2. Build a Pong Game]
+| Learn the fundamentals by building a classic Pong game. Covers input handling, collision detection, and game state.
 
-== Tiny Editor
+| link:tiny-tutorial-export.html[3. Exporting Your Game]
+| Export your game for the web or desktop, and deploy it to itch.io or any static host.
 
-You can try creating a game right away with `Tiny` using link:editor.html?game=[the Editor], or you can experiment by updating the examples available on this page.
+| link:tiny-tutorial-sprites.html[4. Sprites & Animation]
+| Draw spritesheets, animate characters, flip sprites, and manage multiple sheets.
 
-== Tiny is open source
+| link:tiny-tutorial-maps.html[5. Maps with LDtk]
+| Build game levels with the LDtk editor. Draw maps, handle entities, and implement tile-based collision.
+
+| link:tiny-fonts.html[6. Custom Fonts]
+| Create bitmap font spritesheets, configure font banks, and give your game a unique look.
+
+| link:tiny-tutorial-sound.html[7. Adding Sound]
+| Design chip-tune sound effects with the SFX editor and play them from your Lua code.
+|===
+
+== Reference
+
+[cols="1,3",options="header"]
+|===
+| Reference | Description
+
+| link:api.html[API Reference]
+| Complete documentation for every Lua function: graphics, sprites, sound, input, maps, and more.
+
+| link:tiny-cli.html[CLI Commands]
+| Command-line tools for creating, running, debugging, and exporting your games.
+|===
+
+== Try It Online
+
+You can try creating a game right away with `Tiny` using link:editor.html?game=[the Editor], or you can browse the link:showcase.html[Showcase] to see what others have built.
+
+== Open Source
 
 `Tiny` is an open-source project. Users can contribute to the project by reporting issues, suggesting improvements, and even submitting code changes. https://github.com/minigdx/tiny[Check the code source on Github].
 
@@ -57,25 +81,11 @@ image:sample/droidkaigi-tiny-export.gif[DroidKaigi 2024 presentation - Building 
 
 TIP: Want to help make this documentation even better? Feel free to contribute by updating https://github.com/minigdx/tiny/tree/main/tiny-doc/src/docs/asciidoc[the documentation source code]!
 
-include::tiny-install.adoc[leveloffset=+1]
-
-include::tiny-tutorial.adoc[leveloffset=+1]
-
-include::tiny-tutorial-export.adoc[leveloffset=+1]
-
-include::tiny-tutorial-sprites.adoc[leveloffset=+1]
-
-include::tiny-tutorial-maps.adoc[leveloffset=+1]
-
-include::tiny-fonts.adoc[leveloffset=+1]
-
-include::tiny-tutorial-sound.adoc[leveloffset=+1]
-
-include::tiny-showcase.adoc[]
-
 == Links
 
 - https://tomhalligan.substack.com/p/tinkering-with-tiny[Tinkering with Tiny]
 - https://tomhalligan.substack.com/p/tiny-gardening[Tiny Gardening]
+- https://github.com/minigdx/tiny[GitHub Repository]
+- https://github.com/minigdx/tiny/releases[Download Latest Release]
 
 include::licences.adoc[]
