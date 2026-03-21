@@ -30,5 +30,21 @@ document.addEventListener("DOMContentLoaded", function() {
     if (typeof lucide !== "undefined") {
         lucide.createIcons();
     }
+
+    // Inject Pebble-style footer
+    var footer = document.createElement('div');
+    footer.className = 'tiny-footer';
+    footer.innerHTML = [
+        '<div class="tiny-footer__brand">',
+        '    <span class="tiny-footer__brand-text">\uD83E\uDDF8 Tiny</span>',
+        '</div>',
+        '<div class="tiny-footer__links">',
+        '    <a class="tiny-footer__link" href="https://github.com/minigdx/tiny">GitHub</a>',
+        '    <a class="tiny-footer__link" href="documentation.html">Documentation</a>',
+        '    <a class="tiny-footer__link" href="editor.html">Editor</a>',
+        '</div>',
+        '<p class="tiny-footer__copy">&copy; 2026 Tiny Game Engine. Made for creators.</p>'
+    ].join('\n');
+    document.body.appendChild(footer);
 });
 </script>

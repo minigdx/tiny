@@ -323,19 +323,324 @@
         margin-top: 2em;
     }
 
-    /* Override Riak theme fonts for consistency with index.html */
+    /* ── Pebble theme overrides ───────────────────── */
+    /* Match the Pebble-rendered pages (index, showcase, docs, api) */
+
     body {
-        font-family: 'Quicksand', sans-serif;
+        font-family: 'Quicksand', sans-serif !important;
+        color: #334155 !important;
+        background: #fff5f9 !important;
+        background-image:
+            radial-gradient(circle at 10% 20%, rgba(255,0,128,.05) 0%, transparent 20%),
+            radial-gradient(circle at 90% 80%, rgba(0,229,255,.05) 0%, transparent 20%) !important;
+        -webkit-font-smoothing: antialiased;
+        padding-top: 60px !important;
+        overflow-x: hidden;
+        line-height: 1.6 !important;
     }
 
     h1, h2, #toctitle, .sidebarblock > .content > .title {
-        font-family: 'Lilita One', cursive;
-        font-weight: 400;
+        font-family: 'Lilita One', cursive !important;
+        font-weight: 400 !important;
+        color: #1e293b !important;
     }
 
     h3, h4, h5, h6 {
+        font-family: 'Quicksand', sans-serif !important;
+        font-weight: 700 !important;
+        color: #1e293b !important;
+    }
+
+    /* Page title */
+    #header > h1 {
+        font-family: 'Lilita One', cursive !important;
+        font-weight: 400 !important;
+        color: #ff0080 !important;
+        border-bottom: 4px solid rgba(0,229,255,.2) !important;
+        padding-bottom: 16px;
+    }
+
+    /* Content area sizing */
+    #header, #content, #footnotes {
+        max-width: 900px;
+        margin: 0 auto;
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+
+    /* Links */
+    a { color: #ff0080 !important; text-decoration: none !important; }
+    a:hover, a:focus { color: #d4006b !important; }
+
+    /* Keep tiny-button links white */
+    .tiny-button,
+    .tiny-button:link,
+    .tiny-button:visited,
+    .tiny-button:hover,
+    .tiny-button:focus { color: white !important; }
+
+    /* Inline code */
+    *:not(pre) > code {
+        font-family: 'Source Code Pro', monospace;
+        font-size: 0.88em;
+        padding: 2px 6px;
+        white-space: nowrap;
+        background-color: rgba(0,229,255,.08);
+        border: 1px solid rgba(0,229,255,.2);
+        border-radius: 6px;
+        color: #1e293b;
+        text-shadow: none;
+    }
+
+    /* Code blocks */
+    pre, pre > code {
+        font-family: 'Source Code Pro', monospace;
+        font-weight: normal;
+        line-height: 1.7;
+        color: #333;
+    }
+
+    .literalblock > .content pre,
+    .listingblock > .content pre {
+        background: #f8f9fa !important;
+        background-image: none !important;
+        border: 1px solid #e0e0e0 !important;
+        border-radius: 10px !important;
+        box-shadow: 0 2px 12px rgba(0,0,0,.06) !important;
+        padding: 20px 24px !important;
+        font-size: 0.88rem !important;
+    }
+
+    .literalblock > .content > pre,
+    .listingblock > .content > pre {
+        box-shadow: 0 2px 12px rgba(0,0,0,.06) !important;
+        border-radius: 10px !important;
+    }
+
+    /* Section separators */
+    .sect1 + .sect1 {
+        border-top: 1px solid rgba(0,0,0,.06);
+    }
+
+    /* Admonition blocks (NOTE, TIP, WARNING...) */
+    .admonitionblock > table {
+        background: #fff !important;
+        background-image: none !important;
+        border: 2px solid #00e5ff !important;
+        border-radius: 16px !important;
+        overflow: hidden;
+    }
+
+    .admonitionblock > table td.content {
+        font-family: 'Quicksand', sans-serif !important;
+        font-style: normal !important;
+        font-size: 0.95em !important;
+        color: #334155 !important;
+        border-left-color: rgba(0,229,255,.2) !important;
+        padding: 16px 20px !important;
+    }
+
+    .admonitionblock > table td.icon {
+        padding: 16px !important;
+    }
+
+    .admonitionblock .literalblock > .content > pre,
+    .admonitionblock .listingblock > .content > pre {
+        background: #f8f9fa !important;
+        background-image: none !important;
+    }
+
+    /* Sidebar blocks */
+    .sidebarblock {
+        background: #fff !important;
+        background-image: none !important;
+        border: 2px solid #a2ff00 !important;
+        border-radius: 16px !important;
+    }
+
+    .sidebarblock > .content > .title {
+        color: #1e293b !important;
+        text-shadow: none !important;
+        font-family: 'Lilita One', cursive !important;
+    }
+
+    .sidebarblock > .content ul,
+    .sidebarblock > .content p {
+        color: #334155 !important;
+        text-shadow: none !important;
+    }
+
+    .sidebarblock > .content .title {
+        color: #1e293b !important;
+    }
+
+    /* Example blocks */
+    .exampleblock > .content {
+        background-color: #fff;
+        border-color: rgba(0,229,255,.3);
+        border-radius: 12px;
+    }
+
+    /* Tables */
+    table {
+        background: #fff;
+        border: 2px solid rgba(0,0,0,.06);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    table thead, table tfoot {
+        background: rgba(0,229,255,.08);
+    }
+
+    table.tableblock.grid-all {
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.04);
+    }
+
+    /* TOC */
+    #toc {
+        border-bottom: 1px solid rgba(0,0,0,.06);
+        padding-bottom: 1.25em;
+    }
+
+    #content #toc {
+        background: #fff;
+        border: 2px solid rgba(0,229,255,.2);
+        border-radius: 16px;
+    }
+
+    #content #toc a {
+        color: #334155;
+    }
+
+    #content #toc a:hover {
+        color: #ff0080;
+    }
+
+    #content #toctitle {
+        font-family: 'Lilita One', cursive;
+        font-weight: 400;
+        color: #1e293b;
+    }
+
+    /* Lists */
+    #content ul > li {
+        list-style-type: disc;
+    }
+
+    /* Images */
+    .imageblock img {
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(0,0,0,.08);
+    }
+
+    /* Hide default AsciiDoc footer, replaced by Pebble-style footer */
+    #footer {
+        display: none !important;
+    }
+
+    #footer-text {
+        display: none !important;
+    }
+
+    /* Pebble-style footer */
+    .tiny-footer {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 32px;
+        padding: 64px 24px;
+        border-top: 4px solid rgba(0,0,0,.05);
+        max-width: 1200px;
+        margin: 0 auto;
+        color: #94a3b8;
+        font-weight: 500;
         font-family: 'Quicksand', sans-serif;
+    }
+
+    .tiny-footer__brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .tiny-footer__brand-text {
+        font-family: 'Lilita One', cursive;
+        font-weight: 400;
+        font-size: 1.5rem;
+        letter-spacing: 2px;
+        color: #1e293b;
+    }
+
+    .tiny-footer__links {
+        display: flex;
+        gap: 48px;
+    }
+
+    .tiny-footer__link {
+        font-size: .85rem;
         font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        text-decoration: none;
+        color: #94a3b8;
+        transition: color .15s;
+    }
+
+    .tiny-footer__link:hover {
+        color: #ff0080;
+    }
+
+    .tiny-footer__copy {
+        font-size: .85rem;
+        font-weight: 700;
+        opacity: .6;
+    }
+
+    @media (max-width: 600px) {
+        .tiny-footer {
+            flex-direction: column;
+            text-align: center;
+        }
+        .tiny-footer__links {
+            flex-direction: column;
+            gap: 16px;
+        }
+    }
+
+    /* Responsive header */
+    #header > h1 {
+        font-size: 2.5rem;
+    }
+
+    @media (max-width: 600px) {
+        #header > h1 {
+            font-size: 1.8rem;
+        }
+    }
+
+    /* Selection color matching Pebble theme */
+    ::selection {
+        background-color: rgba(255,0,128,.2);
+        color: #1e293b;
+    }
+
+    /* Paragraph styling */
+    p {
+        line-height: 1.7;
+        color: #334155;
+    }
+
+    p aside {
+        font-style: italic;
+    }
+
+    /* Header details (version, author) */
+    #header span {
+        color: #94a3b8;
+        font-size: 0.85em;
     }
 </style>
 
