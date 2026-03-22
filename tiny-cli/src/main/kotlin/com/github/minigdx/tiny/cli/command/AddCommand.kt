@@ -116,6 +116,13 @@ class AddCommand : CliktCommand(name = "add") {
         gameParameters.write(tiny)
     }
 
+    private fun echoFontWarnings() {
+        echo("   ⚠️  Tiny renders fonts as monospace: every character occupies the same cell width.")
+        echo("      Proportional fonts will have uneven spacing. Prefer pixel/monospace fonts.")
+        echo("   ⚠️  Semi-transparent pixels (anti-aliasing) are not supported.")
+        echo("      They will be rendered as fully opaque, causing visual artifacts on glyph edges.")
+    }
+
     private fun addTtfFont(
         resource: String,
         params: GameParameters,
@@ -134,6 +141,7 @@ class AddCommand : CliktCommand(name = "add") {
 
         echo("   📐 Character size: ${result.cellWidth}x${result.cellHeight}")
         echo("   📏 Grid: ${result.cols} chars/row, ${result.rows} rows, ${effectiveChars.length} total chars")
+        echoFontWarnings()
 
         val rows = FontAnalyzer.splitCharsIntoRows(
             result.cols * result.cellWidth,
@@ -194,6 +202,7 @@ class AddCommand : CliktCommand(name = "add") {
         if (result.offsetX != 0 || result.offsetY != 0) {
             echo("   📍 Offset: ${result.offsetX},${result.offsetY}")
         }
+        echoFontWarnings()
 
         return params.addFont(font)
     }
