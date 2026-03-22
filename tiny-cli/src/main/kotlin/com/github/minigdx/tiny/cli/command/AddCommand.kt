@@ -11,6 +11,7 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.optionalValue
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.minigdx.tiny.cli.command.utils.FontAnalyzer
+import com.github.minigdx.tiny.cli.command.utils.TtfConverter
 import com.github.minigdx.tiny.cli.config.GameParameters
 import com.github.minigdx.tiny.cli.exception.MissingTinyConfigurationException
 import java.io.File
@@ -43,8 +44,9 @@ class AddCommand : CliktCommand(name = "add") {
             throw MissingTinyConfigurationException(tiny)
         }
 
-        if (fontName != null && chars == null) {
-            echo("❌ --font requires --chars option.")
+        val hasTtf = resources.any { it.endsWith("ttf") || it.endsWith("otf") }
+        if (fontName != null && chars == null && !hasTtf) {
+            echo("❌ --font requires --chars option (or use a .ttf file for auto-detection).")
             throw Abort()
         }
 
@@ -68,7 +70,13 @@ class AddCommand : CliktCommand(name = "add") {
         // regarding the input, add it into the right resource
         resources.forEach { r ->
             val type =
-                if (r.endsWith("png") && fontName != null) {
+                if ((r.endsWith("ttf") || r.endsWith("otf")) && fontName != null) {
+                    addTtfFont(r, gameParameters).let { gameParameters = it }
+                    "font (from TTF)"
+                } else if ((r.endsWith("ttf") || r.endsWith("otf")) && fontName == null) {
+                    echo("⚠️  TTF files require --font option. Use: tiny-cli add --font $r")
+                    null
+                } else if (r.endsWith("png") && fontName != null) {
                     addFont(r, gameParameters).let { gameParameters = it }
                     "font"
                 } else if (r.endsWith("png")) {
@@ -106,6 +114,43 @@ class AddCommand : CliktCommand(name = "add") {
 
         // Save the updated _tiny.json
         gameParameters.write(tiny)
+    }
+
+    private fun addTtfFont(
+        resource: String,
+        params: GameParameters,
+    ): GameParameters {
+        val ttfFile = gameDirectory.resolve(resource)
+        val fontName = this.fontName!!.ifEmpty { FontAnalyzer.deriveFontName(resource) }
+        val pngName = "${fontName}.png"
+        val pngFile = gameDirectory.resolve(pngName)
+
+        val effectiveChars = chars ?: TtfConverter.DEFAULT_CHARS
+        val targetHeight = size?.let { FontAnalyzer.parseSize(it).second }
+
+        echo("   🔤 Converting TTF to PNG spritesheet...")
+
+        val result = TtfConverter.convert(ttfFile, pngFile, effectiveChars, targetHeight)
+
+        echo("   📐 Character size: ${result.cellWidth}x${result.cellHeight}")
+        echo("   📏 Grid: ${result.cols} chars/row, ${result.rows} rows, ${effectiveChars.length} total chars")
+
+        val rows = FontAnalyzer.splitCharsIntoRows(
+            result.cols * result.cellWidth,
+            result.cellWidth,
+            effectiveChars,
+        )
+
+        val font = FontAnalyzer.buildFontConfig(
+            fontName = fontName,
+            spritesheet = pngName,
+            charWidth = result.cellWidth,
+            charHeight = result.cellHeight,
+            characters = rows,
+            spaceWidth = result.spaceWidth,
+        )
+
+        return params.addFont(font)
     }
 
     private fun addFont(

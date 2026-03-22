@@ -325,10 +325,12 @@ object FontAnalyzer {
         bankName: String = "default",
         offsetX: Int = 0,
         offsetY: Int = 0,
+        spaceWidth: Int? = null,
     ): GameConfigFont {
         return GameConfigFont(
             name = fontName,
             spritesheet = spritesheet,
+            spaceWidth = spaceWidth,
             banks = listOf(
                 GameConfigFontBank(
                     name = bankName,
