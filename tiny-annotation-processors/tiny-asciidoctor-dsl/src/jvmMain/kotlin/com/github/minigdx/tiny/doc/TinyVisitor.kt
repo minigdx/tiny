@@ -107,12 +107,17 @@ class TinyFunctionVisitor :
                                     documentation
                                 }
 
-                                call.args += multiArg.names.map { n -> TinyArgDescriptor(n) }
-                                    .zip(docs) { ano, doc ->
-                                        ano.apply {
-                                            ano.description = doc
-                                        }
+                                val types = multiArg.types
+                                call.args += multiArg.names.mapIndexed { i, n ->
+                                    TinyArgDescriptor(
+                                        n,
+                                        type = types.getOrNull(i)?.type ?: "any",
+                                    )
+                                }.zip(docs) { ano, doc ->
+                                    ano.apply {
+                                        ano.description = doc
                                     }
+                                }
                             } else {
                                 val args = p.getAnnotationsByType(TinyArg::class).firstOrNull()
                                 val arg = args?.name ?: p.name?.asString() ?: ""

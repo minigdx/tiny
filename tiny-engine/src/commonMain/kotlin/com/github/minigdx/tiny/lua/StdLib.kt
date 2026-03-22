@@ -210,10 +210,15 @@ class StdLib(
         }
     }
 
-    @TinyFunction("Print on the screen a string.", example = STD_PRINT_EXAMPLE)
+    @TinyFunction(
+        "Print on the screen a string. " +
+            "Default color is the closest to white (#FFFFFF) in the palette. " +
+            "To ensure visibility, use a color that contrasts with the cls() background color.",
+        example = STD_PRINT_EXAMPLE,
+    )
     internal inner class print : LibFunction() {
         @TinyCall(
-            description = "print on the screen a string at (0,0) with a default color.",
+            description = "print on the screen a string at (0,0) with the default color (closest to white).",
         )
         override fun call(
             @TinyArg("str", type = LuaType.STRING) a: LuaValue,
@@ -222,7 +227,7 @@ class StdLib(
         }
 
         @TinyCall(
-            description = "print on the screen a string with a default color.",
+            description = "print on the screen a string with the default color (closest to white).",
         )
         override fun call(
             @TinyArg("str", type = LuaType.STRING) a: LuaValue,
@@ -233,13 +238,13 @@ class StdLib(
         }
 
         @TinyCall(
-            description = "print on the screen a string with a specific color.",
+            description = "print on the screen a string with a specific color index (1 to N).",
         )
         override fun call(
             @TinyArg("str", type = LuaType.STRING) a: LuaValue,
             @TinyArg("x", type = LuaType.NUMBER) b: LuaValue,
             @TinyArg("y", type = LuaType.NUMBER) c: LuaValue,
-            @TinyArg("color", type = LuaType.ANY) d: LuaValue,
+            @TinyArg("color", type = LuaType.NUMBER) d: LuaValue,
         ): LuaValue {
             val spritesheet = resourceAccess.bootSpritesheet ?: return NONE
             val str = a.tojstring()

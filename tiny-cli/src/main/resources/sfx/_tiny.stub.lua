@@ -1,8 +1,30 @@
 -- DO NOT EDIT // DO NOT EDIT // DO NOT EDIT // DO NOT EDIT // DO NOT EDIT
 -- Tiny stub lua file generated automatically
 -- The file is used only to help Lua editors with autocomplete
--- 
+--
 -- An error, an issue? Please consult https://github.com/minigdx/tiny
+--
+-- COLOR SYSTEM:
+--   Color 0 = TRANSPARENT. Never use 0 if you want something visible.
+--   Colors 1..N are defined in the _tiny.json configuration file ("colors" array).
+--   The first hex color in the array is index 1, the second is index 2, etc.
+--   Typical palette example (PICO-8 style, 16 colors):
+--     1 = black, 2 = dark blue, 3 = dark purple, 4 = dark green,
+--     5 = brown, 6 = dark grey, 7 = light grey, 8 = white,
+--     9 = red, 10 = orange, 11 = yellow, 12 = green,
+--     13 = blue, 14 = lavender, 15 = pink, 16 = peach
+--   Check _tiny.json "colors" array for the actual palette of the current game.
+--
+-- DEFAULT COLORS:
+--   gfx.cls() without arguments clears to the closest color to black (#000000).
+--   print() without a color argument uses the closest color to white (#FFFFFF).
+--   To ensure visibility: use a color index DIFFERENT from the cls() color.
+--   Common safe pattern: gfx.cls(1) then draw with colors >= 2.
+--
+-- COMMON MISTAKES:
+--   WRONG: shape.circlef(10, 10, 10, 0)   -- color 0 is transparent, nothing visible!
+--   WRONG: gfx.cls(1) then shape.circlef(10, 10, 10, 1) -- same color as background!
+--   RIGHT: gfx.cls(1) then shape.circlef(10, 10, 10, 8) -- visible: white circle on black
 
 
 --- Vector2 manipulation library.
@@ -355,10 +377,10 @@ function all() end
 --- Iterate over values of a table in reverse order. The iterator return an index and the value. The method is useful to remove elements from a table while iterating on it.
 --- @overload fun(table: any): any -- Iterate over the values of the table
 function rpairs() end
---- Print on the screen a string.
---- @overload fun(str: string): any -- print on the screen a string at (0,0) with a default color.
---- @overload fun(str: string, x: number, y: number): any -- print on the screen a string with a default color.
---- @overload fun(str: string, x: number, y: number, color: any): any -- print on the screen a string with a specific color.
+--- Print on the screen a string. Default color is the closest to white (#FFFFFF) in the palette. To ensure visibility, use a color that contrasts with the cls() background color.
+--- @overload fun(str: string): any -- print on the screen a string at (0,0) with the default color (closest to white).
+--- @overload fun(str: string, x: number, y: number): any -- print on the screen a string with the default color (closest to white).
+--- @overload fun(str: string, x: number, y: number, color: number): any -- print on the screen a string with a specific color index (1 to N). WARNING: 0 is transparent and will draw nothing visible.
 function print() end
 
 
@@ -375,9 +397,9 @@ gfx = {}
 --- @overload fun(): any -- Return the actual mode. Switch back to the default mode.
 --- @overload fun(mode: number): any -- Switch to another draw mode. Return the previous mode.
 gfx.draw_mode = function() end
---- clear the screen
---- @overload fun(): any -- Clear the screen with a default color.
---- @overload fun(color: number): any -- Clear the screen with a color.
+--- Clear the screen. When called without arguments, clears with the color closest to black (#000000) in the palette. To ensure visibility, always draw with a color index DIFFERENT from the cls() color.
+--- @overload fun(): any -- Clear the screen with the color closest to black (#000000) in the palette.
+--- @overload fun(color: number): any -- Clear the screen with the given color index (1 to N). Color 0 clears to transparent.
 gfx.cls = function() end
 --- Set the color index at the coordinate (x,y).
 --- @overload fun(x: number, y: number, color: number): any -- set the color index at the coordinate (x,y).
@@ -395,7 +417,7 @@ gfx.pget = function() end
 gfx.to_sheet = function() end
 --- Change a color from the palette to another color.
 --- @overload fun(): any -- Reset all previous color changes.
---- @overload fun(a: any, b: any): any -- Replace the color a for the color b.
+--- @overload fun(a: number, b: number): any -- Replace the color a for the color b. Both are color indices (1 to N).
 gfx.pal = function() end
 --- Move the game camera.
 --- @overload fun(): any -- Reset the game camera to it's default position (0,0).
@@ -414,34 +436,34 @@ gfx.clip = function() end
 --- Shape API to draw...shapes. Those shapes can be circle, rectangle, line or oval.All shapes can be draw filed or not filed.
 shape = {}
 --- Draw a rectangle.
---- @overload fun(x: any, y: any, width: any, height: any, color: any): any -- Draw a rectangle.
---- @overload fun(rect: any): any -- Draw a rectangle.
---- @overload fun(rect: any, color: any): any -- Draw a rectangle using a rectangle and a color.
+--- @overload fun(x: number, y: number, width: number, height: number, color: number): any -- Draw a rectangle. Color is a palette index (1 to N). WARNING: 0 is transparent.
+--- @overload fun(rect: table): any -- Draw a rectangle from a table {x, y, width, height, color}.
+--- @overload fun(rect: table, color: number): any -- Draw a rectangle using a table {x, y, width, height} and a color index (1 to N).
 shape.rect = function() end
 --- Draw a filled rectangle.
---- @overload fun(x: any, y: any, width: any, height: any, color: any): any -- Draw a filled rectangle.
---- @overload fun(rect: any): any -- Draw a filled rectangle.
---- @overload fun(rect: any, color: any): any -- Draw a filled rectangle using a rectangle and a color.
+--- @overload fun(x: number, y: number, width: number, height: number, color: number): any -- Draw a filled rectangle. Color is a palette index (1 to N). WARNING: 0 is transparent.
+--- @overload fun(rect: table): any -- Draw a filled rectangle from a table {x, y, width, height, color}.
+--- @overload fun(rect: table, color: number): any -- Draw a filled rectangle using a table {x, y, width, height} and a color index (1 to N).
 shape.rectf = function() end
 --- Draw a filled circle.
---- @overload fun(centerX: any, centerY: any, radius: any, color: any): any -- Draw a circle at the coordinate (centerX, centerY) with the radius and the color.
+--- @overload fun(centerX: number, centerY: number, radius: number, color: number): any -- Draw a filled circle at (centerX, centerY) with the radius and color index (1 to N). WARNING: 0 is transparent.
 shape.circlef = function() end
 --- Draw a line.
---- @overload fun(x0: any, y0: any, x1: any, y1: any, color: any): any -- Draw a line.
---- @overload fun(x0: any, y0: any, x1: any, y1: any): any -- Draw a line with a default color.
+--- @overload fun(x0: number, y0: number, x1: number, y1: number, color: number): any -- Draw a line with the given color index (1 to N). WARNING: 0 is transparent.
+--- @overload fun(x0: number, y0: number, x1: number, y1: number): any -- Draw a line with a default color (closest to white).
 shape.line = function() end
---- Draw a circle.
---- @overload fun(a: any, b: any, c: any): any -- Draw a circle with the default color.
---- @overload fun(centerX: any, centerY: any, radius: any, color: any): any -- Draw a circle.
+--- Draw a circle (outline only).
+--- @overload fun(centerX: number, centerY: number, radius: number): any -- Draw a circle outline with the default color (closest to white).
+--- @overload fun(centerX: number, centerY: number, radius: number, color: number): any -- Draw a circle outline with the given color index (1 to N). WARNING: 0 is transparent.
 shape.circle = function() end
 --- Draw a filled triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3) and color.
---- @overload fun(x1: any, y1: any, x2: any, y2: any, x3: any, y3: any, color: any): any -- Draw a filled triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).
+--- @overload fun(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, color: number): any -- Draw a filled triangle. Color is a palette index (1 to N). WARNING: 0 is transparent.
 shape.trianglef = function() end
---- Draw a triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3) and color.
---- @overload fun(x1: any, y1: any, x2: any, y2: any, x3: any, y3: any, color: any): any -- Draw a triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).
+--- Draw a triangle (outline only) using the coordinates of (x1, y1), (x2, y2) and (x3, y3) and color.
+--- @overload fun(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, color: number): any -- Draw a triangle outline. Color is a palette index (1 to N). WARNING: 0 is transparent.
 shape.triangle = function() end
---- Draw a gradient using dithering, only from color c1 to color c2.
---- @overload fun(x: any, y: any, width: any, height: any, color1: any, color2: any, is_horizontal: any): any -- Draw a gradient using dithering, only from color c1 to color c2.
+--- Draw a gradient using dithering, from color1 to color2.
+--- @overload fun(x: number, y: number, width: number, height: number, color1: number, color2: number, is_horizontal: boolean): any -- Draw a gradient. color1 and color2 are palette indices (1 to N). is_horizontal: true for left-to-right, false for top-to-bottom.
 shape.gradient = function() end
 
 

@@ -45,10 +45,27 @@ class TinyToLuaStubKspProcessor(
                 --
                 -- An error, an issue? Please consult https://github.com/minigdx/tiny
                 --
-                -- Colors:
-                --   Color indices start at 1. The index 0 is reserved for transparency.
-                --   Colors are defined in the _tiny.json configuration file.
-                --   The first color in the palette is index 1, the second is index 2, etc.
+                -- COLOR SYSTEM:
+                --   Color 0 = TRANSPARENT. Never use 0 if you want something visible.
+                --   Colors 1..N are defined in the _tiny.json configuration file ("colors" array).
+                --   The first hex color in the array is index 1, the second is index 2, etc.
+                --   Typical palette example (PICO-8 style, 16 colors):
+                --     1 = black, 2 = dark blue, 3 = dark purple, 4 = dark green,
+                --     5 = brown, 6 = dark grey, 7 = light grey, 8 = white,
+                --     9 = red, 10 = orange, 11 = yellow, 12 = green,
+                --     13 = blue, 14 = lavender, 15 = pink, 16 = peach
+                --   Check _tiny.json "colors" array for the actual palette of the current game.
+                --
+                -- DEFAULT COLORS:
+                --   gfx.cls() without arguments clears to the closest color to black (#000000).
+                --   print() without a color argument uses the closest color to white (#FFFFFF).
+                --   To ensure visibility: use a color index DIFFERENT from the cls() color.
+                --   Common safe pattern: gfx.cls(1) then draw with colors >= 2.
+                --
+                -- COMMON MISTAKES:
+                --   WRONG: shape.circlef(10, 10, 10, 0)   -- color 0 is transparent, nothing visible!
+                --   WRONG: gfx.cls(1) then shape.circlef(10, 10, 10, 1) -- same color as background!
+                --   RIGHT: gfx.cls(1) then shape.circlef(10, 10, 10, 8) -- visible: white circle on black
                 """.trimIndent(),
             ) {
                 libs.forEach {
