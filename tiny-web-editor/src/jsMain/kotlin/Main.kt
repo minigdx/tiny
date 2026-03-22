@@ -203,6 +203,7 @@ private fun setupEditorMode(
  */
 fun getCaretPosition(el: Element): Int {
     val selection = window.asDynamic().getSelection() ?: return -1
+    if (selection.rangeCount == 0) return -1
     val range = selection.getRangeAt(0)
     val prefix = range.cloneRange()
     prefix.selectNodeContents(el)

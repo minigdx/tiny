@@ -1,11 +1,13 @@
 import com.github.minigdx.tiny.file.SourceStream
 import kotlinx.browser.document
-import kotlinx.browser.window
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.get
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.js.Date
 
+@OptIn(ExperimentalEncodingApi::class)
 class EditorStream(field: String) : SourceStream<ByteArray> {
     private val exist: Boolean
     private var updated: Boolean = false
@@ -40,9 +42,9 @@ class EditorStream(field: String) : SourceStream<ByteArray> {
     }
 
     override suspend fun read(): ByteArray {
-        val value = textarea?.innerText ?: ""
+        val value = textarea?.textContent ?: ""
 
-        share?.href = "editor.html?game=" + window.btoa(value)
+        share?.href = "editor.html?game=" + Base64.encode(value.encodeToByteArray())
 
         return value.encodeToByteArray()
     }
