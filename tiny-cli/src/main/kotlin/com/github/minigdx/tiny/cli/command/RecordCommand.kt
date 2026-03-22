@@ -61,9 +61,12 @@ class RecordCommand : CliktCommand(name = "record") {
 
         val baseOptions = gameParameters.toGameOptions()
         val recordSeconds = (maxFrames / 60f) + 1f
+        // When excluding boot, use unlimited frames initially (0) so the engine
+        // doesn't stop during boot. The real limit is set after boot completes.
+        val engineMaxFrames = if (includeBoot) maxFrames else 0L
         val gameOption = baseOptions.copy(
             headless = headless,
-            maxFrames = maxFrames,
+            maxFrames = engineMaxFrames,
             record = recordSeconds,
         )
 
@@ -75,6 +78,9 @@ class RecordCommand : CliktCommand(name = "record") {
             homeDirectory,
         )
 
+        var engine: GameEngine? = null
+        var bootEnded = false
+
         val gameEngine = GameEngine(
             gameOptions = gameOption,
             platform = platform,
@@ -85,14 +91,19 @@ class RecordCommand : CliktCommand(name = "record") {
                     before: GameScript?,
                     after: GameScript?,
                 ) {
-                    if (!includeBoot) {
-                        platform.clearRecordingCache()
+                    if (!bootEnded) {
+                        bootEnded = true
+                        if (!includeBoot) {
+                            platform.clearRecordingCache()
+                            engine?.resetFrameCounter(maxFrames)
+                        }
                     }
                 }
 
                 override fun reload(gameScript: GameScript?) = Unit
             },
         )
+        engine = gameEngine
 
         echo("Recording ${if (isScreenshot) "screenshot" else "GIF"} ($maxFrames frames)...")
 
