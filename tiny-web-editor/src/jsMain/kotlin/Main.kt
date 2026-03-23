@@ -83,28 +83,69 @@ private fun setupDocMode(
     val spritePath = game.getAttribute("sprite")
     val levelPath = game.getAttribute("level")
 
+    // Check if the fn-card structure already exists (e.g. API page from fn-card.peb).
+    // If not, create the toolbar + static code block + "Try it" button dynamically.
+    val hasFnCard = game.parentElement?.classList?.contains("fn-card__example") == true
+    var codeBlock: Element? = null
+
+    if (!hasFnCard) {
+        val toolbar = document.createElement("div") {
+            setAttribute("class", "tiny-toolbar")
+        }
+        game.after(toolbar)
+
+        toolbar.appendChild(
+            document.createElement("span") {
+                setAttribute("class", "fn-card__filename")
+                textContent = "example.lua"
+            },
+        )
+
+        val tryButton = document.createElement("a") {
+            setAttribute("class", "fn-card__try-btn tiny-button")
+            innerHTML = """<i data-lucide="play"></i> Try it"""
+        }
+        toolbar.appendChild(tryButton)
+
+        codeBlock = document.createElement("div") {
+            setAttribute("class", "fn-card__code")
+            val pre = document.createElement("pre")
+            pre.innerHTML = highlightStatic(code)
+            appendChild(pre)
+        }
+        toolbar.after(codeBlock)
+
+        tryButton.addEventListener("click", {
+            game.dispatchEvent(Event("play"))
+        })
+
+        js("if (typeof lucide !== 'undefined') { lucide.createIcons(); }")
+    }
+
     val container = document.createElement("div").apply {
         setAttribute("class", "tiny-container")
         asDynamic().style.display = "none"
     }
-    game.after(container)
+    (codeBlock ?: game).after(container)
 
     val codeToUse = decodedCode ?: "-- Update the code to update the game!\n$code"
 
     var started = false
-    game.addEventListener("play", {
+
+    fun startGame() {
         if (!started) {
+            codeBlock?.asDynamic()?.style?.display = "none"
             container.asDynamic().style.display = ""
             createGame(container, index, codeToUse, spritePath, levelPath, rootPath)
             started = true
         }
-    })
+    }
+
+    game.addEventListener("play", { startGame() })
 
     // There is a user code. Let's unfold the game.
     if (savedCode != null) {
-        container.asDynamic().style.display = ""
-        createGame(container, index, codeToUse, spritePath, levelPath, rootPath)
-        started = true
+        startGame()
     }
 }
 
@@ -266,6 +307,21 @@ fun setCaret(
         }
     }
     return position
+}
+
+/**
+ * Highlight Lua code for static display (no line wrapping in divs).
+ * Same highlighting rules as [highlight] but suited for a <pre> block.
+ */
+fun highlightStatic(content: String): String {
+    return content
+        .replace(Regex("(\".*?\")"), "<strong class=\"code_string\">$1</strong>")
+        .replace(Regex("--(.*)"), """<em class="code_comment">--$1</em>""")
+        .replace(
+            Regex("\\b(if|else|elif|end|while|for|in|of|continue|break|return|function|local|do)\\b"),
+            """<strong class="code_keyword">$1</strong>""",
+        )
+        .replace(Regex("\\b(\\d+)"), "<em class=\"code_number\">$1</em>")
 }
 
 /**
