@@ -88,7 +88,10 @@ object TtfConverter {
         )
     }
 
-    private fun fitFontToHeight(baseFont: Font, targetHeight: Int): Font {
+    private fun fitFontToHeight(
+        baseFont: Font,
+        targetHeight: Int,
+    ): Font {
         // Start from target height as point size and adjust
         var fontSize = targetHeight.toFloat()
         var font = baseFont.deriveFont(fontSize)
@@ -119,7 +122,10 @@ object TtfConverter {
         return bestFont
     }
 
-    private fun measureCharacters(font: Font, chars: String): CharMetrics {
+    private fun measureCharacters(
+        font: Font,
+        chars: String,
+    ): CharMetrics {
         val image = BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB)
         val g2d = image.createGraphics()
         g2d.font = font

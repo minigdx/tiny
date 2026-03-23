@@ -42,17 +42,26 @@ private fun escapeJson(value: String): String {
 class JsonObject {
     private val entries = mutableListOf<JsonEntry>()
 
-    fun value(name: String, value: String?) {
+    fun value(
+        name: String,
+        value: String?,
+    ) {
         entries.add(JsonValueEntry(name, value))
     }
 
-    fun obj(name: String, block: JsonObject.() -> Unit) {
+    fun obj(
+        name: String,
+        block: JsonObject.() -> Unit,
+    ) {
         val child = JsonObject()
         child.block()
         entries.add(JsonObjectEntry(name, child))
     }
 
-    fun array(name: String, block: JsonArray.() -> Unit) {
+    fun array(
+        name: String,
+        block: JsonArray.() -> Unit,
+    ) {
         val child = JsonArray()
         child.block()
         entries.add(JsonArrayEntry(name, child))

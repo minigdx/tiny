@@ -129,7 +129,7 @@ class AddCommand : CliktCommand(name = "add") {
     ): GameParameters {
         val ttfFile = gameDirectory.resolve(resource)
         val fontName = this.fontName!!.ifEmpty { FontAnalyzer.deriveFontName(resource) }
-        val pngName = "${fontName}.png"
+        val pngName = "$fontName.png"
         val pngFile = gameDirectory.resolve(pngName)
 
         val effectiveChars = chars ?: TtfConverter.DEFAULT_CHARS

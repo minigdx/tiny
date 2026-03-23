@@ -123,7 +123,10 @@ object MusicGenerator {
      * using the shortest path in a circular scale of [scaleSize] notes.
      * Returns 0 if already at root.
      */
-    private fun stepTowardRoot(pos: Int, scaleSize: Int): Int {
+    private fun stepTowardRoot(
+        pos: Int,
+        scaleSize: Int,
+    ): Int {
         if (pos == 0) return 0
         return if (pos <= scaleSize / 2) -1 else 1
     }
