@@ -10,6 +10,7 @@ import com.github.minigdx.tiny.file.InputStreamStream
 import com.github.minigdx.tiny.file.SoundDataSourceStream
 import com.github.minigdx.tiny.file.SourceStream
 import com.github.minigdx.tiny.file.VirtualFileSystem
+import com.github.minigdx.tiny.graphic.PixelArray
 import com.github.minigdx.tiny.graphic.PixelFormat.RGBA
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.InputManager
@@ -19,6 +20,7 @@ import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
+import com.github.minigdx.tiny.render.VirtualFrameBuffer
 import com.github.minigdx.tiny.sound.BITS_PER_SAMPLE
 import com.github.minigdx.tiny.sound.CHANNELS
 import com.github.minigdx.tiny.sound.IS_BIG_ENDIAN
@@ -37,11 +39,11 @@ import kotlinx.coroutines.runBlocking
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.glfw.GLFW.GLFW_CURSOR
 import org.lwjgl.glfw.GLFW.GLFW_CURSOR_HIDDEN
+import org.lwjgl.glfw.GLFWImage
 import org.lwjgl.opengl.GL
 import org.lwjgl.system.MemoryUtil
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.imageio.ImageIO
@@ -61,18 +63,42 @@ class GlfwPlatform(
     private val homeDirectory: File,
     private val jarResourcePrefix: String = "",
 ) : Platform {
+    /**
+     * Resolve [name] relative to [baseDirectory], ensuring the result stays
+     * within [baseDirectory] to prevent path traversal.
+     */
+    private fun safeResolve(
+        baseDirectory: File,
+        name: String,
+    ): File {
+        val resolved = baseDirectory.resolve(name).canonicalFile
+        val root = baseDirectory.canonicalFile
+        require(resolved.path.startsWith(root.path + File.separator) || resolved.path == root.path) {
+            "Path traversal detected: '$name' resolves outside '${root.path}'"
+        }
+        return baseDirectory.resolve(name)
+    }
+
     override val performanceMonitor: PerformanceMonitor = LwjglPerformanceMonitor()
 
     private var window: Long = 0
 
+    private lateinit var windowManager: WindowManager
+
     private var lastFrame: Long = getTime()
 
-    // Keep 30 seconds at 60 frames per seconds
-    private val gifFrameCache: MutableFixedSizeList<IntArray> = MutableFixedSizeList(gameOptions.record.toInt() * FPS)
+    // Keep N seconds at 60 frames per seconds (ByteArray of palette indices per frame)
+    private val gifFrameCache: MutableFixedSizeList<ByteArray> = MutableFixedSizeList(gameOptions.record.toInt() * FPS)
 
-    private var lastDraw: ByteArray? = null
+    private var lastDraw: PixelArray = PixelArray(gameOptions.width, gameOptions.height)
 
     private val lwjglInputHandler = LwjglInput(gameOptions)
+
+    /**
+     * Returns the input handler for remote control injection.
+     * Used by the debug server to inject key events from external programs.
+     */
+    fun remoteInput(): LwjglInput = lwjglInputHandler
 
     private val recordScope = CoroutineScope(Dispatchers.IO)
 
@@ -147,6 +173,8 @@ class GlfwPlatform(
             GLFW.glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN)
         }
 
+        setWindowIcon()
+
         // Make the OpenGL context current
         GLFW.glfwMakeContextCurrent(window)
 
@@ -154,7 +182,9 @@ class GlfwPlatform(
         GLFW.glfwSwapInterval(1)
 
         // Make the window visible
-        GLFW.glfwShowWindow(window)
+        if (!gameOptions.headless) {
+            GLFW.glfwShowWindow(window)
+        }
 
         // Get the size of the device window
         val tmpWidth = MemoryUtil.memAllocInt(1)
@@ -169,12 +199,18 @@ class GlfwPlatform(
 
         GL.createCapabilities(true)
 
-        return WindowManager(
+        windowManager = WindowManager(
             windowWidth = tmpWidth.get(),
             windowHeight = tmpHeight.get(),
             screenWidth = tmpFrameBufferWidth.get(),
             screenHeight = tmpFrameBufferHeight.get(),
         )
+
+        GLFW.glfwSetFramebufferSizeCallback(window) { _, width, height ->
+            windowManager.updateScreenDimensions(width, height)
+        }
+
+        return windowManager
     }
 
     override fun initRenderManager(windowManager: WindowManager): Kgl {
@@ -206,38 +242,45 @@ class GlfwPlatform(
         GLFW.glfwTerminate()
     }
 
-    override fun endGameLoop() = Unit
+    override fun endGameLoop() {
+        GLFW.glfwSetWindowShouldClose(window, true)
+    }
+
+    override fun clearRecordingCache() {
+        gifFrameCache.clear()
+    }
+
+    override fun newFrameRendered(virtualFrameBuffer: VirtualFrameBuffer) {
+        virtualFrameBuffer.readFrameBuffer().copyInto(lastDraw)
+        gifFrameCache.add(lastDraw.pixels.copyOf())
+    }
 
     override fun record() {
         val origin = newFile("video", "gif")
 
-        logger.info("GLWF") { "Starting to generate GIF in '${origin.absolutePath}' (Wait for it...)" }
-        val buffer =
-            mutableListOf<IntArray>().apply {
-                addAll(gifFrameCache)
-            }
+        logger.info("GLFW") { "Starting to generate GIF in '${origin.absolutePath}' (Wait for it...)" }
+        val buffer = mutableListOf<ByteArray>().apply {
+            addAll(gifFrameCache)
+        }
 
         recordScope.launch {
             val now = System.currentTimeMillis()
-            val options =
-                ImageOptions().apply {
-                    this.setDelay(20, TimeUnit.MILLISECONDS)
-                }
-            ByteArrayOutputStream().use { out ->
-                val encoder =
-                    FastGifEncoder(
-                        out,
-                        gameOptions.width,
-                        gameOptions.height,
-                        0,
-                        gameOptions.colors(),
-                    )
+            val options = ImageOptions().apply {
+                this.setDelay(20, TimeUnit.MILLISECONDS)
+            }
+            origin.outputStream().buffered().use { out ->
+                val encoder = FastGifEncoder(
+                    out,
+                    gameOptions.width,
+                    gameOptions.height,
+                    0,
+                    gameOptions.colors(),
+                )
 
-                buffer.forEach { img ->
-                    encoder.addImage(img, gameOptions.width, options)
+                buffer.forEach { frame ->
+                    encoder.addIndexedImage(frame, gameOptions.width, options)
                 }
                 encoder.finishEncoding()
-                vfs.save(FileStream(origin), out.toByteArray())
             }
             logger.info("GLFW") { "Screen recorded in '${origin.absolutePath}' in ${System.currentTimeMillis() - now} ms" }
         }
@@ -263,11 +306,61 @@ class GlfwPlatform(
     }
 
     override fun screenshot() {
-        val buffer = lastDraw ?: return
+        val buffer = lastDraw.pixels.copyOf()
 
         recordScope.launch {
             writeImage(buffer)
         }
+    }
+
+    fun recordSync(outputFile: File) {
+        logger.info("GLFW") { "Starting to generate GIF in '${outputFile.absolutePath}' (Wait for it...)" }
+        val buffer = mutableListOf<ByteArray>().apply {
+            addAll(gifFrameCache)
+        }
+
+        val now = System.currentTimeMillis()
+        val options = ImageOptions().apply {
+            this.setDelay(20, TimeUnit.MILLISECONDS)
+        }
+        outputFile.outputStream().buffered().use { out ->
+            val encoder = FastGifEncoder(
+                out,
+                gameOptions.width,
+                gameOptions.height,
+                0,
+                gameOptions.colors(),
+            )
+
+            buffer.forEach { frame ->
+                encoder.addIndexedImage(frame, gameOptions.width, options)
+            }
+            encoder.finishEncoding()
+        }
+        logger.info("GLFW") { "Screen recorded in '${outputFile.absolutePath}' in ${System.currentTimeMillis() - now} ms" }
+    }
+
+    fun screenshotSync(outputFile: File) {
+        val buffer = lastDraw.pixels.copyOf()
+        val width = gameOptions.width
+        val height = gameOptions.height
+        val image = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
+
+        for (y in 0 until height) {
+            for (x in 0 until width) {
+                val colorData = gameOptions.colors().getRGBA(buffer[x + y * width].toInt())
+
+                val r = colorData[0].toInt() and 0xff
+                val g = colorData[1].toInt() and 0xff
+                val b = colorData[2].toInt() and 0xff
+                val a = colorData[3].toInt() and 0xff
+                val color = (a shl 24) or (r shl 16) or (g shl 8) or b
+                image.setRGB(x, y, color)
+            }
+        }
+
+        ImageIO.write(image, "png", outputFile)
+        logger.info("GLFW") { "Screenshot saved in '${outputFile.absolutePath}'" }
     }
 
     override fun writeImage(buffer: ByteArray) {
@@ -331,7 +424,7 @@ class GlfwPlatform(
         return if (fromJar != null) {
             InputStreamStream(fromJar)
         } else {
-            FileStream(gameDirectory.resolve(name))
+            FileStream(safeResolve(gameDirectory, name))
         }
     }
 
@@ -363,7 +456,7 @@ class GlfwPlatform(
         name: String,
         data: String,
     ) {
-        gameDirectory.resolve(name).outputStream().use {
+        safeResolve(gameDirectory, name).outputStream().use {
             it.write(data.toByteArray())
         }
     }
@@ -417,17 +510,59 @@ class GlfwPlatform(
         if (!homeDirectory.exists()) {
             homeDirectory.mkdirs()
         }
-        val file = homeDirectory.resolve(name)
+        val file = safeResolve(homeDirectory, name)
         file.writeText(content)
     }
 
     override fun getFromHome(name: String): String? {
-        val file = homeDirectory.resolve(name)
+        val file = safeResolve(homeDirectory, name)
         return if (file.exists()) {
             file.readText()
         } else {
             null
         }
+    }
+
+    private fun setWindowIcon() {
+        try {
+            val iconFileName = gameOptions.icon ?: "icon.png"
+            val iconFile = safeResolve(gameDirectory, iconFileName)
+            if (!iconFile.exists()) {
+                logger.info("GLFW") { "No icon file found at '${iconFile.absolutePath}', using default icon." }
+                return
+            }
+            val image = ImageIO.read(iconFile) ?: return
+            val isMac = System.getProperty("os.name").lowercase().contains("mac")
+            if (isMac) {
+                // AWT Taskbar conflicts with GLFW on macOS when using -XstartOnFirstThread.
+                // The dock icon can be set via -Xdock:icon JVM argument in the CLI launcher.
+                logger.info("GLFW") { "Dock icon is set via JVM arguments on macOS." }
+            } else {
+                setGlfwWindowIcon(image)
+            }
+        } catch (e: Exception) {
+            logger.info("GLFW") { "Could not set window icon: ${e.message}" }
+        }
+    }
+
+    private fun setGlfwWindowIcon(image: BufferedImage) {
+        val width = image.width
+        val height = image.height
+        val rgb = image.getRGB(0, 0, width, height, null, 0, width)
+        val buffer = MemoryUtil.memAlloc(width * height * 4)
+        for (pixel in rgb) {
+            buffer.put(((pixel shr 16) and 0xFF).toByte()) // R
+            buffer.put(((pixel shr 8) and 0xFF).toByte()) // G
+            buffer.put((pixel and 0xFF).toByte()) // B
+            buffer.put(((pixel shr 24) and 0xFF).toByte()) // A
+        }
+        buffer.flip()
+
+        val glfwImage = GLFWImage.malloc(1)
+        glfwImage.position(0).width(width).height(height).pixels(buffer)
+        GLFW.glfwSetWindowIcon(window, glfwImage)
+        glfwImage.free()
+        MemoryUtil.memFree(buffer)
     }
 
     companion object {

@@ -18,7 +18,14 @@ interface VirtualSoundBoard {
      */
     fun prepare(track: MusicalSequence.Track): SoundHandler
 
+    /**
+     * Create a sound handler from a pre-computed audio buffer.
+     */
+    fun createHandler(buffer: FloatArray): SoundHandler
+
     fun convert(bar: MusicalBar): FloatArray
+
+    fun convert(sequence: MusicalSequence): FloatArray
 
     fun noteOn(
         note: Note,

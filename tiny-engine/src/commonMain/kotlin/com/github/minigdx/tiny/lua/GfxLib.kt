@@ -24,6 +24,7 @@ import kotlin.math.min
 @TinyLib(
     "gfx",
     "Access to graphical API like updating the color palette or applying a dithering pattern.",
+    icon = "palette",
 )
 class GfxLib(
     private val resourceAccess: GameResourceAccess,
@@ -99,12 +100,17 @@ class GfxLib(
         }
     }
 
-    @TinyFunction("clear the screen", example = GFX_CLS_EXAMPLE)
+    @TinyFunction(
+        "Clear the screen. " +
+            "When called without arguments, clears with the color closest to black (#000000) in the palette. " +
+            "To ensure visibility, always draw with a color index DIFFERENT from the cls() color.",
+        example = GFX_CLS_EXAMPLE,
+    )
     internal inner class cls : OneArgFunction() {
-        @TinyCall("Clear the screen with a default color.")
+        @TinyCall("Clear the screen with the color closest to black (#000000) in the palette.")
         override fun call(): LuaValue = super.call()
 
-        @TinyCall("Clear the screen with a color.")
+        @TinyCall("Clear the screen with the given color index (1 to N). Color 0 clears to transparent.")
         override fun call(
             @TinyArg("color", type = LuaType.NUMBER) arg: LuaValue,
         ): LuaValue {
@@ -190,7 +196,11 @@ class GfxLib(
         }
 
         private fun getIndexAndName(arg: LuaValue): Pair<Int, String> {
-            return if (arg.isstring()) {
+            return if (arg.isint()) {
+                val index = arg.toint()
+                val spriteSheet = resourceAccess.findSpritesheet(index)
+                index to (spriteSheet?.name ?: "frame_buffer_$index")
+            } else if (arg.isstring()) {
                 val name = arg.tojstring()
                 val existing = resourceAccess.findSpritesheet(name)
                 val index = existing?.index ?: resourceAccess.newSpritesheetIndex()
@@ -216,8 +226,8 @@ class GfxLib(
 
         @TinyCall("Replace the color a for the color b.")
         override fun call(
-            a: LuaValue,
-            b: LuaValue,
+            @TinyArg("a", type = LuaType.NUMBER) a: LuaValue,
+            @TinyArg("b", type = LuaType.NUMBER) b: LuaValue,
         ): LuaValue {
             virtualFrameBuffer.swapPalette(a.checkint(), b.checkint())
             return NONE

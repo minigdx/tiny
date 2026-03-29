@@ -1,41 +1,12 @@
-local on_update = function(self, listener)
-    table.insert(self.listeners, listener)
-end
-
-local fire_on_update = function(self, value)
-    for l in all(self.listeners) do
-        l(self, value)
-    end
-end
-
-local set_value = function(self, value)
-    self.value = value
-    if (self.on_change) then
-        self:on_change()
-    end
-    self:fire_on_update(value)
-end
-
-
-
-
-
+local utils = require("widgets.utils")
+local icons = require("widgets.icons")
 
 
 
 local factory = { }
 
-function inside_widget(w, x, y, offset)
-    local off = 0
-    if (offset) then
-        off = offset
-    end
-
-    return w.x - off <= x and
-            x <= w.x + w.width + off and
-            w.y - off <= y and
-            y <= w.y + w.height + off
-end
+-- Expose inside_widget as global for widgets that depend on it (e.g., ModeSwitch)
+inside_widget = utils.inside_widget
 
 
 
@@ -61,22 +32,19 @@ end
 
 
 
-local ModeSwitch = require("widgets.ModeSwitch")
 local Envelop = require("widgets.Envelop")
 local Knob = require("widgets.Knob")
 local Checkbox = require("widgets.Checkbox")
 local Fader = require("widgets.Fader")
-local MenuItemModule = require("widgets.MenuItem")
-local MenuItem = MenuItemModule.MenuItem
-local menuItems = MenuItemModule.menuItems
 local Keyboard = require("widgets.Keyboard")
-local Help = require("widgets.Help")
 local Button = require("widgets.Button")
-
-factory.create_mode_switch_component = function(self, value)
-    local result = new(ModeSwitch, value)
-    return result
-end
+local Dropdown = require("widgets.Dropdown")
+local Modal = require("widgets.Modal")
+local TextInput = require("widgets.TextInput")
+local Panel = require("widgets.Panel")
+local TextButton = require("widgets.TextButton")
+local Speaker = require("widgets.Speaker")
+local Counter = require("widgets.Counter")
 
 factory.create_envelop = function(self, data)
     local result = new(Envelop, data)
@@ -107,24 +75,30 @@ factory.create_fader = function(self, value)
     local result = new(Fader, value)
     result.help = result.fields.Help
     result.label = result.fields.Label
-    result.hitbox = {
-        x = result.x,
-        y = result.y,
-        width = result.width,
-        height = result.height + 4
-    }
     return result
 end
 
 factory.create_button = function(self, value)
     local result = new(Button, value)
     result.help = result.fields.Help
+    if result.fields.IconName then
+        result.overlay = icons[result.fields.IconName]
+    end
     return result
 end
 
-factory.create_help = function(self, data)
-    local help = new(Help, data)
-    return help
+factory.create_dropdown = function(self, value)
+    local result = new(Dropdown, value)
+    result.options = result.fields.Options or {}
+    result.help = result.fields.Help
+    result:_init()
+    return result
+end
+
+factory.create_modal = function(self, data)
+    local result = new(Modal, data)
+    result:_init(self)
+    return result
 end
 
 factory.create_keyboard = function(self, data)
@@ -132,34 +106,44 @@ factory.create_keyboard = function(self, data)
     return keyboard
 end
 
-factory.create_menu_item = function(self, data)
-    local menu = new(MenuItem, data)
-
-    local item = data.fields.Item
-    if item == "Wave" then
-        menu.spr = 14
-        menu.hold = true
-    elseif item == "Fx" then
-        menu.spr = 15
-        menu.hold = true
-    elseif item == "Music" then
-        menu.spr = 16
-        menu.hold = true
-    elseif item == "Save" then
-        menu.spr = 17
-    elseif item == "Prev" then
-        menu.spr = 21
-    elseif item == "Next" then
-        menu.spr = 22
-    elseif item == "NewFile" then
-        menu.spr = 13
-    end
-    menu.item = item
-    menu.help = data.fields.Help
-
-    table.insert(menuItems, menu)
-    return menu
+factory.create_text_input = function(self, data)
+    local result = new(TextInput, data)
+    result.help = result.fields.Help
+    result.label = result.fields.Label
+    result:_init()
+    return result
 end
+
+factory.create_panel = function(self, value)
+    local result = new(Panel, value)
+    result.label = result.fields.Label
+    result.variant = utils.variant_mapping[result.fields.Variant] or 0
+    return result
+end
+
+factory.create_text_button = function(self, value)
+    local result = new(TextButton, value)
+    result.label = result.fields.Label or ""
+    result.is_active = result.fields.IsActive or false
+    result.variant = utils.variant_mapping[result.fields.Variant] or 0
+    if result.fields.TinyExit then
+        result.on_change = function(self)
+            tiny.exit(self.fields.TinyExit)
+        end
+    end
+    return result
+end
+
+factory.create_speaker = function(self, value)
+    local result = new(Speaker, value)
+    return result
+end
+
+factory.create_counter = function(self, data)
+    local result = new(Counter, data)
+    return result
+end
+
 
 factory._draw = function(self)
     for w in all(self.widgets) do

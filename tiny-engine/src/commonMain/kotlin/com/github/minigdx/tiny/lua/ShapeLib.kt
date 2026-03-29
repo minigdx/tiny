@@ -59,10 +59,11 @@ private class Shape(private val gameOptions: GameOptions) {
     }
 
     private fun LuaValue.checkColorIndex(): Int {
+        val colors = gameOptions.colors()
         return if (this.isnumber()) {
-            this.checkint()
+            colors.check(this.checkint())
         } else {
-            gameOptions.colors().getColorIndex(this.checkjstring()!!)
+            colors.getColorIndex(this.checkjstring()!!)
         }
     }
 }
@@ -72,6 +73,7 @@ private class Shape(private val gameOptions: GameOptions) {
     "Shape API to draw...shapes. " +
         "Those shapes can be circle, rectangle, line or oval." +
         "All shapes can be draw filed or not filed.",
+    icon = "pentagon",
 )
 class ShapeLib(
     private val gameOptions: GameOptions,
@@ -123,15 +125,15 @@ class ShapeLib(
 
         @TinyCall("Draw a rectangle.")
         override fun call(
-            @TinyArg("rect", "A rectangle {x, y, width, height, color}") a: LuaValue,
+            @TinyArg("rect", "A rectangle {x, y, width, height, color}", type = LuaType.TABLE) a: LuaValue,
         ): LuaValue {
             return super.call(a)
         }
 
         @TinyCall("Draw a rectangle using a rectangle and a color.")
         override fun call(
-            @TinyArg("rect", "A rectangle {x, y, width, height}") a: LuaValue,
-            @TinyArg("color") b: LuaValue,
+            @TinyArg("rect", "A rectangle {x, y, width, height}", type = LuaType.TABLE) a: LuaValue,
+            @TinyArg("color", type = LuaType.NUMBER) b: LuaValue,
         ): LuaValue = super.call(a, b)
     }
 
@@ -154,23 +156,24 @@ class ShapeLib(
 
         @TinyCall("Draw a filled rectangle.")
         override fun call(
-            @TinyArg("rect", "A rectangle {x, y, width, height, color}") a: LuaValue,
+            @TinyArg("rect", "A rectangle {x, y, width, height, color}", type = LuaType.TABLE) a: LuaValue,
         ): LuaValue {
             return super.call(a)
         }
 
         @TinyCall("Draw a filled rectangle using a rectangle and a color.")
         override fun call(
-            @TinyArg("rect", "A rectangle {x, y, width, height}") a: LuaValue,
-            @TinyArg("color") b: LuaValue,
+            @TinyArg("rect", "A rectangle {x, y, width, height}", type = LuaType.TABLE) a: LuaValue,
+            @TinyArg("color", type = LuaType.NUMBER) b: LuaValue,
         ): LuaValue = super.call(a, b)
     }
 
     private fun LuaValue.checkColorIndex(): Int {
+        val colors = gameOptions.colors()
         return if (this.isnumber()) {
-            this.checkint()
+            colors.check(this.checkint())
         } else {
-            gameOptions.colors().getColorIndex(this.checkjstring()!!)
+            colors.getColorIndex(this.checkjstring()!!)
         }
     }
 
@@ -178,10 +181,10 @@ class ShapeLib(
     internal inner class circlef : LibFunction() {
         @TinyCall("Draw a circle at the coordinate (centerX, centerY) with the radius and the color.")
         override fun call(
-            @TinyArg("centerX") a: LuaValue,
-            @TinyArg("centerY") b: LuaValue,
-            @TinyArg("radius") c: LuaValue,
-            @TinyArg("color") d: LuaValue,
+            @TinyArg("centerX", type = LuaType.NUMBER) a: LuaValue,
+            @TinyArg("centerY", type = LuaType.NUMBER) b: LuaValue,
+            @TinyArg("radius", type = LuaType.NUMBER) c: LuaValue,
+            @TinyArg("color", type = LuaType.NUMBER) d: LuaValue,
         ): LuaValue {
             val centerX = a.checkint()
             val centerY = b.checkint()
@@ -237,10 +240,10 @@ class ShapeLib(
 
         @TinyCall("Draw a line with a default color.")
         override fun call(
-            @TinyArg("x0") a: LuaValue,
-            @TinyArg("y0") b: LuaValue,
-            @TinyArg("x1") c: LuaValue,
-            @TinyArg("y1") d: LuaValue,
+            @TinyArg("x0", type = LuaType.NUMBER) a: LuaValue,
+            @TinyArg("y0", type = LuaType.NUMBER) b: LuaValue,
+            @TinyArg("x1", type = LuaType.NUMBER) c: LuaValue,
+            @TinyArg("y1", type = LuaType.NUMBER) d: LuaValue,
         ): LuaValue {
             val args: Array<LuaValue> = arrayOf(a, b, c, d, valueOf("#FFFFFF"))
             invoke(args)
@@ -252,19 +255,19 @@ class ShapeLib(
     internal inner class circle : LibFunction() {
         @TinyCall("Draw a circle with the default color.")
         override fun call(
-            a: LuaValue,
-            b: LuaValue,
-            c: LuaValue,
+            @TinyArg("a", type = LuaType.NUMBER) a: LuaValue,
+            @TinyArg("b", type = LuaType.NUMBER) b: LuaValue,
+            @TinyArg("c", type = LuaType.NUMBER) c: LuaValue,
         ): LuaValue {
             return call(a, b, c, valueOf("#FFFFFF"))
         }
 
         @TinyCall("Draw a circle.")
         override fun call(
-            @TinyArg("centerX") a: LuaValue,
-            @TinyArg("centerY") b: LuaValue,
-            @TinyArg("radius") c: LuaValue,
-            @TinyArg("color") d: LuaValue,
+            @TinyArg("centerX", type = LuaType.NUMBER) a: LuaValue,
+            @TinyArg("centerY", type = LuaType.NUMBER) b: LuaValue,
+            @TinyArg("radius", type = LuaType.NUMBER) c: LuaValue,
+            @TinyArg("color", type = LuaType.NUMBER) d: LuaValue,
         ): LuaValue {
             val centerX = a.checkint()
             val centerY = b.checkint()
@@ -284,7 +287,10 @@ class ShapeLib(
     inner class trianglef : LibFunction() {
         @TinyCall("Draw a filled triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).")
         override fun invoke(
-            @TinyArgs(["x1", "y1", "x2", "y2", "x3", "y3", "color"]) args: Varargs,
+            @TinyArgs(
+                names = ["x1", "y1", "x2", "y2", "x3", "y3", "color"],
+                types = [LuaType.NUMBER, LuaType.NUMBER, LuaType.NUMBER, LuaType.NUMBER, LuaType.NUMBER, LuaType.NUMBER, LuaType.NUMBER],
+            ) args: Varargs,
         ): Varargs {
             if (args.narg() < 7) throw LuaError("Expected 7 args")
 
@@ -310,7 +316,10 @@ class ShapeLib(
 
         @TinyCall("Draw a triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).")
         override fun invoke(
-            @TinyArgs(["x1", "y1", "x2", "y2", "x3", "y3", "color"]) args: Varargs,
+            @TinyArgs(
+                names = ["x1", "y1", "x2", "y2", "x3", "y3", "color"],
+                types = [LuaType.NUMBER, LuaType.NUMBER, LuaType.NUMBER, LuaType.NUMBER, LuaType.NUMBER, LuaType.NUMBER, LuaType.NUMBER],
+            ) args: Varargs,
         ): Varargs {
             if (args.narg() < 7) throw LuaError("Expected 7 args")
 
@@ -355,7 +364,10 @@ class ShapeLib(
 
         @TinyCall("Draw a gradient using dithering, only from color c1 to color c2.")
         override fun invoke(
-            @TinyArgs(["x", "y", "width", "height", "color1", "color2", "is_horizontal"]) args: Varargs,
+            @TinyArgs(
+                names = ["x", "y", "width", "height", "color1", "color2", "is_horizontal"],
+                types = [LuaType.NUMBER, LuaType.NUMBER, LuaType.NUMBER, LuaType.NUMBER, LuaType.NUMBER, LuaType.NUMBER, LuaType.BOOLEAN],
+            ) args: Varargs,
         ): Varargs {
             if (args.narg() < 6) throw LuaError("Expected 6  args")
 

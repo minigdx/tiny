@@ -1,0 +1,101 @@
+:docinfo: shared
+:icons: font
+:book:
+:source-highlighter: rouge
+:favicon: ./sample/favicon.png
+:stylesheet: adoc-riak.css
+:description: Export and deploy your Tiny game for the web or desktop. Learn to use tiny-cli export, deploy to itch.io, and host on static servers.
+:keywords: tiny export, game export, itch.io deploy, web game, game publishing, tiny game engine, webgl game
+
+= Exporting Your Game for the Web
+
+Once your game is ready, it's time to share it with the world!
+Tiny makes it easy to export your game for the web or desktop so anyone can play it.
+
+== Preview locally
+
+Before exporting, you can preview your game in a browser using the built-in development server:
+
+```bash
+tiny-cli serve --port 8080
+```
+
+This starts a local web server with hot reload. Open `http://localhost:8080` in your browser to play the game. Any changes to your Lua scripts are picked up automatically.
+
+== Export for the web
+
+To create a web-ready archive of your game:
+
+```bash
+tiny-cli export -p web --archive my-game.zip
+```
+
+This produces a ZIP file containing everything needed to run your game in a browser:
+
+- `index.html` -- The HTML page that loads your game.
+- `tiny-engine.js` -- The Tiny engine compiled to JavaScript.
+- Your game scripts and assets (Lua files, spritesheets, sounds, etc.).
+
+The game runs using WebGL 2.0 and works in all modern browsers.
+
+== Export for desktop
+
+To create a desktop build:
+
+```bash
+tiny-cli export -p desktop
+```
+
+This produces a runnable archive that requires Java to be installed on the target machine.
+
+You can bundle a JDK for a self-contained package:
+
+```bash
+tiny-cli export -p desktop --include-jdk
+```
+
+To target a specific platform:
+
+```bash
+tiny-cli export -p desktop --include-jdk --desktop-platform linux
+tiny-cli export -p desktop --include-jdk --desktop-platform macos
+tiny-cli export -p desktop --include-jdk --desktop-platform windows
+```
+
+== Deploy to itch.io
+
+https://itch.io[itch.io] is one of the easiest ways to share your game online. Here's how to deploy your web export:
+
+1. **Export your game** as a ZIP file:
++
+```bash
+tiny-cli export -p web --archive my-game.zip
+```
+
+2. **Create a new project** on itch.io:
+   - Go to https://itch.io/game/new[itch.io/game/new]
+   - Fill in the title and description
+
+3. **Upload the ZIP file**:
+   - In the *Uploads* section, upload `my-game.zip`
+   - Check **"This file will be played in the browser"**
+
+4. **Configure the viewport**:
+   - Set *Viewport dimensions* to match your game resolution (e.g., `516x516`)
+   - Enable *Fullscreen button* for a better experience
+
+5. **Save and publish** -- your game is now live!
+
+== Deploy to any static host
+
+Since the web export is just static files, you can host it anywhere:
+
+- **GitHub Pages**: Push the contents of the ZIP to a `gh-pages` branch.
+- **Netlify / Vercel**: Drop the folder and deploy.
+- **Any web server**: Upload the files to your server's public directory.
+
+No backend is required -- the game runs entirely in the browser.
+
+== What's next?
+
+Learn how to add visual assets to your game with the link:tiny-tutorial-sprites.html[Managing Sprites and Animation] tutorial.

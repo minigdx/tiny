@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation - Tiny Game Engine</title>
+
+    <!-- SEO -->
+    <meta name="description" content="Tiny game engine documentation hub. Tutorials, API reference, CLI commands, and getting started guides.">
+    <meta name="author" content="Tiny Game Engine Contributors">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#ff0080">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Documentation - Tiny Game Engine">
+    <meta property="og:description" content="Tiny game engine documentation hub. Tutorials, API reference, CLI commands, and getting started guides.">
+    <meta property="og:url" content="https://minigdx.github.io/tiny/documentation.html">
+    <meta property="og:image" content="https://minigdx.github.io/tiny/sample/favicon.png">
+    <meta property="og:site_name" content="Tiny Game Engine">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="sample/favicon.png">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Quicksand:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
+    <!-- Shared styles -->
+    <link rel="stylesheet" href="tiny-common.css">
+
+    <style>
+        /* ── Hero header ──────────────────────────────── */
+        .doc-hero {
+            padding: 64px 24px 48px;
+            text-align: center;
+        }
+        .doc-hero__title {
+            font-size: 5rem; line-height: 1; text-transform: uppercase;
+            color: var(--pink);
+            filter: drop-shadow(4px 4px 0 var(--yellow));
+        }
+        .doc-hero__subtitle {
+            font-size: 1.35rem; font-weight: 500; color: #64748b;
+            max-width: 600px; margin: 16px auto 0;
+        }
+
+        /* ── Quick links grid ─────────────────────────── */
+        .quick-links { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+
+        /* ── Tutorial list ────────────────────────────── */
+        .tutorial-card {
+            display: flex; align-items: center; gap: 32px;
+            padding: 32px 40px; border-radius: 2rem;
+            background: #fff; border: 4px solid var(--pink);
+            text-decoration: none;
+            transition: transform .2s, box-shadow .2s;
+        }
+        .tutorial-card:hover { transform: translateY(-4px); }
+        .tutorial-card__icon {
+            flex-shrink: 0;
+            width: 64px; height: 64px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 1rem; background: var(--pink); color: #fff;
+            box-shadow: 4px 4px 0 #000;
+        }
+        .tutorial-card__content { flex: 1; }
+        .tutorial-card__title { font-size: 1.5rem; color: var(--dark); margin-bottom: 8px; }
+        .tutorial-card__desc { color: #64748b; font-weight: 500; line-height: 1.6; }
+        .tutorial-card__arrow {
+            flex-shrink: 0;
+            font-size: 2rem; color: var(--pink);
+            transition: transform .2s;
+        }
+        .tutorial-card:hover .tutorial-card__arrow { transform: translateX(4px); }
+
+        /* ── Function of the day ──────────────────────── */
+        .fn-day {
+            max-width: 700px; margin: 32px auto 0;
+            padding: 32px 40px; border-radius: 2rem;
+            background: #fff; border: 4px solid var(--green);
+            text-align: left;
+        }
+        .fn-day__header {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 12px;
+        }
+        .fn-day__badge {
+            display: inline-block; padding: 4px 14px;
+            border-radius: 999px; font-size: .75rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .1em;
+            background: rgba(162,255,0,.2); color: #5a8c00;
+        }
+        .fn-day__sig {
+            font-family: 'Source Code Pro', monospace;
+            font-size: 1.2rem; font-weight: 700; color: var(--dark);
+        }
+        .fn-day__desc {
+            color: #64748b; font-weight: 500; line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        /* ── Resource links ───────────────────────────── */
+        .resource-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+
+        .resource-link {
+            display: flex; align-items: center; gap: 16px;
+            padding: 20px 28px; border-radius: 1.5rem;
+            background: #fff; border: 3px solid rgba(0,0,0,.08);
+            text-decoration: none;
+            transition: border-color .2s, transform .15s;
+        }
+        .resource-link:hover { border-color: var(--cyan); transform: translateY(-2px); }
+        .resource-link__icon { color: var(--cyan); font-size: 1.5rem; flex-shrink: 0; }
+        .resource-link__text { font-size: 1.05rem; font-weight: 700; color: var(--dark); }
+
+        /* ── Responsive ────────────────────────────────── */
+        @media (max-width: 960px) {
+            .quick-links { grid-template-columns: 1fr 1fr; }
+            .doc-hero__title { font-size: 3.5rem; }
+        }
+        @media (max-width: 600px) {
+            .quick-links { grid-template-columns: 1fr; }
+            .resource-grid { grid-template-columns: 1fr; }
+            .doc-hero__title { font-size: 2.5rem; }
+            .tutorial-card { flex-direction: column; text-align: center; }
+            .tutorial-card__arrow { display: none; }
+            .fn-day { padding: 24px; }
+        }
+    </style>
+</head>
+<body>
+<script src="tiny-nav.js"></script>
+<div class="page">
+
+    <main style="flex:1">
+
+        <!-- ── HERO ─────────────────────────────────── -->
+        <section class="doc-hero">
+            <h1 class="doc-hero__title font-display">Documentation</h1>
+            <p class="doc-hero__subtitle">
+                Everything you need to build games with Tiny. Tutorials, API reference, and CLI commands.
+            </p>
+        </section>
+
+        <!-- ── QUICK LINKS ──────────────────────────── -->
+        <section class="section" style="padding-top: 0;">
+            <div class="container">
+                <div class="quick-links">
+                    <a href="tiny-install.html" class="feature-card shadow-bubble" style="text-decoration:none">
+                        <div class="feature-card__icon feature-card__icon--pink">
+                            <span class="material-symbols-outlined" style="font-size:2.5rem">school</span>
+                        </div>
+                        <h2 class="feature-card__title font-display">Tutorials</h2>
+                        <p class="feature-card__desc">7 step-by-step guides from installation to sound. Learn by building complete games from the ground up.</p>
+                    </a>
+                    <a href="api.html" class="feature-card feature-card--cyan shadow-bubble" style="text-decoration:none">
+                        <div class="feature-card__icon feature-card__icon--cyan">
+                            <span class="material-symbols-outlined" style="font-size:2.5rem">menu_book</span>
+                        </div>
+                        <h2 class="feature-card__title font-display">API Reference</h2>
+                        <p class="feature-card__desc">Complete documentation for every Lua function. Graphics, sprites, sound, input, maps, and more.</p>
+                    </a>
+                    <a href="tiny-cli.html" class="feature-card feature-card--green shadow-bubble" style="text-decoration:none">
+                        <div class="feature-card__icon feature-card__icon--green">
+                            <span class="material-symbols-outlined" style="font-size:2.5rem">terminal</span>
+                        </div>
+                        <h2 class="feature-card__title font-display">CLI Reference</h2>
+                        <p class="feature-card__desc">Command-line tools for creating, running, debugging, and exporting your Tiny games.</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── TUTORIALS ────────────────────────────── -->
+        <section class="section section--white">
+            <div class="container">
+                <div class="section-header center-text">
+                    <span class="section-badge font-display">Learn by Doing</span>
+                    <h2 class="section-title font-display">Tutorials</h2>
+                    <p class="section-desc">Follow along and build complete games step by step.</p>
+                </div>
+                <div id="tutorial-list" style="display: flex; flex-direction: column; gap: 24px;">
+                    <!-- Populated by JS from tutorials.json -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ── API REFERENCE ───────────────────────── -->
+        <section class="section section--green">
+            <div class="container">
+                <div class="section-header center-text">
+                    <span class="section-badge section-badge--green font-display">Look It Up</span>
+                    <h2 class="section-title font-display">API Reference</h2>
+                    <p class="section-desc">Complete documentation for every Lua function: graphics, sprites, sound, input, maps, and more.</p>
+                </div>
+
+                <!-- Function of the day -->
+                <div id="fn-of-the-day" style="display: none;">
+                    <div class="center-text" style="margin-bottom: 16px;">
+                        <span class="section-badge section-badge--green font-display" style="font-size: .75rem;">
+                            <span class="material-symbols-outlined" style="font-size: 1rem; vertical-align: middle;">auto_awesome</span>
+                            Function of the Day
+                        </span>
+                    </div>
+                    <div class="fn-day shadow-bubble" id="fn-day-card">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 32px;">
+                    <a href="api.html" class="button button--green">Explore the API</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── CLI REFERENCE ──────────────────────────── -->
+        <section class="section section--cyan">
+            <div class="container">
+                <div class="section-header center-text">
+                    <span class="section-badge section-badge--cyan font-display">Command Line</span>
+                    <h2 class="section-title font-display">CLI Reference</h2>
+                    <p class="section-desc">All the commands you need to create, run, debug, and export your Tiny games.</p>
+                </div>
+                <div style="text-align: center;">
+                    <a href="tiny-cli.html" class="button button--cyan">Explore the CLI</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── ADDITIONAL RESOURCES ─────────────────── -->
+        <section class="section section--green">
+            <div class="container">
+                <div class="section-header center-text">
+                    <span class="section-badge section-badge--cyan font-display">More Resources</span>
+                    <h2 class="section-title font-display">Explore Further</h2>
+                </div>
+                <div class="resource-grid">
+                    <a href="tiny-install.html" class="resource-link">
+                        <span class="resource-link__icon material-symbols-outlined">download</span>
+                        <span class="resource-link__text">Getting Started &amp; Installation</span>
+                    </a>
+                    <a href="showcase.html" class="resource-link">
+                        <span class="resource-link__icon material-symbols-outlined">grid_view</span>
+                        <span class="resource-link__text">Game Showcase</span>
+                    </a>
+                    <a href="editor.html" class="resource-link">
+                        <span class="resource-link__icon material-symbols-outlined">edit</span>
+                        <span class="resource-link__text">Online Editor</span>
+                    </a>
+                    <a href="https://github.com/minigdx/tiny" class="resource-link">
+                        <span class="resource-link__icon material-symbols-outlined">code</span>
+                        <span class="resource-link__text">GitHub Repository</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ── FOOTER ────────────────────────────────── -->
+    <footer class="footer">
+        <div class="footer__brand">
+            <span class="footer__brand-text font-display">&#129528; Tiny</span>
+        </div>
+        <div class="footer__links">
+            <a class="footer__link" href="https://github.com/minigdx/tiny">GitHub</a>
+            <a class="footer__link" href="documentation.html">Documentation</a>
+            <a class="footer__link" href="editor.html">Editor</a>
+        </div>
+        <p class="footer__copy">&copy; 2026 Tiny Game Engine. Made for creators.</p>
+    </footer>
+
+</div>
+
+<script>
+(function () {
+    // ── Load tutorials from JSON ──
+    var tutorialList = document.getElementById('tutorial-list');
+
+    fetch('tutorials.json')
+        .then(function (res) { return res.json(); })
+        .then(function (tutorials) {
+            tutorials.forEach(function (t) {
+                var card = document.createElement('a');
+                card.href = t.href;
+                card.className = 'tutorial-card shadow-bubble';
+                card.style.textDecoration = 'none';
+                card.innerHTML = [
+                    '<div class="tutorial-card__icon">',
+                    '    <span class="material-symbols-outlined" style="font-size:2.5rem">' + t.icon + '</span>',
+                    '</div>',
+                    '<div class="tutorial-card__content">',
+                    '    <h3 class="tutorial-card__title font-display">' + escapeHtml(t.title) + '</h3>',
+                    '    <p class="tutorial-card__desc">' + escapeHtml(t.description) + '</p>',
+                    '</div>',
+                    '<span class="tutorial-card__arrow material-symbols-outlined">arrow_forward</span>'
+                ].join('\n');
+                tutorialList.appendChild(card);
+            });
+        });
+
+    // ── Load function of the day from document.json ──
+    var fnContainer = document.getElementById('fn-of-the-day');
+    var fnCard = document.getElementById('fn-day-card');
+
+    fetch('document.json')
+        .then(function (res) { return res.json(); })
+        .then(function (funcs) {
+            if (!funcs.length) return;
+
+            // Use the day of the year as a seed for consistent daily pick
+            var now = new Date();
+            var start = new Date(now.getFullYear(), 0, 0);
+            var dayOfYear = Math.floor((now - start) / 86400000);
+            var idx = dayOfYear % funcs.length;
+            var fn = funcs[idx];
+
+            fnCard.innerHTML = [
+                '<div class="fn-day__header">',
+                '    <span class="fn-day__badge">' + fn.library + '</span>',
+                '    <span class="fn-day__sig">' + escapeHtml(fn.signature) + '</span>',
+                '</div>',
+                '<p class="fn-day__desc">' + escapeHtml(fn.description) + '</p>',
+                '<div class="terminal">',
+                '    <div class="terminal__header">',
+                '        <span class="terminal__dot terminal__dot--red"></span>',
+                '        <span class="terminal__dot terminal__dot--yellow"></span>',
+                '        <span class="terminal__dot terminal__dot--green"></span>',
+                '        <span class="terminal__filename">example.lua</span>',
+                '    </div>',
+                '    <div class="terminal__body"><pre>' + escapeHtml(fn.example) + '</pre></div>',
+                '</div>'
+            ].join('\n');
+
+            fnContainer.style.display = 'block';
+        });
+
+    function escapeHtml(str) {
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+})();
+</script>
+</body>
+</html>

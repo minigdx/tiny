@@ -1,30 +1,11 @@
-local on_update = function(self, listener)
-    table.insert(self.listeners, listener)
-end
-
-local fire_on_update = function(self, value)
-    for l in all(self.listeners) do
-        l(self, value)
-    end
-end
-
-local function inside_widget(w, x, y, offset)
-    local off = 0
-    if (offset) then
-        off = offset
-    end
-
-    return w.x - off <= x and
-            x <= w.x + w.width + off and
-            w.y - off <= y and
-            y <= w.y + w.height + off
-end
+local utils = require("widgets.utils")
+local inside_widget = utils.inside_widget
 
 local Button = {
     x = 0,
     y = 0,
-    width = 16,
-    height = 16,
+    width = 13,
+    height = 13,
     enabled = true,
     grouped = true,
     status = 0, -- 0 : idle ; 1 : over ; 2 : active
@@ -32,8 +13,8 @@ local Button = {
     on_active_button = function(current, prec)
     end,
     listeners = {},
-    on_update = on_update,
-    fire_on_update = fire_on_update,
+    on_update = utils.on_update,
+    fire_on_update = utils.fire_on_update,
 }
 
 Button._update = function(self)
@@ -58,16 +39,20 @@ Button._update = function(self)
 end
 
 Button._draw = function(self)
-    local background = 0
+    local prev = spr.sheet(2)
+
+    local sy = 56
     if self.status > 0 then
-        background = 16
+        sy = 72
     end
 
-    spr.sdraw(self.x, self.y, 80 + background, 0, self.width, self.height)
+    spr.sdraw(self.x, self.y, 0, sy, self.width, self.height)
 
     if self.overlay ~= nil then
         spr.sdraw(self.x, self.y, self.overlay.x, self.overlay.y, self.width, self.height)
     end
+
+    spr.sheet(prev)
 end
 
 return Button

@@ -15,13 +15,22 @@ import kotlin.random.Random
  * The oscillator supports various wave types including sine, triangle, square, sawtooth, pulse, and noise.
  * Each wave type produces a different harmonic content and timbre.
  *
- * @param waveType The type of waveform to generate (SINE, TRIANGLE, SQUARE, SAW_TOOTH, PULSE, NOISE)
+ * @param waveType0 The type of waveform to generate (SINE, TRIANGLE, SQUARE, SAW_TOOTH, PULSE, NOISE)
+ * @param dutyCycle0 The duty cycle for the PULSE wave type (0.0 to 1.0, default 0.5)
  */
-class Oscillator(val waveType0: () -> Instrument.WaveType) {
+class Oscillator(
+    val waveType0: () -> Instrument.WaveType,
+    val dutyCycle0: () -> Float = { 0.5f },
+) {
     // State for NOISE wave type - implements a low-pass filter
     private var lastOutput: Float = 0.0f
     private var lastFrequencyUsed: Float = 0.0f
     private var cachedAlpha: Float = 0.0f
+    private val random: Random = Random(42)
+
+    // DC blocker state for NOISE
+    private var dcBlockerPrev: Float = 0f
+    private var dcBlockerOut: Float = 0f
 
     /**
      * Generates a single audio sample value for the given frequency at the specified sample position.
@@ -46,13 +55,10 @@ class Oscillator(val waveType0: () -> Instrument.WaveType) {
             }
 
             Instrument.WaveType.TRIANGLE -> {
-                // Generate proper triangle wave using phase
                 val phase = (frequency * time) % 1.0f
                 if (phase < 0.5f) {
-                    // Rising edge: -1 to 1
                     (4.0f * phase) - 1.0f
                 } else {
-                    // Falling edge: 1 to -1
                     3.0f - (4.0f * phase)
                 }
             }
@@ -63,39 +69,43 @@ class Oscillator(val waveType0: () -> Instrument.WaveType) {
             }
 
             Instrument.WaveType.SAW_TOOTH -> {
-                // Generate proper sawtooth wave using phase instead of sine
                 val phase = (frequency * time) % 1.0f
                 (2.0f * phase) - 1.0f
             }
 
             Instrument.WaveType.PULSE -> {
-                // Generate pulse wave with variable duty cycle
                 val phase = (frequency * time) % 1.0f
-                val dutyCycle = 0.25f // 25% duty cycle
-                if (phase < dutyCycle) 1.0f else -1.0f
+                val dc = dutyCycle0()
+                val raw = if (phase < dc) 1.0f else -1.0f
+                // Remove DC offset for non-50% duty cycles
+                val dcOffset = (2.0f * dc) - 1.0f
+                raw - dcOffset
             }
 
             Instrument.WaveType.NOISE -> {
-                // Filtered noise implementation using a low-pass filter
                 val alpha = if (lastFrequencyUsed == frequency) {
                     cachedAlpha
                 } else {
                     val safeCutoff = max(1f, frequency)
                     val wc = TWO_PI * safeCutoff / SAMPLE_RATE
                     val x = exp(-wc)
-                    // Cache values for performance
                     cachedAlpha = 1.0f - x
                     lastFrequencyUsed = frequency
                     cachedAlpha
                 }
 
-                // Generate white noise using time-based seeding for better randomness
-                val seed = (time * 12345.0f + progress * 67890.0f).toLong()
-                val white = Random(seed).nextFloat() * 2f - 1f
-                val result = alpha * white + (1.0f - alpha) * lastOutput
-                lastOutput = result
-                result
+                val white = random.nextFloat() * 2f - 1f
+                val filtered = alpha * white + (1.0f - alpha) * lastOutput
+                lastOutput = filtered
+
+                // DC blocker (single-pole high-pass, ~20 Hz cutoff)
+                val dcAlpha = 0.997f
+                dcBlockerOut = dcAlpha * (dcBlockerOut + filtered - dcBlockerPrev)
+                dcBlockerPrev = filtered
+                dcBlockerOut
             }
+
+            Instrument.WaveType.DRUM -> DrumSynthesizer.generate(frequency, time, random)
         }
     }
 

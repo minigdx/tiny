@@ -1,0 +1,232 @@
+{% extends "base.peb" %}
+
+{% block title %}Showcase - Tiny Game Engine{% endblock %}
+
+{% block meta %}
+    <!-- SEO -->
+    <meta name="description" content="Explore games built with the Tiny game engine. Get inspired by community creations spanning arcade, puzzle, physics, and more.">
+    <meta name="robots" content="index, follow">
+{% endblock %}
+
+{% block pageStyles %}
+    <style>
+        /* -- Header section */
+        .showcase-header {
+            text-align: center;
+            padding: 64px 24px 32px;
+        }
+        .showcase-header__title {
+            font-size: 4.5rem; text-transform: uppercase; color: var(--dark);
+            filter: drop-shadow(4px 4px 0 var(--green));
+        }
+        .showcase-header__subtitle {
+            font-size: 1.25rem; color: #64748b; font-weight: 500;
+            max-width: 560px; margin: 16px auto 0;
+        }
+        .showcase-header__actions {
+            margin-top: 32px;
+        }
+
+        /* -- Game grid */
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* -- Game card */
+        .game-card {
+            display: flex; flex-direction: column;
+            border-radius: 2.5rem;
+            background: #fff; border: 4px solid var(--cyan);
+            overflow: hidden;
+            transition: transform .2s;
+        }
+        .game-card:hover { transform: translateY(-4px); }
+        .game-card--hidden { display: none; }
+
+        .game-card__image {
+            width: 100%; aspect-ratio: 4 / 3;
+            object-fit: cover;
+            border-bottom: 4px solid var(--cyan);
+        }
+
+        .game-card__body {
+            display: flex; flex-direction: column; gap: 12px;
+            padding: 24px;
+            flex: 1;
+        }
+
+        .game-card__genres {
+            display: flex; flex-wrap: wrap; gap: 8px;
+        }
+
+        .genre-tag {
+            display: inline-block;
+            padding: 4px 14px; border-radius: 999px;
+            font-size: .75rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .08em;
+            background: rgba(0,229,255,.15); color: #0891b2;
+        }
+
+        .game-card__title {
+            font-size: 1.4rem; color: var(--dark);
+        }
+
+        .game-card__actions {
+            margin-top: auto; padding-top: 8px;
+        }
+        .game-card__play {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 24px; border-radius: 2rem;
+            font-family: 'Lilita One', cursive; font-weight: 400;
+            font-size: 1rem; text-transform: uppercase; letter-spacing: 1px;
+            text-decoration: none;
+            background: var(--pink); color: #fff;
+            border: 3px solid var(--dark);
+            box-shadow: 0 4px 0 #d4006b;
+            transition: transform .15s, box-shadow .15s;
+        }
+        .game-card__play:hover { transform: translateY(-2px); }
+        .game-card__play:active { transform: translateY(0); }
+
+        /* -- Load more */
+        .load-more-wrapper {
+            text-align: center;
+            padding: 48px 24px 0;
+        }
+
+        /* -- Responsive */
+        @media (max-width: 960px) {
+            .game-grid { grid-template-columns: repeat(2, 1fr); }
+            .showcase-header__title { font-size: 3rem; }
+        }
+        @media (max-width: 600px) {
+            .game-grid { grid-template-columns: 1fr; }
+            .showcase-header__title { font-size: 2.5rem; }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+        <!-- -- HEADER -->
+        <section class="showcase-header">
+            <h1 class="showcase-header__title font-display">Showcase</h1>
+            <p class="showcase-header__subtitle">
+                Get inspired by what's possible with Tiny! Explore games created by the community.
+            </p>
+            <div class="showcase-header__actions">
+                <a href="https://github.com/minigdx/tiny/discussions/categories/show-and-tell"
+                   target="_blank" rel="noopener"
+                   class="button button--pink">Submit Your Game</a>
+            </div>
+        </section>
+
+        <!-- -- FILTER BAR -->
+        <div class="filter-bar" id="filter-bar">
+            <button class="filter-pill filter-pill--active" data-genre="all">All</button>
+{% for genre in genres %}
+            <button class="filter-pill" data-genre="{{ genre }}">{{ genre | capitalize }}</button>
+{% endfor %}
+        </div>
+
+        <!-- -- GAME GRID -->
+        <div class="game-grid" id="game-grid">
+{% for game in games %}
+{% include "partials/game-card.peb" %}
+{% endfor %}
+        </div>
+
+        <!-- -- LOAD MORE -->
+        <div class="load-more-wrapper" id="load-more-wrapper">
+            <button class="button button--cyan button--small" id="load-more-btn">Load More</button>
+        </div>
+
+        <div style="height: 80px;"></div>
+{% endblock %}
+
+{% block pageScripts %}
+<script>
+(function () {
+    var grid = document.getElementById('game-grid');
+    var filterBar = document.getElementById('filter-bar');
+    var loadMoreBtn = document.getElementById('load-more-btn');
+    var loadMoreWrapper = document.getElementById('load-more-wrapper');
+    var activeGenre = 'all';
+    var batchSize = {{ initialCount }};
+    var visibleCount = batchSize;
+
+    // -- Lazy-load GIFs with IntersectionObserver
+    var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+                var img = entry.target;
+                img.src = img.getAttribute('data-src');
+                img.removeAttribute('data-src');
+                observer.unobserve(img);
+            }
+        });
+    }, { rootMargin: '200px 0px' });
+
+    document.querySelectorAll('.game-card__image[data-src]').forEach(function(img) {
+        observer.observe(img);
+    });
+
+    // -- Filter by genre
+    filterBar.addEventListener('click', function (e) {
+        var pill = e.target.closest('.filter-pill');
+        if (!pill) return;
+
+        activeGenre = pill.getAttribute('data-genre');
+        filterBar.querySelectorAll('.filter-pill').forEach(function (p) {
+            p.classList.remove('filter-pill--active');
+        });
+        pill.classList.add('filter-pill--active');
+
+        visibleCount = batchSize;
+        applyFilter();
+    });
+
+    // -- Load more
+    loadMoreBtn.addEventListener('click', function () {
+        visibleCount += batchSize;
+        applyFilter();
+    });
+
+    function applyFilter() {
+        var cards = grid.querySelectorAll('.game-card');
+        var shown = 0;
+        var totalMatch = 0;
+
+        cards.forEach(function (card) {
+            var genres = card.getAttribute('data-genres');
+            var matchGenre = (activeGenre === 'all' || genres.indexOf(activeGenre) !== -1);
+
+            if (matchGenre) {
+                totalMatch++;
+                if (shown < visibleCount) {
+                    card.classList.remove('game-card--hidden');
+                    shown++;
+                } else {
+                    card.classList.add('game-card--hidden');
+                }
+            } else {
+                card.classList.add('game-card--hidden');
+            }
+        });
+
+        if (shown >= totalMatch) {
+            loadMoreWrapper.style.display = 'none';
+        } else {
+            loadMoreWrapper.style.display = 'block';
+        }
+    }
+
+    // Initial state
+    applyFilter();
+})();
+</script>
+{% endblock %}

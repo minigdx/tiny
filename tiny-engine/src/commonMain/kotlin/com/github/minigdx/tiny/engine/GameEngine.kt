@@ -31,6 +31,8 @@ class GameEngine(
 
     private var accumulator: Seconds = 0f
     private var currentFrame: Long = 0L
+    private var previousFrame: Long = 0L
+    private var effectiveMaxFrames: Long = gameOptions.maxFrames
     private var currentMetrics: PerformanceMetrics? = null
 
     lateinit var inputHandler: InputHandler
@@ -114,6 +116,10 @@ class GameEngine(
             accumulator -= REFRESH_LIMIT
             currentFrame++
 
+            if (effectiveMaxFrames > 0 && currentFrame >= effectiveMaxFrames) {
+                platform.endGameLoop()
+            }
+
             interceptUserShortcup()
             currentMetrics?.run { storeFrameMetrics(this) }
 
@@ -139,6 +145,11 @@ class GameEngine(
 
         // Complete frame monitoring and get metrics
         currentMetrics = performanceMonitor.frameEnd()
+
+        if (currentFrame != previousFrame) {
+            platform.newFrameRendered(virtualFrameBuffer)
+            previousFrame = currentFrame
+        }
     }
 
     private suspend fun advanceEngineScript() {
@@ -294,6 +305,20 @@ class GameEngine(
         // Show frame time if it's high
         if (metrics.frameTime > 16.67) { // Slower than 60 FPS
             popup("Frame: ${metrics.frameTime}ms", "#AAAA00")
+        }
+    }
+
+    /**
+     * Reset the frame counter to 0 and optionally set a new max frames limit.
+     *
+     * Used by the record command to restart counting after the boot animation
+     * so that [maxFrames] counts only game frames.
+     */
+    fun resetFrameCounter(maxFrames: Long? = null) {
+        currentFrame = 0
+        previousFrame = 0
+        if (maxFrames != null) {
+            effectiveMaxFrames = maxFrames
         }
     }
 

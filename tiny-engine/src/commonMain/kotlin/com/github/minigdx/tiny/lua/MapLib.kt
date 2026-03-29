@@ -51,6 +51,7 @@ import kotlin.math.floor
 @TinyLib(
     "map",
     "Access map created with LDTk ( https://ldtk.io/ ).",
+    icon = "map",
 )
 class MapLib(
     private val resourceAccess: GameResourceAccess,

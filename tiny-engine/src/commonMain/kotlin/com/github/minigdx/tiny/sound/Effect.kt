@@ -59,3 +59,30 @@ class Vibrato(
         return frequency + vibrato
     }
 }
+
+/**
+ * Tremolo effect — amplitude modulation using a low-frequency oscillator (LFO).
+ *
+ * Unlike [Modulation] which modulates frequency, tremolo modulates the amplitude
+ * of the signal. Typical LFO rates are 2–10 Hz.
+ *
+ * @param frequency LFO rate in Hz
+ * @param depth Modulation depth: 0.0 = no effect, 1.0 = full tremolo
+ */
+@Serializable
+class Tremolo(
+    var frequency: Frequency = 0f,
+    var depth: Percent = 0f,
+) {
+    var active: Boolean = false
+
+    fun apply(
+        time: Seconds,
+        sample: Float,
+    ): Float {
+        if (!active || depth == 0f) return sample
+        // LFO oscillates between (1-depth) and 1.0
+        val lfo = (1.0f - depth) + depth * ((sin(TWO_PI * frequency * time) + 1.0f) * 0.5f)
+        return sample * lfo
+    }
+}

@@ -7,8 +7,6 @@ import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.sound.Instrument
-import com.github.minigdx.tiny.sound.MusicalBar
-import com.github.minigdx.tiny.sound.MusicalSequence
 import com.github.minigdx.tiny.sound.VirtualSoundBoard
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
@@ -26,6 +24,7 @@ Avoid to start a music or a sound at the beginning of the game.
 Before it, force the player to hit a key or click by adding an interactive menu
 or by starting the sound as soon as the player is moving.
 """,
+    icon = "volume-2",
 )
 class SoundLib(
     private val resourceAccess: GameResourceAccess,
@@ -59,16 +58,20 @@ class SoundLib(
             arg2: LuaValue,
         ): LuaValue {
             val loop = arg2.optboolean(false)
-            val sfx = getSfx(arg1.checkint())
+            val index = arg1.checkint()
 
             val result = WrapperLuaTable()
-            if (playSound && sfx != null) {
-                val handler = soundBoard.prepare(sfx)
+            val sound = resourceAccess.findSound(0)
+            val buffer = sound?.data?.musicalBars?.getOrNull(index)
+            if (playSound && buffer != null) {
+                val handler = soundBoard.createHandler(buffer)
 
                 result.function0("stop") {
                     handler.stop()
                     NONE
                 }
+
+                result.wrap("playing") { valueOf(handler.isPlaying()) }
 
                 if (loop) {
                     handler.loop()
@@ -79,6 +82,7 @@ class SoundLib(
                 result.function0("stop") {
                     NONE
                 }
+                result.wrap("playing") { valueOf(false) }
             }
             return result
         }
@@ -94,14 +98,18 @@ class SoundLib(
             arg2: LuaValue,
         ): LuaValue {
             val loop = arg2.optboolean(false)
-            val music = getMusic(arg1.checkint())
+            val index = arg1.checkint()
             val result = WrapperLuaTable()
-            if (playSound && music != null) {
-                val handler = soundBoard.prepare(music)
+            val sound = resourceAccess.findSound(0)
+            val buffer = sound?.data?.musicalSequences?.getOrNull(index)
+            if (playSound && buffer != null) {
+                val handler = soundBoard.createHandler(buffer)
                 result.function0("stop") {
                     handler.stop()
                     NONE
                 }
+
+                result.wrap("playing") { valueOf(handler.isPlaying()) }
 
                 if (loop) {
                     handler.loop()
@@ -112,6 +120,7 @@ class SoundLib(
                 result.function0("stop") {
                     NONE
                 }
+                result.wrap("playing") { valueOf(false) }
             }
 
             return result
@@ -149,32 +158,6 @@ class SoundLib(
             ?.instruments ?: return null
         return if (index in 0 until instruments.size) {
             instruments[index]
-        } else {
-            null
-        }
-    }
-
-    private fun getSfx(index: Int): MusicalBar? {
-        val sfx = resourceAccess.findSound(0)
-            ?.data
-            ?.music
-            ?.musicalBars ?: return null
-
-        return if (index in 0 until sfx.size) {
-            sfx[index]
-        } else {
-            null
-        }
-    }
-
-    private fun getMusic(index: Int): MusicalSequence? {
-        val music = resourceAccess.findSound(0)
-            ?.data
-            ?.music
-            ?.sequences ?: return null
-
-        return if (index in 0 until music.size) {
-            music[index]
         } else {
             null
         }

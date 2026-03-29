@@ -23,6 +23,11 @@ interface SoundHandler {
     fun stop()
 
     /**
+     * Check if the sound is currently playing.
+     */
+    fun isPlaying(): Boolean
+
+    /**
      * Generate the next chunk.
      */
     fun nextChunk(samples: Int): FloatData

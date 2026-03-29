@@ -1,0 +1,91 @@
+:docinfo: shared
+:icons: font
+:book:
+:source-highlighter: rouge
+:favicon: ./sample/favicon.png
+:stylesheet: adoc-riak.css
+:description: Tiny game engine documentation - installation guide, tutorial, API reference, showcase, and more.
+:keywords: game engine, lua, virtual console, fantasy console, retro games, pixel art, indie game development, kotlin multiplatform, game jam, hot reload
+:author: Tiny Game Engine Contributors
+
+= Tiny Documentation
+
+== Tiny Engine
+
+Tiny is a free, open-source **fantasy console** and **lightweight game engine** for creating retro-style games using **Lua scripting**. Build pixel art games with a 256-color palette, test instantly with hot reload, and export to **desktop and web** platforms. Ideal for **game jams**, rapid prototyping, and learning game development.
+
+Create and test your ideas quickly and effectively. Run your games on your desktop computer and export them for the web, making it easy to share your creations with others. Get started right away and see your progress in real-time, thanks to Tiny's **hot reloading** feature.
+
+++++
+<iframe class="no-resize" title="Breakout example game built with Tiny game engine" loading="lazy" width="516" height="516" src="sample/game-example/index.html"></iframe>
+++++
+
+NOTE: The code source of this sample is available in the https://github.com/minigdx/tiny/tree/main/tiny-samples/breakout[Tiny git repository].
+
+== Tutorials
+
+New to Tiny? Follow these step-by-step guides:
+
+[cols="1,3",options="header"]
+|===
+| Guide | Description
+
+| link:tiny-install.html[1. Getting Started]
+| Install the Tiny CLI, create your first project, and learn the game loop basics.
+
+| link:tiny-tutorial.html[2. Build a Pong Game]
+| Learn the fundamentals by building a classic Pong game. Covers input handling, collision detection, and game state.
+
+| link:tiny-tutorial-export.html[3. Exporting Your Game]
+| Export your game for the web or desktop, and deploy it to itch.io or any static host.
+
+| link:tiny-tutorial-sprites.html[4. Sprites & Animation]
+| Draw spritesheets, animate characters, flip sprites, and manage multiple sheets.
+
+| link:tiny-tutorial-maps.html[5. Maps with LDtk]
+| Build game levels with the LDtk editor. Draw maps, handle entities, and implement tile-based collision.
+
+| link:tiny-fonts.html[6. Custom Fonts]
+| Create bitmap font spritesheets, configure font banks, and give your game a unique look.
+
+| link:tiny-tutorial-sound.html[7. Adding Sound]
+| Design chip-tune sound effects with the SFX editor and play them from your Lua code.
+|===
+
+== Reference
+
+[cols="1,3",options="header"]
+|===
+| Reference | Description
+
+| link:api.html[API Reference]
+| Complete documentation for every Lua function: graphics, sprites, sound, input, maps, and more.
+
+| link:tiny-cli.html[CLI Commands]
+| Command-line tools for creating, running, debugging, and exporting your games.
+|===
+
+== Try It Online
+
+You can try creating a game right away with `Tiny` using link:editor.html?game=[the Editor], or you can browse the link:showcase.html[Showcase] to see what others have built.
+
+== Open Source
+
+`Tiny` is an open-source project. Users can contribute to the project by reporting issues, suggesting improvements, and even submitting code changes. https://github.com/minigdx/tiny[Check the code source on Github].
+
+Contributions from the community are welcome, and can help to improve the overall functionality and usability of the game engine!
+
+A presentation about the technologies used behind Tiny was also given during the conference https://2024.droidkaigi.jp/en/timetable/683368/[DroidKaigi 2024 @ Tokyo]. You can check https://speakerdeck.com/dwursteisen/crafting-cross-platform-adventures-building-a-game-engine-with-kotlin-multiplatform[the slides], or you also https://www.youtube.com/watch?v=4_i_Xp96IMM[watch the session].
+
+image:sample/droidkaigi-tiny-export.gif[DroidKaigi 2024 presentation - Building a game engine with Kotlin Multiplatform,link=https://speakerdeck.com/dwursteisen/crafting-cross-platform-adventures-building-a-game-engine-with-kotlin-multiplatform]
+
+TIP: Want to help make this documentation even better? Feel free to contribute by updating https://github.com/minigdx/tiny/tree/main/tiny-doc/src/docs/asciidoc[the documentation source code]!
+
+== Links
+
+- https://tomhalligan.substack.com/p/tinkering-with-tiny[Tinkering with Tiny]
+- https://tomhalligan.substack.com/p/tiny-gardening[Tiny Gardening]
+- https://github.com/minigdx/tiny[GitHub Repository]
+- https://github.com/minigdx/tiny/releases[Download Latest Release]
+
+include::licences.adoc[]

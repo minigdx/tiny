@@ -34,6 +34,8 @@ class JavaSoundHandler(
         soundManager.removeSoundHandler(this)
     }
 
+    override fun isPlaying(): Boolean = !stop
+
     override fun nextChunk(samples: Int): FloatData {
         val chunk = chunkGenerator.generateChunk(samples)
         if (chunk.size == 0) {

@@ -5,8 +5,8 @@ import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.log.Logger
+import com.github.minigdx.tiny.lua.ConsoleLib
 import com.github.minigdx.tiny.lua.CtrlLib
-import com.github.minigdx.tiny.lua.DebugLib
 import com.github.minigdx.tiny.lua.FloppyLib
 import com.github.minigdx.tiny.lua.GfxLib
 import com.github.minigdx.tiny.lua.JuiceLib
@@ -19,6 +19,7 @@ import com.github.minigdx.tiny.lua.ShapeLib
 import com.github.minigdx.tiny.lua.SoundLib
 import com.github.minigdx.tiny.lua.SprLib
 import com.github.minigdx.tiny.lua.StdLib
+import com.github.minigdx.tiny.lua.TextLib
 import com.github.minigdx.tiny.lua.TinyBaseLib
 import com.github.minigdx.tiny.lua.TinyLib
 import com.github.minigdx.tiny.lua.Vec2Lib
@@ -98,7 +99,7 @@ class GameScript(
             load(SfxLib(resourceAccess, virtualSoundBoard, platform, playSound = !forValidation))
             load(SoundLib(resourceAccess, virtualSoundBoard, playSound = !forValidation))
             load(ShapeLib(gameOptions, virtualFrameBuffer))
-            load(DebugLib(logger))
+            load(ConsoleLib(logger))
             load(KeysLib())
             load(MathLib())
             load(Vec2Lib())
@@ -106,6 +107,7 @@ class GameScript(
             load(sprLib)
             load(JuiceLib())
             load(NotesLib())
+            load(TextLib(gameOptions, resourceAccess, virtualFrameBuffer))
             load(FloppyLib(platform = platform, logger = logger))
 
             LoadState.install(this)

@@ -1,0 +1,191 @@
+:docinfo: shared
+:icons: font
+:book:
+:source-highlighter: rouge
+:favicon: ./sample/favicon.png
+:stylesheet: adoc-riak.css
+:description: Learn how to use sprites and animation in the Tiny game engine. Draw spritesheets, animate characters, flip sprites, and manage multiple sheets.
+:keywords: tiny sprites, sprite animation, spritesheet, pixel art, game sprites, tiny game engine, spr.draw
+
+= Managing Sprites and Animation
+
+Sprites are the visual building blocks of your game.
+In Tiny, sprites are stored in **spritesheets** -- PNG images arranged in a grid of equally-sized cells.
+
+== What are sprites?
+
+A spritesheet is a single PNG image containing multiple small images (sprites) laid out in a grid.
+Each sprite occupies a fixed-size cell, and Tiny numbers them left-to-right, top-to-bottom starting from `0`.
+
+For example, with a 128x128 spritesheet and 16x16 cells:
+
+```
+ 0  1  2  3  4  5  6  7
+ 8  9 10 11 12 13 14 15
+16 17 18 19 20 21 22 23
+...
+```
+
+== Setting up your spritesheet
+
+1. Create a spritesheet PNG using any pixel art editor (Aseprite, Piskel, LibreSprite, etc.).
+2. Add it to your game:
++
+```bash
+tiny-cli add my-sprites.png
+```
+3. The spritesheet is registered in your `_tiny.json` configuration:
++
+```json
+{
+  "sprites": ["my-sprites.png"]
+}
+```
+
+The sprite size is configured in `_tiny.json` under the game settings. The default is `16x16` pixels.
+
+== Drawing sprites
+
+Use `spr.draw()` to draw a sprite at a given position:
+
+```lua
+function _draw()
+    gfx.cls()
+    -- Draw sprite number 0 at position (100, 100)
+    spr.draw(0, 100, 100)
+end
+```
+
+=== Flipping sprites
+
+You can flip a sprite horizontally or vertically:
+
+```lua
+-- Flip horizontally
+spr.draw(0, 100, 100, true, false)
+
+-- Flip vertically
+spr.draw(0, 100, 100, false, true)
+
+-- Flip both
+spr.draw(0, 100, 100, true, true)
+```
+
+This is useful for characters that face left or right -- you only need to draw one direction in the spritesheet.
+
+== Drawing sub-regions
+
+For more control, use `spr.sdraw()` to draw a specific region from the spritesheet:
+
+```lua
+-- spr.sdraw(x, y, sprX, sprY, width, height)
+-- Draw a 32x32 region starting at pixel (0, 0) from the spritesheet
+spr.sdraw(100, 100, 0, 0, 32, 32)
+```
+
+You can also flip sub-regions:
+
+```lua
+-- spr.sdraw(x, y, sprX, sprY, width, height, flipX, flipY)
+spr.sdraw(100, 100, 0, 0, 32, 32, true, false)
+```
+
+== Switching spritesheets
+
+If your game uses multiple spritesheets, switch between them with `spr.sheet()`:
+
+```lua
+-- Switch to the second spritesheet (index 1)
+spr.sheet(1)
+spr.draw(0, 100, 100)
+
+-- Switch back to the first spritesheet (index 0)
+spr.sheet(0)
+spr.draw(0, 50, 50)
+```
+
+Spritesheets are indexed in the order they appear in the `sprites` array of `_tiny.json`.
+
+== Simple animation
+
+You can animate a sprite by cycling through sprite indices using `tiny.frame`:
+
+```lua
+function _init()
+    player_x = 128
+    player_y = 128
+    -- Animation frames: sprite indices to cycle through
+    anim_frames = {0, 1, 2, 3}
+    anim_speed = 8  -- Change frame every 8 game frames
+end
+
+function _update()
+    -- Move player
+    if ctrl.pressing(keys.right) then
+        player_x = player_x + 2
+    end
+    if ctrl.pressing(keys.left) then
+        player_x = player_x - 2
+    end
+end
+
+function _draw()
+    gfx.cls()
+
+    -- Pick the current animation frame
+    local frame_index = math.floor(tiny.frame / anim_speed) % #anim_frames
+    local sprite_n = anim_frames[frame_index + 1]
+
+    spr.draw(sprite_n, player_x, player_y)
+end
+```
+
+The pattern is simple: divide `tiny.frame` by the animation speed, take the modulo of the number of frames, and use the result to index into your animation table.
+
+== Try it out
+
+Use the interactive editor below to experiment with sprites. This example uses the built-in dungeon spritesheet:
+
+++++
+<tiny-editor sprite="resources/tiny-dungeon.png" style="display: none;">
+function _init()
+    x = 120
+    y = 120
+    frame_count = 0
+    -- Sprite indices for animation
+    frames = {0, 1, 2, 3}
+    speed = 10
+    flip = false
+end
+
+function _update()
+    frame_count = frame_count + 1
+
+    if ctrl.pressing(keys.right) then
+        x = x + 1
+        flip = false
+    end
+    if ctrl.pressing(keys.left) then
+        x = x - 1
+        flip = true
+    end
+    if ctrl.pressing(keys.up) then y = y - 1 end
+    if ctrl.pressing(keys.down) then y = y + 1 end
+end
+
+function _draw()
+    gfx.cls()
+
+    -- Draw animated sprite
+    local idx = math.floor(frame_count / speed) % #frames
+    local n = frames[idx + 1]
+    spr.draw(n, x, y, flip, false)
+
+    print("arrows: move", 80, 8, 7)
+end
+</tiny-editor>
+++++
+
+== What's next?
+
+Now that you know how to work with sprites, learn how to build game levels with the link:tiny-tutorial-maps.html[Managing Maps with the LDtk Editor] tutorial.

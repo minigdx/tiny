@@ -6,8 +6,10 @@ import com.github.mingdx.tiny.doc.TinyArgs
 import com.github.mingdx.tiny.doc.TinyCall
 import com.github.mingdx.tiny.doc.TinyFunction
 import com.github.mingdx.tiny.doc.TinyLib
+import com.github.minigdx.tiny.engine.FontDescriptor
 import com.github.minigdx.tiny.engine.GameOptions
 import com.github.minigdx.tiny.engine.GameResourceAccess
+import com.github.minigdx.tiny.engine.renderText
 import com.github.minigdx.tiny.render.VirtualFrameBuffer
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
@@ -16,12 +18,14 @@ import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.VarArgFunction
 
-@TinyLib(description = "Standard library.")
+@TinyLib(description = "Standard library.", icon = "book-open")
 class StdLib(
     val gameOptions: GameOptions,
     val resourceAccess: GameResourceAccess,
     val virtualFrameBuffer: VirtualFrameBuffer,
 ) : TwoArgFunction() {
+    private val bootFontDescriptor by lazy { FontDescriptor.createBootDescriptor() }
+
     override fun call(
         arg1: LuaValue,
         arg2: LuaValue,
@@ -54,12 +58,11 @@ class StdLib(
             @TinyArg("class", type = LuaType.TABLE) arg1: LuaValue,
             @TinyArg("default", type = LuaType.TABLE) arg2: LuaValue,
         ): LuaValue {
-            val default =
-                if (arg2.istable()) {
-                    arg2.checktable()!!.deepCopy()
-                } else {
-                    LuaTable()
-                }
+            val default = if (arg2.istable()) {
+                arg2.checktable()!!.deepCopy()
+            } else {
+                LuaTable()
+            }
             val reference = arg1.checktable()!!.deepCopy()
             default.setmetatable(reference)
             reference.rawset("__index", reference)
@@ -70,13 +73,17 @@ class StdLib(
             val result = LuaTable()
             this.keys().forEach { key ->
                 var value = this[key]
-                value =
-                    if (value.istable()) {
-                        value.checktable()!!.deepCopy()
-                    } else {
-                        value
-                    }
+                value = if (value.istable()) {
+                    value.checktable()!!.deepCopy()
+                } else {
+                    value
+                }
                 result[key] = value
+            }
+            // Preserve the metatable during deep copy
+            val metatable = this.getmetatable()
+            if (metatable != null) {
+                result.setmetatable(metatable)
             }
             return result
         }
@@ -101,7 +108,7 @@ class StdLib(
                     val value = arg1.get(k)
                     arg2[k] = value
                 }
-                return arg2
+                arg2
             } else {
                 NIL
             }
@@ -203,10 +210,15 @@ class StdLib(
         }
     }
 
-    @TinyFunction("Print on the screen a string.", example = STD_PRINT_EXAMPLE)
+    @TinyFunction(
+        "Print on the screen a string. " +
+            "Default color is the closest to white (#FFFFFF) in the palette. " +
+            "To ensure visibility, use a color that contrasts with the cls() background color.",
+        example = STD_PRINT_EXAMPLE,
+    )
     internal inner class print : LibFunction() {
         @TinyCall(
-            description = "print on the screen a string at (0,0) with a default color.",
+            description = "print on the screen a string at (0,0) with the default color (closest to white).",
         )
         override fun call(
             @TinyArg("str", type = LuaType.STRING) a: LuaValue,
@@ -215,7 +227,7 @@ class StdLib(
         }
 
         @TinyCall(
-            description = "print on the screen a string with a default color.",
+            description = "print on the screen a string with the default color (closest to white).",
         )
         override fun call(
             @TinyArg("str", type = LuaType.STRING) a: LuaValue,
@@ -226,13 +238,13 @@ class StdLib(
         }
 
         @TinyCall(
-            description = "print on the screen a string with a specific color.",
+            description = "print on the screen a string with a specific color index (1 to N).",
         )
         override fun call(
             @TinyArg("str", type = LuaType.STRING) a: LuaValue,
             @TinyArg("x", type = LuaType.NUMBER) b: LuaValue,
             @TinyArg("y", type = LuaType.NUMBER) c: LuaValue,
-            @TinyArg("color", type = LuaType.ANY) d: LuaValue,
+            @TinyArg("color", type = LuaType.NUMBER) d: LuaValue,
         ): LuaValue {
             val spritesheet = resourceAccess.bootSpritesheet ?: return NONE
             val str = a.tojstring()
@@ -240,93 +252,18 @@ class StdLib(
             val y = c.checkint()
             val color = d.checkColorIndex()
 
-            val space = 4
-            var currentX = x
-            var currentY = y
-            str.forEach { char ->
-
-                val coord = if (char.isLetter()) {
-                    // The character has an accent. Let's try to get rid of it
-                    val l = if (char.hasAccent) {
-                        ACCENT_MAP[char.lowercaseChar()] ?: char.lowercaseChar()
-                    } else {
-                        char.lowercaseChar()
-                    }
-                    val index = l - 'a'
-                    index to 0
-                } else if (char.isDigit()) {
-                    val index = char.lowercaseChar() - '0'
-                    index to 1
-                } else if (char in '!'..'/') {
-                    val index = char.lowercaseChar() - '!'
-                    index to 2
-                } else if (char in '['..'`') {
-                    val index = char.lowercaseChar() - '['
-                    index to 3
-                } else if (char in '{'..'~') {
-                    val index = char.lowercaseChar() - '{'
-                    index to 4
-                } else if (char in ':'..'@') {
-                    val index = char.lowercaseChar() - ':'
-                    index to 5
-                } else if (char == '\n') {
-                    currentY += 6
-                    currentX = x - space // compensate the next space
-                    null
-                } else {
-                    // Maybe it's an emoji: try EMOJI MAP conversion
-                    EMOJI_MAP[char]
-                }
-                if (coord != null) {
-                    val (indexX, indexY) = coord
-
-                    virtualFrameBuffer.drawMonocolor(
-                        spritesheet,
-                        color,
-                        indexX * 4,
-                        indexY * 4,
-                        4,
-                        4,
-                        currentX,
-                        currentY,
-                        flipX = false,
-                        flipY = false,
-                    )
-                }
-                currentX += space
-            }
+            renderText(bootFontDescriptor, spritesheet, str, x, y, color, virtualFrameBuffer)
 
             return NONE
         }
-
-        val Char.hasAccent: Boolean
-            get() = this.isLetter() && this.lowercaseChar() !in 'a'..'z'
     }
 
     private fun LuaValue.checkColorIndex(): Int {
+        val colors = gameOptions.colors()
         return if (this.isnumber()) {
-            this.checkint()
+            colors.check(this.checkint())
         } else {
-            gameOptions.colors().getColorIndex(this.checkjstring()!!)
+            colors.getColorIndex(this.checkjstring()!!)
         }
-    }
-
-    companion object {
-        val ACCENT_MAP =
-            mapOf(
-                'à' to 'a', 'á' to 'a', 'â' to 'a', 'ã' to 'a', 'ä' to 'a', 'å' to 'a',
-                'ç' to 'c',
-                'è' to 'e', 'é' to 'e', 'ê' to 'e', 'ë' to 'e',
-                'ì' to 'i', 'í' to 'i', 'î' to 'i', 'ï' to 'i',
-                'ñ' to 'n',
-                'ò' to 'o', 'ó' to 'o', 'ô' to 'o', 'õ' to 'o', 'ö' to 'o',
-                'ù' to 'u', 'ú' to 'u', 'û' to 'u', 'ü' to 'u',
-                'ý' to 'y', 'ÿ' to 'y',
-            )
-
-        val EMOJI_MAP =
-            mapOf(
-                '⚠' to (0 to 0),
-            )
     }
 }

@@ -6,11 +6,11 @@ function _draw()
     gfx.cls()
     -- every character is a sprite 4x4 pixels.
     print("hello")
-    print("world", 10, 10)
-    print("how", 10, 20, 4)
-    print("are", 26, 20, 5)
-    print("you", 42, 20, 6)
-    print("...", 58, 20, math.rnd(10))
+    print("world", 10, 8)
+    print("how", 10, 16, 4)
+    print("are", 28, 16, 5)
+    print("you", 46, 16, 6)
+    print("...", 64, 16, math.rnd(10))
 end
 """
 
@@ -65,7 +65,11 @@ function _draw()
     local src = {x = 1, y = 2, z = 3}
     local dst = {a = 4, b = 5}
     local result = merge(src, dst)
-    debug.table(result)
+    local index = 1
+    for k,v in pairs(result) do
+        print(k..":"..v , index * 4 * 8, 8)
+        index = index + 1
+    end
 end
 """
 
@@ -76,6 +80,8 @@ function _draw()
     local src = {1, 2, 3}
     local dst = {4, 5}
     local result = append(src, dst)
-    debug.table(result)
+    for k,v in ipairs(result) do
+        print(v, (k + 1) * 8, 8) 
+    end
 end
 """

@@ -12,6 +12,7 @@ import com.github.minigdx.tiny.resources.ResourceType
 import com.github.minigdx.tiny.resources.ResourceType.BOOT_GAMESCRIPT
 import com.github.minigdx.tiny.resources.ResourceType.BOOT_SPRITESHEET
 import com.github.minigdx.tiny.resources.ResourceType.ENGINE_GAMESCRIPT
+import com.github.minigdx.tiny.resources.ResourceType.FONT_SPRITESHEET
 import com.github.minigdx.tiny.resources.ResourceType.GAME_GAMESCRIPT
 import com.github.minigdx.tiny.resources.ResourceType.GAME_LEVEL
 import com.github.minigdx.tiny.resources.ResourceType.GAME_SOUND
@@ -39,6 +40,7 @@ class GameResourceProcessor(
     private var spriteSheets: Array<SpriteSheet?>
     private val levels: Array<GameLevel?>
     private val sounds: Array<Sound?>
+    private val fontSheets: Array<SpriteSheet?>
 
     override var bootSpritesheet: SpriteSheet? = null
         private set
@@ -88,19 +90,32 @@ class GameResourceProcessor(
             Sound(0, 0, "default-sound", SoundData.DEFAULT_EMPTY)
         }
 
+        val fontSpritesheets = gameOptions.fonts.mapIndexed { index, font ->
+            resourceFactory.fontSpritesheet(index, font.spritesheet)
+        }
+        this.fontSheets = Array(fontSpritesheets.size) { null }
+
+        val bootScriptFlow = if (gameOptions.bootScript != null) {
+            resourceFactory.customBootScript(gameOptions.bootScript)
+        } else {
+            resourceFactory.bootscript("_boot.lua")
+        }
+        val bootScriptName = gameOptions.bootScript ?: "_boot.lua"
+
         resources = listOf(
-            resourceFactory.bootscript("_boot.lua"),
+            bootScriptFlow,
             resourceFactory.enginescript("_engine.lua"),
             resourceFactory.bootSpritesheet("_boot.png"),
-        ) + gameScripts + spriteSheets + gameLevels + listOfNotNull(sounds)
+        ) + gameScripts + spriteSheets + gameLevels + listOfNotNull(sounds) + fontSpritesheets
 
         toBeLoaded.addAll(
-            setOf("_boot.lua", "_engine.lua", "_boot.png"),
+            setOf(bootScriptName, "_engine.lua", "_boot.png"),
         )
         toBeLoaded.addAll(gameOptions.gameLevels)
         toBeLoaded.addAll(gameOptions.gameScripts)
         toBeLoaded.addAll(gameOptions.spriteSheets)
         gameOptions.sound?.let { toBeLoaded.add(it) }
+        toBeLoaded.addAll(gameOptions.fonts.map { it.spritesheet })
 
         numberOfResources = resources.size
         logger.debug("GAME_ENGINE") { "Number of resources to load: $numberOfResources" }
@@ -160,6 +175,7 @@ class GameResourceProcessor(
             GAME_SPRITESHEET -> loadGameSpriteSheet(resource)
             GAME_LEVEL -> loadGameLevel(resource)
             GAME_SOUND -> loadGameSound(resource)
+            FONT_SPRITESHEET -> loadFontSpriteSheet(resource)
             PRIMITIVE_SPRITESHEET -> Unit
         }
     }
@@ -181,6 +197,13 @@ class GameResourceProcessor(
         }
 
         spritesheetToBind.addAll(gameLevel.tilesset.values)
+    }
+
+    private fun loadFontSpriteSheet(resource: GameResource) {
+        val spriteSheet = resource as SpriteSheet
+        spriteSheet.textureUnit = fontSheets[resource.index]?.textureUnit
+        fontSheets[resource.index] = spriteSheet
+        spritesheetToBind.add(spriteSheet)
     }
 
     private fun loadGameSpriteSheet(resource: GameResource) {
@@ -283,6 +306,14 @@ class GameResourceProcessor(
 
     override fun findGameScript(name: String): GameScript? {
         return scripts.find { it?.name == name }
+    }
+
+    override fun findFontSpritesheet(index: Int): SpriteSheet? {
+        return fontSheets.atIndex(index)
+    }
+
+    override fun findFontSpritesheet(name: String): SpriteSheet? {
+        return fontSheets.find { it?.name == name }
     }
 
     fun status(): Map<ResourceType, Collection<GameResource>> {

@@ -27,6 +27,11 @@ class MusicalBar(
      * BPM (Beats Per Minute) of the bar.
      */
     var tempo: BPM = 120,
+    /**
+     * Name of the SFX
+     */
+    var name: String? = "SFX $index",
+    var volume: Percent = 1.0f,
 ) {
     val beats: MutableList<MusicalNote> = mutableListOf()
 

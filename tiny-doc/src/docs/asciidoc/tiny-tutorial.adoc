@@ -1,18 +1,27 @@
-== Tiny Tutorial
+:docinfo: shared
+:icons: font
+:book:
+:source-highlighter: rouge
+:favicon: ./sample/favicon.png
+:stylesheet: adoc-riak.css
+:description: Build your first game with the Tiny game engine. Step-by-step Pong tutorial covering game state, input handling, collision detection, and drawing.
+:keywords: tiny tutorial, pong game, lua game tutorial, game development tutorial, beginner game programming, tiny game engine
 
-This tutorial will guide you through creating your very first game step by step. Don't worry if you're new to game development – we'll take it nice and easy.
+= Build Your First Game: Pong
 
-In this tutorial, we'll be creating a simple Pong game using the Lua programming language and `🧸 Tiny`.
+This tutorial will guide you through creating your very first game step by step. Don't worry if you're new to game development -- we'll take it nice and easy.
+
+In this tutorial, we'll be creating a simple Pong game using the Lua programming language and `Tiny`.
 
 Pong is a classic 2D arcade game where two players control paddles on opposite sides of the screen, and try to hit a ball back and forth without letting it pass their paddle. The game ends when one player misses the ball, and the other player scores a point.
 
-Our implementation of Pong will have a fixed screen size of 256 pixels for width and height, and we'll use the `ctrl.pressing()` function to check for key presses. Check the <<_tiny_api,Tiny API>> to know more about the Tiny Engine API.
+Our implementation of Pong will have a fixed screen size of 256 pixels for width and height, and we'll use the `ctrl.pressing()` function to check for key presses. Check the link:api.html[Tiny API] to know more about the Tiny Engine API.
 
 We'll cover four main steps: initializing the game state with the `_init()` function, updating the game state with the `_update()` function and drawing the game with the `_draw()` function.
 
 By the end of this tutorial, you should have a basic Pong game that you can customize and build upon.
 
-=== Step 1: Initialize the Game State
+== Step 1: Initialize the Game State
 First, we need to initialize the game state. We'll define the position and size of the paddles, the position and size of the ball, and the initial velocity of the ball.
 
 ```lua
@@ -28,7 +37,20 @@ function _init()
 end
 ```
 
-=== Step 2: Update the Game State
+== Step 2: Draw the Game
+In the `_draw()` callback, we'll draw the paddles and the ball using the `shape.rectf()` and `shape.circlef()` functions.
+
+```lua
+function _draw()
+  -- Draw game
+  gfx.cls()
+  shape.rectf(player1_pos.x, player1_pos.y, paddle_width, paddle_height, 7)
+  shape.rectf(player2_pos.x, player2_pos.y, paddle_width, paddle_height, 7)
+  shape.circlef(ball_pos.x, ball_pos.y, ball_radius, 7)
+end
+```
+
+== Step 3: Update the Game State
 In the `_update()` callback, we'll update the game state by moving the paddles and the ball. We'll also check for collisions between the ball and the paddles, and update the ball's velocity accordingly.
 
 ```lua
@@ -74,18 +96,7 @@ function _update()
 end
 ```
 
-=== Step 3: Draw the Game
-In the `_draw()` callback, we'll draw the paddles and the ball using the `shape.rectf()` and `shape.circlef()` functions.
 
-```lua
-function _draw()
-  -- Draw game
-  gfx.cls()
-  shape.rectf(player1_pos.x, player1_pos.y, paddle_width, paddle_height, 7)
-  shape.rectf(player2_pos.x, player2_pos.y, paddle_width, paddle_height, 7)
-  shape.circlef(ball_pos.x, ball_pos.y, ball_radius, 7)
-end
-```
 
 And that's it! With these three steps, you should have a basic Pong game up and running in Lua. Feel free to experiment with the game state, update function, and drawing function to customize the game to your liking.
 
@@ -152,3 +163,7 @@ function _draw()
 end
 </tiny-editor>
 ++++
+
+== What's next?
+
+Ready to share your game with the world? Check out the link:tiny-tutorial-export.html[Exporting Your Game for the Web] tutorial to learn how to publish your creation online.

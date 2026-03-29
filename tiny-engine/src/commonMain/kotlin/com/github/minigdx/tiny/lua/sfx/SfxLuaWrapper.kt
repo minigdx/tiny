@@ -37,6 +37,18 @@ class SfxLuaWrapper(
             { sfx.tempo = it.checkint() },
         )
 
+        wrap(
+            "name",
+            { sfx.name?.let { valueOf(it) } ?: NIL },
+            { sfx.name = it.optjstring(null) },
+        )
+
+        wrap(
+            "volume",
+            { valueOf(sfx.volume.toDouble()) },
+            { sfx.volume = it.todouble().toFloat().coerceIn(0f, 1f) },
+        )
+
         function1("set_volume") { arg ->
             val beat = arg["beat"].todouble().toFloat()
             val volume = arg["volume"].todouble().toFloat()
@@ -101,6 +113,7 @@ class SfxLuaWrapper(
                 handler.stop()
                 NONE
             }
+            result.wrap("playing") { valueOf(handler.isPlaying()) }
             result
         }
 

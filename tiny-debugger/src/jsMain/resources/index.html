@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Tiny Debugger</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23f38ba8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m8 2 1.88 1.88'/%3E%3Cpath d='M14.12 3.88 16 2'/%3E%3Cpath d='M9 7.13v-1a3.003 3.003 0 1 1 6 0v1'/%3E%3Cpath d='M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6'/%3E%3Cpath d='M12 20v-9'/%3E%3Cpath d='M6.53 9C4.6 8.8 3 7.1 3 5'/%3E%3Cpath d='M6 13H2'/%3E%3Cpath d='M3 21c0-2.1 1.7-3.9 3.8-4'/%3E%3Cpath d='M20.97 5c0 2.1-1.6 3.8-3.5 4'/%3E%3Cpath d='M22 13h-4'/%3E%3Cpath d='M17.2 17c2.1.1 3.8 1.9 3.8 4'/%3E%3C/svg%3E"/>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #1e1e2e;
+            --bg-surface: #181825;
+            --bg-overlay: #11111b;
+            --bg-highlight: #313244;
+            --bg-hit: #45475a;
+            --text: #cdd6f4;
+            --text-dim: #6c7086;
+            --text-bright: #f5e0dc;
+            --accent: #f38ba8;
+            --accent2: #a6e3a1;
+            --accent3: #89b4fa;
+            --accent4: #f9e2af;
+            --border: #45475a;
+            --red: #f38ba8;
+            --green: #a6e3a1;
+            --blue: #89b4fa;
+            --yellow: #f9e2af;
+            --comment: #6c7086;
+            --string: #a6e3a1;
+            --keyword: #cba6f7;
+            --number: #fab387;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg-base);
+            color: var(--text);
+            font-family: "Source Code Pro", monospace;
+            font-size: 13px;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .layout {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 200px;
+            min-width: 200px;
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .sidebar-title {
+            padding: 12px 16px;
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .script-item {
+            padding: 8px 16px;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 12px;
+        }
+
+        .script-item:hover {
+            background: var(--bg-highlight);
+        }
+
+        .script-item.active {
+            background: var(--bg-highlight);
+            border-left-color: var(--accent3);
+            color: var(--text-bright);
+        }
+
+        /* Main area */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .toolbar-btn {
+            background: var(--bg-highlight);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 6px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: "Source Code Pro", monospace;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .toolbar-btn:hover {
+            background: var(--bg-hit);
+        }
+
+        .toolbar-btn-danger {
+            color: var(--red);
+        }
+
+        .toolbar-btn-danger:hover {
+            background: rgba(243, 139, 168, 0.15);
+        }
+
+        .toolbar-btn-success {
+            color: var(--green);
+        }
+
+        .toolbar-btn-success:hover {
+            background: rgba(166, 227, 161, 0.15);
+        }
+
+        .toolbar-btn-paused {
+            color: var(--green);
+        }
+
+        .toolbar-btn-paused:hover {
+            background: rgba(166, 227, 161, 0.15);
+        }
+
+        .breakpoint-disabled {
+            color: var(--text-dim);
+            opacity: 0.5;
+        }
+
+        .sidebar-section-title-with-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .sidebar-section-title-with-checkbox input[type="checkbox"] {
+            accent-color: var(--accent3);
+            cursor: pointer;
+        }
+
+        .sidebar-section-title-with-checkbox label {
+            cursor: pointer;
+        }
+
+        /* Editor area */
+        .editor-area {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .gutter {
+            width: 70px;
+            min-width: 70px;
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border);
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .gutter-line {
+            display: flex;
+            align-items: center;
+            height: 20px;
+            padding: 0 4px 0 8px;
+            cursor: pointer;
+            gap: 4px;
+        }
+
+        .gutter-line:hover {
+            background: var(--bg-highlight);
+        }
+
+        .gutter-hit {
+            background: rgba(249, 226, 175, 0.15) !important;
+        }
+
+        .line-number {
+            flex: 1;
+            text-align: right;
+            color: var(--text-dim);
+            font-size: 11px;
+        }
+
+        .breakpoint-marker {
+            color: var(--red);
+            font-size: 12px;
+            width: 16px;
+            text-align: center;
+        }
+
+        .code-area {
+            flex: 1;
+            overflow: auto;
+            padding: 0 16px;
+            background: var(--bg-base);
+        }
+
+        .code-line {
+            height: 20px;
+            line-height: 20px;
+            white-space: pre;
+            min-height: 20px;
+            border-left: 2px solid transparent;
+            padding-left: 14px;
+        }
+
+        .code-line-hit {
+            background: rgba(249, 226, 175, 0.12);
+            border-left-color: var(--yellow);
+        }
+
+        .code-line-bp {
+            background: rgba(243, 139, 168, 0.06);
+        }
+
+        /* Syntax highlighting */
+        .code_comment {
+            color: var(--comment);
+            font-style: italic;
+        }
+
+        .code_keyword {
+            color: var(--keyword);
+            font-weight: 600;
+        }
+
+        .code_string {
+            color: var(--string);
+            font-weight: 400;
+        }
+
+        .code_number {
+            color: var(--number);
+            font-style: normal;
+        }
+
+        /* Variables panel */
+        .variables-panel {
+            height: 200px;
+            min-height: 100px;
+            background: var(--bg-surface);
+            border-top: 1px solid var(--border);
+            overflow-y: auto;
+        }
+
+        .variables-title {
+            padding: 8px 16px;
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            background: var(--bg-surface);
+        }
+
+        .var-section-header {
+            padding: 6px 16px;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--accent3);
+            background: var(--bg-overlay);
+        }
+
+        .var-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .var-table th {
+            text-align: left;
+            padding: 4px 12px;
+            font-size: 11px;
+            color: var(--text-dim);
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-surface);
+            position: sticky;
+        }
+
+        .var-row {
+            cursor: default;
+        }
+
+        .var-row:hover {
+            background: var(--bg-highlight);
+        }
+
+        .var-name {
+            padding: 3px 12px;
+            color: var(--accent4);
+            font-size: 12px;
+        }
+
+        .var-value {
+            padding: 3px 12px;
+            color: var(--text);
+            font-size: 12px;
+        }
+
+        .var-toggle {
+            cursor: pointer;
+            font-size: 10px;
+            color: var(--text-dim);
+        }
+
+        .var-child {
+            background: var(--bg-overlay);
+        }
+
+        .var-empty {
+            padding: 16px;
+            color: var(--text-dim);
+            text-align: center;
+            font-size: 12px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .modal {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+            width: 400px;
+            max-width: 90%;
+        }
+
+        .modal-title {
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: var(--text-bright);
+        }
+
+        .modal-desc {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-bottom: 16px;
+        }
+
+        .modal-textarea {
+            width: 100%;
+            background: var(--bg-base);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 8px;
+            font-family: "Source Code Pro", monospace;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 60px;
+            margin-bottom: 16px;
+        }
+
+        .modal-textarea:focus {
+            outline: none;
+            border-color: var(--accent3);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 6px 16px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            font-family: "Source Code Pro", monospace;
+            font-size: 12px;
+        }
+
+        .modal-btn-cancel {
+            background: var(--bg-highlight);
+            color: var(--text);
+        }
+
+        .modal-btn-clear {
+            background: transparent;
+            color: var(--red);
+            border-color: var(--red);
+        }
+
+        .modal-btn-save {
+            background: var(--accent3);
+            color: var(--bg-base);
+            border-color: var(--accent3);
+            font-weight: 600;
+        }
+
+        .modal-btn:hover {
+            opacity: 0.85;
+        }
+
+        .modal-result {
+            font-family: "Source Code Pro", monospace;
+            font-size: 13px;
+            background: var(--bg-overlay);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 8px;
+            margin-bottom: 16px;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .modal-result-error {
+            color: var(--red);
+            border-color: var(--red);
+        }
+
+        .modal-result-success {
+            color: var(--green);
+            border-color: var(--green);
+        }
+
+        /* Sidebar section title */
+        .sidebar-section-title {
+            padding: 10px 16px 6px;
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            border-top: 1px solid var(--border);
+        }
+
+        /* Breakpoint panel */
+        .bp-master-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .bp-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 16px;
+            font-size: 12px;
+            cursor: default;
+        }
+
+        .bp-row:hover {
+            background: var(--bg-highlight);
+        }
+
+        .bp-row:hover .bp-remove {
+            opacity: 1;
+        }
+
+        .bp-toggle {
+            accent-color: var(--accent3);
+            cursor: pointer;
+        }
+
+        .bp-info {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            cursor: pointer;
+            color: var(--text);
+        }
+
+        .bp-info:hover {
+            color: var(--accent3);
+        }
+
+        .bp-remove {
+            opacity: 0;
+            cursor: pointer;
+            color: var(--red);
+            display: flex;
+            align-items: center;
+            transition: opacity 0.15s;
+        }
+
+        .bp-remove:hover {
+            color: var(--text-bright);
+        }
+
+        .bp-condition-badge {
+            color: var(--yellow);
+            display: flex;
+            align-items: center;
+        }
+
+        .bp-remove-all {
+            margin-left: auto;
+            cursor: pointer;
+            color: var(--red);
+            display: flex;
+            align-items: center;
+            opacity: 0.6;
+            transition: opacity 0.15s;
+        }
+
+        .bp-remove-all:hover {
+            opacity: 1;
+        }
+
+        .bp-empty {
+            padding: 8px 16px;
+            color: var(--text-dim);
+            font-size: 11px;
+        }
+
+        /* Drag handle */
+        .drag-handle {
+            height: 6px;
+            background: var(--bg-surface);
+            border-top: 1px solid var(--border);
+            cursor: ns-resize;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-dim);
+        }
+
+        .drag-handle:hover {
+            background: var(--bg-highlight);
+        }
+
+        /* SVG icon alignment */
+        .toolbar-btn svg,
+        .breakpoint-marker svg,
+        .bp-condition-badge svg,
+        .bp-remove svg,
+        .bp-remove-all svg {
+            vertical-align: middle;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-surface);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-highlight);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--border);
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <div class="sidebar">
+            <div class="sidebar-title">Scripts</div>
+            <div id="script-list"></div>
+            <div class="sidebar-section-title sidebar-section-title-with-checkbox">
+                <input type="checkbox" id="toggle-all-breakpoints" checked/>
+                <label for="toggle-all-breakpoints">Breakpoints</label>
+            </div>
+            <div id="breakpoint-panel"></div>
+        </div>
+        <div class="main">
+            <div id="toolbar" class="toolbar"></div>
+            <div class="editor-area">
+                <div id="gutter" class="gutter"></div>
+                <div id="code" class="code-area"></div>
+            </div>
+            <div id="drag-handle" class="drag-handle"></div>
+            <div id="variables-panel" class="variables-panel">
+                <div class="variables-title">Variables</div>
+                <div id="variables"></div>
+            </div>
+        </div>
+    </div>
+    <div id="modal-overlay" class="modal-overlay"></div>
+    <script type="module" src="./tiny-tiny-debugger.mjs"></script>
+</body>
+</html>

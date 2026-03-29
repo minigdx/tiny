@@ -15,9 +15,10 @@ class AsciidocDocument {
     fun section(
         title: String? = null,
         description: String? = null,
+        icon: String? = null,
         block: AsciidocSection.() -> Unit,
     ) {
-        val section = AsciidocSection(title, description)
+        val section = AsciidocSection(title, description, icon)
         section.block()
         sections.add(section)
     }
@@ -25,7 +26,7 @@ class AsciidocDocument {
     fun generate(): String {
         return buildString {
             if (title != null) {
-                appendLine("== $title")
+                appendLine("= $title")
                 appendLine()
             }
             if (author != null) {
@@ -40,7 +41,7 @@ class AsciidocDocument {
 }
 
 @AsciidocDslMarker
-class AsciidocSection(val title: String?, val description: String?) {
+class AsciidocSection(val title: String?, val description: String?, val icon: String? = null) {
     val childs = mutableListOf<AsciidocLibSection>()
 
     fun lib(
@@ -54,8 +55,15 @@ class AsciidocSection(val title: String?, val description: String?) {
 
     fun generate(): String {
         return buildString {
+            if (!icon.isNullOrBlank()) {
+                appendLine("++++")
+                appendLine("""<div class="lib-icon"><i data-lucide="$icon"></i></div>""")
+                appendLine("++++")
+                appendLine()
+            }
+
             if (title != null) {
-                appendLine("=== $title")
+                appendLine("== $title")
                 appendLine()
             }
 
@@ -132,7 +140,7 @@ class AsciidocLibSection(val title: String?) {
     fun generate(): String {
         return buildString {
             if (title != null) {
-                appendLine("==== $title")
+                appendLine("=== $title")
                 appendLine()
             }
             paragraphs.forEach {

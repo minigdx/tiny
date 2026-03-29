@@ -1,0 +1,9 @@
+<div class="terminal">
+    <div class="terminal__header">
+        <span class="terminal__dot terminal__dot--red"></span>
+        <span class="terminal__dot terminal__dot--yellow"></span>
+        <span class="terminal__dot terminal__dot--green"></span>
+        <span class="terminal__filename">{{ terminalFilename }}</span>
+    </div>
+    <div class="terminal__body"><pre>{{ terminalCode }}</pre></div>
+</div>

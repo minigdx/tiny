@@ -11,6 +11,10 @@ annotation class TinyLib(
      * Description of the Library.
      */
     val description: String = "",
+    /**
+     * Lucide icon name for the library section in documentation.
+     */
+    val icon: String = "",
 )
 
 @Target(AnnotationTarget.CLASS)

@@ -3,7 +3,8 @@ package com.github.minigdx.tiny.sound
 import com.github.minigdx.tiny.input.InputHandler
 import com.github.minigdx.tiny.input.internal.ObjectPool
 import com.github.minigdx.tiny.lua.Note
-import com.github.minigdx.tiny.sound.SoundManager.Companion.MASTER_VOLUME
+import com.github.minigdx.tiny.sound.SoundManager.Companion.DEFAULT_MASTER_VOLUME
+import com.github.minigdx.tiny.sound.SoundManager.Companion.softClip
 import com.github.minigdx.tiny.util.MutableFixedSizeList
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -47,6 +48,7 @@ class StreamingAudioThread(
     private val noteEventPool: NoteEventPool,
 ) : Thread("tiny-streaming-audio-thread") {
     init {
+        isDaemon = true
         priority = MAX_PRIORITY
     }
 
@@ -54,6 +56,13 @@ class StreamingAudioThread(
 
     @Volatile
     private var running = true
+
+    fun shutdown() {
+        running = false
+        if (::line.isInitialized) {
+            line.close()
+        }
+    }
 
     private val instrumentPlayers = MutableFixedSizeList<InstrumentPlayer>(MAX_INSTRUMENTS)
 
@@ -94,7 +103,7 @@ class StreamingAudioThread(
             instrumentPlayers.forEach { instrumentPlayer ->
                 floatData[sample] += instrumentPlayer.generate()
             }
-            floatData[sample] = (floatData[sample] * MASTER_VOLUME).coerceIn(-1f, 1f)
+            floatData[sample] = softClip(floatData[sample] * DEFAULT_MASTER_VOLUME)
 
             val sampleValue = (floatData[sample] * 32767f).toInt().coerceIn(-32768, 32767)
 
@@ -190,8 +199,13 @@ class JavaSoundManager : SoundManager() {
     }
 
     override fun destroy() {
-        soundPort.alive = false
-        mixer.add(JavaSoundHandler(FloatArray(0), mixer, this)) // unlock the sound port
-        mixer.alive = false
+        streamingAudioThread.shutdown()
+        streamingAudioThread.join(1000)
+
+        mixer.shutdown()
+        mixer.join(1000)
+
+        soundPort.shutdown()
+        soundPort.join(1000)
     }
 }

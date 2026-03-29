@@ -1,0 +1,32 @@
+<div class="cmd-card shadow-bubble" data-name="{{ cmd.name | lower }}">
+    <div class="cmd-card__header">
+        <span class="cmd-card__name">{{ cmd.name }}</span>
+    </div>
+    <p class="cmd-card__desc">{{ cmd.description }}</p>
+    <div class="cmd-card__usage">
+        <div class="cmd-card__usage-title">Usage</div>
+        <pre class="cmd-card__usage-code">{{ cmd.usage }}</pre>
+    </div>
+{% if cmd.options is not empty %}
+    <div class="cmd-card__params">
+        <div class="cmd-card__params-title">Options</div>
+{% for opt in cmd.options %}
+        <div class="cmd-card__param">
+            <span class="cmd-card__param-name">{% for name in opt.names %}{{ name }}{% if not loop.last %}, {% endif %}{% endfor %}</span>
+            <span class="cmd-card__param-desc">{{ opt.help }}</span>
+        </div>
+{% endfor %}
+    </div>
+{% endif %}
+{% if cmd.arguments is not empty %}
+    <div class="cmd-card__params">
+        <div class="cmd-card__params-title">Arguments</div>
+{% for arg in cmd.arguments %}
+        <div class="cmd-card__param">
+            <span class="cmd-card__param-name">&lt;{{ arg.name }}&gt;</span>
+            <span class="cmd-card__param-desc">{{ arg.help }}</span>
+        </div>
+{% endfor %}
+    </div>
+{% endif %}
+</div>

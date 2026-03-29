@@ -7,18 +7,40 @@ import javax.sound.sampled.DataLine
 import javax.sound.sampled.SourceDataLine
 
 class SoundPort(var alive: Boolean = true, val queue: BlockingQueue<ByteArray>) : Thread("sound-port") {
+    init {
+        isDaemon = true
+    }
+
+    private lateinit var line: SourceDataLine
+
+    fun shutdown() {
+        alive = false
+        interrupt()
+        if (::line.isInitialized) {
+            line.close()
+        }
+    }
+
     override fun run() {
         val format = AudioFormat(SAMPLE_RATE.toFloat(), BITS_PER_SAMPLE, CHANNELS, IS_SIGNED, IS_BIG_ENDIAN)
         val info = DataLine.Info(SourceDataLine::class.java, format)
 
-        val line = (AudioSystem.getLine(info) as SourceDataLine).apply {
+        line = (AudioSystem.getLine(info) as SourceDataLine).apply {
             open(format)
             start()
         }
 
-        while (alive) {
-            val buffer = queue.take()
-            line.write(buffer, 0, buffer.size)
+        try {
+            while (alive) {
+                val buffer = queue.take()
+                line.write(buffer, 0, buffer.size)
+            }
+        } catch (_: InterruptedException) {
+            // Shutdown requested
+        } finally {
+            if (::line.isInitialized) {
+                line.close()
+            }
         }
     }
 }

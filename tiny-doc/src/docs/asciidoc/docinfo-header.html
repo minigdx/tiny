@@ -1,5 +1,66 @@
+<!-- SEO Meta Tags -->
+<meta name="author" content="Tiny Game Engine Contributors">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#ff0080">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Tiny - Lightweight Lua Game Engine & Virtual Console">
+<meta property="og:description" content="Build retro-style games with Lua scripting. Features hot reload, 256-color palette, desktop and web export. Open source and free.">
+<meta property="og:url" content="https://minigdx.github.io/tiny/">
+<meta property="og:image" content="https://minigdx.github.io/tiny/sample/favicon.png">
+<meta property="og:site_name" content="Tiny Game Engine">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Tiny - Lightweight Lua Game Engine & Virtual Console">
+<meta name="twitter:description" content="Build retro-style games with Lua scripting. Features hot reload, 256-color palette, desktop and web export.">
+<meta name="twitter:image" content="https://minigdx.github.io/tiny/sample/favicon.png">
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Tiny Game Engine",
+  "description": "A lightweight, open-source game engine and virtual console for building retro-style games with Lua scripting.",
+  "url": "https://minigdx.github.io/tiny/",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux, Web",
+  "programmingLanguage": "Lua",
+  "license": "https://github.com/minigdx/tiny/blob/main/LICENSE",
+  "author": {
+    "@type": "Organization",
+    "name": "minigdx",
+    "url": "https://github.com/minigdx"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "downloadUrl": "https://github.com/minigdx/tiny/releases",
+  "softwareVersion": "latest",
+  "screenshot": "https://minigdx.github.io/tiny/sample/camping.gif"
+}
+</script>
+
+<!-- Preconnect for fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+
 <style>
+    /* Syntax highlighting (interactive editor) */
+    .code_keyword { color: #7c3aed; }
+    .code_comment { color: #9ca3af; font-style: italic; }
+    .code_string { color: #16a34a; }
+    .code_number { color: #ea580c; }
+
     /** link to start the game **/
     .tiny-button-right {
         margin-left: auto;
@@ -8,9 +69,10 @@
     .tiny-button {
         display: inline-flex;
         align-items: center;
+        gap: 6px;
         padding: 8px 16px;
 
-        background-color: #007bff;
+        background-color: #ff0080;
         color: white;
         text-align: center;
         text-decoration: none;
@@ -22,33 +84,39 @@
 
         font-family: "Source Code Pro", monospace;
 
-        transition: background-color 0.2s ease-in-out, transform 0.1s ease; /* Transition douce pour les effets */
+        transition: background-color 0.2s ease-in-out, transform 0.1s ease;
 
     }
 
     .tiny-button,
-    .tiny-button:link, /* Pour s'assurer que même non visité, il a le bon style */
-    .tiny-button:visited { /* Pour s'assurer que les liens visités gardent la couleur souhaitée */
-        color: white; /* Couleur du texte pour l'état normal, lien et visité */
-        text-decoration: none; /* Maintenir la suppression du soulignement */
+    .tiny-button:link,
+    .tiny-button:visited {
+        color: white;
+        text-decoration: none;
     }
 
     .tiny-button:hover,
-    .tiny-button:focus { /* :focus pour l'accessibilité clavier */
-        background-color: #0056b3; /* Couleur de fond un peu plus foncée au survol/focus */
-        color: white;              /* Assure que la couleur du texte reste blanche */
-        outline: none;             /* Supprime l'outline par défaut sur :focus si vous le souhaitez,
-                                  mais pour l'accessibilité, il est mieux de le styliser :
-                                  par ex. box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5); */
+    .tiny-button:focus {
+        background-color: #d4006b;
+        color: white;
+        outline: none;
+    }
+
+    .tiny-button svg {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
     }
 
     .tiny-toolbar {
         width: calc(100%);
         min-height: 48px;
-        padding: 4px;
-        border-radius: 8px;
-        border: 1px solid #9EC6DF;
-        margin-bottom: 2px;
+        padding: 4px 12px;
+        border-radius: 10px 10px 0 0;
+        background: #eef0f2;
+        border: 1px solid #e0e0e0;
+        border-bottom: none;
+        margin-bottom: 0;
         display: flex;
         align-items: center;
     }
@@ -57,11 +125,16 @@
     .tiny-container {
         display: flex;
         width: calc(100%);
+        border: 1px solid #e0e0e0;
+        border-radius: 0 0 10px 10px;
+        overflow: hidden;
+        background: #f8f9fa;
     }
 
     /** game **/
     .tiny-canvas {
-        border: 1px solid black;
+        border: none;
+        border-right: 1px solid #e0e0e0;
         cursor: none;
 
         flex: 1 1 auto;
@@ -70,15 +143,25 @@
     }
 
     /** code editor **/
+    .tiny-textarea:focus {
+        outline: none;
+    }
+
     .tiny-textarea {
         flex: 2 1 auto;
         display: block;
         min-height: 512px;
         padding-left: 48px;
-        counter-reset: line; /* reset the "line" counter */
+        padding-top: 12px;
+        padding-bottom: 12px;
+        counter-reset: line;
         width: 100%;
         font-family: "Source Code Pro", monospace;
-        resize:none;
+        font-size: 0.88rem;
+        line-height: 1.7;
+        color: #333;
+        background: #f8f9fa;
+        resize: none;
     }
 
     .tiny-textarea div {
@@ -89,23 +172,12 @@
     }
 
     .tiny-textarea div::before {
-        color: #bababa;
-        content: counter(line);   /* insert a div with the value of the counter */
-        counter-increment: line;  /* increment the counter */
+        color: #c0c0c0;
+        content: counter(line);
+        counter-increment: line;
         position: absolute;
-        right: calc(100% + 16px); /* add some space between this and the code line next to it */
-    }
-
-    .code_comment {
-        color: #979797
-    }
-
-    .code_keyword {
-        color: #3b66db
-    }
-
-    .code_string {
-        color: #128427
+        right: calc(100% + 16px);
+        font-size: 0.8em;
     }
 
     .no-resize {
@@ -113,4 +185,483 @@
         border: none;
         overflow: hidden;
     }
+
+    /* Editor page: wider layout, push below fixed nav */
+    body.tiny-editor-page #content {
+        max-width: 90%;
+        padding-top: 64px;
+    }
+
+    body.tiny-editor-page #header {
+        display: none;
+    }
+
+    /* Editor toolbar (editor page mode) */
+    .tiny-editor-toolbar {
+        width: calc(100%);
+        min-height: 48px;
+        padding: 4px 12px;
+        border-radius: 10px 10px 0 0;
+        background: #eef0f2;
+        border: 1px solid #e0e0e0;
+        border-bottom: none;
+        margin-bottom: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-family: 'Quicksand', sans-serif;
+    }
+
+    .tiny-example-name {
+        flex: 1;
+        color: #555;
+        font-size: 0.9em;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .tiny-examples-select {
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-family: 'Source Code Pro', monospace;
+        font-size: 0.85em;
+        background: white;
+        cursor: pointer;
+    }
+
+    .tiny-examples-select:hover {
+        border-color: #ff0080;
+    }
+
+    /* Share link below editor */
+    .tiny-share-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 8px;
+        padding: 6px 12px;
+        color: #555;
+        font-size: 0.85em;
+        font-family: 'Source Code Pro', monospace;
+        text-decoration: none;
+        transition: color 0.15s ease;
+    }
+
+    .tiny-share-link svg {
+        width: 14px;
+        height: 14px;
+        flex-shrink: 0;
+    }
+
+    .tiny-share-link:hover {
+        color: #ff0080;
+    }
+
+    /* Static code block + "Try it" button (matches API fn-card pattern) */
+    .fn-card__try-btn { margin-left: auto; }
+    .fn-card__filename {
+        color: #888;
+        font-size: .8rem;
+        font-family: 'Source Code Pro', monospace;
+    }
+    .fn-card__code {
+        padding: 20px 24px;
+        background: #f8f9fa;
+        border: 1px solid #e0e0e0;
+        border-top: none;
+        border-radius: 0 0 10px 10px;
+        font-family: 'Source Code Pro', monospace;
+        font-size: .88rem;
+        line-height: 1.7;
+        color: #333;
+    }
+    .fn-card__code pre { margin: 0; white-space: pre-wrap; }
+
+    /* Status bar: reload progress indicator */
+    .tiny-status-bar {
+        width: calc(100%);
+        height: 1px;
+    }
+
+    .tiny-status-bar-progress {
+        height: 100%;
+        width: 100%;
+    }
+
+    .tiny-status-editing {
+        background-color: #e89830;
+    }
+
+    .tiny-status-loaded {
+        background-color: #4caf50;
+    }
+
+    /* === Lucide icons for library sections === */
+    /* Original passthrough divs hidden; JS moves icons inline into headings */
+    .lib-icon {
+        display: none;
+    }
+
+    /* Icons inside library headings (h2) */
+    .sect1 > h2 > svg {
+        width: 20px;
+        height: 20px;
+        margin-right: 8px;
+        vertical-align: -3px;
+        color: #1e293b;
+    }
+
+    /* Icons inside TOC links */
+    #toc a > svg {
+        width: 14px;
+        height: 14px;
+        margin-right: 4px;
+        vertical-align: -2px;
+    }
+
+    /* Library headings (h2) */
+    .sect1 > h2 {
+        font-family: 'Lilita One', cursive;
+        font-weight: 400;
+        letter-spacing: 1px;
+        color: #1e293b;
+    }
+
+    /* Function headings (h3) with blue left border */
+    .sect2 > h3 {
+        border-left: 4px solid #00e5ff;
+        padding-left: 12px;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    /* Spacing between function sections */
+    .sect1 > .sectionbody > .sect2 {
+        margin-top: 2em;
+    }
+
+    /* ── Pebble theme overrides ───────────────────── */
+    /* Match the Pebble-rendered pages (index, showcase, docs, api) */
+
+    body {
+        font-family: 'Quicksand', sans-serif !important;
+        color: #334155 !important;
+        background: #fff5f9 !important;
+        background-image:
+            radial-gradient(circle at 10% 20%, rgba(255,0,128,.05) 0%, transparent 20%),
+            radial-gradient(circle at 90% 80%, rgba(0,229,255,.05) 0%, transparent 20%) !important;
+        -webkit-font-smoothing: antialiased;
+        padding-top: 60px !important;
+        overflow-x: hidden;
+        line-height: 1.6 !important;
+    }
+
+    h1, h2, #toctitle, .sidebarblock > .content > .title {
+        font-family: 'Lilita One', cursive !important;
+        font-weight: 400 !important;
+        color: #1e293b !important;
+    }
+
+    h3, h4, h5, h6 {
+        font-family: 'Quicksand', sans-serif !important;
+        font-weight: 700 !important;
+        color: #1e293b !important;
+    }
+
+    /* Page title */
+    #header > h1 {
+        font-family: 'Lilita One', cursive !important;
+        font-weight: 400 !important;
+        color: #ff0080 !important;
+        border-bottom: 4px solid rgba(0,229,255,.2) !important;
+        padding-bottom: 16px;
+    }
+
+    /* Content area sizing */
+    #header, #content, #footnotes {
+        max-width: 900px;
+        margin: 0 auto;
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+
+    /* Links */
+    a { color: #ff0080 !important; text-decoration: none !important; }
+    a:hover, a:focus { color: #d4006b !important; }
+
+    /* Keep tiny-button links white */
+    .tiny-button,
+    .tiny-button:link,
+    .tiny-button:visited,
+    .tiny-button:hover,
+    .tiny-button:focus { color: white !important; }
+
+    /* Inline code */
+    *:not(pre) > code {
+        font-family: 'Source Code Pro', monospace;
+        font-size: 0.88em;
+        padding: 2px 6px;
+        white-space: nowrap;
+        background-color: rgba(0,229,255,.08);
+        border: 1px solid rgba(0,229,255,.2);
+        border-radius: 6px;
+        color: #1e293b;
+        text-shadow: none;
+    }
+
+    /* Code blocks */
+    pre, pre > code {
+        font-family: 'Source Code Pro', monospace;
+        font-weight: normal;
+        line-height: 1.7;
+        color: #333;
+    }
+
+    .literalblock > .content pre,
+    .listingblock > .content pre {
+        background: #f8f9fa !important;
+        background-image: none !important;
+        border: 1px solid #e0e0e0 !important;
+        border-radius: 10px !important;
+        box-shadow: 0 2px 12px rgba(0,0,0,.06) !important;
+        padding: 20px 24px !important;
+        font-size: 0.88rem !important;
+    }
+
+    .literalblock > .content > pre,
+    .listingblock > .content > pre {
+        box-shadow: 0 2px 12px rgba(0,0,0,.06) !important;
+        border-radius: 10px !important;
+    }
+
+    /* Section separators */
+    .sect1 + .sect1 {
+        border-top: 1px solid rgba(0,0,0,.06);
+    }
+
+    /* Admonition blocks (NOTE, TIP, WARNING...) */
+    .admonitionblock > table {
+        background: #fff !important;
+        background-image: none !important;
+        border: 2px solid #00e5ff !important;
+        border-radius: 16px !important;
+        overflow: hidden;
+    }
+
+    .admonitionblock > table td.content {
+        font-family: 'Quicksand', sans-serif !important;
+        font-style: normal !important;
+        font-size: 0.95em !important;
+        color: #334155 !important;
+        border-left-color: rgba(0,229,255,.2) !important;
+        padding: 16px 20px !important;
+    }
+
+    .admonitionblock > table td.icon {
+        padding: 16px !important;
+    }
+
+    .admonitionblock .literalblock > .content > pre,
+    .admonitionblock .listingblock > .content > pre {
+        background: #f8f9fa !important;
+        background-image: none !important;
+    }
+
+    /* Sidebar blocks */
+    .sidebarblock {
+        background: #fff !important;
+        background-image: none !important;
+        border: 2px solid #a2ff00 !important;
+        border-radius: 16px !important;
+    }
+
+    .sidebarblock > .content > .title {
+        color: #1e293b !important;
+        text-shadow: none !important;
+        font-family: 'Lilita One', cursive !important;
+    }
+
+    .sidebarblock > .content ul,
+    .sidebarblock > .content p {
+        color: #334155 !important;
+        text-shadow: none !important;
+    }
+
+    .sidebarblock > .content .title {
+        color: #1e293b !important;
+    }
+
+    /* Example blocks */
+    .exampleblock > .content {
+        background-color: #fff;
+        border-color: rgba(0,229,255,.3);
+        border-radius: 12px;
+    }
+
+    /* Tables */
+    table {
+        background: #fff;
+        border: 2px solid rgba(0,0,0,.06);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    table thead, table tfoot {
+        background: rgba(0,229,255,.08);
+    }
+
+    table.tableblock.grid-all {
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.04);
+    }
+
+    /* TOC */
+    #toc {
+        border-bottom: 1px solid rgba(0,0,0,.06);
+        padding-bottom: 1.25em;
+    }
+
+    #content #toc {
+        background: #fff;
+        border: 2px solid rgba(0,229,255,.2);
+        border-radius: 16px;
+    }
+
+    #content #toc a {
+        color: #334155;
+    }
+
+    #content #toc a:hover {
+        color: #ff0080;
+    }
+
+    #content #toctitle {
+        font-family: 'Lilita One', cursive;
+        font-weight: 400;
+        color: #1e293b;
+    }
+
+    /* Lists */
+    #content ul > li {
+        list-style-type: disc;
+    }
+
+    /* Images */
+    .imageblock img {
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(0,0,0,.08);
+    }
+
+    /* Hide default AsciiDoc footer, replaced by Pebble-style footer */
+    #footer {
+        display: none !important;
+    }
+
+    #footer-text {
+        display: none !important;
+    }
+
+    /* Pebble-style footer */
+    .tiny-footer {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 32px;
+        padding: 64px 24px;
+        border-top: 4px solid rgba(0,0,0,.05);
+        max-width: 1200px;
+        margin: 0 auto;
+        color: #94a3b8;
+        font-weight: 500;
+        font-family: 'Quicksand', sans-serif;
+    }
+
+    .tiny-footer__brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .tiny-footer__brand-text {
+        font-family: 'Lilita One', cursive;
+        font-weight: 400;
+        font-size: 1.5rem;
+        letter-spacing: 2px;
+        color: #1e293b;
+    }
+
+    .tiny-footer__links {
+        display: flex;
+        gap: 48px;
+    }
+
+    .tiny-footer__link {
+        font-size: .85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        text-decoration: none;
+        color: #94a3b8;
+        transition: color .15s;
+    }
+
+    .tiny-footer__link:hover {
+        color: #ff0080;
+    }
+
+    .tiny-footer__copy {
+        font-size: .85rem;
+        font-weight: 700;
+        opacity: .6;
+    }
+
+    @media (max-width: 600px) {
+        .tiny-footer {
+            flex-direction: column;
+            text-align: center;
+        }
+        .tiny-footer__links {
+            flex-direction: column;
+            gap: 16px;
+        }
+    }
+
+    /* Responsive header */
+    #header > h1 {
+        font-size: 2.5rem;
+    }
+
+    @media (max-width: 600px) {
+        #header > h1 {
+            font-size: 1.8rem;
+        }
+    }
+
+    /* Selection color matching Pebble theme */
+    ::selection {
+        background-color: rgba(255,0,128,.2);
+        color: #1e293b;
+    }
+
+    /* Paragraph styling */
+    p {
+        line-height: 1.7;
+        color: #334155;
+    }
+
+    p aside {
+        font-style: italic;
+    }
+
+    /* Header details (version, author) */
+    #header span {
+        color: #94a3b8;
+        font-size: 0.85em;
+    }
 </style>
+
+<script src="tiny-nav.js"></script>

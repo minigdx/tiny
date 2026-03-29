@@ -3,6 +3,7 @@ package com.github.minigdx.tiny.sound
 import com.github.minigdx.tiny.lua.Note
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class HarmonizerTest {
     @Test
@@ -15,22 +16,33 @@ class HarmonizerTest {
     }
 
     @Test
-    fun generate_with_single_harmonic_applies_amplitude() {
+    fun generate_with_single_harmonic_below_one_no_normalization() {
         val harmonizer = Harmonizer(harmonics0 = { floatArrayOf(0.5f) })
         val generator = { freq: Float, sample: Int -> 2.0f }
 
         val result = harmonizer.generate(Note.A4, 0, generator)
-        // Should be: 0.5 * 2.0 = 1.0
+        // totalAmplitude = 0.5 (< 1.0), so no normalization: 0.5 * 2.0 = 1.0
         assertEquals(1.0f, result, 0.001f)
     }
 
     @Test
-    fun generate_with_multiple_harmonics_sums_contributions() {
+    fun generate_with_multiple_harmonics_summing_to_one_no_normalization() {
         val harmonizer = Harmonizer(harmonics0 = { floatArrayOf(0.5f, 0.3f, 0.2f) })
         val generator = { freq: Float, sample: Int -> 1.0f }
 
         val result = harmonizer.generate(Note.A4, 0, generator)
-        // Should be: (0.5 * 1.0) + (0.3 * 1.0) + (0.2 * 1.0) = 1.0
+        // totalAmplitude = 1.0 (not > 1.0), so no normalization: 0.5 + 0.3 + 0.2 = 1.0
+        assertEquals(1.0f, result, 0.001f)
+    }
+
+    @Test
+    fun generate_normalizes_when_total_amplitude_exceeds_one() {
+        val harmonizer = Harmonizer(harmonics0 = { floatArrayOf(1.0f, 1.0f) })
+        val generator = { freq: Float, sample: Int -> 1.0f }
+
+        val result = harmonizer.generate(Note.A4, 0, generator)
+        // totalAmplitude = 2.0, normFactor = 0.5
+        // raw sum = 1.0 + 1.0 = 2.0, normalized = 2.0 * 0.5 = 1.0
         assertEquals(1.0f, result, 0.001f)
     }
 
@@ -50,10 +62,10 @@ class HarmonizerTest {
         harmonizer.generate(Note.A4, 42, generator)
 
         assertEquals(2, capturedFrequencies.size)
-        assertEquals(fundamentalFreq * 1, capturedFrequencies[0], 0.001f) // 1st harmonic (2x fundamental)
-        assertEquals(fundamentalFreq * 2, capturedFrequencies[1], 0.001f) // 2nd harmonic (3x fundamental)
-        assertEquals(42, capturedSamples[0]) // sample passed to generator
-        assertEquals(42, capturedSamples[1]) // sample passed to generator
+        assertEquals(fundamentalFreq * 1, capturedFrequencies[0], 0.001f) // fundamental (1x)
+        assertEquals(fundamentalFreq * 2, capturedFrequencies[1], 0.001f) // 2nd harmonic (2x)
+        assertEquals(42, capturedSamples[0])
+        assertEquals(42, capturedSamples[1])
     }
 
     @Test
@@ -70,9 +82,9 @@ class HarmonizerTest {
         harmonizer.generate(Note.C0, 0, generator)
 
         assertEquals(3, capturedFrequencies.size)
-        assertEquals(fundamentalFreq * 1, capturedFrequencies[0], 0.001f) // 1st harmonic (1x fundamental)
-        assertEquals(fundamentalFreq * 2, capturedFrequencies[1], 0.001f) // 2nd harmonic (2x fundamental)
-        assertEquals(fundamentalFreq * 3, capturedFrequencies[2], 0.001f) // 3rd harmonic (3x fundamental)
+        assertEquals(fundamentalFreq * 1, capturedFrequencies[0], 0.001f) // fundamental (1x)
+        assertEquals(fundamentalFreq * 2, capturedFrequencies[1], 0.001f) // 2nd harmonic (2x)
+        assertEquals(fundamentalFreq * 3, capturedFrequencies[2], 0.001f) // 3rd harmonic (3x)
     }
 
     @Test
@@ -81,7 +93,7 @@ class HarmonizerTest {
         val generator = { freq: Float, sample: Int -> 2.0f }
 
         val result = harmonizer.generate(Note.C0, 0, generator)
-        // Should be: (0.0 * 2.0) + (1.0 * 2.0) + (0.0 * 2.0) = 2.0
+        // totalAmplitude = 1.0 (not > 1.0), no normalization: (0.0 * 2.0) + (1.0 * 2.0) + (0.0 * 2.0) = 2.0
         assertEquals(2.0f, result, 0.001f)
     }
 
@@ -91,7 +103,7 @@ class HarmonizerTest {
         val generator = { freq: Float, sample: Int -> 1.0f }
 
         val result = harmonizer.generate(Note.C0, 0, generator)
-        // Should be: (0.5 * 1.0) + (-0.3 * 1.0) = 0.2
+        // totalAmplitude = 0.5 + (-0.3) = 0.2 (< 1.0), no normalization: 0.5 - 0.3 = 0.2
         assertEquals(0.2f, result, 0.001f)
     }
 
@@ -128,8 +140,10 @@ class HarmonizerTest {
         }
 
         val result = harmonizer.generate(Note.C0, 0, generator)
-        // Should be: (0.8 * 1) + (0.6 * 2) + (0.4 * 3) = 0.8 + 1.2 + 1.2 = 3.2
-        assertEquals(3.2f, result, 0.001f)
+        // totalAmplitude = 0.8 + 0.6 + 0.4 = 1.8 > 1.0, normFactor = 1/1.8
+        // raw sum = (0.8 * 1) + (0.6 * 2) + (0.4 * 3) = 0.8 + 1.2 + 1.2 = 3.2
+        // normalized = 3.2 / 1.8 ≈ 1.778
+        assertEquals(3.2f / 1.8f, result, 0.01f)
     }
 
     @Test
@@ -139,8 +153,9 @@ class HarmonizerTest {
         val generator = { freq: Float, sample: Int -> 1.0f }
 
         val result = harmonizer.generate(Note.C0, 0, generator)
-        // Should be: 0.1 + 0.2 + 0.3 + ... + 1.0 = sum of 0.1 to 1.0 = 5.5
-        assertEquals(5.5f, result, 0.001f)
+        // totalAmplitude = 0.1 + 0.2 + ... + 1.0 = 5.5 > 1.0, normFactor = 1/5.5
+        // raw sum = 5.5, normalized = 5.5 / 5.5 = 1.0
+        assertEquals(1.0f, result, 0.001f)
     }
 
     @Test
@@ -154,7 +169,20 @@ class HarmonizerTest {
         }
 
         val result = harmonizer.generate(Note.C0, 0, generator)
-        // Should be: (1.0 * 3.14) + (1.0 * 2.71) = 5.85
-        assertEquals(5.85f, result, 0.001f)
+        // totalAmplitude = 2.0 > 1.0, normFactor = 0.5
+        // raw sum = (1.0 * 3.14) + (1.0 * 2.71) = 5.85
+        // normalized = 5.85 * 0.5 = 2.925
+        assertEquals(2.925f, result, 0.001f)
+    }
+
+    @Test
+    fun generate_output_bounded_with_unit_generator() {
+        // When generator returns values in [-1,1] and harmonics sum > 1,
+        // the normalizer should ensure output stays in [-1,1]
+        val harmonizer = Harmonizer(harmonics0 = { floatArrayOf(1.0f, 0.8f, 0.6f, 0.4f) })
+        val generator = { freq: Float, sample: Int -> 1.0f }
+
+        val result = harmonizer.generate(Note.A4, 0, generator)
+        assertTrue(result >= -1.0f && result <= 1.0f, "Normalized output should be bounded, got $result")
     }
 }

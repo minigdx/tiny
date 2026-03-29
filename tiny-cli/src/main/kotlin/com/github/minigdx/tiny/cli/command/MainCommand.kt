@@ -10,13 +10,13 @@ class MainCommand : CliktCommand() {
         subcommands(
             CreateCommand(),
             RunCommand(),
-            DebugCommand(),
             AddCommand(),
             ExportCommand(),
             ServeCommand(),
             PaletteCommand(),
             SfxCommand(),
             UpdateCommand(),
+            RecordCommand(),
             ResourcesCommand(),
             DocsCommand(),
         )

@@ -185,6 +185,52 @@ class OscillatorTest {
     }
 
     @Test
+    fun emit_drum_bass_snare_hihat_produce_bounded_output() {
+        val oscillator = Oscillator(waveType0 = { Instrument.WaveType.DRUM })
+        // C4 = ~261.63 Hz (bass drum), D4 = ~293.66 Hz (snare), E4 = ~329.63 Hz (hi-hat closed)
+        val frequencies = listOf(261.63f, 293.66f, 329.63f)
+        for (freq in frequencies) {
+            for (sample in 0..2000 step 10) {
+                val result = oscillator.emit(freq, sample)
+                assertTrue(
+                    result >= -1.0f && result <= 1.0f,
+                    "Drum at freq $freq should be bounded [-1, 1], got $result at sample $sample",
+                )
+            }
+        }
+    }
+
+    @Test
+    fun emit_drum_different_notes_produce_different_sounds() {
+        // C4 (bass drum) vs D4 (snare) should produce different waveforms
+        val oscBass = Oscillator(waveType0 = { Instrument.WaveType.DRUM })
+        val oscSnare = Oscillator(waveType0 = { Instrument.WaveType.DRUM })
+
+        val bassSamples = (0..100).map { oscBass.emit(261.63f, it) }
+        val snareSamples = (0..100).map { oscSnare.emit(293.66f, it) }
+
+        // The two drum parts should not produce identical output
+        val different = bassSamples.zip(snareSamples).any { (a, b) -> abs(a - b) > 0.01f }
+        assertTrue(different, "Bass drum and snare should produce different sounds")
+    }
+
+    @Test
+    fun emit_drum_sound_decays_over_time() {
+        val oscillator = Oscillator(waveType0 = { Instrument.WaveType.DRUM })
+        // Use C4 (bass drum) - should decay
+        val earlyEnergy = (0..50).map { abs(oscillator.emit(261.63f, it)) }.average()
+
+        val oscillator2 = Oscillator(waveType0 = { Instrument.WaveType.DRUM })
+        // Late samples - well after the drum has decayed
+        val lateEnergy = (20000..20050).map { abs(oscillator2.emit(261.63f, it)) }.average()
+
+        assertTrue(
+            earlyEnergy > lateEnergy,
+            "Drum sound should decay over time: early=$earlyEnergy, late=$lateEnergy",
+        )
+    }
+
+    @Test
     fun emit_all_wave_types_produce_bounded_output() {
         val waveTypes = listOf(
             Instrument.WaveType.SINE,
@@ -193,6 +239,7 @@ class OscillatorTest {
             Instrument.WaveType.SAW_TOOTH,
             Instrument.WaveType.PULSE,
             Instrument.WaveType.NOISE,
+            Instrument.WaveType.DRUM,
         )
 
         val frequency = 440.0f

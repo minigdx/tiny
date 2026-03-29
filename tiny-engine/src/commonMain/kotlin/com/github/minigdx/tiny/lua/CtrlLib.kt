@@ -16,6 +16,7 @@ import org.luaj.vm2.lib.TwoArgFunction
 @TinyLib(
     "ctrl",
     "Access to controllers like touch/mouse events or accessing which key is pressed by the user.",
+    icon = "keyboard",
 )
 class CtrlLib(
     private val inputHandler: InputHandler,
@@ -78,16 +79,33 @@ class CtrlLib(
 
     @TinyFunction(
         "Return true if the key was pressed during the last frame. " +
+            "When called without argument, return a table of all keys pressed during the last frame " +
+            "(values matching the keys lib), or false if no key was pressed. " +
             "If you need to check that the key is still pressed, see `ctrl.pressing` instead.",
         example = CTRL_PRESSING_EXAMPLE,
     )
     inner class pressed : OneArgFunction() {
         private val values = Key.entries.toTypedArray()
 
+        @TinyCall("Get all keys just pressed as a table of key values, or false if none.")
+        override fun call(): LuaValue {
+            val result = LuaTable()
+            var index = 1
+            for (key in values) {
+                if (key == Key.ANY_KEY) continue
+                if (inputHandler.isKeyJustPressed(key)) {
+                    result.rawset(index, valueOf(key.ordinal))
+                    index++
+                }
+            }
+            return if (index > 1) result else BFALSE
+        }
+
         @TinyCall("Is the key was pressed?")
         override fun call(
             @TinyArg("key", type = LuaType.NUMBER) arg: LuaValue,
         ): LuaValue {
+            if (arg.isnil()) return call()
             val int = arg.checkint()
             if (int >= values.size || int < 0) return BFALSE
 

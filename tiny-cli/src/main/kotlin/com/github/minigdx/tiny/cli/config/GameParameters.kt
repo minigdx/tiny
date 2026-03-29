@@ -1,5 +1,7 @@
 package com.github.minigdx.tiny.cli.config
 
+import com.github.minigdx.tiny.engine.FontDescriptor
+import com.github.minigdx.tiny.engine.GameConfigFont
 import com.github.minigdx.tiny.engine.GameOptions
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
@@ -37,7 +39,13 @@ sealed class GameParameters {
 
     abstract fun addSound(sound: String): GameParameters
 
+    abstract fun addFont(font: GameConfigFont): GameParameters
+
+    abstract fun setBootScript(script: String): GameParameters
+
     abstract fun setPalette(colors: List<String>): GameParameters
+
+    abstract fun setIcon(icon: String): GameParameters
 
     /**
      * Return the list of the user Lua script to load.
@@ -101,6 +109,23 @@ data class GameParametersV1(
      * The game have to display it by itself if the mouse is required.
      */
     val hideMouseCursor: Boolean = false,
+    /**
+     * Custom boot script to use instead of the default boot.lua.
+     * This script should exist in the game directory.
+     * When set, this script will be used as the first script to run.
+     */
+    val bootScript: String? = null,
+    /**
+     * Path to the game icon image (PNG).
+     * Used as favicon for web export and application icon for desktop export.
+     * If null, the default generated icon.png is used if it exists.
+     */
+    val icon: String? = null,
+    /**
+     * Custom fonts to be loaded.
+     * Each font has a name, a spritesheet image, and character bank definitions.
+     */
+    val fonts: List<GameConfigFont> = emptyList(),
 ) : GameParameters() {
     override fun toGameOptions(): GameOptions {
         return GameOptions(
@@ -114,6 +139,11 @@ data class GameParametersV1(
             zoom = zoom,
             sound = sound,
             hideMouseCursor = hideMouseCursor,
+            bootScript = bootScript,
+            icon = icon,
+            fonts = fonts.map { font ->
+                FontDescriptor.fromConfig(font)
+            },
         )
     }
 
@@ -148,5 +178,28 @@ data class GameParametersV1(
 
     override fun setPalette(colors: List<String>): GameParameters {
         return copy(colors = colors)
+    }
+
+    override fun setIcon(icon: String): GameParameters {
+        return copy(icon = icon)
+    }
+
+    override fun addFont(font: GameConfigFont): GameParameters {
+        val existing = fonts.find { it.name == font.name }
+        return if (existing != null) {
+            val merged = existing.copy(banks = existing.banks + font.banks)
+            copy(fonts = fonts.map { if (it.name == font.name) merged else it })
+        } else {
+            copy(fonts = fonts + font)
+        }
+    }
+
+    override fun setBootScript(script: String): GameParameters {
+        return copy(bootScript = script)
+    }
+
+    fun setEntryPoint(scriptName: String): GameParametersV1 {
+        val reordered = listOf(scriptName) + scripts.filter { it != scriptName }
+        return copy(scripts = reordered)
     }
 }

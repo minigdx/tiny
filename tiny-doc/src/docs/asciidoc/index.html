@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tiny - Lightweight Lua Game Engine & Virtual Console</title>
+
+    <!-- SEO -->
+    <meta name="description" content="Build retro-style games with Lua scripting. Features hot reload, 256-color palette, desktop and web export. Open source and free.">
+    <meta name="author" content="Tiny Game Engine Contributors">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#ff0080">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Tiny - Lightweight Lua Game Engine & Virtual Console">
+    <meta property="og:description" content="Build retro-style games with Lua scripting. Features hot reload, 256-color palette, desktop and web export. Open source and free.">
+    <meta property="og:url" content="https://minigdx.github.io/tiny/">
+    <meta property="og:image" content="https://minigdx.github.io/tiny/sample/favicon.png">
+    <meta property="og:site_name" content="Tiny Game Engine">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Tiny - Lightweight Lua Game Engine & Virtual Console">
+    <meta name="twitter:description" content="Build retro-style games with Lua scripting. Features hot reload, 256-color palette, desktop and web export.">
+    <meta name="twitter:image" content="https://minigdx.github.io/tiny/sample/favicon.png">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="sample/favicon.png">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Tiny Game Engine",
+        "description": "A lightweight, open-source game engine and virtual console for building retro-style games with Lua scripting.",
+        "url": "https://minigdx.github.io/tiny/",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Windows, macOS, Linux, Web",
+        "programmingLanguage": "Lua",
+        "license": "https://github.com/minigdx/tiny/blob/main/LICENSE",
+        "author": {
+            "@type": "Organization",
+            "name": "minigdx",
+            "url": "https://github.com/minigdx"
+        },
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "downloadUrl": "https://github.com/minigdx/tiny/releases"
+    }
+    </script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Quicksand:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
+    <!-- Shared styles -->
+    <link rel="stylesheet" href="tiny-common.css">
+
+    <style>
+        /* ── Layout overrides ─────────────────────────── */
+        .grid-2      { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+
+        /* ── Hero ──────────────────────────────────────── */
+        .hero__wrapper { padding: 48px 24px 0; max-width: 1094px; margin: 0 auto; }
+        .hero__card {
+            position: relative;
+            height: 494px; max-width: 1046px; margin: 0 auto;
+            border-radius: 3rem; border: 4px solid var(--cyan);
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,.25);
+        }
+        .hero__game {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%; border: none;
+            opacity: .8;
+            overflow: hidden;
+        }
+        .hero__content {
+            position: absolute; inset: 0; z-index: 1;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; gap: 24px;
+            pointer-events: none;
+        }
+        .hero__content .button { pointer-events: auto; }
+        .hero__title {
+            font-size: 9rem; line-height: 1; text-transform: uppercase;
+            color: var(--pink);
+            filter: drop-shadow(8px 8px 0 var(--yellow));
+        }
+        .hero__subtitle {
+            font-size: 1.5rem; font-weight: 700; color: #334155;
+            background: rgba(255,255,255,.6);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            border: 2px solid rgba(0,229,255,.3);
+            border-radius: 1rem; padding: 16px 32px;
+        }
+        .hero__actions { display: flex; gap: 24px; margin-top: 8px; }
+
+        /* ── Feature section ──────────────────────────── */
+        .features__header { margin-bottom: 64px; }
+        .features__title { font-size: 3.5rem; line-height: 1.1; color: var(--dark); margin-top: 16px; }
+        .features__desc  { font-size: 1.25rem; color: #64748b; max-width: 640px; margin: 16px auto 0; font-weight: 500; }
+        .features__badge {
+            display: inline-block; padding: 8px 24px;
+            border: 2px solid var(--pink); border-radius: 999px;
+            font-size: .9rem; text-transform: uppercase; letter-spacing: .2em;
+            color: var(--pink); background: #fff;
+            transform: rotate(-2deg);
+        }
+        .features__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+
+        /* ── Section labels (two-col) ─────────────────── */
+        .section-label { font-size: 1.5rem; text-transform: uppercase; letter-spacing: .15em; font-style: italic; }
+        .section-label--pink { color: var(--pink); }
+        .section-label--cyan { color: var(--cyan); }
+        .section-text  { font-size: 1.25rem; color: #64748b; font-weight: 500; line-height: 1.6; margin-top: 16px; }
+
+        /* Override section-title size for index page */
+        .index-section-title { font-size: 3.5rem; line-height: 1; margin-top: 8px; }
+
+        /* ── Tabs (above terminal) ─────────────────────── */
+        .tabs { display: flex; gap: 0; }
+        .tab {
+            padding: 8px 18px;
+            font-family: 'Source Code Pro', monospace;
+            font-size: .82rem; font-weight: 700;
+            background: #dfe2e6; color: #888;
+            border: 1px solid #e0e0e0;
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            transition: background .15s, color .15s;
+            margin-right: -1px;
+        }
+        .tab:hover { background: #eef0f2; color: #555; }
+        .tab--active {
+            background: #eef0f2; color: #333;
+            border-bottom-color: #eef0f2;
+        }
+        .tab-content { display: none; }
+        .tab-content--active { display: block; }
+
+        /* ── Hot-reload overlay ─────────────────────────── */
+        .hot-reload-card { position: relative; }
+        .hot-reload-overlay {
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(255,0,128,.15);
+            backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+            border-radius: 10px;
+        }
+        .hot-reload-badge {
+            display: flex; align-items: center; gap: 12px;
+            background: #fff; padding: 16px 32px;
+            border-radius: 2rem; border: 4px solid var(--dark);
+        }
+        .hot-reload-badge .material-symbols-outlined {
+            color: var(--pink); font-size: 2rem;
+            animation: spin 2s linear infinite;
+        }
+        .hot-reload-badge span:last-child {
+            font-size: 1.25rem; letter-spacing: 2px;
+            text-transform: uppercase; color: var(--dark);
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── CTA section ───────────────────────────────── */
+        .cta-card {
+            max-width: 900px; margin: 0 auto;
+            padding: 64px; border-radius: 4rem;
+            background: #fff; border: 4px solid var(--pink);
+            text-align: center; position: relative; overflow: hidden;
+        }
+        .cta-card__glow-yellow { position: absolute; top: -48px; left: -48px; width: 192px; height: 192px; background: rgba(255,240,0,.3); border-radius: 50%; filter: blur(48px); }
+        .cta-card__glow-blue   { position: absolute; bottom: -48px; right: -48px; width: 192px; height: 192px; background: rgba(0,229,255,.3); border-radius: 50%; filter: blur(48px); }
+        .cta-card__title {
+            font-size: 4.5rem; text-transform: uppercase; color: var(--dark);
+            filter: drop-shadow(4px 4px 0 var(--green));
+        }
+        .cta-card__desc { font-size: 1.5rem; color: #64748b; font-weight: 500; max-width: 560px; margin: 24px auto 0; }
+        .cta-card__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 32px; margin-top: 40px; position: relative; z-index: 1; }
+
+        /* ── Responsive ────────────────────────────────── */
+        @media (max-width: 960px) {
+            .grid-2 { grid-template-columns: 1fr; }
+            .grid-2 > :first-child { order: 2; }
+            .grid-2 > :last-child  { order: 1; }
+            .features__grid { grid-template-columns: 1fr 1fr; }
+            .hero__title { font-size: 6rem; }
+            .index-section-title, .features__title { font-size: 2.5rem; }
+            .cta-card__title { font-size: 3rem; }
+        }
+        @media (max-width: 600px) {
+            .hero__card { height: 400px; border-radius: 1.5rem; }
+            .hero__title { font-size: 4rem; }
+            .hero__subtitle { font-size: 1.1rem; padding: 12px 20px; }
+            .hero__actions { flex-direction: column; }
+            .features__grid { grid-template-columns: 1fr; }
+            .cta-card { padding: 40px 24px; border-radius: 2rem; }
+            .cta-card__title { font-size: 2.5rem; }
+            .cta-card__actions { flex-direction: column; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+<script src="tiny-nav.js"></script>
+<div class="page">
+
+    <main style="flex:1">
+
+        <!-- ── HERO ─────────────────────────────────── -->
+        <section class="hero__wrapper">
+            <div class="hero__card">
+                <iframe src="sample/home/index.html" class="hero__game" tabindex="-1" loading="lazy" title="Hero background animation" scrolling="no"></iframe>
+                <div class="hero__content">
+                    <h1 class="hero__title font-display">&#129528; tiny</h1>
+                    <p class="hero__subtitle">Build, Tweak, and Play.</p>
+                    <div class="hero__actions">
+                        <a href="editor.html" class="button button--pink">Start Creating</a>
+                        <a href="showcase.html" class="button button--white">View Samples</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── FEATURES ─────────────────────────────── -->
+        <section id="features" class="section section--green">
+            <div class="container">
+                <div class="features__header center-text">
+                    <span class="features__badge font-display">Core Features</span>
+                    <h2 class="features__title font-display">Designed for Playful Creation</h2>
+                    <p class="features__desc">
+                        A tiny virtual console for building pixel art games. Hot-reload, 256 colors, Lua scripting, and export to desktop or web.
+                    </p>
+                </div>
+                <div class="features__grid">
+                    <div class="feature-card shadow-bubble">
+                        <div class="feature-card__icon feature-card__icon--pink">
+                            <span class="material-symbols-outlined" style="font-size:2.5rem">bolt</span>
+                        </div>
+                        <h3 class="feature-card__title font-display">Hot Reload</h3>
+                        <p class="feature-card__desc">See your changes instantly. Edit your Lua scripts and watch the game update in real-time without restarting.</p>
+                    </div>
+                    <div class="feature-card feature-card--cyan shadow-bubble">
+                        <div class="feature-card__icon feature-card__icon--cyan">
+                            <span class="material-symbols-outlined" style="font-size:2.5rem">code</span>
+                        </div>
+                        <h3 class="feature-card__title font-display">Lua Scripting</h3>
+                        <p class="feature-card__desc">Write game logic in Lua &mdash; a simple, powerful language perfect for beginners and veterans alike.</p>
+                    </div>
+                    <div class="feature-card feature-card--green shadow-bubble">
+                        <div class="feature-card__icon feature-card__icon--green">
+                            <span class="material-symbols-outlined" style="font-size:2.5rem">public</span>
+                        </div>
+                        <h3 class="feature-card__title font-display">Desktop &amp; Web</h3>
+                        <p class="feature-card__desc">Build once, run everywhere. Export your games for JVM desktop or WebGL browser &mdash; from a single codebase.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── LUA SCRIPTING + TABS ──────────────────── -->
+        <section class="section section--white">
+            <div class="container">
+                <div class="grid-2">
+                    <!-- Code panel -->
+                    <div>
+                        <div class="tabs">
+                            <button class="tab tab--active" onclick="showTab('draw', this)">game.lua</button>
+                            <button class="tab" onclick="showTab('sprite', this)">player.lua</button>
+                            <button class="tab" onclick="showTab('input', this)">controls.lua</button>
+                        </div>
+                        <div class="terminal" style="border-top-left-radius:0">
+                            <div class="terminal__header">
+                                <span class="terminal__dot terminal__dot--red"></span>
+                                <span class="terminal__dot terminal__dot--yellow"></span>
+                                <span class="terminal__dot terminal__dot--green"></span>
+                                <span class="terminal__filename" id="tab-filename">game.lua</span>
+                            </div>
+                            <div class="terminal__body">
+                                <!-- Tab: Draw -->
+                                <div class="tab-content tab-content--active" id="tab-draw">
+<pre><span class="syn-kw">function</span> <span class="syn-fn">_draw</span>()
+    <span class="syn-cm">-- clear the screen</span>
+    gfx.<span class="syn-fn">cls</span>(<span class="syn-nb">1</span>)
+
+    <span class="syn-cm">-- draw shapes</span>
+    shape.<span class="syn-fn">rectf</span>(<span class="syn-nb">10</span>, <span class="syn-nb">10</span>, <span class="syn-nb">50</span>, <span class="syn-nb">30</span>, <span class="syn-nb">8</span>)
+    shape.<span class="syn-fn">circlef</span>(<span class="syn-nb">128</span>, <span class="syn-nb">128</span>, <span class="syn-nb">24</span>, <span class="syn-nb">12</span>)
+
+    <span class="syn-cm">-- print text</span>
+    <span class="syn-fn">print</span>(<span class="syn-st">"hello tiny!"</span>, <span class="syn-nb">80</span>, <span class="syn-nb">200</span>, <span class="syn-nb">7</span>)
+<span class="syn-kw">end</span></pre>
+                                </div>
+                                <!-- Tab: Sprites -->
+                                <div class="tab-content" id="tab-sprite">
+<pre><span class="syn-kw">function</span> <span class="syn-fn">_init</span>()
+    player = { x = <span class="syn-nb">128</span>, y = <span class="syn-nb">128</span> }
+<span class="syn-kw">end</span>
+
+<span class="syn-kw">function</span> <span class="syn-fn">_update</span>()
+    <span class="syn-kw">if</span> ctrl.<span class="syn-fn">pressing</span>(keys.right) <span class="syn-kw">then</span>
+        player.x = player.x + <span class="syn-nb">2</span>
+    <span class="syn-kw">end</span>
+<span class="syn-kw">end</span>
+
+<span class="syn-kw">function</span> <span class="syn-fn">_draw</span>()
+    gfx.<span class="syn-fn">cls</span>(<span class="syn-nb">1</span>)
+    spr.<span class="syn-fn">draw</span>(<span class="syn-nb">0</span>, player.x, player.y)
+<span class="syn-kw">end</span></pre>
+                                </div>
+                                <!-- Tab: Input -->
+                                <div class="tab-content" id="tab-input">
+<pre><span class="syn-kw">function</span> <span class="syn-fn">_update</span>()
+    <span class="syn-kw">if</span> ctrl.<span class="syn-fn">pressed</span>(keys.space) <span class="syn-kw">then</span>
+        sfx.<span class="syn-fn">play</span>(<span class="syn-nb">0</span>)
+    <span class="syn-kw">end</span>
+<span class="syn-kw">end</span>
+
+<span class="syn-kw">function</span> <span class="syn-fn">_draw</span>()
+    gfx.<span class="syn-fn">cls</span>(<span class="syn-nb">2</span>)
+    <span class="syn-fn">print</span>(<span class="syn-st">"press space!"</span>, <span class="syn-nb">80</span>, <span class="syn-nb">120</span>, <span class="syn-nb">7</span>)
+<span class="syn-kw">end</span></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Text -->
+                    <div>
+                        <p class="section-label section-label--pink font-display">Powerfully Simple</p>
+                        <h2 class="section-title index-section-title font-display">Lua Scripting</h2>
+                        <p class="section-text">
+                            Use Lua to bring your worlds to life. A lightweight, easy-to-learn language with a clean API for sprites, input, maps, and sound. Writing game logic feels like sketching on paper.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── HOT RELOAD ────────────────────────────── -->
+        <section class="section">
+            <div class="container">
+                <div class="grid-2">
+                    <!-- Text (shows first on desktop) -->
+                    <div style="order:0">
+                        <p class="section-label section-label--cyan font-display">No Restart Required</p>
+                        <h2 class="section-title index-section-title font-display">Hot Reload Everything</h2>
+                        <p class="section-text">
+                            Edit your scripts while the game is running. Change colors, tweak physics, rewrite behaviors &mdash; your game state stays intact, so you never lose your flow.
+                        </p>
+                    </div>
+                    <!-- Code with overlay -->
+                    <div class="hot-reload-card" style="order:1">
+                        <div class="terminal">
+                            <div class="terminal__header">
+                                <span class="terminal__dot terminal__dot--red"></span>
+                                <span class="terminal__dot terminal__dot--yellow"></span>
+                                <span class="terminal__dot terminal__dot--green"></span>
+                                <span class="terminal__filename">enemy.lua</span>
+                            </div>
+                            <div class="terminal__body">
+<pre><span class="syn-kw">function</span> <span class="syn-fn">_update</span>()
+    <span class="syn-cm">-- tweak speed while playing!</span>
+    enemy.speed = <span class="syn-nb">3</span>
+
+    <span class="syn-kw">if</span> enemy.x &lt; player.x <span class="syn-kw">then</span>
+        enemy.x = enemy.x + enemy.speed
+    <span class="syn-kw">end</span>
+<span class="syn-kw">end</span>
+
+<span class="syn-kw">function</span> <span class="syn-fn">_draw</span>()
+    spr.<span class="syn-fn">draw</span>(<span class="syn-nb">1</span>, enemy.x, enemy.y)
+<span class="syn-kw">end</span></pre>
+                            </div>
+                        </div>
+                        <div class="hot-reload-overlay">
+                            <div class="hot-reload-badge shadow-bubble">
+                                <span class="material-symbols-outlined">refresh</span>
+                                <span class="font-display">Live Reloading</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── CTA ───────────────────────────────────── -->
+        <section class="section">
+            <div class="cta-card shadow-bubble">
+                <div class="cta-card__glow-yellow"></div>
+                <div class="cta-card__glow-blue"></div>
+                <h2 class="cta-card__title font-display">Ready to Play?</h2>
+                <p class="cta-card__desc">
+                    Start building your retro-style game right now, directly in your browser. No installation required.
+                </p>
+                <div class="cta-card__actions">
+                    <a href="editor.html" class="button button--pink">Launch Editor</a>
+                    <a href="documentation.html" class="button button--white" style="color:var(--dark)">Browse Docs</a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ── FOOTER ────────────────────────────────── -->
+    <footer class="footer">
+        <div class="footer__brand">
+            <span class="footer__brand-text font-display">&#129528; Tiny</span>
+        </div>
+        <div class="footer__links">
+            <a class="footer__link" href="https://github.com/minigdx/tiny">GitHub</a>
+            <a class="footer__link" href="documentation.html">Documentation</a>
+            <a class="footer__link" href="editor.html">Editor</a>
+        </div>
+        <p class="footer__copy">&copy; 2026 Tiny Game Engine. Made for creators.</p>
+    </footer>
+
+</div>
+
+<!-- Tab switching -->
+<script>
+    function showTab(tabId, btn) {
+        document.querySelectorAll('.tab-content').forEach(function(el) {
+            el.classList.remove('tab-content--active');
+        });
+        document.getElementById('tab-' + tabId).classList.add('tab-content--active');
+
+        document.querySelectorAll('.tab').forEach(function(t) {
+            t.classList.remove('tab--active');
+        });
+        btn.classList.add('tab--active');
+
+        var filenameMap = { 'draw': 'game.lua', 'sprite': 'player.lua', 'input': 'controls.lua' };
+        document.getElementById('tab-filename').textContent = filenameMap[tabId];
+    }
+</script>
+</body>
+</html>

@@ -1,1 +1,50 @@
 <script type="module" crossorigin src="./tiny-web-editor.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var iconDivs = document.querySelectorAll('.lib-icon');
+    var headings = document.querySelectorAll('.sect1 > h2');
+
+    iconDivs.forEach(function(iconDiv, index) {
+        var lucideEl = iconDiv.querySelector('[data-lucide]');
+        if (!lucideEl || index >= headings.length) return;
+        var iconName = lucideEl.getAttribute('data-lucide');
+        var h3 = headings[index];
+
+        // Insert icon inline into the heading
+        var headingIcon = document.createElement('i');
+        headingIcon.setAttribute('data-lucide', iconName);
+        h3.insertBefore(headingIcon, h3.firstChild);
+
+        // Insert icon into the matching TOC entry
+        if (h3.id) {
+            var tocLink = document.querySelector('#toc a[href="#' + h3.id + '"]');
+            if (tocLink) {
+                var tocIcon = document.createElement('i');
+                tocIcon.setAttribute('data-lucide', iconName);
+                tocLink.insertBefore(tocIcon, tocLink.firstChild);
+            }
+        }
+    });
+
+    // Render all Lucide icons (headings + TOC)
+    if (typeof lucide !== "undefined") {
+        lucide.createIcons();
+    }
+
+    // Inject Pebble-style footer
+    var footer = document.createElement('div');
+    footer.className = 'tiny-footer';
+    footer.innerHTML = [
+        '<div class="tiny-footer__brand">',
+        '    <span class="tiny-footer__brand-text">\uD83E\uDDF8 Tiny</span>',
+        '</div>',
+        '<div class="tiny-footer__links">',
+        '    <a class="tiny-footer__link" href="https://github.com/minigdx/tiny">GitHub</a>',
+        '    <a class="tiny-footer__link" href="documentation.html">Documentation</a>',
+        '    <a class="tiny-footer__link" href="editor.html">Editor</a>',
+        '</div>',
+        '<p class="tiny-footer__copy">&copy; 2026 Tiny Game Engine. Made for creators.</p>'
+    ].join('\n');
+    document.body.appendChild(footer);
+});
+</script>

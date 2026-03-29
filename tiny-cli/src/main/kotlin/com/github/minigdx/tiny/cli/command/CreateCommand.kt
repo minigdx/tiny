@@ -13,6 +13,7 @@ import com.github.ajalt.mordant.rendering.TextStyles
 import com.github.minigdx.tiny.cli.GamePalette
 import com.github.minigdx.tiny.cli.command.utils.ColorUtils
 import com.github.minigdx.tiny.cli.command.utils.ColorUtils.brightness
+import com.github.minigdx.tiny.cli.command.utils.IconImageGenerator
 import com.github.minigdx.tiny.cli.command.utils.PaletteImageGenerator
 import com.github.minigdx.tiny.cli.config.GameParameters
 import com.github.minigdx.tiny.cli.config.GameParametersV1
@@ -37,6 +38,38 @@ end
 function _draw()
     gfx.cls()
     print("Congratulation! Your game is running!")
+end
+"""
+
+@Language("Lua")
+private const val DEFAULT_BOOT_SCRIPT = """
+local ready = false
+
+function _init(screen_width, screen_height)
+    -- prepare your boot script
+end
+
+function _update()
+    -- clear the screen and exist the boot script when all resources are loaded
+    if (ready) then
+        gfx.cls("#000000")
+        tiny.exit(0) -- start the first script in the game script stack
+    end
+end
+
+function _draw()
+    gfx.cls("#000000")
+    -- draw your boot animation
+end
+
+--[[
+_resources is a magic method called when all the resources are loaded
+Before this call, only primitives can be used. Sprites are not loaded yet, as sound, levels, ...
+After, all resources are available
+]]--
+function _resources()
+    -- all game resources are loaded
+    ready = true
 end
 """
 
@@ -90,6 +123,12 @@ ${
         .prompt("\uD83D\uDDB1\uFE0F  Hide system cursor mouse? (yes or no)", default = "No")
         .validate { it.lowercase() == "yes" || it.lowercase() == "no" }
 
+    private val bootScript by option(help = "🚀 Custom boot script to use instead of the default boot.lua")
+        .prompt("\uD83D\uDE80  Custom boot script (leave empty for default boot.lua)", default = "")
+        .validate {
+            require(it.isEmpty() || it.endsWith(".lua")) { "Invalid boot script extension: $it. Must be a .lua file." }
+        }
+
     override fun help(context: Context) = "Create a new game with the help of a wizard 🧙."
 
     override fun run() {
@@ -98,6 +137,16 @@ ${
         echo("➡\uFE0F  Game Resolution: $spriteSize")
         echo("➡\uFE0F  Sprite Sheet Filenames: ${spritesheets.ifBlank { "No spritesheet added!" }}")
         echo("➡\uFE0F  Color palette: ${GamePalette.ALL[palette - 1].name}")
+        if (bootScript.isNotBlank()) {
+            echo("➡\uFE0F  Boot script: $bootScript")
+        }
+
+        val sortedColors = GamePalette.ALL[palette - 1].colors.sortedBy { brightness(it) }
+
+        if (!gameDirectory.exists()) gameDirectory.mkdirs()
+
+        // Generate game icon
+        val iconFile = IconImageGenerator.generateIcon(gameDirectory, sortedColors, gameName)
 
         val configuration = GameParametersV1(
             name = gameName,
@@ -105,13 +154,13 @@ ${
             resolution = gameResolution.toSize(),
             sprites = spriteSize.toSize(),
             zoom = zoom,
-            colors = GamePalette.ALL[palette - 1].colors.sortedBy { brightness(it) },
+            colors = sortedColors,
             scripts = listOf(gameScript),
             sound = "default-sound.sfx",
             hideMouseCursor = hideMouseCursor == "yes".lowercase(),
+            bootScript = bootScript.ifBlank { null },
+            icon = iconFile.name,
         ) as GameParameters
-
-        if (!gameDirectory.exists()) gameDirectory.mkdirs()
 
         val configurationFile = gameDirectory.resolve("_tiny.json")
         configuration.write(configurationFile)
@@ -120,6 +169,10 @@ ${
         soundFile.writeText(SoundData.DEFAULT_SFX.music.serialize())
 
         gameDirectory.resolve(gameScript).writeText(DEFAULT_GAME_SCRIPT)
+
+        if (bootScript.isNotBlank()) {
+            gameDirectory.resolve(bootScript).writeText(DEFAULT_BOOT_SCRIPT)
+        }
 
         CreateCommand::class.java.getResourceAsStream("/_tiny.stub.lua")?.let { content ->
             gameDirectory.resolve("_tiny.stub.lua").writeBytes(content.readAllBytes())
@@ -130,6 +183,7 @@ ${
 
         echo("\uD83C\uDFD7\uFE0F  Game created into: ${gameDirectory.absolutePath}")
         echo("\uD83C\uDFA8  Palette image created: ${paletteFile.name}")
+        echo("\uD83C\uDFAE  Game icon created: ${iconFile.name}")
         echo("\uD83C\uDFC3\u200D♂\uFE0F To run the game: tiny-cli run ${computePath(gameDirectory)}")
     }
 

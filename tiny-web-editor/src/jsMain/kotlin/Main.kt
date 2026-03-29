@@ -23,10 +23,25 @@ import org.w3c.dom.Element
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.HTMLDivElement
+import org.w3c.dom.HTMLSelectElement
 import org.w3c.dom.Node
+import org.w3c.dom.events.Event
 import org.w3c.dom.url.URLSearchParams
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
+
+data class ExampleEntry(val name: String, val code: String)
+
+fun parseExamples(json: String): List<ExampleEntry> {
+    val parsed: dynamic = kotlin.js.JSON.parse(json)
+    val length = parsed.length as Int
+    val result = mutableListOf<ExampleEntry>()
+    for (i in 0 until length) {
+        val item = parsed[i]
+        result.add(ExampleEntry(item.name as String, item.code as String))
+    }
+    return result
+}
 
 @OptIn(ExperimentalEncodingApi::class)
 fun main() {
@@ -37,64 +52,186 @@ fun main() {
     val url = URLSearchParams(window.location.search)
     val savedCode = url.get("game")
     val decodedCode = if (savedCode?.isNotBlank() == true) {
-        Base64.decode(savedCode.encodeToByteArray()).decodeToString()
+        // URLSearchParams decodes '+' as space; restore it for valid base64
+        Base64.decode(savedCode.replace(' ', '+').encodeToByteArray()).decodeToString()
     } else {
         null
     }
 
     elts.forEachIndexed { index, game ->
-        val code = game.textContent ?: ""
-        val spritePath = game.getAttribute("sprite")
-        val levelPath = game.getAttribute("level")
+        val mode = game.getAttribute("mode")
+        if (mode == "editor") {
+            setupEditorMode(index, game, decodedCode, rootPath)
+        } else {
+            setupDocMode(index, game, decodedCode, savedCode, rootPath)
+        }
+    }
 
+    // Render Lucide icons in dynamically created elements
+    js("if (typeof lucide !== 'undefined') { lucide.createIcons(); }")
+}
+
+@OptIn(ExperimentalEncodingApi::class)
+private fun setupDocMode(
+    index: Int,
+    game: Element,
+    decodedCode: String?,
+    savedCode: String?,
+    rootPath: String,
+) {
+    val code = game.textContent ?: ""
+    val spritePath = game.getAttribute("sprite")
+    val levelPath = game.getAttribute("level")
+
+    // Check if the fn-card structure already exists (e.g. API page from fn-card.peb).
+    // If not, create the toolbar + static code block + "Try it" button dynamically.
+    val hasFnCard = game.parentElement?.classList?.contains("fn-card__example") == true
+    var codeBlock: Element? = null
+
+    if (!hasFnCard) {
         val toolbar = document.createElement("div") {
             setAttribute("class", "tiny-toolbar")
         }
-        game.before(toolbar)
+        game.after(toolbar)
 
-        val link = document.createElement("a") {
-            setAttribute("id", "link-editor-$index")
-            setAttribute("class", "tiny-play tiny-button")
-            setAttribute("href", "#link-editor-$index")
-        } as HTMLAnchorElement
-        toolbar.appendChild(link)
+        toolbar.appendChild(
+            document.createElement("span") {
+                setAttribute("class", "fn-card__filename")
+                textContent = "example.lua"
+            },
+        )
 
-        val playLink = document.createElement("div").apply {
-            setAttribute("class", "tiny-container")
+        val tryButton = document.createElement("a") {
+            setAttribute("class", "fn-card__try-btn tiny-button")
+            innerHTML = """<i data-lucide="play"></i> Try it"""
         }
-        toolbar.after(playLink)
+        toolbar.appendChild(tryButton)
 
-        val codeToUse = decodedCode ?: "-- Update the code to update the game!\n$code"
-
-        var clicked = false
-        link.textContent = "\uD83D\uDC7E ▶ Run and tweak an example"
-        link.onclick = { _ ->
-            if (!clicked) {
-                createGame(playLink, index, codeToUse, spritePath, levelPath, rootPath)
-                clicked = true
-            }
-            true
+        codeBlock = document.createElement("div") {
+            setAttribute("class", "fn-card__code")
+            val pre = document.createElement("pre")
+            pre.innerHTML = highlightStatic(code)
+            appendChild(pre)
         }
+        toolbar.after(codeBlock)
 
-        val playground = (
-            document.createElement("a") {
-                setAttribute("class", "tiny-button tiny-button-right")
-                id = "share-$index"
-                textContent = "↗\uFE0F Playground"
-            } as HTMLAnchorElement
-        ).apply {
-            val b64 = Base64.encode(code.encodeToByteArray())
-            href = "playground.html?game=$b64"
-            target = "_blank"
-        }
+        tryButton.addEventListener("click", {
+            game.dispatchEvent(Event("play"))
+        })
 
-        toolbar.appendChild(playground)
+        js("if (typeof lucide !== 'undefined') { lucide.createIcons(); }")
+    }
 
-        // There is a user code. Let's unfold the game.
-        if (savedCode != null) {
-            createGame(playLink, index, codeToUse, spritePath, levelPath, rootPath)
+    val container = document.createElement("div").apply {
+        setAttribute("class", "tiny-container")
+        asDynamic().style.display = "none"
+    }
+    (codeBlock ?: game).after(container)
+
+    val codeToUse = decodedCode ?: "-- Update the code to update the game!\n$code"
+
+    var started = false
+
+    fun startGame() {
+        if (!started) {
+            codeBlock?.asDynamic()?.style?.display = "none"
+            container.asDynamic().style.display = ""
+            createGame(container, index, codeToUse, spritePath, levelPath, rootPath)
+            started = true
         }
     }
+
+    game.addEventListener("play", { startGame() })
+
+    // There is a user code. Let's unfold the game.
+    if (savedCode != null) {
+        startGame()
+    }
+}
+
+@OptIn(ExperimentalEncodingApi::class)
+private fun setupEditorMode(
+    index: Int,
+    game: Element,
+    decodedCode: String?,
+    rootPath: String,
+) {
+    val code = game.textContent ?: ""
+    val spritePath = game.getAttribute("sprite")
+    val levelPath = game.getAttribute("level")
+    val examplesJson = game.getAttribute("examples") ?: "[]"
+    val examples = parseExamples(examplesJson)
+
+    val codeToUse = decodedCode ?: "-- Update the code to update the game!\n$code"
+
+    // Widen the editor page layout
+    document.body?.classList?.add("tiny-editor-page")
+
+    // Create editor toolbar (example name + dropdown only)
+    val toolbar = document.createElement("div") {
+        setAttribute("class", "tiny-editor-toolbar")
+    }
+    game.before(toolbar)
+
+    // Example name label
+    val exampleName = document.createElement("span") {
+        setAttribute("class", "tiny-example-name")
+        textContent = if (decodedCode != null) "Shared Code" else examples.firstOrNull()?.name ?: "Empty Project"
+    }
+    toolbar.appendChild(exampleName)
+
+    // Examples dropdown
+    val select = document.createElement("select") {
+        setAttribute("class", "tiny-examples-select")
+    } as HTMLSelectElement
+    examples.forEachIndexed { i, example ->
+        select.appendChild(
+            document.createElement("option") {
+                setAttribute("value", i.toString())
+                textContent = example.name
+            },
+        )
+    }
+    toolbar.appendChild(select)
+
+    // Container for game + editor
+    val playLink = document.createElement("div").apply {
+        setAttribute("class", "tiny-container")
+    }
+    toolbar.after(playLink)
+
+    // Share link below the editor
+    val share = (
+        document.createElement("a") {
+            setAttribute("class", "tiny-share-link")
+            id = "share-$index"
+            innerHTML = """<i data-lucide="share-2"></i> Share this code"""
+        } as HTMLAnchorElement
+    ).apply {
+        val b64 = Base64.encode(codeToUse.encodeToByteArray())
+        href = "editor.html?game=$b64"
+        target = "_blank"
+    }
+    playLink.after(share)
+
+    // Auto-start the game
+    createGame(playLink, index, codeToUse, spritePath, levelPath, rootPath)
+
+    // Examples dropdown change handler
+    select.addEventListener("change", {
+        val selectedIndex = select.selectedIndex
+        if (selectedIndex >= 0 && selectedIndex < examples.size) {
+            val example = examples[selectedIndex]
+            val decoded = Base64.decode(example.code.encodeToByteArray()).decodeToString()
+            val editor = document.getElementById("editor-$index") as? HTMLDivElement
+            if (editor != null) {
+                editor.innerHTML = highlight(decoded)
+                editor.dispatchEvent(Event("input"))
+            }
+            exampleName.textContent = example.name
+            share.href = "editor.html?game=${example.code}"
+        }
+    }, null)
 }
 
 /**
@@ -107,6 +244,7 @@ fun main() {
  */
 fun getCaretPosition(el: Element): Int {
     val selection = window.asDynamic().getSelection() ?: return -1
+    if (selection.rangeCount == 0) return -1
     val range = selection.getRangeAt(0)
     val prefix = range.cloneRange()
     prefix.selectNodeContents(el)
@@ -172,6 +310,21 @@ fun setCaret(
 }
 
 /**
+ * Highlight Lua code for static display (no line wrapping in divs).
+ * Same highlighting rules as [highlight] but suited for a <pre> block.
+ */
+fun highlightStatic(content: String): String {
+    return content
+        .replace(Regex("(\".*?\")"), "<strong class=\"code_string\">$1</strong>")
+        .replace(Regex("--(.*)"), """<em class="code_comment">--$1</em>""")
+        .replace(
+            Regex("\\b(if|else|elif|end|while|for|in|of|continue|break|return|function|local|do)\\b"),
+            """<strong class="code_keyword">$1</strong>""",
+        )
+        .replace(Regex("\\b(\\d+)"), "<em class=\"code_number\">$1</em>")
+}
+
+/**
  * Highlight the code with HTML tags.
  *
  * - String: <strong class="code_string">
@@ -216,6 +369,20 @@ private fun createGame(
     levelPath: String?,
     rootPath: String,
 ) {
+    val statusBar = (document.createElement("div") as HTMLDivElement).apply {
+        setAttribute("class", "tiny-status-bar")
+    }
+    val statusBarProgress = (document.createElement("div") as HTMLDivElement).apply {
+        setAttribute("class", "tiny-status-bar-progress tiny-status-loaded")
+    }
+    statusBar.appendChild(statusBarProgress)
+    container.before(statusBar)
+
+    statusBarProgress.addEventListener("transitionend", {
+        statusBarProgress.classList.remove("tiny-status-editing")
+        statusBarProgress.classList.add("tiny-status-loaded")
+    }, null)
+
     val textarea = (document.createElement("div") as HTMLDivElement).apply {
         setAttribute("id", "editor-$index")
         setAttribute("spellcheck", "false")
@@ -228,6 +395,15 @@ private fun createGame(
             val pos = getCaretPosition(this)
             this.innerHTML = highlight(extractText(this))
             setCaret(pos, this)
+
+            // Reset status bar: orange, animate from 0% to 100% over 1.5s
+            statusBarProgress.classList.remove("tiny-status-loaded")
+            statusBarProgress.classList.add("tiny-status-editing")
+            statusBarProgress.style.transition = "none"
+            statusBarProgress.style.width = "0%"
+            statusBarProgress.getBoundingClientRect() // Force reflow
+            statusBarProgress.style.transition = "width 1s linear"
+            statusBarProgress.style.width = "100%"
         }
     }
     textarea.innerHTML = highlight(textarea.innerText)

@@ -1,0 +1,11 @@
+    <footer class="footer">
+        <div class="footer__brand">
+            <span class="footer__brand-text font-display">&#129528; Tiny</span>
+        </div>
+        <div class="footer__links">
+            <a class="footer__link" href="https://github.com/minigdx/tiny">GitHub</a>
+            <a class="footer__link" href="documentation.html">Documentation</a>
+            <a class="footer__link" href="editor.html">Editor</a>
+        </div>
+        <p class="footer__copy">&copy; 2026 Tiny Game Engine. Made for creators.</p>
+    </footer>

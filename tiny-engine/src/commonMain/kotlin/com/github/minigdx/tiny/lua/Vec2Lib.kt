@@ -12,7 +12,7 @@ import org.luaj.vm2.lib.LibFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.VarArgFunction
 
-@TinyLib("vec2", "Vector2 manipulation library.")
+@TinyLib("vec2", "Vector2 manipulation library.", icon = "move")
 class Vec2Lib : TwoArgFunction() {
     override fun call(
         arg1: LuaValue,

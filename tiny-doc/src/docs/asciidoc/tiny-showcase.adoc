@@ -4,15 +4,16 @@ Get inspired by what's possible with `🧸 Tiny`! This showcase features amazing
 
 Here are a few examples of games created using `🧸 Tiny`.
 
-image:sample/camping.gif[link=https://dwursteisen.itch.io/trijam-camping]
-image:sample/level-up.gif[link=https://dwursteisen.itch.io/trijam-220-type-it]
-image:sample/memory.gif[link=https://dwursteisen.itch.io/memory-pong-trijam-251]
-image:sample/connect_me.gif[link=https://dwursteisen.itch.io/connect-me]
-image:sample/only_three_seconds.gif[link=https://dwursteisen.itch.io/one-light-for-three-seconds]
-image:sample/meiro_de_maigo2.gif[link=https://dwursteisen.itch.io/meiro-de]
-image:sample/freezming.gif[link=https://dwursteisen.itch.io/freezming]
-image:sample/gravity-balls.gif[link=https://dwursteisen.itch.io/gravity-balls]
-image:sample/reflections.gif[link=https://dwursteisen.itch.io/macro-jams-06-reflections]
+image:sample/camping.gif[Camping - a cozy survival game made with Tiny game engine,link=https://dwursteisen.itch.io/trijam-camping]
+image:sample/level-up.gif[Level Up - a typing game made with Tiny game engine,link=https://dwursteisen.itch.io/trijam-220-type-it]
+image:sample/memory.gif[Memory Pong - a hack module and pong mashup game made with Tiny,link=https://dwursteisen.itch.io/memory-pong-trijam-251]
+image:sample/connect_me.gif[Connect Me - a puzzle connection game made with Tiny game engine,link=https://dwursteisen.itch.io/connect-me]
+image:sample/only_three_seconds.gif[Only Three Seconds - a light-based game made with Tiny,link=https://dwursteisen.itch.io/one-light-for-three-seconds]
+image:sample/meiro_de_maigo2.gif[Meiro de Maigo - a maze exploration game made with Tiny game engine,link=https://dwursteisen.itch.io/meiro-de]
+image:sample/freezming.gif[Freezming - a freezing-themed game made with Tiny game engine,link=https://dwursteisen.itch.io/freezming]
+image:sample/gravity-balls.gif[Gravity Balls - a physics gravity game made with Tiny game engine,link=https://dwursteisen.itch.io/gravity-balls]
+image:sample/reflections.gif[Reflections - a reflection-themed game made with Tiny game engine,link=https://dwursteisen.itch.io/macro-jams-06-reflections]
+image:sample/2026-1bit-jam-2.gif[2026 1bit Jam 2 - a game made with Tiny game engine,link=https://dwursteisen.itch.io/pair-of-pipes]
 
 
 TIP: Want your game to appear here? Create a post about it in https://github.com/minigdx/tiny/discussions/categories/show-and-tell[the Show and tell board] and share all information about it.

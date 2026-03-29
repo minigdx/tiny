@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Tiny Game Engine{% endblock %}</title>
+    <meta name="theme-color" content="#ff0080">
+
+{% block meta %}{% endblock %}
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="sample/favicon.png">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Quicksand:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
+    <!-- Shared styles -->
+    <link rel="stylesheet" href="tiny-common.css">
+
+{% block pageStyles %}{% endblock %}
+</head>
+<body>
+{% include "partials/nav.peb" %}
+<div class="page">
+
+    <main style="flex:1">
+{% block content %}{% endblock %}
+    </main>
+
+{% include "partials/footer.peb" %}
+</div>
+{% block pageScripts %}{% endblock %}
+</body>
+</html>

@@ -214,7 +214,7 @@ editor.on_active_tab = function(current, prev)
     if prev ~= nil then
         -- update the model of the previous tab before switching.
         local score = editor.generate_score(prev.content)
-        debug.console(score)
+        console.log(score)
         prev.content = sfx.to_table(score)
     end
 

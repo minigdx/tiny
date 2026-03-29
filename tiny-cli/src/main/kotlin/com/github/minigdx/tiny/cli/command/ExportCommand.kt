@@ -1,5 +1,6 @@
 package com.github.minigdx.tiny.cli.command
 
+import com.github.ajalt.clikt.core.Abort
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.arguments.argument
@@ -9,6 +10,7 @@ import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.choice
 import com.github.ajalt.clikt.parameters.types.file
+import com.github.minigdx.tiny.cli.command.utils.IconConverter
 import com.github.minigdx.tiny.cli.config.GameParameters
 import com.github.minigdx.tiny.cli.config.GameParameters.Companion.JSON
 import com.github.minigdx.tiny.cli.config.GameParametersV1
@@ -95,7 +97,7 @@ class ExportCommand : CliktCommand(name = "export") {
         if (includeJdk && !isJpackageAvailable()) {
             echo("\uD83D\uDE31 jpackage is not available. Please use Java 14 or later with jpackage support.")
             echo("\uD83D\uDCA1 Alternatively, use --exclude-jdk to create a portable JAR launcher.")
-            return
+            throw Abort()
         }
 
         val targetPlatform = when (desktopPlatform) {
@@ -113,6 +115,7 @@ class ExportCommand : CliktCommand(name = "export") {
                 appVersion = appVersion,
                 platform = targetPlatform,
                 debug = debug,
+                gameParameters = gameParameters,
             )
         } else {
             createPortableJarLauncher(
@@ -143,6 +146,52 @@ class ExportCommand : CliktCommand(name = "export") {
         }
     }
 
+    /**
+     * Resolve the icon file for the target platform, converting to the platform-specific
+     * format if needed (ICO for Windows, ICNS for macOS, PNG for Linux).
+     */
+    private fun resolveIconForPlatform(
+        gameDir: File,
+        gameParameters: GameParameters,
+        platform: String,
+        tempDir: File,
+    ): File? {
+        val iconName = when (gameParameters) {
+            is GameParametersV1 -> gameParameters.icon
+        }
+
+        // Find the icon file: use configured icon, or fall back to icon.png
+        val iconFile = if (iconName != null) {
+            gameDir.resolve(iconName)
+        } else {
+            gameDir.resolve("icon.png")
+        }
+
+        if (!iconFile.exists()) {
+            return null
+        }
+
+        return when (platform) {
+            "windows" -> {
+                val icoFile = File(tempDir, "icon.ico")
+                val result = IconConverter.convertToIco(iconFile, icoFile)
+                if (result == null) {
+                    echo("\u26A0\uFE0F Failed to convert icon to ICO format.")
+                }
+                result
+            }
+            "mac" -> {
+                val icnsFile = File(tempDir, "icon.icns")
+                val result = IconConverter.convertToIcns(iconFile, icnsFile)
+                if (result == null) {
+                    echo("\u26A0\uFE0F Failed to convert icon to ICNS format (sips not available?).")
+                }
+                result
+            }
+            else -> iconFile // Linux accepts PNG directly
+        }
+    }
+
     private fun createStandaloneAppWithJdk(
         gameDir: File,
         outputDir: File,
@@ -150,6 +199,7 @@ class ExportCommand : CliktCommand(name = "export") {
         appVersion: String,
         platform: String,
         debug: Boolean = false,
+        gameParameters: GameParameters,
     ) {
         echo("\uD83D\uDCE6 Creating standalone application with bundled JDK...")
 
@@ -169,6 +219,12 @@ class ExportCommand : CliktCommand(name = "export") {
             "--main-class", "com.github.minigdx.tiny.cli.MainKt",
         )
 
+        // Add application icon
+        val iconFile = resolveIconForPlatform(gameDir, gameParameters, platform, tempDir)
+        if (iconFile != null) {
+            jpackageCommand.addAll(listOf("--icon", iconFile.absolutePath))
+        }
+
         // Add platform-specific arguments for game location
         when (platform) {
             "mac" -> {
@@ -180,6 +236,8 @@ class ExportCommand : CliktCommand(name = "export") {
                         "run",
                         "--arguments",
                         "--mac-from-jpackage",
+                        "--arguments",
+                        "--no-debug",
                     ),
                 )
 
@@ -198,6 +256,8 @@ class ExportCommand : CliktCommand(name = "export") {
                         "run",
                         "--arguments",
                         "game",
+                        "--arguments",
+                        "--no-debug",
                     ),
                 )
 
@@ -213,6 +273,8 @@ class ExportCommand : CliktCommand(name = "export") {
                         "run",
                         "--arguments",
                         "game",
+                        "--arguments",
+                        "--no-debug",
                     ),
                 )
 
@@ -228,6 +290,8 @@ class ExportCommand : CliktCommand(name = "export") {
                         "run",
                         "--arguments",
                         "game",
+                        "--arguments",
+                        "--no-debug",
                     ),
                 )
             }
@@ -242,6 +306,7 @@ class ExportCommand : CliktCommand(name = "export") {
 
         if (exitCode != 0) {
             echo("\uD83D\uDE31 jpackage failed with exit code $exitCode")
+            throw Abort()
         }
 
         if (!debug) {
@@ -279,7 +344,7 @@ class ExportCommand : CliktCommand(name = "export") {
             echo("\uD83D\uDE31 Could not find tiny-cli JAR.")
             echo("\uD83D\uDCA1 The CLI must be installed before using export-desktop.")
             echo("\uD83D\uDCA1 Run 'make install' to install the CLI.")
-            return
+            throw Abort()
         }
 
         Files.copy(cliJar.toPath(), outputJar.toPath(), StandardCopyOption.REPLACE_EXISTING)
@@ -359,7 +424,7 @@ class ExportCommand : CliktCommand(name = "export") {
 
     private fun getDependencies(): List<String> {
         val classPath = System.getProperty("java.class.path")
-        return classPath.split(":")
+        return classPath.split(File.pathSeparator)
             .filter { it.endsWith(".jar") }
             .filter { !it.contains("tiny-cli-") } // Exclude the CLI jar as it's already copied
             .distinct()
@@ -436,7 +501,7 @@ class ExportCommand : CliktCommand(name = "export") {
         return when (platform) {
             "windows" -> "exe"
             "mac" -> "dmg"
-            "linux" -> "pkg"
+            "linux" -> "deb"
             else -> "app-image"
         }
     }
@@ -444,6 +509,22 @@ class ExportCommand : CliktCommand(name = "export") {
 
 @OptIn(ExperimentalSerializationApi::class)
 class GameExporter {
+    /**
+     * Resolve a file name relative to the game directory, ensuring the resolved path
+     * stays within the game directory to prevent path traversal attacks.
+     */
+    private fun safeResolve(
+        gameDirectory: File,
+        name: String,
+    ): File {
+        val resolved = gameDirectory.resolve(name).canonicalFile
+        val gameRoot = gameDirectory.canonicalFile
+        require(resolved.path.startsWith(gameRoot.path + File.separator) || resolved.path == gameRoot.path) {
+            "Path traversal detected: '$name' resolves outside the game directory"
+        }
+        return gameDirectory.resolve(name)
+    }
+
     fun export(
         gameDirectory: File,
         archive: String,
@@ -497,11 +578,22 @@ class GameExporter {
 
         when (gameParameters) {
             is GameParametersV1 -> {
+                // Bundle the custom boot script if configured
+                listOfNotNull(gameParameters.bootScript)
+                    .filterNot { exportedFile.contains(it) }
+                    .forEach { name ->
+                        exportedGame.putNextEntry(ZipEntry(name))
+                        exportedGame.write(safeResolve(gameDirectory, name).readBytes())
+                        exportedGame.closeEntry()
+
+                        exportedFile += name
+                    }
+
                 (gameParameters.scripts)
                     .filterNot { exportedFile.contains(it) }
                     .forEach { name ->
                         exportedGame.putNextEntry(ZipEntry(name))
-                        exportedGame.write(gameDirectory.resolve(name).readBytes())
+                        exportedGame.write(safeResolve(gameDirectory, name).readBytes())
                         exportedGame.closeEntry()
 
                         exportedFile += name
@@ -510,7 +602,17 @@ class GameExporter {
                     .filterNot { exportedFile.contains(it) }
                     .forEach { name ->
                         exportedGame.putNextEntry(ZipEntry(name))
-                        exportedGame.write(gameDirectory.resolve(name).readBytes())
+                        exportedGame.write(safeResolve(gameDirectory, name).readBytes())
+                        exportedGame.closeEntry()
+
+                        exportedFile += name
+                    }
+                gameParameters.fonts
+                    .map { it.spritesheet }
+                    .filterNot { exportedFile.contains(it) }
+                    .forEach { name ->
+                        exportedGame.putNextEntry(ZipEntry(name))
+                        exportedGame.write(safeResolve(gameDirectory, name).readBytes())
                         exportedGame.closeEntry()
 
                         exportedFile += name
@@ -519,7 +621,7 @@ class GameExporter {
                     .filterNot { exportedFile.contains(it) }
                     .forEach { name ->
                         exportedGame.putNextEntry(ZipEntry(name))
-                        exportedGame.write(gameDirectory.resolve(name).readBytes())
+                        exportedGame.write(safeResolve(gameDirectory, name).readBytes())
                         exportedGame.closeEntry()
 
                         exportedFile += name
@@ -528,15 +630,15 @@ class GameExporter {
                     .filterNot { exportedFile.contains(it) }
                     .forEach { name ->
                         exportedGame.putNextEntry(ZipEntry(name))
-                        exportedGame.write(gameDirectory.resolve(name).readBytes())
+                        exportedGame.write(safeResolve(gameDirectory, name).readBytes())
                         exportedGame.closeEntry()
 
                         exportedFile += name
 
-                        val ldtk = Ldtk.read(gameDirectory.resolve(name).readText())
+                        val ldtk = Ldtk.read(safeResolve(gameDirectory, name).readText())
                         ldtk.levels.flatMap { level -> level.layerInstances }
                             .mapNotNull { it.__tilesetRelPath }
-                            .map { gameDirectory.resolve(it) }
+                            .map { safeResolve(gameDirectory, it) }
                             .filterNot { file -> exportedFile.contains(file.relativeTo(gameDirectory).name) }
                             .toSet()
                             .forEach { file ->
@@ -548,34 +650,33 @@ class GameExporter {
                             }
                     }
 
-                // Add index.html
+                // Add game icon to the export
+                val iconFileName = gameParameters.icon
+                val iconList = if (iconFileName != null) {
+                    val iconFile = safeResolve(gameDirectory, iconFileName)
+                    if (iconFile.exists() && !exportedFile.contains(iconFileName)) {
+                        exportedGame.putNextEntry(ZipEntry(iconFileName))
+                        exportedGame.write(iconFile.readBytes())
+                        exportedGame.closeEntry()
+                        exportedFile += iconFileName
+                    }
+                    listOf(iconFileName)
+                } else {
+                    // Fallback: check if icon.png exists in game directory
+                    val defaultIcon = gameDirectory.resolve("icon.png")
+                    if (defaultIcon.exists() && !exportedFile.contains("icon.png")) {
+                        exportedGame.putNextEntry(ZipEntry("icon.png"))
+                        exportedGame.write(defaultIcon.readBytes())
+                        exportedGame.closeEntry()
+                        exportedFile += "icon.png"
+                        listOf("icon.png")
+                    } else {
+                        emptyList()
+                    }
+                }
 
-                var template = indexContent
-                template = template.replace("{GAME_ID}", gameParameters.id)
-                template = template.replace("{GAME_NAME}", gameParameters.name)
-                template = template.replace("{GAME_WIDTH}", gameParameters.resolution.width.toString())
-                template = template.replace("{GAME_HEIGHT}", gameParameters.resolution.height.toString())
-                template = template.replace("{GAME_ZOOM}", gameParameters.zoom.toString())
-                template = template.replace("{GAME_SPRW}", gameParameters.sprites.width.toString())
-                template = template.replace("{GAME_SPRH}", gameParameters.sprites.height.toString())
-                template = template.replace("{GAME_HIDE_MOUSE}", gameParameters.hideMouseCursor.toString())
-
-                template = replaceList(
-                    template,
-                    gameParameters.scripts,
-                    "{GAME_SCRIPT}",
-                    "GAME_SCRIPT",
-                )
-                template = replaceList(
-                    template,
-                    gameParameters.spritesheets,
-                    "{GAME_SPRITESHEET}",
-                    "GAME_SPRITESHEET",
-                )
-                template = replaceList(template, gameParameters.levels, "{GAME_LEVEL}", "GAME_LEVEL")
-                template = replaceList(template, listOfNotNull(gameParameters.sound), "{GAME_SOUND}", "GAME_SOUND")
-
-                template = template.replace("{GAME_COLORS}", gameParameters.colors.joinToString(","))
+                // Add index.html with only the game name replaced
+                val template = indexContent.replace("{GAME_NAME}", gameParameters.name)
 
                 exportedGame.putNextEntry(ZipEntry("index.html"))
                 exportedGame.write(template.toByteArray())
@@ -584,22 +685,6 @@ class GameExporter {
         }
 
         exportedGame.close()
-    }
-
-    private fun replaceList(
-        template: String,
-        values: List<String>,
-        tag: String,
-        delimiter: String,
-    ): String {
-        val pattern = ("<!-- $delimiter -->(.*?)<!-- ${delimiter}_END -->").toRegex(RegexOption.DOT_MATCHES_ALL)
-        val delimiterTag = pattern.find(template)!!.groupValues[1]
-
-        var result = ""
-        values.forEach { script ->
-            result += delimiterTag.replace(tag, script)
-        }
-        return template.replace(delimiterTag, result)
     }
 
     companion object {

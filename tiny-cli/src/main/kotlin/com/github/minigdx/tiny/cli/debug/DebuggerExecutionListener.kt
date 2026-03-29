@@ -47,28 +47,41 @@ class DebuggerExecutionListener(
 
     private val blocker = CoroutineBlocker()
 
-    private var advanceByStep: Boolean = false
+    private var resumeMode: ResumeMode = ResumeMode.RESUME
 
-    // Current line when the execution resume.
+    // Current line when the execution resumed.
     // So when the step advance of one step, it's to another line.
     private var advanceByStepCurrentLine: Int = -1
+
+    // Script name at the time the execution was resumed (used for STEP_OVER).
+    private var advanceByStepCurrentScript: String = ""
+
+    // Call depth at the time the execution was resumed (used for STEP_OVER).
+    private var advanceByStepCallDepth: Int = 0
+
+    // Current call depth counter (incremented on call, decremented on return).
+    private var callDepth: Int = 0
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
             for (debugRemoteCommand in debugCommandReceiver) {
                 when (debugRemoteCommand) {
                     is ToggleBreakpoint -> toggleBreakpoint(debugRemoteCommand)
+                    is DeleteBreakpoint -> deleteBreakpoint(debugRemoteCommand)
                     is ResumeExecution -> resumeExecution(debugRemoteCommand)
                     Disconnect -> disconnect()
                     RequestBreakpoints -> sendCurrentBreakpoints()
+                    is EvaluateExpression -> evaluateExpression(debugRemoteCommand)
                 }
             }
         }
     }
 
     private fun resumeExecution(debugRemoteCommand: ResumeExecution) {
-        advanceByStep = debugRemoteCommand.advanceByStep
+        resumeMode = debugRemoteCommand.mode
         advanceByStepCurrentLine = currentExecutionPoint.line
+        advanceByStepCurrentScript = currentExecutionPoint.script
+        advanceByStepCallDepth = callDepth
         blocker.unblock()
     }
 
@@ -112,6 +125,11 @@ class DebuggerExecutionListener(
                 upValues = context.upValues,
             ),
         )
+    }
+
+    private fun deleteBreakpoint(command: DeleteBreakpoint) {
+        val executionPoint = ExecutionPoint(command.script, command.line)
+        breakpoints = breakpoints - executionPoint
     }
 
     private fun toggleBreakpoint(debugRemoteCommand: ToggleBreakpoint) {
@@ -209,12 +227,14 @@ class DebuggerExecutionListener(
         varargs: Varargs,
         stack: Array<LuaValue>,
     ) {
+        callDepth++
         callstack(globals.running).onCall(c, varargs, stack)
 
         onCall(c)
     }
 
     override fun onCall(f: LuaFunction) {
+        callDepth++
         callstack(globals.running).onCall(f)
         (f as? LuaClosure)?.run { onCall(this) }
     }
@@ -254,8 +274,21 @@ class DebuggerExecutionListener(
         currentExecutionPoint.pc = pc
         currentExecutionPoint.line = line
 
-        if (advanceByStep && line != advanceByStepCurrentLine) {
-            pauseExecution(currentExecutionPoint.script, line)
+        when (resumeMode) {
+            ResumeMode.STEP_INTO -> if (line != advanceByStepCurrentLine) {
+                pauseExecution(currentExecutionPoint.script, line)
+            }
+
+            ResumeMode.STEP_OVER -> if (
+                callDepth <= advanceByStepCallDepth &&
+                currentExecutionPoint.script == advanceByStepCurrentScript &&
+                line != advanceByStepCurrentLine
+            ) {
+                pauseExecution(currentExecutionPoint.script, line)
+            }
+
+            ResumeMode.RESUME -> { // no stepping pause
+            }
         }
 
         breakpoints.values.forEach { breakpoint ->
@@ -287,13 +320,9 @@ class DebuggerExecutionListener(
     }
 
     /**
-     * Evaluates a Lua condition in the current execution context.
+     * Evaluates a Lua expression in the current execution context and returns the raw LuaValue.
      */
-    private fun evaluateCondition(
-        condition: String,
-        scriptName: String,
-        line: Int,
-    ): Boolean {
+    private fun evaluateLuaExpression(expression: String): LuaValue {
         val frames = callstack(globals.running).getCallFrames()
 
         // Collect upvalues
@@ -330,14 +359,53 @@ class DebuggerExecutionListener(
                 }
             }
 
-            // Evaluate condition
-            appendLine("return ($condition)")
+            // Evaluate expression
+            appendLine("return ($expression)")
         }
 
         // Execute the script
-        val result = globals.load(script).call()
-        return result.toboolean()
+        return globals.load(script).call()
     }
+
+    /**
+     * Evaluates a Lua condition in the current execution context.
+     */
+    private fun evaluateCondition(
+        condition: String,
+        scriptName: String,
+        line: Int,
+    ): Boolean = evaluateLuaExpression(condition).toboolean()
+
+    /**
+     * Evaluates an arbitrary Lua expression and sends the result back to the debugger.
+     */
+    private suspend fun evaluateExpression(cmd: EvaluateExpression) {
+        try {
+            val result = evaluateLuaExpression(cmd.expression)
+            val formatted = formatValue(result)
+            val resultStr = luaValueToDisplayString(formatted)
+            engineCommandSender.send(EvaluationResult(result = resultStr))
+        } catch (e: Exception) {
+            engineCommandSender.send(EvaluationResult(result = "", error = e.message ?: "Unknown error"))
+        }
+    }
+
+    /**
+     * Converts a formatted [com.github.minigdx.tiny.cli.debug.LuaValue] to a readable display string.
+     */
+    private fun luaValueToDisplayString(
+        value: com.github.minigdx.tiny.cli.debug.LuaValue,
+        indent: String = "",
+    ): String =
+        when (value) {
+            is Primitive -> value.value
+            is Dictionary -> {
+                val entries = value.entries.entries.joinToString("\n") { (k, v) ->
+                    "$indent  $k = ${luaValueToDisplayString(v, "$indent  ")}"
+                }
+                "{\n$entries\n$indent}"
+            }
+        }
 
     /**
      * Converts a LuaValue to its string representation for script generation.
@@ -367,6 +435,7 @@ class DebuggerExecutionListener(
                 }
                 "{${entries.joinToString(", ")}}"
             }
+
             else -> "nil" // For functions and other complex types
         }
     }
@@ -401,6 +470,7 @@ class DebuggerExecutionListener(
     }
 
     override fun onReturn() {
+        callDepth--
         callstack(globals.running).onReturn()
 
         val frame = callstack(globals.running).getCurrentFrame()
@@ -525,6 +595,8 @@ class DebuggerExecutionListener(
                         .map { it.varname }
 
                 return locvars.zip(stack!!) { name, value -> LuaValue.varargsOf(name, value) }
+                    // Remove internal local variables "(for generator)", "(for state)", "(for control)"
+                    .filter { !it.arg(1).tojstring().startsWith("(") }
             }
         }
     }

@@ -1,5 +1,5 @@
 @import url(//fonts.googleapis.com/css?family=Titillium+Web:400,700);
-@import url(//fonts.googleapis.com/css?family=Noticia+Text:400,400italic);
+
 @import url(//cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.0/css/font-awesome.css);
 /* Derived from the Riak documentation theme developed by Basho Technologies, Inc. | CC BY 3.0 License | https://docs.basho.org */
 /* normalize.css v2.1.1 | MIT License | git.io/normalize */
@@ -124,7 +124,7 @@ table { border-collapse: collapse; border-spacing: 0; }
 
 html, body { font-size: 100%; }
 
-body { background: white; color: #222222; padding: 0; margin: 0; font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif; font-weight: normal; font-style: normal; line-height: 1; position: relative; cursor: auto; }
+body { background: white; color: #222222; padding: 56px 0 0 0; margin: 0; font-family: "Titillium Web", "Helvetica Neue", Helvetica, Arial, sans-serif; font-weight: normal; font-style: normal; line-height: 1; position: relative; cursor: auto; }
 
 a:hover { cursor: pointer; }
 
@@ -168,8 +168,8 @@ p.lead, .paragraph.lead > p, #preamble > .sectionbody > .paragraph:first-of-type
 div, dl, dt, dd, ul, ol, li, h1, h2, h3, #toctitle, .sidebarblock > .content > .title, h4, h5, h6, pre, form, p, blockquote, th, td { margin: 0; padding: 0; direction: ltr; }
 
 /* Default Link Styles */
-a { color: #2984a9; text-decoration: underline; line-height: inherit; }
-a:hover, a:focus { color: #faa94c; }
+a { color: #2563eb; text-decoration: underline; line-height: inherit; }
+a:hover, a:focus { color: #1d4ed8; }
 a img { border: none; }
 
 /* Default paragraph styles */
@@ -322,7 +322,7 @@ p a > code:hover { color: #444444; }
 #toctitle { color: #3c3d3f; }
 
 @media only screen and (min-width: 1280px) { body.toc2 { padding-left: 20em; }
-  #toc.toc2 { position: fixed; width: 20em; left: 0; top: 0; border-right: 1px solid #cccccc; border-bottom: 0; z-index: 1000; padding: 1em; height: 100%; overflow: auto; }
+  #toc.toc2 { position: fixed; width: 20em; left: 0; top: 56px; border-right: 1px solid #cccccc; border-bottom: 0; z-index: 1000; padding: 1em; height: calc(100% - 56px); overflow: auto; }
   #toc.toc2 #toctitle { margin-top: 0; }
   #toc.toc2 > ul { font-size: .95em; }
   #toc.toc2 ul ul { margin-left: 0; padding-left: 1.25em; }
@@ -384,7 +384,7 @@ table.tableblock #preamble > .sectionbody > .paragraph:first-of-type p { font-si
 
 .exampleblock > .content > :last-child > :last-child, .exampleblock > .content .olist > ol > li:last-child > :last-child, .exampleblock > .content .ulist > ul > li:last-child > :last-child, .exampleblock > .content .qlist > ol > li:last-child > :last-child, .sidebarblock > .content > :last-child > :last-child, .sidebarblock > .content .olist > ol > li:last-child > :last-child, .sidebarblock > .content .ulist > ul > li:last-child > :last-child, .sidebarblock > .content .qlist > ol > li:last-child > :last-child { margin-bottom: 0; }
 
-.literalblock > .content pre, .listingblock > .content pre { background: url('../images/riak/pre-bg.jpg'); border-width: 0 0 1px 0; border-style: solid; border-color: #f0f0f0; -webkit-border-radius: 4px; border-radius: 4px; padding: 15px; word-wrap: break-word; }
+.literalblock > .content pre, .listingblock > .content pre { background: #f8f9fa; border-width: 0 0 1px 0; border-style: solid; border-color: #f0f0f0; -webkit-border-radius: 4px; border-radius: 4px; padding: 15px; word-wrap: break-word; }
 .literalblock > .content pre.nowrap, .listingblock > .content pre.nowrap { overflow-x: auto; white-space: pre; word-wrap: normal; }
 .literalblock > .content pre > code, .listingblock > .content pre > code { display: block; }
 @media only screen { .literalblock > .content pre, .listingblock > .content pre { font-size: 0.64em; } }
@@ -616,7 +616,7 @@ div.unbreakable { page-break-inside: avoid; }
 span.icon > [class^="icon-"], span.icon > [class*=" icon-"] { cursor: default; }
 
 .admonitionblock td.icon [class^="icon-"]:before { font-size: 2.5em; text-shadow: 0 0 8px white, 1px 1px 2px rgba(0, 0, 0, 0.5); cursor: default; }
-.admonitionblock td.icon .icon-note:before { content: "\f05a"; color: #2984a9; color: #1f637f; }
+.admonitionblock td.icon .icon-note:before { content: "\f05a"; color: #2563eb; }
 .admonitionblock td.icon .icon-tip:before { content: "\f0eb"; text-shadow: 1px 1px 2px rgba(155, 155, 0, 0.8); color: #111; }
 .admonitionblock td.icon .icon-warning:before { content: "\f071"; color: #bf6900; }
 .admonitionblock td.icon .icon-caution:before { content: "\f06d"; color: #bf3400; }
@@ -628,7 +628,7 @@ span.icon > [class^="icon-"], span.icon > [class*=" icon-"] { cursor: default; }
 .conum:after { content: attr(data-value); }
 .conum:not([data-value]):empty { display: none; }
 
-body { background-image: url('../images/riak/body-bg.jpg'); }
+body { background-image: none; }
 
 ::selection { background-color: #fcc07f; color: #fff; }
 
@@ -638,18 +638,18 @@ body { background-image: url('../images/riak/body-bg.jpg'); }
 
 #content ul > li { list-style-type: square; }
 
-p > em { font-family: 'Noticia Text', serif; font-weight: 400; font-size: 95%; }
+p > em { font-family: 'Titillium Web', sans-serif; font-weight: 400; font-size: 95%; }
 
-.admonitionblock > table { width: 100%; background-image: url('../images/riak/info-bg.jpg'); border-collapse: separate; border-spacing: 0; -webkit-border-radius: 5px; border-radius: 5px; border: 1px solid #9EC6DF; }
+.admonitionblock > table { width: 100%; background-image: none; border-collapse: separate; border-spacing: 0; -webkit-border-radius: 5px; border-radius: 5px; border: 1px solid #9EC6DF; }
 .admonitionblock > table td.icon { padding: 15px; }
 .admonitionblock > table td.icon .icon-tip:before { text-shadow: 0 0 20px white, 1px 1px 2px rgba(155, 155, 0, 0.8); }
-.admonitionblock > table td.content { font-family: 'Noticia Text', italic; font-size: 90%; font-style: italic; border: 0; padding: 15px; }
+.admonitionblock > table td.content { font-family: 'Titillium Web', sans-serif; font-size: 90%; font-style: italic; border: 0; padding: 15px; }
 
-.admonitionblock .literalblock > .content > pre, .admonitionblock .listingblock > .content > pre { background-image: url('../images/riak/info-bg.jpg'); }
+.admonitionblock .literalblock > .content > pre, .admonitionblock .listingblock > .content > pre { background-image: none; }
 
 .exampleblock > .content { background-color: transparent; border-color: #c9c9c9; }
 
-.sidebarblock { background-image: url('../images/riak/sidebar-bg.jpg'); -webkit-border-radius: 5px; border-radius: 5px; }
+.sidebarblock { background-image: none; -webkit-border-radius: 5px; border-radius: 5px; }
 .sidebarblock > .content > .title { color: #f1f1f1; text-shadow: 0px 2px 2px black; font-size: 1.25em; font-weight: bold; }
 .sidebarblock > .content ul, .sidebarblock > .content p { color: #f1f1f1; text-shadow: 0px 1px 1px black; }
 .sidebarblock > .content .title { color: #dfdfdf; }
@@ -660,6 +660,6 @@ p > em { font-family: 'Noticia Text', serif; font-weight: 400; font-size: 95%; }
 
 table.tableblock.grid-all { -webkit-border-radius: 0; border-radius: 0; -webkit-box-shadow: 0 1px 3px #999999; box-shadow: 0 1px 3px #999999; }
 
-#footer { background-image: url('../images/riak/footer-bg.jpg'); padding: 25px 0; }
+#footer { background-image: none; padding: 25px 0; }
 
 #footer-text { color: #fff; text-shadow: 1px 1px 1px #333; font-size: 80%; text-align: center; }

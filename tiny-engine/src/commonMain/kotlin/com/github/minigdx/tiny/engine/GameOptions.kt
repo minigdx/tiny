@@ -9,9 +9,9 @@ import com.github.minigdx.tiny.input.Vector2
 data class GameOptions(
     val width: Pixel,
     val height: Pixel,
-    val palette: List<String>,
-    val gameScripts: List<String>,
-    val spriteSheets: List<String>,
+    val palette: List<String> = emptyList(),
+    val gameScripts: List<String> = emptyList(),
+    val spriteSheets: List<String> = emptyList(),
     val gameLevels: List<String> = emptyList(),
     val sound: String? = null,
     val zoom: Int = 2,
@@ -19,6 +19,12 @@ data class GameOptions(
     val gutter: Pair<Pixel, Pixel> = 10 to 10,
     val spriteSize: Pair<Pixel, Pixel> = 8 to 8,
     val hideMouseCursor: Boolean = false,
+    val bootScript: String? = null,
+    val icon: String? = null,
+    val fonts: List<FontDescriptor> = emptyList(),
+    val headless: Boolean = false,
+    // 0 = unlimited
+    val maxFrames: Long = 0L,
 ) : MouseProject {
     init {
         require(width > 0) { "The width needs to be a positive number." }

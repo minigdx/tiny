@@ -132,16 +132,19 @@ class ResourceFactory(
 
     fun bootscript(name: String) = script(0, name, BOOT_GAMESCRIPT)
 
+    fun customBootScript(name: String) = script(0, name, BOOT_GAMESCRIPT, forceFromGameDirectory = true)
+
     private fun script(
         index: Int,
         name: String,
         resourceType: ResourceType,
+        forceFromGameDirectory: Boolean = false,
     ): Flow<GameScript> {
         var version = 0
         return vfs.watch(
             platform.createByteArrayStream(
                 name = name,
-                canUseJarPrefix = !protectedResources.contains(resourceType),
+                canUseJarPrefix = forceFromGameDirectory || !protectedResources.contains(resourceType),
             ),
         ).map { content ->
             GameScript(
@@ -174,6 +177,13 @@ class ResourceFactory(
 
     fun bootSpritesheet(name: String): Flow<SpriteSheet> {
         return spritesheet(0, name, BOOT_SPRITESHEET)
+    }
+
+    fun fontSpritesheet(
+        index: Int,
+        name: String,
+    ): Flow<SpriteSheet> {
+        return spritesheet(index, name, ResourceType.FONT_SPRITESHEET)
     }
 
     private fun spritesheet(

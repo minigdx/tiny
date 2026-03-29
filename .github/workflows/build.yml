@@ -32,12 +32,20 @@ jobs:
           files: |
             tiny-cli/build/distributions/tiny-cli-${{github.ref_name}}.zip
             tiny-cli/build/distributions/tiny-cli-${{github.ref_name}}.tar
+      - name: Install butler
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: jdno/setup-butler@v1
+      - name: Publish to itch.io
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+        run: butler push tiny-cli/build/distributions/tiny-cli-${{github.ref_name}}.zip dwursteisen/tiny:tiny-cli --userversion ${{github.ref_name}}
       - name: Update documentation sample
         run: |
           unzip tiny-cli/build/distributions/tiny-cli-${{github.ref_name}}.zip
           tiny-cli-${{github.ref_name}}/bin/tiny-cli docs --output tiny-doc/src/docs/asciidoc/dependencies/tiny-cli-commands.adoc
-          tiny-cli-${{github.ref_name}}/bin/tiny-cli export tiny-sample
-          unzip -o -d tiny-doc/src/docs/asciidoc/sample/game-example tiny-sample/tiny-export.zip
+          tiny-cli-${{github.ref_name}}/bin/tiny-cli export tiny-samples/breakout
+          unzip -o -d tiny-doc/src/docs/asciidoc/sample/game-example tiny-samples/breakout/tiny-export.zip
           tiny-cli-${{github.ref_name}}/bin/tiny-cli export tiny-cli/src/main/resources/sfx
           unzip -o -d tiny-doc/src/docs/asciidoc/sample/sfx-editor tiny-cli/src/main/resources/sfx/tiny-export.zip
       - name: Build examples and generate Asciidoctor HTML pages
@@ -48,6 +56,76 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./tiny-doc/build/docs/asciidoc
+      - name: Upload CLI distribution
+        uses: actions/upload-artifact@v4
+        with:
+          name: tiny-cli-dist
+          path: tiny-cli/build/distributions/tiny-cli-${{github.ref_name}}.zip
+          retention-days: 1
+
+  test-export:
+    needs: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'zulu'
+      - name: Download CLI distribution
+        uses: actions/download-artifact@v4
+        with:
+          name: tiny-cli-dist
+      - name: Extract CLI distribution (Unix)
+        if: runner.os != 'Windows'
+        run: unzip tiny-cli-${{github.ref_name}}.zip
+      - name: Extract CLI distribution (Windows)
+        if: runner.os == 'Windows'
+        run: Expand-Archive -Path tiny-cli-${{github.ref_name}}.zip -DestinationPath .
+      - name: Test web export (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          tiny-cli-${{github.ref_name}}/bin/tiny-cli export tiny-samples/breakout
+          test -f tiny-samples/breakout/tiny-export.zip
+      - name: Test web export (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          tiny-cli-${{github.ref_name}}\bin\tiny-cli.bat export tiny-samples\breakout
+          if (-Not (Test-Path tiny-samples\breakout\tiny-export.zip)) { exit 1 }
+      - name: Test desktop export (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          tiny-cli-${{github.ref_name}}/bin/tiny-cli export tiny-samples/breakout -p desktop --exclude-jdk
+          test -d exported-game
+          ls exported-game/*.jar
+      - name: Test desktop export (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          tiny-cli-${{github.ref_name}}\bin\tiny-cli.bat export tiny-samples\breakout -p desktop --exclude-jdk
+          if (-Not (Test-Path exported-game)) { exit 1 }
+          if (-Not (Get-ChildItem exported-game\*.jar)) { exit 1 }
+      - name: Test desktop export with JDK (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          tiny-cli-${{github.ref_name}}/bin/tiny-cli export tiny-samples/breakout -p desktop --include-jdk -o exported-game-jdk
+          test -d exported-game-jdk
+          if [ "$(uname -s)" = "Linux" ]; then
+            ls exported-game-jdk/*.deb
+          elif [ "$(uname -s)" = "Darwin" ]; then
+            ls exported-game-jdk/*.dmg
+          fi
+      - name: Test desktop export with JDK (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          tiny-cli-${{github.ref_name}}\bin\tiny-cli.bat export tiny-samples\breakout -p desktop --include-jdk -o exported-game-jdk
+          if (-Not (Test-Path exported-game-jdk)) { exit 1 }
+          if (-Not (Get-ChildItem exported-game-jdk\*.exe)) { exit 1 }
 
 env:
   GRADLE_OPTS: -Dorg.gradle.configureondemand=true -Dorg.gradle.parallel=true -Dkotlin.incremental=false -Dorg.gradle.jvmargs="-Xmx3g -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"

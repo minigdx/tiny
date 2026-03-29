@@ -56,4 +56,14 @@ interface GameResourceAccess {
     fun findSound(name: String): Sound?
 
     fun findGameScript(name: String): GameScript?
+
+    /**
+     * Access a font spritesheet by its index.
+     */
+    fun findFontSpritesheet(index: Int): SpriteSheet?
+
+    /**
+     * Find a font spritesheet by its name.
+     */
+    fun findFontSpritesheet(name: String): SpriteSheet?
 }

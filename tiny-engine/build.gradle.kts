@@ -51,8 +51,8 @@ dependencies {
         because("KSP will generate all Lua stub methods from all Lua libs from Tiny.")
     }
 
-    add("kspJvm", project(":tiny-annotation-processors:tiny-api-to-asciidoc-generator")) {
-        because("KSP will generate the asciidoctor documentation of all Lua libs from Tiny.")
+    add("kspJvm", project(":tiny-annotation-processors:tiny-api-to-json-generator")) {
+        because("KSP will generate the JSON API reference of all Lua libs from Tiny.")
     }
 }
 
@@ -98,8 +98,8 @@ configurations.create("tinyWebEngine") {
     outgoing.artifact(tinyEngineJsJar)
 }
 
-// -- Asciidoctor artifact configuration
-configurations.create("tinyApiAsciidoctor") {
+// -- JSON API artifact configuration
+configurations.create("tinyApiJson") {
     isCanBeResolved = false
     isCanBeConsumed = true
 }
@@ -130,8 +130,8 @@ artifacts {
     add("tinyWebEngine", tinyEngineJsJar) {
         builtBy(tinyEngineJsJar)
     }
-    // API as Asciidoctor.
-    add("tinyApiAsciidoctor", project.layout.buildDirectory.dir("generated/ksp/jvm/jvmMain/resources/tiny-api.adoc")) {
+    // API as JSON.
+    add("tinyApiJson", project.layout.buildDirectory.dir("generated/ksp/jvm/jvmMain/resources/tiny-api.json")) {
         builtBy("kspKotlinJvm")
     }
     // API as Lua stub.

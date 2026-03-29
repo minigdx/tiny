@@ -1,0 +1,10 @@
+<a href="{{ tutorial.href }}" class="tutorial-card shadow-bubble" style="text-decoration:none">
+    <div class="tutorial-card__icon">
+        <span class="material-symbols-outlined" style="font-size:2.5rem">{{ tutorial.icon }}</span>
+    </div>
+    <div class="tutorial-card__content">
+        <h3 class="tutorial-card__title font-display">{{ tutorial.title }}</h3>
+        <p class="tutorial-card__desc">{{ tutorial.description }}</p>
+    </div>
+    <span class="tutorial-card__arrow material-symbols-outlined">arrow_forward</span>
+</a>

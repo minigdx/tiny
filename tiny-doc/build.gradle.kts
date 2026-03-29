@@ -3,7 +3,7 @@ import org.asciidoctor.gradle.jvm.AsciidoctorTask
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.asciidoctorj)
-    alias(libs.plugins.minigdx.developer)
+    alias(libs.plugins.minigdx.jvm)
 }
 
 val asciidoctorResources by configurations.creating {
@@ -11,7 +11,7 @@ val asciidoctorResources by configurations.creating {
     isCanBeResolved = true
 }
 
-val asciidoctorDependencies by configurations.creating {
+val jsonApiDependencies by configurations.creating {
     isCanBeConsumed = false
     isCanBeResolved = true
 }
@@ -28,14 +28,17 @@ dependencies {
     )
 
     add(
-        asciidoctorDependencies.name,
+        jsonApiDependencies.name,
         project(
             mapOf(
                 "path" to ":tiny-engine",
-                "configuration" to "tinyApiAsciidoctor",
+                "configuration" to "tinyApiJson",
             ),
         ),
     )
+
+    implementation(libs.pebble)
+    implementation(libs.kotlin.serialization.json)
 }
 
 val unzipAsciidoctorResources =
@@ -44,13 +47,6 @@ val unzipAsciidoctorResources =
             cp.from(zipTree(asciidoctorResources.incoming.artifacts.artifactFiles.files.first()))
         }
         cp.into(project.layout.buildDirectory.get().asFile.resolve("docs/asciidoc"))
-    }
-
-val copyAsciidoctorDependencies =
-    tasks.maybeCreate("copy-asciidoctorDependencies", Copy::class).also { cp ->
-        // I'm bit lazy, I copy the result straight into the source directory :grimace:
-        cp.into(project.projectDir.resolve("src/docs/asciidoc/dependencies"))
-        cp.from(asciidoctorDependencies)
     }
 
 val copySample =
@@ -65,14 +61,80 @@ val copyResources =
         into(project.layout.buildDirectory.get().asFile.resolve("docs/asciidoc/resources"))
     }
 
+val copyJsonApi =
+    tasks.maybeCreate("copy-jsonApiDependencies", Copy::class).also { cp ->
+        cp.into(project.layout.buildDirectory.get().asFile.resolve("docs/asciidoc"))
+        cp.from(jsonApiDependencies)
+    }
+
+val copySeoFiles = tasks.register("copy-seoFiles", Copy::class) {
+    from(project.projectDir.resolve("src/docs/asciidoc")) {
+        include("robots.txt")
+        include("sitemap.xml")
+        include(".nojekyll")
+        include("tiny-nav.js")
+        include("tiny-common.css")
+        include("showcase.json")
+        include("tutorials.json")
+        include("document.json")
+    }
+    into(project.layout.buildDirectory.get().asFile.resolve("docs/asciidoc"))
+}
+
+val renderPebbleTemplates = tasks.register("renderPebbleTemplates", JavaExec::class) {
+    val templateDir = project.projectDir.resolve("src/docs/templates")
+    val dataDir = project.projectDir.resolve("src/docs/asciidoc")
+    val outputDir = project.layout.buildDirectory.get().asFile.resolve("docs/asciidoc")
+    val apiJsonFile = project.layout.buildDirectory.get().asFile.resolve("docs/asciidoc/tiny-api.json")
+    val cliJsonFile = dataDir.resolve("tiny-cli-commands.json")
+
+    dependsOn(
+        tasks.named("classes"),
+        copyJsonApi,
+        copySeoFiles,
+        unzipAsciidoctorResources,
+        copySample,
+        copyResources,
+    )
+
+    classpath = project.the<SourceSetContainer>().getByName("main").runtimeClasspath
+    mainClass.set("com.github.minigdx.tiny.doc.PebbleRendererKt")
+    args = listOf(
+        templateDir.absolutePath,
+        dataDir.absolutePath,
+        outputDir.absolutePath,
+        apiJsonFile.absolutePath,
+        cliJsonFile.absolutePath,
+    )
+
+    inputs.dir(templateDir)
+    inputs.files(
+        dataDir.resolve("showcase.json"),
+        dataDir.resolve("tutorials.json"),
+        dataDir.resolve("document.json"),
+        cliJsonFile,
+    )
+    inputs.files(apiJsonFile)
+    outputs.files(
+        outputDir.resolve("index.html"),
+        outputDir.resolve("showcase.html"),
+        outputDir.resolve("documentation.html"),
+        outputDir.resolve("api.html"),
+        outputDir.resolve("editor.html"),
+        outputDir.resolve("tiny-cli.html"),
+    )
+}
+
 tasks.withType(AsciidoctorTask::class.java).configureEach {
     this.baseDirFollowsSourceDir()
     this.notCompatibleWithConfigurationCache("AsciidoctorJ plugin is not compatible with configuration cache")
 
     this.dependsOn(
         unzipAsciidoctorResources.dependsOn(":tiny-web-editor:tinyWebEditor"),
-        copyAsciidoctorDependencies,
+        copyJsonApi,
         copySample,
         copyResources,
+        copySeoFiles,
+        renderPebbleTemplates,
     )
 }

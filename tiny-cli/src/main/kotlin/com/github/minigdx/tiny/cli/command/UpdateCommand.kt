@@ -3,184 +3,129 @@ package com.github.minigdx.tiny.cli.command
 import com.github.ajalt.clikt.core.Abort
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.Context
-import com.github.ajalt.clikt.core.terminal
 import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
-import com.github.ajalt.mordant.input.InputReceiver
-import com.github.ajalt.mordant.input.receiveKeyEvents
-import com.github.ajalt.mordant.rendering.TextStyles
-import com.github.ajalt.mordant.table.table
+import com.github.ajalt.clikt.parameters.types.int
 import com.github.minigdx.tiny.cli.command.utils.ColorUtils
 import com.github.minigdx.tiny.cli.config.GameParameters
 import com.github.minigdx.tiny.cli.config.GameParametersV1
 import java.io.File
 
 class UpdateCommand : CliktCommand(name = "update") {
-    val gameDirectory by option("-d", "--directory", help = "The directory containing your game to be updated.")
+    private val gameDirectory by option("-d", "--directory", help = "The directory containing your game to be updated.")
         .file(mustExist = true, canBeDir = true, canBeFile = false)
         .default(File("."))
 
-    override fun help(context: Context) = "Interactively view and update game parameters."
+    private val newZoom by option("--zoom", help = "Set the game zoom level (1-8).")
+        .int()
 
-    private var currentParameters: GameParametersV1? = null
-    private var selectedIndex = 0
-    private val editableParameters = mutableListOf<EditableParameter>()
+    private val hideMouseCursor by option("--hide-cursor", help = "Hide the system mouse cursor.")
+        .flag()
+
+    private val showMouseCursor by option("--show-cursor", help = "Show the system mouse cursor.")
+        .flag()
+
+    private val entryPoint by option("--entry-point", help = "Set the entry point script (moved to first in scripts list).")
+
+    override fun help(context: Context) = "View and update game parameters."
 
     override fun run() {
         val configFile = gameDirectory.resolve("_tiny.json")
         if (!configFile.exists()) {
-            echo("❌ No _tiny.json found in ${gameDirectory.absolutePath}! Can't update parameters without it.")
+            echo("❌ No _tiny.json found in ${gameDirectory.absolutePath}")
             throw Abort()
         }
 
-        try {
-            val gameParameters = GameParameters.read(configFile)
-            if (gameParameters !is GameParametersV1) {
-                echo("❌ Only GameParametersV1 is supported for updates.")
-                throw Abort()
-            }
-
-            currentParameters = gameParameters
-            setupEditableParameters()
-            runInteractiveLoop(configFile)
+        val gameParameters = try {
+            GameParameters.read(configFile)
         } catch (e: Exception) {
             echo("❌ Error reading _tiny.json: ${e.message}")
             throw Abort()
         }
-    }
 
-    private fun setupEditableParameters() {
-        val params = currentParameters ?: return
-        editableParameters.clear()
+        if (gameParameters !is GameParametersV1) {
+            echo("❌ Only V1 game configuration is supported.")
+            throw Abort()
+        }
 
-        // Add basic parameters
-        editableParameters.add(EditableParameter("name", params.name, false))
-        editableParameters.add(
-            EditableParameter(
-                "resolution",
-                "${params.resolution.width}x${params.resolution.height}",
-                false,
-            ),
-        )
-        editableParameters.add(EditableParameter("sprites", "${params.sprites.width}x${params.sprites.height}", false))
-        editableParameters.add(EditableParameter("zoom", params.zoom.toString(), true))
-        editableParameters.add(EditableParameter("palette", ColorUtils.formatCurrentPaletteDisplay(params.colors, maxColors = 16), false))
-        editableParameters.add(EditableParameter("scripts", params.scripts.joinToString(", "), false))
-        editableParameters.add(EditableParameter("spritesheets", params.spritesheets.joinToString(", "), false))
-        editableParameters.add(EditableParameter("levels", params.levels.joinToString(", "), false))
-        editableParameters.add(EditableParameter("sounds", listOfNotNull(params.sound).joinToString(", "), false))
-        editableParameters.add(EditableParameter("hideMouseCursor", if (params.hideMouseCursor) "Yes" else "No", true))
-    }
-
-    private fun runInteractiveLoop(configFile: File) {
-        echo("🎮 Interactive Game Parameter Editor")
-        echo("Use ↑/↓ arrow keys to navigate, Enter to toggle values, 'q' to quit and save")
-        echo()
-
-        displayParameters()
-        currentContext.terminal.receiveKeyEvents { event ->
-            val next = when (event.key) {
-                "ArrowUp" -> {
-                    selectedIndex = (selectedIndex - 1).coerceAtLeast(0)
-                    true
-                }
-
-                "ArrowDown" -> {
-                    selectedIndex = (selectedIndex + 1).coerceAtMost(editableParameters.lastIndex)
-                    true
-                }
-
-                "Enter" -> {
-                    toggleParameter()
-                    true
-                }
-
-                "q" -> {
-                    saveAndExit(configFile)
-                    false
-                }
-                else -> true
-            }
-            if (next) {
-                displayParameters()
-                InputReceiver.Status.Continue
-            } else {
-                InputReceiver.Status.Finished
-            }
+        val hasUpdates = newZoom != null || hideMouseCursor || showMouseCursor || entryPoint != null
+        if (hasUpdates) {
+            applyUpdates(gameParameters, configFile)
+        } else {
+            displayParameters(gameParameters)
         }
     }
 
-    private fun displayParameters() {
-        currentContext.terminal.cursor.move {
-            clearScreen()
-        }
+    private fun applyUpdates(
+        params: GameParametersV1,
+        configFile: File,
+    ) {
+        var updated = params
 
-        echo("🎮 Game Parameters for: ${currentParameters?.name}")
-        echo()
-
-        val table = table {
-            header {
-                row("Parameter", "Value", "Editable")
+        newZoom?.let { zoom ->
+            if (zoom !in 1..8) {
+                echo("❌ Zoom must be between 1 and 8.")
+                throw Abort()
             }
-            body {
-                editableParameters.forEachIndexed { index, param ->
-                    val isSelected = index == selectedIndex
-                    val paramName = if (isSelected) TextStyles.bold(param.name) else param.name
-                    val paramValue = if (isSelected) TextStyles.bold(param.value) else param.value
-                    val editable = if (param.isEditable) "✓" else "✗"
+            updated = updated.copy(zoom = zoom)
+            echo("✅ Zoom updated to $zoom")
+        }
 
-                    row(paramName, paramValue, editable)
-                }
+        if (hideMouseCursor) {
+            updated = updated.copy(hideMouseCursor = true)
+            echo("✅ Mouse cursor hidden")
+        } else if (showMouseCursor) {
+            updated = updated.copy(hideMouseCursor = false)
+            echo("✅ Mouse cursor visible")
+        }
+
+        entryPoint?.let { script ->
+            if (script !in updated.scripts) {
+                echo("❌ Script '$script' not found. Available scripts: ${updated.scripts.joinToString(", ")}")
+                throw Abort()
             }
+            updated = updated.setEntryPoint(script)
+            echo("✅ Entry point set to $script")
         }
 
-        echo(table)
-        echo()
-        echo("Selected: ${editableParameters[selectedIndex].name}")
-        if (editableParameters[selectedIndex].isEditable) {
-            echo("Press Enter to toggle this value")
-        }
-        echo("Press 'q' to quit and save changes")
-    }
-
-    private fun toggleParameter() {
-        val param = editableParameters[selectedIndex]
-        if (!param.isEditable) {
-            echo("⚠️  This parameter is not editable")
-            return
-        }
-
-        when (param.name) {
-            "hideMouseCursor" -> {
-                val currentParams = currentParameters ?: return
-                val newValue = !currentParams.hideMouseCursor
-                currentParameters = currentParams.copy(hideMouseCursor = newValue)
-                param.value = if (newValue) "Yes" else "No"
-                echo("✅ ${param.name} toggled to: ${param.value}")
-            }
-
-            "zoom" -> {
-                val currentParams = currentParameters ?: return
-                val newValue = ((currentParams.zoom + 1) % 9).coerceIn(1, 8)
-                param.value = newValue.toString()
-                currentParameters = currentParams.copy(zoom = newValue)
-            }
-        }
-    }
-
-    private fun saveAndExit(configFile: File) {
         try {
-            currentParameters?.write(configFile)
-            echo("✅ Parameters saved successfully!")
+            updated.write(configFile)
         } catch (e: Exception) {
             echo("❌ Error saving parameters: ${e.message}")
+            throw Abort()
         }
+
+        echo()
+        displayParameters(updated)
     }
 
-    private data class EditableParameter(
-        val name: String,
-        var value: String,
-        val isEditable: Boolean,
-    )
+    private fun displayParameters(params: GameParametersV1) {
+        echo("🎮 ${params.name}")
+        echo()
+        echo("🖥  Resolution: ${params.resolution.width}x${params.resolution.height}")
+        echo("📐 Sprites: ${params.sprites.width}x${params.sprites.height}")
+        echo("🔍 Zoom: ${params.zoom}")
+        echo("🎨 Palette: ${ColorUtils.formatCurrentPaletteDisplay(params.colors, maxColors = 16)}")
+        if (params.scripts.isNotEmpty()) {
+            echo("🚀 Entry point: ${params.scripts.first()}")
+        }
+        echo("📝 Scripts: ${params.scripts.joinToString(", ").ifEmpty { "none" }}")
+        echo("🖼️  Spritesheets: ${params.spritesheets.joinToString(", ").ifEmpty { "none" }}")
+        echo("🗺️  Levels: ${params.levels.joinToString(", ").ifEmpty { "none" }}")
+        echo("🔊 Sounds: ${listOfNotNull(params.sound).joinToString(", ").ifEmpty { "none" }}")
+        val fontsDisplay = if (params.fonts.isEmpty()) {
+            "none"
+        } else {
+            params.fonts.joinToString(", ") { font ->
+                val banks = font.banks.joinToString("+") { bank ->
+                    "${bank.name}(${bank.width}x${bank.height})"
+                }
+                "${font.name} [$banks]"
+            }
+        }
+        echo("🔤 Fonts: $fontsDisplay")
+        echo("🖱️  Hide mouse cursor: ${if (params.hideMouseCursor) "yes" else "no"}")
+    }
 }
