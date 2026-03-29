@@ -31,8 +31,8 @@ Fader._update = function(self)
                     self:on_press()
                 end
             end
-            local track_top = self.y + 8
-            local track_bottom = self.y + self.height - 8
+            local track_top = self.y
+            local track_bottom = self.y + self.height
             local track_height = track_bottom - track_top
             local clamped_y = math.max(track_top, math.min(track_bottom, pos.y))
             local percent = 1.0 - ((clamped_y - track_top) / track_height)
@@ -83,15 +83,15 @@ Fader._draw = function(self)
     spr.sdraw(self.x, self.y + self.height - 8, 0, 40, 8, 8)
 
     -- Compute cursor Y from value (reverse the logarithmic mapping)
-    local percent = math.sqrt(self.value)
-    local track_top = self.y + 8
-    local track_bottom = self.y + self.height - 8
+    local percent = self.value
+    local track_top = self.y + 1
+    local track_bottom = self.y + self.height - 3
     local track_height = track_bottom - track_top
-    local cursor_y = track_top + (1.0 - percent) * track_height
+    local cursor_y = math.ceil(track_top + (1.0 - percent) * track_height)
 
     -- Yellow fill (palette index 8) between cursor bottom and fader bottom
     local fill_top = cursor_y + 2
-    local fill_bottom = self.y + self.height - 8
+    local fill_bottom = self.y + self.height - 1
     if fill_top < fill_bottom then
         shape.rectf(self.x + 1, fill_top, 6, fill_bottom - fill_top, 9)
     end
