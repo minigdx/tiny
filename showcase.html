@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Showcase - Tiny Game Engine</title>
+    <meta name="theme-color" content="#ff0080">
+
+    <!-- SEO -->
+    <meta name="description" content="Explore games built with the Tiny game engine. Get inspired by community creations spanning arcade, puzzle, physics, and more.">
+    <meta name="robots" content="index, follow">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="sample/favicon.png">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Quicksand:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
+    <!-- Shared styles -->
+    <link rel="stylesheet" href="tiny-common.css">
+
+    <style>
+        /* -- Header section */
+        .showcase-header {
+            text-align: center;
+            padding: 64px 24px 32px;
+        }
+        .showcase-header__title {
+            font-size: 4.5rem; text-transform: uppercase; color: var(--dark);
+            filter: drop-shadow(4px 4px 0 var(--green));
+        }
+        .showcase-header__subtitle {
+            font-size: 1.25rem; color: #64748b; font-weight: 500;
+            max-width: 560px; margin: 16px auto 0;
+        }
+        .showcase-header__actions {
+            margin-top: 32px;
+        }
+
+        /* -- Game grid */
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* -- Game card */
+        .game-card {
+            display: flex; flex-direction: column;
+            border-radius: 2.5rem;
+            background: #fff; border: 4px solid var(--cyan);
+            overflow: hidden;
+            transition: transform .2s;
+        }
+        .game-card:hover { transform: translateY(-4px); }
+        .game-card--hidden { display: none; }
+
+        .game-card__image {
+            width: 100%; aspect-ratio: 4 / 3;
+            object-fit: cover;
+            border-bottom: 4px solid var(--cyan);
+        }
+
+        .game-card__body {
+            display: flex; flex-direction: column; gap: 12px;
+            padding: 24px;
+            flex: 1;
+        }
+
+        .game-card__genres {
+            display: flex; flex-wrap: wrap; gap: 8px;
+        }
+
+        .genre-tag {
+            display: inline-block;
+            padding: 4px 14px; border-radius: 999px;
+            font-size: .75rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .08em;
+            background: rgba(0,229,255,.15); color: #0891b2;
+        }
+
+        .game-card__title {
+            font-size: 1.4rem; color: var(--dark);
+        }
+
+        .game-card__actions {
+            margin-top: auto; padding-top: 8px;
+        }
+        .game-card__play {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 24px; border-radius: 2rem;
+            font-family: 'Lilita One', cursive; font-weight: 400;
+            font-size: 1rem; text-transform: uppercase; letter-spacing: 1px;
+            text-decoration: none;
+            background: var(--pink); color: #fff;
+            border: 3px solid var(--dark);
+            box-shadow: 0 4px 0 #d4006b;
+            transition: transform .15s, box-shadow .15s;
+        }
+        .game-card__play:hover { transform: translateY(-2px); }
+        .game-card__play:active { transform: translateY(0); }
+
+        /* -- Load more */
+        .load-more-wrapper {
+            text-align: center;
+            padding: 48px 24px 0;
+        }
+
+        /* -- Responsive */
+        @media (max-width: 960px) {
+            .game-grid { grid-template-columns: repeat(2, 1fr); }
+            .showcase-header__title { font-size: 3rem; }
+        }
+        @media (max-width: 600px) {
+            .game-grid { grid-template-columns: 1fr; }
+            .showcase-header__title { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+<nav class="tiny-nav">
+    <a href="index.html" class="tiny-nav__logo">&#129528; Tiny</a>
+    <div class="tiny-nav__links">
+        <a href="index.html#features" class="tiny-nav__link">Features</a>
+        <a href="showcase.html" class="tiny-nav__link">Showcase</a>
+        <a href="documentation.html" class="tiny-nav__link">Docs</a>
+        <a href="api.html" class="tiny-nav__link">API</a>
+        <a href="editor.html" class="tiny-nav__link">Editor</a>
+        <a href="https://github.com/minigdx/tiny" class="tiny-nav__link">Community</a>
+        <a href="tiny-install.html" class="tiny-nav__cta">Get Started</a>
+    </div>
+</nav>
+<div class="page">
+
+    <main style="flex:1">
+        <!-- -- HEADER -->
+        <section class="showcase-header">
+            <h1 class="showcase-header__title font-display">Showcase</h1>
+            <p class="showcase-header__subtitle">
+                Get inspired by what's possible with Tiny! Explore games created by the community.
+            </p>
+            <div class="showcase-header__actions">
+                <a href="https://github.com/minigdx/tiny/discussions/categories/show-and-tell"
+                   target="_blank" rel="noopener"
+                   class="button button--pink">Submit Your Game</a>
+            </div>
+        </section>
+
+        <!-- -- FILTER BAR -->
+        <div class="filter-bar" id="filter-bar">
+            <button class="filter-pill filter-pill--active" data-genre="all">All</button>
+            <button class="filter-pill" data-genre="arcade">Arcade</button>
+            <button class="filter-pill" data-genre="exploration">Exploration</button>
+            <button class="filter-pill" data-genre="physics">Physics</button>
+            <button class="filter-pill" data-genre="puzzle">Puzzle</button>
+            <button class="filter-pill" data-genre="survival">Survival</button>
+            <button class="filter-pill" data-genre="typing">Typing</button>
+        </div>
+
+        <!-- -- GAME GRID -->
+        <div class="game-grid" id="game-grid">
+<div class="game-card shadow-bubble" data-genres="survival">
+    <img class="game-card__image"
+         data-src="sample/camping.gif"
+         alt="Camping - a game made with Tiny game engine"
+         src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23eef0f2' width='400' height='300'/%3E%3C/svg%3E">
+    <div class="game-card__body">
+        <div class="game-card__genres">
+            <span class="genre-tag">Survival</span>
+        </div>
+        <h3 class="game-card__title font-display">Camping</h3>
+        <div class="game-card__actions">
+            <a class="game-card__play" href="https://dwursteisen.itch.io/trijam-camping" target="_blank" rel="noopener">
+                <span class="material-symbols-outlined" style="font-size:1.2rem">play_arrow</span> Play
+            </a>
+        </div>
+    </div>
+</div>
+<div class="game-card shadow-bubble" data-genres="typing">
+    <img class="game-card__image"
+         data-src="sample/level-up.gif"
+         alt="Level Up - a game made with Tiny game engine"
+         src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23eef0f2' width='400' height='300'/%3E%3C/svg%3E">
+    <div class="game-card__body">
+        <div class="game-card__genres">
+            <span class="genre-tag">Typing</span>
+        </div>
+        <h3 class="game-card__title font-display">Level Up</h3>
+        <div class="game-card__actions">
+            <a class="game-card__play" href="https://dwursteisen.itch.io/trijam-220-type-it" target="_blank" rel="noopener">
+                <span class="material-symbols-outlined" style="font-size:1.2rem">play_arrow</span> Play
+            </a>
+        </div>
+    </div>
+</div>
+<div class="game-card shadow-bubble" data-genres="arcade">
+    <img class="game-card__image"
+         data-src="sample/memory.gif"
+         alt="Memory Pong - a game made with Tiny game engine"
+         src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23eef0f2' width='400' height='300'/%3E%3C/svg%3E">
+    <div class="game-card__body">
+        <div class="game-card__genres">
+            <span class="genre-tag">Arcade</span>
+        </div>
+        <h3 class="game-card__title font-display">Memory Pong</h3>
+        <div class="game-card__actions">
+            <a class="game-card__play" href="https://dwursteisen.itch.io/memory-pong-trijam-251" target="_blank" rel="noopener">
+                <span class="material-symbols-outlined" style="font-size:1.2rem">play_arrow</span> Play
+            </a>
+        </div>
+    </div>
+</div>
+<div class="game-card shadow-bubble" data-genres="puzzle">
+    <img class="game-card__image"
+         data-src="sample/connect_me.gif"
+         alt="Connect Me - a game made with Tiny game engine"
+         src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23eef0f2' width='400' height='300'/%3E%3C/svg%3E">
+    <div class="game-card__body">
+        <div class="game-card__genres">
+            <span class="genre-tag">Puzzle</span>
+        </div>
+        <h3 class="game-card__title font-display">Connect Me</h3>
+        <div class="game-card__actions">
+            <a class="game-card__play" href="https://dwursteisen.itch.io/connect-me" target="_blank" rel="noopener">
+                <span class="material-symbols-outlined" style="font-size:1.2rem">play_arrow</span> Play
+            </a>
+        </div>
+    </div>
+</div>
+<div class="game-card shadow-bubble" data-genres="arcade">
+    <img class="game-card__image"
+         data-src="sample/only_three_seconds.gif"
+         alt="Only Three Seconds - a game made with Tiny game engine"
+         src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23eef0f2' width='400' height='300'/%3E%3C/svg%3E">
+    <div class="game-card__body">
+        <div class="game-card__genres">
+            <span class="genre-tag">Arcade</span>
+        </div>
+        <h3 class="game-card__title font-display">Only Three Seconds</h3>
+        <div class="game-card__actions">
+            <a class="game-card__play" href="https://dwursteisen.itch.io/one-light-for-three-seconds" target="_blank" rel="noopener">
+                <span class="material-symbols-outlined" style="font-size:1.2rem">play_arrow</span> Play
+            </a>
+        </div>
+    </div>
+</div>
+<div class="game-card shadow-bubble" data-genres="exploration">
+    <img class="game-card__image"
+         data-src="sample/meiro_de_maigo2.gif"
+         alt="Meiro de Maigo - a game made with Tiny game engine"
+         src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23eef0f2' width='400' height='300'/%3E%3C/svg%3E">
+    <div class="game-card__body">
+        <div class="game-card__genres">
+            <span class="genre-tag">Exploration</span>
+        </div>
+        <h3 class="game-card__title font-display">Meiro de Maigo</h3>
+        <div class="game-card__actions">
+            <a class="game-card__play" href="https://dwursteisen.itch.io/meiro-de" target="_blank" rel="noopener">
+                <span class="material-symbols-outlined" style="font-size:1.2rem">play_arrow</span> Play
+            </a>
+        </div>
+    </div>
+</div>
+<div class="game-card shadow-bubble game-card--hidden" data-genres="arcade">
+    <img class="game-card__image"
+         data-src="sample/freezming.gif"
+         alt="Freezming - a game made with Tiny game engine"
+         src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23eef0f2' width='400' height='300'/%3E%3C/svg%3E">
+    <div class="game-card__body">
+        <div class="game-card__genres">
+            <span class="genre-tag">Arcade</span>
+        </div>
+        <h3 class="game-card__title font-display">Freezming</h3>
+        <div class="game-card__actions">
+            <a class="game-card__play" href="https://dwursteisen.itch.io/freezming" target="_blank" rel="noopener">
+                <span class="material-symbols-outlined" style="font-size:1.2rem">play_arrow</span> Play
+            </a>
+        </div>
+    </div>
+</div>
+<div class="game-card shadow-bubble game-card--hidden" data-genres="physics">
+    <img class="game-card__image"
+         data-src="sample/gravity-balls.gif"
+         alt="Gravity Balls - a game made with Tiny game engine"
+         src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23eef0f2' width='400' height='300'/%3E%3C/svg%3E">
+    <div class="game-card__body">
+        <div class="game-card__genres">
+            <span class="genre-tag">Physics</span>
+        </div>
+        <h3 class="game-card__title font-display">Gravity Balls</h3>
+        <div class="game-card__actions">
+            <a class="game-card__play" href="https://dwursteisen.itch.io/gravity-balls" target="_blank" rel="noopener">
+                <span class="material-symbols-outlined" style="font-size:1.2rem">play_arrow</span> Play
+            </a>
+        </div>
+    </div>
+</div>
+<div class="game-card shadow-bubble game-card--hidden" data-genres="puzzle">
+    <img class="game-card__image"
+         data-src="sample/reflections.gif"
+         alt="Reflections - a game made with Tiny game engine"
+         src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23eef0f2' width='400' height='300'/%3E%3C/svg%3E">
+    <div class="game-card__body">
+        <div class="game-card__genres">
+            <span class="genre-tag">Puzzle</span>
+        </div>
+        <h3 class="game-card__title font-display">Reflections</h3>
+        <div class="game-card__actions">
+            <a class="game-card__play" href="https://dwursteisen.itch.io/macro-jams-06-reflections" target="_blank" rel="noopener">
+                <span class="material-symbols-outlined" style="font-size:1.2rem">play_arrow</span> Play
+            </a>
+        </div>
+    </div>
+</div>
+<div class="game-card shadow-bubble game-card--hidden" data-genres="puzzle">
+    <img class="game-card__image"
+         data-src="sample/2026-1bit-jam-2.gif"
+         alt="Pair of Pipes - a game made with Tiny game engine"
+         src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23eef0f2' width='400' height='300'/%3E%3C/svg%3E">
+    <div class="game-card__body">
+        <div class="game-card__genres">
+            <span class="genre-tag">Puzzle</span>
+        </div>
+        <h3 class="game-card__title font-display">Pair of Pipes</h3>
+        <div class="game-card__actions">
+            <a class="game-card__play" href="https://dwursteisen.itch.io/pair-of-pipes" target="_blank" rel="noopener">
+                <span class="material-symbols-outlined" style="font-size:1.2rem">play_arrow</span> Play
+            </a>
+        </div>
+    </div>
+</div>
+        </div>
+
+        <!-- -- LOAD MORE -->
+        <div class="load-more-wrapper" id="load-more-wrapper">
+            <button class="button button--cyan button--small" id="load-more-btn">Load More</button>
+        </div>
+
+        <div style="height: 80px;"></div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer__brand">
+            <span class="footer__brand-text font-display">&#129528; Tiny</span>
+        </div>
+        <div class="footer__links">
+            <a class="footer__link" href="https://github.com/minigdx/tiny">GitHub</a>
+            <a class="footer__link" href="documentation.html">Documentation</a>
+            <a class="footer__link" href="editor.html">Editor</a>
+        </div>
+        <p class="footer__copy">&copy; 2026 Tiny Game Engine. Made for creators.</p>
+    </footer>
+</div>
+<script>
+(function () {
+    var grid = document.getElementById('game-grid');
+    var filterBar = document.getElementById('filter-bar');
+    var loadMoreBtn = document.getElementById('load-more-btn');
+    var loadMoreWrapper = document.getElementById('load-more-wrapper');
+    var activeGenre = 'all';
+    var batchSize = 6;
+    var visibleCount = batchSize;
+
+    // -- Lazy-load GIFs with IntersectionObserver
+    var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+                var img = entry.target;
+                img.src = img.getAttribute('data-src');
+                img.removeAttribute('data-src');
+                observer.unobserve(img);
+            }
+        });
+    }, { rootMargin: '200px 0px' });
+
+    document.querySelectorAll('.game-card__image[data-src]').forEach(function(img) {
+        observer.observe(img);
+    });
+
+    // -- Filter by genre
+    filterBar.addEventListener('click', function (e) {
+        var pill = e.target.closest('.filter-pill');
+        if (!pill) return;
+
+        activeGenre = pill.getAttribute('data-genre');
+        filterBar.querySelectorAll('.filter-pill').forEach(function (p) {
+            p.classList.remove('filter-pill--active');
+        });
+        pill.classList.add('filter-pill--active');
+
+        visibleCount = batchSize;
+        applyFilter();
+    });
+
+    // -- Load more
+    loadMoreBtn.addEventListener('click', function () {
+        visibleCount += batchSize;
+        applyFilter();
+    });
+
+    function applyFilter() {
+        var cards = grid.querySelectorAll('.game-card');
+        var shown = 0;
+        var totalMatch = 0;
+
+        cards.forEach(function (card) {
+            var genres = card.getAttribute('data-genres');
+            var matchGenre = (activeGenre === 'all' || genres.indexOf(activeGenre) !== -1);
+
+            if (matchGenre) {
+                totalMatch++;
+                if (shown < visibleCount) {
+                    card.classList.remove('game-card--hidden');
+                    shown++;
+                } else {
+                    card.classList.add('game-card--hidden');
+                }
+            } else {
+                card.classList.add('game-card--hidden');
+            }
+        });
+
+        if (shown >= totalMatch) {
+            loadMoreWrapper.style.display = 'none';
+        } else {
+            loadMoreWrapper.style.display = 'block';
+        }
+    }
+
+    // Initial state
+    applyFilter();
+})();
+</script>
+</body>
+</html>

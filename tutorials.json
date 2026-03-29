@@ -1,0 +1,44 @@
+[
+  {
+    "title": "1. Getting Started",
+    "icon": "download",
+    "href": "tiny-install.html",
+    "description": "Install Tiny CLI, create your first project, and learn the basics of the game loop."
+  },
+  {
+    "title": "2. Build a Pong Game",
+    "icon": "sports_tennis",
+    "href": "tiny-tutorial.html",
+    "description": "Learn the fundamentals of Tiny by building a classic Pong game. Covers input handling, collision detection, and game state."
+  },
+  {
+    "title": "3. Exporting Your Game",
+    "icon": "public",
+    "href": "tiny-tutorial-export.html",
+    "description": "Export your game for the web or desktop, and deploy it to itch.io or any static host."
+  },
+  {
+    "title": "4. Sprites & Animation",
+    "icon": "image",
+    "href": "tiny-tutorial-sprites.html",
+    "description": "Draw spritesheets, animate characters, flip sprites, and manage multiple sheets."
+  },
+  {
+    "title": "5. Maps with LDtk",
+    "icon": "map",
+    "href": "tiny-tutorial-maps.html",
+    "description": "Build game levels with the LDtk editor. Draw maps, handle entities, and implement tile-based collision."
+  },
+  {
+    "title": "6. Custom Fonts",
+    "icon": "font_download",
+    "href": "tiny-fonts.html",
+    "description": "Create bitmap font spritesheets, configure font banks, and give your game a unique look."
+  },
+  {
+    "title": "7. Adding Sound",
+    "icon": "music_note",
+    "href": "tiny-tutorial-sound.html",
+    "description": "Design chip-tune sound effects with the SFX editor and play them from your Lua code."
+  }
+]

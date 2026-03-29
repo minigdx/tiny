@@ -1,0 +1,3834 @@
+{
+  "libraries": [
+    {
+      "name": "std",
+      "description": "Standard library.",
+      "icon": "book-open",
+      "variables": [
+      ],
+      "functions": [
+        {
+          "name": "all",
+          "description": "Iterate over values of a table.\n\n- If you want to iterate over keys, use `pairs(table)`.\n - If you want to iterate over index, use `ipairs(table)`.\n - If you want to iterate in reverse, use `rpairs(table)`.\n",
+          "example": null,
+          "calls": [
+            {
+              "description": "Iterate over the values of the table",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "table",
+                  "type": "table",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "append",
+          "description": "Append *all values* from the table `source` to the table `dest`.",
+          "example": "\nfunction _draw()\n    gfx.cls()\n    local src = {1, 2, 3}\n    local dst = {4, 5}\n    local result = append(src, dst)\n    for k,v in ipairs(result) do\n        print(v, (k + 1) * 8, 8) \n    end\nend\n",
+          "calls": [
+            {
+              "description": "Copy source into dest.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "source",
+                  "type": "table",
+                  "description": ""
+                },
+                {
+                  "name": "dest",
+                  "type": "table",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "merge",
+          "description": "Add *all key/value* from the table `source` to the table `dest`.",
+          "example": "\nfunction _draw()\n    gfx.cls()\n    local src = {x = 1, y = 2, z = 3}\n    local dst = {a = 4, b = 5}\n    local result = merge(src, dst)\n    local index = 1\n    for k,v in pairs(result) do\n        print(k..\":\"..v , index * 4 * 8, 8)\n        index = index + 1\n    end\nend\n",
+          "calls": [
+            {
+              "description": "Merge source into dest.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "source",
+                  "type": "table",
+                  "description": ""
+                },
+                {
+                  "name": "dest",
+                  "type": "table",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "new",
+          "description": "Create new instance of a class by creating a new table and setting the metatable. It allow to create kind of Object Oriented Programming.\n\n ",
+          "example": "\nlocal Player = {\n    x = 128,\n    y = 128,\n    color = 8\n}\n\nfunction Player:draw()\n    shape.rectf(self.x, self.y, 10, 10, self.color)\nend\n\nfunction _init()\n    -- create a new player\n    player = new(Player)\n    -- create a new player with default vaules\n    player2 = new(Player, {x = 200, y = 200, color = 9})\nend\n\nfunction _draw()\n    gfx.cls()\n    player:draw() -- call the draw method on the player instance.\n    player2:draw() -- call the draw method on the player2 instance.\nend\n",
+          "calls": [
+            {
+              "description": "Create new instance of class.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "class",
+                  "type": "table",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Create new instance of class using default values.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "class",
+                  "type": "table",
+                  "description": ""
+                },
+                {
+                  "name": "default",
+                  "type": "table",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "print",
+          "description": "Print on the screen a string. Default color is the closest to white (#FFFFFF) in the palette. To ensure visibility, use a color that contrasts with the cls() background color.",
+          "example": "\nfunction _draw()\n    gfx.cls()\n    -- every character is a sprite 4x4 pixels.\n    print(\"hello\")\n    print(\"world\", 10, 8)\n    print(\"how\", 10, 16, 4)\n    print(\"are\", 28, 16, 5)\n    print(\"you\", 46, 16, 6)\n    print(\"...\", 64, 16, math.rnd(10))\nend\n",
+          "calls": [
+            {
+              "description": "print on the screen a string at (0,0) with the default color (closest to white).",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "str",
+                  "type": "string",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "print on the screen a string with the default color (closest to white).",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "str",
+                  "type": "string",
+                  "description": ""
+                },
+                {
+                  "name": "x",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "print on the screen a string with a specific color index (1 to N).",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "str",
+                  "type": "string",
+                  "description": ""
+                },
+                {
+                  "name": "x",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "color",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "rpairs",
+          "description": "Iterate over values of a table in reverse order. The iterator return an index and the value. The method is useful to remove elements from a table while iterating on it.",
+          "example": "\nfunction _draw()\n    gfx.cls()\n    local data = {\n        { name = \"riri\" },\n        { name = \"fifi\" },\n        { name = \"loulou\" }\n    }\n\n    local y = 0\n    for index, key in rpairs(data) do\n        print(index .. \" - \" .. key.name, 10, y)\n        y = y + 10\n    end\nend\n",
+          "calls": [
+            {
+              "description": "Iterate over the values of the table",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "table",
+                  "type": "table",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "console",
+      "description": "Helpers to log information in the console.",
+      "icon": "terminal",
+      "variables": [
+      ],
+      "functions": [
+        {
+          "name": "log",
+          "description": "Log a message into the console.",
+          "example": "\nfunction _update()\n    console.log(\"hello from the console\")\n    console.log(\"Log a value: \", tiny.frame)\n    console.log(\"Log a table: \", ctrl.touch())\nend\n  \nfunction _draw()\n    gfx.cls()\n    -- draw the mouse position.\n    local pos = ctrl.touch()\n\n    shape.line(pos.x - 2, pos.y, pos.x + 2, pos.y, 3)\n    shape.line(pos.x, pos.y - 2, pos.x, pos.y + 2, 3) \nend\n",
+          "calls": [
+            {
+              "description": "Log a message into the console.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "str",
+                  "type": "any",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ctrl",
+      "description": "Access to controllers like touch/mouse events or accessing which key is pressed by the user.",
+      "icon": "keyboard",
+      "variables": [
+      ],
+      "functions": [
+        {
+          "name": "pressed",
+          "description": "Return true if the key was pressed during the last frame. When called without argument, return a table of all keys pressed during the last frame (values matching the keys lib), or false if no key was pressed. If you need to check that the key is still pressed, see `ctrl.pressing` instead.",
+          "example": "\nlocal percent_a = 1\nlocal percent_b = 1\n\nfunction _update()\n    percent_a = math.min(percent_a + 0.05, 1)\n    percent_b = math.min(percent_b + 0.05, 1)\n\n    if ctrl.pressed(keys.space) then\n        percent_a = 0\n    end\n    \n    if ctrl.pressing(keys.space) then\n        percent_b = 0\n    end\n\n    local offset_a = juice.powIn2(0, 8, percent_a)\n    local offset_b = juice.powIn2(0, 8, percent_b)\n\n    gfx.cls()\n    shape.rectf(64, 128 - 16, 32, 32, 7)\n    shape.rectf(64, 128 - 32 + offset_a, 32, 32, 8)\n\n    shape.rectf(32 + 128, 128 - 16, 32, 32, 7)\n    shape.rectf(32 + 128, 128 - 32 + offset_b, 32, 32, 8)\n\n    print(\"pressed\", 64, 128 + 32)\n    print(\"pressing\", 32 + 128, 128 + 32)\nend\n",
+          "calls": [
+            {
+              "description": "Get all keys just pressed as a table of key values, or false if none.",
+              "returnType": "any",
+              "args": [
+              ]
+            },
+            {
+              "description": "Is the key was pressed?",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "key",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "pressing",
+          "description": "Return true if the key is still pressed. ",
+          "example": "\nlocal percent_a = 1\nlocal percent_b = 1\n\nfunction _update()\n    percent_a = math.min(percent_a + 0.05, 1)\n    percent_b = math.min(percent_b + 0.05, 1)\n\n    if ctrl.pressed(keys.space) then\n        percent_a = 0\n    end\n    \n    if ctrl.pressing(keys.space) then\n        percent_b = 0\n    end\n\n    local offset_a = juice.powIn2(0, 8, percent_a)\n    local offset_b = juice.powIn2(0, 8, percent_b)\n\n    gfx.cls()\n    shape.rectf(64, 128 - 16, 32, 32, 7)\n    shape.rectf(64, 128 - 32 + offset_a, 32, 32, 8)\n\n    shape.rectf(32 + 128, 128 - 16, 32, 32, 7)\n    shape.rectf(32 + 128, 128 - 32 + offset_b, 32, 32, 8)\n\n    print(\"pressed\", 64, 128 + 32)\n    print(\"pressing\", 32 + 128, 128 + 32)\nend\n",
+          "calls": [
+            {
+              "description": "Is the key is still pressed?",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "key",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "touch",
+          "description": "Get coordinates of the current touch/mouse. If the mouse/touch is out-of the screen, the coordinates will be the last mouse position/touch. The function return those coordinates as a table {x, y}. A sprite can be draw directly on the mouse position by passing the sprite number. ",
+          "example": "\nfunction _draw()\n  gfx.cls(2)\n  p = ctrl.touch()\n  print(\"coordinates: \"..p.x .. \"x\"..p.y, 1, 1, 4)\n  shape.rectf(p.x, p.y, 5,5, p.x + p.y)\nend\n",
+          "calls": [
+            {
+              "description": "Get the mouse coordinates.",
+              "returnType": "any",
+              "args": [
+              ]
+            },
+            {
+              "description": "Get the mouse coordinate and draw a sprite on those coordinates.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "sprN",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "touched",
+          "description": "Return the position of the touch (as `{x, y}`)if the screen was touched or the mouse button was pressed during the last frame. `nil` otherwise.\nThe touch can be : \n\n- 0: left click or one finger\n- 1: right click or two fingers\n- 2: middle click or three fingers\n\nIf you need to check that the touch/mouse button is still active, see `ctrl.touching` instead.",
+          "example": "\nlocal circles = {}\n\nfunction _update()\n    local pos = ctrl.touched(0)\n    if pos ~= nil then\n        table.insert(circles, pos)\n    end\nend\n\nfunction _draw()\n    gfx.cls()\n    local p = ctrl.touch()\n    shape.circlef(p.x, p.y, 4, 8)\n    for pos in all(circles) do \n        shape.circlef(pos.x, pos.y, 4, 9)\n        print(\"(\"..pos.x .. \", \"..pos.y..\")\", pos.x + 3, pos.y + 3)\n    end\nend\n",
+          "calls": [
+            {
+              "description": "Is the screen was touched or mouse button was pressed?",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "touch",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "touching",
+          "description": "Return the position of the touch (as `{x, y}`)if the screen is still touched or the mouse button is still pressed. `nil` otherwise.\nThe touch can be : \n\n- 0: left click or one finger\n- 1: right click or two fingers\n- 2: middle click or three fingers\n\n",
+          "example": "\nfunction _draw()\n    gfx.cls()\n    local p = ctrl.touch()\n    shape.circlef(p.x, p.y, 4, 8)\n\n    local start = ctrl.touching(0)\n    if start ~= nil then\n        local pos = ctrl.touch()\n        shape.line(start.x, start.y, pos.x, pos.y, 1)\n        print(\"(\"..start.x .. \", \"..start.y..\")\", start.x, start.y)\n        print(\"(\"..pos.x .. \", \"..pos.y..\")\", pos.x, pos.y)\n    end\nend\n",
+          "calls": [
+            {
+              "description": "Is the screen is still touched or mouse button is still pressed?",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "touch",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "floppy",
+      "description": "Floppy allow you to get or save user Lua structure.",
+      "icon": "save",
+      "variables": [
+      ],
+      "functions": [
+        {
+          "name": "get",
+          "description": "Load and get the content of the file name",
+          "example": null,
+          "calls": [
+            {
+              "description": "Load and get the content of the file name",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "name",
+                  "type": "string",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "put",
+          "description": "Save the content into a local file, on desktop or in the local storage on the web platform.",
+          "example": null,
+          "calls": [
+            {
+              "description": "Save the content into the file name.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "name",
+                  "type": "string",
+                  "description": ""
+                },
+                {
+                  "name": "content",
+                  "type": "any",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gfx",
+      "description": "Access to graphical API like updating the color palette or applying a dithering pattern.",
+      "icon": "palette",
+      "variables": [
+      ],
+      "functions": [
+        {
+          "name": "camera",
+          "description": "Move the game camera.",
+          "example": "\nlocal x = 0\nlocal y = 0\n\nfunction _update()\n    if ctrl.pressing(keys.left) then\n        x = x - 0.5\n    elseif ctrl.pressing(keys.right) then\n        x = x + 0.5\n    end\n\n    if ctrl.pressing(keys.up) then\n        y = y - 0.5\n    elseif ctrl.pressing(keys.down) then\n        y = y + 0.5\n    end\n    gfx.camera(math.floor(x), math.floor(y))\nend\n\nfunction _draw()\n    gfx.cls(2)\n    for x = 0 - 64, 256 + 64, 16 do\n        for y = 0 - 64, 256 + 64, 16 do\n            shape.line(x - 2, y, x + 2, y, 9)\n            shape.line(x, y - 2, x, y + 2, 9)\n        end\n    end\n    print(\"camera: (\"..x..\", \"..y..\")\", 6, 6)\n    \n    shape.rect(0, 0, 256, 256, 1)\nend",
+          "calls": [
+            {
+              "description": "Reset the game camera to it's default position (0,0).",
+              "returnType": "any",
+              "args": [
+              ]
+            },
+            {
+              "description": "Set game camera to the position x, y.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "x",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "clip",
+          "description": "Clip the draw surface (ie: limit the drawing area).",
+          "example": "\nfunction _init()\n  c = {}\n  for i=1,100 do\n    table.insert(c, {x=math.rnd(256), y=math.rnd(256), c = math.rnd(1,12)})\nend\n\nend\nfunction _draw()\n  gfx.cls()\n  local pos = ctrl.touch()\n  -- set a clip area to crop circles\n  gfx.clip(pos.x - 20, pos.y - 20, 40, 40)\n  for circle in all(c) do\n    shape.circlef(circle.x, circle.y, 10, circle.c)\n  end\nend\n",
+          "calls": [
+            {
+              "description": "Reset the clip and draw on the fullscreen.",
+              "returnType": "any",
+              "args": [
+              ]
+            },
+            {
+              "description": "Clip and limit the drawing area.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "x",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "width",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "height",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "cls",
+          "description": "Clear the screen. When called without arguments, clears with the color closest to black (#000000) in the palette. To ensure visibility, always draw with a color index DIFFERENT from the cls() color.",
+          "example": "\nfunction _draw()\n    if ctrl.pressed(keys.space) then\n       gfx.cls()\n    end\n\n    print(\"Press space to clear the screen\") \n    local pos = ctrl.touch()\n    shape.circlef(pos.x, pos.y, 4, math.rnd())\nend",
+          "calls": [
+            {
+              "description": "Clear the screen with the color closest to black (#000000) in the palette.",
+              "returnType": "any",
+              "args": [
+              ]
+            },
+            {
+              "description": "Clear the screen with the given color index (1 to N). Color 0 clears to transparent.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "color",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "dither",
+          "description": "Apply a dithering pattern on every new draw call. The pattern is using the bits value of a 2 octet value. The first bits is the one on the far left and represent the pixel of the top left of a 4x4 matrix. The last bit is the pixel from the bottom right of this matrix.",
+          "example": "\nfunction _draw()\n    gfx.cls()\n    gfx.dither()\n    shape.circlef(30, 30, 30, 2)\n    gfx.dither(0xA5A5) -- set a dithering pattern\n    shape.circlef(50, 50, 30, 3)\n    gfx.dither(0x0842) -- set another dithering pattern\n    shape.circlef(70, 70, 30, 2)\nend\n",
+          "calls": [
+            {
+              "description": "Reset dithering pattern. The previous dithering pattern is returned.",
+              "returnType": "any",
+              "args": [
+              ]
+            },
+            {
+              "description": "Apply dithering pattern. The previous dithering pattern is returned.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "pattern",
+                  "type": "number",
+                  "description": "Dither pattern. For example: 0xA5A5 or 0x3030"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "draw_mode",
+          "description": "Switch to another draw mode. \n\n- 0: default.\n - 1: drawing with transparent (ie: can erase part of the screen)\n  - 2: drawing a stencil that will be use with the next mode\n  - 3: drawing using a stencil test (ie: drawing only in the stencil)\n  - 4: drawing using a stencil test (ie: drawing everywhere except in the stencil)\n",
+          "example": "\nlocal draw_stencil = 2\nlocal draw_inside_stencil = 3\nlocal draw_outside_stencil = 4\n\nlocal outside = false\n\nfunction _draw()\n    if ctrl.pressed(keys.space) then\n        outside = not outside\n    end\n\n    gfx.cls(3)\n\n    gfx.draw_mode(draw_stencil)\n\n    -- draw a circle in the middle of the screen\n    shape.circlef(128, 128, 64, 1)\n    \n    if outside then\n        gfx.draw_mode(draw_inside_stencil)\n    else\n        gfx.draw_mode(draw_outside_stencil)\n    end\n    \n    -- draw the sprite sheet. only in the circle\n    spr.sdraw()\n    gfx.draw_mode()\nend\n",
+          "calls": [
+            {
+              "description": "Return the actual mode. Switch back to the default mode.",
+              "returnType": "any",
+              "args": [
+              ]
+            },
+            {
+              "description": "Switch to another draw mode. Return the previous mode.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "mode",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "pal",
+          "description": "Change a color from the palette to another color.",
+          "example": "\nfunction _draw()\n    gfx.cls()\n    print(\"example\", 10, 10, 2) -- print using the color index 2\n    gfx.pal(2, 3) -- switch the text color to another color\n    print(\"example\", 10, 20, 2) -- print using the color index 2\n    gfx.pal() -- reset the palette\n    print(\"example\", 10, 30, 2) -- print using the color index 2\nend\n",
+          "calls": [
+            {
+              "description": "Reset all previous color changes.",
+              "returnType": "any",
+              "args": [
+              ]
+            },
+            {
+              "description": "Replace the color a for the color b.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "a",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "b",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "pget",
+          "description": "Get the color index at the coordinate (x,y).",
+          "example": "\nfunction _draw()\n   gfx.cls()\n   local index = 0\n   for x=0, 240, 16 do\n     for y=0, 240, 16 do\n        shape.rectf(x, y, 16, 16, index)\n        index = index + 1\n     end\n   end\n\n   local pos = ctrl.touch()\n   local color = gfx.pget(pos.x, pos.y)\n   if color ~= nil then \n     shape.rectf(0, 0, 80, 6, 13)\n     print(\"color index: \"..color)\n   end\n\n\n   shape.circlef(pos.x - 2, pos.y - 2, 4, 0)\nend",
+          "calls": [
+            {
+              "description": "get the color index at the coordinate (x,y).",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "x",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "pset",
+          "description": "Set the color index at the coordinate (x,y).",
+          "example": "\nfunction _draw()\n   local pos = ctrl.touching(0)\n   if pos ~= nil then\n      -- set the pixel with the color 9 when the mouse is pressed\n      local p = ctrl.touch()\n      gfx.pset(p.x, p.y, 9)\n   end\nend",
+          "calls": [
+            {
+              "description": "set the color index at the coordinate (x,y).",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "x",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "color",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "to_sheet",
+          "description": "Transform the current frame buffer into a spritesheeet. \n\n- If the index of the spritesheet already exist, the spritesheet will be replaced\n- If the index of the spritesheet doesn't exist, a new spritesheet at this index will be created\n- If the index of the spritesheet is negative, a new spritesheet will be created at the last positive index.\n",
+          "example": "\nfunction _draw()\n    gfx.cls(1)\n    -- draw a transparent circle (like a hole)\n    shape.circlef(64, 128, 20, 0)\n    -- keep the result as spritesheet 0\n    gfx.to_sheet(0)\n\n    gfx.cls(1)\n    -- draw some circles\n    shape.circlef(64, 108, 20, 8)\n    shape.circlef(44, 128, 20, 9)\n    shape.circlef(64, 148, 20, 10)\n    shape.circlef(84, 128, 20, 11)\n\n    -- draw over the circles\n    -- the mask generated before.\n    spr.sheet(0)\n    spr.sdraw()\nend",
+          "calls": [
+            {
+              "description": "Copy the current frame buffer to an new or existing sheet index.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "sheet",
+                  "type": "any",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "juice",
+      "description": "Easing functions to 'juice' a game. Interpolation to juice your game.\nAll interpolations available: \n\n- pow2, pow3, pow4, pow5,\n- powIn2, powIn3, powIn4, powIn5,\n- powOut2, powOut3, powOut4, powOut5,\n- sine, sineIn, sineOut,\n- circle, circleIn, circleOut,\n- elastic, elasticIn, elasticOut,\n- swing, swingIn, swingOut,\n- bounce, bounceIn, bounceOut,\n- exp10, expIn10, expOut10,\n- exp5, expIn5, expOut5,\n- linear ",
+      "icon": "sparkles",
+      "variables": [
+      ],
+      "functions": [
+        {
+          "name": "bounce",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "bounceIn",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "bounceOut",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "circle",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "circleIn",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "circleOut",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "elastic",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "elasticIn",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "elasticOut",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "exp10",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "exp5",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "expIn10",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "expIn5",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "expOut10",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "expOut5",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "linear",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "pow2",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "pow3",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "pow4",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "pow5",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "powIn2",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "powIn3",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "powIn4",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "powIn5",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "powOut2",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "powOut3",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "powOut4",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "powOut5",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "sine",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "sineIn",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "sineOut",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "swing",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "swingIn",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "swingOut",
+          "description": "",
+          "example": "\nlocal center_x = 256 * 0.5\nlocal center_y = 256 * 0.5\nlocal width = 128\n\nfunction _update()\n    gfx.cls()\n    shape.line(center_x - 64, center_y + 64, center_x + 64, center_y + 64, 2)\n    shape.line(center_x + 64, center_y - 64, center_x + 64, center_y + 64, 2)\n\n    \n    for x = 0, width, 2 do\n        local y = juice.##function##(0, 128, x / width)\n        gfx.pset(\n            center_x - 64 + x, center_y + 64 - y, 3\n        )\n    end\n\n    local percent = (tiny.frame % 100) / 100\n    local x = width * percent\n    local y = juice.##function##(0, 128, percent)\n    shape.circlef(center_x - 64 + x, center_y + 64 - y, 4, 7)\n    shape.rectf(center_x - 64 + x - 2, center_y + 64 + 8, 4, 4, 7)\n    shape.rectf(center_x + 70, center_y + 64 - y, 4, 4, 7)\n    local name = \"##function##\"\n    print(name, center_x - #name * 4 * 0.5, center_y + 92)\nend\n\n",
+          "calls": [
+            {
+              "description": "Give a percentage (progress) of the interpolation",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Interpolate the value given a start and an end value.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "start",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "end",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "Progress value. Needs to be between 0 (start of the interpolation) and 1 (end of the interpolation)"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "keys",
+      "description": "List of the available keys. To be used with ctrl.\n\n- `keys.up`, `keys.down`, `keys.left`, `keys.right` for directions.\n- `keys.a` to `keys.z` and `keys.0` to `keys.9` for letters and numbers.\n- `keys.space` and `keys.enter` for other keys.\n",
+      "icon": "command",
+      "variables": [
+      ],
+      "functions": [
+      ]
+    },
+    {
+      "name": "map",
+      "description": "Access map created with LDTk ( https://ldtk.io/ ).",
+      "icon": "map",
+      "variables": [
+      ],
+      "functions": [
+        {
+          "name": "cflag",
+          "description": "Get the flag from a tile, using cell coordinates.",
+          "example": null,
+          "calls": [
+            {
+              "description": "Get the flag from the tile at the coordinate cx,cy.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "cx",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "cy",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Get the flag from the tile at the coordinate cx,cy from a specific layer.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "cx",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "cy",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "layer",
+                  "type": "any",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "draw",
+          "description": "Draw map tiles on the screen.",
+          "example": null,
+          "calls": [
+            {
+              "description": "Draw all active layers on the screen.",
+              "returnType": "any",
+              "args": [
+              ]
+            },
+            {
+              "description": "Draw the layer with the name or the index on the screen.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "index",
+                  "type": "any",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "entities",
+          "description": "Table with all entities by type (ie: `map.entities[\"player\"]`).\n            \n```\nlocal entities = map.entities()\nlocal players = entities[\"Player\"]\nfor entity in all(players) do \n    shape.rectf(entity.x, entity.y, entity.width, entity.height, 8) -- display an entity using a rectangle\nend\n[...]\nentity.fields -- access custom field of the entity\n```\n        ",
+          "example": null,
+          "calls": [
+            {
+              "description": "Get all entities from all entities layer as a table, with an entry per type.",
+              "returnType": "any",
+              "args": [
+              ]
+            },
+            {
+              "description": "Get all entities from the specific layer as a table, with an entry per type.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "a",
+                  "type": "any",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "flag",
+          "description": "Get the flag from a tile, using screen coordinates.",
+          "example": null,
+          "calls": [
+            {
+              "description": "Get the flag from the tile at the coordinate x,y.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "x",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Get the flag from the tile at the coordinate x,y from a specific layer.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "x",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "layer",
+                  "type": "any",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "from",
+          "description": "Convert cell coordinates cx, cy into map screen coordinates x, y.",
+          "example": null,
+          "calls": [
+            {
+              "description": "Convert the cell coordinates into coordinates as a table [x,y].",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "arg1",
+                  "type": "any",
+                  "description": ""
+                },
+                {
+                  "name": "arg2",
+                  "type": "any",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Convert the cell coordinates from a table {cx,cy} into screen coordinates as a table {x,y}.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "cell",
+                  "type": "table",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "layer",
+          "description": "Get the list of layers from the actual level.",
+          "example": null,
+          "calls": [
+            {
+              "description": "Get the layer at the specified index or name from the actual level. The layer in the front is 0.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "layer_index",
+                  "type": "any",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Get the list of layers from the actual level.",
+              "returnType": "any",
+              "args": [
+              ]
+            }
+          ]
+        },
+        {
+          "name": "level",
+          "description": "Set the current level to use.",
+          "example": null,
+          "calls": [
+            {
+              "description": "Return the index of the current level.",
+              "returnType": "any",
+              "args": [
+              ]
+            },
+            {
+              "description": "Set the current level to use. The level can be an index, the name or the id defined by LDTK. Return the previous index level or NIL if the new level is invalid.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "level",
+                  "type": "any",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "to",
+          "description": "Convert screen coordinates x, y into map cell coordinates {cx, cy}.\nFor example, coordinates of the player can be converted to cell coordinates to access the flag of the tile matching the player coordinates.",
+          "example": null,
+          "calls": [
+            {
+              "description": "Convert the coordinates into cell coordinates as a table {cx = cx,cy = cy}.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "x",
+                  "type": "any",
+                  "description": ""
+                },
+                {
+                  "name": "y",
+                  "type": "any",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Convert the coordinates from a table {x,y} into cell coordinates as a table {cx,cy}.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "coordinates",
+                  "type": "table",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "math",
+      "description": "Math functions. Please note that standard Lua math methods are also available.",
+      "icon": "calculator",
+      "variables": [
+        {
+          "name": "huge",
+          "description": "positive infinity value."
+        },
+        {
+          "name": "pi",
+          "description": "value of pi (~3.14)"
+        }
+      ],
+      "functions": [
+        {
+          "name": "atan2",
+          "description": "Calculate the angle in radians between the positive x-axis and the point (x, y).",
+          "example": null,
+          "calls": [
+            {
+              "description": "Calculate the angle for the point (x, y). Please note the argument order: y then x.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "y",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "x",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "clamp",
+          "description": "Clamp the value between 2 values.",
+          "example": "\nfunction _draw()\n    gfx.cls()\n    \n    local pos = ctrl.touch()\n\n    local x = math.clamp(60, pos.x, 256 - 60)\n    \n    gfx.dither(0xA5A5)\n    shape.line(64, 129, 256 - 60, 129, 9)\n    gfx.dither()\n    shape.rect(60, 128, 4, 4, 9)\n    shape.rect(256 - 60, 128, 4, 4, 9)\n    shape.circlef(pos.x, pos.y, 2, 9)\n    shape.circle(x, 129, 2, 8)\nend\n",
+          "calls": [
+            {
+              "description": "Clamp the value between a and b. If a is greater than b, then b will be returned.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "a",
+                  "type": "number",
+                  "description": "The minimum value."
+                },
+                {
+                  "name": "value",
+                  "type": "number",
+                  "description": "The value to be clamped."
+                },
+                {
+                  "name": "b",
+                  "type": "number",
+                  "description": "The maximum value."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "dst",
+          "description": "Compute the distance between two points.",
+          "example": "\nfunction _draw()\n    gfx.cls()\n    \n    local pos = ctrl.touch()\n    shape.line(pos.x, pos.y, 128, 128, 3)\n    shape.circlef(128, 128, 2, 9)\n    shape.circlef(pos.x, pos.y, 2, 9)\n\n    -- midle of the line\n    local x = (pos.x - 128) * 0.5\n    local y = (pos.y - 128) * 0.5\n    \n    -- display dst\n    local dst = math.dst(128, 128, pos.x, pos.y)\n    print(\"dst: \"..dst, 128 + x, 128 + y)\nend\n",
+          "calls": [
+            {
+              "description": "Distance between (x1, y1) and (x2, y2).",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "x1",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y1",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "x2",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y2",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "dst2",
+          "description": "Compute the distance between two points not squared. Use this method to know if an coordinate is closer than another.",
+          "example": "\nlocal a = {\n    x = 10 + math.rnd(236),\n    y = 10 + math.rnd(236)\n}\n\nlocal b = {\n    x = 10 + math.rnd(236),\n    y = 10 + math.rnd(236)\n}\n\nfunction _draw()\n    gfx.cls()\n    \n    local pos = ctrl.touch()\n\n    if math.dst2(pos.x, pos.y, a.x, a.y) > math.dst2(pos.x, pos.y, b.x, b.y) then\n        -- b is closer\n        shape.line(pos.x, pos.y, b.x, b.y, 3)\n    else\n        -- a is closer\n        shape.line(pos.x, pos.y, a.x, a.y, 3)\n    end\n    shape.circlef(a.x, a.y, 2, 9)\n    shape.circlef(b.x, b.y, 2, 9)\n    shape.circlef(pos.x, pos.y, 2, 9)\nend\n",
+          "calls": [
+            {
+              "description": "Distance not squared between (x1, y1) and (x2, y2).",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "x1",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y1",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "x2",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y2",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "perlin",
+          "description": "Perlin noise. The random generated value is between 0.0 and 1.0.",
+          "example": "\nfunction _draw()\n    gfx.cls(8)\n\n    gfx.dither(0x0001)\n    local x = math.perlin(0.1, 0.2, tiny.frame / 100)\n    local y = math.perlin(0.4, 0.5, tiny.frame / 100)\n    shape.circlef(x * 256, y * 256, 64, 7)\nend\n",
+          "calls": [
+            {
+              "description": "Generate a random value regarding the parameters x,y and z.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "x",
+                  "type": "number",
+                  "description": "A value between 0.0 and 1.0."
+                },
+                {
+                  "name": "y",
+                  "type": "number",
+                  "description": "A value between 0.0 and 1.0."
+                },
+                {
+                  "name": "z",
+                  "type": "number",
+                  "description": "A value between 0.0 and 1.0."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "rnd",
+          "description": "Generate random values",
+          "example": "\nlocal value = {}\nfunction _update()\n    table.insert(value, math.rnd(126))\n\n    if(#value > 50) then\n        table.remove(value, #value)\n    end\nend\n\nfunction _draw()\n    gfx.cls()\n    local y = 0\n    for v in all(value) do\n        print(\"rnd: \"..v, 4, y)\n        y = y + 6\n    end\nend\n",
+          "calls": [
+            {
+              "description": "Generate a random int (negative or positive value)",
+              "returnType": "any",
+              "args": [
+              ]
+            },
+            {
+              "description": "Generate a random value between 1 until the argument. If a table is passed, it'll return a random element of the table.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "until",
+                  "type": "any",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Generate a random value between a and b.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "a",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "b",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "roverlap",
+          "description": "Check if two (r)ectangles overlaps.",
+          "example": null,
+          "calls": [
+            {
+              "description": "Check if the rectangle rect1 overlaps with the rectangle rect2.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "rect1",
+                  "type": "table",
+                  "description": "Rectangle as a table {x, y, with, height}."
+                },
+                {
+                  "name": "rect2",
+                  "type": "table",
+                  "description": "Rectangle as a table {x, y, with, height}."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "sign",
+          "description": "Return the sign of the number: -1 if negative. 1 otherwise.",
+          "example": "\nfunction _draw()\n    gfx.cls()\n    local cos = math.cos(tiny.t)\n    print(\"cos: \"..cos)\n    print(\"sign: \"..math.sign(cos), 0, 8)\n\n    shape.line(128, 128, 128 + cos * 128, 128, 9)\nend\n",
+          "calls": [
+            {
+              "description": "Return the sign of the number.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "number",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "notes",
+      "description": "List all notes from C0 to B8. Please note that bemols are the note with b (ie: Gb2) while sharps are the note with s (ie: As3).",
+      "icon": "music",
+      "variables": [
+      ],
+      "functions": [
+        {
+          "name": "note",
+          "description": "Get the name of a note regarding the note index (ie: C0 = 0, Cs0 = 1, ...)",
+          "example": null,
+          "calls": [
+            {
+              "description": "Get the name of a note regarding the note index (ie: C0 = 0, Cs0 = 1, ...)",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "note_index",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sfx",
+      "description": "TODO",
+      "icon": "audio-waveform",
+      "variables": [
+      ],
+      "functions": [
+        {
+          "name": "instrument",
+          "description": "Access instrument using its index or its name.",
+          "example": null,
+          "calls": [
+            {
+              "description": "Access instrument using its index or its name.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "a",
+                  "type": "any",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Access instrument using its index or its name. Create it if the instrument is missing and the flag is true.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "a",
+                  "type": "any",
+                  "description": ""
+                },
+                {
+                  "name": "b",
+                  "type": "any",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "save",
+          "description": "Save the actual music in the current sfx file.",
+          "example": null,
+          "calls": [
+            {
+              "description": "Save the actual music in the current sfx file.",
+              "returnType": "any",
+              "args": [
+              ]
+            }
+          ]
+        },
+        {
+          "name": "sequence",
+          "description": "Access musical sequence using its index.",
+          "example": null,
+          "calls": [
+            {
+              "description": "Access musical sequence using its index.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "arg",
+                  "type": "any",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "sfx",
+          "description": "Access sfx using its index or its name.",
+          "example": null,
+          "calls": [
+            {
+              "description": "Access sfx using its index or its name.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "arg",
+                  "type": "any",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "shape",
+      "description": "Shape API to draw...shapes. Those shapes can be circle, rectangle, line or oval.All shapes can be draw filed or not filed.",
+      "icon": "pentagon",
+      "variables": [
+      ],
+      "functions": [
+        {
+          "name": "circle",
+          "description": "Draw a circle.",
+          "example": "\nfunction _draw()\n    gfx.cls()\n\n    -- filled circle\n    shape.circlef(20, 20, 20, 4)\n    shape.circlef(30, 30, 20, 5)\n    shape.circlef(40, 40, 20, 6)\n    print(\"filled circle\", 20, 10)\n\n    -- non filled circle\n    shape.circle(50, 70, 10, 7)\n    shape.circle(60, 80, 10, 8)\n    shape.circle(70, 90, 10, 9)\n    print(\"non filled circle\", 20, 65)\n\n    shape.circle(80, 120, 15, 10)\n    shape.circle(80, 140, 20, 16)\n    shape.circle(80, 160, 30, 14)\n    print(\"circle with different radius\", 20, 115)\n\nend\n",
+          "calls": [
+            {
+              "description": "Draw a circle with the default color.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "a",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "b",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "c",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Draw a circle.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "centerX",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "centerY",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "radius",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "color",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "circlef",
+          "description": "Draw a filled circle.",
+          "example": "\nfunction _draw()\n    gfx.cls()\n\n    -- filled circle\n    shape.circlef(20, 20, 20, 4)\n    shape.circlef(30, 30, 20, 5)\n    shape.circlef(40, 40, 20, 6)\n    print(\"filled circle\", 20, 10)\n\n    -- non filled circle\n    shape.circle(50, 70, 10, 7)\n    shape.circle(60, 80, 10, 8)\n    shape.circle(70, 90, 10, 9)\n    print(\"non filled circle\", 20, 65)\n\n    shape.circle(80, 120, 15, 10)\n    shape.circle(80, 140, 20, 16)\n    shape.circle(80, 160, 30, 14)\n    print(\"circle with different radius\", 20, 115)\n\nend\n",
+          "calls": [
+            {
+              "description": "Draw a circle at the coordinate (centerX, centerY) with the radius and the color.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "centerX",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "centerY",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "radius",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "color",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "gradient",
+          "description": "Draw a gradient using dithering, only from color c1 to color c2.",
+          "example": "\nfunction _draw()\n    \n local c1 = 2\n local c2 = 3   \n\n    gfx.cls(c1)\n    shape.rectf(0, 256 - 16, 256, 16, c2)\n    for x=0,240,16 do\n        shape.gradient(x, 16 * math.cos(2 * 3.14 * (x / 256) + tiny.t * 2), 16, 256, c1, c2, false)\n    end\n      \nend\n",
+          "calls": [
+            {
+              "description": "Draw a gradient using dithering, only from color c1 to color c2.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "x",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "width",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "height",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "color1",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "color2",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "is_horizontal",
+                  "type": "boolean",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "line",
+          "description": "Draw a line.",
+          "example": "\nfunction _draw()\n  gfx.cls()\n  \n  local i =0\n  for x =16, 240, 16 do\n    for y =16, 240, 16 do\n      shape.line(x, y, 256 - x, 256 - y, i)\n      i = i + 1\n    end\n  end\nend\n",
+          "calls": [
+            {
+              "description": "Draw a line.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "x0",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y0",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "x1",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y1",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "color",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Draw a line with a default color.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "x0",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y0",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "x1",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y1",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "rect",
+          "description": "Draw a rectangle.",
+          "example": "\nfunction _draw()\n  gfx.cls()\n\n  -- filled rectangle\n  print(\"filled rectangle\", 20, 10)\n  shape.rectf(20, 20, 20, 20, 4)\n  shape.rectf(30, 30, 20, 20, 5)\n  shape.rectf(40, 40, 20, 20, 6)\n\n  print(\"non filled rectangle\", 20, 65)\n  -- non filled rectangle\n  shape.rect(50, 70, 20, 20, 7)\n  shape.rect(60, 80, 20, 20, 8)\n  shape.rect(70, 90, 20, 20, 9)\n\n  print(\"rectangle with different width\", 20, 115)\n  shape.rect(20, 120, 30, 20, 10)\n  shape.rect(20, 140, 40, 20, 12)\n  shape.rect(20, 160, 60, 20, 13)\n\nend\n",
+          "calls": [
+            {
+              "description": "Draw a rectangle.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "x",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "width",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "height",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "color",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Draw a rectangle.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "rect",
+                  "type": "table",
+                  "description": "A rectangle {x, y, width, height, color}"
+                }
+              ]
+            },
+            {
+              "description": "Draw a rectangle using a rectangle and a color.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "rect",
+                  "type": "table",
+                  "description": "A rectangle {x, y, width, height}"
+                },
+                {
+                  "name": "color",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "rectf",
+          "description": "Draw a filled rectangle.",
+          "example": "\nfunction _draw()\n  gfx.cls()\n\n  -- filled rectangle\n  print(\"filled rectangle\", 20, 10)\n  shape.rectf(20, 20, 20, 20, 4)\n  shape.rectf(30, 30, 20, 20, 5)\n  shape.rectf(40, 40, 20, 20, 6)\n\n  print(\"non filled rectangle\", 20, 65)\n  -- non filled rectangle\n  shape.rect(50, 70, 20, 20, 7)\n  shape.rect(60, 80, 20, 20, 8)\n  shape.rect(70, 90, 20, 20, 9)\n\n  print(\"rectangle with different width\", 20, 115)\n  shape.rect(20, 120, 30, 20, 10)\n  shape.rect(20, 140, 40, 20, 12)\n  shape.rect(20, 160, 60, 20, 13)\n\nend\n",
+          "calls": [
+            {
+              "description": "Draw a filled rectangle.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "x",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "width",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "height",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "color",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Draw a filled rectangle.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "rect",
+                  "type": "table",
+                  "description": "A rectangle {x, y, width, height, color}"
+                }
+              ]
+            },
+            {
+              "description": "Draw a filled rectangle using a rectangle and a color.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "rect",
+                  "type": "table",
+                  "description": "A rectangle {x, y, width, height}"
+                },
+                {
+                  "name": "color",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "triangle",
+          "description": "Draw a triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3) and color.",
+          "example": "\nfunction tri(f, fill)\n  local x1 = 128 + math.cos(f) * 64\n  local y1 = 128 + math.sin(f) * 64\n\n  local x2 = 128 + math.cos(f + math.pi * 1/3) * 64\n  local y2 = 128 + math.sin(f + math.pi * 1/3) * 64\n\n  local x3 = 128 + math.cos(f+ math.pi * 2/3) * 64\n  local y3 = 128 + math.sin(f +math.pi * 2/3) * 64\n\n  if fill then\n    shape.trianglef(x3, y3, x2, y2, x1, y1, 8)\n  else\n    shape.triangle(x1, y1, x2, y2, x3, y3, 8)\n  end\nend\n\nfunction _draw()\n  gfx.cls()\n  local f = tiny.frame * 0.01\n\n  tri(f, false)\n  tri(f*2, true)\nend\n",
+          "calls": [
+            {
+              "description": "Draw a triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "x1",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y1",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "x2",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y2",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "x3",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y3",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "color",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "trianglef",
+          "description": "Draw a filled triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3) and color.",
+          "example": "\nfunction tri(f, fill)\n  local x1 = 128 + math.cos(f) * 64\n  local y1 = 128 + math.sin(f) * 64\n\n  local x2 = 128 + math.cos(f + math.pi * 1/3) * 64\n  local y2 = 128 + math.sin(f + math.pi * 1/3) * 64\n\n  local x3 = 128 + math.cos(f+ math.pi * 2/3) * 64\n  local y3 = 128 + math.sin(f +math.pi * 2/3) * 64\n\n  if fill then\n    shape.trianglef(x3, y3, x2, y2, x1, y1, 8)\n  else\n    shape.triangle(x1, y1, x2, y2, x3, y3, 8)\n  end\nend\n\nfunction _draw()\n  gfx.cls()\n  local f = tiny.frame * 0.01\n\n  tri(f, false)\n  tri(f*2, true)\nend\n",
+          "calls": [
+            {
+              "description": "Draw a filled triangle using the coordinates of (x1, y1), (x2, y2) and (x3, y3).",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "x1",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y1",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "x2",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y2",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "x3",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y3",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "color",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sound",
+      "description": "Sound API to play/loop/stop a sound.\nA sound can be created using the sound editor, using the command line `tiny-cli sfx <filename>`.\n\nWARNING: Because of browser behaviour, a sound can *only* be played only after the first\nuser interaction.\n\nAvoid to start a music or a sound at the beginning of the game.\nBefore it, force the player to hit a key or click by adding an interactive menu\nor by starting the sound as soon as the player is moving.\n",
+      "icon": "volume-2",
+      "variables": [
+      ],
+      "functions": [
+        {
+          "name": "music",
+          "description": "Play a music",
+          "example": null,
+          "calls": [
+            {
+              "description": "Play the music at the index music_index. The music can be looped.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "music_index",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "loop",
+                  "type": "boolean",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "note",
+          "description": "Play a note by an instrument until it's stopped",
+          "example": "\nfunction _init()\n    keys = {\n        {note=\"E4\", x=57, y=100, w=16, h=50},\n        {note=\"Fs4\", x=75, y=100, w=16, h=50},\n        {note=\"Gs4\", x=93, y=100, w=16, h=50},\n        {note=\"A4\", x=111, y=100, w=16, h=50},\n        {note=\"B4\", x=129, y=100, w=16, h=50},\n        {note=\"Cs5\", x=147, y=100, w=16, h=50},\n        {note=\"Ds5\", x=165, y=100, w=16, h=50},\n        {note=\"E5\", x=183, y=100, w=16, h=50}\n    }\n    active_notes = {}\nend\n\nfunction _update()\n    local touch = ctrl.touching(0)\n\n    for i, key in ipairs(keys) do\n        if in_bounds(touch, key) then\n            active_notes[i] = active_notes[i] or sound.note(key.note, 1)\n        else\n            active_notes[i] = active_notes[i] and active_notes[i].stop()\n        end\n    end\nend\n\nfunction _draw()\n    gfx.cls()\n    print(\"E MAJOR SCALE\", 57, 84, 15)\n    print(\"Click keys to play\", 57, 92, 14)\n\n    for i, key in ipairs(keys) do\n        if active_notes[i] then\n            shape.rectf(key.x, key.y, key.w, key.h, 15)\n        else\n            shape.rect(key.x, key.y, key.w, key.h, 14)\n        end\n    end\n    local pos = ctrl.touch()\n    shape.circlef(pos.x, pos.y, 2, 2)\nend\n\nfunction in_bounds(touch, key)\n    return touch and touch.x >= key.x and touch.x < key.x + key.w and\n           touch.y >= key.y and touch.y < key.y + key.h\nend\n",
+          "calls": [
+            {
+              "description": "Play the note note_name using the instrument at instrument_index",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "note_name",
+                  "type": "string",
+                  "description": ""
+                },
+                {
+                  "name": "instrument_index",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "sfx",
+          "description": "Play a sfx.",
+          "example": null,
+          "calls": [
+            {
+              "description": "Play a sfx at sfx_index. The sfx can be looped.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "sfx_index",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "loop",
+                  "type": "boolean",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "spr",
+      "description": "Sprite API to draw or update sprites.",
+      "icon": "image",
+      "variables": [
+      ],
+      "functions": [
+        {
+          "name": "draw",
+          "description": "Draw a sprite.",
+          "example": "\nfunction _init()\n  id = 1\nend\n\nfunction _draw()\n    if ctrl.pressed(keys.left) then\n      id = id - 1\n    elseif ctrl.pressed(keys.right) then\n      id = id + 1\n    end\n\n    gfx.cls()\n    print(\"sprite index \"..id.. \" (press left or right to change)\", 50, 112)\n    spr.draw(id, 120, 120)\nend\n",
+          "calls": [
+            {
+              "description": "Draw a sprite at the default coordinate (0, 0).",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "sprN",
+                  "type": "any",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Draw a sprite.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "sprN",
+                  "type": "any",
+                  "description": ""
+                },
+                {
+                  "name": "x",
+                  "type": "any",
+                  "description": ""
+                },
+                {
+                  "name": "y",
+                  "type": "any",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Draw a sprite and allow flip on x or y axis.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "sprN",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "x",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "flipX",
+                  "type": "boolean",
+                  "description": ""
+                },
+                {
+                  "name": "flipY",
+                  "type": "boolean",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "pget",
+          "description": "Get the color index at the coordinate (x,y) from the current spritesheet.",
+          "example": "\nfunction _draw()\n    local pos = ctrl.touch()\n    \n    gfx.cls()\n    \n    spr.sdraw()\n    shape.circlef(pos.x - 4, pos.y - 4, 8, 3)\n    local color = spr.pget(pos.x, pos.y)\n    if(color ~= nil) then\n        print(\"index color: \"..color, 7, 0)\n        shape.rectf(0, 0, 6, 6, color)\n        shape.circlef(pos.x - 4, pos.y - 4, 6, color)\n    end\nend\n",
+          "calls": [
+            {
+              "description": "get the color index at the coordinate (x,y) from the current spritesheet.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "x",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "pset",
+          "description": "Set the color index at the coordinate (x,y) in the current spritesheet.",
+          "example": "\nfunction _draw()\n    local pos = ctrl.touch()\n\n    local touching = ctrl.touching(0)\n    gfx.cls()\n\n   spr.sdraw()\n\n   if touching ~= nil then\n      spr.pset(pos.x, pos.y, 9)\n   end\n   print(\"click to alter\", 45, 96)\n   shape.circle(64 + 8, 128 + 8, 32, 1)\n   shape.circlef(128 + 8, 128 + 8, 32, 1)\n   spr.draw(100, 128, 128)\n\n   shape.circlef(pos.x, pos.y, 2, 3)\nend\n\n",
+          "calls": [
+            {
+              "description": "Set the color index at the coordinate (x,y) in the current spritesheet.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "x",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "color",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "sdraw",
+          "description": "S(uper) Draw a fragment from the spritesheet.",
+          "example": "\nfunction _draw()\n    local pos = ctrl.touch()\n    \n    gfx.cls()\n    \n    spr.sdraw()\n    shape.circlef(pos.x - 4, pos.y - 4, 8, 3)\n    local color = spr.pget(pos.x, pos.y)\n    if(color ~= nil) then\n        print(\"index color: \"..color, 7, 0)\n        shape.rectf(0, 0, 6, 6, color)\n        shape.circlef(pos.x - 4, pos.y - 4, 6, color)\n    end\nend\n",
+          "calls": [
+            {
+              "description": "Draw the full spritesheet at default coordinate (0, 0)",
+              "returnType": "any",
+              "args": [
+              ]
+            },
+            {
+              "description": "Draw the full spritesheet at coordinate (x, y)",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "x",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Draw the full spritesheet at coordinate (x, y) from the sprite (sprX, sprY)",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "x",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "sprX",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "sprY",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Draw a fragment from the spritesheet at the coordinate (x, y) from the sprite (sprX, sprY) with the width and height.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "x",
+                  "type": "number",
+                  "description": "screen x coordinate to draw the sprite (default 0)"
+                },
+                {
+                  "name": "y",
+                  "type": "number",
+                  "description": "screen y coordinate to draw the sprite (default 0)"
+                },
+                {
+                  "name": "sprX",
+                  "type": "number",
+                  "description": "x coordinate from the spritesheet (default 0)"
+                },
+                {
+                  "name": "sprY",
+                  "type": "number",
+                  "description": "y coordinate from the spritesheet (default 0)"
+                },
+                {
+                  "name": "width",
+                  "type": "number",
+                  "description": "width of the spritesheet to copy (default width of the spritesheet)"
+                },
+                {
+                  "name": "height",
+                  "type": "number",
+                  "description": "height of the spritesheet to copy (default height of the spritesheet)"
+                },
+                {
+                  "name": "flipX",
+                  "type": "boolean",
+                  "description": "flip on the x axis (default: false)"
+                },
+                {
+                  "name": "flipY",
+                  "type": "boolean",
+                  "description": "flip on the y axis (default: false)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "sheet",
+          "description": "Switch to another spritesheet. The index of the spritesheet is given by it's position in the spritesheets field from the `_tiny.json` file.The first spritesheet is at the index 0. It retuns the previous spritesheet. The spritesheet can also be referenced by its filename.",
+          "example": "\nlocal current = 0\nfunction _update()\n    local x = math.perlin((tiny.frame % 100) / 100, (tiny.frame % 100) / 100, (tiny.frame % 100) / 100)\n    local y = math.perlin((tiny.frame  * 0.5 % 100) / 100, (tiny.frame % 100) / 100, (tiny.frame * 0.5 % 100) / 100)\n\n    gfx.cls()\n    shape.circlef(x * 256, y * 256, 10, 8)\n    gfx.to_sheet(\"circle.png\")\n    \n    gfx.cls()\n    shape.rectf(x * 256, y * 256, 20, 20, 8)\n    gfx.to_sheet(\"rect.png\")\n\n    if ctrl.pressed(keys.space) then\n        current = (current + 1) % 2\n    end\nend\n\nfunction _draw()\n    if current == 0 then\n        spr.sheet(\"circle.png\")\n    else\n        spr.sheet(\"rect.png\")\n    end\n    spr.sdraw()\nend\n",
+          "calls": [
+            {
+              "description": "Switch to the first spritesheet",
+              "returnType": "any",
+              "args": [
+              ]
+            },
+            {
+              "description": "Switch to the N spritesheet",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "spritesheetN",
+                  "type": "any",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "text",
+      "description": "Text rendering library for custom fonts. Allows selecting fonts configured in `_tiny.json` and rendering text with them. When no font is selected, uses the default boot font (same as `print()`).",
+      "icon": "type",
+      "variables": [
+      ],
+      "functions": [
+        {
+          "name": "font",
+          "description": "Select a font to use for text rendering. Call without arguments to reset to the default boot font.",
+          "example": "\nfunction _draw()\n    gfx.cls()\n    -- Use the default boot font\n    text.font()\n    text.print(\"default font\", 10, 10)\n\n    -- Switch to the first custom font (index 0)\n    text.font(0)\n    text.print(\"custom font\", 10, 30)\n\n    -- Switch to a custom font by name\n    text.font(\"big_font\")\n    text.print(\"big font\", 10, 50)\n\n    -- Reset to default\n    text.font()\n    text.print(\"back to default\", 10, 70)\nend\n",
+          "calls": [
+            {
+              "description": "Reset to the default boot font.",
+              "returnType": "any",
+              "args": [
+              ]
+            },
+            {
+              "description": "Select a font by index.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "index",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "print",
+          "description": "Print text on the screen using the currently selected font.",
+          "example": "\nfunction _draw()\n    gfx.cls()\n    -- Print with default color (white)\n    text.print(\"hello world\", 10, 10)\n\n    -- Print with a color index\n    text.print(\"colored text\", 10, 20, 9)\n\n    -- Print multiline text\n    text.print(\"line 1\\nline 2\\nline 3\", 10, 40)\nend\n",
+          "calls": [
+            {
+              "description": "Print text at the given position with an optional color.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "args",
+                  "type": "any",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "width",
+          "description": "Measure the width in pixels of a string using the currently selected font.",
+          "example": "\nfunction _draw()\n    gfx.cls()\n    local msg = \"hello\"\n    local w = text.width(msg)\n    -- Center the text on screen\n    local x = (256 - w) / 2\n    text.print(msg, x, 120)\nend\n",
+          "calls": [
+            {
+              "description": "Returns the width in pixels of the text.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "str",
+                  "type": "string",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "tiny",
+      "description": "Tiny Lib which offer offer the current frame (`tiny.frame`), the current time (`tiny.time`), delta time (`tiny.dt`), game dimensions (`tiny.width`, `tiny.height`), platform information (`tiny.platform`) and to switch to another script using `exit`.",
+      "icon": "gamepad-2",
+      "variables": [
+        {
+          "name": "dt",
+          "description": "Delta time between two frame. As Tiny is a fixed frame engine, it's always equal to 1/60"
+        },
+        {
+          "name": "frame",
+          "description": "Number of frames elapsed since the start of the game."
+        },
+        {
+          "name": "height",
+          "description": "Height of the game in pixels."
+        },
+        {
+          "name": "platform",
+          "description": "Current platform: 1 for desktop, 2 for web."
+        },
+        {
+          "name": "t",
+          "description": "Time elapsed since the start of the game."
+        },
+        {
+          "name": "width",
+          "description": "Width of the game in pixels."
+        }
+      ],
+      "functions": [
+        {
+          "name": "exit",
+          "description": "Exit the actual script to switch to another one. The next script to use is identified by it's index. The index of the script is the index of it in the list of scripts from the `_tiny.json` file.The first script is at the index 0.",
+          "example": null,
+          "calls": [
+            {
+              "description": "Exit the actual script to switch to another one.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "scriptIndex",
+                  "type": "any",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "vec2",
+      "description": "Vector2 manipulation library.",
+      "icon": "move",
+      "variables": [
+      ],
+      "functions": [
+        {
+          "name": "add",
+          "description": "Add vector2 to another vector2",
+          "example": "\nfunction _init()\n    gfx.camera(-128, -128)\n\n    local v1 = vec2.create(32, 38)\n    local v2 = vec2.create(20, 2)\n\n    gfx.cls(1)\n    print(\"v1\", 2, 15, 10)\n    shape.line(0, 0, v1.x, v1.y, 10)\n    print(\"v2\", 23, 3, 9)\n    shape.line(0, 0, v2.x, v2.y, 9)\n\n    local v3 = vec2.add(v1, v2)\n\n    print(\"v1 + v2\", 30, 15, 11)\n    gfx.dither(0xAAAA)\n    shape.line(0, 0, v3.x, v3.y, 11)\n    gfx.dither()\nend\n",
+          "calls": [
+            {
+              "description": "Add a vector 2 {x, y} to another vector 2 {x, y}",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "v1",
+                  "type": "table",
+                  "description": "vector 2 as a table {x, y}"
+                },
+                {
+                  "name": "v2",
+                  "type": "table",
+                  "description": "vector 2 as a table {x, y}"
+                }
+              ]
+            },
+            {
+              "description": "Add a destructured vector 2 to another destructured vector 2",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "x1",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y1",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "x2",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y2",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "create",
+          "description": "Create a vector 2 as a table { x, y }.",
+          "example": null,
+          "calls": [
+            {
+              "description": "Create a vector 2 as a table { x, y }.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "x",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Create a vector 2 as a table { x, y } using another vector 2.",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "vec2",
+                  "type": "table",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "crs",
+          "description": "Cross product",
+          "example": null,
+          "calls": [
+            {
+              "description": "Cross product between a vector 2 {x, y} and another vector 2 {x, y}",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "v1",
+                  "type": "table",
+                  "description": "vector 2 as a table {x, y}"
+                },
+                {
+                  "name": "v2",
+                  "type": "table",
+                  "description": "vector 2 as a table {x, y}"
+                }
+              ]
+            },
+            {
+              "description": "Cross product between a destructured vector 2 and another destructured vector 2",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "x1",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y1",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "x2",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y2",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "dot",
+          "description": "Dot product between two vectors",
+          "example": "\nfunction _init()\n    angle = 0\nend\nfunction _update()\n\n    if ctrl.pressing(keys.space) then\n        angle = angle + 0.1\n    end\n\n    gfx.camera(-128, -128)\n\n    local v1 = vec2.create(1, 0)\n    local v2 = vec2.create(math.cos(angle), math.sin(angle))\n    local dot = vec2.dot(v1, v2)\n    \n    local scl = vec2.scl(v1, dot)\n    \n    gfx.cls(1)\n    \n    local scaledv1 = vec2.scl(v1, 64)\n    local scaledv2 = vec2.scl(v2, 64)\n    local scaledv3 = vec2.scl(scl, 64)\n\n    print(\"v1\", 18, 5, 10)\n    shape.line(0, 0, scaledv1.x, scaledv1.y, 10)\n    print(\"v2\", scaledv2.x + 5, scaledv2.y + 5, 11)\n    shape.line(0, 0, scaledv2.x, scaledv2.y, 11)\n    \n    print(\"dot\", scaledv3.x, 5, 9)\n    shape.line(0, 0, scaledv3.x, scaledv3.y, 9)\nend    \n",
+          "calls": [
+            {
+              "description": "Dot product between a vector 2 {x, y} and another vector 2 {x, y}",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "v1",
+                  "type": "table",
+                  "description": "vector 2 as a table {x, y}"
+                },
+                {
+                  "name": "v2",
+                  "type": "table",
+                  "description": "vector 2 as a table {x, y}"
+                }
+              ]
+            },
+            {
+              "description": "Dot product between a destructured vector 2 and another destructured vector 2",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "x1",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y1",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "x2",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y2",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "mag",
+          "description": "Calculate the magnitude (length) of a vector",
+          "example": null,
+          "calls": [
+            {
+              "description": "Calculate the magnitude (length) of a vector 2 {x, y}",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "x",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Calculate the magnitude (length) of a vector 2 {x, y}",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "v1",
+                  "type": "table",
+                  "description": "vector 2 as a table {x, y}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "nor",
+          "description": "Normalize a vector",
+          "example": "\nfunction _update()\n    gfx.cls(1)\n\n    local v0 = vec2.create(43, 64)\n    local v1 = vec2.nor(v0)\n    \n    \n    print(\"vector     x: \" .. v0.x .. \" y: \" .. v0.y)\n    print(\"normalized x: \" .. v1.x .. \" y: \" .. v1.y, 0, 8)\nend \n",
+          "calls": [
+            {
+              "description": "Normalize a vector 2 {x, y}",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "x",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Normalize a vector 2 {x, y}",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "v1",
+                  "type": "table",
+                  "description": "vector 2 as a table {x, y}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "scl",
+          "description": "Scale a vector",
+          "example": "\nfunction _init()\n    gfx.camera(-128, -128)\n\n    local v1 = vec2.create(32, 38)\n    local v2 = vec2.scl(v1, 2)\n\n    gfx.cls(1)\n    print(\"v1 scaled\", 8, 60, 11)\n    gfx.dither(0xAAAA)\n    shape.line(0, 0, v2.x, v2.y, 11)\n    gfx.dither()\n    print(\"v1\", 18, 15, 10)\n    shape.line(0, 0, v1.x, v1.y, 10)\nend\n",
+          "calls": [
+            {
+              "description": "Scale a vector 2 {x, y} using the factor scl",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "x",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "scl",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            },
+            {
+              "description": "Scale a vector 2 {x, y} using the factor scl",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "v1",
+                  "type": "table",
+                  "description": "vector 2 as a table {x, y}"
+                },
+                {
+                  "name": "scl",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "sub",
+          "description": "Subtract another vector from another vector",
+          "example": "\nfunction _init()\n    gfx.camera(-128, -128)\n\n    local v1 = vec2.create(32, 38)\n    local v2 = vec2.create(20, 2)\n\n    gfx.cls(1)\n    print(\"v1\", 18, 15, 10)\n    shape.line(0, 0, v1.x, v1.y, 10)\n    print(\"v2\", 23, 3, 9)\n    shape.line(0, 0, v2.x, v2.y, 9)\n\n    local v3 = vec2.sub(v1, v2)\n\n    print(\"v1 - v2\", 0, 40, 11)\n    gfx.dither(0xAAAA)\n    shape.line(0, 0, v3.x, v3.y, 11)\n    gfx.dither()\nend\n",
+          "calls": [
+            {
+              "description": "Subtract a vector 2 {x, y} from another vector 2 {x, y}",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "v1",
+                  "type": "table",
+                  "description": "vector 2 as a table {x, y}"
+                },
+                {
+                  "name": "v2",
+                  "type": "table",
+                  "description": "vector 2 as a table {x, y}"
+                }
+              ]
+            },
+            {
+              "description": "Subtract a destructured vector 2 from another destructured vector 2",
+              "returnType": "any",
+              "args": [
+                {
+                  "name": "x1",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y1",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "x2",
+                  "type": "number",
+                  "description": ""
+                },
+                {
+                  "name": "y2",
+                  "type": "number",
+                  "description": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

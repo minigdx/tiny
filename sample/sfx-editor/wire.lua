@@ -20,12 +20,12 @@ local function get_value(obj, path)
     for i = 1, #parts do
         local key = parts[i]
         if type(current) ~= "table" then
-            debug.console("ERROR: get_value - attempt to index a " .. type(current) .. " value")
-            debug.console("  path:", path)
-            debug.console("  i:", i)
-            debug.console("  key:", key)
-            debug.console("  current:", current)
-            debug.console("  parts:", parts)
+            console.log("ERROR: get_value - attempt to index a " .. type(current) .. " value")
+            console.log("  path:", path)
+            console.log("  i:", i)
+            console.log("  key:", key)
+            console.log("  current:", current)
+            console.log("  parts:", parts)
             return nil
         end
         current = current[key]
@@ -39,7 +39,7 @@ end
 
 -- Set a nested value in an object using a path
 local function set_value(obj, path, value)
-    -- debug.console("set_value", obj, path, value)
+    -- console.log("set_value", obj, path, value)
     local parts = parse_path(path)
     local current = obj
     
@@ -94,6 +94,7 @@ function guessMode(target)
         return "change"
     end
 end
+
 --- Sync data from source to target
 -- Updates target whenever source changes (via on_change) or continuously (via _update)
 -- @param source Source object

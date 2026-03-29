@@ -3,26 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Tiny - Platform game</title>
+    <!-- GAME_ICON --><link rel="icon" type="image/png" href="{GAME_ICON}"><!-- GAME_ICON_END -->
   <script type="module" crossorigin src="./tiny-engine.js"></script>
-  <link rel="modulepreload" crossorigin href="./chunks/kotlin-stdlib-DC6cbFtm.js">
-  <link rel="modulepreload" crossorigin href="./chunks/kotlin-coroutines-BJhAlCrN.js">
-  <link rel="modulepreload" crossorigin href="./chunks/lua-BBcSEoPQ.js">
+  <link rel="modulepreload" crossorigin href="./chunks/kotlin-stdlib-RkXoM5PC.js">
+  <link rel="modulepreload" crossorigin href="./chunks/kotlin-coroutines-BNVZt-6-.js">
+  <link rel="modulepreload" crossorigin href="./chunks/lua-DQrR2WQ2.js">
 </head>
 <body style="margin: 0">
 <div style="text-align:center;">
-    <tiny-game id="tiny-game-71c3108e-090b-4d8a-b3fe-0974db6a82bc" name="Platform game" mouse="false" width="256" height="256" zoom="2" spritew="16" spriteh="16">
-        <!-- GAME_SCRIPT -->
-        <tiny-script name="pong.lua"></tiny-script>
-        <!-- GAME_SCRIPT_END -->
-        <!-- GAME_SPRITESHEET -->
-        <tiny-spritesheet name="game.png"></tiny-spritesheet>
-        <!-- GAME_SPRITESHEET_END -->
-        <!-- GAME_LEVEL --><!-- GAME_LEVEL_END -->
-        <!-- GAME_SOUND -->
-        <tiny-sound name="default-sound.sfx"></tiny-sound>
-        <!-- GAME_SOUND_END -->
-        <tiny-colors name="#000000,#1D2B53,#7E2553,#008751,#AB5236,#5F574F,#C2C3C7,#FFF1E8,#FF004D,#FFA300,#FFEC27,#00E436,#29ADFF,#83769C,#FF77A8,#FFCCAA"></tiny-colors>
-    </tiny-game>
+    <tiny-game game="."/>
 </div>
 </body>
 </html>

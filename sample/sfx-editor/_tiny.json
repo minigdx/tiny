@@ -1,7 +1,7 @@
 {
   "version": "V1",
-  "id": "b9bfec40-57eb-45bb-9e9a-435edb19c17e",
   "name": "Tiny SFX Sequencer",
+  "id": "b9bfec40-57eb-45bb-9e9a-435edb19c17e",
   "resolution": {
     "width": 384,
     "height": 256
@@ -12,56 +12,98 @@
   },
   "zoom": 2,
   "colors": [
-    "#28282E",
-    "#1D2B53",
-    "#6C5671",
-    "#87A889",
-    "#F98284",
-    "#FFA300",
-    "#B0A9E4",
-    "#DEA38B",
-    "#ACCCE4",
+    "#414D66",
+    "#7284AA",
+    "#F76666",
+    "#A891D4",
+    "#8FABD0",
+    "#8CE8AB",
     "#FEAAE4",
-    "#D9C8BF",
     "#FFC384",
-    "#B0EB93",
-    "#FFCCAA",
-    "#E9F59D",
-    "#FFE6C6",
-    "#FFF7A0",
+    "#FFEA86",
+    "#DEE7FC",
     "#FFF1E8",
-    "#FFF7E4"
+    "#FFFFFF",
+    "#6EB887"
   ],
   "scripts": [
-    "instrument-editor.lua",
-    "sfx-editor.lua",
+    "tiny-instrument-editor.lua",
+    "tiny-sfx-editor.lua",
+    "tiny-music-editor.lua",
+    "sfx-templates.lua",
+    "music-templates.lua",
+    "editor-base.lua",
     "wire.lua",
-    "test-game.lua",
-    "game.lua",
     "mouse.lua",
+    "layers.lua",
     "widgets.lua",
-    "music-editor.lua",
+    "widgets/icons.lua",
     "widgets/Envelop.lua",
-    "widgets/MatrixSelector.lua",
-    "widgets/ModeSwitch.lua",
+    "widgets/Dropdown.lua",
     "widgets/Knob.lua",
     "widgets/Checkbox.lua",
     "widgets/Fader.lua",
-    "widgets/MenuItem.lua",
     "widgets/Keyboard.lua",
-    "widgets/Help.lua",
-    "widgets/Button.lua"
+    "widgets/Button.lua",
+    "widgets/Modal.lua",
+    "widgets/Panel.lua",
+    "widgets/TextButton.lua",
+    "widgets/TextInput.lua",
+    "widgets/Speaker.lua",
+    "widgets/Counter.lua",
+    "widgets/utils.lua"
   ],
   "spritesheets": [
     "sfx-spritesheet.png",
-    "sfx.png"
+    "sfx.png",
+    "sprite-sheet.png"
   ],
   "levels": [
+    "tiny-music-editor.ldtk",
     "sfx-editor.ldtk",
     "editor.ldtk"
   ],
-  "sounds": [
-    "test.sfx"
-  ],
-  "hideMouseCursor": true
+  "hideMouseCursor": true,
+  "fonts": [
+    {
+      "name": "monogram",
+      "spritesheet": "monogram-bitmap.png",
+      "banks": [
+        {
+          "name": "ascii",
+          "width": 6,
+          "height": 12,
+          "characters": [
+            " !\"#$%&'()*+,-./",
+            "0123456789:;<=>?",
+            "@ABCDEFGHIJKLMNO",
+            "PQRSTUVWXYZ[\\]^_",
+            "`abcdefghijklmno↧↨",
+            "pqrstuvwxyz{|}~…↔↕",
+            "                ↑↓",
+            "                ←→"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "monogram-italic",
+      "spritesheet": "monogram-italic-bitmap.png",
+      "banks": [
+        {
+          "name": "ascii",
+          "width": 6,
+          "height": 12,
+          "characters": [
+            " !\"#$%&'()*+,-./",
+            "0123456789:;<=>?",
+            "@ABCDEFGHIJKLMNO",
+            "PQRSTUVWXYZ[\\]^_",
+            "`abcdefghijklmno",
+            "pqrstuvwxyz{|}~"
+          ]
+        }
+      ]
+    }
+  ]
 }

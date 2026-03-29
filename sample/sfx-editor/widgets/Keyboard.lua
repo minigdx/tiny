@@ -1,14 +1,5 @@
-local function inside_widget(w, x, y, offset)
-    local off = 0
-    if (offset) then
-        off = offset
-    end
-
-    return w.x - off <= x and
-            x <= w.x + w.width + off and
-            w.y - off <= y and
-            y <= w.y + w.height + off
-end
+local utils = require("widgets.utils")
+local inside_widget = utils.inside_widget
 
 local Keyboard = {
     value = nil,
@@ -21,18 +12,34 @@ Keyboard._update = function(self)
 
     local color_to_note = {
         [1] = "C4",
-        [3] = "Cs4",
-        [4] = "D4",
-        [5] = "Ds4",
-        [8] = "E4",
-        [13] = "F4",
-        [12] = "Fs4",
-        [15] = "G4",
-        [11] = "Gs4",
-        [17] = "A4",
-        [7] = "As4",
-        [10] = "B4"
+        [2] = "Cs4",
+        [5] = "D4",
+        [10] = "Ds4",
+        [12] = "E4",
+        [4] = "F4",
+        [6] = "Fs4",
+        [9] = "G4",
+        [3] = "Gs4",
+        [7] = "A4",
+        [8] = "As4",
+        [13] = "B4",
     }
+
+    local key_to_note = {
+        a = "C4",
+        w = "Cs4",
+        s = "D4",
+        e = "Ds4",
+        d = "E4",
+        f = "F4",
+        t = "Fs4",
+        g = "G4",
+        y = "Gs4",
+        h = "A4",
+        u = "As4",
+        j = "B4"
+    }
+
     local pos = ctrl.touch()
 
     local value
@@ -40,10 +47,25 @@ Keyboard._update = function(self)
         local relative_x = pos.x - self.x
         local relative_y = pos.y - self.y
 
+        local prev = spr.sheet(2)
         local color = spr.pget(relative_x + spr_x, relative_y + spr_y)
+        spr.sheet(prev)
         value = color_to_note[color]
     else
-        value = nil
+        -- No mouse/touch input: check physical keyboard
+        for k, note in pairs(key_to_note) do
+            if ctrl.pressing(keys[k]) then
+                value = note
+                self._held_key = k
+                break
+            end
+        end
+        -- Detect key release
+        if value == nil and self._held_key then
+            if not ctrl.pressing(keys[self._held_key]) then
+                self._held_key = nil
+            end
+        end
     end
 
     -- There is a value change.
@@ -56,7 +78,9 @@ Keyboard._update = function(self)
 end
 
 Keyboard._draw = function(self)
+    local prev = spr.sheet(2)
     spr.sdraw(self.x, self.y, 0, 192, self.width, self.height)
+    spr.sheet(prev)
 end
 
 return Keyboard
