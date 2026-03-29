@@ -1,0 +1,30 @@
+{
+  "version": "V1",
+  "name": "Home Waves",
+  "id": "home-waves",
+  "resolution": {
+    "width": 523,
+    "height": 247
+  },
+  "sprites": {
+    "width": 16,
+    "height": 16
+  },
+  "zoom": 2,
+  "colors": [
+    "#87CEEB",
+    "#9DD5EF",
+    "#B0D4E8",
+    "#C8E3F2",
+    "#D4E9F7",
+    "#E6F2FB",
+    "#F0F7FC",
+    "#FFFFFF"
+  ],
+  "scripts": [
+    "clouds.lua"
+  ],
+  "sound": "default-sound.sfx",
+  "hideMouseCursor": false,
+  "bootScript": "boot.lua"
+}
