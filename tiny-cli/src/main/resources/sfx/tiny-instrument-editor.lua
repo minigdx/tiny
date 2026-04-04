@@ -113,13 +113,26 @@ function _init_envelop(entities)
     end
 end
 
+local HARMONIC_MAX = 5
+
+local harmonicTransform = {
+    -- instrument (0-5) -> fader (0-1)
+    to_widget = function(source, target, value)
+        return (value or 0) / HARMONIC_MAX
+    end,
+    -- fader (0-1) -> instrument (0-5)
+    from_widget = function(source, target, value)
+        return (value or 0) * HARMONIC_MAX
+    end,
+}
+
 function _init_harmonics(entities)
     for mode in all(entities["Harmonics"]) do
         for index, harmonic in ipairs(mode.fields.Harmonics) do
             local fader = wire.find_widget(all_widgets, harmonic)
             fader.on_press = on_press
             fader.on_release = on_release
-            wire.bind(state, "instrument.harmonics." .. index, fader, "value")
+            wire.bind(state, "instrument.harmonics." .. index, fader, "value", harmonicTransform)
         end
     end
 end
