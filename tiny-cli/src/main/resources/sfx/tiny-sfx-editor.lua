@@ -614,6 +614,25 @@ function _init()
     _init_velocity_editor(widget_entities)
     _init_sfx_editor(widget_entities)
     _init_player(widget_entities)
+
+    -- Detect octave from loaded SFX (same logic as on_select)
+    local octave = 2
+    local notes = state.sfx.notes
+    if #notes > 0 then
+        local min_octave = 7
+        for note in all(notes) do
+            if note.octave < min_octave then
+                min_octave = note.octave
+            end
+        end
+        octave = min_octave
+    end
+    if sfx_editor_ref then
+        sfx_editor_ref.octave = octave
+    end
+    if octave_counter_ref then
+        octave_counter_ref.value = octave
+    end
 end
 
 function _update()

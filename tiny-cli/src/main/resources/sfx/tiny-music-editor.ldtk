@@ -11,7 +11,7 @@
 	"iid": "4cf47920-fa90-11f0-ad09-7b5a63ac610d",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 106,
+	"nextUid": 107,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -3084,6 +3084,43 @@
 					"allowedRefs": "OnlySpecificEntity",
 					"allowedRefsEntityUid": 78,
 					"allowedRefTags": [],
+					"tilesetUid": null
+				},
+				{
+					"identifier": "Speed",
+					"doc": null,
+					"__type": "EntityRef",
+					"uid": 106,
+					"type": "F_EntityRef",
+					"isArray": false,
+					"canBeNull": true,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "RefLinkBetweenCenters",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "CurvedArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlyTags",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": ["PercentOutput"],
 					"tilesetUid": null
 				}
 			]
@@ -9656,6 +9693,15 @@
 								}, "__tile": null, "defUid": 105, "realEditorValues": [{
 									"id": "V_String",
 									"params": ["0883b030-fa90-11f0-9ead-999e302540dc"]
+								}] },
+								{ "__identifier": "Speed", "__type": "EntityRef", "__value": {
+									"entityIid": "f1a2b3c4-fa90-11f0-9ead-speed0fader01",
+									"layerIid": "c5000ed1-fa90-11f0-9ead-a1240c4664a1",
+									"levelIid": "c5000ed0-fa90-11f0-9ead-c7908e5e7535",
+									"worldIid": "4cf47921-fa90-11f0-ad09-8d23e32977ff"
+								}, "__tile": null, "defUid": 106, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["f1a2b3c4-fa90-11f0-9ead-speed0fader01"]
 								}] }
 							],
 							"__worldX": 1000,
@@ -9691,6 +9737,22 @@
 							"px": [152,184],
 							"fieldInstances": [],
 							"__worldX": 968,
+							"__worldY": 184
+						},
+						{
+							"__identifier": "Fader",
+							"__grid": [21,23],
+							"__pivot": [0,0],
+							"__tags": [ "Widget", "PercentOutput" ],
+							"__tile": { "tilesetUid": 72, "x": 0, "y": 24, "w": 8, "h": 24 },
+							"__smartColor": "#8B9BB4",
+							"iid": "f1a2b3c4-fa90-11f0-9ead-speed0fader01",
+							"width": 8,
+							"height": 56,
+							"defUid": 77,
+							"px": [168,184],
+							"fieldInstances": [],
+							"__worldX": 984,
 							"__worldY": 184
 						},
 						{

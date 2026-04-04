@@ -159,18 +159,20 @@ local function _init_music_generator(widget_entities)
     local master_volume_fader = wire.find_widget(all_widgets, gen.fields.Volume)
     local selector_dd = wire.find_widget(all_widgets, gen.fields.Selector)
     local export_button = wire.find_widget(all_widgets, gen.fields.Export)
+    local speed_fader = gen.fields.Speed and wire.find_widget(all_widgets, gen.fields.Speed) or nil
 
     selector_dd_ref = selector_dd
     play_button_ref = play_button
 
-    -- Find unreferenced dropdown for Lead Style by position (21, 72)
+    -- Find unreferenced dropdowns by position
     local lead_style_dd = nil
+    local root_dd = nil
     local referenced_iids = {}
     for _, field_name in ipairs({
         "DrumPattern", "DrumVolume", "MusicTheme", "MusicScale",
         "LeadInstrument", "LeadVolume", "BassInstrument", "BassVolume",
         "RythmVolume", "RythmChordProgression", "RythmInstrument",
-        "Play", "Volume", "Selector", "Export",
+        "Play", "Volume", "Selector", "Export", "Speed",
     }) do
         local ref = gen.fields[field_name]
         if ref then
@@ -178,11 +180,12 @@ local function _init_music_generator(widget_entities)
         end
     end
     for w in all(all_widgets) do
-        if w.options and not referenced_iids[w.iid]
-            and w.x >= 18 and w.x <= 24
-            and w.y >= 69 and w.y <= 75 then
-            lead_style_dd = w
-            break
+        if w.options and not referenced_iids[w.iid] then
+            if w.x >= 18 and w.x <= 24 and w.y >= 69 and w.y <= 75 then
+                lead_style_dd = w
+            elseif w.x >= 18 and w.x <= 24 and w.y >= 109 and w.y <= 115 then
+                root_dd = w
+            end
         end
     end
 
@@ -205,6 +208,7 @@ local function _init_music_generator(widget_entities)
     populate_dropdown(progression_dd, music_templates.progression_names, find_index(music_templates.progression_names, config.progression_name))
     populate_dropdown(drum_pattern_dd, music_templates.drum_pattern_names, find_index(music_templates.drum_pattern_names, config.drum_pattern))
     populate_dropdown(lead_style_dd, music_templates.lead_styles, find_index(music_templates.lead_styles, config.lead_style))
+    populate_dropdown(root_dd, music_templates.root_notes, find_index(music_templates.root_notes, config.root))
     populate_dropdown(chord_inst_dd, inst_options, config.chord_instrument + 1)
     populate_dropdown(bass_inst_dd, inst_options, config.bass_instrument + 1)
     populate_dropdown(lead_inst_dd, inst_options, config.lead_instrument + 1)
@@ -216,6 +220,7 @@ local function _init_music_generator(widget_entities)
     if lead_volume_fader then lead_volume_fader.value = config.lead_volume end
     if drum_volume_fader then drum_volume_fader.value = config.drum_volume end
     if master_volume_fader then master_volume_fader.value = 1.0 end
+    if speed_fader then speed_fader.value = (config.bpm - 60) / 200 end
 
     -- Dropdown callbacks: update config on change
     if scale_dd then
@@ -242,6 +247,13 @@ local function _init_music_generator(widget_entities)
     if lead_style_dd then
         lead_style_dd.on_change = function(self)
             config.lead_style = music_templates.lead_styles[self.selected]
+            mark_config_dirty()
+        end
+    end
+
+    if root_dd then
+        root_dd.on_change = function(self)
+            config.root = music_templates.root_notes[self.selected]
             mark_config_dirty()
         end
     end
@@ -296,6 +308,14 @@ local function _init_music_generator(widget_entities)
         end
     end
 
+    -- Speed fader: control BPM (60-260)
+    if speed_fader then
+        speed_fader.on_change = function(self)
+            config.bpm = math.floor(60 + self.value * 200)
+            mark_config_dirty()
+        end
+    end
+
     -- Master volume: scale all track volumes
     if master_volume_fader then
         master_volume_fader.on_change = function(self)
@@ -339,6 +359,9 @@ local function _init_music_generator(widget_entities)
             end
             if lead_style_dd then
                 lead_style_dd:set_selected(find_index(music_templates.lead_styles, theme.lead_style))
+            end
+            if speed_fader then
+                speed_fader.value = (config.bpm - 60) / 200
             end
 
             mark_config_dirty()
@@ -456,6 +479,12 @@ local function _init_music_generator(widget_entities)
                 if drum_volume_fader then
                     drum_volume_fader.value = config.drum_volume
                 end
+                if root_dd then
+                    root_dd:set_selected(find_index(music_templates.root_notes, config.root))
+                end
+                if speed_fader then
+                    speed_fader.value = (config.bpm - 60) / 200
+                end
             end
 
             config_dirty = true
@@ -513,6 +542,12 @@ local function _init_music_generator(widget_entities)
         end
         if drum_volume_fader then
             drum_volume_fader.value = config.drum_volume
+        end
+        if root_dd then
+            root_dd:set_selected(find_index(music_templates.root_notes, config.root))
+        end
+        if speed_fader then
+            speed_fader.value = (config.bpm - 60) / 200
         end
 
         config_dirty = false
