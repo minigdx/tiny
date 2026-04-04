@@ -327,25 +327,27 @@ class MusicGeneratorTest {
     }
 
     @Test
-    fun tracks_fade_volume_at_end_for_smooth_looping() {
+    fun tracks_maintain_consistent_volume_throughout() {
         val config = MusicConfiguration()
         val seq = createSequence()
         MusicGenerator.generate(seq, config)
 
-        // Chord track: last beat (31) should have lower volume than early beats in last bar (24)
+        // Chord track: volume should be the same in last bar as in earlier bars
         val chordBeat24 = seq.tracks[0].beats[24]
         val chordBeat31 = seq.tracks[0].beats[31]
-        assertTrue(
-            chordBeat31.volume < chordBeat24.volume,
-            "Chord should fade at end: beat 31 (${chordBeat31.volume}) < beat 24 (${chordBeat24.volume})",
+        assertEquals(
+            chordBeat24.volume,
+            chordBeat31.volume,
+            "Chord volume should be consistent: beat 24 (${chordBeat24.volume}) == beat 31 (${chordBeat31.volume})",
         )
 
-        // Bass track: last fifth (beat 30) should have lower volume than earlier fifth (beat 26)
-        val bassBeat26 = seq.tracks[1].beats[26]
-        val bassBeat30 = seq.tracks[1].beats[30]
-        assertTrue(
-            bassBeat30.volume < bassBeat26.volume,
-            "Bass should fade at end: beat 30 (${bassBeat30.volume}) < beat 26 (${bassBeat26.volume})",
+        // Bass track: same role notes should have the same volume across bars
+        val bassBeat26 = seq.tracks[1].beats[26] // fifth in bar 3
+        val bassBeat18 = seq.tracks[1].beats[18] // fifth in bar 2
+        assertEquals(
+            bassBeat18.volume,
+            bassBeat26.volume,
+            "Bass fifth volume should be consistent: beat 18 (${bassBeat18.volume}) == beat 26 (${bassBeat26.volume})",
         )
     }
 
