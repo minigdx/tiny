@@ -57,6 +57,9 @@ class StreamingAudioThread(
     @Volatile
     private var running = true
 
+    @Volatile
+    var musicScheduler: MusicScheduler? = null
+
     fun shutdown() {
         running = false
         if (::line.isInitialized) {
@@ -98,10 +101,14 @@ class StreamingAudioThread(
 
     private fun generateSamples(floatData: FloatArray) {
         val buffer = ByteBuffer.wrap(byteBuffer).order(ByteOrder.LITTLE_ENDIAN)
+        val scheduler = musicScheduler
         (0 until BUFFER_SIZE).forEach { sample ->
             floatData[sample] = 0f
             instrumentPlayers.forEach { instrumentPlayer ->
                 floatData[sample] += instrumentPlayer.generate()
+            }
+            if (scheduler != null) {
+                floatData[sample] += scheduler.generate()
             }
             floatData[sample] = softClip(floatData[sample] * DEFAULT_MASTER_VOLUME)
 
@@ -188,6 +195,32 @@ class JavaSoundManager : SoundManager() {
         }
     }
 
+    private val scheduler = MusicScheduler()
+
+    override fun playMusic(
+        config: MusicConfiguration,
+        instruments: Array<Instrument?>,
+    ) {
+        scheduler.play(config, instruments)
+        streamingAudioThread.musicScheduler = scheduler
+    }
+
+    override fun stopMusic() {
+        scheduler.stop()
+        streamingAudioThread.musicScheduler = null
+    }
+
+    override fun updateMusic(
+        config: MusicConfiguration,
+        instruments: Array<Instrument?>,
+    ) {
+        scheduler.updateConfig(config, instruments)
+    }
+
+    override fun isMusicPlaying(): Boolean {
+        return scheduler.isPlaying()
+    }
+
     override fun createSoundHandler(buffer: FloatArray): SoundHandler {
         val handler = JavaSoundHandler(
             data = buffer,
@@ -199,6 +232,8 @@ class JavaSoundManager : SoundManager() {
     }
 
     override fun destroy() {
+        scheduler.stop()
+
         streamingAudioThread.shutdown()
         streamingAudioThread.join(1000)
 

@@ -33,4 +33,32 @@ interface VirtualSoundBoard {
     )
 
     fun noteOff(note: Note)
+
+    /**
+     * Start streaming music playback using real-time beat-by-beat scheduling.
+     * Changes apply without interrupting playback.
+     */
+    fun playMusic(
+        config: MusicConfiguration,
+        instruments: Array<Instrument?>,
+    )
+
+    /**
+     * Stop streaming music playback.
+     */
+    fun stopMusic()
+
+    /**
+     * Update the configuration of currently streaming music.
+     * The change is applied at the next bar boundary.
+     */
+    fun updateMusic(
+        config: MusicConfiguration,
+        instruments: Array<Instrument?>,
+    )
+
+    /**
+     * Check if streaming music is currently playing.
+     */
+    fun isMusicPlaying(): Boolean
 }

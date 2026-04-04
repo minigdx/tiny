@@ -100,6 +100,22 @@ class SoundLib(
             val index = arg1.checkint()
             val result = WrapperLuaTable()
             val sound = resourceAccess.findSound(0)
+
+            // Use streaming playback if the sequence has a configuration
+            val sequence = sound?.data?.music?.sequences?.getOrNull(index)
+            val config = sequence?.configuration
+            if (playSound && config != null) {
+                val instruments = sound.data.music.instruments
+                soundBoard.playMusic(config, instruments)
+                result.function0("stop") {
+                    soundBoard.stopMusic()
+                    NONE
+                }
+                result.wrap("playing") { valueOf(soundBoard.isMusicPlaying()) }
+                return result
+            }
+
+            // Fallback to pre-computed buffer playback
             val buffer = sound?.data?.musicalSequences?.getOrNull(index)
             if (playSound && buffer != null) {
                 val handler = soundBoard.createHandler(buffer)

@@ -4,6 +4,8 @@ import com.github.minigdx.tiny.log.StdOutLogger
 import com.github.minigdx.tiny.lua.Note
 import com.github.minigdx.tiny.sound.Instrument
 import com.github.minigdx.tiny.sound.InstrumentPlayer
+import com.github.minigdx.tiny.sound.MusicConfiguration
+import com.github.minigdx.tiny.sound.MusicScheduler
 import js.array.ReadonlyArray
 import js.objects.ReadonlyRecord
 import js.typedarrays.Float32Array
@@ -15,8 +17,11 @@ import web.events.EventHandler
 
 class SynthesizerProcessor : AudioWorkletProcessor() {
     private var currentInstrumentPlayer: InstrumentPlayer? = null
+    private val musicScheduler = MusicScheduler()
 
     private val logger = StdOutLogger("SynthesizerProcessor")
+
+    private val json = Json { ignoreUnknownKeys = true }
 
     init {
         port.onmessage = EventHandler { event ->
@@ -30,7 +35,7 @@ class SynthesizerProcessor : AudioWorkletProcessor() {
 
                     if (instrumentJson != null && note != null) {
                         try {
-                            val instrument = Json.decodeFromString<Instrument>(instrumentJson)
+                            val instrument = json.decodeFromString<Instrument>(instrumentJson)
                             // Stop current note if any
                             currentInstrumentPlayer?.close()
                             // Create new player and start note
@@ -45,6 +50,35 @@ class SynthesizerProcessor : AudioWorkletProcessor() {
                     val note = data.note as? Int
                     if (note != null) {
                         currentInstrumentPlayer?.noteOff(Note.entries[note])
+                    }
+                }
+                "musicPlay" -> {
+                    try {
+                        val configJson = data.config as? String
+                        val instrumentsJson = data.instruments as? String
+                        if (configJson != null && instrumentsJson != null) {
+                            val config = json.decodeFromString<MusicConfiguration>(configJson)
+                            val instruments = json.decodeFromString<Array<Instrument?>>(instrumentsJson)
+                            musicScheduler.play(config, instruments)
+                        }
+                    } catch (e: Exception) {
+                        logger.error("AUDIO", e) { "Error starting music" }
+                    }
+                }
+                "musicStop" -> {
+                    musicScheduler.stop()
+                }
+                "musicUpdate" -> {
+                    try {
+                        val configJson = data.config as? String
+                        val instrumentsJson = data.instruments as? String
+                        if (configJson != null && instrumentsJson != null) {
+                            val config = json.decodeFromString<MusicConfiguration>(configJson)
+                            val instruments = json.decodeFromString<Array<Instrument?>>(instrumentsJson)
+                            musicScheduler.updateConfig(config, instruments)
+                        }
+                    } catch (e: Exception) {
+                        logger.error("AUDIO", e) { "Error updating music" }
                     }
                 }
                 else -> {
@@ -62,19 +96,12 @@ class SynthesizerProcessor : AudioWorkletProcessor() {
         // Get the first output channel (mono output)
         val output = outputs[0][0]
 
-        // Generate audio samples
         val player = currentInstrumentPlayer
-        if (player != null) {
-            // Fill the output buffer with generated samples
-            for (i in 0 until output.length) {
-                val sample = player.generate()
-                output[i] = sample
-            }
-        } else {
-            // No active player, output silence
-            for (i in 0 until output.length) {
-                output[i] = 0f
-            }
+
+        for (i in 0 until output.length) {
+            var sample = player?.generate() ?: 0f
+            sample += musicScheduler.generate()
+            output[i] = sample
         }
 
         return true

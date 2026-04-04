@@ -52,13 +52,19 @@ class SequenceLuaWrapper(
 
         function1("generate") { arg ->
             val config = luaTableToConfig(arg.checktable()!!)
-            MusicGenerator.generate(sequence, config)
-            sequence.configuration = config
-            // Link instruments after generation
-            sequence.tracks.forEach { track ->
-                track.instrument = music.instruments.getOrNull(track.instrumentIndex)
+            if (soundBoard.isMusicPlaying()) {
+                // Push config update to running scheduler (applies at next bar)
+                sequence.configuration = config
+                soundBoard.updateMusic(config, music.instruments)
+            } else {
+                MusicGenerator.generate(sequence, config)
+                sequence.configuration = config
+                // Link instruments after generation
+                sequence.tracks.forEach { track ->
+                    track.instrument = music.instruments.getOrNull(track.instrumentIndex)
+                }
+                cachedBuffer = null
             }
-            cachedBuffer = null
             NONE
         }
 
@@ -68,15 +74,29 @@ class SequenceLuaWrapper(
         }
 
         function0("play") {
-            val buffer = cachedBuffer ?: soundBoard.convert(sequence).also { cachedBuffer = it }
-            val handler = soundBoard.createHandler(buffer).also { it.play() }
-            val result = WrapperLuaTable()
-            result.function0("stop") {
-                handler.stop()
-                NONE
+            val config = sequence.configuration
+            if (config != null) {
+                // Streaming playback for generated music
+                soundBoard.playMusic(config, music.instruments)
+                val result = WrapperLuaTable()
+                result.function0("stop") {
+                    soundBoard.stopMusic()
+                    NONE
+                }
+                result.wrap("playing") { valueOf(soundBoard.isMusicPlaying()) }
+                result
+            } else {
+                // Legacy pre-computed playback for manually composed sequences
+                val buffer = cachedBuffer ?: soundBoard.convert(sequence).also { cachedBuffer = it }
+                val handler = soundBoard.createHandler(buffer).also { it.play() }
+                val result = WrapperLuaTable()
+                result.function0("stop") {
+                    handler.stop()
+                    NONE
+                }
+                result.wrap("playing") { valueOf(handler.isPlaying()) }
+                result
             }
-            result.wrap("playing") { valueOf(handler.isPlaying()) }
-            result
         }
 
         function0("export") {

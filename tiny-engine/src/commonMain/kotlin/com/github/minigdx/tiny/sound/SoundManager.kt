@@ -48,6 +48,28 @@ class DefaultSoundBoard(private val soundManager: SoundManager) : VirtualSoundBo
     override fun noteOff(note: Note) {
         soundManager.noteOff(note)
     }
+
+    override fun playMusic(
+        config: MusicConfiguration,
+        instruments: Array<Instrument?>,
+    ) {
+        soundManager.playMusic(config, instruments)
+    }
+
+    override fun stopMusic() {
+        soundManager.stopMusic()
+    }
+
+    override fun updateMusic(
+        config: MusicConfiguration,
+        instruments: Array<Instrument?>,
+    ) {
+        soundManager.updateMusic(config, instruments)
+    }
+
+    override fun isMusicPlaying(): Boolean {
+        return soundManager.isMusicPlaying()
+    }
 }
 
 abstract class SoundManager {
@@ -311,6 +333,20 @@ abstract class SoundManager {
     )
 
     abstract fun noteOff(note: Note)
+
+    abstract fun playMusic(
+        config: MusicConfiguration,
+        instruments: Array<Instrument?>,
+    )
+
+    abstract fun stopMusic()
+
+    abstract fun updateMusic(
+        config: MusicConfiguration,
+        instruments: Array<Instrument?>,
+    )
+
+    abstract fun isMusicPlaying(): Boolean
 
     private val currentHandlers = mutableListOf<SoundHandler>()
 

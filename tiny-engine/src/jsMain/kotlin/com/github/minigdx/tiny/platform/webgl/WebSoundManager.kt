@@ -6,6 +6,7 @@ import com.github.minigdx.tiny.sound.BufferedChunkGenerator
 import com.github.minigdx.tiny.sound.ChunkGenerator
 import com.github.minigdx.tiny.sound.Instrument
 import com.github.minigdx.tiny.sound.InstrumentPlayer
+import com.github.minigdx.tiny.sound.MusicConfiguration
 import com.github.minigdx.tiny.sound.SoundHandler
 import com.github.minigdx.tiny.sound.SoundManager
 import com.github.minigdx.tiny.util.MutableFixedSizeList
@@ -195,6 +196,53 @@ class WebSoundManager : SoundManager() {
 
         return sourceNode
     }
+
+    private var musicPlaying = false
+
+    override fun playMusic(
+        config: MusicConfiguration,
+        instruments: Array<Instrument?>,
+    ) {
+        if (!ready) return
+        musicPlaying = true
+        val configJson = Json.encodeToString(config)
+        val instrumentsJson = Json.encodeToString(instruments)
+        audioWorkletNode.port.postMessage(
+            json(
+                "type" to "musicPlay",
+                "config" to configJson,
+                "instruments" to instrumentsJson,
+            ),
+        )
+    }
+
+    override fun stopMusic() {
+        if (!ready) return
+        musicPlaying = false
+        audioWorkletNode.port.postMessage(
+            json(
+                "type" to "musicStop",
+            ),
+        )
+    }
+
+    override fun updateMusic(
+        config: MusicConfiguration,
+        instruments: Array<Instrument?>,
+    ) {
+        if (!ready) return
+        val configJson = Json.encodeToString(config)
+        val instrumentsJson = Json.encodeToString(instruments)
+        audioWorkletNode.port.postMessage(
+            json(
+                "type" to "musicUpdate",
+                "config" to configJson,
+                "instruments" to instrumentsJson,
+            ),
+        )
+    }
+
+    override fun isMusicPlaying(): Boolean = musicPlaying
 
     override fun createSoundHandler(buffer: FloatArray): SoundHandler {
         val handler = WebSoundHandler(BufferedChunkGenerator(buffer), this)
