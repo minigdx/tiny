@@ -52,18 +52,16 @@ class SequenceLuaWrapper(
 
         function1("generate") { arg ->
             val config = luaTableToConfig(arg.checktable()!!)
+            // Always regenerate the local sequence so export/save stay up to date
+            MusicGenerator.generate(sequence, config)
+            sequence.configuration = config
+            sequence.tracks.forEach { track ->
+                track.instrument = music.instruments.getOrNull(track.instrumentIndex)
+            }
+            cachedBuffer = null
+            // If streaming, push the config update to the scheduler (applies at next bar)
             if (soundBoard.isMusicPlaying()) {
-                // Push config update to running scheduler (applies at next bar)
-                sequence.configuration = config
                 soundBoard.updateMusic(config, music.instruments)
-            } else {
-                MusicGenerator.generate(sequence, config)
-                sequence.configuration = config
-                // Link instruments after generation
-                sequence.tracks.forEach { track ->
-                    track.instrument = music.instruments.getOrNull(track.instrumentIndex)
-                }
-                cachedBuffer = null
             }
             NONE
         }

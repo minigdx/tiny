@@ -22,6 +22,7 @@ local state = {
 local playing = false
 local play_handler = nil
 local config_dirty = true
+local master_volume = 1.0
 
 local config = {
     root = "C",
@@ -98,8 +99,37 @@ local function build_seq_label(index)
     return "Seq " .. index
 end
 
+-- Build a config with volumes scaled by master volume for playback/export
+local function build_play_config()
+    return {
+        root = config.root,
+        scale_name = config.scale_name,
+        progression_name = config.progression_name,
+        lead_style = config.lead_style,
+        drum_pattern = config.drum_pattern,
+        chord_instrument = config.chord_instrument,
+        bass_instrument = config.bass_instrument,
+        lead_instrument = config.lead_instrument,
+        drum_instrument = config.drum_instrument,
+        chord_volume = config.chord_volume * master_volume,
+        bass_volume = config.bass_volume * master_volume,
+        lead_volume = config.lead_volume * master_volume,
+        drum_volume = config.drum_volume * master_volume,
+        bpm = config.bpm,
+        seed = config.seed,
+    }
+end
+
+-- Push a live config update to the streaming scheduler
+local function push_live_update()
+    if playing and state.seq then
+        state.seq.generate(build_play_config())
+    end
+end
+
 local function mark_config_dirty()
     config_dirty = true
+    push_live_update()
 end
 
 local function _init_music_generator(widget_entities)
@@ -266,19 +296,23 @@ local function _init_music_generator(widget_entities)
         end
     end
 
-    -- Master volume: apply multiplier to all track volumes
+    -- Master volume: scale all track volumes
     if master_volume_fader then
         master_volume_fader.on_change = function(self)
-            local vol = self.value
-            local base_volumes = { config.chord_volume, config.bass_volume, config.lead_volume, config.drum_volume }
-            for i = 0, 3 do
-                local track = state.seq.track(i)
-                if track then
-                    track.volume = base_volumes[i + 1] * vol
+            master_volume = self.value
+            if playing then
+                push_live_update()
+            else
+                -- For pre-computed path, update tracks directly
+                local base_volumes = { config.chord_volume, config.bass_volume, config.lead_volume, config.drum_volume }
+                for i = 0, 3 do
+                    local track = state.seq.track(i)
+                    if track then
+                        track.volume = base_volumes[i + 1] * master_volume
+                    end
                 end
+                state.seq.invalidate()
             end
-            -- Master volume changes need audio re-render but not note regeneration
-            state.seq.invalidate()
         end
     end
 
@@ -327,7 +361,7 @@ local function _init_music_generator(widget_entities)
             else
                 if config_dirty then
                     config.seed = math.random(1, 2147483647)
-                    state.seq.generate(config)
+                    state.seq.generate(build_play_config())
                     config_dirty = false
                 end
                 play_handler = state.seq.play()
@@ -345,7 +379,7 @@ local function _init_music_generator(widget_entities)
         export_button.on_change = function()
             if config_dirty then
                 config.seed = math.random(1, 2147483647)
-                state.seq.generate(config)
+                state.seq.generate(build_play_config())
                 config_dirty = false
             end
             state.seq.export()
