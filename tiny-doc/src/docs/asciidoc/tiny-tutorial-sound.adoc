@@ -36,7 +36,7 @@ The SFX editor lets you:
 Each sound occupies a numbered slot (0, 1, 2, ...) in the SFX file.
 
 ++++
-<iframe title="Tiny SFX Editor" loading="lazy" width="516" height="516" src="sample/sfx-editor/index.html" style="border: 4px solid #00e5ff; border-radius: 1rem; display: block; margin: 1em auto;"></iframe>
+<iframe title="Tiny SFX Editor" loading="lazy" width="768" height="516" src="sample/sfx-editor/index.html" style="border: 4px solid #00e5ff; border-radius: 1rem; display: block; margin: 1em auto;"></iframe>
 ++++
 
 == Configuration
