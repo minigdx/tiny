@@ -71,6 +71,57 @@ object MusicGenerator {
         val hihat: IntArray,
     )
 
+    data class RhythmStyle(
+        val arpPattern: List<Int>,
+        val beatPattern: IntArray,
+    )
+
+    val RHYTHM_STYLE_NAMES = listOf(
+        "Arp Up",
+        "Arp Down",
+        "UpDown",
+        "Broken",
+        "Spread",
+        "Pulse",
+        "Block",
+        "Offbeat",
+    )
+
+    val RHYTHM_STYLES: Map<String, RhythmStyle> = mapOf(
+        "Arp Up" to RhythmStyle(
+            arpPattern = listOf(0, 1, 2),
+            beatPattern = intArrayOf(1, 1, 1, 1, 1, 1, 1, 1),
+        ),
+        "Arp Down" to RhythmStyle(
+            arpPattern = listOf(2, 1, 0),
+            beatPattern = intArrayOf(1, 1, 1, 1, 1, 1, 1, 1),
+        ),
+        "UpDown" to RhythmStyle(
+            arpPattern = listOf(0, 1, 2, 1),
+            beatPattern = intArrayOf(1, 1, 1, 1, 1, 1, 1, 1),
+        ),
+        "Broken" to RhythmStyle(
+            arpPattern = listOf(0, 2, 1, 2),
+            beatPattern = intArrayOf(1, 1, 1, 1, 1, 1, 1, 1),
+        ),
+        "Spread" to RhythmStyle(
+            arpPattern = listOf(0, 1, 2, 3),
+            beatPattern = intArrayOf(1, 1, 1, 1, 1, 1, 1, 1),
+        ),
+        "Pulse" to RhythmStyle(
+            arpPattern = listOf(0, 0, 0, 2),
+            beatPattern = intArrayOf(1, 1, 1, 1, 1, 1, 1, 1),
+        ),
+        "Block" to RhythmStyle(
+            arpPattern = listOf(0, 0, 0, 0),
+            beatPattern = intArrayOf(1, 0, 1, 0, 1, 0, 1, 0),
+        ),
+        "Offbeat" to RhythmStyle(
+            arpPattern = listOf(0, 1, 2, 1),
+            beatPattern = intArrayOf(0, 1, 0, 1, 0, 1, 0, 1),
+        ),
+    )
+
     private fun noteNameToIndex(name: String): Int {
         val idx = NOTE_NAMES.indexOf(name)
         return if (idx >= 0) idx else 0
@@ -147,6 +198,7 @@ object MusicGenerator {
     ) {
         val scale = SCALES[config.scaleName] ?: SCALES["Major"]!!
         val progression = PROGRESSIONS[config.progressionName] ?: PROGRESSIONS["Classic"]!!
+        val style = RHYTHM_STYLES[config.rhythmStyle] ?: RHYTHM_STYLES["Arp Up"]!!
         clearTrack(track)
         track.instrumentIndex = config.chordInstrument
         track.volume = config.chordVolume
@@ -154,16 +206,23 @@ object MusicGenerator {
         for (bar in 0..3) {
             val degree = progression[bar % progression.size]
             val chord = buildChordNotes(config.root, scale, degree, 3)
+            // Add octave note for "Spread" style (index 3)
+            val chordWithOctave = chord + (chord[0] + 12)
             for (i in 0..7) {
                 val beat = bar * 8 + i
                 if (beat < 33) {
-                    val noteIdx = i % chord.size
-                    track.beats[beat] = MusicalNote(
-                        semitoneToNote(chord[noteIdx]),
-                        beat.toFloat(),
-                        1f,
-                        0.5f,
-                    )
+                    val pi = i % style.beatPattern.size
+                    if (style.beatPattern[pi] == 1) {
+                        val arpIdx = i % style.arpPattern.size
+                        val noteIdx = style.arpPattern[arpIdx]
+                        val semi = chordWithOctave[noteIdx.coerceIn(0, chordWithOctave.lastIndex)]
+                        track.beats[beat] = MusicalNote(
+                            semitoneToNote(semi),
+                            beat.toFloat(),
+                            1f,
+                            0.5f,
+                        )
+                    }
                 }
             }
         }

@@ -85,6 +85,19 @@ M.drum_pattern_names = { "Rock", "Dance", "Halftime", "Funky", "March", "Sparse"
 
 M.lead_styles = { "Stepwise", "Arpeggiated", "Bouncy", "Sparse", "Random" }
 
+M.rhythm_style_names = { "Arp Up", "Arp Down", "UpDown", "Broken", "Spread", "Pulse", "Block", "Offbeat" }
+
+M.rhythm_styles = {
+    ["Arp Up"]   = { arp = { 0, 1, 2 },       beat = { 1, 1, 1, 1, 1, 1, 1, 1 } },
+    ["Arp Down"] = { arp = { 2, 1, 0 },       beat = { 1, 1, 1, 1, 1, 1, 1, 1 } },
+    ["UpDown"]   = { arp = { 0, 1, 2, 1 },    beat = { 1, 1, 1, 1, 1, 1, 1, 1 } },
+    ["Broken"]   = { arp = { 0, 2, 1, 2 },    beat = { 1, 1, 1, 1, 1, 1, 1, 1 } },
+    ["Spread"]   = { arp = { 0, 1, 2, 3 },    beat = { 1, 1, 1, 1, 1, 1, 1, 1 } },
+    ["Pulse"]    = { arp = { 0, 0, 0, 2 },    beat = { 1, 1, 1, 1, 1, 1, 1, 1 } },
+    ["Block"]    = { arp = { 0, 0, 0, 0 },    beat = { 1, 0, 1, 0, 1, 0, 1, 0 } },
+    ["Offbeat"]  = { arp = { 0, 1, 2, 1 },    beat = { 0, 1, 0, 1, 0, 1, 0, 1 } },
+}
+
 local function build_scale_notes(root_name, scale, octave)
     local root_semi = note_name_to_index(root_name) + octave * 12
     local notes = {}
@@ -114,6 +127,7 @@ end
 local function generate_chords(track, config)
     local scale = M.scales[config.scale_name]
     local progression = M.progressions[config.progression_name]
+    local style = M.rhythm_styles[config.rhythm_style or "Arp Up"] or M.rhythm_styles["Arp Up"]
     track.clear()
     track.instrument = config.chord_instrument or 0
     track.volume = config.chord_volume or 0.6
@@ -121,11 +135,20 @@ local function generate_chords(track, config)
     for bar = 0, 3 do
         local degree = progression[(bar % #progression) + 1]
         local chord = build_chord_notes(config.root, scale, degree, 3)
+        -- Add octave note for "Spread" style (index 3)
+        local chord_with_octave = { chord[1], chord[2], chord[3], chord[1] + 12 }
         for i = 0, 7 do
             local beat = bar * 8 + i
             if beat < 33 then
-                local note_idx = (i % #chord) + 1
-                track.set_note({ beat = beat, note = make_note(chord[note_idx]), volume = 0.5 })
+                local pi = (i % #style.beat) + 1
+                if style.beat[pi] == 1 then
+                    local arp_idx = (i % #style.arp) + 1
+                    local note_idx = style.arp[arp_idx]
+                    -- arp values are 0-based indices; clamp to chord_with_octave range
+                    local clamped = math.min(note_idx, #chord_with_octave - 1)
+                    local semi = chord_with_octave[clamped + 1]
+                    track.set_note({ beat = beat, note = make_note(semi), volume = 0.5 })
+                end
             end
         end
     end

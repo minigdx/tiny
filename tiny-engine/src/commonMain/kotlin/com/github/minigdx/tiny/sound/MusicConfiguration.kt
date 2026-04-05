@@ -11,6 +11,7 @@ data class MusicConfiguration(
     @EncodeDefault val scaleName: String = "Major",
     @EncodeDefault val progressionName: String = "Classic",
     @EncodeDefault val leadStyle: String = "Stepwise",
+    @EncodeDefault val rhythmStyle: String = "Arp Up",
     @EncodeDefault val drumPattern: String = "Rock",
     @EncodeDefault val chordInstrument: Int = 0,
     @EncodeDefault val bassInstrument: Int = 1,

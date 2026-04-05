@@ -111,6 +111,7 @@ class SequenceLuaWrapper(
             table.set("scale_name", LuaValue.valueOf(config.scaleName))
             table.set("progression_name", LuaValue.valueOf(config.progressionName))
             table.set("lead_style", LuaValue.valueOf(config.leadStyle))
+            table.set("rhythm_style", LuaValue.valueOf(config.rhythmStyle))
             table.set("drum_pattern", LuaValue.valueOf(config.drumPattern))
             table.set("chord_instrument", LuaValue.valueOf(config.chordInstrument))
             table.set("bass_instrument", LuaValue.valueOf(config.bassInstrument))
@@ -131,6 +132,7 @@ class SequenceLuaWrapper(
                 scaleName = table.get("scale_name").optjstring("Major") ?: "Major",
                 progressionName = table.get("progression_name").optjstring("Classic") ?: "Classic",
                 leadStyle = table.get("lead_style").optjstring("Stepwise") ?: "Stepwise",
+                rhythmStyle = table.get("rhythm_style").optjstring("Arp Up") ?: "Arp Up",
                 drumPattern = table.get("drum_pattern").optjstring("Rock") ?: "Rock",
                 chordInstrument = table.get("chord_instrument").optint(0),
                 bassInstrument = table.get("bass_instrument").optint(1),

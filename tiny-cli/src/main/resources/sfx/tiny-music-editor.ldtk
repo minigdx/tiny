@@ -11,7 +11,7 @@
 	"iid": "4cf47920-fa90-11f0-ad09-7b5a63ac610d",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 107,
+	"nextUid": 108,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -3121,6 +3121,43 @@
 					"allowedRefs": "OnlyTags",
 					"allowedRefsEntityUid": null,
 					"allowedRefTags": ["PercentOutput"],
+					"tilesetUid": null
+				},
+				{
+					"identifier": "RythmArpegiator",
+					"doc": null,
+					"__type": "EntityRef",
+					"uid": 107,
+					"type": "F_EntityRef",
+					"isArray": false,
+					"canBeNull": true,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "RefLinkBetweenCenters",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "CurvedArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySpecificEntity",
+					"allowedRefsEntityUid": 2,
+					"allowedRefTags": [],
 					"tilesetUid": null
 				}
 			]
@@ -9420,19 +9457,19 @@
 						},
 						{
 							"__identifier": "Dropdown",
-							"__grid": [7,18],
+							"__grid": [2,20],
 							"__pivot": [0,0],
 							"__tags": ["Widget"],
 							"__tile": { "tilesetUid": 72, "x": 24, "y": 0, "w": 24, "h": 24 },
 							"__smartColor": "#D77643",
 							"iid": "32cf0410-fa90-11f0-9ead-e9c92c8921e0",
-							"width": 112,
+							"width": 152,
 							"height": 16,
 							"defUid": 2,
-							"px": [62,144],
+							"px": [22,160],
 							"fieldInstances": [],
-							"__worldX": 878,
-							"__worldY": 144
+							"__worldX": 838,
+							"__worldY": 160
 						},
 						{
 							"__identifier": "Dropdown",
@@ -9477,10 +9514,10 @@
 							"width": 8,
 							"height": 32,
 							"defUid": 77,
-							"px": [176,144],
+							"px": [176,148],
 							"fieldInstances": [],
 							"__worldX": 992,
-							"__worldY": 144
+							"__worldY": 148
 						},
 						{
 							"__identifier": "Fader",
@@ -9702,6 +9739,15 @@
 								}, "__tile": null, "defUid": 106, "realEditorValues": [{
 									"id": "V_String",
 									"params": ["f1a2b3c4-fa90-11f0-9ead-speed0fader01"]
+								}] },
+								{ "__identifier": "RythmArpegiator", "__type": "EntityRef", "__value": {
+									"entityIid": "7343ffe0-fa90-11f0-9ead-576269b9b089",
+									"layerIid": "c5000ed1-fa90-11f0-9ead-a1240c4664a1",
+									"levelIid": "c5000ed0-fa90-11f0-9ead-c7908e5e7535",
+									"worldIid": "4cf47921-fa90-11f0-ad09-8d23e32977ff"
+								}, "__tile": null, "defUid": 107, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["7343ffe0-fa90-11f0-9ead-576269b9b089"]
 								}] }
 							],
 							"__worldX": 1000,
@@ -9709,7 +9755,7 @@
 						},
 						{
 							"__identifier": "Dropdown",
-							"__grid": [2,14],
+							"__grid": [2,13],
 							"__pivot": [0,0],
 							"__tags": ["Widget"],
 							"__tile": { "tilesetUid": 72, "x": 24, "y": 0, "w": 24, "h": 24 },
@@ -9718,42 +9764,42 @@
 							"width": 152,
 							"height": 16,
 							"defUid": 2,
-							"px": [21,112],
+							"px": [21,108],
 							"fieldInstances": [],
 							"__worldX": 837,
-							"__worldY": 112
+							"__worldY": 108
 						},
 						{
 							"__identifier": "Fader",
-							"__grid": [19,23],
+							"__grid": [35,24],
 							"__pivot": [0,0],
 							"__tags": [ "Widget", "PercentOutput" ],
 							"__tile": { "tilesetUid": 72, "x": 0, "y": 24, "w": 8, "h": 24 },
 							"__smartColor": "#8B9BB4",
 							"iid": "04d6c670-fa90-11f0-9ead-fded0c18e8e2",
 							"width": 8,
-							"height": 56,
+							"height": 50,
 							"defUid": 77,
-							"px": [152,184],
+							"px": [280,192],
 							"fieldInstances": [],
-							"__worldX": 968,
-							"__worldY": 184
+							"__worldX": 1096,
+							"__worldY": 192
 						},
 						{
 							"__identifier": "Fader",
-							"__grid": [21,23],
+							"__grid": [45,24],
 							"__pivot": [0,0],
 							"__tags": [ "Widget", "PercentOutput" ],
 							"__tile": { "tilesetUid": 72, "x": 0, "y": 24, "w": 8, "h": 24 },
 							"__smartColor": "#8B9BB4",
 							"iid": "f1a2b3c4-fa90-11f0-9ead-speed0fader01",
 							"width": 8,
-							"height": 56,
+							"height": 50,
 							"defUid": 77,
-							"px": [168,184],
+							"px": [360,192],
 							"fieldInstances": [],
-							"__worldX": 984,
-							"__worldY": 184
+							"__worldX": 1176,
+							"__worldY": 192
 						},
 						{
 							"__identifier": "Dropdown",
@@ -9816,7 +9862,7 @@
 						},
 						{
 							"__identifier": "Dropdown",
-							"__grid": [2,20],
+							"__grid": [2,15],
 							"__pivot": [0,0],
 							"__tags": ["Widget"],
 							"__tile": { "tilesetUid": 72, "x": 24, "y": 0, "w": 24, "h": 24 },
@@ -9825,10 +9871,10 @@
 							"width": 152,
 							"height": 16,
 							"defUid": 2,
-							"px": [22,160],
+							"px": [22,124],
 							"fieldInstances": [],
 							"__worldX": 838,
-							"__worldY": 160
+							"__worldY": 124
 						}
 					]
 				},
@@ -9865,7 +9911,7 @@
 							"__smartColor": "#FFFFFF",
 							"iid": "2a823bc0-fa90-11f0-9ead-fb15f3d46ffd",
 							"width": 176,
-							"height": 48,
+							"height": 56,
 							"defUid": 71,
 							"px": [16,88],
 							"fieldInstances": [
@@ -9908,16 +9954,16 @@
 						},
 						{
 							"__identifier": "Panel",
-							"__grid": [2,17],
+							"__grid": [2,18],
 							"__pivot": [0,0],
 							"__tags": ["panel"],
 							"__tile": { "tilesetUid": 72, "x": 0, "y": 0, "w": 24, "h": 24 },
 							"__smartColor": "#FFFFFF",
 							"iid": "e7972550-fa90-11f0-9ead-af6100a30ea6",
 							"width": 176,
-							"height": 48,
+							"height": 40,
 							"defUid": 71,
-							"px": [16,136],
+							"px": [16,144],
 							"fieldInstances": [
 								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "Purple", "__tile": null, "defUid": 74, "realEditorValues": [{
 									"id": "V_String",
@@ -9929,7 +9975,7 @@
 								}] }
 							],
 							"__worldX": 832,
-							"__worldY": 136
+							"__worldY": 144
 						},
 						{
 							"__identifier": "Panel",
@@ -10012,6 +10058,50 @@
 							],
 							"__worldX": 896,
 							"__worldY": 32
+						},
+						{
+							"__identifier": "Panel",
+							"__grid": [25,23],
+							"__pivot": [0,0],
+							"__tags": ["panel"],
+							"__tile": { "tilesetUid": 72, "x": 0, "y": 0, "w": 24, "h": 24 },
+							"__smartColor": "#FFFFFF",
+							"iid": "6897ccc0-21a0-11f1-a29b-156eea82614f",
+							"width": 96,
+							"height": 64,
+							"defUid": 71,
+							"px": [200,184],
+							"fieldInstances": [
+								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "LigthBlue", "__tile": null, "defUid": 74, "realEditorValues": [] },
+								{ "__identifier": "Label", "__type": "String", "__value": "volume", "__tile": null, "defUid": 81, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["volume"]
+								}] }
+							],
+							"__worldX": 1016,
+							"__worldY": 184
+						},
+						{
+							"__identifier": "Panel",
+							"__grid": [37,23],
+							"__pivot": [0,0],
+							"__tags": ["panel"],
+							"__tile": { "tilesetUid": 72, "x": 0, "y": 0, "w": 24, "h": 24 },
+							"__smartColor": "#FFFFFF",
+							"iid": "6d0279e0-21a0-11f1-a29b-d5824b25f030",
+							"width": 80,
+							"height": 64,
+							"defUid": 71,
+							"px": [296,184],
+							"fieldInstances": [
+								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "LigthBlue", "__tile": null, "defUid": 74, "realEditorValues": [] },
+								{ "__identifier": "Label", "__type": "String", "__value": "speed", "__tile": null, "defUid": 81, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["speed"]
+								}] }
+							],
+							"__worldX": 1112,
+							"__worldY": 184
 						}
 					]
 				},

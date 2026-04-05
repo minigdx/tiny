@@ -29,6 +29,7 @@ local config = {
     scale_name = "Major",
     progression_name = "Classic",
     lead_style = "Stepwise",
+    rhythm_style = "Arp Up",
     drum_pattern = "Rock",
     chord_instrument = 0,
     bass_instrument = 1,
@@ -42,13 +43,13 @@ local config = {
 }
 
 local themes = {
-    { name = "Adventurous", scale_name = "Major", progression_name = "Classic", lead_style = "Stepwise", drum_pattern = "Rock", bpm = 120 },
-    { name = "Jumper", scale_name = "Penta Maj", progression_name = "Upbeat", lead_style = "Bouncy", drum_pattern = "Dance", bpm = 140 },
-    { name = "Mystery", scale_name = "Dorian", progression_name = "Tense", lead_style = "Sparse", drum_pattern = "Sparse", bpm = 90 },
-    { name = "Sadness", scale_name = "Minor", progression_name = "Melancholy", lead_style = "Stepwise", drum_pattern = "Halftime", bpm = 100 },
-    { name = "Industrial", scale_name = "Mixolydian", progression_name = "Tense", lead_style = "Arpeggiated", drum_pattern = "Funky", bpm = 130 },
-    { name = "Dreamy", scale_name = "Penta Min", progression_name = "Dreamy", lead_style = "Arpeggiated", drum_pattern = "Halftime", bpm = 80 },
-    { name = "March", scale_name = "Major", progression_name = "Upbeat", lead_style = "Stepwise", drum_pattern = "March", bpm = 110 },
+    { name = "Adventurous", scale_name = "Major", progression_name = "Classic", lead_style = "Stepwise", rhythm_style = "Arp Up", drum_pattern = "Rock", bpm = 120 },
+    { name = "Jumper", scale_name = "Penta Maj", progression_name = "Upbeat", lead_style = "Bouncy", rhythm_style = "Broken", drum_pattern = "Dance", bpm = 140 },
+    { name = "Mystery", scale_name = "Dorian", progression_name = "Tense", lead_style = "Sparse", rhythm_style = "Pulse", drum_pattern = "Sparse", bpm = 90 },
+    { name = "Sadness", scale_name = "Minor", progression_name = "Melancholy", lead_style = "Stepwise", rhythm_style = "UpDown", drum_pattern = "Halftime", bpm = 100 },
+    { name = "Industrial", scale_name = "Mixolydian", progression_name = "Tense", lead_style = "Arpeggiated", rhythm_style = "Offbeat", drum_pattern = "Funky", bpm = 130 },
+    { name = "Dreamy", scale_name = "Penta Min", progression_name = "Dreamy", lead_style = "Arpeggiated", rhythm_style = "Spread", drum_pattern = "Halftime", bpm = 80 },
+    { name = "March", scale_name = "Major", progression_name = "Upbeat", lead_style = "Stepwise", rhythm_style = "Block", drum_pattern = "March", bpm = 110 },
 }
 
 local function wrap_dropdown_overlay(dropdown)
@@ -106,6 +107,7 @@ local function build_play_config()
         scale_name = config.scale_name,
         progression_name = config.progression_name,
         lead_style = config.lead_style,
+        rhythm_style = config.rhythm_style,
         drum_pattern = config.drum_pattern,
         chord_instrument = config.chord_instrument,
         bass_instrument = config.bass_instrument,
@@ -160,6 +162,7 @@ local function _init_music_generator(widget_entities)
     local selector_dd = wire.find_widget(all_widgets, gen.fields.Selector)
     local export_button = wire.find_widget(all_widgets, gen.fields.Export)
     local speed_fader = gen.fields.Speed and wire.find_widget(all_widgets, gen.fields.Speed) or nil
+    local rhythm_style_dd = gen.fields.RythmArpegiator and wire.find_widget(all_widgets, gen.fields.RythmArpegiator) or nil
 
     selector_dd_ref = selector_dd
     play_button_ref = play_button
@@ -172,6 +175,7 @@ local function _init_music_generator(widget_entities)
         "DrumPattern", "DrumVolume", "MusicTheme", "MusicScale",
         "LeadInstrument", "LeadVolume", "BassInstrument", "BassVolume",
         "RythmVolume", "RythmChordProgression", "RythmInstrument",
+        "RythmArpegiator",
         "Play", "Volume", "Selector", "Export", "Speed",
     }) do
         local ref = gen.fields[field_name]
@@ -208,6 +212,7 @@ local function _init_music_generator(widget_entities)
     populate_dropdown(progression_dd, music_templates.progression_names, find_index(music_templates.progression_names, config.progression_name))
     populate_dropdown(drum_pattern_dd, music_templates.drum_pattern_names, find_index(music_templates.drum_pattern_names, config.drum_pattern))
     populate_dropdown(lead_style_dd, music_templates.lead_styles, find_index(music_templates.lead_styles, config.lead_style))
+    populate_dropdown(rhythm_style_dd, music_templates.rhythm_style_names, find_index(music_templates.rhythm_style_names, config.rhythm_style))
     populate_dropdown(root_dd, music_templates.root_notes, find_index(music_templates.root_notes, config.root))
     populate_dropdown(chord_inst_dd, inst_options, config.chord_instrument + 1)
     populate_dropdown(bass_inst_dd, inst_options, config.bass_instrument + 1)
@@ -247,6 +252,13 @@ local function _init_music_generator(widget_entities)
     if lead_style_dd then
         lead_style_dd.on_change = function(self)
             config.lead_style = music_templates.lead_styles[self.selected]
+            mark_config_dirty()
+        end
+    end
+
+    if rhythm_style_dd then
+        rhythm_style_dd.on_change = function(self)
+            config.rhythm_style = music_templates.rhythm_style_names[self.selected]
             mark_config_dirty()
         end
     end
@@ -345,6 +357,7 @@ local function _init_music_generator(widget_entities)
             config.scale_name = theme.scale_name
             config.progression_name = theme.progression_name
             config.lead_style = theme.lead_style
+            config.rhythm_style = theme.rhythm_style
             config.drum_pattern = theme.drum_pattern
             config.bpm = theme.bpm
 
@@ -359,6 +372,9 @@ local function _init_music_generator(widget_entities)
             end
             if lead_style_dd then
                 lead_style_dd:set_selected(find_index(music_templates.lead_styles, theme.lead_style))
+            end
+            if rhythm_style_dd then
+                rhythm_style_dd:set_selected(find_index(music_templates.rhythm_style_names, theme.rhythm_style))
             end
             if speed_fader then
                 speed_fader.value = (config.bpm - 60) / 200
@@ -433,6 +449,7 @@ local function _init_music_generator(widget_entities)
                 config.scale_name = saved_config.scale_name or config.scale_name
                 config.progression_name = saved_config.progression_name or config.progression_name
                 config.lead_style = saved_config.lead_style or config.lead_style
+                config.rhythm_style = saved_config.rhythm_style or config.rhythm_style
                 config.drum_pattern = saved_config.drum_pattern or config.drum_pattern
                 config.chord_instrument = saved_config.chord_instrument or config.chord_instrument
                 config.bass_instrument = saved_config.bass_instrument or config.bass_instrument
@@ -457,6 +474,9 @@ local function _init_music_generator(widget_entities)
                 end
                 if lead_style_dd then
                     lead_style_dd:set_selected(find_index(music_templates.lead_styles, config.lead_style))
+                end
+                if rhythm_style_dd then
+                    rhythm_style_dd:set_selected(find_index(music_templates.rhythm_style_names, config.rhythm_style))
                 end
                 if chord_inst_dd then
                     chord_inst_dd:set_selected(config.chord_instrument + 1)
@@ -498,6 +518,7 @@ local function _init_music_generator(widget_entities)
         config.scale_name = saved_config.scale_name or config.scale_name
         config.progression_name = saved_config.progression_name or config.progression_name
         config.lead_style = saved_config.lead_style or config.lead_style
+        config.rhythm_style = saved_config.rhythm_style or config.rhythm_style
         config.drum_pattern = saved_config.drum_pattern or config.drum_pattern
         config.chord_instrument = saved_config.chord_instrument or config.chord_instrument
         config.bass_instrument = saved_config.bass_instrument or config.bass_instrument
@@ -521,6 +542,9 @@ local function _init_music_generator(widget_entities)
         end
         if lead_style_dd then
             lead_style_dd:set_selected(find_index(music_templates.lead_styles, config.lead_style))
+        end
+        if rhythm_style_dd then
+            rhythm_style_dd:set_selected(find_index(music_templates.rhythm_style_names, config.rhythm_style))
         end
         if chord_inst_dd then
             chord_inst_dd:set_selected(config.chord_instrument + 1)
