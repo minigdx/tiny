@@ -42,20 +42,6 @@ class SoundManagerTest {
         override fun noteOff(note: Note) {
             TODO("Not yet implemented")
         }
-
-        override fun playMusic(
-            config: MusicConfiguration,
-            instruments: Array<Instrument?>,
-        ) = Unit
-
-        override fun stopMusic() = Unit
-
-        override fun updateMusic(
-            config: MusicConfiguration,
-            instruments: Array<Instrument?>,
-        ) = Unit
-
-        override fun isMusicPlaying(): Boolean = false
     }
 
     /**

@@ -4,12 +4,12 @@ import com.github.minigdx.tiny.lua.Note
 
 interface VirtualSoundBoard {
     /**
-     * Create a sound handler from a [MusicalBar]
+     * Create a sound handler from a [MusicalPhrase]
      */
-    fun prepare(bar: MusicalBar): SoundHandler
+    fun prepare(bar: MusicalPhrase): SoundHandler
 
     /**
-     * Create a sound handler from a [MusicalBar]
+     * Create a sound handler from a [MusicalPhrase]
      */
     fun prepare(sequence: MusicalSequence): SoundHandler
 
@@ -23,7 +23,7 @@ interface VirtualSoundBoard {
      */
     fun createHandler(buffer: FloatArray): SoundHandler
 
-    fun convert(bar: MusicalBar): FloatArray
+    fun convert(bar: MusicalPhrase): FloatArray
 
     fun convert(sequence: MusicalSequence): FloatArray
 
@@ -33,32 +33,4 @@ interface VirtualSoundBoard {
     )
 
     fun noteOff(note: Note)
-
-    /**
-     * Start streaming music playback using real-time beat-by-beat scheduling.
-     * Changes apply without interrupting playback.
-     */
-    fun playMusic(
-        config: MusicConfiguration,
-        instruments: Array<Instrument?>,
-    )
-
-    /**
-     * Stop streaming music playback.
-     */
-    fun stopMusic()
-
-    /**
-     * Update the configuration of currently streaming music.
-     * The change is applied at the next bar boundary.
-     */
-    fun updateMusic(
-        config: MusicConfiguration,
-        instruments: Array<Instrument?>,
-    )
-
-    /**
-     * Check if streaming music is currently playing.
-     */
-    fun isMusicPlaying(): Boolean
 }

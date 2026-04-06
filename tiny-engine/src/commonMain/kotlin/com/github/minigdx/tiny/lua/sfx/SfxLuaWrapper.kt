@@ -4,13 +4,13 @@ import com.github.minigdx.tiny.lua.Note
 import com.github.minigdx.tiny.lua.WrapperLuaTable
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.resources.Sound
-import com.github.minigdx.tiny.sound.MusicalBar
+import com.github.minigdx.tiny.sound.MusicalPhrase
 import com.github.minigdx.tiny.sound.VirtualSoundBoard
 import org.luaj.vm2.LuaTable
 
 class SfxLuaWrapper(
     private val origin: Sound,
-    private val sfx: MusicalBar,
+    private val sfx: MusicalPhrase,
     private val soundBoard: VirtualSoundBoard,
     private val platform: Platform,
 ) : WrapperLuaTable() {
@@ -24,7 +24,7 @@ class SfxLuaWrapper(
             "all",
             {
                 val luaTable = LuaTable()
-                origin.data.music.musicalBars.map { it.index }.forEach {
+                origin.data.music.musicalPhrases.map { it.index }.forEach {
                     luaTable.insert(0, valueOf(it))
                 }
                 luaTable

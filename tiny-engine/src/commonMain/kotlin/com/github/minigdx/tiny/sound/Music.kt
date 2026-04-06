@@ -27,8 +27,8 @@ class Music(
             null,
             null,
         ),
-    val musicalBars: Array<MusicalBar> = Array(32) {
-        MusicalBar(it, clarinet, clarinet.index)
+    val musicalPhrases: Array<MusicalPhrase> = Array(32) {
+        MusicalPhrase(it, clarinet, clarinet.index)
     },
     val sequences: Array<MusicalSequence> = Array(8) {
         MusicalSequence(it)
@@ -36,9 +36,8 @@ class Music(
 ) {
     fun serialize(): String {
         val lightSequences = sequences.map { seq ->
-            val hasConfig = seq.configuration != null
             val allSilence = seq.tracks.all { track -> track.beats.all { it.note == null } }
-            if (hasConfig || allSilence) {
+            if (allSilence) {
                 MusicalSequence(
                     index = seq.index,
                     tracks = Array(4) { i ->
@@ -51,13 +50,12 @@ class Music(
                     },
                     tempo = seq.tempo,
                     name = seq.name,
-                    configuration = seq.configuration,
                 )
             } else {
                 seq
             }
         }.toTypedArray()
-        val lightCopy = Music(instruments, musicalBars, lightSequences)
+        val lightCopy = Music(instruments, musicalPhrases, lightSequences)
         return serialize(lightCopy)
     }
 

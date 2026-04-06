@@ -2,8 +2,7 @@ package com.github.minigdx.tiny.file
 
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.sound.Music
-import com.github.minigdx.tiny.sound.MusicGenerator
-import com.github.minigdx.tiny.sound.MusicalBar
+import com.github.minigdx.tiny.sound.MusicalPhrase
 import com.github.minigdx.tiny.sound.MusicalSequence
 import com.github.minigdx.tiny.sound.SoundManager
 import kotlinx.coroutines.async
@@ -29,15 +28,12 @@ class SoundDataSourceStream(
                 null
             }
         }
-        music.musicalBars.forEach { musicBar ->
+        music.musicalPhrases.forEach { musicBar ->
             musicBar.instrument = music.instruments[musicBar.instrumentIndex]
         }
         music.sequences.forEach { sequence ->
             sequence.tracks.forEach { track ->
                 track.instrument = music.instruments[track.instrumentIndex]
-            }
-            sequence.configuration?.let { config ->
-                MusicGenerator.generate(sequence, config)
             }
         }
 
@@ -45,9 +41,9 @@ class SoundDataSourceStream(
         // Each task gets a copied instrument to avoid shared mutable state
         // (NOISE wave type has filter state in Instrument).
         val (sounds, sequences) = coroutineScope {
-            val soundsDeferred = music.musicalBars.map { bar ->
+            val soundsDeferred = music.musicalPhrases.map { bar ->
                 async {
-                    val isolatedBar = MusicalBar(
+                    val isolatedBar = MusicalPhrase(
                         index = bar.index,
                         instrumentIndex = bar.instrumentIndex,
                         tempo = bar.tempo,

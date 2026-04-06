@@ -7,7 +7,7 @@ import kotlin.test.assertContentEquals
 class MusicalBarTest {
     @Test
     fun it_set_unique_note() {
-        val bar = MusicalBar()
+        val bar = MusicalPhrase()
         bar.setNote(Note.Gs0, 1f, 2f, true)
 
         // Start before the actual note
@@ -29,7 +29,7 @@ class MusicalBarTest {
 
     @Test
     fun it_support_sequential_notes() {
-        val bar = MusicalBar()
+        val bar = MusicalPhrase()
         bar.setNote(Note.Cs5, 1f, 0.5f, true)
         bar.setNote(Note.Cs5, 1.5f, 0.5f, true)
 

@@ -9,7 +9,7 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 
 class DefaultSoundBoard(private val soundManager: SoundManager) : VirtualSoundBoard {
-    override fun prepare(bar: MusicalBar): SoundHandler {
+    override fun prepare(bar: MusicalPhrase): SoundHandler {
         val buffer = soundManager.convert(bar)
         return soundManager.createSoundHandler(buffer)
     }
@@ -29,7 +29,7 @@ class DefaultSoundBoard(private val soundManager: SoundManager) : VirtualSoundBo
         return soundManager.createSoundHandler(buffer)
     }
 
-    override fun convert(bar: MusicalBar): FloatArray {
+    override fun convert(bar: MusicalPhrase): FloatArray {
         val buffer = soundManager.convert(bar)
         return buffer
     }
@@ -47,28 +47,6 @@ class DefaultSoundBoard(private val soundManager: SoundManager) : VirtualSoundBo
 
     override fun noteOff(note: Note) {
         soundManager.noteOff(note)
-    }
-
-    override fun playMusic(
-        config: MusicConfiguration,
-        instruments: Array<Instrument?>,
-    ) {
-        soundManager.playMusic(config, instruments)
-    }
-
-    override fun stopMusic() {
-        soundManager.stopMusic()
-    }
-
-    override fun updateMusic(
-        config: MusicConfiguration,
-        instruments: Array<Instrument?>,
-    ) {
-        soundManager.updateMusic(config, instruments)
-    }
-
-    override fun isMusicPlaying(): Boolean {
-        return soundManager.isMusicPlaying()
     }
 }
 
@@ -90,7 +68,7 @@ abstract class SoundManager {
     /**
      * Convert the MusicBar into a playable sound.
      */
-    fun convert(bar: MusicalBar): FloatArray {
+    fun convert(bar: MusicalPhrase): FloatArray {
         return convert(
             defaultInstrument = bar.instrument,
             beats = bar.beats,
@@ -338,20 +316,6 @@ abstract class SoundManager {
     )
 
     abstract fun noteOff(note: Note)
-
-    abstract fun playMusic(
-        config: MusicConfiguration,
-        instruments: Array<Instrument?>,
-    )
-
-    abstract fun stopMusic()
-
-    abstract fun updateMusic(
-        config: MusicConfiguration,
-        instruments: Array<Instrument?>,
-    )
-
-    abstract fun isMusicPlaying(): Boolean
 
     private val currentHandlers = mutableListOf<SoundHandler>()
 

@@ -4,8 +4,6 @@ import com.github.minigdx.tiny.log.StdOutLogger
 import com.github.minigdx.tiny.lua.Note
 import com.github.minigdx.tiny.sound.Instrument
 import com.github.minigdx.tiny.sound.InstrumentPlayer
-import com.github.minigdx.tiny.sound.MusicConfiguration
-import com.github.minigdx.tiny.sound.MusicScheduler
 import js.array.ReadonlyArray
 import js.objects.ReadonlyRecord
 import js.typedarrays.Float32Array
@@ -17,7 +15,6 @@ import web.events.EventHandler
 
 class SynthesizerProcessor : AudioWorkletProcessor() {
     private var currentInstrumentPlayer: InstrumentPlayer? = null
-    private val musicScheduler = MusicScheduler()
 
     private val logger = StdOutLogger("SynthesizerProcessor")
 
@@ -52,35 +49,6 @@ class SynthesizerProcessor : AudioWorkletProcessor() {
                         currentInstrumentPlayer?.noteOff(Note.entries[note])
                     }
                 }
-                "musicPlay" -> {
-                    try {
-                        val configJson = data.config as? String
-                        val instrumentsJson = data.instruments as? String
-                        if (configJson != null && instrumentsJson != null) {
-                            val config = json.decodeFromString<MusicConfiguration>(configJson)
-                            val instruments = json.decodeFromString<Array<Instrument?>>(instrumentsJson)
-                            musicScheduler.play(config, instruments)
-                        }
-                    } catch (e: Exception) {
-                        logger.error("AUDIO", e) { "Error starting music" }
-                    }
-                }
-                "musicStop" -> {
-                    musicScheduler.stop()
-                }
-                "musicUpdate" -> {
-                    try {
-                        val configJson = data.config as? String
-                        val instrumentsJson = data.instruments as? String
-                        if (configJson != null && instrumentsJson != null) {
-                            val config = json.decodeFromString<MusicConfiguration>(configJson)
-                            val instruments = json.decodeFromString<Array<Instrument?>>(instrumentsJson)
-                            musicScheduler.updateConfig(config, instruments)
-                        }
-                    } catch (e: Exception) {
-                        logger.error("AUDIO", e) { "Error updating music" }
-                    }
-                }
                 else -> {
                     logger.error("AUDIO") { "Unknown type: $type" }
                 }
@@ -99,8 +67,7 @@ class SynthesizerProcessor : AudioWorkletProcessor() {
         val player = currentInstrumentPlayer
 
         for (i in 0 until output.length) {
-            var sample = player?.generate() ?: 0f
-            sample += musicScheduler.generate()
+            val sample = player?.generate() ?: 0f
             output[i] = sample
         }
 

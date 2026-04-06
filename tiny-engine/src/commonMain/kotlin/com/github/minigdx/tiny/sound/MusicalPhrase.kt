@@ -8,15 +8,15 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
 /**
- * A musical bar is holding musical notes.
- * A musical bar is holding 32 beats.
- * A musical bar without an instrument will not be played.
+ * A musical phrase is holding musical notes.
+ * A musical phrase is holding 32 beats.
+ * A musical phrase without an instrument will not be played.
  *
  * If the last note duration is longer the remaining time,
  * the note will be cut.
  */
 @Serializable
-class MusicalBar(
+class MusicalPhrase(
     var index: Int = 1,
     @Transient var instrument: Instrument? = null,
     /**

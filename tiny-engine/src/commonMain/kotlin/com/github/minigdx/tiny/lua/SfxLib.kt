@@ -121,7 +121,7 @@ class SfxLib(
             val sound = resourceAccess.findSound(0) ?: return NIL
 
             val index = arg.checkint()
-            return sound.data.music.musicalBars
+            return sound.data.music.musicalPhrases
                 .getOrNull(index)
                 ?.let { SfxLuaWrapper(sound, it, soundBoard, platform) } ?: NIL
         }

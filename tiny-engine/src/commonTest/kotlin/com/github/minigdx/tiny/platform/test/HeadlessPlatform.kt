@@ -138,20 +138,6 @@ class HeadlessPlatform(
             override fun noteOff(note: Note) {
                 TODO("Not yet implemented")
             }
-
-            override fun playMusic(
-                config: com.github.minigdx.tiny.sound.MusicConfiguration,
-                instruments: Array<com.github.minigdx.tiny.sound.Instrument?>,
-            ) = Unit
-
-            override fun stopMusic() = Unit
-
-            override fun updateMusic(
-                config: com.github.minigdx.tiny.sound.MusicConfiguration,
-                instruments: Array<com.github.minigdx.tiny.sound.Instrument?>,
-            ) = Unit
-
-            override fun isMusicPlaying(): Boolean = false
         }
     }
 

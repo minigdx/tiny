@@ -11,7 +11,6 @@ class MusicalSequence(
     val tracks: Array<Track> = Array(4) { Track(it, 0) },
     var tempo: BPM = 120,
     var name: String? = null,
-    var configuration: MusicConfiguration? = null,
 ) {
     @Serializable
     class Track(
