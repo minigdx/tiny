@@ -41,7 +41,7 @@ local function start_playback()
     if tracker_widget then
         tracker_widget:sync_to_sequence(state.seq)
     end
-    play_handler = state.seq.play()
+    play_handler = state.seq.loop()
     playing = true
     for s in all(speaker_widgets) do
         s.playing = true

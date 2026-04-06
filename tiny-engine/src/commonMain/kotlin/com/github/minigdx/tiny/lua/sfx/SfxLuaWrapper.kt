@@ -7,6 +7,7 @@ import com.github.minigdx.tiny.resources.Sound
 import com.github.minigdx.tiny.sound.MusicalPhrase
 import com.github.minigdx.tiny.sound.VirtualSoundBoard
 import org.luaj.vm2.LuaTable
+import kotlin.time.TimeSource.Monotonic.markNow
 
 class SfxLuaWrapper(
     private val origin: Sound,
@@ -60,7 +61,7 @@ class SfxLuaWrapper(
 
         function1("set_note") { arg ->
             val beat = arg["beat"].todouble().toFloat()
-            val note = Note.Companion.fromName(arg["note"].tojstring())
+            val note = Note.fromName(arg["note"].tojstring())
             val duration = arg["duration"].todouble().toFloat()
             val uniqueOnBeat = arg["unique"].optboolean(false)
 
@@ -71,7 +72,7 @@ class SfxLuaWrapper(
 
         function1("remove_note") { arg ->
             val beat = arg["beat"].todouble().toFloat()
-            val note = Note.Companion.fromName(arg["note"].tojstring())
+            val note = Note.fromName(arg["note"].tojstring())
 
             sfx.removeNote(note, beat)
 
@@ -79,7 +80,7 @@ class SfxLuaWrapper(
         }
 
         function1("note_data") { arg ->
-            val note = Note.Companion.fromName(arg.tojstring())
+            val note = Note.fromName(arg.tojstring())
 
             LuaTable().apply {
                 this.set("note", valueOf(note.name))
@@ -108,7 +109,7 @@ class SfxLuaWrapper(
 
         function0("play") {
             val handler = soundBoard.prepare(sfx).also { it.play() }
-            val startMark = kotlin.time.TimeSource.Monotonic.markNow()
+            val startMark = markNow()
             val bpm = sfx.tempo
             val result = WrapperLuaTable()
             result.function0("stop") {

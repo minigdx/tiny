@@ -41,7 +41,10 @@ class JavaSoundHandler(
     override fun nextChunk(samples: Int): FloatData {
         val chunk = chunkGenerator.generateChunk(samples)
         if (chunk.size == 0) {
-            if (!loop) {
+            if (loop) {
+                chunkGenerator.reset()
+                return chunkGenerator.generateChunk(samples)
+            } else {
                 stop()
             }
         }

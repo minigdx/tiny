@@ -8,7 +8,7 @@ import kotlin.math.min
  */
 interface SoundHandler {
     /**
-     * Start to play a sound.
+     * Start to play a sound. Stop it after the last note.
      */
     fun play()
 
@@ -42,6 +42,11 @@ interface ChunkGenerator {
     fun generateChunk(samples: Int): FloatData
 
     /**
+     * Reset the generator to the beginning of the buffer.
+     */
+    fun reset()
+
+    /**
      * Returns the current playback progress as a value from 0.0 to 1.0.
      */
     fun progress(): Float = 0f
@@ -55,13 +60,11 @@ class BufferedChunkGenerator(private val data: FloatArray) : ChunkGenerator {
     override fun generateChunk(samples: Int): FloatData {
         chunk.copyFrom(data, position, position + samples)
         position = min(position + samples, data.size)
-        if (chunk.size == 0) {
-            // Wrap around immediately instead of returning a silent chunk
-            position = 0
-            chunk.copyFrom(data, position, position + samples)
-            position = min(position + samples, data.size)
-        }
         return chunk
+    }
+
+    override fun reset() {
+        position = 0
     }
 
     override fun progress(): Float {
