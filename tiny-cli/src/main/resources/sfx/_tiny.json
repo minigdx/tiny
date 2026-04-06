@@ -30,6 +30,7 @@
     "tiny-instrument-editor.lua",
     "tiny-sfx-editor.lua",
     "tiny-music-editor.lua",
+    "tiny-tracker-editor.lua",
     "sfx-templates.lua",
     "music-templates.lua",
     "editor-base.lua",
@@ -51,6 +52,7 @@
     "widgets/TextInput.lua",
     "widgets/Speaker.lua",
     "widgets/Counter.lua",
+    "widgets/Tracker.lua",
     "widgets/utils.lua"
   ],
   "spritesheets": [

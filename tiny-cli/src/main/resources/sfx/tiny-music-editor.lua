@@ -655,6 +655,12 @@ function _init()
 end
 
 function _update()
+    -- TAB switches to tracker editor
+    if ctrl.pressed(keys.tab) then
+        tiny.exit("tiny-tracker-editor.lua")
+        return
+    end
+
     -- Auto-stop: detect when playback finishes
     if playing and play_handler then
         if not play_handler.playing then

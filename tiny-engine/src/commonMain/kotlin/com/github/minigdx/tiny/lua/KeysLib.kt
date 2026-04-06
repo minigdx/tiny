@@ -53,6 +53,8 @@ class KeysLib : TwoArgFunction() {
     @TinyVariable("ctrl", "the key ctrl down", hideInDocumentation = true)
     @TinyVariable("alt", "the key alt down", hideInDocumentation = true)
     @TinyVariable("delete", "the key delete", hideInDocumentation = true)
+    @TinyVariable("tab", "the key tab", hideInDocumentation = true)
+    @TinyVariable("escape", "the key escape", hideInDocumentation = true)
     override fun call(
         arg1: LuaValue,
         arg2: LuaValue,
@@ -82,6 +84,8 @@ class KeysLib : TwoArgFunction() {
         keys["ctrl"] = LuaInteger.valueOf(Key.CTRL.ordinal)
         keys["alt"] = LuaInteger.valueOf(Key.ALT.ordinal)
         keys["delete"] = LuaInteger.valueOf(Key.BACKSPACE.ordinal)
+        keys["tab"] = LuaInteger.valueOf(Key.TAB.ordinal)
+        keys["escape"] = LuaInteger.valueOf(Key.ESCAPE.ordinal)
 
         arg2["keys"] = keys
         arg2["package"]["loaded"]["keys"] = keys

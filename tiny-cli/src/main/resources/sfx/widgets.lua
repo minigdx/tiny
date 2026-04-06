@@ -45,6 +45,7 @@ local Panel = require("widgets.Panel")
 local TextButton = require("widgets.TextButton")
 local Speaker = require("widgets.Speaker")
 local Counter = require("widgets.Counter")
+local Tracker = require("widgets.Tracker")
 
 factory.create_envelop = function(self, data)
     local result = new(Envelop, data)
@@ -141,6 +142,12 @@ end
 
 factory.create_counter = function(self, data)
     local result = new(Counter, data)
+    return result
+end
+
+factory.create_tracker = function(self, data)
+    local result = new(Tracker, data)
+    result:_init()
     return result
 end
 
