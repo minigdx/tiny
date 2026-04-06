@@ -31,10 +31,20 @@ interface SoundHandler {
      * Generate the next chunk.
      */
     fun nextChunk(samples: Int): FloatData
+
+    /**
+     * Returns the current playback progress as a value from 0.0 to 1.0.
+     */
+    fun progress(): Float = 0f
 }
 
 interface ChunkGenerator {
     fun generateChunk(samples: Int): FloatData
+
+    /**
+     * Returns the current playback progress as a value from 0.0 to 1.0.
+     */
+    fun progress(): Float = 0f
 }
 
 class BufferedChunkGenerator(private val data: FloatArray) : ChunkGenerator {
@@ -52,5 +62,10 @@ class BufferedChunkGenerator(private val data: FloatArray) : ChunkGenerator {
             position = min(position + samples, data.size)
         }
         return chunk
+    }
+
+    override fun progress(): Float {
+        if (data.isEmpty()) return 0f
+        return position.toFloat() / data.size.toFloat()
     }
 }

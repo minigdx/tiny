@@ -36,6 +36,8 @@ class JavaSoundHandler(
 
     override fun isPlaying(): Boolean = !stop
 
+    override fun progress(): Float = chunkGenerator.progress()
+
     override fun nextChunk(samples: Int): FloatData {
         val chunk = chunkGenerator.generateChunk(samples)
         if (chunk.size == 0) {

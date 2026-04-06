@@ -45,8 +45,9 @@ class SequenceLuaWrapper(
 
         function0("play") {
             val startMark = kotlin.time.TimeSource.Monotonic.markNow()
-            val bpm = sequence.tempo
+            val totalBeats = sequence.tracks.maxOf { it.beats.size }
             val buffer = cachedBuffer ?: soundBoard.convert(sequence).also { cachedBuffer = it }
+            val bufferDurationSeconds = buffer.size.toDouble() / 44100.0
             val handler = soundBoard.createHandler(buffer).also { it.loop() }
             val result = WrapperLuaTable()
             result.function0("stop") {
@@ -56,7 +57,8 @@ class SequenceLuaWrapper(
             result.wrap("playing") { valueOf(handler.isPlaying()) }
             result.wrap("beat") {
                 val elapsed = startMark.elapsedNow().toDouble(kotlin.time.DurationUnit.SECONDS)
-                valueOf(elapsed * bpm / 60.0)
+                val elapsedInLoop = elapsed % bufferDurationSeconds
+                valueOf(elapsedInLoop * totalBeats / bufferDurationSeconds)
             }
             result
         }

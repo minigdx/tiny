@@ -111,11 +111,12 @@ abstract class SoundManager {
 
         if (tracks.isEmpty()) return floatArrayOf()
 
-        // Ensure the buffer covers the full sequence length so looping is seamless.
+        // Use the exact musical duration so looping is seamless.
+        // Release tails extending past the sequence boundary are truncated,
+        // which is standard for looping patterns.
         val secondsPerBeat = 60f / sequence.tempo
         val totalBeats = sequence.tracks.maxOf { it.beats.size }
-        val minSequenceSamples = (totalBeats * secondsPerBeat * SAMPLE_RATE).roundToInt()
-        val resultSize = max(tracks.maxOf { it.size }, minSequenceSamples)
+        val resultSize = (totalBeats * secondsPerBeat * SAMPLE_RATE).roundToInt()
         val result = FloatArray(resultSize)
 
         // Calculate RMS values for each track to properly scale them during mixing
