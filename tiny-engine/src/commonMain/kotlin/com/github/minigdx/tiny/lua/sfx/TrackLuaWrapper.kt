@@ -66,9 +66,16 @@ class TrackLuaWrapper(
             val note = Note.Companion.fromName(noteName)
             val volume = arg["volume"].optdouble(1.0).toFloat().coerceIn(0f, 1f)
             val duration = arg["duration"].optdouble(1.0).toFloat()
+            val isOff = arg["off"].optboolean(false)
 
             if (beat in track.beats.indices) {
-                track.beats[beat] = MusicalNote(note, beat.toFloat(), duration, volume)
+                track.beats[beat] = MusicalNote(
+                    note = note,
+                    beat = beat.toFloat(),
+                    duration = duration,
+                    volume = volume,
+                    isOffNote = isOff,
+                )
             }
             NONE
         }

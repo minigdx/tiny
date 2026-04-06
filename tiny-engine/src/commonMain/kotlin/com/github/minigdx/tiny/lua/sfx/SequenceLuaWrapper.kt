@@ -48,6 +48,12 @@ class SequenceLuaWrapper(
                 val config = sequence.configuration ?: return@wrap NIL
                 configToLuaTable(config)
             },
+            { value ->
+                if (value.isnil()) {
+                    sequence.configuration = null
+                    cachedBuffer = null
+                }
+            },
         )
 
         function1("generate") { arg ->
@@ -73,6 +79,8 @@ class SequenceLuaWrapper(
 
         function0("play") {
             val config = sequence.configuration
+            val startMark = kotlin.time.TimeSource.Monotonic.markNow()
+            val bpm = sequence.tempo
             if (config != null) {
                 // Streaming playback for generated music
                 soundBoard.playMusic(config, music.instruments)
@@ -82,6 +90,10 @@ class SequenceLuaWrapper(
                     NONE
                 }
                 result.wrap("playing") { valueOf(soundBoard.isMusicPlaying()) }
+                result.wrap("beat") {
+                    val elapsed = startMark.elapsedNow().toDouble(kotlin.time.DurationUnit.SECONDS)
+                    valueOf(elapsed * bpm / 60.0)
+                }
                 result
             } else {
                 // Legacy pre-computed playback for manually composed sequences
@@ -93,6 +105,10 @@ class SequenceLuaWrapper(
                     NONE
                 }
                 result.wrap("playing") { valueOf(handler.isPlaying()) }
+                result.wrap("beat") {
+                    val elapsed = startMark.elapsedNow().toDouble(kotlin.time.DurationUnit.SECONDS)
+                    valueOf(elapsed * bpm / 60.0)
+                }
                 result
             }
         }

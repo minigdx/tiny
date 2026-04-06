@@ -8,7 +8,7 @@ local Tracker = {
     cursor_col = 1,
     cursor_spot = 1,
     scroll_offset = 0,
-    total_lines = 64,
+    total_lines = 32,
     num_cols = 4,
     line_h = 10,
     line_gap = 1,
@@ -16,6 +16,8 @@ local Tracker = {
     col_w = 64,
     col_positions = nil,
     on_change = function(self) end,
+    -- Playback position (nil when not playing, 0-based beat)
+    play_beat = nil,
     -- Key repeat state
     hold_key = nil,
     hold_timer = 0,
@@ -55,6 +57,49 @@ local piano_map = {
     { key = "y", note = 7, accident = 2 },  -- Y key -> G#
     { key = "u", note = 1, accident = 2 },  -- U key -> A#
 }
+
+-- Note name conversion helpers
+local note_letter_to_index = { A = 1, B = 2, C = 3, D = 4, E = 5, F = 6, G = 7 }
+local accident_to_suffix = { "", "s", "b" }
+
+local function build_note_name(cell)
+    if not cell.note then return nil end
+    local letter = note_names[cell.note]
+    local suffix = accident_to_suffix[cell.accident]
+    local octave = cell.octave
+
+    -- Handle enharmonic equivalents for names not in the Note enum
+    if letter == "E" and suffix == "s" then return "F" .. octave end
+    if letter == "B" and suffix == "s" then
+        if octave < 8 then return "C" .. (octave + 1) end
+        return nil
+    end
+    if letter == "C" and suffix == "b" then
+        if octave > 0 then return "B" .. (octave - 1) end
+        return nil
+    end
+    if letter == "F" and suffix == "b" then return "E" .. octave end
+
+    return letter .. suffix .. octave
+end
+
+local function parse_note_name(name)
+    if not name or name == "" then return nil, nil, nil end
+    local octave = tonumber(name:sub(-1))
+    if not octave then return nil, nil, nil end
+    local base = name:sub(1, -2)
+    local letter = base:sub(1, 1):upper()
+    local ni = note_letter_to_index[letter]
+    if not ni then return nil, nil, nil end
+    local accident = 1
+    if #base > 1 then
+        local acc = base:sub(2, 2)
+        if acc == "s" then accident = 2
+        elseif acc == "b" then accident = 3
+        end
+    end
+    return ni, accident, octave
+end
 
 local function shake_offset(self, line, c, spot)
     if self.shake_timer > 0 and line == self.shake_line and c == self.shake_col and spot == self.shake_spot then
@@ -210,10 +255,10 @@ Tracker._update = function(self)
         end
     end
 
-    -- Value modification with ctrl/shift
+    -- Value modification with x/c
     local delta = 0
-    if ctrl.pressed(keys.ctrl) then delta = 1 end
-    if ctrl.pressed(keys.shift) then delta = -1 end
+    if ctrl.pressed(keys.c) then delta = 1 end
+    if ctrl.pressed(keys.x) then delta = -1 end
 
     if delta ~= 0 then
         local cell = self.data[self.cursor_line][self.cursor_col]
@@ -277,6 +322,123 @@ Tracker._update = function(self)
     end
 end
 
+-- Load tracker grid from a sequence's 4 tracks
+Tracker.load_from_sequence = function(self, seq)
+    -- Clear all cells
+    for i = 1, self.total_lines do
+        for j = 1, self.num_cols do
+            self.data[i][j] = { note = nil, accident = 1, octave = 4, volume = 5, duration = 1 }
+        end
+    end
+
+    for col = 1, self.num_cols do
+        local track = seq.track(col - 1)
+        if not track then goto next_col end
+
+        local beats = track.beats
+        if not beats then goto next_col end
+
+        -- First pass: place notes into the grid
+        for _, beat in ipairs(beats) do
+            local pos = math.floor(beat.beat)
+            if beat.note and pos >= 0 and pos < self.total_lines then
+                local ni, acc, oct = parse_note_name(beat.note)
+                if ni then
+                    local line = pos + 1
+                    local vol = math.floor(beat.volume * 9 + 0.5)
+                    if vol < 0 then vol = 0 end
+                    if vol > 9 then vol = 9 end
+                    self.data[line][col] = {
+                        note = ni,
+                        accident = acc,
+                        octave = oct,
+                        volume = vol,
+                        duration = 1,
+                    }
+                end
+            end
+        end
+
+        -- Second pass: compute durations (distance to next note)
+        for i = self.total_lines, 1, -1 do
+            if self.data[i][col].note then
+                local dur = 1
+                for j = i + 1, self.total_lines do
+                    if self.data[j][col].note then break end
+                    dur = dur + 1
+                end
+                self.data[i][col].duration = dur
+            end
+        end
+
+        ::next_col::
+    end
+end
+
+-- Sync tracker grid data back into a sequence's tracks
+Tracker.sync_to_sequence = function(self, seq)
+    for col = 1, self.num_cols do
+        local track = seq.track(col - 1)
+        if not track then goto next_col end
+
+        track.clear()
+
+        -- Collect notes in this column
+        local notes = {}
+        for line = 1, self.total_lines do
+            local cell = self.data[line][col]
+            if cell.note then
+                table.insert(notes, { line = line, cell = cell })
+            end
+        end
+
+        -- Set notes on the track
+        for idx, entry in ipairs(notes) do
+            local beat_pos = entry.line - 1
+            local name = build_note_name(entry.cell)
+            if name then
+                local vol = entry.cell.volume / 9.0
+                track.set_note({
+                    beat = beat_pos,
+                    note = name,
+                    volume = vol,
+                    duration = entry.cell.duration,
+                })
+
+                -- Add off-note if duration ends before next note
+                local end_pos = beat_pos + entry.cell.duration
+                local next_entry = notes[idx + 1]
+                local next_pos = next_entry and (next_entry.line - 1) or self.total_lines
+                if end_pos < next_pos and end_pos < self.total_lines then
+                    track.set_note({
+                        beat = end_pos,
+                        note = name,
+                        volume = 0,
+                        duration = 1,
+                        off = true,
+                    })
+                end
+            end
+        end
+
+        ::next_col::
+    end
+
+    -- Clear config so playback uses the pre-computed path with actual track beats
+    seq.config = nil
+    seq.invalidate()
+end
+
+-- Move cursor_line to the current beat during playback
+Tracker._update_play_position = function(self)
+    if self.play_beat == nil then return end
+    local play_line = math.floor(self.play_beat) + 1
+    if play_line >= 1 and play_line <= self.total_lines then
+        self.cursor_line = play_line
+        self:_ensure_visible()
+    end
+end
+
 Tracker._draw = function(self)
     text.font("monogram")
     local vis = self:_visible_lines()
@@ -301,8 +463,8 @@ Tracker._draw = function(self)
             shape.rectf(cx + 1, ly, self.col_w - 2, self.line_h, bg)
         end
 
-        -- Selection cursor highlight
-        if is_current then
+        -- Selection cursor highlight (only when not playing)
+        if is_current and self.play_beat == nil then
             local sel_cx = self.col_positions[self.cursor_col]
             shape.rectf(sel_cx + spot_offsets[self.cursor_spot], ly, spot_widths[self.cursor_spot], self.line_h, 5)
         end
@@ -331,5 +493,7 @@ Tracker._draw = function(self)
 
     text.font()
 end
+
+Tracker.build_note_name = build_note_name
 
 return Tracker

@@ -115,8 +115,9 @@ Player._update = function(self)
     end
 
     if self.play then
-        self.time = self.time + tiny.dt
-        self.beat = self.time * (state.sfx.bpm / 60)
+        if self.handler then
+            self.beat = self.handler.beat or 0
+        end
 
         local finished = false
         if self.handler and not self.handler.playing then
@@ -128,7 +129,6 @@ Player._update = function(self)
         if finished then
             self.play = false
             self.beat = 0
-            self.time = 0
             if self.playButton then
                 self.playButton.overlay = icons.Play
             end
@@ -145,7 +145,6 @@ Player._draw = function(self) end
 Player.playSfx = function(self)
     self.beat = 0
     self.play = not self.play
-    self.time = 0
 
     if self.handler then
         self.handler.stop()
