@@ -137,17 +137,6 @@ local function load_config_from_seq()
     config.bpm = state.seq.tempo or config.bpm
 end
 
--- Remove a widget from all_widgets
-local function remove_widget(widget)
-    if not widget then return end
-    for i = #all_widgets, 1, -1 do
-        if all_widgets[i] == widget then
-            table.remove(all_widgets, i)
-            break
-        end
-    end
-end
-
 -- Update UI controls to match current config
 local function sync_ui(refs)
     if refs.chord_inst_dd then
@@ -191,63 +180,22 @@ local function _init_music_generator(widget_entities)
     if not gen then return end
 
     -- Find referenced widgets
-    local drum_pattern_dd = wire.find_widget(all_widgets, gen.fields.DrumPattern)
     local drum_volume_fader = wire.find_widget(all_widgets, gen.fields.DrumVolume)
-    local theme_dd = wire.find_widget(all_widgets, gen.fields.MusicTheme)
-    local scale_dd = wire.find_widget(all_widgets, gen.fields.MusicScale)
     local lead_inst_dd = wire.find_widget(all_widgets, gen.fields.LeadInstrument)
     local lead_volume_fader = wire.find_widget(all_widgets, gen.fields.LeadVolume)
     local bass_inst_dd = wire.find_widget(all_widgets, gen.fields.BassInstrument)
     local bass_volume_fader = wire.find_widget(all_widgets, gen.fields.BassVolume)
     local chord_volume_fader = wire.find_widget(all_widgets, gen.fields.RythmVolume)
-    local progression_dd = wire.find_widget(all_widgets, gen.fields.RythmChordProgression)
     local chord_inst_dd = wire.find_widget(all_widgets, gen.fields.RythmInstrument)
     local play_button = wire.find_widget(all_widgets, gen.fields.Play)
     local master_volume_fader = wire.find_widget(all_widgets, gen.fields.Volume)
     local selector_dd = wire.find_widget(all_widgets, gen.fields.Selector)
     local export_button = wire.find_widget(all_widgets, gen.fields.Export)
     local speed_fader = gen.fields.Speed and wire.find_widget(all_widgets, gen.fields.Speed) or nil
-    local rhythm_style_dd = gen.fields.RythmArpegiator and wire.find_widget(all_widgets, gen.fields.RythmArpegiator) or nil
+    local drum_inst_dd = gen.fields.DrumInstrument and wire.find_widget(all_widgets, gen.fields.DrumInstrument) or nil
 
     selector_dd_ref = selector_dd
     play_button_ref = play_button
-
-    -- Find unreferenced dropdowns by position (lead style, root note)
-    local referenced_iids = {}
-    for _, field_name in ipairs({
-        "DrumPattern", "DrumVolume", "MusicTheme", "MusicScale",
-        "LeadInstrument", "LeadVolume", "BassInstrument", "BassVolume",
-        "RythmVolume", "RythmChordProgression", "RythmInstrument",
-        "RythmArpegiator",
-        "Play", "Volume", "Selector", "Export", "Speed",
-    }) do
-        local ref = gen.fields[field_name]
-        if ref then
-            referenced_iids[ref.entityIid] = true
-        end
-    end
-    local lead_style_dd = nil
-    local root_dd = nil
-    for w in all(all_widgets) do
-        if w.options and not referenced_iids[w.iid] then
-            if w.x >= 18 and w.x <= 24 and w.y >= 69 and w.y <= 75 then
-                lead_style_dd = w
-            elseif w.x >= 18 and w.x <= 24 and w.y >= 109 and w.y <= 115 then
-                root_dd = w
-            end
-        end
-    end
-
-    -- Remove auto-generation widgets (no longer needed)
-    remove_widget(theme_dd)
-    remove_widget(scale_dd)
-    remove_widget(progression_dd)
-    remove_widget(lead_style_dd)
-    remove_widget(rhythm_style_dd)
-    remove_widget(root_dd)
-
-    -- Repurpose DrumPattern dropdown as DrumInstrument
-    local drum_inst_dd = drum_pattern_dd
 
     -- Build option lists
     local inst_options = build_instrument_options()
@@ -493,7 +441,7 @@ function _init()
     _init_fader(widget_entities)
     _init_counter(widget_entities)
 
-    -- Wire music generator widgets (removes unused auto-gen widgets)
+    -- Wire music generator widgets
     _init_music_generator(widget_entities)
 
     save_state = EditorBase.init_save_reminder(all_widgets, save_button_ref, modals_by_name)

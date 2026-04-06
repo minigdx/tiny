@@ -11,7 +11,7 @@
 	"iid": "4cf47920-fa90-11f0-ad09-7b5a63ac610d",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 110,
+	"nextUid": 111,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -2532,43 +2532,6 @@
 			"pivotY": 0,
 			"fieldDefs": [
 				{
-					"identifier": "DrumPattern",
-					"doc": null,
-					"__type": "EntityRef",
-					"uid": 91,
-					"type": "F_EntityRef",
-					"isArray": false,
-					"canBeNull": true,
-					"arrayMinLength": null,
-					"arrayMaxLength": null,
-					"editorDisplayMode": "RefLinkBetweenCenters",
-					"editorDisplayScale": 1,
-					"editorDisplayPos": "Above",
-					"editorLinkStyle": "CurvedArrow",
-					"editorDisplayColor": null,
-					"editorAlwaysShow": false,
-					"editorShowInWorld": true,
-					"editorCutLongValues": true,
-					"editorTextSuffix": null,
-					"editorTextPrefix": null,
-					"useForSmartColor": false,
-					"exportToToc": false,
-					"searchable": false,
-					"min": null,
-					"max": null,
-					"regex": null,
-					"acceptFileTypes": null,
-					"defaultOverride": null,
-					"textLanguageMode": null,
-					"symmetricalRef": false,
-					"autoChainRef": true,
-					"allowOutOfLevelRef": true,
-					"allowedRefs": "OnlySpecificEntity",
-					"allowedRefsEntityUid": 2,
-					"allowedRefTags": [],
-					"tilesetUid": null
-				},
-				{
 					"identifier": "DrumVolume",
 					"doc": null,
 					"__type": "EntityRef",
@@ -2603,80 +2566,6 @@
 					"allowedRefs": "OnlyTags",
 					"allowedRefsEntityUid": null,
 					"allowedRefTags": ["PercentOutput"],
-					"tilesetUid": null
-				},
-				{
-					"identifier": "MusicTheme",
-					"doc": null,
-					"__type": "EntityRef",
-					"uid": 94,
-					"type": "F_EntityRef",
-					"isArray": false,
-					"canBeNull": true,
-					"arrayMinLength": null,
-					"arrayMaxLength": null,
-					"editorDisplayMode": "RefLinkBetweenCenters",
-					"editorDisplayScale": 1,
-					"editorDisplayPos": "Above",
-					"editorLinkStyle": "CurvedArrow",
-					"editorDisplayColor": null,
-					"editorAlwaysShow": false,
-					"editorShowInWorld": true,
-					"editorCutLongValues": true,
-					"editorTextSuffix": null,
-					"editorTextPrefix": null,
-					"useForSmartColor": false,
-					"exportToToc": false,
-					"searchable": false,
-					"min": null,
-					"max": null,
-					"regex": null,
-					"acceptFileTypes": null,
-					"defaultOverride": null,
-					"textLanguageMode": null,
-					"symmetricalRef": false,
-					"autoChainRef": true,
-					"allowOutOfLevelRef": true,
-					"allowedRefs": "OnlySpecificEntity",
-					"allowedRefsEntityUid": 2,
-					"allowedRefTags": [],
-					"tilesetUid": null
-				},
-				{
-					"identifier": "MusicScale",
-					"doc": null,
-					"__type": "EntityRef",
-					"uid": 93,
-					"type": "F_EntityRef",
-					"isArray": false,
-					"canBeNull": true,
-					"arrayMinLength": null,
-					"arrayMaxLength": null,
-					"editorDisplayMode": "RefLinkBetweenCenters",
-					"editorDisplayScale": 1,
-					"editorDisplayPos": "Above",
-					"editorLinkStyle": "CurvedArrow",
-					"editorDisplayColor": null,
-					"editorAlwaysShow": false,
-					"editorShowInWorld": true,
-					"editorCutLongValues": true,
-					"editorTextSuffix": null,
-					"editorTextPrefix": null,
-					"useForSmartColor": false,
-					"exportToToc": false,
-					"searchable": false,
-					"min": null,
-					"max": null,
-					"regex": null,
-					"acceptFileTypes": null,
-					"defaultOverride": null,
-					"textLanguageMode": null,
-					"symmetricalRef": false,
-					"autoChainRef": true,
-					"allowOutOfLevelRef": true,
-					"allowedRefs": "OnlySpecificEntity",
-					"allowedRefsEntityUid": 2,
-					"allowedRefTags": [],
 					"tilesetUid": null
 				},
 				{
@@ -2862,43 +2751,6 @@
 					"allowedRefs": "OnlyTags",
 					"allowedRefsEntityUid": 90,
 					"allowedRefTags": ["PercentOutput"],
-					"tilesetUid": null
-				},
-				{
-					"identifier": "RythmChordProgression",
-					"doc": null,
-					"__type": "EntityRef",
-					"uid": 100,
-					"type": "F_EntityRef",
-					"isArray": false,
-					"canBeNull": true,
-					"arrayMinLength": null,
-					"arrayMaxLength": null,
-					"editorDisplayMode": "RefLinkBetweenCenters",
-					"editorDisplayScale": 1,
-					"editorDisplayPos": "Above",
-					"editorLinkStyle": "CurvedArrow",
-					"editorDisplayColor": null,
-					"editorAlwaysShow": false,
-					"editorShowInWorld": true,
-					"editorCutLongValues": true,
-					"editorTextSuffix": null,
-					"editorTextPrefix": null,
-					"useForSmartColor": false,
-					"exportToToc": false,
-					"searchable": false,
-					"min": null,
-					"max": null,
-					"regex": null,
-					"acceptFileTypes": null,
-					"defaultOverride": null,
-					"textLanguageMode": null,
-					"symmetricalRef": false,
-					"autoChainRef": true,
-					"allowOutOfLevelRef": true,
-					"allowedRefs": "OnlySpecificEntity",
-					"allowedRefsEntityUid": 2,
-					"allowedRefTags": [],
 					"tilesetUid": null
 				},
 				{
@@ -3124,10 +2976,10 @@
 					"tilesetUid": null
 				},
 				{
-					"identifier": "RythmArpegiator",
+					"identifier": "DrumInstrument",
 					"doc": null,
 					"__type": "EntityRef",
-					"uid": 107,
+					"uid": 110,
 					"type": "F_EntityRef",
 					"isArray": false,
 					"canBeNull": true,
@@ -9492,7 +9344,7 @@
 						},
 						{
 							"__identifier": "Dropdown",
-							"__grid": [2,20],
+							"__grid": [2,17],
 							"__pivot": [0,0],
 							"__tags": ["Widget"],
 							"__tile": { "tilesetUid": 72, "x": 24, "y": 0, "w": 24, "h": 24 },
@@ -9501,14 +9353,14 @@
 							"width": 152,
 							"height": 16,
 							"defUid": 2,
-							"px": [22,160],
+							"px": [22,136],
 							"fieldInstances": [],
 							"__worldX": 838,
-							"__worldY": 160
+							"__worldY": 136
 						},
 						{
 							"__identifier": "Dropdown",
-							"__grid": [25,14],
+							"__grid": [25,11],
 							"__pivot": [0,0],
 							"__tags": ["Widget"],
 							"__tile": { "tilesetUid": 72, "x": 24, "y": 0, "w": 24, "h": 24 },
@@ -9517,14 +9369,14 @@
 							"width": 152,
 							"height": 16,
 							"defUid": 2,
-							"px": [206,112],
+							"px": [206,88],
 							"fieldInstances": [],
 							"__worldX": 1022,
-							"__worldY": 112
+							"__worldY": 88
 						},
 						{
 							"__identifier": "Dropdown",
-							"__grid": [25,20],
+							"__grid": [25,17],
 							"__pivot": [0,0],
 							"__tags": ["Widget"],
 							"__tile": { "tilesetUid": 72, "x": 24, "y": 0, "w": 24, "h": 24 },
@@ -9533,14 +9385,14 @@
 							"width": 152,
 							"height": 16,
 							"defUid": 2,
-							"px": [206,160],
+							"px": [206,136],
 							"fieldInstances": [],
 							"__worldX": 1022,
-							"__worldY": 160
+							"__worldY": 136
 						},
 						{
 							"__identifier": "Fader",
-							"__grid": [22,18],
+							"__grid": [22,15],
 							"__pivot": [0,0],
 							"__tags": [ "Widget", "PercentOutput" ],
 							"__tile": { "tilesetUid": 72, "x": 0, "y": 24, "w": 8, "h": 24 },
@@ -9549,14 +9401,14 @@
 							"width": 8,
 							"height": 32,
 							"defUid": 77,
-							"px": [176,148],
+							"px": [176,124],
 							"fieldInstances": [],
 							"__worldX": 992,
-							"__worldY": 148
+							"__worldY": 124
 						},
 						{
 							"__identifier": "Fader",
-							"__grid": [22,12],
+							"__grid": [22,9],
 							"__pivot": [0,0],
 							"__tags": [ "Widget", "PercentOutput" ],
 							"__tile": { "tilesetUid": 72, "x": 0, "y": 24, "w": 8, "h": 24 },
@@ -9565,14 +9417,14 @@
 							"width": 8,
 							"height": 32,
 							"defUid": 77,
-							"px": [176,96],
+							"px": [176,76],
 							"fieldInstances": [],
 							"__worldX": 992,
-							"__worldY": 96
+							"__worldY": 76
 						},
 						{
 							"__identifier": "Fader",
-							"__grid": [45,12],
+							"__grid": [45,9],
 							"__pivot": [0,0],
 							"__tags": [ "Widget", "PercentOutput" ],
 							"__tile": { "tilesetUid": 72, "x": 0, "y": 24, "w": 8, "h": 24 },
@@ -9581,14 +9433,14 @@
 							"width": 8,
 							"height": 32,
 							"defUid": 77,
-							"px": [360,96],
+							"px": [360,76],
 							"fieldInstances": [],
 							"__worldX": 1176,
-							"__worldY": 96
+							"__worldY": 76
 						},
 						{
 							"__identifier": "Fader",
-							"__grid": [45,18],
+							"__grid": [45,15],
 							"__pivot": [0,0],
 							"__tags": [ "Widget", "PercentOutput" ],
 							"__tile": { "tilesetUid": 72, "x": 0, "y": 24, "w": 8, "h": 24 },
@@ -9597,26 +9449,10 @@
 							"width": 8,
 							"height": 32,
 							"defUid": 77,
-							"px": [360,144],
+							"px": [360,124],
 							"fieldInstances": [],
 							"__worldX": 1176,
-							"__worldY": 144
-						},
-						{
-							"__identifier": "Dropdown",
-							"__grid": [3,8],
-							"__pivot": [0,0],
-							"__tags": ["Widget"],
-							"__tile": { "tilesetUid": 72, "x": 24, "y": 0, "w": 24, "h": 24 },
-							"__smartColor": "#D77643",
-							"iid": "cde96ed0-fa90-11f0-9ead-75069c70a8df",
-							"width": 160,
-							"height": 16,
-							"defUid": 2,
-							"px": [24,68],
-							"fieldInstances": [],
-							"__worldX": 840,
-							"__worldY": 68
+							"__worldY": 124
 						},
 						{
 							"__identifier": "MusicGenerator",
@@ -9631,15 +9467,6 @@
 							"defUid": 90,
 							"px": [184,192],
 							"fieldInstances": [
-								{ "__identifier": "DrumPattern", "__type": "EntityRef", "__value": {
-									"entityIid": "345f8f20-fa90-11f0-9ead-936860ff124d",
-									"layerIid": "c5000ed1-fa90-11f0-9ead-a1240c4664a1",
-									"levelIid": "c5000ed0-fa90-11f0-9ead-c7908e5e7535",
-									"worldIid": "4cf47921-fa90-11f0-ad09-8d23e32977ff"
-								}, "__tile": null, "defUid": 91, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["345f8f20-fa90-11f0-9ead-936860ff124d"]
-								}] },
 								{ "__identifier": "DrumVolume", "__type": "EntityRef", "__value": {
 									"entityIid": "3d7b8f50-fa90-11f0-9ead-c907c95f81b4",
 									"layerIid": "c5000ed1-fa90-11f0-9ead-a1240c4664a1",
@@ -9648,24 +9475,6 @@
 								}, "__tile": null, "defUid": 92, "realEditorValues": [{
 									"id": "V_String",
 									"params": ["3d7b8f50-fa90-11f0-9ead-c907c95f81b4"]
-								}] },
-								{ "__identifier": "MusicTheme", "__type": "EntityRef", "__value": {
-									"entityIid": "cde96ed0-fa90-11f0-9ead-75069c70a8df",
-									"layerIid": "c5000ed1-fa90-11f0-9ead-a1240c4664a1",
-									"levelIid": "c5000ed0-fa90-11f0-9ead-c7908e5e7535",
-									"worldIid": "4cf47921-fa90-11f0-ad09-8d23e32977ff"
-								}, "__tile": null, "defUid": 94, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["cde96ed0-fa90-11f0-9ead-75069c70a8df"]
-								}] },
-								{ "__identifier": "MusicScale", "__type": "EntityRef", "__value": {
-									"entityIid": "384e4820-fa90-11f0-9ead-cbd74a75cb33",
-									"layerIid": "c5000ed1-fa90-11f0-9ead-a1240c4664a1",
-									"levelIid": "c5000ed0-fa90-11f0-9ead-c7908e5e7535",
-									"worldIid": "4cf47921-fa90-11f0-ad09-8d23e32977ff"
-								}, "__tile": null, "defUid": 93, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["384e4820-fa90-11f0-9ead-cbd74a75cb33"]
 								}] },
 								{ "__identifier": "LeadInstrument", "__type": "EntityRef", "__value": {
 									"entityIid": "34003110-fa90-11f0-9ead-ed6beeb66f81",
@@ -9711,15 +9520,6 @@
 								}, "__tile": null, "defUid": 99, "realEditorValues": [{
 									"id": "V_String",
 									"params": ["3c72d1e0-fa90-11f0-9ead-b169c3291a2f"]
-								}] },
-								{ "__identifier": "RythmChordProgression", "__type": "EntityRef", "__value": {
-									"entityIid": "48a63de0-fa90-11f0-9ead-3711375dd545",
-									"layerIid": "c5000ed1-fa90-11f0-9ead-a1240c4664a1",
-									"levelIid": "c5000ed0-fa90-11f0-9ead-c7908e5e7535",
-									"worldIid": "4cf47921-fa90-11f0-ad09-8d23e32977ff"
-								}, "__tile": null, "defUid": 100, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["48a63de0-fa90-11f0-9ead-3711375dd545"]
 								}] },
 								{ "__identifier": "RythmInstrument", "__type": "EntityRef", "__value": {
 									"entityIid": "3229ea70-fa90-11f0-9ead-b333f7210bae",
@@ -9775,34 +9575,18 @@
 									"id": "V_String",
 									"params": ["f1a2b3c4-fa90-11f0-9ead-speed0fader01"]
 								}] },
-								{ "__identifier": "RythmArpegiator", "__type": "EntityRef", "__value": {
-									"entityIid": "7343ffe0-fa90-11f0-9ead-576269b9b089",
+								{ "__identifier": "DrumInstrument", "__type": "EntityRef", "__value": {
+									"entityIid": "345f8f20-fa90-11f0-9ead-936860ff124d",
 									"layerIid": "c5000ed1-fa90-11f0-9ead-a1240c4664a1",
 									"levelIid": "c5000ed0-fa90-11f0-9ead-c7908e5e7535",
 									"worldIid": "4cf47921-fa90-11f0-ad09-8d23e32977ff"
-								}, "__tile": null, "defUid": 107, "realEditorValues": [{
+								}, "__tile": null, "defUid": 110, "realEditorValues": [{
 									"id": "V_String",
-									"params": ["7343ffe0-fa90-11f0-9ead-576269b9b089"]
+									"params": ["345f8f20-fa90-11f0-9ead-936860ff124d"]
 								}] }
 							],
 							"__worldX": 1000,
 							"__worldY": 192
-						},
-						{
-							"__identifier": "Dropdown",
-							"__grid": [2,13],
-							"__pivot": [0,0],
-							"__tags": ["Widget"],
-							"__tile": { "tilesetUid": 72, "x": 24, "y": 0, "w": 24, "h": 24 },
-							"__smartColor": "#D77643",
-							"iid": "7343ffe0-fa90-11f0-9ead-576269b9b089",
-							"width": 152,
-							"height": 16,
-							"defUid": 2,
-							"px": [21,108],
-							"fieldInstances": [],
-							"__worldX": 837,
-							"__worldY": 108
 						},
 						{
 							"__identifier": "Fader",
@@ -9878,38 +9662,6 @@
 							],
 							"__worldX": 1109,
 							"__worldY": 37
-						},
-						{
-							"__identifier": "Dropdown",
-							"__grid": [26,8],
-							"__pivot": [0,0],
-							"__tags": ["Widget"],
-							"__tile": { "tilesetUid": 72, "x": 24, "y": 0, "w": 24, "h": 24 },
-							"__smartColor": "#D77643",
-							"iid": "384e4820-fa90-11f0-9ead-cbd74a75cb33",
-							"width": 160,
-							"height": 16,
-							"defUid": 2,
-							"px": [208,68],
-							"fieldInstances": [],
-							"__worldX": 1024,
-							"__worldY": 68
-						},
-						{
-							"__identifier": "Dropdown",
-							"__grid": [2,15],
-							"__pivot": [0,0],
-							"__tags": ["Widget"],
-							"__tile": { "tilesetUid": 72, "x": 24, "y": 0, "w": 24, "h": 24 },
-							"__smartColor": "#D77643",
-							"iid": "48a63de0-fa90-11f0-9ead-3711375dd545",
-							"width": 152,
-							"height": 16,
-							"defUid": 2,
-							"px": [22,124],
-							"fieldInstances": [],
-							"__worldX": 838,
-							"__worldY": 124
 						}
 					]
 				},
@@ -9939,16 +9691,16 @@
 					"entityInstances": [
 						{
 							"__identifier": "Panel",
-							"__grid": [2,11],
+							"__grid": [2,9],
 							"__pivot": [0,0],
 							"__tags": ["panel"],
 							"__tile": { "tilesetUid": 72, "x": 0, "y": 0, "w": 24, "h": 24 },
 							"__smartColor": "#FFFFFF",
 							"iid": "2a823bc0-fa90-11f0-9ead-fb15f3d46ffd",
 							"width": 176,
-							"height": 56,
+							"height": 40,
 							"defUid": 71,
-							"px": [16,88],
+							"px": [16,72],
 							"fieldInstances": [
 								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "HardBlue", "__tile": null, "defUid": 74, "realEditorValues": [{
 									"id": "V_String",
@@ -9960,20 +9712,20 @@
 								}] }
 							],
 							"__worldX": 832,
-							"__worldY": 88
+							"__worldY": 72
 						},
 						{
 							"__identifier": "Panel",
-							"__grid": [25,11],
+							"__grid": [25,9],
 							"__pivot": [0,0],
 							"__tags": ["panel"],
 							"__tile": { "tilesetUid": 72, "x": 0, "y": 0, "w": 24, "h": 24 },
 							"__smartColor": "#FFFFFF",
 							"iid": "e52bcaa0-fa90-11f0-9ead-e1a0b870b228",
 							"width": 176,
-							"height": 48,
+							"height": 40,
 							"defUid": 71,
-							"px": [200,88],
+							"px": [200,72],
 							"fieldInstances": [
 								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "Orange", "__tile": null, "defUid": 74, "realEditorValues": [{
 									"id": "V_String",
@@ -9985,11 +9737,11 @@
 								}] }
 							],
 							"__worldX": 1016,
-							"__worldY": 88
+							"__worldY": 72
 						},
 						{
 							"__identifier": "Panel",
-							"__grid": [2,18],
+							"__grid": [2,15],
 							"__pivot": [0,0],
 							"__tags": ["panel"],
 							"__tile": { "tilesetUid": 72, "x": 0, "y": 0, "w": 24, "h": 24 },
@@ -9998,7 +9750,7 @@
 							"width": 176,
 							"height": 40,
 							"defUid": 71,
-							"px": [16,144],
+							"px": [16,120],
 							"fieldInstances": [
 								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "Purple", "__tile": null, "defUid": 74, "realEditorValues": [{
 									"id": "V_String",
@@ -10010,20 +9762,20 @@
 								}] }
 							],
 							"__worldX": 832,
-							"__worldY": 144
+							"__worldY": 120
 						},
 						{
 							"__identifier": "Panel",
-							"__grid": [25,17],
+							"__grid": [25,15],
 							"__pivot": [0,0],
 							"__tags": ["panel"],
 							"__tile": { "tilesetUid": 72, "x": 0, "y": 0, "w": 24, "h": 24 },
 							"__smartColor": "#FFFFFF",
 							"iid": "e9b4d530-fa90-11f0-9ead-930f3c8a73eb",
 							"width": 176,
-							"height": 48,
+							"height": 40,
 							"defUid": 71,
-							"px": [200,136],
+							"px": [200,120],
 							"fieldInstances": [
 								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "Yellow", "__tile": null, "defUid": 74, "realEditorValues": [{
 									"id": "V_String",
@@ -10035,45 +9787,7 @@
 								}] }
 							],
 							"__worldX": 1016,
-							"__worldY": 136
-						},
-						{
-							"__identifier": "Panel",
-							"__grid": [2,8],
-							"__pivot": [0,0],
-							"__tags": ["panel"],
-							"__tile": { "tilesetUid": 72, "x": 0, "y": 0, "w": 24, "h": 24 },
-							"__smartColor": "#FFFFFF",
-							"iid": "2bddc890-fa90-11f0-9ead-4be14b174530",
-							"width": 176,
-							"height": 24,
-							"defUid": 71,
-							"px": [16,64],
-							"fieldInstances": [
-								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "LigthBlue", "__tile": null, "defUid": 74, "realEditorValues": [] },
-								{ "__identifier": "Label", "__type": "String", "__value": null, "__tile": null, "defUid": 81, "realEditorValues": [] }
-							],
-							"__worldX": 832,
-							"__worldY": 64
-						},
-						{
-							"__identifier": "Panel",
-							"__grid": [25,8],
-							"__pivot": [0,0],
-							"__tags": ["panel"],
-							"__tile": { "tilesetUid": 72, "x": 0, "y": 0, "w": 24, "h": 24 },
-							"__smartColor": "#FFFFFF",
-							"iid": "c1d82370-fa90-11f0-9ead-0dd1fa44b09d",
-							"width": 176,
-							"height": 24,
-							"defUid": 71,
-							"px": [200,64],
-							"fieldInstances": [
-								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "LigthBlue", "__tile": null, "defUid": 74, "realEditorValues": [] },
-								{ "__identifier": "Label", "__type": "String", "__value": null, "__tile": null, "defUid": 81, "realEditorValues": [] }
-							],
-							"__worldX": 1016,
-							"__worldY": 64
+							"__worldY": 120
 						},
 						{
 							"__identifier": "Panel",
