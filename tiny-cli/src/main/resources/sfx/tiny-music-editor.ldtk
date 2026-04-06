@@ -9328,19 +9328,19 @@
 						},
 						{
 							"__identifier": "Dropdown",
-							"__grid": [6,11],
+							"__grid": [25,11],
 							"__pivot": [0,0],
 							"__tags": ["Widget"],
 							"__tile": { "tilesetUid": 72, "x": 24, "y": 0, "w": 24, "h": 24 },
 							"__smartColor": "#D77643",
 							"iid": "3229ea70-fa90-11f0-9ead-b333f7210bae",
-							"width": 120,
+							"width": 152,
 							"height": 16,
 							"defUid": 2,
-							"px": [54,92],
+							"px": [206,88],
 							"fieldInstances": [],
-							"__worldX": 870,
-							"__worldY": 92
+							"__worldX": 1022,
+							"__worldY": 88
 						},
 						{
 							"__identifier": "Dropdown",
@@ -9360,7 +9360,7 @@
 						},
 						{
 							"__identifier": "Dropdown",
-							"__grid": [25,11],
+							"__grid": [2,11],
 							"__pivot": [0,0],
 							"__tags": ["Widget"],
 							"__tile": { "tilesetUid": 72, "x": 24, "y": 0, "w": 24, "h": 24 },
@@ -9369,9 +9369,9 @@
 							"width": 152,
 							"height": 16,
 							"defUid": 2,
-							"px": [206,88],
+							"px": [22,88],
 							"fieldInstances": [],
-							"__worldX": 1022,
+							"__worldX": 838,
 							"__worldY": 88
 						},
 						{
@@ -9408,7 +9408,7 @@
 						},
 						{
 							"__identifier": "Fader",
-							"__grid": [22,9],
+							"__grid": [45,9],
 							"__pivot": [0,0],
 							"__tags": [ "Widget", "PercentOutput" ],
 							"__tile": { "tilesetUid": 72, "x": 0, "y": 24, "w": 8, "h": 24 },
@@ -9417,14 +9417,14 @@
 							"width": 8,
 							"height": 32,
 							"defUid": 77,
-							"px": [176,76],
+							"px": [360,76],
 							"fieldInstances": [],
-							"__worldX": 992,
+							"__worldX": 1176,
 							"__worldY": 76
 						},
 						{
 							"__identifier": "Fader",
-							"__grid": [45,9],
+							"__grid": [22,9],
 							"__pivot": [0,0],
 							"__tags": [ "Widget", "PercentOutput" ],
 							"__tile": { "tilesetUid": 72, "x": 0, "y": 24, "w": 8, "h": 24 },
@@ -9433,9 +9433,9 @@
 							"width": 8,
 							"height": 32,
 							"defUid": 77,
-							"px": [360,76],
+							"px": [176,76],
 							"fieldInstances": [],
-							"__worldX": 1176,
+							"__worldX": 992,
 							"__worldY": 76
 						},
 						{
@@ -9691,7 +9691,7 @@
 					"entityInstances": [
 						{
 							"__identifier": "Panel",
-							"__grid": [2,9],
+							"__grid": [25,9],
 							"__pivot": [0,0],
 							"__tags": ["panel"],
 							"__tile": { "tilesetUid": 72, "x": 0, "y": 0, "w": 24, "h": 24 },
@@ -9700,7 +9700,7 @@
 							"width": 176,
 							"height": 40,
 							"defUid": 71,
-							"px": [16,72],
+							"px": [200,72],
 							"fieldInstances": [
 								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "HardBlue", "__tile": null, "defUid": 74, "realEditorValues": [{
 									"id": "V_String",
@@ -9711,12 +9711,12 @@
 									"params": ["Rythm"]
 								}] }
 							],
-							"__worldX": 832,
+							"__worldX": 1016,
 							"__worldY": 72
 						},
 						{
 							"__identifier": "Panel",
-							"__grid": [25,9],
+							"__grid": [2,9],
 							"__pivot": [0,0],
 							"__tags": ["panel"],
 							"__tile": { "tilesetUid": 72, "x": 0, "y": 0, "w": 24, "h": 24 },
@@ -9725,7 +9725,7 @@
 							"width": 176,
 							"height": 40,
 							"defUid": 71,
-							"px": [200,72],
+							"px": [16,72],
 							"fieldInstances": [
 								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "Orange", "__tile": null, "defUid": 74, "realEditorValues": [{
 									"id": "V_String",
@@ -9736,7 +9736,7 @@
 									"params": ["Melody"]
 								}] }
 							],
-							"__worldX": 1016,
+							"__worldX": 832,
 							"__worldY": 72
 						},
 						{
@@ -11687,7 +11687,10 @@
 							"defUid": 71,
 							"px": [22,46],
 							"fieldInstances": [
-								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "LigthBlue", "__tile": null, "defUid": 74, "realEditorValues": [] },
+								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "Orange", "__tile": null, "defUid": 74, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Orange"]
+								}] },
 								{ "__identifier": "Label", "__type": "String", "__value": "Melody", "__tile": null, "defUid": 81, "realEditorValues": [{
 									"id": "V_String",
 									"params": ["Melody"]
@@ -11709,7 +11712,10 @@
 							"defUid": 71,
 							"px": [86,46],
 							"fieldInstances": [
-								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "LigthBlue", "__tile": null, "defUid": 74, "realEditorValues": [] },
+								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "HardBlue", "__tile": null, "defUid": 74, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["HardBlue"]
+								}] },
 								{ "__identifier": "Label", "__type": "String", "__value": "Rythm", "__tile": null, "defUid": 81, "realEditorValues": [{
 									"id": "V_String",
 									"params": ["Rythm"]
@@ -11731,7 +11737,10 @@
 							"defUid": 71,
 							"px": [150,46],
 							"fieldInstances": [
-								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "LigthBlue", "__tile": null, "defUid": 74, "realEditorValues": [] },
+								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "Purple", "__tile": null, "defUid": 74, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Purple"]
+								}] },
 								{ "__identifier": "Label", "__type": "String", "__value": "Bass", "__tile": null, "defUid": 81, "realEditorValues": [{
 									"id": "V_String",
 									"params": ["Bass"]
@@ -11753,7 +11762,10 @@
 							"defUid": 71,
 							"px": [214,46],
 							"fieldInstances": [
-								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "LigthBlue", "__tile": null, "defUid": 74, "realEditorValues": [] },
+								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "Yellow", "__tile": null, "defUid": 74, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Yellow"]
+								}] },
 								{ "__identifier": "Label", "__type": "String", "__value": "Drums", "__tile": null, "defUid": 81, "realEditorValues": [{
 									"id": "V_String",
 									"params": ["Drums"]
