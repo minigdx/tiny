@@ -2,6 +2,7 @@ package com.github.minigdx.tiny.file
 
 import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.sound.Music
+import com.github.minigdx.tiny.sound.MusicalPattern
 import com.github.minigdx.tiny.sound.MusicalPhrase
 import com.github.minigdx.tiny.sound.MusicalSequence
 import com.github.minigdx.tiny.sound.SoundManager
@@ -32,8 +33,10 @@ class SoundDataSourceStream(
             musicBar.instrument = music.instruments[musicBar.instrumentIndex]
         }
         music.sequences.forEach { sequence ->
-            sequence.tracks.forEach { track ->
-                track.instrument = music.instruments[track.instrumentIndex]
+            sequence.patterns.forEach { pattern ->
+                pattern.tracks.forEach { phrase ->
+                    phrase.instrument = music.instruments[phrase.instrumentIndex]
+                }
             }
         }
 
@@ -57,24 +60,30 @@ class SoundDataSourceStream(
             }
             val sequencesDeferred = music.sequences.map { sequence ->
                 async {
-                    // Create an isolated copy with fresh instrument state per track
-                    val isolatedTracks = sequence.tracks.map { track ->
-                        MusicalSequence.Track(
-                            index = track.index,
-                            instrumentIndex = track.instrumentIndex,
-                            mute = track.mute,
-                            volume = track.volume,
-                        ).also {
-                            it.instrument = track.instrument?.copyWithFreshState()
-                            it.beats.clear()
-                            it.beats.addAll(track.beats)
-                        }
+                    // Create an isolated copy with fresh instrument state per phrase
+                    val isolatedPatterns = sequence.patterns.map { pattern ->
+                        val isolatedTracks = pattern.tracks.map { phrase ->
+                            MusicalPhrase(
+                                index = phrase.index,
+                                instrumentIndex = phrase.instrumentIndex,
+                                volume = phrase.volume,
+                                mute = phrase.mute,
+                            ).also {
+                                it.instrument = phrase.instrument?.copyWithFreshState()
+                                it.setNotes(phrase.beats)
+                            }
+                        }.toTypedArray()
+                        MusicalPattern(
+                            index = pattern.index,
+                            tracks = isolatedTracks,
+                        )
                     }.toTypedArray()
                     val isolatedSequence = MusicalSequence(
                         index = sequence.index,
-                        tracks = isolatedTracks,
+                        patterns = isolatedPatterns,
                         tempo = sequence.tempo,
                         name = sequence.name,
+                        arrangement = sequence.arrangement,
                     )
                     soundManager.convert(isolatedSequence)
                 }

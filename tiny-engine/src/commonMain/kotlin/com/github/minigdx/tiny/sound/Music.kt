@@ -36,20 +36,29 @@ class Music(
 ) {
     fun serialize(): String {
         val lightSequences = sequences.map { seq ->
-            val allSilence = seq.tracks.all { track -> track.beats.all { it.note == null } }
+            val allSilence = seq.patterns.all { pattern ->
+                pattern.tracks.all { phrase -> phrase.beats.all { it.note == null } }
+            }
             if (allSilence) {
                 MusicalSequence(
                     index = seq.index,
-                    tracks = Array(4) { i ->
-                        MusicalSequence.Track(
-                            index = seq.tracks[i].index,
-                            instrumentIndex = seq.tracks[i].instrumentIndex,
-                            mute = seq.tracks[i].mute,
-                            volume = seq.tracks[i].volume,
-                        ).also { it.beats.clear() }
-                    },
+                    patterns = seq.patterns.map { pattern ->
+                        MusicalPattern(
+                            index = pattern.index,
+                            tracks = Array(pattern.tracks.size) { i ->
+                                val phrase = pattern.tracks[i]
+                                MusicalPhrase(
+                                    index = phrase.index,
+                                    instrumentIndex = phrase.instrumentIndex,
+                                    volume = phrase.volume,
+                                    mute = phrase.mute,
+                                )
+                            },
+                        )
+                    }.toTypedArray(),
                     tempo = seq.tempo,
                     name = seq.name,
+                    arrangement = seq.arrangement,
                 )
             } else {
                 seq

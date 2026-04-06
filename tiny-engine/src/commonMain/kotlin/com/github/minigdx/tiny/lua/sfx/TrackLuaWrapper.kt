@@ -4,47 +4,47 @@ import com.github.minigdx.tiny.lua.Note
 import com.github.minigdx.tiny.lua.WrapperLuaTable
 import com.github.minigdx.tiny.sound.Music
 import com.github.minigdx.tiny.sound.MusicalNote
-import com.github.minigdx.tiny.sound.MusicalSequence
+import com.github.minigdx.tiny.sound.MusicalPhrase
 import org.luaj.vm2.LuaTable
 
 class TrackLuaWrapper(
     private val music: Music,
-    private val track: MusicalSequence.Track,
+    private val phrase: MusicalPhrase,
 ) : WrapperLuaTable() {
     init {
         wrap(
             "index",
-            { valueOf(track.index) },
+            { valueOf(phrase.index) },
         )
 
         wrap(
             "instrument",
-            { valueOf(track.instrumentIndex) },
+            { valueOf(phrase.instrumentIndex) },
             {
                 val index = it.checkint()
                 val instrument = music.instruments.getOrNull(index)
                 if (instrument != null) {
-                    track.instrumentIndex = index
-                    track.instrument = instrument
+                    phrase.instrumentIndex = index
+                    phrase.instrument = instrument
                 }
             },
         )
 
         wrap(
             "volume",
-            { valueOf(track.volume.toDouble()) },
-            { track.volume = it.todouble().toFloat().coerceIn(0f, 1f) },
+            { valueOf(phrase.volume.toDouble()) },
+            { phrase.volume = it.todouble().toFloat().coerceIn(0f, 1f) },
         )
 
         wrap(
             "mute",
-            { valueOf(track.mute) },
-            { track.mute = it.checkboolean() },
+            { valueOf(phrase.mute) },
+            { phrase.mute = it.checkboolean() },
         )
 
         wrap("beats") {
             val result = LuaTable()
-            track.beats.sortedBy { it.beat }
+            phrase.beats.sortedBy { it.beat }
                 .map {
                     LuaTable().apply {
                         this.set("note", it.note?.name?.let { valueOf(it) } ?: NIL)
@@ -69,8 +69,8 @@ class TrackLuaWrapper(
             val duration = arg["duration"].optdouble(1.0).toFloat()
             val isOff = arg["off"].optboolean(false)
 
-            if (beat in track.beats.indices) {
-                track.beats[beat] = MusicalNote(
+            if (beat in phrase.beats.indices) {
+                phrase.beats[beat] = MusicalNote(
                     note = note,
                     beat = beat.toFloat(),
                     duration = duration,
@@ -82,8 +82,8 @@ class TrackLuaWrapper(
         }
 
         function0("clear") {
-            track.beats.indices.forEach { i ->
-                track.beats[i] = MusicalNote(null, i.toFloat(), 1f, 1f)
+            phrase.beats.indices.forEach { i ->
+                phrase.beats[i] = MusicalNote(null, i.toFloat(), 1f, 1f)
             }
             NONE
         }

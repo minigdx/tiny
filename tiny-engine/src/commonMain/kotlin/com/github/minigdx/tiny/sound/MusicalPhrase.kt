@@ -32,6 +32,7 @@ class MusicalPhrase(
      */
     var name: String? = "SFX $index",
     var volume: Percent = 1.0f,
+    var mute: Boolean = false,
 ) {
     val beats: MutableList<MusicalNote> = mutableListOf()
 

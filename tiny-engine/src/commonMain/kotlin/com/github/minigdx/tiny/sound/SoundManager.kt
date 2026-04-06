@@ -19,12 +19,6 @@ class DefaultSoundBoard(private val soundManager: SoundManager) : VirtualSoundBo
         return soundManager.createSoundHandler(buffer)
     }
 
-    override fun prepare(track: MusicalSequence.Track): SoundHandler {
-        val sequence = MusicalSequence(tracks = arrayOf(track), index = 0)
-        val buffer = soundManager.convert(sequence)
-        return soundManager.createSoundHandler(buffer)
-    }
-
     override fun createHandler(buffer: FloatArray): SoundHandler {
         return soundManager.createSoundHandler(buffer)
     }
@@ -78,11 +72,18 @@ abstract class SoundManager {
     }
 
     fun convert(sequence: MusicalSequence): FloatArray {
-        val tracks = sequence.tracks.filter { !it.mute && it.instrument != null }.map { track ->
-            // Convert notes from track to note for sounds.
-            var current = track.beats.first().copy()
+        // Collect all active phrases across patterns referenced by the arrangement.
+        val allPhrases = sequence.arrangement.mapNotNull { patternIndex ->
+            sequence.patterns.getOrNull(patternIndex)
+        }.flatMap { pattern ->
+            pattern.tracks.toList()
+        }
+
+        val tracks = allPhrases.filter { !it.mute && it.instrument != null }.map { phrase ->
+            // Convert notes from phrase to note for sounds.
+            var current = phrase.beats.first().copy()
             val beats = mutableListOf(current)
-            track.beats.drop(1).forEach { beat ->
+            phrase.beats.drop(1).forEach { beat ->
                 // Set the Note Off
                 if (beat.isOffNote) {
                     current = beat.copy(volume = 0f, duration = 1f)
@@ -102,10 +103,10 @@ abstract class SoundManager {
             }
 
             convert(
-                defaultInstrument = track.instrument,
+                defaultInstrument = phrase.instrument,
                 beats = beats,
                 tempo = sequence.tempo,
-                volume = track.volume,
+                volume = phrase.volume,
             )
         }
 
@@ -115,7 +116,7 @@ abstract class SoundManager {
         // Release tails extending past the sequence boundary are truncated,
         // which is standard for looping patterns.
         val secondsPerBeat = 60f / sequence.tempo
-        val totalBeats = sequence.tracks.maxOf { it.beats.size }
+        val totalBeats = allPhrases.maxOf { it.beats.size }
         val resultSize = (totalBeats * secondsPerBeat * SAMPLE_RATE).roundToInt()
         val result = FloatArray(resultSize)
 

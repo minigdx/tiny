@@ -35,8 +35,9 @@ class SequenceLuaWrapper(
 
         function1("track") { arg ->
             val index = arg.checkint()
-            val track = sequence.tracks.getOrNull(index) ?: return@function1 NIL
-            TrackLuaWrapper(music, track)
+            val pattern = sequence.patterns.firstOrNull() ?: return@function1 NIL
+            val phrase = pattern.tracks.getOrNull(index) ?: return@function1 NIL
+            TrackLuaWrapper(music, phrase)
         }
 
         function0("invalidate") {
@@ -46,7 +47,7 @@ class SequenceLuaWrapper(
 
         function0("play") {
             val startMark = markNow()
-            val totalBeats = sequence.tracks.maxOf { it.beats.size }
+            val totalBeats = sequence.patterns.flatMap { it.tracks.toList() }.maxOf { it.beats.size }
             val buffer = cachedBuffer ?: soundBoard.convert(sequence).also { cachedBuffer = it }
             val bufferDurationSeconds = buffer.size.toDouble() / 44100.0
             val handler = soundBoard.createHandler(buffer).also { it.play() }
@@ -66,7 +67,7 @@ class SequenceLuaWrapper(
 
         function0("loop") {
             val startMark = markNow()
-            val totalBeats = sequence.tracks.maxOf { it.beats.size }
+            val totalBeats = sequence.patterns.flatMap { it.tracks.toList() }.maxOf { it.beats.size }
             val buffer = cachedBuffer ?: soundBoard.convert(sequence).also { cachedBuffer = it }
             val bufferDurationSeconds = buffer.size.toDouble() / 44100.0
             val handler = soundBoard.createHandler(buffer).also { it.loop() }

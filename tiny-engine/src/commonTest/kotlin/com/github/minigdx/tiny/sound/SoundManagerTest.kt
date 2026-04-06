@@ -76,6 +76,36 @@ class SoundManagerTest {
         return instrument
     }
 
+    /**
+     * Create a MusicalPhrase configured as a track channel (with a single beat).
+     */
+    private fun createTrackPhrase(
+        index: Int,
+        instrumentIndex: Int,
+        instrument: Instrument,
+        note: Note,
+        volume: Float = 0.9f,
+    ): MusicalPhrase {
+        return MusicalPhrase(index = index, instrumentIndex = instrumentIndex).also {
+            it.instrument = instrument
+            it.beats.add(MusicalNote(note, 0f, 1f, volume))
+        }
+    }
+
+    /**
+     * Build a MusicalSequence from an array of track phrases.
+     */
+    private fun buildSequence(vararg phrases: MusicalPhrase): MusicalSequence {
+        val pattern = MusicalPattern(
+            index = 0,
+            tracks = Array(phrases.size) { phrases[it] },
+        )
+        return MusicalSequence(
+            index = 0,
+            patterns = arrayOf(pattern),
+        )
+    }
+
     @Test
     fun testInstrumentProducesSound() {
         // First, let's verify that our instrument setup actually produces sound
@@ -104,28 +134,10 @@ class SoundManagerTest {
     fun testMixingPreventsClipping() {
         val soundManager = TestSoundManager()
 
-        // Create a musical sequence with two tracks that would normally cause clipping
-        val sequence = MusicalSequence(0)
-
-        // Create two tracks with loud sounds
-        val track1 = MusicalSequence.Track(0, 0)
-        val track2 = MusicalSequence.Track(1, 1)
-
-        // Create properly configured instruments
-        track1.instrument = createTestInstrument(0)
-        track2.instrument = createTestInstrument(1)
-
-        // Clear default beats and add our test beats
-        track1.beats.clear()
-        track2.beats.clear()
-
-        // Add a loud note to each track at the same position
         val note = Note.A4
-        track1.beats.add(MusicalNote(note, 0f, 1f, 0.9f))
-        track2.beats.add(MusicalNote(note, 0f, 1f, 0.9f))
-
-        sequence.tracks[0] = track1
-        sequence.tracks[1] = track2
+        val phrase1 = createTrackPhrase(0, 0, createTestInstrument(0), note)
+        val phrase2 = createTrackPhrase(1, 1, createTestInstrument(1), note)
+        val sequence = buildSequence(phrase1, phrase2)
 
         // Convert the sequence to audio samples
         val result = soundManager.convert(sequence)
@@ -156,19 +168,12 @@ class SoundManagerTest {
     fun testMultipleTracksWithSameNote() {
         val soundManager = TestSoundManager()
 
-        // Create a sequence with multiple tracks playing the same note
-        val sequence = MusicalSequence(0)
-
-        // Create tracks with the same loud note
-        val numTracks = 4
-        for (i in 0 until numTracks) {
-            val track = MusicalSequence.Track(i, i)
-            track.instrument = createTestInstrument(i)
-            track.beats.clear()
-            // Add the same loud note to each track
-            track.beats.add(MusicalNote(Note.A4, 0f, 1f, 0.9f))
-            sequence.tracks[i] = track
+        // Create a sequence with 4 tracks playing the same note
+        val note = Note.A4
+        val phrases = Array(4) { i ->
+            createTrackPhrase(i, i, createTestInstrument(i), note)
         }
+        val sequence = buildSequence(*phrases)
 
         // Convert the sequence to audio samples
         val result = soundManager.convert(sequence)
@@ -196,12 +201,8 @@ class SoundManagerTest {
         assertTrue(mixedRms > 0.01f, "Mixed output is too quiet: RMS = $mixedRms")
 
         // Create a sequence with just one track for comparison
-        val singleTrackSequence = MusicalSequence(0)
-        val singleTrack = MusicalSequence.Track(0, 0)
-        singleTrack.instrument = createTestInstrument(0)
-        singleTrack.beats.clear()
-        singleTrack.beats.add(MusicalNote(Note.A4, 0f, 1f, 0.9f))
-        singleTrackSequence.tracks[0] = singleTrack
+        val singlePhrase = createTrackPhrase(0, 0, createTestInstrument(0), note)
+        val singleTrackSequence = buildSequence(singlePhrase)
 
         // Convert the single track sequence
         val singleTrackResult = soundManager.convert(singleTrackSequence)
