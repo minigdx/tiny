@@ -53,6 +53,7 @@ class TrackLuaWrapper(
                         this.set("volume", valueOf(it.volume.toDouble()))
                         this.set("beat", valueOf(it.beat.toDouble()))
                         this.set("duration", valueOf(it.duration.toDouble()))
+                        this.set("off", valueOf(it.isOffNote))
                     }
                 }.forEachIndexed { index, value ->
                     result.insert(index + 1, value)

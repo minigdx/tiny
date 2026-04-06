@@ -1,7 +1,6 @@
 local widgets = require("widgets")
 local wire = require("wire")
 local EditorBase = require("editor-base")
-local music_templates = require("music-templates")
 local icons = require("widgets.icons")
 
 local all_widgets = {}
@@ -21,16 +20,10 @@ local state = {
 
 local playing = false
 local play_handler = nil
-local config_dirty = true
 local master_volume = 1.0
 
+-- Track configuration: instruments, volumes, speed
 local config = {
-    root = "C",
-    scale_name = "Major",
-    progression_name = "Classic",
-    lead_style = "Stepwise",
-    rhythm_style = "Arp Up",
-    drum_pattern = "Rock",
     chord_instrument = 0,
     bass_instrument = 1,
     lead_instrument = 2,
@@ -40,16 +33,6 @@ local config = {
     lead_volume = 0.25,
     drum_volume = 0.35,
     bpm = 120,
-}
-
-local themes = {
-    { name = "Adventurous", scale_name = "Major", progression_name = "Classic", lead_style = "Stepwise", rhythm_style = "Arp Up", drum_pattern = "Rock", bpm = 120 },
-    { name = "Jumper", scale_name = "Penta Maj", progression_name = "Upbeat", lead_style = "Bouncy", rhythm_style = "Broken", drum_pattern = "Dance", bpm = 140 },
-    { name = "Mystery", scale_name = "Dorian", progression_name = "Tense", lead_style = "Sparse", rhythm_style = "Pulse", drum_pattern = "Sparse", bpm = 90 },
-    { name = "Sadness", scale_name = "Minor", progression_name = "Melancholy", lead_style = "Stepwise", rhythm_style = "UpDown", drum_pattern = "Halftime", bpm = 100 },
-    { name = "Industrial", scale_name = "Mixolydian", progression_name = "Tense", lead_style = "Arpeggiated", rhythm_style = "Offbeat", drum_pattern = "Funky", bpm = 130 },
-    { name = "Dreamy", scale_name = "Penta Min", progression_name = "Dreamy", lead_style = "Arpeggiated", rhythm_style = "Spread", drum_pattern = "Halftime", bpm = 80 },
-    { name = "March", scale_name = "Major", progression_name = "Upbeat", lead_style = "Stepwise", rhythm_style = "Block", drum_pattern = "March", bpm = 110 },
 }
 
 local function wrap_dropdown_overlay(dropdown)
@@ -65,13 +48,6 @@ local function wrap_dropdown_overlay(dropdown)
             end
         end
     end
-end
-
-local function find_index(list, value)
-    for i, v in ipairs(list) do
-        if v == value then return i end
-    end
-    return 1
 end
 
 local function build_instrument_options()
@@ -100,38 +76,107 @@ local function build_seq_label(index)
     return "Seq " .. index
 end
 
--- Build a config with volumes scaled by master volume for playback/export
-local function build_play_config()
-    return {
-        root = config.root,
-        scale_name = config.scale_name,
-        progression_name = config.progression_name,
-        lead_style = config.lead_style,
-        rhythm_style = config.rhythm_style,
-        drum_pattern = config.drum_pattern,
-        chord_instrument = config.chord_instrument,
-        bass_instrument = config.bass_instrument,
-        lead_instrument = config.lead_instrument,
-        drum_instrument = config.drum_instrument,
-        chord_volume = config.chord_volume * master_volume,
-        bass_volume = config.bass_volume * master_volume,
-        lead_volume = config.lead_volume * master_volume,
-        drum_volume = config.drum_volume * master_volume,
-        bpm = config.bpm,
-        seed = config.seed,
-    }
+-- Apply config to sequence tracks
+local function apply_config_to_seq()
+    if not state.seq then return end
+    local instruments = { config.lead_instrument, config.chord_instrument, config.bass_instrument, config.drum_instrument }
+    local volumes = { config.lead_volume, config.chord_volume, config.bass_volume, config.drum_volume }
+    for i = 0, 3 do
+        local track = state.seq.track(i)
+        if track then
+            track.instrument = instruments[i + 1]
+            track.volume = volumes[i + 1] * master_volume
+        end
+    end
+    state.seq.tempo = config.bpm
+    state.seq.config = nil
+    state.seq.invalidate()
 end
 
--- Push a live config update to the streaming scheduler
-local function push_live_update()
-    if playing and state.seq then
-        state.seq.generate(build_play_config())
+-- Load config from sequence tracks (with backward compat for auto-gen sequences)
+local function load_config_from_seq()
+    if not state.seq then return end
+
+    -- Try legacy saved config first (backward compat with auto-gen sequences)
+    local saved_config = state.seq.config
+    if saved_config then
+        config.chord_instrument = saved_config.chord_instrument or config.chord_instrument
+        config.bass_instrument = saved_config.bass_instrument or config.bass_instrument
+        config.lead_instrument = saved_config.lead_instrument or config.lead_instrument
+        config.drum_instrument = saved_config.drum_instrument or config.drum_instrument
+        config.chord_volume = saved_config.chord_volume or config.chord_volume
+        config.bass_volume = saved_config.bass_volume or config.bass_volume
+        config.lead_volume = saved_config.lead_volume or config.lead_volume
+        config.drum_volume = saved_config.drum_volume or config.drum_volume
+        config.bpm = saved_config.bpm or config.bpm
+        -- Clear config to use pre-computed path from now on
+        state.seq.config = nil
+    else
+        -- Load from tracks directly
+        local track0 = state.seq.track(0)
+        local track1 = state.seq.track(1)
+        local track2 = state.seq.track(2)
+        local track3 = state.seq.track(3)
+        if track0 then
+            config.lead_instrument = track0.instrument
+            config.lead_volume = track0.volume
+        end
+        if track1 then
+            config.chord_instrument = track1.instrument
+            config.chord_volume = track1.volume
+        end
+        if track2 then
+            config.bass_instrument = track2.instrument
+            config.bass_volume = track2.volume
+        end
+        if track3 then
+            config.drum_instrument = track3.instrument
+            config.drum_volume = track3.volume
+        end
+    end
+    config.bpm = state.seq.tempo or config.bpm
+end
+
+-- Remove a widget from all_widgets
+local function remove_widget(widget)
+    if not widget then return end
+    for i = #all_widgets, 1, -1 do
+        if all_widgets[i] == widget then
+            table.remove(all_widgets, i)
+            break
+        end
     end
 end
 
-local function mark_config_dirty()
-    config_dirty = true
-    push_live_update()
+-- Update UI controls to match current config
+local function sync_ui(refs)
+    if refs.chord_inst_dd then
+        refs.chord_inst_dd:set_selected(config.chord_instrument + 1)
+    end
+    if refs.bass_inst_dd then
+        refs.bass_inst_dd:set_selected(config.bass_instrument + 1)
+    end
+    if refs.lead_inst_dd then
+        refs.lead_inst_dd:set_selected(config.lead_instrument + 1)
+    end
+    if refs.drum_inst_dd then
+        refs.drum_inst_dd:set_selected(config.drum_instrument + 1)
+    end
+    if refs.chord_volume_fader then
+        refs.chord_volume_fader.value = config.chord_volume
+    end
+    if refs.bass_volume_fader then
+        refs.bass_volume_fader.value = config.bass_volume
+    end
+    if refs.lead_volume_fader then
+        refs.lead_volume_fader.value = config.lead_volume
+    end
+    if refs.drum_volume_fader then
+        refs.drum_volume_fader.value = config.drum_volume
+    end
+    if refs.speed_fader then
+        refs.speed_fader.value = (config.bpm - 60) / 200
+    end
 end
 
 local function _init_music_generator(widget_entities)
@@ -167,9 +212,7 @@ local function _init_music_generator(widget_entities)
     selector_dd_ref = selector_dd
     play_button_ref = play_button
 
-    -- Find unreferenced dropdowns by position
-    local lead_style_dd = nil
-    local root_dd = nil
+    -- Find unreferenced dropdowns by position (lead style, root note)
     local referenced_iids = {}
     for _, field_name in ipairs({
         "DrumPattern", "DrumVolume", "MusicTheme", "MusicScale",
@@ -183,6 +226,8 @@ local function _init_music_generator(widget_entities)
             referenced_iids[ref.entityIid] = true
         end
     end
+    local lead_style_dd = nil
+    local root_dd = nil
     for w in all(all_widgets) do
         if w.options and not referenced_iids[w.iid] then
             if w.x >= 18 and w.x <= 24 and w.y >= 69 and w.y <= 75 then
@@ -193,12 +238,18 @@ local function _init_music_generator(widget_entities)
         end
     end
 
-    -- Build option lists
-    local theme_names = {}
-    for _, t in ipairs(themes) do
-        table.insert(theme_names, t.name)
-    end
+    -- Remove auto-generation widgets (no longer needed)
+    remove_widget(theme_dd)
+    remove_widget(scale_dd)
+    remove_widget(progression_dd)
+    remove_widget(lead_style_dd)
+    remove_widget(rhythm_style_dd)
+    remove_widget(root_dd)
 
+    -- Repurpose DrumPattern dropdown as DrumInstrument
+    local drum_inst_dd = drum_pattern_dd
+
+    -- Build option lists
     local inst_options = build_instrument_options()
 
     local seq_options = {}
@@ -206,17 +257,27 @@ local function _init_music_generator(widget_entities)
         table.insert(seq_options, build_seq_label(i))
     end
 
-    -- Populate dropdowns with options
-    populate_dropdown(theme_dd, theme_names, 1)
-    populate_dropdown(scale_dd, music_templates.scale_names, find_index(music_templates.scale_names, config.scale_name))
-    populate_dropdown(progression_dd, music_templates.progression_names, find_index(music_templates.progression_names, config.progression_name))
-    populate_dropdown(drum_pattern_dd, music_templates.drum_pattern_names, find_index(music_templates.drum_pattern_names, config.drum_pattern))
-    populate_dropdown(lead_style_dd, music_templates.lead_styles, find_index(music_templates.lead_styles, config.lead_style))
-    populate_dropdown(rhythm_style_dd, music_templates.rhythm_style_names, find_index(music_templates.rhythm_style_names, config.rhythm_style))
-    populate_dropdown(root_dd, music_templates.root_notes, find_index(music_templates.root_notes, config.root))
+    -- Load config from current sequence
+    load_config_from_seq()
+
+    -- Widget refs for sync_ui
+    local refs = {
+        chord_inst_dd = chord_inst_dd,
+        bass_inst_dd = bass_inst_dd,
+        lead_inst_dd = lead_inst_dd,
+        drum_inst_dd = drum_inst_dd,
+        chord_volume_fader = chord_volume_fader,
+        bass_volume_fader = bass_volume_fader,
+        lead_volume_fader = lead_volume_fader,
+        drum_volume_fader = drum_volume_fader,
+        speed_fader = speed_fader,
+    }
+
+    -- Populate dropdowns
     populate_dropdown(chord_inst_dd, inst_options, config.chord_instrument + 1)
     populate_dropdown(bass_inst_dd, inst_options, config.bass_instrument + 1)
     populate_dropdown(lead_inst_dd, inst_options, config.lead_instrument + 1)
+    populate_dropdown(drum_inst_dd, inst_options, config.drum_instrument + 1)
     populate_dropdown(selector_dd, seq_options, state.seq_index + 1)
 
     -- Set initial fader values
@@ -227,96 +288,61 @@ local function _init_music_generator(widget_entities)
     if master_volume_fader then master_volume_fader.value = 1.0 end
     if speed_fader then speed_fader.value = (config.bpm - 60) / 200 end
 
-    -- Dropdown callbacks: update config on change
-    if scale_dd then
-        scale_dd.on_change = function(self)
-            config.scale_name = music_templates.scale_names[self.selected]
-            mark_config_dirty()
-        end
-    end
-
-    if progression_dd then
-        progression_dd.on_change = function(self)
-            config.progression_name = music_templates.progression_names[self.selected]
-            mark_config_dirty()
-        end
-    end
-
-    if drum_pattern_dd then
-        drum_pattern_dd.on_change = function(self)
-            config.drum_pattern = music_templates.drum_pattern_names[self.selected]
-            mark_config_dirty()
-        end
-    end
-
-    if lead_style_dd then
-        lead_style_dd.on_change = function(self)
-            config.lead_style = music_templates.lead_styles[self.selected]
-            mark_config_dirty()
-        end
-    end
-
-    if rhythm_style_dd then
-        rhythm_style_dd.on_change = function(self)
-            config.rhythm_style = music_templates.rhythm_style_names[self.selected]
-            mark_config_dirty()
-        end
-    end
-
-    if root_dd then
-        root_dd.on_change = function(self)
-            config.root = music_templates.root_notes[self.selected]
-            mark_config_dirty()
-        end
-    end
-
+    -- Instrument dropdown callbacks
     if chord_inst_dd then
         chord_inst_dd.on_change = function(self)
             config.chord_instrument = self.selected - 1
-            mark_config_dirty()
+            apply_config_to_seq()
         end
     end
 
     if bass_inst_dd then
         bass_inst_dd.on_change = function(self)
             config.bass_instrument = self.selected - 1
-            mark_config_dirty()
+            apply_config_to_seq()
         end
     end
 
     if lead_inst_dd then
         lead_inst_dd.on_change = function(self)
             config.lead_instrument = self.selected - 1
-            mark_config_dirty()
+            apply_config_to_seq()
         end
     end
 
-    -- Fader callbacks: update config on change
+    if drum_inst_dd then
+        drum_inst_dd.on_change = function(self)
+            config.drum_instrument = self.selected - 1
+            apply_config_to_seq()
+        end
+    end
+
+    -- Volume fader callbacks
     if chord_volume_fader then
         chord_volume_fader.on_change = function(self)
             config.chord_volume = self.value
-            mark_config_dirty()
+            apply_config_to_seq()
         end
     end
 
     if bass_volume_fader then
         bass_volume_fader.on_change = function(self)
             config.bass_volume = self.value
-            mark_config_dirty()
+            apply_config_to_seq()
         end
     end
 
     if lead_volume_fader then
         lead_volume_fader.on_change = function(self)
             config.lead_volume = self.value
-            mark_config_dirty()
+            apply_config_to_seq()
         end
     end
 
     if drum_volume_fader then
         drum_volume_fader.on_change = function(self)
             config.drum_volume = self.value
-            mark_config_dirty()
+            apply_config_to_seq()
         end
     end
 
@@ -324,67 +350,19 @@ local function _init_music_generator(widget_entities)
     if speed_fader then
         speed_fader.on_change = function(self)
             config.bpm = math.floor(60 + self.value * 200)
-            mark_config_dirty()
+            apply_config_to_seq()
         end
     end
 
-    -- Master volume: scale all track volumes
+    -- Master volume fader
     if master_volume_fader then
         master_volume_fader.on_change = function(self)
             master_volume = self.value
-            if playing then
-                push_live_update()
-            else
-                -- For pre-computed path, update tracks directly
-                local base_volumes = { config.chord_volume, config.bass_volume, config.lead_volume, config.drum_volume }
-                for i = 0, 3 do
-                    local track = state.seq.track(i)
-                    if track then
-                        track.volume = base_volumes[i + 1] * master_volume
-                    end
-                end
-                state.seq.invalidate()
-            end
+            apply_config_to_seq()
         end
     end
 
-    -- Theme dropdown: updates ALL config fields + syncs all other dropdowns
-    if theme_dd then
-        theme_dd.on_change = function(self)
-            local theme = themes[self.selected]
-            if not theme then return end
-
-            config.scale_name = theme.scale_name
-            config.progression_name = theme.progression_name
-            config.lead_style = theme.lead_style
-            config.rhythm_style = theme.rhythm_style
-            config.drum_pattern = theme.drum_pattern
-            config.bpm = theme.bpm
-
-            if scale_dd then
-                scale_dd:set_selected(find_index(music_templates.scale_names, theme.scale_name))
-            end
-            if progression_dd then
-                progression_dd:set_selected(find_index(music_templates.progression_names, theme.progression_name))
-            end
-            if drum_pattern_dd then
-                drum_pattern_dd:set_selected(find_index(music_templates.drum_pattern_names, theme.drum_pattern))
-            end
-            if lead_style_dd then
-                lead_style_dd:set_selected(find_index(music_templates.lead_styles, theme.lead_style))
-            end
-            if rhythm_style_dd then
-                rhythm_style_dd:set_selected(find_index(music_templates.rhythm_style_names, theme.rhythm_style))
-            end
-            if speed_fader then
-                speed_fader.value = (config.bpm - 60) / 200
-            end
-
-            mark_config_dirty()
-        end
-    end
-
-    -- Play button: toggle generate + play / stop
+    -- Play button: play/stop the sequence (pre-computed path)
     if play_button then
         play_button.on_change = function()
             if playing then
@@ -398,11 +376,7 @@ local function _init_music_generator(widget_entities)
                     s.playing = false
                 end
             else
-                if config_dirty then
-                    config.seed = math.random(1, 2147483647)
-                    state.seq.generate(build_play_config())
-                    config_dirty = false
-                end
+                apply_config_to_seq()
                 play_handler = state.seq.play()
                 playing = true
                 play_button.overlay = icons.Stop
@@ -413,14 +387,10 @@ local function _init_music_generator(widget_entities)
         end
     end
 
-    -- Export button: export current sequence as wav
+    -- Export button
     if export_button then
         export_button.on_change = function()
-            if config_dirty then
-                config.seed = math.random(1, 2147483647)
-                state.seq.generate(build_play_config())
-                config_dirty = false
-            end
+            apply_config_to_seq()
             state.seq.export()
         end
     end
@@ -441,141 +411,17 @@ local function _init_music_generator(widget_entities)
             end
             state.seq_index = self.selected - 1
             state.seq = sfx.sequence(state.seq_index)
+            _G._tiny_music_seq_index = state.seq_index
 
-            -- Load config from sequence if available
-            local saved_config = state.seq.config
-            if saved_config then
-                config.root = saved_config.root or config.root
-                config.scale_name = saved_config.scale_name or config.scale_name
-                config.progression_name = saved_config.progression_name or config.progression_name
-                config.lead_style = saved_config.lead_style or config.lead_style
-                config.rhythm_style = saved_config.rhythm_style or config.rhythm_style
-                config.drum_pattern = saved_config.drum_pattern or config.drum_pattern
-                config.chord_instrument = saved_config.chord_instrument or config.chord_instrument
-                config.bass_instrument = saved_config.bass_instrument or config.bass_instrument
-                config.lead_instrument = saved_config.lead_instrument or config.lead_instrument
-                config.drum_instrument = saved_config.drum_instrument or config.drum_instrument
-                config.chord_volume = saved_config.chord_volume or config.chord_volume
-                config.bass_volume = saved_config.bass_volume or config.bass_volume
-                config.lead_volume = saved_config.lead_volume or config.lead_volume
-                config.drum_volume = saved_config.drum_volume or config.drum_volume
-                config.bpm = saved_config.bpm or config.bpm
-                config.seed = saved_config.seed or config.seed
-
-                -- Update UI controls to match loaded config
-                if scale_dd then
-                    scale_dd:set_selected(find_index(music_templates.scale_names, config.scale_name))
-                end
-                if progression_dd then
-                    progression_dd:set_selected(find_index(music_templates.progression_names, config.progression_name))
-                end
-                if drum_pattern_dd then
-                    drum_pattern_dd:set_selected(find_index(music_templates.drum_pattern_names, config.drum_pattern))
-                end
-                if lead_style_dd then
-                    lead_style_dd:set_selected(find_index(music_templates.lead_styles, config.lead_style))
-                end
-                if rhythm_style_dd then
-                    rhythm_style_dd:set_selected(find_index(music_templates.rhythm_style_names, config.rhythm_style))
-                end
-                if chord_inst_dd then
-                    chord_inst_dd:set_selected(config.chord_instrument + 1)
-                end
-                if bass_inst_dd then
-                    bass_inst_dd:set_selected(config.bass_instrument + 1)
-                end
-                if lead_inst_dd then
-                    lead_inst_dd:set_selected(config.lead_instrument + 1)
-                end
-                if chord_volume_fader then
-                    chord_volume_fader.value = config.chord_volume
-                end
-                if bass_volume_fader then
-                    bass_volume_fader.value = config.bass_volume
-                end
-                if lead_volume_fader then
-                    lead_volume_fader.value = config.lead_volume
-                end
-                if drum_volume_fader then
-                    drum_volume_fader.value = config.drum_volume
-                end
-                if root_dd then
-                    root_dd:set_selected(find_index(music_templates.root_notes, config.root))
-                end
-                if speed_fader then
-                    speed_fader.value = (config.bpm - 60) / 200
-                end
-            end
-
-            config_dirty = true
+            load_config_from_seq()
+            sync_ui(refs)
+            apply_config_to_seq()
         end
     end
 
-    -- Load config for initial sequence if available
-    local saved_config = state.seq.config
-    if saved_config then
-        config.root = saved_config.root or config.root
-        config.scale_name = saved_config.scale_name or config.scale_name
-        config.progression_name = saved_config.progression_name or config.progression_name
-        config.lead_style = saved_config.lead_style or config.lead_style
-        config.rhythm_style = saved_config.rhythm_style or config.rhythm_style
-        config.drum_pattern = saved_config.drum_pattern or config.drum_pattern
-        config.chord_instrument = saved_config.chord_instrument or config.chord_instrument
-        config.bass_instrument = saved_config.bass_instrument or config.bass_instrument
-        config.lead_instrument = saved_config.lead_instrument or config.lead_instrument
-        config.drum_instrument = saved_config.drum_instrument or config.drum_instrument
-        config.chord_volume = saved_config.chord_volume or config.chord_volume
-        config.bass_volume = saved_config.bass_volume or config.bass_volume
-        config.lead_volume = saved_config.lead_volume or config.lead_volume
-        config.drum_volume = saved_config.drum_volume or config.drum_volume
-        config.bpm = saved_config.bpm or config.bpm
-        config.seed = saved_config.seed or config.seed
-
-        if scale_dd then
-            scale_dd:set_selected(find_index(music_templates.scale_names, config.scale_name))
-        end
-        if progression_dd then
-            progression_dd:set_selected(find_index(music_templates.progression_names, config.progression_name))
-        end
-        if drum_pattern_dd then
-            drum_pattern_dd:set_selected(find_index(music_templates.drum_pattern_names, config.drum_pattern))
-        end
-        if lead_style_dd then
-            lead_style_dd:set_selected(find_index(music_templates.lead_styles, config.lead_style))
-        end
-        if rhythm_style_dd then
-            rhythm_style_dd:set_selected(find_index(music_templates.rhythm_style_names, config.rhythm_style))
-        end
-        if chord_inst_dd then
-            chord_inst_dd:set_selected(config.chord_instrument + 1)
-        end
-        if bass_inst_dd then
-            bass_inst_dd:set_selected(config.bass_instrument + 1)
-        end
-        if lead_inst_dd then
-            lead_inst_dd:set_selected(config.lead_instrument + 1)
-        end
-        if chord_volume_fader then
-            chord_volume_fader.value = config.chord_volume
-        end
-        if bass_volume_fader then
-            bass_volume_fader.value = config.bass_volume
-        end
-        if lead_volume_fader then
-            lead_volume_fader.value = config.lead_volume
-        end
-        if drum_volume_fader then
-            drum_volume_fader.value = config.drum_volume
-        end
-        if root_dd then
-            root_dd:set_selected(find_index(music_templates.root_notes, config.root))
-        end
-        if speed_fader then
-            speed_fader.value = (config.bpm - 60) / 200
-        end
-
-        config_dirty = false
-    end
+    -- Apply config to sequence on init
+    apply_config_to_seq()
+    _G._tiny_music_seq_index = state.seq_index
 end
 
 function _init_fader(entities)
@@ -603,12 +449,12 @@ function _init()
     play_button_ref = nil
     playing = false
     play_handler = nil
-    config_dirty = true
+    master_volume = 1.0
 
     map.level("MusicEditor")
 
-    state.seq_index = 0
-    state.seq = sfx.sequence(0)
+    state.seq_index = _G._tiny_music_seq_index or 0
+    state.seq = sfx.sequence(state.seq_index)
 
     -- Panels first (drawn behind everything)
     local panel_entities = map.entities("Panels")
@@ -621,7 +467,6 @@ function _init()
     save_button_ref = buttons_by_action["Save"]
 
     EditorBase.init_speakers(widget_entities, all_widgets, speaker_widgets)
-
 
     modals_by_name = EditorBase.init_buttons(widget_entities, all_widgets, {
         on_open = function()
@@ -648,7 +493,7 @@ function _init()
     _init_fader(widget_entities)
     _init_counter(widget_entities)
 
-    -- Wire music generator widgets BEFORE save reminder
+    -- Wire music generator widgets (removes unused auto-gen widgets)
     _init_music_generator(widget_entities)
 
     save_state = EditorBase.init_save_reminder(all_widgets, save_button_ref, modals_by_name)
@@ -657,6 +502,11 @@ end
 function _update()
     -- TAB switches to tracker editor
     if ctrl.pressed(keys.tab) then
+        if playing and play_handler then
+            play_handler.stop()
+            playing = false
+            play_handler = nil
+        end
         tiny.exit("tiny-tracker-editor.lua")
         return
     end

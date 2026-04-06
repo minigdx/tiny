@@ -98,7 +98,7 @@ class SequenceLuaWrapper(
             } else {
                 // Legacy pre-computed playback for manually composed sequences
                 val buffer = cachedBuffer ?: soundBoard.convert(sequence).also { cachedBuffer = it }
-                val handler = soundBoard.createHandler(buffer).also { it.play() }
+                val handler = soundBoard.createHandler(buffer).also { it.loop() }
                 val result = WrapperLuaTable()
                 result.function0("stop") {
                     handler.stop()

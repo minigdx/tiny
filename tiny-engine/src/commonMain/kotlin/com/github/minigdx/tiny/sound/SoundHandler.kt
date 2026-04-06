@@ -46,7 +46,10 @@ class BufferedChunkGenerator(private val data: FloatArray) : ChunkGenerator {
         chunk.copyFrom(data, position, position + samples)
         position = min(position + samples, data.size)
         if (chunk.size == 0) {
+            // Wrap around immediately instead of returning a silent chunk
             position = 0
+            chunk.copyFrom(data, position, position + samples)
+            position = min(position + samples, data.size)
         }
         return chunk
     }

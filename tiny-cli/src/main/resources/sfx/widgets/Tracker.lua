@@ -338,36 +338,36 @@ Tracker.load_from_sequence = function(self, seq)
         local beats = track.beats
         if not beats then goto next_col end
 
-        -- First pass: place notes into the grid
+        -- First pass: place notes into the grid (skip off-notes which are silence markers)
         for _, beat in ipairs(beats) do
             local pos = math.floor(beat.beat)
-            if beat.note and pos >= 0 and pos < self.total_lines then
+            if beat.note and not beat.off and pos >= 0 and pos < self.total_lines then
                 local ni, acc, oct = parse_note_name(beat.note)
                 if ni then
                     local line = pos + 1
                     local vol = math.floor(beat.volume * 9 + 0.5)
                     if vol < 0 then vol = 0 end
                     if vol > 9 then vol = 9 end
+                    local dur = math.floor(beat.duration + 0.5)
+                    if dur < 1 then dur = 1 end
                     self.data[line][col] = {
                         note = ni,
                         accident = acc,
                         octave = oct,
                         volume = vol,
-                        duration = 1,
+                        duration = dur,
                     }
                 end
             end
         end
 
-        -- Second pass: compute durations (distance to next note)
+        -- Second pass: clamp durations so they don't overlap with the next note
         for i = self.total_lines, 1, -1 do
             if self.data[i][col].note then
-                local dur = 1
-                for j = i + 1, self.total_lines do
-                    if self.data[j][col].note then break end
-                    dur = dur + 1
+                local max_dur = self:_max_duration(i, col)
+                if self.data[i][col].duration > max_dur then
+                    self.data[i][col].duration = max_dur
                 end
-                self.data[i][col].duration = dur
             end
         end
 

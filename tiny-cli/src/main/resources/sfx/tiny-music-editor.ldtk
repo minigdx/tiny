@@ -11917,6 +11917,22 @@
 							"fieldInstances": [],
 							"__worldX": 824,
 							"__worldY": 336
+						},
+						{
+							"__identifier": "Speaker",
+							"__grid": [35,23],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 72, "x": 208, "y": 0, "w": 48, "h": 96 },
+							"__smartColor": "#C0CBDC",
+							"iid": "e03d2490-21a0-11f1-97d2-7515653668fc",
+							"width": 98,
+							"height": 96,
+							"defUid": 76,
+							"px": [280,184],
+							"fieldInstances": [],
+							"__worldX": 1096,
+							"__worldY": 456
 						}
 					]
 				},
@@ -11958,9 +11974,9 @@
 							"px": [22,46],
 							"fieldInstances": [
 								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "LigthBlue", "__tile": null, "defUid": 74, "realEditorValues": [] },
-								{ "__identifier": "Label", "__type": "String", "__value": "Melodie", "__tile": null, "defUid": 81, "realEditorValues": [{
+								{ "__identifier": "Label", "__type": "String", "__value": "Melody", "__tile": null, "defUid": 81, "realEditorValues": [{
 									"id": "V_String",
-									"params": ["Melodie"]
+									"params": ["Melody"]
 								}] }
 							],
 							"__worldX": 838,

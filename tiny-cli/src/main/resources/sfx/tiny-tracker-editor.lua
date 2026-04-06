@@ -87,8 +87,8 @@ function _init()
 
     map.level("TrackerEditor")
 
-    state.seq_index = 0
-    state.seq = sfx.sequence(0)
+    state.seq_index = _G._tiny_music_seq_index or 0
+    state.seq = sfx.sequence(state.seq_index)
 
     -- Ensure instruments are linked on tracks
     for i = 0, 3 do
@@ -143,6 +143,7 @@ function _update()
     if ctrl.pressed(keys.tab) then
         stop_playback()
         preview_note_off()
+        _G._tiny_music_seq_index = state.seq_index
         tiny.exit("tiny-music-editor.lua")
         return
     end

@@ -133,7 +133,11 @@ abstract class SoundManager {
 
         if (tracks.isEmpty()) return floatArrayOf()
 
-        val resultSize = tracks.maxOf { it.size }
+        // Ensure the buffer covers the full sequence length so looping is seamless.
+        val secondsPerBeat = 60f / sequence.tempo
+        val totalBeats = sequence.tracks.maxOf { it.beats.size }
+        val minSequenceSamples = (totalBeats * secondsPerBeat * SAMPLE_RATE).roundToInt()
+        val resultSize = max(tracks.maxOf { it.size }, minSequenceSamples)
         val result = FloatArray(resultSize)
 
         // Calculate RMS values for each track to properly scale them during mixing
@@ -171,18 +175,6 @@ abstract class SoundManager {
                     }
                 }
                 result[index] = softClip(mixedSample * invSize)
-            }
-        }
-
-        // Crossfade the tail into the head for seamless looping.
-        // The last LOOP_CROSSFADE_SAMPLES blend from the original end into the
-        // original start so that when playback wraps around the transition is smooth.
-        val crossfadeLen = min(LOOP_CROSSFADE_SAMPLES, result.size / 2)
-        if (crossfadeLen > 0) {
-            for (i in 0 until crossfadeLen) {
-                val alpha = i.toFloat() / crossfadeLen
-                val tailIdx = result.size - crossfadeLen + i
-                result[tailIdx] = result[tailIdx] * (1f - alpha) + result[i] * alpha
             }
         }
 
@@ -390,9 +382,6 @@ abstract class SoundManager {
 
         // ~2ms at 44100 Hz - safety fade-out to prevent clicks at buffer boundaries
         private const val FADE_OUT_SAMPLES = 88
-
-        // ~50ms at 44100 Hz - crossfade length for seamless loop boundaries
-        private const val LOOP_CROSSFADE_SAMPLES = 2205
 
         // Minimum release time in seconds (~2ms) to prevent clicks
         private const val MIN_RELEASE_SECONDS = 0.002f
