@@ -323,7 +323,10 @@ Tracker._update = function(self)
 end
 
 -- Load tracker grid from a sequence's 4 tracks
-Tracker.load_from_sequence = function(self, seq)
+-- pattern_index: optional 0-based pattern index (default 0)
+Tracker.load_from_sequence = function(self, seq, pattern_index)
+    pattern_index = pattern_index or 0
+
     -- Clear all cells
     for i = 1, self.total_lines do
         for j = 1, self.num_cols do
@@ -332,7 +335,7 @@ Tracker.load_from_sequence = function(self, seq)
     end
 
     for col = 1, self.num_cols do
-        local track = seq.track(col - 1)
+        local track = seq.track(col - 1, pattern_index)
         if not track then goto next_col end
 
         local beats = track.beats
@@ -376,9 +379,12 @@ Tracker.load_from_sequence = function(self, seq)
 end
 
 -- Sync tracker grid data back into a sequence's tracks
-Tracker.sync_to_sequence = function(self, seq)
+-- pattern_index: optional 0-based pattern index (default 0)
+Tracker.sync_to_sequence = function(self, seq, pattern_index)
+    pattern_index = pattern_index or 0
+
     for col = 1, self.num_cols do
-        local track = seq.track(col - 1)
+        local track = seq.track(col - 1, pattern_index)
         if not track then goto next_col end
 
         track.clear()

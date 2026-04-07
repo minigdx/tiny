@@ -188,11 +188,14 @@ class JavaSoundManager : SoundManager() {
         }
     }
 
-    override fun createSoundHandler(buffer: FloatArray): SoundHandler {
+    override fun createSoundHandler(
+        buffer: FloatArray,
+        loopStartSample: Int,
+    ): SoundHandler {
         val handler = JavaSoundHandler(
-            data = buffer,
+            chunkGenerator = BufferedChunkGenerator(buffer, loopStartSample),
             mixerGateway = mixer,
-            this,
+            soundManager = this,
         )
         addSoundHandler(handler)
         return handler

@@ -1,4 +1,5 @@
 local widgets = require("widgets")
+local wire = require("wire")
 local EditorBase = require("editor-base")
 local icons = require("widgets.icons")
 local Tracker = require("widgets.Tracker")
@@ -9,10 +10,13 @@ local speaker_widgets = {}
 local save_state = nil
 local save_button_ref = nil
 local tracker_widget = nil
+local arrangement_widget = nil
+local pattern_counter = nil
 
 local state = {
     seq = nil,
     seq_index = 0,
+    pattern_index = 0,
 }
 
 local playing = false
@@ -20,6 +24,21 @@ local play_handler = nil
 
 -- Track which note is currently sounding for the preview (per column instrument)
 local preview_note = nil
+
+-- Load the current pattern into the tracker grid
+local function load_current_pattern()
+    if not tracker_widget or not state.seq then return end
+    -- Ensure the pattern exists
+    state.seq.ensure_pattern(state.pattern_index)
+    -- Load from the selected pattern
+    tracker_widget:load_from_sequence(state.seq, state.pattern_index)
+end
+
+-- Sync the tracker grid back to the current pattern
+local function sync_current_pattern()
+    if not tracker_widget or not state.seq then return end
+    tracker_widget:sync_to_sequence(state.seq, state.pattern_index)
+end
 
 local function stop_playback()
     if play_handler then
@@ -38,8 +57,10 @@ end
 local function start_playback()
     if not state.seq then return end
     -- Sync tracker data to sequence before playing
-    if tracker_widget then
-        tracker_widget:sync_to_sequence(state.seq)
+    sync_current_pattern()
+    -- Sync arrangement data
+    if arrangement_widget then
+        arrangement_widget:sync_to_sequence(state.seq)
     end
     play_handler = state.seq.loop()
     playing = true
@@ -81,6 +102,8 @@ function _init()
     save_state = nil
     save_button_ref = nil
     tracker_widget = nil
+    arrangement_widget = nil
+    pattern_counter = nil
     playing = false
     play_handler = nil
     preview_note = nil
@@ -110,17 +133,66 @@ function _init()
 
     EditorBase.init_speakers(widget_entities, all_widgets, speaker_widgets)
 
+    -- Create counters (including the Pattern counter)
+    for c in all(widget_entities["Counter"]) do
+        local counter = widgets:create_counter(c)
+        table.insert(all_widgets, counter)
+    end
+
+    -- Create arrangement widgets
+    for a in all(widget_entities["Arrangement"]) do
+        arrangement_widget = widgets:create_arrangement(a)
+        table.insert(all_widgets, arrangement_widget)
+    end
+
     -- Create tracker widget from entity
     for t in all(widget_entities["Tracker"]) do
         tracker_widget = widgets:create_tracker(t)
         table.insert(all_widgets, tracker_widget)
+
+        -- Resolve Pattern counter reference from the Tracker entity
+        if t.fields and t.fields.Pattern then
+            pattern_counter = wire.find_widget(all_widgets, t.fields.Pattern)
+        end
+
+        -- Resolve Arrangement reference from the Tracker entity
+        if t.fields and t.fields.Arragment then
+            local arr_ref = wire.find_widget(all_widgets, t.fields.Arragment)
+            if arr_ref then
+                arrangement_widget = arr_ref
+            end
+        end
+    end
+
+    -- Configure Pattern counter
+    if pattern_counter then
+        pattern_counter.min = 0
+        pattern_counter.max = 7
+        pattern_counter.value = state.pattern_index
+        pattern_counter.on_change = function(self)
+            -- Sync current pattern before switching
+            sync_current_pattern()
+            state.pattern_index = self.value
+            -- Ensure the new pattern exists and load it
+            load_current_pattern()
+        end
+    end
+
+    -- Load arrangement and sequence data
+    if arrangement_widget and state.seq then
+        arrangement_widget:load_from_sequence(state.seq)
+        arrangement_widget.on_change = function(self)
+            self:sync_to_sequence(state.seq)
+            -- Update max_pattern from sequence
+            self.max_pattern = state.seq.pattern_count - 1
+        end
     end
 
     -- Load sequence data into tracker
     if tracker_widget and state.seq then
-        tracker_widget:load_from_sequence(state.seq)
+        load_current_pattern()
         tracker_widget.on_change = function(self)
-            self:sync_to_sequence(state.seq)
+            sync_current_pattern()
         end
     end
 
@@ -143,6 +215,10 @@ function _update()
     if ctrl.pressed(keys.tab) then
         stop_playback()
         preview_note_off()
+        sync_current_pattern()
+        if arrangement_widget then
+            arrangement_widget:sync_to_sequence(state.seq)
+        end
         _G._tiny_music_seq_index = state.seq_index
         tiny.exit("tiny-music-editor.lua")
         return

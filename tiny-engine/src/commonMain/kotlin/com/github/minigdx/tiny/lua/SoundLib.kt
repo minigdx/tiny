@@ -102,8 +102,10 @@ class SoundLib(
             val sound = resourceAccess.findSound(0)
 
             val buffer = sound?.data?.musicalSequences?.getOrNull(index)
+            val sequence = sound?.data?.music?.sequences?.getOrNull(index)
             if (playSound && buffer != null) {
-                val handler = soundBoard.createHandler(buffer)
+                val loopStartSample = sequence?.loopStartSample ?: 0
+                val handler = soundBoard.createHandler(buffer, loopStartSample)
                 result.function0("stop") {
                     handler.stop()
                     NONE

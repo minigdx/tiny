@@ -15,7 +15,10 @@ class SoundManagerTest {
             // No-op for testing
         }
 
-        override fun createSoundHandler(buffer: FloatArray): SoundHandler {
+        override fun createSoundHandler(
+            buffer: FloatArray,
+            loopStartSample: Int,
+        ): SoundHandler {
             // Return a dummy sound handler for testing
             return object : SoundHandler {
                 override fun play() {}

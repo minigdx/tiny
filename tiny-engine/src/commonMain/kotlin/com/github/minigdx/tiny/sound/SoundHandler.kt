@@ -52,7 +52,10 @@ interface ChunkGenerator {
     fun progress(): Float = 0f
 }
 
-class BufferedChunkGenerator(private val data: FloatArray) : ChunkGenerator {
+class BufferedChunkGenerator(
+    private val data: FloatArray,
+    private val loopStartPosition: Int = 0,
+) : ChunkGenerator {
     private var position: Int = 0
 
     private val chunk = FloatData(data.size)
@@ -64,7 +67,7 @@ class BufferedChunkGenerator(private val data: FloatArray) : ChunkGenerator {
     }
 
     override fun reset() {
-        position = 0
+        position = if (loopStartPosition in 0..data.size) loopStartPosition else 0
     }
 
     override fun progress(): Float {

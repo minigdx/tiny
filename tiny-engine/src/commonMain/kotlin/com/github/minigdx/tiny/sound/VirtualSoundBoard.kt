@@ -15,8 +15,12 @@ interface VirtualSoundBoard {
 
     /**
      * Create a sound handler from a pre-computed audio buffer.
+     * @param loopStartSample sample index where looping restarts (0 = beginning)
      */
-    fun createHandler(buffer: FloatArray): SoundHandler
+    fun createHandler(
+        buffer: FloatArray,
+        loopStartSample: Int = 0,
+    ): SoundHandler
 
     fun convert(bar: MusicalPhrase): FloatArray
 

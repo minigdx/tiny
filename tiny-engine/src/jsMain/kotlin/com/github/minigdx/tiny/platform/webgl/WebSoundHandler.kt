@@ -9,6 +9,7 @@ import web.events.EventHandler
 class WebSoundHandler(
     private val chunkGenerator: ChunkGenerator,
     private val soundManager: WebSoundManager,
+    private val loopStartSample: Int = 0,
 ) : SoundHandler {
     private var audioNode: AudioBufferSourceNode? = null
     private var playing = false
@@ -20,7 +21,7 @@ class WebSoundHandler(
     }
 
     override fun loop() {
-        audioNode = soundManager.playChunkGenerator(chunkGenerator, loop = true)
+        audioNode = soundManager.playChunkGenerator(chunkGenerator, loop = true, loopStartSample = loopStartSample)
         playing = true
     }
 

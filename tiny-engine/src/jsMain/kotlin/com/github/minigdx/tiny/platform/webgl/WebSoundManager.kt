@@ -132,6 +132,7 @@ class WebSoundManager : SoundManager() {
     fun playChunkGenerator(
         chunkGenerator: ChunkGenerator,
         loop: Boolean = false,
+        loopStartSample: Int = 0,
     ): web.audio.AudioBufferSourceNode {
         if (!ready) {
             throw IllegalStateException("AudioContext is not ready")
@@ -186,6 +187,9 @@ class WebSoundManager : SoundManager() {
         val sourceNode = audioContext.createBufferSource()
         sourceNode.buffer = audioBuffer
         sourceNode.loop = loop
+        if (loop && loopStartSample > 0) {
+            sourceNode.loopStart = loopStartSample.toDouble() / SAMPLE_RATE.toDouble()
+        }
 
         // Connect directly to destination (bypass AudioWorklet)
         sourceNode.connect(audioContext.destination)
@@ -196,8 +200,11 @@ class WebSoundManager : SoundManager() {
         return sourceNode
     }
 
-    override fun createSoundHandler(buffer: FloatArray): SoundHandler {
-        val handler = WebSoundHandler(BufferedChunkGenerator(buffer), this)
+    override fun createSoundHandler(
+        buffer: FloatArray,
+        loopStartSample: Int,
+    ): SoundHandler {
+        val handler = WebSoundHandler(BufferedChunkGenerator(buffer, loopStartSample), this, loopStartSample)
         addSoundHandler(handler)
         return handler
     }

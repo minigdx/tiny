@@ -84,6 +84,7 @@ class SoundDataSourceStream(
                         tempo = sequence.tempo,
                         name = sequence.name,
                         arrangement = sequence.arrangement,
+                        loopFrom = sequence.loopFrom,
                     )
                     soundManager.convert(isolatedSequence)
                 }

@@ -59,6 +59,7 @@ class Music(
                     tempo = seq.tempo,
                     name = seq.name,
                     arrangement = seq.arrangement,
+                    loopFrom = seq.loopFrom,
                 )
             } else {
                 seq

@@ -107,7 +107,10 @@ class HeadlessPlatform(
         return object : SoundManager() {
             override fun initSoundManager(inputHandler: InputHandler) = Unit
 
-            override fun createSoundHandler(buffer: FloatArray): SoundHandler =
+            override fun createSoundHandler(
+                buffer: FloatArray,
+                loopStartSample: Int,
+            ): SoundHandler =
                 object : SoundHandler {
                     override fun play() {
                         TODO("Not yet implemented")

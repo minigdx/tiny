@@ -53,6 +53,7 @@
     "widgets/Speaker.lua",
     "widgets/Counter.lua",
     "widgets/Tracker.lua",
+    "widgets/Arrangement.lua",
     "widgets/utils.lua"
   ],
   "spritesheets": [

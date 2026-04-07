@@ -19,8 +19,11 @@ class DefaultSoundBoard(private val soundManager: SoundManager) : VirtualSoundBo
         return soundManager.createSoundHandler(buffer)
     }
 
-    override fun createHandler(buffer: FloatArray): SoundHandler {
-        return soundManager.createSoundHandler(buffer)
+    override fun createHandler(
+        buffer: FloatArray,
+        loopStartSample: Int,
+    ): SoundHandler {
+        return soundManager.createSoundHandler(buffer, loopStartSample)
     }
 
     override fun convert(bar: MusicalPhrase): FloatArray {
@@ -56,8 +59,12 @@ abstract class SoundManager {
 
     /**
      * @param buffer byte array representing the sound. Each sample is represented with a float from -1.0f to 1.0f
+     * @param loopStartSample sample index where looping restarts (0 = beginning)
      */
-    abstract fun createSoundHandler(buffer: FloatArray): SoundHandler
+    abstract fun createSoundHandler(
+        buffer: FloatArray,
+        loopStartSample: Int = 0,
+    ): SoundHandler
 
     /**
      * Convert the MusicBar into a playable sound.

@@ -46,6 +46,7 @@ local TextButton = require("widgets.TextButton")
 local Speaker = require("widgets.Speaker")
 local Counter = require("widgets.Counter")
 local Tracker = require("widgets.Tracker")
+local Arrangement = require("widgets.Arrangement")
 
 factory.create_envelop = function(self, data)
     local result = new(Envelop, data)
@@ -147,6 +148,12 @@ end
 
 factory.create_tracker = function(self, data)
     local result = new(Tracker, data)
+    result:_init()
+    return result
+end
+
+factory.create_arrangement = function(self, data)
+    local result = new(Arrangement, data)
     result:_init()
     return result
 end

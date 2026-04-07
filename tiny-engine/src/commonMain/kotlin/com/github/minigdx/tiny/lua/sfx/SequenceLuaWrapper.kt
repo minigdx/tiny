@@ -3,8 +3,11 @@ package com.github.minigdx.tiny.lua.sfx
 import com.github.minigdx.tiny.lua.WrapperLuaTable
 import com.github.minigdx.tiny.platform.Platform
 import com.github.minigdx.tiny.sound.Music
+import com.github.minigdx.tiny.sound.MusicalPattern
+import com.github.minigdx.tiny.sound.MusicalPhrase
 import com.github.minigdx.tiny.sound.MusicalSequence
 import com.github.minigdx.tiny.sound.VirtualSoundBoard
+import org.luaj.vm2.LuaValue
 import kotlin.time.TimeSource.Monotonic.markNow
 
 class SequenceLuaWrapper(
@@ -33,11 +36,76 @@ class SequenceLuaWrapper(
             { sequence.tempo = it.checkint() },
         )
 
-        function1("track") { arg ->
-            val index = arg.checkint()
-            val pattern = sequence.patterns.firstOrNull() ?: return@function1 NIL
-            val phrase = pattern.tracks.getOrNull(index) ?: return@function1 NIL
+        wrap(
+            "loopFrom",
+            { valueOf(sequence.loopFrom) },
+            { sequence.loopFrom = it.checkint() },
+        )
+
+        wrap(
+            "pattern_count",
+            { valueOf(sequence.patterns.size) },
+        )
+
+        // arrangement: read/write as a Lua table of ints (0-based pattern indices)
+        wrap(
+            "arrangement",
+            {
+                val t = WrapperLuaTable()
+                sequence.arrangement.forEachIndexed { i, v ->
+                    t.rawset(i + 1, valueOf(v))
+                }
+                t
+            },
+            { luaVal ->
+                val t = luaVal.checktable() ?: return@wrap
+                val list = mutableListOf<Int>()
+                for (i in 1..t.length()) {
+                    list.add(t.get(i).checkint())
+                }
+                sequence.arrangement = list
+            },
+        )
+
+        // track(trackIndex, patternIndex) — patternIndex defaults to 0
+        function2("track") { trackArg, patternArg ->
+            val trackIndex = trackArg.checkint()
+            val patternIndex = if (patternArg.isnil()) 0 else patternArg.checkint()
+            val pattern = sequence.patterns.getOrNull(patternIndex) ?: return@function2 NIL
+            val phrase = pattern.tracks.getOrNull(trackIndex) ?: return@function2 NIL
             TrackLuaWrapper(music, phrase)
+        }
+
+        // ensure_pattern(index) — create patterns up to the given index if they don't exist
+        function1("ensure_pattern") { arg ->
+            val patternIndex = arg.checkint()
+            if (patternIndex >= 0 && patternIndex >= sequence.patterns.size) {
+                sequence.patterns = Array(patternIndex + 1) { i ->
+                    if (i < sequence.patterns.size) {
+                        sequence.patterns[i]
+                    } else {
+                        MusicalPattern(
+                            index = i,
+                            tracks = Array(4) { channelIndex ->
+                                MusicalPhrase(
+                                    index = channelIndex,
+                                    instrumentIndex = sequence.patterns.firstOrNull()
+                                        ?.tracks?.getOrNull(channelIndex)?.instrumentIndex ?: 0,
+                                ).also { phrase ->
+                                    phrase.instrument = sequence.patterns.firstOrNull()
+                                        ?.tracks?.getOrNull(channelIndex)?.instrument
+                                    (0..32).forEach { beat ->
+                                        phrase.beats.add(
+                                            com.github.minigdx.tiny.sound.MusicalNote(null, beat.toFloat(), 1f, 1f),
+                                        )
+                                    }
+                                }
+                            },
+                        )
+                    }
+                }
+            }
+            LuaValue.valueOf(sequence.patterns.size)
         }
 
         function0("invalidate") {
@@ -50,7 +118,7 @@ class SequenceLuaWrapper(
             val totalBeats = sequence.patterns.flatMap { it.tracks.toList() }.maxOf { it.beats.size }
             val buffer = cachedBuffer ?: soundBoard.convert(sequence).also { cachedBuffer = it }
             val bufferDurationSeconds = buffer.size.toDouble() / 44100.0
-            val handler = soundBoard.createHandler(buffer).also { it.play() }
+            val handler = soundBoard.createHandler(buffer, sequence.loopStartSample).also { it.play() }
             val result = WrapperLuaTable()
             result.function0("stop") {
                 handler.stop()
@@ -70,7 +138,7 @@ class SequenceLuaWrapper(
             val totalBeats = sequence.patterns.flatMap { it.tracks.toList() }.maxOf { it.beats.size }
             val buffer = cachedBuffer ?: soundBoard.convert(sequence).also { cachedBuffer = it }
             val bufferDurationSeconds = buffer.size.toDouble() / 44100.0
-            val handler = soundBoard.createHandler(buffer).also { it.loop() }
+            val handler = soundBoard.createHandler(buffer, sequence.loopStartSample).also { it.loop() }
             val result = WrapperLuaTable()
             result.function0("stop") {
                 handler.stop()
