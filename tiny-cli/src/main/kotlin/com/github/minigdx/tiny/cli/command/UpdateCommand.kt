@@ -29,6 +29,8 @@ class UpdateCommand : CliktCommand(name = "update") {
 
     private val entryPoint by option("--entry-point", help = "Set the entry point script (moved to first in scripts list).")
 
+    private val bootScript by option("--boot-script", help = "Set a custom boot script instead of the default boot.lua.")
+
     override fun help(context: Context) = "View and update game parameters."
 
     override fun run() {
@@ -50,7 +52,7 @@ class UpdateCommand : CliktCommand(name = "update") {
             throw Abort()
         }
 
-        val hasUpdates = newZoom != null || hideMouseCursor || showMouseCursor || entryPoint != null
+        val hasUpdates = newZoom != null || hideMouseCursor || showMouseCursor || entryPoint != null || bootScript != null
         if (hasUpdates) {
             applyUpdates(gameParameters, configFile)
         } else {
@@ -90,6 +92,16 @@ class UpdateCommand : CliktCommand(name = "update") {
             echo("✅ Entry point set to $script")
         }
 
+        bootScript?.let { script ->
+            val scriptFile = gameDirectory.resolve(script)
+            if (!scriptFile.exists()) {
+                echo("❌ Boot script '$script' not found in ${gameDirectory.absolutePath}")
+                throw Abort()
+            }
+            updated = updated.setBootScript(script) as GameParametersV1
+            echo("✅ Boot script set to $script")
+        }
+
         try {
             updated.write(configFile)
         } catch (e: Exception) {
@@ -127,5 +139,6 @@ class UpdateCommand : CliktCommand(name = "update") {
         }
         echo("🔤 Fonts: $fontsDisplay")
         echo("🖱️  Hide mouse cursor: ${if (params.hideMouseCursor) "yes" else "no"}")
+        echo("⚡ Boot script: ${params.bootScript ?: "default (boot.lua)"}")
     }
 }
