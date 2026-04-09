@@ -86,7 +86,7 @@ abstract class SoundManager {
             pattern.tracks.toList()
         }
 
-        val tracks = allPhrases.filter { !it.mute && it.instrument != null }.map { phrase ->
+        val tracks = allPhrases.filter { !it.mute && it.instrument != null && it.beats.isNotEmpty() }.map { phrase ->
             // Convert notes from phrase to note for sounds.
             var current = phrase.beats.first().copy()
             val beats = mutableListOf(current)
