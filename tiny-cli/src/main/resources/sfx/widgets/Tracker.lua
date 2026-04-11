@@ -1,3 +1,6 @@
+local utils = require("widgets.utils")
+local inside_widget = utils.inside_widget
+
 local Tracker = {
     x = 0,
     y = 0,
@@ -213,6 +216,35 @@ Tracker._update = function(self)
     -- Shake timer
     if self.shake_timer > 0 then
         self.shake_timer = self.shake_timer - 1
+    end
+
+    -- Click to focus on a cell
+    if self.play_beat == nil then
+        local touched = ctrl.touched(0)
+        if touched and inside_widget(self, touched.x, touched.y) then
+            local row_h = self.line_h + self.line_gap
+            local clicked_line = math.floor((touched.y - self.y) / row_h) + self.scroll_offset + 1
+            if clicked_line >= 1 and clicked_line <= self.total_lines then
+                self.cursor_line = clicked_line
+                -- Determine which column was clicked
+                for c = self.num_cols, 1, -1 do
+                    if touched.x >= self.col_positions[c] then
+                        self.cursor_col = c
+                        -- Determine which spot within the column
+                        local local_x = touched.x - self.col_positions[c]
+                        self.cursor_spot = 1
+                        for s = #spot_offsets, 1, -1 do
+                            if local_x >= spot_offsets[s] then
+                                self.cursor_spot = s
+                                break
+                            end
+                        end
+                        break
+                    end
+                end
+                self:_ensure_visible()
+            end
+        end
     end
 
     -- Navigation with key repeat (up/down/left/right)
