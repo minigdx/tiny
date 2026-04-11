@@ -3,13 +3,25 @@ local inside_widget = utils.inside_widget
 local inside_rect = utils.inside_rect
 
 local MAX_SLOTS = 8
-local ARROW_W = 10  -- width reserved for the arrow area on the left
+local ARROW_W = 10  -- width reserved for the loop arrow area on the left
 local SLOT_PAD = 1  -- padding between slots
+
+-- Sprite coordinates on sheet 2
+local PATTERN_BG_SX, PATTERN_BG_SY = 48, 120
+local PATTERN_BG_W, PATTERN_BG_H = 26, 12
+
+local LEFT_ARROW_SX, LEFT_ARROW_SY = 48, 136
+local LEFT_ARROW_HOVER_SX, LEFT_ARROW_HOVER_SY = 48, 144
+local RIGHT_ARROW_SX, RIGHT_ARROW_SY = 56, 136
+local RIGHT_ARROW_HOVER_SX, RIGHT_ARROW_HOVER_SY = 56, 144
+local ARROW_SIZE = 8
+
+local SLOT_CONTENT_W = ARROW_SIZE + PATTERN_BG_W + ARROW_SIZE
 
 local Arrangement = {
     x = 0,
     y = 0,
-    width = 40,
+    width = ARROW_W + SLOT_CONTENT_W,
     height = 104,
     -- arrangement data: array of pattern indices (1-based Lua), nil = empty
     slots = {},
@@ -149,22 +161,26 @@ Arrangement._update = function(self)
 
     -- Check for click on slots
     if touched then
-        local sw = slot_w(self)
         local sx = slot_x(self)
         local sh = slot_height(self)
 
         for i = 1, MAX_SLOTS do
             local sy = slot_y(self, i)
-            if inside_rect(touched.x, touched.y, sx, sy, sw, sh) then
+            local pattern_x = sx + ARROW_SIZE
+            if inside_rect(touched.x, touched.y, pattern_x, sy, PATTERN_BG_W, PATTERN_BG_H) then
                 local fc = filled_count(self)
+                local is_filled = self.slots[i] ~= nil
 
-                -- Right click detection: use ctrl.touched(1) for secondary button
-                local right = ctrl.touched(1)
-                local is_right = right ~= nil and inside_rect(right.x, right.y, sx, sy, sw, sh)
+                -- Arrow positions (matching _draw)
+                local left_x = sx + 10
+                local right_x = pattern_x + PATTERN_BG_W - 8
+                local arrow_vy = sy + 3
+                local on_left_arrow = is_filled and inside_rect(touched.x, touched.y, left_x, arrow_vy, ARROW_SIZE, ARROW_SIZE)
+                local on_right_arrow = is_filled and inside_rect(touched.x, touched.y, right_x, arrow_vy, ARROW_SIZE, ARROW_SIZE)
 
-                if is_right then
-                    -- Decrement or clear
-                    if self.slots[i] ~= nil then
+                if on_right_arrow then
+                    -- Right arrow: decrement or clear
+                    if is_filled then
                         if self.slots[i] > 0 then
                             self.slots[i] = self.slots[i] - 1
                         else
@@ -174,17 +190,21 @@ Arrangement._update = function(self)
                             end
                         end
                     end
-                else
-                    -- Left click: increment or fill
-                    if self.slots[i] ~= nil then
+                elseif on_left_arrow then
+                    -- Left arrow: increment or fill next empty slot
+                    if is_filled then
                         if self.slots[i] < self.max_pattern then
                             self.slots[i] = self.slots[i] + 1
                         end
                     else
-                        -- Can only fill the next empty slot (no gaps)
                         if i == fc + 1 then
                             self.slots[i] = 0
                         end
+                    end
+                else
+                    -- Click on pattern area (not on arrows): fill next empty slot
+                    if not is_filled and i == fc + 1 then
+                        self.slots[i] = 0
                     end
                 end
 
@@ -203,27 +223,56 @@ end
 
 Arrangement._draw = function(self)
     local sh = slot_height(self)
-    local sw = slot_w(self)
     local sx = slot_x(self)
     local fc = filled_count(self)
+    local pos = ctrl.touch()
+
     text.font("monogram")
 
-    -- Draw slots
+    -- Draw slots using sprites
+    local prev = spr.sheet(2)
+
     for i = 1, MAX_SLOTS do
         local sy = slot_y(self, i)
         local is_filled = self.slots[i] ~= nil
 
-        -- Slot background
-        shape.rectf(sx, sy, sw, sh - SLOT_PAD, 2)
-        shape.rect(sx, sy, sw, sh - SLOT_PAD, 1)
+        -- Layout positions
+        local left_x = sx + 10
+        local pattern_x = sx + ARROW_SIZE
+        local right_x = pattern_x + PATTERN_BG_W - 8
+        local arrow_vy = sy + 3
 
-        -- Slot content
+        -- Pattern button background
+        spr.sdraw(pattern_x, sy, PATTERN_BG_SX, PATTERN_BG_SY, PATTERN_BG_W, PATTERN_BG_H)
+
+        -- Left arrow (shown if clicking it would do something)
+        local show_left = is_filled or i == fc + 1
+        if show_left then
+            local left_hover = inside_rect(pos.x, pos.y, left_x, arrow_vy, ARROW_SIZE, ARROW_SIZE)
+            if left_hover then
+                spr.sdraw(left_x, arrow_vy, LEFT_ARROW_HOVER_SX, LEFT_ARROW_HOVER_SY, ARROW_SIZE, ARROW_SIZE)
+            else
+                spr.sdraw(left_x, arrow_vy, LEFT_ARROW_SX, LEFT_ARROW_SY, ARROW_SIZE, ARROW_SIZE)
+            end
+        end
+
         if is_filled then
+            -- Pattern ID text (centered on pattern background)
             local val_str = tostring(self.slots[i])
-            local tx = sx + math.floor(sw / 2) - math.floor(#val_str * 3)
+            local tx = pattern_x + math.floor(PATTERN_BG_W / 2) - math.floor(#val_str * 3)
             text.print(val_str, tx, sy + 1, 1)
+
+            -- Right arrow (only for filled slots)
+            local right_hover = inside_rect(pos.x, pos.y, right_x, arrow_vy, ARROW_SIZE, ARROW_SIZE)
+            if right_hover then
+                spr.sdraw(right_x, arrow_vy, RIGHT_ARROW_HOVER_SX, RIGHT_ARROW_HOVER_SY, ARROW_SIZE, ARROW_SIZE)
+            else
+                spr.sdraw(right_x, arrow_vy, RIGHT_ARROW_SX, RIGHT_ARROW_SY, ARROW_SIZE, ARROW_SIZE)
+            end
         end
     end
+
+    spr.sheet(prev)
 
     -- Draw loop arrow
     local arrow_slot = self.loop_index
