@@ -9,8 +9,9 @@ import kotlinx.serialization.Transient
 
 /**
  * A musical phrase is holding musical notes.
- * A musical phrase is holding 32 beats.
+ * A musical phrase is holding up to 32 beats.
  * A musical phrase without an instrument will not be played.
+ * A musical phrase will play only [duration] beats
  *
  * If the last note duration is longer the remaining time,
  * the note will be cut.
@@ -33,6 +34,14 @@ class MusicalPhrase(
     var name: String? = "SFX $index",
     var volume: Percent = 1.0f,
     var mute: Boolean = false,
+    /**
+     * Duration of the phase.
+     *
+     * Only the number of [duration] beats will be played before being looped again,
+     *
+     * For example: if a [duration] is 12, then beats after the 12 will be ignored, when played.
+     */
+    val duration: Int = 32,
 ) {
     val beats: MutableList<MusicalNote> = mutableListOf()
 

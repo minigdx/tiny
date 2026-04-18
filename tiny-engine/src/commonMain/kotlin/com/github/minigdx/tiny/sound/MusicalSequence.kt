@@ -25,8 +25,15 @@ class MusicalSequence(
     var patterns: Array<MusicalPattern> = arrayOf(MusicalPattern(0)),
     var tempo: BPM = 120,
     var name: String? = null,
+    /**
+     * Index of the pattern in which order the sequence is played.
+     */
     var arrangement: List<Int> = listOf(0),
-    var loopFrom: Int = 0,
+    /**
+     * After the last pattern of the arrangement is played,
+     * when the sequence is looped, it will start back at [loopFrom] index.
+     */
+    var loopFrom: Int = -1,
 ) {
     /**
      * Compute the sample index where looping should restart.
