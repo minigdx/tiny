@@ -25,9 +25,13 @@ Knob._init = function(self)
 end
 
 Knob._draw = function(self)
+
     local prev = spr.sheet(2)
     local i = math.floor(self.value * 6)
 
+    if self.is_hover or self.start_value then
+        spr.sdraw(self.x - 1, self.y - 1, 104, 24, 18, 18)
+    end
     spr.sdraw(self.x, self.y, 24 + self.color * 16, 24, 16, 16)
     spr.sdraw(self.x, self.y, 24 + i * 16, 56, 16, 16)
 
