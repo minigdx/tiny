@@ -3,59 +3,56 @@ local inside_widget = utils.inside_widget
 local inside_rect = utils.inside_rect
 
 local MAX_SLOTS = 8
-local ARROW_W = 10  -- width reserved for the loop arrow area on the left
-local SLOT_PAD = 1  -- padding between slots
+
+-- Layout offsets (relative to widget.x/.y)
+local POPUP_DY = 0
+local MAIN_DY = 14
+local STR_DY = 28
+local FIRST_SLOT_DX = 8
+local SLOT_STRIDE = 13
+
+-- Pattern sprite footprint
+local PATTERN_W = 11
+local PATTERN_H = 13
 
 -- Sprite coordinates on sheet 2
-local PATTERN_BG_SX, PATTERN_BG_SY = 48, 120
-local PATTERN_BG_W, PATTERN_BG_H = 26, 12
+local EMPTY_AVAIL_SX, EMPTY_AVAIL_SY = 0, 136
+local EMPTY_NOTAVAIL_SX, EMPTY_NOTAVAIL_SY = 16, 136
+local HOVER_BORDER_SX, HOVER_BORDER_SY = 0, 152
+local HOVER_BORDER_W = 12
+local HOVER_BORDER_H = 14
 
-local LEFT_ARROW_SX, LEFT_ARROW_SY = 48, 136
-local LEFT_ARROW_HOVER_SX, LEFT_ARROW_HOVER_SY = 48, 144
-local RIGHT_ARROW_SX, RIGHT_ARROW_SY = 56, 136
-local RIGHT_ARROW_HOVER_SX, RIGHT_ARROW_HOVER_SY = 56, 144
-local ARROW_SIZE = 8
-
-local SLOT_CONTENT_W = ARROW_SIZE + PATTERN_BG_W + ARROW_SIZE
-
-local Arrangement = {
-    x = 0,
-    y = 0,
-    width = ARROW_W + SLOT_CONTENT_W,
-    height = 104,
-    -- arrangement data: array of pattern indices (1-based Lua), nil = empty
-    slots = {},
-    -- loop arrow position (0-based arrangement index, -1 = no loop)
-    loop_index = 0,
-    -- max pattern index (0-based) the user can assign
-    max_pattern = 0,
-    -- dragging state for the loop arrow
-    dragging = false,
-    drag_start_y = 0,
-    -- callback
-    on_change = function(self) end,
-    listeners = {},
-    on_update = utils.on_update,
-    fire_on_update = utils.fire_on_update,
+-- Color sprites cycled per pattern index (A..H)
+local COLOR_SPRITES = {
+    { 16, 152 }, -- yellow
+    { 32, 152 }, -- pink
+    { 48, 152 }, -- light white
+    { 64, 152 }, -- green
 }
 
-local function slot_height(self)
-    return math.floor(self.height / MAX_SLOTS)
+-- Arrow sprites (popup selector)
+local ARROW_SIZE = 8
+local ARROW_RIGHT_SX, ARROW_RIGHT_SY = 32, 136
+local ARROW_LEFT_SX, ARROW_LEFT_SY = 32, 144
+local ARROW_RIGHT_HOVER_SX, ARROW_RIGHT_HOVER_SY = 40, 136
+local ARROW_LEFT_HOVER_SX, ARROW_LEFT_HOVER_SY = 40, 144
+
+-- Palette indices
+local COLOR_TEXT_DARK = 1
+local COLOR_STR_BG = 7      -- orange
+local COLOR_STR_PREVIEW = 2 -- muted blue-grey
+local COLOR_WHITE = 11
+
+-- STR label dimensions
+local STR_W = 13
+local STR_H = 6
+local STR_BORDER_W = 14
+local STR_BORDER_H = 8
+
+local function index_to_letter(i)
+    return string.char(string.byte("A") + i)
 end
 
-local function slot_y(self, i)
-    return self.y + (i - 1) * slot_height(self)
-end
-
-local function slot_x(self)
-    return self.x + ARROW_W
-end
-
-local function slot_w(self)
-    return self.width - ARROW_W
-end
-
--- How many slots are filled (non-nil)?
 local function filled_count(self)
     local count = 0
     for i = 1, MAX_SLOTS do
@@ -68,28 +65,100 @@ local function filled_count(self)
     return count
 end
 
--- Arrow handle area (small rectangle next to the triangle)
-local function arrow_handle_rect(self)
-    local idx = self.loop_index + 1  -- 1-based
-    local fc = filled_count(self)
-    if fc == 0 then fc = 1 end
-    -- Clamp arrow to valid range
-    if idx < 1 then idx = 1 end
-    if idx > fc then idx = fc end
-    local sy = slot_y(self, idx)
-    local sh = slot_height(self)
-    local handle_y = sy + math.floor(sh / 2) - 3
-    return self.x, handle_y, ARROW_W - 2, 7
+local function pattern_sprite_for(idx)
+    if idx == nil then
+        return EMPTY_AVAIL_SX, EMPTY_AVAIL_SY
+    end
+    local c = COLOR_SPRITES[(idx % 4) + 1]
+    return c[1], c[2]
 end
+
+local function slot_main_pos(self, i)
+    return self.x + FIRST_SLOT_DX + (i - 1) * SLOT_STRIDE, self.y + MAIN_DY
+end
+
+local function slot_popup_pos(self, i)
+    return self.x + FIRST_SLOT_DX + (i - 1) * SLOT_STRIDE, self.y + POPUP_DY
+end
+
+local function slot_str_pos(self, i)
+    return self.x + FIRST_SLOT_DX + (i - 1) * SLOT_STRIDE, self.y + STR_DY
+end
+
+
+local function draw_str_label(x, y, bg, fg)
+    shape.rectf(x, y, STR_W, STR_H, bg)
+    local tx = x + 1
+    local ty = y + 1
+    print("str", tx, ty, fg)
+end
+
+local function draw_str_border(x, y)
+    shape.rect(x - 1, y - 1, STR_BORDER_W, STR_BORDER_H, COLOR_WHITE)
+end
+
+local function cycle_value(self, i, dir)
+    local current = self.slots[i]
+    local fc = filled_count(self)
+    local can_unset = (current ~= nil) and (i == fc) and (i > 1)
+
+    if dir > 0 then
+        if current == nil then
+            self.slots[i] = 0
+        elseif current >= self.max_pattern then
+            if can_unset then
+                self.slots[i] = nil
+            else
+                self.slots[i] = 0
+            end
+        else
+            self.slots[i] = current + 1
+        end
+    else
+        if current == nil then
+            self.slots[i] = self.max_pattern
+        elseif current <= 0 then
+            if can_unset then
+                self.slots[i] = nil
+            else
+                self.slots[i] = self.max_pattern
+            end
+        else
+            self.slots[i] = current - 1
+        end
+    end
+end
+
+local function clamp_loop(self)
+    local fc = filled_count(self)
+    if self.loop_index >= fc then
+        self.loop_index = -1
+    end
+end
+
+local Arrangement = {
+    x = 0,
+    y = 0,
+    width = 264,
+    height = 32,
+    slots = {},
+    loop_index = 0,
+    max_pattern = 0,
+    selected_slot = nil,
+    on_change = function(self) end,
+    listeners = {},
+    on_update = utils.on_update,
+    fire_on_update = utils.fire_on_update,
+}
 
 Arrangement._init = function(self)
     self.slots = {}
     for i = 1, MAX_SLOTS do
         self.slots[i] = nil
     end
+    self.selected_slot = nil
 end
 
--- Load arrangement data from a sequence object
 Arrangement.load_from_sequence = function(self, seq)
     local arr = seq.arrangement
     for i = 1, MAX_SLOTS do
@@ -102,9 +171,9 @@ Arrangement.load_from_sequence = function(self, seq)
     end
     self.loop_index = seq.loopFrom or 0
     self.max_pattern = seq.pattern_count - 1
+    self.selected_slot = nil
 end
 
--- Write arrangement data back to a sequence object
 Arrangement.sync_to_sequence = function(self, seq)
     local arr = {}
     for i = 1, MAX_SLOTS do
@@ -122,196 +191,177 @@ Arrangement.sync_to_sequence = function(self, seq)
 end
 
 Arrangement._update = function(self)
-    local pos = ctrl.touch()
-
-    -- Handle drag of loop arrow
-    if self.dragging then
-        local touching = ctrl.touching(0)
-        if touching then
-            -- Compute which slot the mouse is closest to
-            local sh = slot_height(self)
-            local rel_y = pos.y - self.y
-            local slot_idx = math.floor(rel_y / sh)
-            local fc = filled_count(self)
-            if fc == 0 then fc = 1 end
-            -- Clamp: 0 to fc (fc means "after the last pattern" = no loop)
-            slot_idx = math.max(0, math.min(fc, slot_idx))
-            if slot_idx >= fc then
-                -- Past the last filled slot = no loop
-                self.loop_index = -1
-            else
-                self.loop_index = slot_idx
-            end
-        else
-            self.dragging = false
-            self:on_change()
-        end
+    local touched = ctrl.touched(0)
+    if not touched then
         return
     end
 
-    -- Check for click/touch on the arrow handle to start drag
-    local touched = ctrl.touched(0)
-    if touched then
-        local hx, hy, hw, hh = arrow_handle_rect(self)
-        if inside_rect(touched.x, touched.y, hx, hy, hw, hh) then
-            self.dragging = true
+    -- Popup arrows take priority
+    if self.selected_slot then
+        local px, py = slot_popup_pos(self, self.selected_slot)
+        local arrow_y = py + math.floor((PATTERN_H - ARROW_SIZE) / 2)
+        local left_ax = px - ARROW_SIZE
+        local right_ax = px + PATTERN_W
+
+        if inside_rect(touched.x, touched.y, left_ax, arrow_y, ARROW_SIZE, ARROW_SIZE) then
+            cycle_value(self, self.selected_slot, -1)
+            if self.slots[self.selected_slot] == nil then
+                self.selected_slot = nil
+            end
+            clamp_loop(self)
+            self:on_change()
+            return
+        end
+
+        if inside_rect(touched.x, touched.y, right_ax, arrow_y, ARROW_SIZE, ARROW_SIZE) then
+            cycle_value(self, self.selected_slot, 1)
+            if self.slots[self.selected_slot] == nil then
+                self.selected_slot = nil
+            end
+            clamp_loop(self)
+            self:on_change()
+            return
+        end
+
+        if inside_rect(touched.x, touched.y, px, py, PATTERN_W, PATTERN_H) then
             return
         end
     end
 
-    -- Check for click on slots
-    if touched then
-        local sx = slot_x(self)
-        local sh = slot_height(self)
-
-        for i = 1, MAX_SLOTS do
-            local sy = slot_y(self, i)
-            local pattern_x = sx + ARROW_SIZE
-            if inside_rect(touched.x, touched.y, pattern_x, sy, PATTERN_BG_W, PATTERN_BG_H) then
-                local fc = filled_count(self)
-                local is_filled = self.slots[i] ~= nil
-
-                -- Arrow positions (matching _draw)
-                local left_x = sx + 10
-                local right_x = pattern_x + PATTERN_BG_W - 8
-                local arrow_vy = sy + 3
-                local on_left_arrow = is_filled and inside_rect(touched.x, touched.y, left_x, arrow_vy, ARROW_SIZE, ARROW_SIZE)
-                local on_right_arrow = is_filled and inside_rect(touched.x, touched.y, right_x, arrow_vy, ARROW_SIZE, ARROW_SIZE)
-
-                if on_right_arrow then
-                    -- Right arrow: decrement or clear
-                    if is_filled then
-                        if self.slots[i] > 0 then
-                            self.slots[i] = self.slots[i] - 1
-                        else
-                            -- Can only clear if it's the last filled slot
-                            if i == fc and i > 1 then
-                                self.slots[i] = nil
-                            end
-                        end
-                    end
-                elseif on_left_arrow then
-                    -- Left arrow: increment or fill next empty slot
-                    if is_filled then
-                        if self.slots[i] < self.max_pattern then
-                            self.slots[i] = self.slots[i] + 1
-                        end
-                    else
-                        if i == fc + 1 then
-                            self.slots[i] = 0
-                        end
-                    end
+    -- STR label: toggle loop start on the clicked slot
+    for i = 1, MAX_SLOTS do
+        if self.slots[i] ~= nil then
+            local sx, sy = slot_str_pos(self, i)
+            if inside_rect(touched.x, touched.y, sx, sy, STR_W, STR_H) then
+                if self.loop_index == i - 1 then
+                    self.loop_index = -1
                 else
-                    -- Click on pattern area (not on arrows): fill next empty slot
-                    if not is_filled and i == fc + 1 then
-                        self.slots[i] = 0
-                    end
+                    self.loop_index = i - 1
                 end
-
-                -- Adjust loop_index if it points past the filled area
-                local new_fc = filled_count(self)
-                if self.loop_index >= new_fc then
-                    self.loop_index = math.max(0, new_fc - 1)
-                end
-
                 self:on_change()
-                break
+                return
             end
         end
+    end
+
+    -- Main row: fill an empty-available slot or toggle popup on a filled slot
+    local fc = filled_count(self)
+    for i = 1, MAX_SLOTS do
+        local sx, sy = slot_main_pos(self, i)
+        if inside_rect(touched.x, touched.y, sx, sy, PATTERN_W, PATTERN_H) then
+            local is_filled = self.slots[i] ~= nil
+            local is_available = (not is_filled) and i == fc + 1
+
+            if is_filled then
+                if self.selected_slot == i then
+                    self.selected_slot = nil
+                else
+                    self.selected_slot = i
+                end
+            elseif is_available then
+                self.slots[i] = 0
+                self.selected_slot = i
+                self:on_change()
+            end
+            return
+        end
+    end
+
+    if self.selected_slot then
+        self.selected_slot = nil
     end
 end
 
 Arrangement._draw = function(self)
-    local sh = slot_height(self)
-    local sx = slot_x(self)
-    local fc = filled_count(self)
     local pos = ctrl.touch()
+    local prev = spr.sheet(2)
+    local fc = filled_count(self)
 
     text.font("monogram")
 
-    -- Draw slots using sprites
-    local prev = spr.sheet(2)
-
+    -- Main row of pattern squares
     for i = 1, MAX_SLOTS do
-        local sy = slot_y(self, i)
+        local sx, sy = slot_main_pos(self, i)
         local is_filled = self.slots[i] ~= nil
+        local is_available = (not is_filled) and i == fc + 1
 
-        -- Layout positions
-        local left_x = sx + 10
-        local pattern_x = sx + ARROW_SIZE
-        local right_x = pattern_x + PATTERN_BG_W - 8
-        local arrow_vy = sy + 3
-
-        -- Pattern button background
-        spr.sdraw(pattern_x, sy, PATTERN_BG_SX, PATTERN_BG_SY, PATTERN_BG_W, PATTERN_BG_H)
-
-        -- Left arrow (shown if clicking it would do something)
-        local show_left = is_filled or i == fc + 1
-        if show_left then
-            local left_hover = inside_rect(pos.x, pos.y, left_x, arrow_vy, ARROW_SIZE, ARROW_SIZE)
-            if left_hover then
-                spr.sdraw(left_x, arrow_vy, LEFT_ARROW_HOVER_SX, LEFT_ARROW_HOVER_SY, ARROW_SIZE, ARROW_SIZE)
-            else
-                spr.sdraw(left_x, arrow_vy, LEFT_ARROW_SX, LEFT_ARROW_SY, ARROW_SIZE, ARROW_SIZE)
-            end
+        local sp_x, sp_y
+        if is_filled then
+            sp_x, sp_y = pattern_sprite_for(self.slots[i])
+        elseif is_available then
+            sp_x, sp_y = EMPTY_AVAIL_SX, EMPTY_AVAIL_SY
+        else
+            sp_x, sp_y = EMPTY_NOTAVAIL_SX, EMPTY_NOTAVAIL_SY
         end
+
+        spr.sdraw(sx, sy, sp_x, sp_y, PATTERN_W, PATTERN_H)
 
         if is_filled then
-            -- Pattern ID text (centered on pattern background)
-            local val_str = tostring(self.slots[i])
-            local tx = pattern_x + math.floor(PATTERN_BG_W / 2) - math.floor(#val_str * 3)
-            text.print(val_str, tx, sy + 1, 1)
-
-            -- Right arrow (only for filled slots)
-            local right_hover = inside_rect(pos.x, pos.y, right_x, arrow_vy, ARROW_SIZE, ARROW_SIZE)
-            if right_hover then
-                spr.sdraw(right_x, arrow_vy, RIGHT_ARROW_HOVER_SX, RIGHT_ARROW_HOVER_SY, ARROW_SIZE, ARROW_SIZE)
-            else
-                spr.sdraw(right_x, arrow_vy, RIGHT_ARROW_SX, RIGHT_ARROW_SY, ARROW_SIZE, ARROW_SIZE)
-            end
+            local letter = index_to_letter(self.slots[i])
+            text.print(letter, sx + 2, sy + 1, COLOR_TEXT_DARK)
         end
+
+        if inside_rect(pos.x, pos.y, sx, sy, PATTERN_W, PATTERN_H) then
+            spr.sdraw(sx, sy, HOVER_BORDER_SX, HOVER_BORDER_SY, HOVER_BORDER_W, HOVER_BORDER_H)
+        end
+    end
+
+    -- Popup above the selected slot
+    if self.selected_slot then
+        local i = self.selected_slot
+        local px, py = slot_popup_pos(self, i)
+        local arrow_y = py + math.floor((PATTERN_H - ARROW_SIZE) / 2)
+        local left_ax = px - ARROW_SIZE
+        local right_ax = px + PATTERN_W + 3
+
+        local idx = self.slots[i]
+        local sp_x, sp_y = pattern_sprite_for(idx)
+        spr.sdraw(px, py, sp_x, sp_y, PATTERN_W, PATTERN_H)
+
+        if idx ~= nil then
+            local letter = index_to_letter(idx)
+            text.print(letter, px + 2, py + 1, COLOR_TEXT_DARK)
+        end
+
+        local left_hover = inside_rect(pos.x, pos.y, left_ax, arrow_y, ARROW_SIZE, ARROW_SIZE)
+        local right_hover = inside_rect(pos.x, pos.y, right_ax, arrow_y, ARROW_SIZE, ARROW_SIZE)
+
+        local lsx, lsy = ARROW_LEFT_SX, ARROW_LEFT_SY
+        if left_hover then
+            lsx, lsy = ARROW_LEFT_HOVER_SX, ARROW_LEFT_HOVER_SY
+        end
+        spr.sdraw(left_ax, arrow_y, lsx, lsy, ARROW_SIZE, ARROW_SIZE)
+
+        local rsx, rsy = ARROW_RIGHT_SX, ARROW_RIGHT_SY
+        if right_hover then
+            rsx, rsy = ARROW_RIGHT_HOVER_SX, ARROW_RIGHT_HOVER_SY
+        end
+        spr.sdraw(right_ax, arrow_y, rsx, rsy, ARROW_SIZE, ARROW_SIZE)
     end
 
     spr.sheet(prev)
 
-    -- Draw loop arrow
-    local arrow_slot = self.loop_index
-    if arrow_slot >= 0 and fc > 0 then
-        local arrow_i = arrow_slot + 1  -- 1-based
-        if arrow_i > fc then arrow_i = fc end
-        local ay = slot_y(self, arrow_i) + math.floor(sh / 2)
+    -- STR labels: orange on the loop start, preview on hover of other filled slots
+    for i = 1, MAX_SLOTS do
+        if self.slots[i] ~= nil then
+            local sx, sy = slot_str_pos(self, i)
+            local px, py = slot_main_pos(self, i)
+            local is_loop = (self.loop_index == i - 1)
+            local over_pattern = inside_rect(pos.x, pos.y, px, py, PATTERN_W, PATTERN_H)
+            local over_str = inside_rect(pos.x, pos.y, sx, sy, STR_W, STR_H)
 
-        -- Dithered vertical line from arrow to bottom of filled area
-        local line_top = slot_y(self, 1) + 2
-        local line_bottom = slot_y(self, fc) + sh - 3
-        local line_x = self.x + 3
-
-        gfx.dither(0x5050)
-        shape.line(line_x, line_top, line_x, line_bottom, 3)
-        gfx.dither()
-
-        -- Arrow triangle (pointing right)
-        local tx = self.x + 1
-        local ty = ay
-        shape.rectf(tx, ty - 2, 5, 5, 6)
-        -- Triangle shape: draw 3 rows
-        gfx.pset(tx + 5, ty - 1, 6)
-        gfx.pset(tx + 5, ty, 6)
-        gfx.pset(tx + 5, ty + 1, 6)
-        gfx.pset(tx + 6, ty, 6)
-
-        -- Arrow handle (small rectangle for dragging)
-        shape.rectf(self.x, ay - 3, 2, 7, 6)
-    elseif fc > 0 then
-        -- No loop: show a small mark at the last slot
-        local ay = slot_y(self, fc) + math.floor(sh / 2)
-        local line_x = self.x + 3
-        gfx.dither(0x5050)
-        shape.line(line_x, slot_y(self, 1) + 2, line_x, ay, 3)
-        gfx.dither()
-        -- X mark to indicate no loop
-        shape.line(self.x + 1, ay - 2, self.x + 5, ay + 2, 4)
-        shape.line(self.x + 5, ay - 2, self.x + 1, ay + 2, 4)
+            if is_loop then
+                draw_str_label(sx, sy, COLOR_STR_BG, COLOR_TEXT_DARK)
+                if over_str then
+                    draw_str_border(sx, sy)
+                end
+            elseif over_pattern or over_str then
+                draw_str_label(sx, sy, COLOR_STR_PREVIEW, COLOR_TEXT_DARK)
+                if over_str then
+                    draw_str_border(sx, sy)
+                end
+            end
+        end
     end
 
     text.font()
