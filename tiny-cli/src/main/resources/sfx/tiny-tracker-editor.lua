@@ -40,6 +40,19 @@ local function sync_current_pattern()
     tracker_widget:sync_to_sequence(state.seq, state.pattern_index)
 end
 
+local function arrangement_filled_count()
+    if not arrangement_widget then return 0 end
+    local count = 0
+    for i = 1, 8 do
+        if arrangement_widget.slots[i] ~= nil then
+            count = count + 1
+        else
+            break
+        end
+    end
+    return count
+end
+
 local function stop_playback()
     if play_handler then
         play_handler.stop()
@@ -48,6 +61,10 @@ local function stop_playback()
     play_handler = nil
     if tracker_widget then
         tracker_widget.play_beat = nil
+    end
+    if arrangement_widget then
+        arrangement_widget.playing = false
+        arrangement_widget.play_slot = nil
     end
     for s in all(speaker_widgets) do
         s.playing = false
@@ -64,6 +81,11 @@ local function start_playback()
     end
     play_handler = state.seq.loop()
     playing = true
+    if arrangement_widget then
+        arrangement_widget.playing = true
+        local fc = arrangement_filled_count()
+        arrangement_widget.play_slot = fc > 0 and 1 or nil
+    end
     for s in all(speaker_widgets) do
         s.playing = true
     end
@@ -186,6 +208,13 @@ function _init()
             -- Update max_pattern from sequence
             self.max_pattern = state.seq.pattern_count - 1
         end
+        arrangement_widget.on_play_toggle = function()
+            if playing then
+                stop_playback()
+            else
+                start_playback()
+            end
+        end
     end
 
     -- Load sequence data into tracker
@@ -242,6 +271,14 @@ function _update()
             if beat and tracker_widget then
                 tracker_widget.play_beat = beat % 32
                 tracker_widget:_update_play_position()
+            end
+            if beat and arrangement_widget then
+                local fc = arrangement_filled_count()
+                if fc > 0 then
+                    arrangement_widget.play_slot = (math.floor(beat / 32) % fc) + 1
+                else
+                    arrangement_widget.play_slot = nil
+                end
             end
         end
     end

@@ -8,7 +8,8 @@ local MAX_SLOTS = 8
 local POPUP_DY = 0
 local MAIN_DY = 14
 local STR_DY = 28
-local FIRST_SLOT_DX = 8
+local PLAY_DX = 8
+local FIRST_SLOT_DX = 21
 local SLOT_STRIDE = 13
 
 -- Pattern sprite footprint
@@ -21,6 +22,14 @@ local EMPTY_NOTAVAIL_SX, EMPTY_NOTAVAIL_SY = 16, 136
 local HOVER_BORDER_SX, HOVER_BORDER_SY = 0, 152
 local HOVER_BORDER_W = 12
 local HOVER_BORDER_H = 14
+local PLAYING_BORDER_SX, PLAYING_BORDER_SY = 0, 168
+
+-- Play button sprites
+local PLAY_BG_SX, PLAY_BG_SY = 16, 136
+local PLAY_ICON_SX, PLAY_ICON_SY = 40, 88
+local PAUSE_ICON_SX, PAUSE_ICON_SY = 56, 88
+local PLAY_ICON_W = 8
+local PLAY_ICON_H = 10
 
 -- Color sprites cycled per pattern index (A..H)
 local COLOR_SPRITES = {
@@ -145,11 +154,18 @@ local Arrangement = {
     loop_index = 0,
     max_pattern = 0,
     selected_slot = nil,
+    playing = false,
+    play_slot = nil,
     on_change = function(self) end,
+    on_play_toggle = function(self) end,
     listeners = {},
     on_update = utils.on_update,
     fire_on_update = utils.fire_on_update,
 }
+
+local function play_button_pos(self)
+    return self.x + PLAY_DX, self.y + MAIN_DY
+end
 
 Arrangement._init = function(self)
     self.slots = {}
@@ -193,6 +209,13 @@ end
 Arrangement._update = function(self)
     local touched = ctrl.touched(0)
     if not touched then
+        return
+    end
+
+    -- Play button
+    local pbx, pby = play_button_pos(self)
+    if inside_rect(touched.x, touched.y, pbx, pby, PATTERN_W, PATTERN_H) then
+        self:on_play_toggle()
         return
     end
 
@@ -279,6 +302,18 @@ Arrangement._draw = function(self)
 
     text.font("monogram")
 
+    -- Play button
+    local pbx, pby = play_button_pos(self)
+    spr.sdraw(pbx, pby, PLAY_BG_SX, PLAY_BG_SY, PATTERN_W, PATTERN_H)
+    local icon_sx = self.playing and PAUSE_ICON_SX or PLAY_ICON_SX
+    local icon_sy = self.playing and PAUSE_ICON_SY or PLAY_ICON_SY
+    local icon_x = pbx + math.floor((PATTERN_W - PLAY_ICON_W) / 2)
+    local icon_y = pby + math.floor((PATTERN_H - PLAY_ICON_H) / 2)
+    spr.sdraw(icon_x, icon_y, icon_sx, icon_sy, PLAY_ICON_W, PLAY_ICON_H)
+    if inside_rect(pos.x, pos.y, pbx, pby, PATTERN_W, PATTERN_H) then
+        spr.sdraw(pbx, pby, HOVER_BORDER_SX, HOVER_BORDER_SY, HOVER_BORDER_W, HOVER_BORDER_H)
+    end
+
     -- Main row of pattern squares
     for i = 1, MAX_SLOTS do
         local sx, sy = slot_main_pos(self, i)
@@ -299,6 +334,10 @@ Arrangement._draw = function(self)
         if is_filled then
             local letter = index_to_letter(self.slots[i])
             text.print(letter, sx + 2, sy + 1, COLOR_TEXT_DARK)
+        end
+
+        if self.playing and self.play_slot == i and is_filled then
+            spr.sdraw(sx, sy, PLAYING_BORDER_SX, PLAYING_BORDER_SY, HOVER_BORDER_W, HOVER_BORDER_H)
         end
 
         if inside_rect(pos.x, pos.y, sx, sy, PATTERN_W, PATTERN_H) then
