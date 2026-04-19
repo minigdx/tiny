@@ -9960,9 +9960,9 @@
 							"defUid": 71,
 							"px": [200,72],
 							"fieldInstances": [
-								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "HardBlue", "__tile": null, "defUid": 74, "realEditorValues": [{
+								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "Green", "__tile": null, "defUid": 74, "realEditorValues": [{
 									"id": "V_String",
-									"params": ["HardBlue"]
+									"params": ["Green"]
 								}] },
 								{ "__identifier": "Label", "__type": "String", "__value": "Rythm", "__tile": null, "defUid": 81, "realEditorValues": [{
 									"id": "V_String",
@@ -12008,7 +12008,10 @@
 							"fieldInstances": [
 								{ "__identifier": "Label", "__type": "String", "__value": "", "__tile": null, "defUid": 79, "realEditorValues": [] },
 								{ "__identifier": "IsActive", "__type": "Bool", "__value": false, "__tile": null, "defUid": 80, "realEditorValues": [] },
-								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "HardBlue", "__tile": null, "defUid": 82, "realEditorValues": [] },
+								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "Orange", "__tile": null, "defUid": 82, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Orange"]
+								}] },
 								{ "__identifier": "TinyExit", "__type": "String", "__value": null, "__tile": null, "defUid": 83, "realEditorValues": [] },
 								{ "__identifier": "Action", "__type": "LocalEnum.Action", "__value": null, "__tile": null, "defUid": 84, "realEditorValues": [] }
 							],
@@ -12030,7 +12033,10 @@
 							"fieldInstances": [
 								{ "__identifier": "Label", "__type": "String", "__value": "", "__tile": null, "defUid": 79, "realEditorValues": [] },
 								{ "__identifier": "IsActive", "__type": "Bool", "__value": false, "__tile": null, "defUid": 80, "realEditorValues": [] },
-								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "HardBlue", "__tile": null, "defUid": 82, "realEditorValues": [] },
+								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "Green", "__tile": null, "defUid": 82, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Green"]
+								}] },
 								{ "__identifier": "TinyExit", "__type": "String", "__value": null, "__tile": null, "defUid": 83, "realEditorValues": [] },
 								{ "__identifier": "Action", "__type": "LocalEnum.Action", "__value": null, "__tile": null, "defUid": 84, "realEditorValues": [] }
 							],
@@ -12052,7 +12058,10 @@
 							"fieldInstances": [
 								{ "__identifier": "Label", "__type": "String", "__value": "", "__tile": null, "defUid": 79, "realEditorValues": [] },
 								{ "__identifier": "IsActive", "__type": "Bool", "__value": false, "__tile": null, "defUid": 80, "realEditorValues": [] },
-								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "HardBlue", "__tile": null, "defUid": 82, "realEditorValues": [] },
+								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "Purple", "__tile": null, "defUid": 82, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Purple"]
+								}] },
 								{ "__identifier": "TinyExit", "__type": "String", "__value": null, "__tile": null, "defUid": 83, "realEditorValues": [] },
 								{ "__identifier": "Action", "__type": "LocalEnum.Action", "__value": null, "__tile": null, "defUid": 84, "realEditorValues": [] }
 							],
@@ -12074,7 +12083,10 @@
 							"fieldInstances": [
 								{ "__identifier": "Label", "__type": "String", "__value": "", "__tile": null, "defUid": 79, "realEditorValues": [] },
 								{ "__identifier": "IsActive", "__type": "Bool", "__value": false, "__tile": null, "defUid": 80, "realEditorValues": [] },
-								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "HardBlue", "__tile": null, "defUid": 82, "realEditorValues": [] },
+								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "Orange", "__tile": null, "defUid": 82, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Orange"]
+								}] },
 								{ "__identifier": "TinyExit", "__type": "String", "__value": null, "__tile": null, "defUid": 83, "realEditorValues": [] },
 								{ "__identifier": "Action", "__type": "LocalEnum.Action", "__value": null, "__tile": null, "defUid": 84, "realEditorValues": [] }
 							],
@@ -12145,9 +12157,9 @@
 							"defUid": 71,
 							"px": [86,46],
 							"fieldInstances": [
-								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "HardBlue", "__tile": null, "defUid": 74, "realEditorValues": [{
+								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "Green", "__tile": null, "defUid": 74, "realEditorValues": [{
 									"id": "V_String",
-									"params": ["HardBlue"]
+									"params": ["Green"]
 								}] },
 								{ "__identifier": "Label", "__type": "String", "__value": "Rythm", "__tile": null, "defUid": 81, "realEditorValues": [{
 									"id": "V_String",

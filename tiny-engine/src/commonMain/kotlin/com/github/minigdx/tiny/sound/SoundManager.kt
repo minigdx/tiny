@@ -86,7 +86,17 @@ abstract class SoundManager {
             pattern.tracks.toList()
         }
 
-        val tracks = allPhrases.filter { !it.mute && it.instrument != null && it.beats.isNotEmpty() }.map { phrase ->
+        val activePhrases = allPhrases.filter { !it.mute && it.instrument != null && it.beats.isNotEmpty() }
+        if (activePhrases.isEmpty()) return floatArrayOf()
+
+        // Use the exact musical duration so looping is seamless.
+        // Release tails extending past the sequence boundary are truncated,
+        // which is standard for looping patterns.
+        val secondsPerBeat = 60f / sequence.tempo
+        val totalBeats = allPhrases.maxOf { it.beats.size }
+        val resultSize = (totalBeats * secondsPerBeat * SAMPLE_RATE).roundToInt()
+
+        val tracks = activePhrases.map { phrase ->
             // Convert notes from phrase to note for sounds.
             var current = phrase.beats.first().copy()
             val beats = mutableListOf(current)
@@ -109,22 +119,34 @@ abstract class SoundManager {
                 }
             }
 
-            convert(
+            val phraseBuffer = convert(
                 defaultInstrument = phrase.instrument,
                 beats = beats,
                 tempo = sequence.tempo,
                 volume = phrase.volume,
             )
+
+            // Tile the phrase over the full sequence duration so shorter tracks
+            // repeat their pattern (e.g. a 4-beat drum loops twice inside an
+            // 8-beat rhythm track). Release tails from one iteration overlap
+            // with the attack of the next via additive mixing.
+            val phraseSamples = (phrase.beats.size * secondsPerBeat * SAMPLE_RATE).roundToInt()
+            if (phraseSamples <= 0 || phraseBuffer.isEmpty()) {
+                FloatArray(resultSize)
+            } else {
+                val trackBuffer = FloatArray(resultSize)
+                var offset = 0
+                while (offset < resultSize) {
+                    val maxCopy = min(phraseBuffer.size, resultSize - offset)
+                    for (i in 0 until maxCopy) {
+                        trackBuffer[offset + i] += phraseBuffer[i]
+                    }
+                    offset += phraseSamples
+                }
+                trackBuffer
+            }
         }
 
-        if (tracks.isEmpty()) return floatArrayOf()
-
-        // Use the exact musical duration so looping is seamless.
-        // Release tails extending past the sequence boundary are truncated,
-        // which is standard for looping patterns.
-        val secondsPerBeat = 60f / sequence.tempo
-        val totalBeats = allPhrases.maxOf { it.beats.size }
-        val resultSize = (totalBeats * secondsPerBeat * SAMPLE_RATE).roundToInt()
         val result = FloatArray(resultSize)
 
         // Calculate RMS values for each track to properly scale them during mixing

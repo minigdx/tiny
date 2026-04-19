@@ -514,12 +514,16 @@ Tracker._draw = function(self)
     text.font("monogram")
     local vis = self:_visible_lines()
 
+    local playing = self.play_beat ~= nil
+
     for i = 0, vis - 1 do
         local line = self.scroll_offset + i + 1
         if line > self.total_lines then break end
 
         local ly = self.y + i * (self.line_h + self.line_gap)
-        local is_current = (line == self.cursor_line)
+        -- Edit cursor only highlights the gutter when not playing, so playback
+        -- highlights don't fight with the edit selection.
+        local is_current = (line == self.cursor_line) and not playing
         local bg = is_current and 1 or 2
         local gutter_fg = is_current and 2 or 1
         local dot_color = gutter_fg
@@ -528,14 +532,21 @@ Tracker._draw = function(self)
         shape.rectf(self.x, ly, self.gutter_w, self.line_h, bg)
         text.print(string.format("%02d", line), self.x + 1, ly - 1, gutter_fg)
 
-        -- Column backgrounds
+        -- Column backgrounds. During playback each column highlights its own
+        -- current beat (play_beat wraps per-track by duration).
         for c = 1, self.num_cols do
             local cx = self.col_positions[c]
-            shape.rectf(cx + 1, ly, self.col_w - 2, self.line_h, bg)
+            local col_bg = bg
+            if playing then
+                local col_dur = self.track_durations and self.track_durations[c] or self.total_lines
+                local col_play_line = (math.floor(self.play_beat) % col_dur) + 1
+                col_bg = (line == col_play_line) and 1 or 2
+            end
+            shape.rectf(cx + 1, ly, self.col_w - 2, self.line_h, col_bg)
         end
 
         -- Selection cursor highlight (only when not playing, and only within the column's duration)
-        if is_current and self.play_beat == nil then
+        if is_current and not playing then
             local col_dur = self.track_durations and self.track_durations[self.cursor_col] or self.total_lines
             if line <= col_dur then
                 local sel_cx = self.col_positions[self.cursor_col]
