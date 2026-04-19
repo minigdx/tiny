@@ -1,6 +1,9 @@
 local utils = require("widgets.utils")
 local inside_widget = utils.inside_widget
 
+-- Maximum number of beats a MusicalPhrase can hold.
+local MAX_LINES = 32
+
 local Tracker = {
     x = 0,
     y = 0,
@@ -11,7 +14,7 @@ local Tracker = {
     cursor_col = 1,
     cursor_spot = 1,
     scroll_offset = 0,
-    total_lines = 32,
+    total_lines = MAX_LINES,
     num_cols = 4,
     line_h = 10,
     line_gap = 1,
@@ -115,7 +118,7 @@ Tracker._init = function(self)
     text.font("monogram")
     self.gutter_w = text.width(" 99")
     self.data = {}
-    for i = 1, self.total_lines do
+    for i = 1, MAX_LINES do
         self.data[i] = {}
         for j = 1, self.num_cols do
             self.data[i][j] = { note = nil, accident = 1, octave = 4, volume = 5, duration = 1 }
@@ -131,6 +134,31 @@ end
 
 Tracker._visible_lines = function(self)
     return math.floor(self.height / (self.line_h + self.line_gap))
+end
+
+-- Recompute [total_lines] from the per-track durations of the given pattern.
+-- Also clamps the cursor so it stays inside the visible window.
+Tracker.refresh_total_lines = function(self, seq, pattern_index)
+    pattern_index = pattern_index or 0
+    self.track_durations = self.track_durations or {}
+    local max_dur = 0
+    for col = 1, self.num_cols do
+        local track = seq.track(col - 1, pattern_index)
+        local dur = track and track.duration or MAX_LINES
+        if dur < 1 then dur = 1 end
+        if dur > MAX_LINES then dur = MAX_LINES end
+        self.track_durations[col] = dur
+        if dur > max_dur then max_dur = dur end
+    end
+    if max_dur < 1 then max_dur = 1 end
+    self.total_lines = max_dur
+    if self.cursor_line > self.total_lines then
+        self.cursor_line = self.total_lines
+    end
+    if self.scroll_offset > self.total_lines - 1 then
+        self.scroll_offset = math.max(0, self.total_lines - 1)
+    end
+    self:_ensure_visible()
 end
 
 Tracker._ensure_visible = function(self)
@@ -360,11 +388,14 @@ Tracker.load_from_sequence = function(self, seq, pattern_index)
     pattern_index = pattern_index or 0
 
     -- Clear all cells
-    for i = 1, self.total_lines do
+    for i = 1, MAX_LINES do
         for j = 1, self.num_cols do
             self.data[i][j] = { note = nil, accident = 1, octave = 4, volume = 5, duration = 1 }
         end
     end
+
+    -- Resize the display window to the largest per-track duration of this pattern.
+    self:refresh_total_lines(seq, pattern_index)
 
     for col = 1, self.num_cols do
         local track = seq.track(col - 1, pattern_index)
@@ -376,7 +407,7 @@ Tracker.load_from_sequence = function(self, seq, pattern_index)
         -- First pass: place notes into the grid (skip off-notes which are silence markers)
         for _, beat in ipairs(beats) do
             local pos = math.floor(beat.beat)
-            if beat.note and not beat.off and pos >= 0 and pos < self.total_lines then
+            if beat.note and not beat.off and pos >= 0 and pos < MAX_LINES then
                 local ni, acc, oct = parse_note_name(beat.note)
                 if ni then
                     local line = pos + 1
@@ -421,9 +452,11 @@ Tracker.sync_to_sequence = function(self, seq, pattern_index)
 
         track.clear()
 
-        -- Collect notes in this column
+        -- Collect notes in this column. Iterate over the full grid so notes
+        -- entered before a duration change are preserved in the phrase's
+        -- backing storage, even when they sit beyond the current duration.
         local notes = {}
-        for line = 1, self.total_lines do
+        for line = 1, MAX_LINES do
             local cell = self.data[line][col]
             if cell.note then
                 table.insert(notes, { line = line, cell = cell })
@@ -446,8 +479,8 @@ Tracker.sync_to_sequence = function(self, seq, pattern_index)
                 -- Add off-note if duration ends before next note
                 local end_pos = beat_pos + entry.cell.duration
                 local next_entry = notes[idx + 1]
-                local next_pos = next_entry and (next_entry.line - 1) or self.total_lines
-                if end_pos < next_pos and end_pos < self.total_lines then
+                local next_pos = next_entry and (next_entry.line - 1) or MAX_LINES
+                if end_pos < next_pos and end_pos < MAX_LINES then
                     track.set_note({
                         beat = end_pos,
                         note = name,
@@ -501,30 +534,36 @@ Tracker._draw = function(self)
             shape.rectf(cx + 1, ly, self.col_w - 2, self.line_h, bg)
         end
 
-        -- Selection cursor highlight (only when not playing)
+        -- Selection cursor highlight (only when not playing, and only within the column's duration)
         if is_current and self.play_beat == nil then
-            local sel_cx = self.col_positions[self.cursor_col]
-            shape.rectf(sel_cx + spot_offsets[self.cursor_spot], ly, spot_widths[self.cursor_spot], self.line_h, 5)
+            local col_dur = self.track_durations and self.track_durations[self.cursor_col] or self.total_lines
+            if line <= col_dur then
+                local sel_cx = self.col_positions[self.cursor_col]
+                shape.rectf(sel_cx + spot_offsets[self.cursor_spot], ly, spot_widths[self.cursor_spot], self.line_h, 5)
+            end
         end
 
         -- Column text content
         for c = 1, self.num_cols do
-            local cx = self.col_positions[c]
-            local cell = self.data[line][c]
+            local col_dur = self.track_durations and self.track_durations[c] or self.total_lines
+            if line <= col_dur then
+                local cx = self.col_positions[c]
+                local cell = self.data[line][c]
 
-            if cell.note then
-                local nc = note_colors[cell.note]
-                text.print(note_names[cell.note], cx + spot_offsets[1] + shake_offset(self, line, c, 1), ly - 1, nc)
-                text.print(accident_names[cell.accident], cx + spot_offsets[2] + shake_offset(self, line, c, 2), ly - 1, nc)
-                text.print(tostring(cell.octave), cx + spot_offsets[3] + shake_offset(self, line, c, 3), ly - 1, 10)
-                text.print(tostring(cell.volume), cx + spot_offsets[4] + shake_offset(self, line, c, 4), ly - 1, 7)
-                text.print(string.format("%2d", cell.duration), cx + spot_offsets[5] + shake_offset(self, line, c, 5), ly - 1, 6)
-            else
-                text.print(".", cx + spot_offsets[1], ly - 1, dot_color)
-                text.print(".", cx + spot_offsets[2], ly - 1, dot_color)
-                text.print(".", cx + spot_offsets[3], ly - 1, dot_color)
-                text.print(".", cx + spot_offsets[4], ly - 1, dot_color)
-                text.print("..", cx + spot_offsets[5], ly - 1, dot_color)
+                if cell.note then
+                    local nc = note_colors[cell.note]
+                    text.print(note_names[cell.note], cx + spot_offsets[1] + shake_offset(self, line, c, 1), ly - 1, nc)
+                    text.print(accident_names[cell.accident], cx + spot_offsets[2] + shake_offset(self, line, c, 2), ly - 1, nc)
+                    text.print(tostring(cell.octave), cx + spot_offsets[3] + shake_offset(self, line, c, 3), ly - 1, 10)
+                    text.print(tostring(cell.volume), cx + spot_offsets[4] + shake_offset(self, line, c, 4), ly - 1, 7)
+                    text.print(string.format("%2d", cell.duration), cx + spot_offsets[5] + shake_offset(self, line, c, 5), ly - 1, 6)
+                else
+                    text.print(".", cx + spot_offsets[1], ly - 1, dot_color)
+                    text.print(".", cx + spot_offsets[2], ly - 1, dot_color)
+                    text.print(".", cx + spot_offsets[3], ly - 1, dot_color)
+                    text.print(".", cx + spot_offsets[4], ly - 1, dot_color)
+                    text.print("..", cx + spot_offsets[5], ly - 1, dot_color)
+                end
             end
         end
     end

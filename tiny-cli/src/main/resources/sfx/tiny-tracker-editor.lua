@@ -12,12 +12,38 @@ local save_button_ref = nil
 local tracker_widget = nil
 local arrangement_widget = nil
 local pattern_counter = nil
+local duration_buttons = {}
+
+-- Cycle of per-track durations exposed by the duration buttons.
+local DURATION_CYCLE = { 32, 24, 12, 8, 4 }
 
 local state = {
     seq = nil,
     seq_index = 0,
     pattern_index = 0,
 }
+
+local function next_duration(current)
+    for i, d in ipairs(DURATION_CYCLE) do
+        if d == current then
+            return DURATION_CYCLE[(i % #DURATION_CYCLE) + 1]
+        end
+    end
+    return DURATION_CYCLE[1]
+end
+
+local function refresh_duration_buttons()
+    if not state.seq then return end
+    for col = 1, 4 do
+        local btn = duration_buttons[col]
+        if btn then
+            local track = state.seq.track(col - 1, state.pattern_index)
+            if track then
+                btn.label = tostring(track.duration)
+            end
+        end
+    end
+end
 
 local playing = false
 local play_handler = nil
@@ -126,6 +152,7 @@ function _init()
     tracker_widget = nil
     arrangement_widget = nil
     pattern_counter = nil
+    duration_buttons = {}
     playing = false
     play_handler = nil
     preview_note = nil
@@ -184,6 +211,14 @@ function _init()
                 arrangement_widget = arr_ref
             end
         end
+
+        -- Resolve per-track duration button refs from the Tracker entity
+        local duration_fields = { "MelodyDuration", "RythmDuration", "BassDuration", "DrumDuration" }
+        for col, field_name in ipairs(duration_fields) do
+            if t.fields and t.fields[field_name] then
+                duration_buttons[col] = wire.find_widget(all_widgets, t.fields[field_name])
+            end
+        end
     end
 
     -- Configure Pattern counter
@@ -197,6 +232,27 @@ function _init()
             state.pattern_index = self.value
             -- Ensure the new pattern exists and load it
             load_current_pattern()
+            refresh_duration_buttons()
+        end
+    end
+
+    -- Configure per-track duration buttons (cycle 32 -> 24 -> 12 -> 8 -> 4)
+    for col = 1, 4 do
+        local btn = duration_buttons[col]
+        if btn then
+            btn.on_change = function(self)
+                if not state.seq then return end
+                local track = state.seq.track(col - 1, state.pattern_index)
+                if not track then return end
+                track.duration = next_duration(track.duration)
+                self.label = tostring(track.duration)
+                if tracker_widget then
+                    tracker_widget:refresh_total_lines(state.seq, state.pattern_index)
+                end
+                -- Re-sync so the phrase's off-notes and cached buffer pick up
+                -- the new duration.
+                sync_current_pattern()
+            end
         end
     end
 
@@ -224,6 +280,8 @@ function _init()
             sync_current_pattern()
         end
     end
+
+    refresh_duration_buttons()
 
     modals_by_name = EditorBase.init_buttons(widget_entities, all_widgets, {
         on_open = function()
