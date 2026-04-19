@@ -20,7 +20,7 @@ class MusicalPattern(
     val tracks: Array<MusicalPhrase> = Array(4) { channelIndex ->
         MusicalPhrase(index = channelIndex, instrumentIndex = 0).also { phrase ->
             (0..32).forEach { beat ->
-                phrase.beats.add(MusicalNote(null, beat.toFloat(), 1f, 1f))
+                phrase.addBeat(MusicalNote(null, beat.toFloat(), 1f, 1f))
             }
         }
     },

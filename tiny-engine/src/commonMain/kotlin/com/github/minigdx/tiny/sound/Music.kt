@@ -52,6 +52,7 @@ class Music(
                                     instrumentIndex = phrase.instrumentIndex,
                                     volume = phrase.volume,
                                     mute = phrase.mute,
+                                    duration = phrase.duration,
                                 )
                             },
                         )

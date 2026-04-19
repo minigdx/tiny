@@ -4,6 +4,7 @@ import com.github.minigdx.tiny.BPM
 import com.github.minigdx.tiny.Beats
 import com.github.minigdx.tiny.Percent
 import com.github.minigdx.tiny.lua.Note
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
@@ -41,15 +42,57 @@ class MusicalPhrase(
      *
      * For example: if a [duration] is 12, then beats after the 12 will be ignored, when played.
      */
-    val duration: Int = 32,
+    var duration: Int = 32,
 ) {
-    val beats: MutableList<MusicalNote> = mutableListOf()
+    /**
+     * Backing storage for all beats. Serialized as `beats` for backward compatibility.
+     * Prefer using [beats] for reading (filtered by [duration]) and the dedicated
+     * mutation methods ([setBeatAt], [resetBeats], [addBeat]) instead of mutating
+     * this list directly.
+     */
+    @SerialName("beats")
+    val allBeats: MutableList<MusicalNote> = mutableListOf()
+
+    /**
+     * Beats that will be played, limited to the first [duration] beats.
+     */
+    val beats: List<MusicalNote>
+        get() = allBeats.take(duration)
+
+    /**
+     * Append a beat to the backing storage. Intended for phrase initialization.
+     */
+    fun addBeat(note: MusicalNote) {
+        allBeats.add(note)
+    }
+
+    /**
+     * Replace the beat at [index] in the backing storage.
+     * No-op if [index] is out of bounds.
+     */
+    fun setBeatAt(
+        index: Int,
+        note: MusicalNote,
+    ) {
+        if (index in allBeats.indices) {
+            allBeats[index] = note
+        }
+    }
+
+    /**
+     * Reset every stored beat to a default silent beat.
+     */
+    fun resetBeats() {
+        allBeats.indices.forEach { i ->
+            allBeats[i] = MusicalNote(null, i.toFloat(), 1f, 1f)
+        }
+    }
 
     private fun notesOnTheBeat(
         beat: Beats,
         duration: Beats,
     ): List<MusicalNote> {
-        return beats
+        return allBeats
             .filter { note1 ->
                 note1.beat < beat + duration && note1.beat + note1.duration > beat
             }
@@ -59,8 +102,8 @@ class MusicalPhrase(
      * Set all notes of the musical bar.
      */
     fun setNotes(notes: List<MusicalNote>) {
-        beats.clear()
-        beats.addAll(notes)
+        allBeats.clear()
+        allBeats.addAll(notes)
     }
 
     /**
@@ -80,10 +123,10 @@ class MusicalPhrase(
         // Keep the previous volume
         val volume = toRemoveBeats.firstOrNull()?.volume ?: 1f
 
-        beats.removeAll(toRemoveBeats)
+        allBeats.removeAll(toRemoveBeats)
 
         // Save the new note
-        beats.add(MusicalNote(note, beat, duration, volume))
+        allBeats.add(MusicalNote(note, beat, duration, volume))
     }
 
     /**
@@ -98,7 +141,7 @@ class MusicalPhrase(
             .filter { n -> n.note == note }
             .filter { n -> beat in n.beat..(n.beat + n.duration) }
 
-        beats.removeAll(toBeRemoved)
+        allBeats.removeAll(toBeRemoved)
     }
 
     fun setVolume(

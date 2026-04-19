@@ -95,7 +95,7 @@ class SequenceLuaWrapper(
                                     phrase.instrument = sequence.patterns.firstOrNull()
                                         ?.tracks?.getOrNull(channelIndex)?.instrument
                                     (0..32).forEach { beat ->
-                                        phrase.beats.add(
+                                        phrase.addBeat(
                                             com.github.minigdx.tiny.sound.MusicalNote(null, beat.toFloat(), 1f, 1f),
                                         )
                                     }

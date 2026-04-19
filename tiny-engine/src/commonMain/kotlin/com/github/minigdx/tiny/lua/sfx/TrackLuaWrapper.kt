@@ -42,6 +42,12 @@ class TrackLuaWrapper(
             { phrase.mute = it.checkboolean() },
         )
 
+        wrap(
+            "duration",
+            { valueOf(phrase.duration) },
+            { phrase.duration = it.checkint() },
+        )
+
         wrap("beats") {
             val result = LuaTable()
             phrase.beats.sortedBy { it.beat }
@@ -69,22 +75,21 @@ class TrackLuaWrapper(
             val duration = arg["duration"].optdouble(1.0).toFloat()
             val isOff = arg["off"].optboolean(false)
 
-            if (beat in phrase.beats.indices) {
-                phrase.beats[beat] = MusicalNote(
+            phrase.setBeatAt(
+                beat,
+                MusicalNote(
                     note = note,
                     beat = beat.toFloat(),
                     duration = duration,
                     volume = volume,
                     isOffNote = isOff,
-                )
-            }
+                ),
+            )
             NONE
         }
 
         function0("clear") {
-            phrase.beats.indices.forEach { i ->
-                phrase.beats[i] = MusicalNote(null, i.toFloat(), 1f, 1f)
-            }
+            phrase.resetBeats()
             NONE
         }
     }

@@ -52,6 +52,7 @@ class SoundDataSourceStream(
                         tempo = bar.tempo,
                         name = bar.name,
                         volume = bar.volume,
+                        duration = bar.duration,
                     )
                     isolatedBar.instrument = bar.instrument?.copyWithFreshState()
                     isolatedBar.setNotes(bar.beats)
@@ -68,6 +69,7 @@ class SoundDataSourceStream(
                                 instrumentIndex = phrase.instrumentIndex,
                                 volume = phrase.volume,
                                 mute = phrase.mute,
+                                duration = phrase.duration,
                             ).also {
                                 it.instrument = phrase.instrument?.copyWithFreshState()
                                 it.setNotes(phrase.beats)

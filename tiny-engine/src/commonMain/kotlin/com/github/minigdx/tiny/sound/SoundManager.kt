@@ -186,7 +186,7 @@ abstract class SoundManager {
 
     private fun convert(
         defaultInstrument: Instrument?,
-        beats: MutableList<MusicalNote>,
+        beats: List<MusicalNote>,
         tempo: BPM,
         volume: Percent = 1f,
     ): FloatArray {

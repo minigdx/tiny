@@ -91,7 +91,7 @@ class SoundManagerTest {
     ): MusicalPhrase {
         return MusicalPhrase(index = index, instrumentIndex = instrumentIndex).also {
             it.instrument = instrument
-            it.beats.add(MusicalNote(note, 0f, 1f, volume))
+            it.addBeat(MusicalNote(note, 0f, 1f, volume))
         }
     }
 
