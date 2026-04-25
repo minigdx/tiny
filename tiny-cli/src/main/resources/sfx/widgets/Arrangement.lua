@@ -336,12 +336,13 @@ Arrangement._draw = function(self)
             text.print(letter, sx + 2, sy + 1, COLOR_TEXT_DARK)
         end
 
-        if self.playing and self.play_slot == i and is_filled then
-            spr.sdraw(sx, sy, PLAYING_BORDER_SX, PLAYING_BORDER_SY, HOVER_BORDER_W, HOVER_BORDER_H)
-        end
-
         if inside_rect(pos.x, pos.y, sx, sy, PATTERN_W, PATTERN_H) then
             spr.sdraw(sx, sy, HOVER_BORDER_SX, HOVER_BORDER_SY, HOVER_BORDER_W, HOVER_BORDER_H)
+        end
+
+        -- Playing border drawn last so it stays visible even when the slot is hovered.
+        if self.playing and self.play_slot == i and is_filled then
+            spr.sdraw(sx, sy, PLAYING_BORDER_SX, PLAYING_BORDER_SY, HOVER_BORDER_W, HOVER_BORDER_H)
         end
     end
 

@@ -12083,9 +12083,9 @@
 							"fieldInstances": [
 								{ "__identifier": "Label", "__type": "String", "__value": "", "__tile": null, "defUid": 79, "realEditorValues": [] },
 								{ "__identifier": "IsActive", "__type": "Bool", "__value": false, "__tile": null, "defUid": 80, "realEditorValues": [] },
-								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "Orange", "__tile": null, "defUid": 82, "realEditorValues": [{
+								{ "__identifier": "Variant", "__type": "LocalEnum.Variant", "__value": "Yellow", "__tile": null, "defUid": 82, "realEditorValues": [{
 									"id": "V_String",
-									"params": ["Orange"]
+									"params": ["Yellow"]
 								}] },
 								{ "__identifier": "TinyExit", "__type": "String", "__value": null, "__tile": null, "defUid": 83, "realEditorValues": [] },
 								{ "__identifier": "Action", "__type": "LocalEnum.Action", "__value": null, "__tile": null, "defUid": 84, "realEditorValues": [] }

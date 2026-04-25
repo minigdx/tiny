@@ -79,22 +79,42 @@ abstract class SoundManager {
     }
 
     fun convert(sequence: MusicalSequence): FloatArray {
-        // Collect all active phrases across patterns referenced by the arrangement.
-        val allPhrases = sequence.arrangement.mapNotNull { patternIndex ->
-            sequence.patterns.getOrNull(patternIndex)
-        }.flatMap { pattern ->
-            pattern.tracks.toList()
+        // Render each arrangement entry sequentially, then concatenate.
+        // Patterns play one after the other — tracks inside a pattern play simultaneously.
+        if (sequence.arrangement.isEmpty()) return floatArrayOf()
+
+        val patternBuffers = sequence.arrangement.map { patternIndex ->
+            val pattern = sequence.patterns.getOrNull(patternIndex) ?: return@map floatArrayOf()
+            convertPattern(pattern, sequence.tempo)
         }
 
+        val totalSize = patternBuffers.sumOf { it.size }
+        if (totalSize == 0) return floatArrayOf()
+
+        val result = FloatArray(totalSize)
+        var offset = 0
+        for (buffer in patternBuffers) {
+            buffer.copyInto(result, destinationOffset = offset)
+            offset += buffer.size
+        }
+        return result
+    }
+
+    private fun convertPattern(
+        pattern: MusicalPattern,
+        tempo: BPM,
+    ): FloatArray {
+        val allPhrases = pattern.tracks.toList()
         val activePhrases = allPhrases.filter { !it.mute && it.instrument != null && it.beats.isNotEmpty() }
         if (activePhrases.isEmpty()) return floatArrayOf()
 
         // Use the exact musical duration so looping is seamless.
-        // Release tails extending past the sequence boundary are truncated,
+        // Release tails extending past the pattern boundary are truncated,
         // which is standard for looping patterns.
-        val secondsPerBeat = 60f / sequence.tempo
+        val secondsPerBeat = 60f / tempo
         val totalBeats = allPhrases.maxOf { it.beats.size }
         val resultSize = (totalBeats * secondsPerBeat * SAMPLE_RATE).roundToInt()
+        if (resultSize <= 0) return floatArrayOf()
 
         val tracks = activePhrases.map { phrase ->
             // Convert notes from phrase to note for sounds.
@@ -122,11 +142,11 @@ abstract class SoundManager {
             val phraseBuffer = convert(
                 defaultInstrument = phrase.instrument,
                 beats = beats,
-                tempo = sequence.tempo,
+                tempo = tempo,
                 volume = phrase.volume,
             )
 
-            // Tile the phrase over the full sequence duration so shorter tracks
+            // Tile the phrase over the full pattern duration so shorter tracks
             // repeat their pattern (e.g. a 4-beat drum loops twice inside an
             // 8-beat rhythm track). Release tails from one iteration overlap
             // with the attack of the next via additive mixing.
@@ -153,7 +173,7 @@ abstract class SoundManager {
         val trackRmsValues = FloatArray(tracks.size) { calculateRms(tracks[it]) }
         val totalRms = trackRmsValues.sum()
 
-        // Step 6: Pre-compute scale factors and use indexed loops
+        // Pre-compute scale factors and use indexed loops
         if (totalRms > 0.001f) {
             val scaleFactors = FloatArray(tracks.size) { t ->
                 if (trackRmsValues[t] > 0.001f) {

@@ -36,20 +36,42 @@ class MusicalSequence(
     var loopFrom: Int = -1,
 ) {
     /**
+     * Number of beats per pattern at arrangement position [position],
+     * defined as the max beat count across the pattern's tracks.
+     * Returns 0 when the position or referenced pattern is missing.
+     */
+    private fun beatsAt(position: Int): Int {
+        val patternIndex = arrangement.getOrNull(position) ?: return 0
+        val pattern = patterns.getOrNull(patternIndex) ?: return 0
+        return pattern.tracks.maxOfOrNull { it.beats.size } ?: 0
+    }
+
+    /**
+     * Total number of beats played across the full arrangement.
+     */
+    val totalBeats: Int
+        get() = arrangement.indices.sumOf { beatsAt(it) }
+
+    /**
      * Compute the sample index where looping should restart.
      *
-     * When the arrangement plays patterns sequentially, each pattern contributes
-     * a fixed number of beats. [loopFrom] indicates which arrangement position
-     * to loop back to.
+     * Patterns in the arrangement play sequentially, so the sample offset is the
+     * sum of rendered samples for arrangement positions before [loopFrom].
      *
      * Returns 0 if loopFrom <= 0 (loop from start).
      */
     val loopStartSample: Int
         get() {
             if (loopFrom <= 0) return 0
-            val beatsPerPattern = patterns.flatMap { it.tracks.toList() }
-                .maxOfOrNull { it.beats.size } ?: return 0
             val secondsPerBeat = 60f / tempo
-            return (loopFrom * beatsPerPattern * secondsPerBeat * SoundManager.SAMPLE_RATE).roundToInt()
+            val upTo = loopFrom.coerceAtMost(arrangement.size)
+            var samples = 0
+            for (i in 0 until upTo) {
+                val beats = beatsAt(i)
+                if (beats > 0) {
+                    samples += (beats * secondsPerBeat * SoundManager.SAMPLE_RATE).roundToInt()
+                }
+            }
+            return samples
         }
 }

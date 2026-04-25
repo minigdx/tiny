@@ -7,6 +7,7 @@ import com.github.minigdx.tiny.sound.MusicalPattern
 import com.github.minigdx.tiny.sound.MusicalPhrase
 import com.github.minigdx.tiny.sound.MusicalSequence
 import com.github.minigdx.tiny.sound.VirtualSoundBoard
+import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import kotlin.time.TimeSource.Monotonic.markNow
 
@@ -47,11 +48,13 @@ class SequenceLuaWrapper(
             { valueOf(sequence.patterns.size) },
         )
 
-        // arrangement: read/write as a Lua table of ints (0-based pattern indices)
+        // arrangement: read/write as a Lua table of ints (0-based pattern indices).
+        // Uses a plain LuaTable so numeric indexing (arr[i]) works; WrapperLuaTable's
+        // overridden get() only routes named getters and would return NIL for integer keys.
         wrap(
             "arrangement",
             {
-                val t = WrapperLuaTable()
+                val t = LuaTable()
                 sequence.arrangement.forEachIndexed { i, v ->
                     t.rawset(i + 1, valueOf(v))
                 }
@@ -115,7 +118,7 @@ class SequenceLuaWrapper(
 
         function0("play") {
             val startMark = markNow()
-            val totalBeats = sequence.patterns.flatMap { it.tracks.toList() }.maxOf { it.beats.size }
+            val totalBeats = sequence.totalBeats
             val buffer = cachedBuffer ?: soundBoard.convert(sequence).also { cachedBuffer = it }
             val bufferDurationSeconds = buffer.size.toDouble() / 44100.0
             val handler = soundBoard.createHandler(buffer, sequence.loopStartSample).also { it.play() }
@@ -135,7 +138,7 @@ class SequenceLuaWrapper(
 
         function0("loop") {
             val startMark = markNow()
-            val totalBeats = sequence.patterns.flatMap { it.tracks.toList() }.maxOf { it.beats.size }
+            val totalBeats = sequence.totalBeats
             val buffer = cachedBuffer ?: soundBoard.convert(sequence).also { cachedBuffer = it }
             val bufferDurationSeconds = buffer.size.toDouble() / 44100.0
             val handler = soundBoard.createHandler(buffer, sequence.loopStartSample).also { it.loop() }

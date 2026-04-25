@@ -23,6 +23,12 @@ local state = {
     pattern_index = 0,
 }
 
+-- Arrangement slot whose pattern is currently mirrored in the tracker grid.
+-- Only set during playback, when the tracker follows the sequence through the arrangement.
+local displayed_slot = nil
+-- Pattern_index the user had selected before playback started, restored on stop.
+local saved_pattern_index = nil
+
 local function next_duration(current)
     for i, d in ipairs(DURATION_CYCLE) do
         if d == current then
@@ -95,6 +101,19 @@ local function stop_playback()
     for s in all(speaker_widgets) do
         s.playing = false
     end
+    -- Restore the pattern the user was editing before playback started.
+    if saved_pattern_index ~= nil and state.seq then
+        state.pattern_index = saved_pattern_index
+        if pattern_counter then
+            pattern_counter.value = saved_pattern_index
+        end
+        if tracker_widget then
+            tracker_widget:load_from_sequence(state.seq, state.pattern_index)
+        end
+        refresh_duration_buttons()
+    end
+    saved_pattern_index = nil
+    displayed_slot = nil
 end
 
 local function start_playback()
@@ -107,6 +126,8 @@ local function start_playback()
     end
     play_handler = state.seq.loop()
     playing = true
+    saved_pattern_index = state.pattern_index
+    displayed_slot = nil
     if arrangement_widget then
         arrangement_widget.playing = true
         local fc = arrangement_filled_count()
@@ -326,17 +347,32 @@ function _update()
             stop_playback()
         else
             local beat = play_handler.beat
-            if beat and tracker_widget then
-                tracker_widget.play_beat = beat % 32
-                tracker_widget:_update_play_position()
-            end
             if beat and arrangement_widget then
                 local fc = arrangement_filled_count()
                 if fc > 0 then
-                    arrangement_widget.play_slot = (math.floor(beat / 32) % fc) + 1
+                    local slot = (math.floor(beat / 32) % fc) + 1
+                    arrangement_widget.play_slot = slot
+
+                    -- Follow playback: swap the tracker grid to the pattern now playing.
+                    if slot ~= displayed_slot then
+                        displayed_slot = slot
+                        local pattern_idx = arrangement_widget.slots[slot]
+                        if pattern_idx ~= nil and state.seq then
+                            state.pattern_index = pattern_idx
+                            if pattern_counter then
+                                pattern_counter.value = pattern_idx
+                            end
+                            tracker_widget:load_from_sequence(state.seq, pattern_idx)
+                            refresh_duration_buttons()
+                        end
+                    end
                 else
                     arrangement_widget.play_slot = nil
                 end
+            end
+            if beat and tracker_widget then
+                tracker_widget.play_beat = beat % 32
+                tracker_widget:_update_play_position()
             end
         end
     end
