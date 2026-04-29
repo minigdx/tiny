@@ -304,6 +304,22 @@ function _init()
 
     refresh_duration_buttons()
 
+    -- Switch toggles back to the music editor (same behaviour as TAB).
+    for s in all(widget_entities["Switch"]) do
+        local switch = widgets:create_switch(s)
+        switch.on_change = function()
+            stop_playback()
+            preview_note_off()
+            sync_current_pattern()
+            if arrangement_widget then
+                arrangement_widget:sync_to_sequence(state.seq)
+            end
+            _G._tiny_music_seq_index = state.seq_index
+            tiny.exit("tiny-music-editor.lua")
+        end
+        table.insert(all_widgets, switch)
+    end
+
     modals_by_name = EditorBase.init_buttons(widget_entities, all_widgets, {
         on_open = function()
             return state.seq.name or ""

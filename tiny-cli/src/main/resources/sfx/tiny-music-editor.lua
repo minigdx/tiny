@@ -441,6 +441,20 @@ function _init()
     _init_fader(widget_entities)
     _init_counter(widget_entities)
 
+    -- Switch toggles to the tracker editor (same behaviour as TAB).
+    for s in all(widget_entities["Switch"]) do
+        local switch = widgets:create_switch(s)
+        switch.on_change = function()
+            if playing and play_handler then
+                play_handler.stop()
+                playing = false
+                play_handler = nil
+            end
+            tiny.exit("tiny-tracker-editor.lua")
+        end
+        table.insert(all_widgets, switch)
+    end
+
     -- Wire music generator widgets
     _init_music_generator(widget_entities)
 
