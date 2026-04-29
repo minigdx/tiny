@@ -430,7 +430,7 @@ function _update()
                     local cell = {
                         note = mapping.note,
                         accident = mapping.accident,
-                        octave = tracker_widget.last_octave,
+                        octave = tracker_widget.last_octaves[tracker_widget.cursor_col],
                     }
                     preview_note_on(cell, tracker_widget.cursor_col)
                     break

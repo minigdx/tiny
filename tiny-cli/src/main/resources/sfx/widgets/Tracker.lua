@@ -29,8 +29,8 @@ local Tracker = {
     hold_timer = 0,
     hold_initial_delay = 20,
     hold_repeat_rate = 4,
-    -- Default octave for new notes
-    last_octave = 4,
+    -- Default octave for new notes, per column (melody, rythm, bass, drum)
+    last_octaves = { 4, 4, 2, 4 },
     -- Shake feedback
     shake_timer = 0,
     shake_line = 0,
@@ -121,7 +121,7 @@ Tracker._init = function(self)
     for i = 1, MAX_LINES do
         self.data[i] = {}
         for j = 1, self.num_cols do
-            self.data[i][j] = { note = nil, accident = 1, octave = 4, volume = 5, duration = 1 }
+            self.data[i][j] = { note = nil, accident = 1, octave = self.last_octaves[j], volume = 5, duration = 1 }
         end
     end
     self.col_positions = {}
@@ -304,7 +304,7 @@ Tracker._update = function(self)
             local was_empty = cell.note == nil
             cell.note = mapping.note
             cell.accident = mapping.accident
-            cell.octave = self.last_octave
+            cell.octave = self.last_octaves[self.cursor_col]
             cell.duration = 1
             if was_empty then
                 self:_clamp_prev_duration(self.cursor_line, self.cursor_col)
@@ -325,7 +325,7 @@ Tracker._update = function(self)
         if self.cursor_spot == 1 then
             if cell.note == nil then
                 cell.note = 1
-                cell.octave = self.last_octave
+                cell.octave = self.last_octaves[self.cursor_col]
                 cell.duration = 1
                 self:_clamp_prev_duration(self.cursor_line, self.cursor_col)
             else
@@ -349,7 +349,7 @@ Tracker._update = function(self)
                 self:_shake(self.cursor_line, self.cursor_col, 3)
             else
                 cell.octave = new_oct
-                self.last_octave = cell.octave
+                self.last_octaves[self.cursor_col] = cell.octave
             end
         elseif self.cursor_spot == 4 and cell.note then
             cell.volume = cell.volume + delta
@@ -375,7 +375,7 @@ Tracker._update = function(self)
         local cell = self.data[self.cursor_line][self.cursor_col]
         cell.note = nil
         cell.accident = 1
-        cell.octave = 4
+        cell.octave = self.last_octaves[self.cursor_col]
         cell.volume = 5
         cell.duration = 1
         self:on_change()
@@ -390,7 +390,7 @@ Tracker.load_from_sequence = function(self, seq, pattern_index)
     -- Clear all cells
     for i = 1, MAX_LINES do
         for j = 1, self.num_cols do
-            self.data[i][j] = { note = nil, accident = 1, octave = 4, volume = 5, duration = 1 }
+            self.data[i][j] = { note = nil, accident = 1, octave = self.last_octaves[j], volume = 5, duration = 1 }
         end
     end
 
