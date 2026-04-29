@@ -164,7 +164,7 @@ end
 -- @return The widget with matching iid, or nil
 wire.find_widget = function(widgets, ref)
     if (not ref) then
-        error("find_widget is called without a valid entity ref")
+        return nil
     end
 
     for widget in all(widgets) do

@@ -9634,30 +9634,6 @@
 							"__worldY": 184
 						},
 						{
-							"__identifier": "Button",
-							"__grid": [6,4],
-							"__pivot": [0,0],
-							"__tags": [ "Widget", "Action" ],
-							"__tile": { "tilesetUid": 72, "x": 0, "y": 56, "w": 16, "h": 16 },
-							"__smartColor": "#BE4A2F",
-							"iid": "348200b0-fa90-11f0-9ead-e99c8684d40d",
-							"width": 13,
-							"height": 13,
-							"defUid": 1,
-							"px": [48,38],
-							"fieldInstances": [
-								{ "__identifier": "Modal", "__type": "String", "__value": null, "__tile": null, "defUid": 13, "realEditorValues": [] },
-								{ "__identifier": "IconName", "__type": "LocalEnum.Icon", "__value": "Play", "__tile": null, "defUid": 15, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["Play"]
-								}] },
-								{ "__identifier": "Action", "__type": "LocalEnum.Action", "__value": null, "__tile": null, "defUid": 18, "realEditorValues": [] },
-								{ "__identifier": "Layer", "__type": "String", "__value": null, "__tile": null, "defUid": 28, "realEditorValues": [] }
-							],
-							"__worldX": 864,
-							"__worldY": 38
-						},
-						{
 							"__identifier": "Dropdown",
 							"__grid": [25,11],
 							"__pivot": [0,0],
@@ -9861,15 +9837,7 @@
 									"id": "V_String",
 									"params": ["3229ea70-fa90-11f0-9ead-b333f7210bae"]
 								}] },
-								{ "__identifier": "Play", "__type": "EntityRef", "__value": {
-									"entityIid": "348200b0-fa90-11f0-9ead-e99c8684d40d",
-									"layerIid": "c5000ed1-fa90-11f0-9ead-a1240c4664a1",
-									"levelIid": "c5000ed0-fa90-11f0-9ead-c7908e5e7535",
-									"worldIid": "4cf47921-fa90-11f0-ad09-8d23e32977ff"
-								}, "__tile": null, "defUid": 102, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["348200b0-fa90-11f0-9ead-e99c8684d40d"]
-								}] },
+								{ "__identifier": "Play", "__type": "EntityRef", "__value": null, "__tile": null, "defUid": 102, "realEditorValues": [] },
 								{ "__identifier": "Volume", "__type": "EntityRef", "__value": {
 									"entityIid": "04d6c670-fa90-11f0-9ead-fded0c18e8e2",
 									"layerIid": "c5000ed1-fa90-11f0-9ead-a1240c4664a1",
@@ -10006,7 +9974,10 @@
 							"height": 16,
 							"defUid": 118,
 							"px": [336,32],
-							"fieldInstances": [{ "__identifier": "RightActive", "__type": "Bool", "__value": false, "__tile": null, "defUid": 119, "realEditorValues": [] }],
+							"fieldInstances": [{ "__identifier": "RightActive", "__type": "Bool", "__value": true, "__tile": null, "defUid": 119, "realEditorValues": [{
+								"id": "V_Bool",
+								"params": [ true ]
+							}] }],
 							"__worldX": 1152,
 							"__worldY": 32
 						}
@@ -12194,9 +12165,9 @@
 							"height": 16,
 							"defUid": 118,
 							"px": [336,32],
-							"fieldInstances": [{ "__identifier": "RightActive", "__type": "Bool", "__value": true, "__tile": null, "defUid": 119, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "RightActive", "__type": "Bool", "__value": false, "__tile": null, "defUid": 119, "realEditorValues": [{
 								"id": "V_Bool",
-								"params": [ true ]
+								"params": [ false ]
 							}] }],
 							"__worldX": 1152,
 							"__worldY": 304

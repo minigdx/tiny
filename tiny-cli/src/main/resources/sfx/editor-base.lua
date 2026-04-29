@@ -196,7 +196,7 @@ end
 
 -- Update save reminder: shakes the save button periodically when dirty
 EditorBase.update_save_reminder = function(save_button, save_state)
-    if save_state.dirty and save_button and tiny.t >= save_state.next_shake_time then
+    if save_state and save_state.dirty and save_button and tiny.t >= save_state.next_shake_time then
         save_button:shake()
         save_state.next_shake_time = tiny.t + 15
     end

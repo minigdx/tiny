@@ -24,8 +24,8 @@ local master_volume = 1.0
 
 -- Track configuration: instruments, volumes, speed
 local config = {
-    chord_instrument = 0,
-    bass_instrument = 1,
+    chord_instrument = 6,
+    bass_instrument = 4,
     lead_instrument = 2,
     drum_instrument = 3,
     chord_volume = 0.3,
