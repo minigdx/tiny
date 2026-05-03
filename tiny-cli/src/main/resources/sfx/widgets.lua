@@ -48,6 +48,7 @@ local Counter = require("widgets.Counter")
 local Tracker = require("widgets.Tracker")
 local Arrangement = require("widgets.Arrangement")
 local Switch = require("widgets.Switch")
+local Label = require("widgets.Label")
 
 factory.create_envelop = function(self, data)
     local result = new(Envelop, data)
@@ -77,7 +78,12 @@ end
 factory.create_fader = function(self, value)
     local result = new(Fader, value)
     result.help = result.fields.Help
-    result.label = result.fields.Label
+    return result
+end
+
+factory.create_label = function(self, value)
+    local result = new(Label, value)
+    result:_init()
     return result
 end
 

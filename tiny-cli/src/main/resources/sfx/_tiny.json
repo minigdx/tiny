@@ -55,6 +55,7 @@
     "widgets/Tracker.lua",
     "widgets/Arrangement.lua",
     "widgets/Switch.lua",
+    "widgets/Label.lua",
     "widgets/utils.lua"
   ],
   "spritesheets": [

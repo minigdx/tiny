@@ -11,7 +11,7 @@
 	"iid": "4cf47920-fa90-11f0-ad09-7b5a63ac610d",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 120,
+	"nextUid": 123,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -2236,7 +2236,45 @@
 			"limitBehavior": "MoveLastOne",
 			"pivotX": 0,
 			"pivotY": 0,
-			"fieldDefs": []
+			"fieldDefs": [
+				{
+					"identifier": "Label",
+					"doc": null,
+					"__type": "EntityRef",
+					"uid": 122,
+					"type": "F_EntityRef",
+					"isArray": false,
+					"canBeNull": true,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "RefLinkBetweenCenters",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "CurvedArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySpecificEntity",
+					"allowedRefsEntityUid": 120,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				}
+			]
 		},
 		{
 			"identifier": "TextButton",
@@ -3379,6 +3417,79 @@
 					"tilesetUid": null
 				}
 			]
+		},
+		{
+			"identifier": "Label",
+			"uid": 120,
+			"tags": ["Widget"],
+			"exportToToc": false,
+			"allowOutOfBounds": false,
+			"doc": null,
+			"width": 8,
+			"height": 8,
+			"resizableX": true,
+			"resizableY": true,
+			"minWidth": 8,
+			"maxWidth": null,
+			"minHeight": 8,
+			"maxHeight": null,
+			"keepAspectRatio": false,
+			"tileOpacity": 1,
+			"fillOpacity": 1,
+			"lineOpacity": 1,
+			"hollow": false,
+			"color": "#265C42",
+			"renderMode": "Rectangle",
+			"showName": true,
+			"tilesetId": null,
+			"tileRenderMode": "FitInside",
+			"tileRect": null,
+			"uiTileRect": null,
+			"nineSliceBorders": [],
+			"maxCount": 0,
+			"limitScope": "PerLevel",
+			"limitBehavior": "MoveLastOne",
+			"pivotX": 0,
+			"pivotY": 0,
+			"fieldDefs": [
+				{
+					"identifier": "Default",
+					"doc": null,
+					"__type": "String",
+					"uid": 121,
+					"type": "F_String",
+					"isArray": false,
+					"canBeNull": true,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				}
+			]
 		}
 	], "tilesets": [
 		{
@@ -3688,7 +3799,7 @@
 							"height": 48,
 							"defUid": 77,
 							"px": [14,112],
-							"fieldInstances": [],
+							"fieldInstances": [{ "__identifier": "Label", "__type": "EntityRef", "__value": null, "__tile": null, "defUid": 122, "realEditorValues": [] }],
 							"__worldX": 14,
 							"__worldY": 112
 						},
@@ -3704,7 +3815,7 @@
 							"height": 48,
 							"defUid": 77,
 							"px": [26,112],
-							"fieldInstances": [],
+							"fieldInstances": [{ "__identifier": "Label", "__type": "EntityRef", "__value": null, "__tile": null, "defUid": 122, "realEditorValues": [] }],
 							"__worldX": 26,
 							"__worldY": 112
 						},
@@ -3720,7 +3831,7 @@
 							"height": 48,
 							"defUid": 77,
 							"px": [38,112],
-							"fieldInstances": [],
+							"fieldInstances": [{ "__identifier": "Label", "__type": "EntityRef", "__value": null, "__tile": null, "defUid": 122, "realEditorValues": [] }],
 							"__worldX": 38,
 							"__worldY": 112
 						},
@@ -3736,7 +3847,7 @@
 							"height": 48,
 							"defUid": 77,
 							"px": [50,112],
-							"fieldInstances": [],
+							"fieldInstances": [{ "__identifier": "Label", "__type": "EntityRef", "__value": null, "__tile": null, "defUid": 122, "realEditorValues": [] }],
 							"__worldX": 50,
 							"__worldY": 112
 						},
@@ -3752,7 +3863,7 @@
 							"height": 48,
 							"defUid": 77,
 							"px": [62,112],
-							"fieldInstances": [],
+							"fieldInstances": [{ "__identifier": "Label", "__type": "EntityRef", "__value": null, "__tile": null, "defUid": 122, "realEditorValues": [] }],
 							"__worldX": 62,
 							"__worldY": 112
 						},
@@ -3768,7 +3879,7 @@
 							"height": 48,
 							"defUid": 77,
 							"px": [74,112],
-							"fieldInstances": [],
+							"fieldInstances": [{ "__identifier": "Label", "__type": "EntityRef", "__value": null, "__tile": null, "defUid": 122, "realEditorValues": [] }],
 							"__worldX": 74,
 							"__worldY": 112
 						},
@@ -3784,7 +3895,7 @@
 							"height": 48,
 							"defUid": 77,
 							"px": [86,112],
-							"fieldInstances": [],
+							"fieldInstances": [{ "__identifier": "Label", "__type": "EntityRef", "__value": null, "__tile": null, "defUid": 122, "realEditorValues": [] }],
 							"__worldX": 86,
 							"__worldY": 112
 						},
@@ -6482,7 +6593,15 @@
 							"height": 36,
 							"defUid": 77,
 							"px": [58,120],
-							"fieldInstances": [],
+							"fieldInstances": [{ "__identifier": "Label", "__type": "EntityRef", "__value": {
+								"entityIid": "899180f0-21a0-11f1-b286-cf1eeba9a805",
+								"layerIid": "5e14b915-fa90-11f0-a3f9-ab74689b52a1",
+								"levelIid": "5e146af0-fa90-11f0-a3f9-6d10d9fa5d38",
+								"worldIid": "4cf47921-fa90-11f0-ad09-8d23e32977ff"
+							}, "__tile": null, "defUid": 122, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["899180f0-21a0-11f1-b286-cf1eeba9a805"]
+							}] }],
 							"__worldX": 474,
 							"__worldY": 120
 						},
@@ -6514,7 +6633,15 @@
 							"height": 36,
 							"defUid": 77,
 							"px": [140,120],
-							"fieldInstances": [],
+							"fieldInstances": [{ "__identifier": "Label", "__type": "EntityRef", "__value": {
+								"entityIid": "8c108ab0-21a0-11f1-b286-6d1fc107f855",
+								"layerIid": "5e14b915-fa90-11f0-a3f9-ab74689b52a1",
+								"levelIid": "5e146af0-fa90-11f0-a3f9-6d10d9fa5d38",
+								"worldIid": "4cf47921-fa90-11f0-ad09-8d23e32977ff"
+							}, "__tile": null, "defUid": 122, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["8c108ab0-21a0-11f1-b286-6d1fc107f855"]
+							}] }],
 							"__worldX": 556,
 							"__worldY": 120
 						},
@@ -6548,6 +6675,38 @@
 							],
 							"__worldX": 612,
 							"__worldY": 4
+						},
+						{
+							"__identifier": "Label",
+							"__grid": [1,17],
+							"__pivot": [0,0],
+							"__tags": ["Widget"],
+							"__tile": null,
+							"__smartColor": "#265C42",
+							"iid": "899180f0-21a0-11f1-b286-cf1eeba9a805",
+							"width": 48,
+							"height": 8,
+							"defUid": 120,
+							"px": [8,136],
+							"fieldInstances": [{ "__identifier": "Default", "__type": "String", "__value": null, "__tile": null, "defUid": 121, "realEditorValues": [] }],
+							"__worldX": 424,
+							"__worldY": 136
+						},
+						{
+							"__identifier": "Label",
+							"__grid": [10,17],
+							"__pivot": [0,0],
+							"__tags": ["Widget"],
+							"__tile": null,
+							"__smartColor": "#265C42",
+							"iid": "8c108ab0-21a0-11f1-b286-6d1fc107f855",
+							"width": 56,
+							"height": 8,
+							"defUid": 120,
+							"px": [80,136],
+							"fieldInstances": [{ "__identifier": "Default", "__type": "String", "__value": null, "__tile": null, "defUid": 121, "realEditorValues": [] }],
+							"__worldX": 496,
+							"__worldY": 136
 						}
 					]
 				},
@@ -9709,7 +9868,7 @@
 							"height": 32,
 							"defUid": 77,
 							"px": [176,124],
-							"fieldInstances": [],
+							"fieldInstances": [{ "__identifier": "Label", "__type": "EntityRef", "__value": null, "__tile": null, "defUid": 122, "realEditorValues": [] }],
 							"__worldX": 992,
 							"__worldY": 124
 						},
@@ -9725,7 +9884,7 @@
 							"height": 32,
 							"defUid": 77,
 							"px": [360,76],
-							"fieldInstances": [],
+							"fieldInstances": [{ "__identifier": "Label", "__type": "EntityRef", "__value": null, "__tile": null, "defUid": 122, "realEditorValues": [] }],
 							"__worldX": 1176,
 							"__worldY": 76
 						},
@@ -9741,7 +9900,7 @@
 							"height": 32,
 							"defUid": 77,
 							"px": [176,76],
-							"fieldInstances": [],
+							"fieldInstances": [{ "__identifier": "Label", "__type": "EntityRef", "__value": null, "__tile": null, "defUid": 122, "realEditorValues": [] }],
 							"__worldX": 992,
 							"__worldY": 76
 						},
@@ -9757,7 +9916,7 @@
 							"height": 32,
 							"defUid": 77,
 							"px": [360,124],
-							"fieldInstances": [],
+							"fieldInstances": [{ "__identifier": "Label", "__type": "EntityRef", "__value": null, "__tile": null, "defUid": 122, "realEditorValues": [] }],
 							"__worldX": 1176,
 							"__worldY": 124
 						},
@@ -9899,7 +10058,15 @@
 							"height": 50,
 							"defUid": 77,
 							"px": [280,192],
-							"fieldInstances": [],
+							"fieldInstances": [{ "__identifier": "Label", "__type": "EntityRef", "__value": {
+								"entityIid": "b3775d40-21a0-11f1-b286-89ac37f19663",
+								"layerIid": "c5000ed1-fa90-11f0-9ead-a1240c4664a1",
+								"levelIid": "c5000ed0-fa90-11f0-9ead-c7908e5e7535",
+								"worldIid": "4cf47921-fa90-11f0-ad09-8d23e32977ff"
+							}, "__tile": null, "defUid": 122, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["b3775d40-21a0-11f1-b286-89ac37f19663"]
+							}] }],
 							"__worldX": 1096,
 							"__worldY": 192
 						},
@@ -9915,7 +10082,15 @@
 							"height": 50,
 							"defUid": 77,
 							"px": [360,192],
-							"fieldInstances": [],
+							"fieldInstances": [{ "__identifier": "Label", "__type": "EntityRef", "__value": {
+								"entityIid": "b546c610-21a0-11f1-b286-a7536690523f",
+								"layerIid": "c5000ed1-fa90-11f0-9ead-a1240c4664a1",
+								"levelIid": "c5000ed0-fa90-11f0-9ead-c7908e5e7535",
+								"worldIid": "4cf47921-fa90-11f0-ad09-8d23e32977ff"
+							}, "__tile": null, "defUid": 122, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["b546c610-21a0-11f1-b286-a7536690523f"]
+							}] }],
 							"__worldX": 1176,
 							"__worldY": 192
 						},
@@ -9980,6 +10155,38 @@
 							}] }],
 							"__worldX": 1152,
 							"__worldY": 32
+						},
+						{
+							"__identifier": "Label",
+							"__grid": [26,27],
+							"__pivot": [0,0],
+							"__tags": ["Widget"],
+							"__tile": null,
+							"__smartColor": "#265C42",
+							"iid": "b3775d40-21a0-11f1-b286-89ac37f19663",
+							"width": 64,
+							"height": 8,
+							"defUid": 120,
+							"px": [208,216],
+							"fieldInstances": [{ "__identifier": "Default", "__type": "String", "__value": null, "__tile": null, "defUid": 121, "realEditorValues": [] }],
+							"__worldX": 1024,
+							"__worldY": 216
+						},
+						{
+							"__identifier": "Label",
+							"__grid": [38,27],
+							"__pivot": [0,0],
+							"__tags": ["Widget"],
+							"__tile": null,
+							"__smartColor": "#265C42",
+							"iid": "b546c610-21a0-11f1-b286-a7536690523f",
+							"width": 48,
+							"height": 8,
+							"defUid": 120,
+							"px": [304,216],
+							"fieldInstances": [{ "__identifier": "Default", "__type": "String", "__value": null, "__tile": null, "defUid": 121, "realEditorValues": [] }],
+							"__worldX": 1120,
+							"__worldY": 216
 						}
 					]
 				},

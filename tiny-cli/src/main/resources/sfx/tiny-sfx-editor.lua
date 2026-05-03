@@ -8,6 +8,7 @@ local all_widgets = {}
 local modals_by_name = {}
 local dropdown_widget = nil
 local speaker_widgets = {}
+local fader_widgets = {}
 local sfx_editor_ref = nil
 local octave_counter_ref = nil
 local overlay_widget = nil
@@ -382,6 +383,7 @@ function _init_fader(entities)
     for f in all(entities["Fader"]) do
         local fader = widgets:create_fader(f)
         table.insert(all_widgets, fader)
+        table.insert(fader_widgets, fader)
     end
 end
 
@@ -389,6 +391,31 @@ function _init_counter_entities(entities)
     for c in all(entities["Counter"]) do
         local counter = widgets:create_counter(c)
         table.insert(all_widgets, counter)
+    end
+end
+
+function _init_label(entities)
+    for l in all(entities["Label"] or {}) do
+        local label = widgets:create_label(l)
+        table.insert(all_widgets, label)
+    end
+end
+
+local function format_fader_value(value)
+    return tostring(math.floor((value or 0) * 100)) .. "%"
+end
+
+local function wire_fader_labels()
+    for f in all(fader_widgets) do
+        local label_ref = f.fields and f.fields.Label
+        if label_ref then
+            local label = wire.find_widget(all_widgets, label_ref)
+            if label then
+                wire.sync(f, "value", label, "text", function(_, _, value)
+                    return format_fader_value(value)
+                end)
+            end
+        end
     end
 end
 
@@ -524,6 +551,7 @@ function _init()
     modals_by_name = {}
     dropdown_widget = nil
     speaker_widgets = {}
+    fader_widgets = {}
     sfx_editor_ref = nil
     octave_counter_ref = nil
     overlay_widget = nil
@@ -610,9 +638,14 @@ function _init()
     _init_knob(widget_entities)
     _init_fader(widget_entities)
     _init_counter_entities(widget_entities)
+    _init_label(widget_entities)
     _init_velocity_editor(widget_entities)
     _init_sfx_editor(widget_entities)
     _init_player(widget_entities)
+
+    -- Wire fader labels after fader on_change handlers are set,
+    -- so wire.listen wraps (rather than is overwritten by) those handlers.
+    wire_fader_labels()
 
     -- Detect octave from loaded SFX (same logic as on_select)
     local octave = 2

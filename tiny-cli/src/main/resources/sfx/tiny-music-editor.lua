@@ -6,6 +6,7 @@ local icons = require("widgets.icons")
 local all_widgets = {}
 local modals_by_name = {}
 local speaker_widgets = {}
+local fader_widgets = {}
 local overlay_widget = nil
 
 local save_state = nil
@@ -164,7 +165,7 @@ local function sync_ui(refs)
         refs.drum_volume_fader.value = config.drum_volume
     end
     if refs.speed_fader then
-        refs.speed_fader.value = (config.bpm - 60) / 200
+        refs.speed_fader.value = (config.bpm - 60) / 240
     end
 end
 
@@ -234,7 +235,7 @@ local function _init_music_generator(widget_entities)
     if lead_volume_fader then lead_volume_fader.value = config.lead_volume end
     if drum_volume_fader then drum_volume_fader.value = config.drum_volume end
     if master_volume_fader then master_volume_fader.value = 1.0 end
-    if speed_fader then speed_fader.value = (config.bpm - 60) / 200 end
+    if speed_fader then speed_fader.value = (config.bpm - 60) / 240 end
 
     -- Instrument dropdown callbacks
     if chord_inst_dd then
@@ -294,10 +295,10 @@ local function _init_music_generator(widget_entities)
         end
     end
 
-    -- Speed fader: control BPM (60-260)
+    -- Speed fader: control BPM (60-300)
     if speed_fader then
         speed_fader.on_change = function(self)
-            config.bpm = math.floor(60 + self.value * 200)
+            config.bpm = math.floor(60 + self.value * 240)
             apply_config_to_seq()
         end
     end
@@ -376,6 +377,7 @@ function _init_fader(entities)
     for f in all(entities["Fader"]) do
         local fader = widgets:create_fader(f)
         table.insert(all_widgets, fader)
+        table.insert(fader_widgets, fader)
     end
 end
 
@@ -386,10 +388,36 @@ function _init_counter(entities)
     end
 end
 
+function _init_label(entities)
+    for l in all(entities["Label"] or {}) do
+        local label = widgets:create_label(l)
+        table.insert(all_widgets, label)
+    end
+end
+
+local function format_fader_value(value)
+    return tostring(math.floor((value or 0) * 100)) .. "%"
+end
+
+local function wire_fader_labels()
+    for f in all(fader_widgets) do
+        local label_ref = f.fields and f.fields.Label
+        if label_ref then
+            local label = wire.find_widget(all_widgets, label_ref)
+            if label then
+                wire.sync(f, "value", label, "text", function(_, _, value)
+                    return format_fader_value(value)
+                end)
+            end
+        end
+    end
+end
+
 function _init()
     all_widgets = {}
     modals_by_name = {}
     speaker_widgets = {}
+    fader_widgets = {}
     overlay_widget = nil
     save_state = nil
     save_button_ref = nil
@@ -440,6 +468,7 @@ function _init()
 
     _init_fader(widget_entities)
     _init_counter(widget_entities)
+    _init_label(widget_entities)
 
     -- Switch toggles to the tracker editor (same behaviour as TAB).
     for s in all(widget_entities["Switch"]) do
@@ -457,6 +486,10 @@ function _init()
 
     -- Wire music generator widgets
     _init_music_generator(widget_entities)
+
+    -- Wire fader labels after music generator sets fader on_change handlers,
+    -- so wire.listen wraps (rather than is overwritten by) those handlers.
+    wire_fader_labels()
 
     save_state = EditorBase.init_save_reminder(all_widgets, save_button_ref, modals_by_name)
 end
