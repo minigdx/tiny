@@ -45,6 +45,9 @@ local note_colors = { 11, 4, 6, 9, 3, 7, 8 } -- A=11, B=4, C=6, D=9, E=3, F=7, G
 -- Spots: note, accidental, octave, volume, duration
 local spot_offsets = { 3, 10, 16, 24, 32 }
 local spot_widths = { 7, 6, 6, 7, 13 }
+local spot_legends = { "Note", "Accident", "Octave", "Volume", "Duration" }
+-- Note and accident text colors vary per note, so they fall back to white.
+local spot_legend_colors = { 10, 10, 10, 7, 6 }
 
 -- Piano keyboard mapping (QWERTY layout)
 local piano_map = {
@@ -579,7 +582,28 @@ Tracker._draw = function(self)
         end
     end
 
+    self:_draw_legend()
+
     text.font()
+end
+
+-- Verticals shorten left-to-right so horizontals never cross another vertical.
+Tracker._draw_legend = function(self)
+    local col1_x = self.col_positions[1]
+    local y_bottom = self.y + self.height
+    local first_drop = 3
+    local row_h = 7
+
+    for i = 1, 5 do
+        local x_spot = col1_x + spot_offsets[i] + math.floor(spot_widths[i] / 2)
+        local x_label = col1_x + spot_offsets[i] + spot_widths[i] + 2
+        local y_turn = y_bottom + first_drop + (5 - i) * row_h
+        local color = spot_legend_colors[i]
+
+        shape.line(x_spot, y_bottom, x_spot, y_turn, color)
+        shape.line(x_spot, y_turn, x_label - 1, y_turn, color)
+        text.print(spot_legends[i], x_label, y_turn - 3, color)
+    end
 end
 
 Tracker.build_note_name = build_note_name

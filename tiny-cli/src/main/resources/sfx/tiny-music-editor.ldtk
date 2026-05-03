@@ -12023,19 +12023,19 @@
 						},
 						{
 							"__identifier": "Arrangement",
-							"__grid": [1,26],
+							"__grid": [18,25],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
 							"__smartColor": "#A22633",
 							"iid": "6f5424c0-21a0-11f1-be4f-e13032fa44f1",
-							"width": 264,
-							"height": 32,
+							"width": 128,
+							"height": 16,
 							"defUid": 111,
-							"px": [8,212],
+							"px": [144,204],
 							"fieldInstances": [],
-							"__worldX": 824,
-							"__worldY": 484
+							"__worldX": 960,
+							"__worldY": 476
 						},
 						{
 							"__identifier": "Counter",
