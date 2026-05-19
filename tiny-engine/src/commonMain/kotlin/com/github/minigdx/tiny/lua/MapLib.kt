@@ -35,9 +35,9 @@ import kotlin.math.floor
  * map.world("Another.ldtk") // load another world as current world
  * map.world() // return the actual world identifier (index)
  * map.world(2)
- * map.level("AnotherLevel") // load another level from the current world
- * map.level() // return the actual level identifier (index)
- * map.level(3)
+ * map.level("AnotherLevel") // load another level from the current world by identifier
+ * map.level() // return the current level data as a table {index, identifier, iid, x, y, width, height, fields}
+ * map.level(3) // load another level by index
  *
  * map.properties -> {
  *      worldIdentifier: ...
@@ -85,49 +85,63 @@ class MapLib(
         return map
     }
 
-    @TinyFunction("Set the current level to use.")
+    @TinyFunction("Get or set the current level to use.")
     inner class level : LibFunction() {
-        @TinyCall("Return the index of the current level.")
+        @TinyCall(
+            "Return the current level data as a table " +
+                "(index, identifier, iid, x, y, width, height, fields) " +
+                "or NIL if no level is currently loaded.",
+        )
         override fun call(): LuaValue {
-            return LuaValue.valueOf(currentLevel)
+            val world = resourceAccess.findLevel(currentWorld) ?: return NIL
+            val level = world.ldtk.levels.getOrNull(currentLevel) ?: return NIL
+            return level.toLua(currentLevel)
         }
 
         @TinyCall(
             "Set the current level to use. " +
-                "The level can be an index, the name or the id defined by LDTK. " +
-                "Return the previous index level or NIL if the new level is invalid.",
+                "The level can be an index (0-based), the identifier or the iid defined by LDTK. " +
+                "A level table previously returned by `map.level()` is also accepted. " +
+                "Return the previous level data as a table, or NIL if the new level is invalid.",
         )
         override fun call(
             @TinyArg("level", type = LuaType.ANY) a: LuaValue,
         ): LuaValue {
-            // The parameter is an index. Let's check if the index is valid.
-            if (a.isint()) {
-                val index = a.checkint()
-                val world = resourceAccess.findLevel(currentWorld) ?: return NIL
-                if (index in (0..world.ldtk.levels.size)) {
-                    val previous = valueOf(currentLevel)
-                    currentLevel = index
-                    return previous
-                } else {
-                    return NIL
-                }
-            } else {
-                val id = a.tojstring() // can be an identifier of an uuid
-                val world = resourceAccess.findLevel(currentWorld) ?: return NIL
-                val index = world
-                    .ldtk
-                    .levels
-                    // Try to find the first level that match the id or the identifier
-                    .indexOfFirst { level -> level.iid == id || level.identifier == id }
+            val world = resourceAccess.findLevel(currentWorld) ?: return NIL
+            val levels = world.ldtk.levels
 
-                if (index != -1) {
-                    val previous = valueOf(currentLevel)
-                    currentLevel = index
-                    return previous
-                } else {
-                    return NIL
+            val newIndex: Int =
+                when {
+                    a.isint() -> {
+                        val index = a.checkint()
+                        if (index in levels.indices) index else return NIL
+                    }
+                    a.istable() -> {
+                        val iid = a["iid"]
+                        val identifier = a["identifier"]
+                        val tableIndex = a["index"]
+                        val matched =
+                            when {
+                                !iid.isnil() ->
+                                    levels.indexOfFirst { level -> level.iid == iid.tojstring() }
+                                !identifier.isnil() ->
+                                    levels.indexOfFirst { level -> level.identifier == identifier.tojstring() }
+                                tableIndex.isint() ->
+                                    tableIndex.checkint().takeIf { it in levels.indices } ?: -1
+                                else -> -1
+                            }
+                        if (matched != -1) matched else return NIL
+                    }
+                    else -> {
+                        val id = a.tojstring()
+                        levels.indexOfFirst { level -> level.iid == id || level.identifier == id }
+                            .takeIf { it != -1 } ?: return NIL
+                    }
                 }
-            }
+
+            val previous = levels.getOrNull(currentLevel)?.toLua(currentLevel) ?: NIL
+            currentLevel = newIndex
+            return previous
         }
     }
 
@@ -393,29 +407,7 @@ entity.fields -- access custom field of the entity
             return table
         }
 
-        private fun toLua(field: CustomField): List<LuaValue> {
-            fun toLua(value: Any?): LuaValue {
-                return when (value) {
-                    is Int -> valueOf(value)
-                    is Float -> valueOf(value.toDouble())
-                    is String -> valueOf(value)
-                    is Boolean -> valueOf(value)
-                    is EntityRef -> value.toLua()
-                    is GridPoint -> value.toLua()
-                    is TilesetRect -> value.toLua()
-                    is List<*> -> LuaValue.listOf(value.map { toLua(it) }.toTypedArray())
-                    null -> NIL
-                    else -> throw IllegalArgumentException(
-                        "Field of type ${value::class} cannot be converted to LuaValue. " +
-                            "It's a missing feature: the game engine needs to be updated.",
-                    )
-                }
-            }
-            return listOf(
-                LuaValue.valueOf(field.__identifier),
-                toLua(field.__value),
-            )
-        }
+        private fun toLua(field: CustomField): List<LuaValue> = customFieldToLua(field)
     }
 
     private fun isActiveLayer(index: Int): Boolean {
@@ -527,6 +519,46 @@ entity.fields -- access custom field of the entity
             flipX,
             flipY,
         )
+    }
+
+    private fun Level.toLua(index: Int): LuaTable {
+        val result = LuaTable()
+        result["index"] = valueOf(index)
+        result["identifier"] = valueOf(identifier)
+        result["iid"] = valueOf(iid)
+        result["x"] = valueOf(worldX)
+        result["y"] = valueOf(worldY)
+        result["width"] = valueOf(pxWid)
+        result["height"] = valueOf(pxHei)
+        result["fields"] = LuaValue.tableOf(
+            fieldInstances.flatMap { field -> customFieldToLua(field) }.toTypedArray(),
+        )
+        return result
+    }
+
+    private fun customFieldToLua(field: CustomField): List<LuaValue> {
+        return listOf(
+            LuaValue.valueOf(field.__identifier),
+            customFieldValueToLua(field.__value),
+        )
+    }
+
+    private fun customFieldValueToLua(value: Any?): LuaValue {
+        return when (value) {
+            is Int -> valueOf(value)
+            is Float -> valueOf(value.toDouble())
+            is String -> valueOf(value)
+            is Boolean -> valueOf(value)
+            is EntityRef -> value.toLua()
+            is GridPoint -> value.toLua()
+            is TilesetRect -> value.toLua()
+            is List<*> -> LuaValue.listOf(value.map { customFieldValueToLua(it) }.toTypedArray())
+            null -> NIL
+            else -> throw IllegalArgumentException(
+                "Field of type ${value::class} cannot be converted to LuaValue. " +
+                    "It's a missing feature: the game engine needs to be updated.",
+            )
+        }
     }
 
     private fun EntityRef.toLua(): LuaTable {

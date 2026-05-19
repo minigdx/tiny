@@ -104,6 +104,14 @@ data class Level(
     val iid: StrIID,
     val worldX: Int,
     val worldY: Int,
+    /**
+     * Width of the level in pixels.
+     */
+    val pxWid: PixelInt,
+    /**
+     * Height of the level in pixels.
+     */
+    val pxHei: PixelInt,
     val layerInstances: List<Layer>,
     /**
      * 	An array of all custom fields and their values.
