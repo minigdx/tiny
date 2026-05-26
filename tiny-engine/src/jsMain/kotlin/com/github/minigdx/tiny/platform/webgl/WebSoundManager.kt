@@ -26,7 +26,10 @@ import kotlin.math.pow
 class WebSoundManager : SoundManager() {
     lateinit var audioContext: AudioContext
 
-    var ready: Boolean = false
+    // True once the AudioWorklet module is loaded. Only gates noteOn/noteOff,
+    // which actually need the worklet node. SFX playback via playChunkGenerator
+    // uses regular AudioBufferSource nodes and does not depend on this flag.
+    var workletReady: Boolean = false
 
     private var nextStartTime: Double = 0.0
 
@@ -42,15 +45,19 @@ class WebSoundManager : SoundManager() {
             if (audioContext.state != AudioContextState.running) {
                 audioContext.resumeAsync()
             }
-            // Note: ready flag is set in initializeAudioWorklet() after audioWorkletNode is initialized
         }
+        // Start loading the AudioWorklet immediately. addModule() works on a suspended
+        // AudioContext, so by the time the user interacts (required by browser autoplay
+        // policy before any sound can play) the worklet is most likely already loaded.
+        // Without this, Firefox and Safari hit a race where the first sound.sfx call
+        // right after the first input lands before addModule resolves.
+        initializeAudioWorklet()
+
+        // Resume the AudioContext on the first user interaction (browser autoplay policy).
         if (audioContext.state != AudioContextState.running) {
             inputHandler.onFirstUserInteraction {
                 audioContext.resumeAsync()
-                initializeAudioWorklet()
             }
-        } else {
-            initializeAudioWorklet()
         }
     }
 
@@ -61,11 +68,11 @@ class WebSoundManager : SoundManager() {
 
         soundContext.launch {
             // Load the bundled worklet from Vite assets
-            val result = audioContext.audioWorklet.addModule(SynthesizerAudioWorklet)
+            audioContext.audioWorklet.addModule(SynthesizerAudioWorklet)
             audioWorkletNode = AudioWorkletNode(audioContext, AudioWorkletProcessorName("SynthesizerProcessor"))
             val destinationNode = audioContext.destination
             audioWorkletNode.connect(destinationNode)
-            ready = true
+            workletReady = true
         }
     }
 
@@ -73,7 +80,7 @@ class WebSoundManager : SoundManager() {
         note: Note,
         instrument: Instrument,
     ) {
-        if (!ready) return
+        if (!workletReady) return
 
         // Get or create instrument player for this note
         val instrumentPlayer = InstrumentPlayer(instrument)
@@ -104,7 +111,7 @@ class WebSoundManager : SoundManager() {
     }
 
     override fun noteOff(note: Note) {
-        if (!ready) return
+        if (!workletReady) return
 
         // Find the instrument player for this note
         instrumentPlayers.forEach { it.noteOff(note) }
@@ -126,7 +133,7 @@ class WebSoundManager : SoundManager() {
      * @param chunkGenerator The generator containing the audio sample data
      * @param loop Whether to loop the audio playback
      * @return AudioBufferSourceNode that can be used to control playback (e.g., stop())
-     * @throws IllegalStateException if the AudioContext is not ready
+     * @throws IllegalStateException if the AudioContext has not been initialized yet
      * @throws IllegalArgumentException if the ChunkGenerator produces no audio data
      */
     fun playChunkGenerator(
@@ -134,8 +141,14 @@ class WebSoundManager : SoundManager() {
         loop: Boolean = false,
         loopStartSample: Int = 0,
     ): web.audio.AudioBufferSourceNode {
-        if (!ready) {
-            throw IllegalStateException("AudioContext is not ready")
+        if (!::audioContext.isInitialized) {
+            throw IllegalStateException("AudioContext is not initialized")
+        }
+        // If the AudioContext is still suspended (e.g. autoplay policy not yet satisfied),
+        // try to resume it. A buffer source started on a suspended context will start
+        // playing as soon as the context becomes running.
+        if (audioContext.state != AudioContextState.running) {
+            audioContext.resumeAsync()
         }
 
         // Extract all audio data from the chunk generator
