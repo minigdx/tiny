@@ -33,6 +33,11 @@ class JsInputHandler(
         canvas.addEventListener("mousemove", ::mouseMove, false)
         canvas.addEventListener("mouseleave", ::mouseLeave, false)
         canvas.addEventListener("mouseenter", ::mouseEnter, false)
+        canvas.addEventListener("contextmenu", ::contextMenu, false)
+    }
+
+    private fun contextMenu(event: Event) {
+        event.preventDefault()
     }
 
     private val flagMouse1: Short = 0x1
