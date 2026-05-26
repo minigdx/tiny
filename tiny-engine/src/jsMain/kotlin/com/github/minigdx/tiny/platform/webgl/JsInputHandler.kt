@@ -40,9 +40,10 @@ class JsInputHandler(
         event.preventDefault()
     }
 
+    // MouseEvent.buttons bitmask: 0x1 = left, 0x2 = right, 0x4 = middle.
     private val flagMouse1: Short = 0x1
-    private val flagMouse2: Short = 0x10
-    private val flagMouse3: Short = 0x100
+    private val flagMouse2: Short = 0x2
+    private val flagMouse3: Short = 0x4
     private val flags = arrayOf(flagMouse1, flagMouse2, flagMouse3)
     private val touchSignals =
         arrayListOf(
