@@ -38,6 +38,17 @@ interface Platform {
     fun gameLoop(gameLoop: GameLoop)
 
     /**
+     * Toggle the game between fullscreen and its initial windowed form.
+     */
+    fun toggleFullscreen() = Unit
+
+    /**
+     * Force the game into fullscreen ([fullscreen] true) or back to its
+     * initial windowed form ([fullscreen] false).
+     */
+    fun setFullscreen(fullscreen: Boolean) = Unit
+
+    /**
      * Save the last 30 seconds of the game.
      */
     fun record() = Unit

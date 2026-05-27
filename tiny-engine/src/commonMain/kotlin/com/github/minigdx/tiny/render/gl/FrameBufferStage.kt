@@ -12,6 +12,8 @@ import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.render.shader.FragmentShader
 import com.github.minigdx.tiny.render.shader.ShaderProgram
 import com.github.minigdx.tiny.render.shader.VertexShader
+import kotlin.math.min
+import kotlin.math.roundToInt
 
 class FrameBufferStage(
     gl: Kgl,
@@ -60,11 +62,27 @@ class FrameBufferStage(
         program.use()
         program.bindFramebuffer(GL_FRAMEBUFFER, null)
 
+        // Scale the game uniformly to fit the framebuffer while keeping its
+        // aspect ratio, then center it so the unused space is letterboxed.
+        // Matches the windowed zoom exactly and gracefully handles fullscreen.
+        val gutterWidth = gameOptions.gutter.first
+        val gutterHeight = gameOptions.gutter.second
+        val logicalWidth = gameOptions.width + gutterWidth * 2
+        val logicalHeight = gameOptions.height + gutterHeight * 2
+
+        val scale = min(
+            windowManager.screenWidth.toFloat() / logicalWidth,
+            windowManager.screenHeight.toFloat() / logicalHeight,
+        )
+
+        val offsetX = (windowManager.screenWidth - logicalWidth * scale) / 2f
+        val offsetY = (windowManager.screenHeight - logicalHeight * scale) / 2f
+
         program.viewport(
-            gameOptions.gutter.first * gameOptions.zoom * windowManager.ratioWidth,
-            gameOptions.gutter.second * gameOptions.zoom * windowManager.ratioHeight,
-            gameOptions.width * gameOptions.zoom * windowManager.ratioWidth,
-            gameOptions.height * gameOptions.zoom * windowManager.ratioHeight,
+            (offsetX + gutterWidth * scale).roundToInt(),
+            (offsetY + gutterHeight * scale).roundToInt(),
+            (gameOptions.width * scale).roundToInt(),
+            (gameOptions.height * scale).roundToInt(),
         )
 
         program.clearColor(0f, 0f, 0f, 1.0f)

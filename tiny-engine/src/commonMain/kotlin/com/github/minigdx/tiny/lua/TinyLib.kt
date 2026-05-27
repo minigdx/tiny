@@ -8,6 +8,7 @@ import com.github.mingdx.tiny.doc.TinyLib
 import com.github.mingdx.tiny.doc.TinyVariable
 import com.github.minigdx.tiny.engine.Exit
 import com.github.minigdx.tiny.engine.GameOptions
+import com.github.minigdx.tiny.platform.Platform
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.OneArgFunction
@@ -27,6 +28,7 @@ internal expect fun platformValue(): Int
 class TinyLib(
     private val gameScript: List<String>,
     private val gameOptions: GameOptions,
+    private val platform: Platform,
 ) : TwoArgFunction() {
     private var time: Double = 0.0
     private var frame: Int = 0
@@ -63,6 +65,7 @@ class TinyLib(
         tiny["height"] = valueOf(gameOptions.height)
         tiny["platform"] = valueOf(platformType)
         tiny["exit"] = exit()
+        tiny["fullscreen"] = fullscreen()
         arg2["tiny"] = tiny
         arg2["package"]["loaded"]["tiny"] = tiny
         return tiny
@@ -86,6 +89,29 @@ class TinyLib(
                 val index = gameScript.indexOfFirst { it == scriptName }
                 throw Exit(index)
             }
+        }
+    }
+
+    @TinyFunction(
+        "Switch the game between fullscreen and windowed mode. " +
+            "Called without argument, it toggles the current mode. " +
+            "Called with a boolean, it forces fullscreen (`true`) or windowed (`false`).",
+        example = FULLSCREEN_EXAMPLE
+    )
+    internal inner class fullscreen : OneArgFunction() {
+        @TinyCall("Toggle between fullscreen and windowed mode.")
+        override fun call(): LuaValue = call(NIL)
+
+        @TinyCall("Force fullscreen mode when `enabled` is true, windowed mode otherwise.")
+        override fun call(
+            @TinyArg("enabled", type = LuaType.BOOLEAN) arg: LuaValue,
+        ): LuaValue {
+            if (arg.isnil()) {
+                platform.toggleFullscreen()
+            } else {
+                platform.setFullscreen(arg.toboolean())
+            }
+            return NIL
         }
     }
 }

@@ -83,6 +83,14 @@ class GlfwPlatform(
 
     private var window: Long = 0
 
+    private var fullscreen: Boolean = false
+
+    // Windowed geometry saved before switching to fullscreen, restored when leaving it.
+    private var windowedX: Int = 0
+    private var windowedY: Int = 0
+    private var windowedWidth: Int = 0
+    private var windowedHeight: Int = 0
+
     private lateinit var windowManager: WindowManager
 
     private var lastFrame: Long = getTime()
@@ -244,6 +252,60 @@ class GlfwPlatform(
 
     override fun endGameLoop() {
         GLFW.glfwSetWindowShouldClose(window, true)
+    }
+
+    override fun toggleFullscreen() {
+        setFullscreen(!fullscreen)
+    }
+
+    override fun setFullscreen(fullscreen: Boolean) {
+        if (fullscreen == this.fullscreen) {
+            return
+        }
+        if (fullscreen) {
+            // Save the windowed geometry so it can be restored later.
+            val x = MemoryUtil.memAllocInt(1)
+            val y = MemoryUtil.memAllocInt(1)
+            val w = MemoryUtil.memAllocInt(1)
+            val h = MemoryUtil.memAllocInt(1)
+            GLFW.glfwGetWindowPos(window, x, y)
+            GLFW.glfwGetWindowSize(window, w, h)
+            windowedX = x.get()
+            windowedY = y.get()
+            windowedWidth = w.get()
+            windowedHeight = h.get()
+            MemoryUtil.memFree(x)
+            MemoryUtil.memFree(y)
+            MemoryUtil.memFree(w)
+            MemoryUtil.memFree(h)
+
+            val monitor = GLFW.glfwGetPrimaryMonitor()
+            val vidmode = GLFW.glfwGetVideoMode(monitor)
+                ?: throw IllegalStateException("No primary monitor found")
+            GLFW.glfwSetWindowMonitor(
+                window,
+                monitor,
+                0,
+                0,
+                vidmode.width(),
+                vidmode.height(),
+                vidmode.refreshRate(),
+            )
+            this.fullscreen = true
+        } else {
+            GLFW.glfwSetWindowMonitor(
+                window,
+                MemoryUtil.NULL,
+                windowedX,
+                windowedY,
+                windowedWidth,
+                windowedHeight,
+                GLFW.GLFW_DONT_CARE,
+            )
+            this.fullscreen = false
+        }
+        // V-sync is reset when the window's monitor changes.
+        GLFW.glfwSwapInterval(1)
     }
 
     override fun clearRecordingCache() {

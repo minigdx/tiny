@@ -27,14 +27,9 @@ class WindowManager(
     var screenHeight: Int = screenHeight
         private set
 
-    var ratioWidth: Int = screenWidth / windowWidth
-        private set
-
-    var ratioHeight: Int = screenHeight / windowHeight
-        private set
-
     /**
-     * Update screen dimensions when DPI changes (e.g., moving between Retina and standard displays).
+     * Update screen dimensions when the framebuffer size changes
+     * (DPI changes, window resize, or entering/leaving fullscreen).
      */
     fun updateScreenDimensions(
         newWidth: Int,
@@ -42,7 +37,5 @@ class WindowManager(
     ) {
         screenWidth = newWidth
         screenHeight = newHeight
-        ratioWidth = newWidth / windowWidth
-        ratioHeight = newHeight / windowHeight
     }
 }

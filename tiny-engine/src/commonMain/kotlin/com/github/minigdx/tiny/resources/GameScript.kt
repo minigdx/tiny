@@ -74,7 +74,7 @@ class GameScript(
 
     var globals: Globals? = null
 
-    private val tinyLib: TinyLib = TinyLib(gameOptions.gameScripts, gameOptions)
+    private val tinyLib: TinyLib = TinyLib(gameOptions.gameScripts, gameOptions, platform)
 
     class State(val args: LuaValue)
 

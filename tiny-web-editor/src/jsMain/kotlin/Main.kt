@@ -476,6 +476,10 @@ class EditorWebGlPlatform(val delegate: Platform) : Platform {
 
     override fun gameLoop(gameLoop: GameLoop) = delegate.gameLoop(gameLoop)
 
+    override fun toggleFullscreen() = delegate.toggleFullscreen()
+
+    override fun setFullscreen(fullscreen: Boolean) = delegate.setFullscreen(fullscreen)
+
     override fun writeImage(buffer: ByteArray) {
         TODO("Not yet implemented")
     }

@@ -17,6 +17,7 @@ import com.github.minigdx.tiny.platform.SoundData
 import com.github.minigdx.tiny.platform.WindowManager
 import com.github.minigdx.tiny.platform.performance.PerformanceMonitor
 import com.github.minigdx.tiny.sound.SoundManager
+import kotlinx.browser.document
 import kotlinx.browser.localStorage
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineDispatcher
@@ -72,6 +73,27 @@ class WebGlPlatform(
             gameLoop.draw()
 
             gameLoop(gameLoop)
+        }
+    }
+
+    // requestFullscreen / exitFullscreen and fullscreenElement are not part of
+    // Kotlin's default org.w3c.dom externals, so they go through dynamic interop.
+    private fun isFullscreen(): Boolean = document.asDynamic().fullscreenElement != null
+
+    override fun toggleFullscreen() {
+        setFullscreen(!isFullscreen())
+    }
+
+    override fun setFullscreen(fullscreen: Boolean) {
+        if (fullscreen == isFullscreen()) {
+            return
+        }
+        if (fullscreen) {
+            // Letterbox the fixed-resolution canvas to preserve its aspect ratio.
+            canvas.style.setProperty("object-fit", "contain")
+            canvas.asDynamic().requestFullscreen()
+        } else {
+            document.asDynamic().exitFullscreen()
         }
     }
 
