@@ -60,10 +60,12 @@ class KeysLib : TwoArgFunction() {
         arg2: LuaValue,
     ): LuaValue {
         val keys = LuaTable()
-        // chars
+        // chars (lower and upper case)
         ('a'..'z').forEach { char ->
             val index = char - 'a'
-            keys[char.toString()] = LuaInteger.valueOf(Key.A.ordinal + index)
+            val value = LuaInteger.valueOf(Key.A.ordinal + index)
+            keys[char.toString()] = value
+            keys[char.uppercaseChar().toString()] = value
         }
 
         // numbers
@@ -72,20 +74,26 @@ class KeysLib : TwoArgFunction() {
             keys[char.toString()] = LuaInteger.valueOf(Key.NUM0.ordinal + index)
         }
 
-        // arrows
-        keys["up"] = LuaInteger.valueOf(Key.ARROW_UP.ordinal)
-        keys["down"] = LuaInteger.valueOf(Key.ARROW_DOWN.ordinal)
-        keys["right"] = LuaInteger.valueOf(Key.ARROW_RIGHT.ordinal)
-        keys["left"] = LuaInteger.valueOf(Key.ARROW_LEFT.ordinal)
+        fun register(name: String, key: Key) {
+            val value = LuaInteger.valueOf(key.ordinal)
+            keys[name] = value
+            keys[name.uppercase()] = value
+        }
 
-        keys["space"] = LuaInteger.valueOf(Key.SPACE.ordinal)
-        keys["enter"] = LuaInteger.valueOf(Key.ENTER.ordinal)
-        keys["shift"] = LuaInteger.valueOf(Key.SHIFT.ordinal)
-        keys["ctrl"] = LuaInteger.valueOf(Key.CTRL.ordinal)
-        keys["alt"] = LuaInteger.valueOf(Key.ALT.ordinal)
-        keys["delete"] = LuaInteger.valueOf(Key.BACKSPACE.ordinal)
-        keys["tab"] = LuaInteger.valueOf(Key.TAB.ordinal)
-        keys["escape"] = LuaInteger.valueOf(Key.ESCAPE.ordinal)
+        // arrows
+        register("up", Key.ARROW_UP)
+        register("down", Key.ARROW_DOWN)
+        register("right", Key.ARROW_RIGHT)
+        register("left", Key.ARROW_LEFT)
+
+        register("space", Key.SPACE)
+        register("enter", Key.ENTER)
+        register("shift", Key.SHIFT)
+        register("ctrl", Key.CTRL)
+        register("alt", Key.ALT)
+        register("delete", Key.BACKSPACE)
+        register("tab", Key.TAB)
+        register("escape", Key.ESCAPE)
 
         arg2["keys"] = keys
         arg2["package"]["loaded"]["keys"] = keys

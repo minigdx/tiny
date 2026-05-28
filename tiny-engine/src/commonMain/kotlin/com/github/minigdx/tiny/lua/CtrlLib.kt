@@ -124,7 +124,7 @@ class CtrlLib(
         override fun call(
             @TinyArg("key", type = LuaType.NUMBER) arg: LuaValue,
         ): LuaValue {
-            val values = Key.values()
+            val values = Key.entries.toTypedArray()
             val int = arg.checkint()
             if (int >= values.size || int < 0) return BFALSE
             // get the key by its ordinal.
@@ -149,11 +149,11 @@ class CtrlLib(
         override fun call(
             @TinyArg("touch", type = LuaType.NUMBER) arg: LuaValue,
         ): LuaValue {
-            val values = TouchSignal.values()
+            val values = TouchSignal.entries.toTypedArray()
             val int = arg.checkint()
             if (int >= values.size || int < 0) return BFALSE
             // get the key by its ordinal.
-            val touchSignal = TouchSignal.values()[int]
+            val touchSignal = TouchSignal.entries[int]
             val touched = inputHandler.isJustTouched(touchSignal)
 
             val coordinates =

@@ -91,7 +91,7 @@ class ExportCommand : CliktCommand(name = "export") {
         echo("\uD83D\uDDA5\uFE0F Exporting for desktop platform...")
 
         val configFile = gameDirectory.resolve("_tiny.json")
-        val gameParameters = Json.decodeFromStream<GameParameters>(FileInputStream(configFile))
+        val gameParameters = GameParameters.read(FileInputStream(configFile))
         val finalAppName = appName ?: gameParameters.name
 
         if (includeJdk && !isJpackageAvailable()) {
@@ -652,7 +652,7 @@ class GameExporter {
 
                 // Add game icon to the export
                 val iconFileName = gameParameters.icon
-                val iconList = if (iconFileName != null) {
+                if (iconFileName != null) {
                     val iconFile = safeResolve(gameDirectory, iconFileName)
                     if (iconFile.exists() && !exportedFile.contains(iconFileName)) {
                         exportedGame.putNextEntry(ZipEntry(iconFileName))
