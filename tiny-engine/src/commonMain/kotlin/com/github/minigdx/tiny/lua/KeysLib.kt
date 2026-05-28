@@ -74,7 +74,10 @@ class KeysLib : TwoArgFunction() {
             keys[char.toString()] = LuaInteger.valueOf(Key.NUM0.ordinal + index)
         }
 
-        fun register(name: String, key: Key) {
+        fun register(
+            name: String,
+            key: Key,
+        ) {
             val value = LuaInteger.valueOf(key.ordinal)
             keys[name] = value
             keys[name.uppercase()] = value

@@ -96,7 +96,7 @@ class TinyLib(
         "Switch the game between fullscreen and windowed mode. " +
             "Called without argument, it toggles the current mode. " +
             "Called with a boolean, it forces fullscreen (`true`) or windowed (`false`).",
-        example = FULLSCREEN_EXAMPLE
+        example = FULLSCREEN_EXAMPLE,
     )
     internal inner class fullscreen : OneArgFunction() {
         @TinyCall("Toggle between fullscreen and windowed mode.")
